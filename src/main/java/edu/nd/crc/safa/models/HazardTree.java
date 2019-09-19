@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.models;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
+// import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -12,7 +12,7 @@ public class HazardTree {
 	@Id @GeneratedValue private Long id;
 
 	private String name;
-	private JSONPObject structure;
+	private String structure;
 
 	public String getName() {
 		return name;
@@ -22,11 +22,11 @@ public class HazardTree {
 		this.name = name;
 	}
 
-	public JSONPObject getStructure() {
+	public String getStructure() {
 		return structure;
 	}
 
-	public void setLastName(JSONPObject structure) {
+	public void setStructure(String structure) {
 		this.structure = structure;
 	}
 }

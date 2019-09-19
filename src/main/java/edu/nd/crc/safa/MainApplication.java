@@ -2,11 +2,11 @@ package edu.nd.crc.safa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-// import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-// @ComponentScan(basePackages = { "edu.nd.crc.safa"})
+@ComponentScan(basePackages = { "edu.nd.crc.safa", "edu.nd.crc.safa.models"})
 @EnableTransactionManagement
 @EnableNeo4jRepositories
 @SpringBootApplication

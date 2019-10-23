@@ -29,6 +29,6 @@ dependencies {
     compile("io.github.lukehutch:fast-classpath-scanner:3.1.13")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-rest")
-    compile("org.springframework.data:spring-data-neo4j:5.2.0.RELEASE")
+    compile("org.neo4j.driver:neo4j-java-driver:1.7.5")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }

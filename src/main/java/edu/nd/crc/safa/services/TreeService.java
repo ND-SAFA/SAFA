@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.neo4j.driver.internal.value.ListValue;
-import org.neo4j.driver.internal.value.NodeValue;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
-import org.neo4j.driver.v1.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,23 +172,11 @@ public class TreeService {
     for(int i = 0; i < records.size(); i++) {
       Record rec = records.get(i);
       if (values.isEmpty()) {
-        Node root = (Node)rec.get("root").asObject();
-        Map<String, Object> mapping = new HashMap<String, Object>(root.asMap());
-        mapping.put("classes", "node");
-        values.add(mapping);
-        ids.put(root.id(), root.get("id").asString());
+        addNode(rec.get("root"), values, ids);
       }
-      {
 
-        Node node = (Node)rec.get("artifact").asObject();
-        String label = ((List<String>)node.labels()).get(0).toString();
-        Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-        mapping.put("classes", "node");
-        mapping.put("label", label);
-        values.add(mapping);
-        LOG.debug("[NODE " + node.id() + ":" + label + "] " + mapping);
-        ids.put(node.id(), node.get("id").asString());
-      }
+      addNode(rec.get("artifact"), values, ids);
+      
       {
         ListValue rels = (ListValue)rec.get("rel");
         rels.asObject().forEach(o -> {
@@ -207,8 +194,19 @@ public class TreeService {
     }
     return values;
   } 
+
+  private void addNode(Value rec, List<Map<String, Object>> values, Map<Long, String> ids) {
+    Node node = (Node)rec.asObject();
+    String label = ((List<String>)node.labels()).get(0).toString();
+    Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
+    mapping.put("classes", "node");
+    mapping.put("label", label);
+    values.add(mapping);
+    LOG.debug("[NODE " + node.id() + ":" + label + "] " + mapping);
+    ids.put(node.id(), node.get("id").asString());
+  }
   
-  public static <T> Collection<T>  
+  private static <T> Collection<T>  
                   getCollectionFromIterable(Iterable<T> itr) 
   { 
       // Create an empty Collection to hold the result 

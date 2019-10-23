@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.neo4j.driver.internal.value.ListValue;
+import org.neo4j.driver.internal.value.NodeValue;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
+import org.neo4j.driver.v1.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,11 +180,14 @@ public class TreeService {
         ids.put(root.id(), root.get("id").asString());
       }
       {
+
         Node node = (Node)rec.get("artifact").asObject();
+        String label = ((List<String>)node.labels()).get(0).toString();
         Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
         mapping.put("classes", "node");
+        mapping.put("label", label);
         values.add(mapping);
-        LOG.debug("[NODE " + node.id() +"] " + mapping);
+        LOG.debug("[NODE " + node.id() + ":" + label + "] " + mapping);
         ids.put(node.id(), node.get("id").asString());
       }
       {

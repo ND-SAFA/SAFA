@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +71,8 @@ public class TreeService {
   private List<Map<String, Object>> convertToEdgesNodes(StatementResult result) {
     List<Map<String, Object>> values = new ArrayList<>();
     Map<Long, String> ids = new HashMap<>();
+    Map<Long, Boolean> edges = new HashMap<>();
+
     List<Record> records = result.list();
     for(int i = 0; i < records.size(); i++) {
       Record rec = records.get(i);
@@ -85,14 +86,18 @@ public class TreeService {
         ListValue rels = (ListValue)rec.get("rel");
         rels.asObject().forEach(o -> {
           Relationship rel = (Relationship)o;
-          LOG.debug("[EDGE " + rel.id() + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
-          Map<String, Object> mapping = new HashMap<String, Object>(); 
-          mapping.put("classes", "edge");
-          mapping.put("id", rel.id());
-          mapping.put("type", rel.type());
-          mapping.put("source", ids.get(rel.startNodeId()));
-          mapping.put("target", ids.get(rel.endNodeId()));
-          values.add(mapping);
+          Long relId = rel.id();
+          if (!edges.containsKey(relId)) {
+            edges.put(relId, true);
+            LOG.debug("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
+            Map<String, Object> mapping = new HashMap<String, Object>(); 
+            mapping.put("classes", "edge");
+            mapping.put("id", relId);
+            mapping.put("type", rel.type());
+            mapping.put("source", ids.get(rel.startNodeId()));
+            mapping.put("target", ids.get(rel.endNodeId()));
+            values.add(mapping);
+          }
         });
       } 
     }

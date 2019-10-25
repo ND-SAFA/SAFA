@@ -26,7 +26,7 @@ curl -v -u neo4j:neo4j -X POST localhost:7474/user/neo4j/password -H "Content-ty
 ## Build and Run
 
 ```bash
-./gradlew clean build && java -jar build/libs/*jar
+./gradlew clean build && ./gradlew bootRun
 ```
 
 Should serve on localhost:8080

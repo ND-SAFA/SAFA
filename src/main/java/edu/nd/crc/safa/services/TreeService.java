@@ -38,9 +38,9 @@ public class TreeService {
 	@Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId, String root) {
     try ( Session session = driver.session() ) {
-      String query = String.format("MATCH path=(child {id: '%s'})-[*]->(:Hazard)\n", root) +
+      String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
                      "WITH path ORDER BY length(path) LIMIT 1\n" +
-                     "MATCH (root:Hazard {id: nodes(path)[1].id})<-[rel*]-(artifact)\n"+
+                     "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n"+
                      "RETURN root,rel,artifact";
       StatementResult result = session.run(query);
       return convertToEdgesNodes(result);
@@ -76,9 +76,9 @@ public class TreeService {
     List<Record> records = result.list();
     for(int i = 0; i < records.size(); i++) {
       Record rec = records.get(i);
-      if (values.isEmpty()) {
-        addNode(rec.get("root"), values, ids);
-      }
+      // if (values.isEmpty()) {
+      //   addNode(rec.get("root"), values, ids);
+      // }
 
       addNode(rec.get("artifact"), values, ids);
 

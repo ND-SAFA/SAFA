@@ -20,7 +20,6 @@ public class TreesController {
 	}
 
   @GetMapping("/projects/{id}/trees")
-  // @ResponseBody
   public List<Map<String, Object>> trees(@PathVariable String id, @RequestParam(value = "root", required = false) String root) {
     String projectId = id;
     if (root != null) {

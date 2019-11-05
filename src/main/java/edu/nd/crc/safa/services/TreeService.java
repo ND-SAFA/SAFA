@@ -28,20 +28,35 @@ public class TreeService {
 
   private final static Logger LOG = LoggerFactory.getLogger(TreeService.class);
 
-	public TreeService() {
+  public TreeService() {
   }
   
   public TreeService(Driver driver) {
     this.driver = driver;
   }
   
-	@Transactional(readOnly = true)
+  @Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId, String root) {
+    int version = 1;
     try ( Session session = driver.session() ) {
-      String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
-                     "WITH path ORDER BY length(path) LIMIT 1\n" +
-                     "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n"+
-                     "RETURN root,rel,artifact";
+      String query = "MATCH ()<-[r:UPDATE]-(o)\n" +
+        String.format("WHERE r.version <= %s\n", version) +
+        "WITH o, r AS rs ORDER BY r.version DESC\n" +
+        "WITH o, head(collect([rs,o])) AS removed\n" +
+        "WITH filter(c in collect(removed) WHERE c[0].type<>\"ADD\") as cRes\n" +
+        "WITH extract(c in cRes | c[1]) as excluded\n" +
+        // Find parent hazard
+      String.format("MATCH path=(child {id: '%s'})-[*0..]->(parent:Hazard)\n", root) +
+      "WITH excluded, path ORDER BY length(path) LIMIT 1\n" +
+      // Get parent hazard
+      "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n" +
+      // Remove nodes
+      "WHERE NOT any(e in excluded WHERE e IN nodes(p))\n" +
+      "RETURN root, rel, artifact";
+      // String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
+      //                "WITH path ORDER BY length(path) LIMIT 1\n" +
+      //                "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n"+
+      //                "RETURN root,rel,artifact";
       StatementResult result = session.run(query);
       return convertToEdgesNodes(result);
     }
@@ -49,22 +64,26 @@ public class TreeService {
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> hazards(String projectId) {
-    List<Map<String, Object>> values = new ArrayList<>();
+    // List<Map<String, Object>> values = new ArrayList<>();
     try ( Session session = driver.session() ) {
-      String query = "Match (h:Hazard) return h;";
+      String query = String.format("MATCH path=(child:Hazard)-[*0..]->(parent:Hazard)\n") +
+                     "WITH path ORDER BY length(path)\n" +
+                     "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact:Hazard)\n"+
+                     "RETURN root,rel,artifact";
       StatementResult result = session.run(query);
-      List<Record> records = result.list();
-      for(int i = 0; i < records.size(); i++) {
-        Record rec = records.get(i);
-        Node node = (Node)rec.get("h").asObject();
-        String label = node.labels().iterator().next();
-        Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-        mapping.put("classes", "node");
-        mapping.put("label", label);
-        values.add(mapping);
-        LOG.debug("[NODE " + node.id() +"] " + mapping);
-      }
-      return values;
+      return convertToEdgesNodes(result);
+      // List<Record> records = result.list();
+      // for(int i = 0; i < records.size(); i++) {
+      //   Record rec = records.get(i);
+      //   Node node = (Node)rec.get("h").asObject();
+      //   String label = node.labels().iterator().next();
+      //   Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
+      //   mapping.put("classes", "node");
+      //   mapping.put("label", label);
+      //   values.add(mapping);
+      //   LOG.debug("[NODE " + node.id() +"] " + mapping);
+      // }
+      // return values;
     }
   }
 

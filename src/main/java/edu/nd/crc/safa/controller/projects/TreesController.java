@@ -13,11 +13,11 @@ import edu.nd.crc.safa.services.TreeService;
 @RestController
 public class TreesController {
 
-	private final TreeService treeService;
-	
-	public TreesController(TreeService treeService) {
-		this.treeService = treeService;
-	}
+  private final TreeService treeService;
+
+  public TreesController(TreeService treeService) {
+    this.treeService = treeService;
+  }
 
   @GetMapping("/projects/{id}/trees")
   public List<Map<String, Object>> trees(@PathVariable String id, @RequestParam(value = "root", required = false) String root) {

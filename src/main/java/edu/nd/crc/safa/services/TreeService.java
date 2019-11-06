@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.neo4j.driver.internal.value.ListValue;
+import org.neo4j.driver.internal.value.NodeValue;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
@@ -46,13 +48,17 @@ public class TreeService {
         "WITH filter(c in collect(removed) WHERE c[0].type<>\"ADD\") as cRes\n" +
         "WITH extract(c in cRes | c[1]) as excluded\n" +
         // Find parent hazard
-      String.format("MATCH path=(child {id: '%s'})-[*0..]->(parent:Hazard)\n", root) +
-      "WITH excluded, path ORDER BY length(path) LIMIT 1\n" +
-      // Get parent hazard
-      "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n" +
-      // Remove nodes
-      "WHERE NOT any(e in excluded WHERE e IN nodes(p))\n" +
-      "RETURN root, rel, artifact";
+        String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
+        "WITH excluded, path ORDER BY length(path) LIMIT 1\n" +
+        // Get parent hazard
+        "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n" +
+        // Remove nodes
+        "WHERE NOT any(e in excluded WHERE e IN nodes(p))\n" +
+        "RETURN root, rel, artifact";
+      // String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
+      //                "WITH path ORDER BY length(path) LIMIT 1\n" +
+      //                "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[*0..]-(artifact) WITH *, relationships(p) as rel\n" +
+      //                "RETURN root,rel,artifact\n";
       // String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
       //                "WITH path ORDER BY length(path) LIMIT 1\n" +
       //                "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n"+
@@ -64,7 +70,6 @@ public class TreeService {
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> hazards(String projectId) {
-    // List<Map<String, Object>> values = new ArrayList<>();
     try ( Session session = driver.session() ) {
       String query = String.format("MATCH path=(child:Hazard)-[*0..]->(parent:Hazard)\n") +
                      "WITH path ORDER BY length(path)\n" +
@@ -72,18 +77,6 @@ public class TreeService {
                      "RETURN root,rel,artifact";
       StatementResult result = session.run(query);
       return convertToEdgesNodes(result);
-      // List<Record> records = result.list();
-      // for(int i = 0; i < records.size(); i++) {
-      //   Record rec = records.get(i);
-      //   Node node = (Node)rec.get("h").asObject();
-      //   String label = node.labels().iterator().next();
-      //   Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-      //   mapping.put("classes", "node");
-      //   mapping.put("label", label);
-      //   values.add(mapping);
-      //   LOG.debug("[NODE " + node.id() +"] " + mapping);
-      // }
-      // return values;
     }
   }
 
@@ -95,9 +88,6 @@ public class TreeService {
     List<Record> records = result.list();
     for(int i = 0; i < records.size(); i++) {
       Record rec = records.get(i);
-      // if (values.isEmpty()) {
-      //   addNode(rec.get("root"), values, ids);
-      // }
 
       addNode(rec.get("artifact"), values, ids);
 
@@ -108,7 +98,7 @@ public class TreeService {
           Long relId = rel.id();
           if (!edges.containsKey(relId)) {
             edges.put(relId, true);
-            LOG.debug("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
+            System.out.println("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
             Map<String, Object> mapping = new HashMap<String, Object>(); 
             mapping.put("classes", "edge");
             mapping.put("id", relId);
@@ -127,11 +117,17 @@ public class TreeService {
     Node node = (Node)rec.asObject();
     String label = ((List<String>)node.labels()).get(0).toString();
     Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
+    System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
+    if (node.get("id") == null || node.get("id").toString() == "NULL") {
+      String nodeId = UUID.randomUUID().toString();
+      mapping.put("id", nodeId);
+      ids.put(node.id(), nodeId);
+    } else {
+      ids.put(node.id(), node.get("id").asString());
+    }
     mapping.put("classes", "node");
     mapping.put("label", label);
     values.add(mapping);
-    LOG.debug("[NODE " + node.id() + ":" + label + "] " + mapping);
-    ids.put(node.id(), node.get("id").asString());
   }
   
   // private static <T> Collection<T>  

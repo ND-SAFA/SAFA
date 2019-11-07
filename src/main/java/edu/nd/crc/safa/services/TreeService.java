@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.neo4j.driver.internal.value.ListValue;
-import org.neo4j.driver.internal.value.NodeValue;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
 import org.slf4j.Logger;
@@ -45,24 +43,11 @@ public class TreeService {
         String.format("WHERE r.version <= %s\n", version) +
         "WITH o, r AS rs ORDER BY r.version DESC\n" +
         "WITH o, head(collect([rs,o])) AS removed\n" +
-        "WITH filter(c in collect(removed) WHERE c[0].type<>\"ADD\") as cRes\n" +
-        "WITH extract(c in cRes | c[1]) as excluded\n" +
-        // Find parent hazard
-        String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
-        "WITH excluded, path ORDER BY length(path) LIMIT 1\n" +
-        // Get parent hazard
-        "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n" +
-        // Remove nodes
-        "WHERE NOT any(e in excluded WHERE e IN nodes(p))\n" +
-        "RETURN root, rel, artifact";
-      // String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
-      //                "WITH path ORDER BY length(path) LIMIT 1\n" +
-      //                "MATCH p=(root:Hazard {id: nodes(path)[0].id})<-[*0..]-(artifact) WITH *, relationships(p) as rel\n" +
-      //                "RETURN root,rel,artifact\n";
-      // String query = String.format("MATCH path=(child)-[*0..]->(parent:Hazard {id: '%s'})\n", root) +
-      //                "WITH path ORDER BY length(path) LIMIT 1\n" +
-      //                "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact)\n"+
-      //                "RETURN root,rel,artifact";
+        "WITH [c in collect(removed) WHERE c[0].type<>'ADD' | c[1]] as excluded\n" +
+        String.format("MATCH path=(artifact)-[r*0..]->(root:Hazard {id: '%s'})\n", root) +
+        String.format("WHERE NOT ANY(e IN excluded WHERE e IN nodes(path)) AND NOT ANY(r IN relationships(path) WHERE EXISTS(r.version) AND r.version > %s)\n", version) +
+        "UNWIND [rf IN r WHERE TYPE(rf)<>'UPDATES'] as rel\n" +
+        "RETURN collect(distinct artifact), collect(distinct rel), root";
       StatementResult result = session.run(query);
       return convertToEdgesNodes(result);
     }
@@ -85,39 +70,29 @@ public class TreeService {
     Map<Long, String> ids = new HashMap<>();
     Map<Long, Boolean> edges = new HashMap<>();
 
-    List<Record> records = result.list();
-    for(int i = 0; i < records.size(); i++) {
-      Record rec = records.get(i);
+    Record record = result.single();
 
-      addNode(rec.get("artifact"), values, ids);
+    List<Node> nodes = record.get("collect(distinct artifact)").asList(Values.ofNode());
+    List<Relationship> rels = record.get("collect(distinct rel)").asList(Values.ofRelationship());
+    Node root = record.get("root").asNode();
 
-      {
-        ListValue rels = (ListValue)rec.get("rel");
-        rels.asObject().forEach(o -> {
-          Relationship rel = (Relationship)o;
-          Long relId = rel.id();
-          if (!edges.containsKey(relId)) {
-            edges.put(relId, true);
-            System.out.println("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
-            Map<String, Object> mapping = new HashMap<String, Object>(); 
-            mapping.put("classes", "edge");
-            mapping.put("id", relId);
-            mapping.put("type", rel.type());
-            mapping.put("source", ids.get(rel.startNodeId()));
-            mapping.put("target", ids.get(rel.endNodeId()));
-            values.add(mapping);
-          }
-        });
-      } 
+    addNode(root, values, ids);
+
+    for(int i = 0; i < nodes.size(); i++) {
+      addNode(nodes.get(i), values, ids);
     }
+
+    for(int i = 0; i < rels.size(); i++) {
+      addEdge(rels.get(i), values, edges, ids);
+    }
+
     return values;
   } 
 
-  private void addNode(Value rec, List<Map<String, Object>> values, Map<Long, String> ids) {
-    Node node = (Node)rec.asObject();
+  private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
     String label = ((List<String>)node.labels()).get(0).toString();
     Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-    System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
+    // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
     if (node.get("id") == null || node.get("id").toString() == "NULL") {
       String nodeId = UUID.randomUUID().toString();
       mapping.put("id", nodeId);
@@ -129,19 +104,19 @@ public class TreeService {
     mapping.put("label", label);
     values.add(mapping);
   }
-  
-  // private static <T> Collection<T>  
-  //                 getCollectionFromIterable(Iterable<T> itr) 
-  // { 
-  //     // Create an empty Collection to hold the result 
-  //     Collection<T> cltn = new ArrayList<T>(); 
 
-  //     // Iterate through the iterable to 
-  //     // add each element into the collection 
-  //     for (T t : itr) 
-  //         cltn.add(t); 
-
-  //     // Return the converted collection 
-  //     return cltn; 
-  // } 
+  private void addEdge(Relationship rel, List<Map<String, Object>> values,  Map<Long, Boolean> edges, Map<Long, String> ids) {
+    Long relId = rel.id();
+    if (!edges.containsKey(relId)) {
+      edges.put(relId, true);
+      // System.out.println("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
+      Map<String, Object> mapping = new HashMap<String, Object>(); 
+      mapping.put("classes", "edge");
+      mapping.put("id", relId);
+      mapping.put("type", rel.type());
+      mapping.put("source", ids.get(rel.startNodeId()));
+      mapping.put("target", ids.get(rel.endNodeId()));
+      values.add(mapping);
+    }
+  }
 }

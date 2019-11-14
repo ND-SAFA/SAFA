@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.services;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +40,10 @@ public class TreeService {
   @Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId) {
     try ( Session session = driver.session() ) {
-      String query = String.format("MATCH path=(child:Hazard)-[*0..]->(parent:Hazard)\n") +
-                     "WITH path ORDER BY length(path)\n" +
-                     "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact:Hazard)\n"+
-                    //  "UNWIND [rf IN r WHERE TYPE(rf)<>'UPDATES'] as rel\n" +
-                     "RETURN artifact, rel, root";
+      String query = "MATCH path=(root:Hazard)<-[rel*]-(artifact:Hazard)\n"+
+                     "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
       StatementResult result = session.run(query);
-      return parseHazardTree(result);
+      return parseArtifactTree(result);
 
     }
   }
@@ -86,36 +82,13 @@ public class TreeService {
         "WITH [c in collect(removed) WHERE c[0].type<>'ADD' | c[1]] as excluded\n" +
         String.format("MATCH pEx=(a:Hazard {id: '%s'})<-[r*0..]-(b)\n", root) +
         String.format("WITH excluded, apoc.coll.toSet(collect([r in relationships(pEx) WHERE r.version > %s | startNode(r)])) AS uEx\n", version) +
-
         String.format("MATCH path=(artifact)-[r*0..]->(root:Hazard {id: '%s'})\n", root) +
         "WHERE NOT ANY(e IN excluded WHERE e IN nodes(path)) AND NOT ANY(e IN uEx WHERE ANY (ez IN e WHERE ez IN nodes(path)))\n" +
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
+        
       StatementResult result = session.run(query);
       return parseArtifactTree(result);
     }
-  }
-
-  private List<Map<String, Object>> parseHazardTree(StatementResult result) {
-    List<Map<String, Object>> values = new ArrayList<>();
-    Map<Long, String> ids = new HashMap<>();
-    Map<Long, Boolean> edges = new HashMap<>();
-
-    List<Record> records = result.list();
-
-    for(int i = 0; i < records.size(); i++) {
-      Record record = records.get(i);
-      Node node = (Node)record.get("artifact").asObject();
-      addNode(node, values, ids);
-      {
-        ListValue rels = (ListValue)record.get("rel");
-        rels.asObject().forEach(o -> {
-          Relationship rel = (Relationship)o;
-          addEdge(rel, values, edges, ids);
-        });
-      }
-    }
-
-    return values;
   }
 
   private List<Map<String, Object>> parseArtifactTree(StatementResult result) {

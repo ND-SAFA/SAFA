@@ -18,8 +18,13 @@ public class TreesController {
     this.treeService = treeService;
   }
 
-  @GetMapping("/projects/{projId}/trees/")
+  @GetMapping("/projects/{projId}/hazards/")
   public List<Map<String, Object>> hazards(@PathVariable String projId) {
+    return treeService.hazards(projId);
+  }
+
+  @GetMapping("/projects/{projId}/trees/")
+  public List<Map<String, Object>> trees(@PathVariable String projId) {
     return treeService.trees(projId);
   }
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.neo4j.driver.internal.value.ListValue;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
@@ -36,15 +35,29 @@ public class TreeService {
   public TreeService(Driver driver) {
     this.driver = driver;
   }
+
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> hazards(String projectId) {
+    List<Map<String, Object>> set = new ArrayList<>();
+    try ( Session session = driver.session() ) {
+      String query = "MATCH (n:Hazard) WITH n ORDER BY n.id ASC RETURN n";
+      StatementResult result = session.run(query);
+      List<Record> records = result.list();
+      for(int i = 0; i < records.size(); i++) {
+        Node node = records.get(i).get("n").asNode();
+        addNode(node, set);
+      }
+      return set;
+    }
+  }
   
   @Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId) {
     try ( Session session = driver.session() ) {
-      String query = "MATCH path=(root:Hazard)<-[rel*]-(artifact:Hazard)\n"+
+      String query = "MATCH path=(root:Hazard)<-[rel*]-(artifact:Hazard)\n" +
                      "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
       StatementResult result = session.run(query);
       return parseArtifactTree(result);
-
     }
   }
 
@@ -59,7 +72,8 @@ public class TreeService {
     try ( Session session = driver.session() ) {
       String query = String.format("MATCH ({id:'%s'})<-[r*]-()\n", root) +
                     "UNWIND [re in r WHERE TYPE(re)='UPDATES' | re.version] AS ru\n" +
-                    "RETURN last(collect(distinct ru)) as last";
+                    "WITH ru AS res ORDER BY res\n" +
+                    "RETURN last(collect(distinct res)) as last";
       StatementResult result = session.run(query);
       Value last = result.next().get("last");
       int latestVersion = 0; 
@@ -128,6 +142,10 @@ public class TreeService {
       mapping.put("label", label);
       values.add(mapping);
     }
+  }
+
+  private void addNode(Node node, List<Map<String, Object>> values) {
+    addNode(node, values, new HashMap<Long, String>());
   }
 
   private void addEdge(Relationship rel, List<Map<String, Object>> values,  Map<Long, Boolean> edges, Map<Long, String> ids) {

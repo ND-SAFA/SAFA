@@ -75,7 +75,7 @@ public class TreeService {
                     "WITH ru AS res ORDER BY res\n" +
                     "RETURN last(collect(distinct res)) as last";
       StatementResult result = session.run(query);
-      Value last = result.next().get("last");
+      Value last = result.single().get("last");
       int latestVersion = 0; 
       if (!last.isNull()) {
         latestVersion = last.asInt();
@@ -89,15 +89,17 @@ public class TreeService {
   @Transactional(readOnly = true)
   public List<Map<String, Object>> versions(String projectId, String root, int version) {
     try ( Session session = driver.session() ) {
-      String query = "MATCH ()<-[r:UPDATES]-(o)\n" +
+      String query = "MATCH (p)<-[r:UPDATES]-(c)\n" +
         String.format("WHERE r.version <= %s\n", version) +
-        "WITH o, r AS rs ORDER BY r.version DESC\n" +
-        "WITH o, head(collect([rs,o])) AS removed\n" +
-        "WITH [c in collect(removed) WHERE c[0].type<>'ADD' | c[1]] as excluded\n" +
-        String.format("MATCH pEx=(a:Hazard {id: '%s'})<-[r*0..]-(b)\n", root) +
-        String.format("WITH excluded, apoc.coll.toSet(collect([r in relationships(pEx) WHERE r.version > %s | startNode(r)])) AS uEx\n", version) +
-        String.format("MATCH path=(artifact)-[r*0..]->(root:Hazard {id: '%s'})\n", root) +
-        "WHERE NOT ANY(e IN excluded WHERE e IN nodes(path)) AND NOT ANY(e IN uEx WHERE ANY (ez IN e WHERE ez IN nodes(path)))\n" +
+        "WITH p, c, r AS rs ORDER BY r.version DESC\n" +
+        "WITH p, c, head(collect([p, rs, c])) AS removed\n" +
+        "WITH [c in collect(removed) WHERE c[1].type<>'ADD' | c] as excluded\n" +
+        "UNWIND excluded AS e\n" +
+        "MATCH (a {id: e[0].id})<-[eR]-(b {id: e[2].id})\n" +
+        "WITH eR, CASE WHEN e[0].id=e[2].id THEN e[0] ELSE [] END AS eN\n" +
+        "WITH apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRelationships, apoc.coll.toSet(apoc.coll.flatten(collect(eN))) AS eNodes\n" +
+        String.format("MATCH path=()-[*0..]->(:Hazard {id: '%s'})\n", root) +
+        "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
         
       StatementResult result = session.run(query);

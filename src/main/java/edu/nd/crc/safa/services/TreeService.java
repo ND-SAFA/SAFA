@@ -114,8 +114,7 @@ public class TreeService {
         // Prune unwanted nodes and relationships
         "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
         // Return a unique set of nodes and relationships
-        "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel\n";
-      System.out.println(query);
+        "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect(relationships(path)))) AS rel\n";
       StatementResult result = session.run(query);
       return parseArtifactTree(result);
     }
@@ -136,7 +135,26 @@ public class TreeService {
     }
 
     for(int i = 0; i < rels.size(); i++) {
-      addEdge(rels.get(i), values, edges, ids);
+      final Relationship r = rels.get(i);
+      if( !r.type().equals("UPDATES") ){
+        addEdge(r, values, edges, ids);
+      }else{
+        // Handle modifications
+        if( r.get("type").asString().equals("MODIFIED") ) {
+          String root = ids.get(r.startNodeId());
+          for( Map<String,Object> value : values ){
+            if( value.get("id").equals(root) ){
+              if( value.get("label").equals("Code") ){
+                if( !value.containsKey("original") ){
+                  value.put("original", value.get("commit").toString());
+                }
+                value.put("commit", r.get("data").asString());
+                value.put("modified", true);
+              }
+            }
+          }
+        }
+      }
     }
 
     return values;

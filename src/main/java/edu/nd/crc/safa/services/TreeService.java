@@ -71,11 +71,11 @@ public class TreeService {
   public Map<String, Integer> versions(String projectId, String root) {
     try ( Session session = driver.session() ) {
       String query = String.format("MATCH (a {id:'%s'})", root) +
-        "CALL apoc.path.expandConfig(a, {relationshipFilter:'>|UPDATES', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
-        "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
-        "UNWIND rel as ru\n" + 
-        "WITH ru AS res ORDER BY res\n" + 
-        "RETURN last(collect(distinct res)) as last";
+      "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
+      "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
+      "UNWIND rel as ru\n" + 
+      "WITH ru AS res ORDER BY res\n" + 
+      "RETURN last(collect(distinct res)) as last";
         
       StatementResult result = session.run(query);
       Value last = result.single().get("last");

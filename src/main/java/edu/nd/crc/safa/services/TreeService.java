@@ -191,6 +191,37 @@ public class TreeService {
       }
     }
 
+    // Warnings
+    for(int i = 0; i < nodes.size(); i++) {
+      final Node node = nodes.get(i);
+      final String id = ids.get(node.id());
+      final String label = ((List<String>)node.labels()).get(0).toString();
+
+      // Calculate children
+      int children = 0;
+      for( Map<String,Object> value : values ){
+        if( value.getOrDefault("source", "").equals(id) && !value.getOrDefault("type", "").equals("UPDATES") ){
+          children++;
+        }
+      }
+
+      List<String> warnings = new ArrayList<String>();
+      if( children == 0 ){
+        if( label.equals("DesignDefinition") ){
+          warnings.add("Missing Code");
+        }
+      }
+
+      if( !warnings.isEmpty() ) {
+        // Find this node's values
+        for( Map<String,Object> value : values ){
+          if( value.getOrDefault("id", "").equals(id) ){
+            value.put("warnings", warnings.toArray());
+          }
+        }
+      }
+    }
+
     return values;
   } 
 

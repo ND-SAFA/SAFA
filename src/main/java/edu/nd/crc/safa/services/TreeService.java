@@ -10,6 +10,7 @@ import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
@@ -34,75 +35,185 @@ public class TreeService {
   public TreeService(Driver driver) {
     this.driver = driver;
   }
-  
-  @Transactional(readOnly = true)
-  public List<Map<String, Object>> trees(String projectId, String root) {
-    int version = 1;
-    try ( Session session = driver.session() ) {
-      String query = "MATCH ()<-[r:UPDATE]-(o)\n" +
-        String.format("WHERE r.version <= %s\n", version) +
-        "WITH o, r AS rs ORDER BY r.version DESC\n" +
-        "WITH o, head(collect([rs,o])) AS removed\n" +
-        "WITH [c in collect(removed) WHERE c[0].type<>'ADD' | c[1]] as excluded\n" +
-        String.format("MATCH path=(artifact)-[r*0..]->(root:Hazard {id: '%s'})\n", root) +
-        String.format("WHERE NOT ANY(e IN excluded WHERE e IN nodes(path)) AND NOT ANY(r IN relationships(path) WHERE EXISTS(r.version) AND r.version > %s)\n", version) +
-        "UNWIND [rf IN r WHERE TYPE(rf)<>'UPDATES'] as rel\n" +
-        "RETURN collect(distinct artifact), collect(distinct rel), root";
-      StatementResult result = session.run(query);
-      return convertToEdgesNodes(result);
-    }
-  }
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> hazards(String projectId) {
+    List<Map<String, Object>> set = new ArrayList<>();
     try ( Session session = driver.session() ) {
-      String query = String.format("MATCH path=(child:Hazard)-[*0..]->(parent:Hazard)\n") +
-                     "WITH path ORDER BY length(path)\n" +
-                     "MATCH (root:Hazard {id: nodes(path)[0].id})<-[rel*0..]-(artifact:Hazard)\n"+
-                     "RETURN root,rel,artifact";
+      String query = "MATCH (n:Hazard) WITH n ORDER BY n.id ASC RETURN n";
       StatementResult result = session.run(query);
-      return convertToEdgesNodes(result);
+      List<Record> records = result.list();
+      for(int i = 0; i < records.size(); i++) {
+        Node node = records.get(i).get("n").asNode();
+        addNode(node, set);
+      }
+      return set;
+    }
+  }
+  
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> trees(String projectId) {
+    try ( Session session = driver.session() ) {
+      String query = "MATCH path=(root:Hazard)-[rel*]->(artifact:Hazard)\n" +
+                     "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
+      StatementResult result = session.run(query);
+      return parseArtifactTree(result);
     }
   }
 
-  private List<Map<String, Object>> convertToEdgesNodes(StatementResult result) {
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> trees(String projectId, String root) {
+    int version = versions(projectId, root).get("latest");
+    return versions(projectId, root, version);
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, Integer> versions(String projectId, String root) {
+    try ( Session session = driver.session() ) {
+      String query = String.format("MATCH (a {id:'%s'})", root) +
+      "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
+      "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
+      "UNWIND rel as ru\n" + 
+      "WITH ru AS res ORDER BY res\n" + 
+      "RETURN last(collect(distinct res)) as last";
+        
+      StatementResult result = session.run(query);
+      Value last = result.single().get("last");
+      int latestVersion = 0; 
+      if (!last.isNull()) {
+        latestVersion = last.asInt();
+      }
+      Map<String, Integer> ret = new HashMap<String, Integer>();
+      ret.put("latest", latestVersion);
+      return ret;
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> versions(String projectId, String root, int version) {
+    try ( Session session = driver.session() ) {
+      String query ="MATCH (p)-[r:UPDATES]->(c)\n" +
+        String.format("WHERE r.version <= %s\n", version) +
+        "WITH p, c, r AS rs ORDER BY r.version DESC\n" +
+        "WITH p, c, head(collect([p, rs, c])) AS removed\n" +
+        "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n" +
+        "WITH [e in excluded | e[0]] AS eHead, [e in excluded | e[1]] AS eTail, apoc.coll.toSet(apoc.coll.flatten([e in excluded WHERE e[0].id=e[1].id| e[0]])) AS eNo\n" +
+        // Find all removed relationships
+        "OPTIONAL MATCH (a)-[eR]-(b)\n" +
+        "WHERE a IN eHead AND b IN eTail\n" +
+        "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n" +
+        // Remove modification relations newer than requested version
+        "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n" +
+        String.format("WHERE eR.version > %s AND eR.type='MODIFIED'\n", version) +
+        "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n" +
+        // Find any nodes added after wanted version
+        "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n" +
+        "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n" +
+        "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n" +
+        String.format("WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1].version > %s | c[2]]) as added\n", version) +
+        "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n" +
+        // Get Paths
+        String.format("MATCH (h:Hazard {id: '%s'})\n", root) +
+        "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path\n" +
+        // Prune unwanted nodes and relationships
+        "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
+        // Return a unique set of nodes and relationships
+        "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
+      StatementResult result = session.run(query);
+      return parseArtifactTree(result);
+    }
+  }
+
+  private List<Map<String, Object>> parseArtifactTree(StatementResult result) {
     List<Map<String, Object>> values = new ArrayList<>();
     Map<Long, String> ids = new HashMap<>();
     Map<Long, Boolean> edges = new HashMap<>();
 
-    Record record = result.single();
+    Record record = result.next();
 
-    List<Node> nodes = record.get("collect(distinct artifact)").asList(Values.ofNode());
-    List<Relationship> rels = record.get("collect(distinct rel)").asList(Values.ofRelationship());
-    Node root = record.get("root").asNode();
-
-    addNode(root, values, ids);
+    List<Node> nodes = record.get("artifact").asList(Values.ofNode());
+    List<Relationship> rels = record.get("rel").asList(Values.ofRelationship());
 
     for(int i = 0; i < nodes.size(); i++) {
       addNode(nodes.get(i), values, ids);
     }
 
+    // Find the highest version of the modification
+    Map<String, Integer> maxModification = new HashMap<String, Integer>();
+    for( int i = 0; i < rels.size(); i++ ){
+      final Relationship r = rels.get(i);
+      if( r.type().equals("UPDATES") && r.get("type").asString().equals("MODIFIED") ){
+        final String root = ids.get(r.startNodeId());
+        final int version = r.get("version").asInt();
+
+        if( maxModification.getOrDefault(root, 0) < version ){
+          maxModification.put(root, version);
+        }
+      }
+    }
+
     for(int i = 0; i < rels.size(); i++) {
-      addEdge(rels.get(i), values, edges, ids);
+      final Relationship r = rels.get(i);
+      if( !r.type().equals("UPDATES") ){
+        addEdge(r, values, edges, ids);
+      }else{
+        // Handle modifications
+        if( r.get("type").asString().equals("MODIFIED") ) {
+          final String root = ids.get(r.startNodeId());
+
+          // Make sure we only apply the latest version
+          final int version = r.get("version").asInt();
+          if( maxModification.get(root) != version ){
+            continue;
+          }
+
+          // Handle updating nodes
+          for( Map<String,Object> value : values ){
+            if( value.get("id").equals(root) ){
+              if( !value.get("label").equals("Code") && !value.get("label").equals("Package") ){
+                if( !value.containsKey("original") ){
+                  value.put("original", value.get("DATA").toString());
+                }
+                value.put("DATA", r.get("data").asString());
+              }
+
+              if( value.get("label").equals("Code") ){
+                if( !value.containsKey("original") ){
+                  value.put("original", value.get("commit").toString());
+                }
+                value.put("commit", r.get("data").asString());
+              }
+
+              value.put("modified", true);
+            }
+          }
+        }
+      }
     }
 
     return values;
   } 
 
   private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
-    String label = ((List<String>)node.labels()).get(0).toString();
-    Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-    // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
-    if (node.get("id") == null || node.get("id").toString() == "NULL") {
-      String nodeId = UUID.randomUUID().toString();
-      mapping.put("id", nodeId);
-      ids.put(node.id(), nodeId);
-    } else {
-      ids.put(node.id(), node.get("id").asString());
+    if (!ids.containsKey(node.id())) {
+      String label = ((List<String>)node.labels()).get(0).toString();
+      Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
+      // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
+      if (node.get("id") == null || node.get("id").toString() == "NULL") {
+        String nodeId = UUID.randomUUID().toString();
+        mapping.put("id", nodeId);
+        ids.put(node.id(), nodeId);
+      } else {
+        ids.put(node.id(), node.get("id").asString());
+      }
+      mapping.put("classes", "node");
+      mapping.put("label", label);
+      values.add(mapping);
     }
-    mapping.put("classes", "node");
-    mapping.put("label", label);
-    values.add(mapping);
+  }
+
+  private void addNode(Node node, List<Map<String, Object>> values) {
+    addNode(node, values, new HashMap<Long, String>());
   }
 
   private void addEdge(Relationship rel, List<Map<String, Object>> values,  Map<Long, Boolean> edges, Map<Long, String> ids) {

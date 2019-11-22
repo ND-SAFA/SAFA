@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.neo4j.driver.v1.Driver;
@@ -34,6 +35,25 @@ public class TreeService {
   
   public TreeService(Driver driver) {
     this.driver = driver;
+  }
+
+  @Transactional(readOnly = true)
+  public List<String> parents(String projectId, String node) {
+    try ( Session session = driver.session() ) {
+      String query = String.format("MATCH (a {id:'%s'})", node) +
+        "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/Hazard', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
+        "RETURN CASE WHEN LABELS(a)[0]='Hazard' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten(collect(last(nodes(path))))) END AS nodes";
+      StatementResult result = session.run(query);
+
+      List<String> ret = new ArrayList<String>();
+      while( result.hasNext() ){
+        List<Node> nodes = result.next().get("nodes").asList(Values.ofNode());
+        for( Node n : nodes ){
+          ret.add(n.get("id").asString());
+        }
+      }
+      return ret;
+    }
   }
 
   @Transactional(readOnly = true)

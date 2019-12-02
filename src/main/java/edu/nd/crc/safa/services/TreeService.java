@@ -256,7 +256,12 @@ public class TreeService {
         mapping.put("id", nodeId);
         ids.put(node.id(), nodeId);
       } else {
-        ids.put(node.id(), node.get("id").asString());
+        if( label.equals("Package") ){
+          ids.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
+          mapping.put("id", node.get("issue").asString() + "." + node.get("id").asString());
+        }else{
+          ids.put(node.id(), node.get("id").asString());
+        }
       }
       mapping.put("classes", "node");
       mapping.put("label", label);

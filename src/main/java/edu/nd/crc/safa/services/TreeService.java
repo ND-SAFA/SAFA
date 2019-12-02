@@ -218,18 +218,19 @@ public class TreeService {
       final String id = ids.get(node.id());
       final String label = ((List<String>)node.labels()).get(0).toString();
 
-      // Calculate children
-      int children = 0;
-      for( Map<String,Object> value : values ){
-        if( value.getOrDefault("source", "").equals(id) && !value.getOrDefault("type", "").equals("UPDATES") ){
-          children++;
+      List<String> warnings = new ArrayList<String>();
+
+      // Handle design definitions with no child nodes
+      if( label.equals("DesignDefinition") ){
+        if( !containsChildOfType("Code", node, nodes, ids, values) ){
+          warnings.add("Missing Code");
         }
       }
 
-      List<String> warnings = new ArrayList<String>();
-      if( children == 0 ){
-        if( label.equals("DesignDefinition") ){
-          warnings.add("Missing Code");
+      // Handle requirements with no design definitions
+      if( label.equals("Requirement") ){
+        if( !containsChildOfType("DesignDefinition", node, nodes, ids, values) ){
+          warnings.add("Missing Design Definition");
         }
       }
 
@@ -245,6 +246,30 @@ public class TreeService {
 
     return values;
   } 
+
+  private boolean containsChildOfType(final String type, final Node node, final List<Node> nodes, final Map<Long, String> ids, final List<Map<String, Object>> values) {
+    final String id = ids.get(node.id());
+
+    List<String> nChildren = new ArrayList<String>();
+    for( Map<String,Object> value : values ){
+      if( value.getOrDefault("source", "").equals(id) && !value.getOrDefault("type", "").equals("UPDATES") ){
+        String target = (String)value.getOrDefault("target", "");
+        if (!target.isEmpty()){
+          nChildren.add(target);
+        }
+      }
+    }
+
+    for( String child: nChildren) {
+      for( Node n: nodes ){
+        if( ids.get(n.id()).equals(child) && ((List<String>)n.labels()).get(0).toString().equals(type)){
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
     if (!ids.containsKey(node.id())) {

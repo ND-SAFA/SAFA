@@ -41,10 +41,10 @@ public class TreeService {
   public List<String> parents(String projectId, String node) {
     try ( Session session = driver.session() ) {
       String query = "MATCH (a)\n" +
-        String.format("WHERE a.id =~ '(?i)%s'\n", node.replace(".", "\\\\.")) +
+        "WHERE a.id =~ $node\n" +
         "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/Hazard', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
         "RETURN CASE WHEN LABELS(a)[0]='Hazard' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten(collect(last(nodes(path))))) END AS nodes";
-      StatementResult result = session.run(query);
+      StatementResult result = session.run(query, Values.parameters("node", "(?i)"+node.replace(".", "\\\\.")));
 
       List<String> ret = new ArrayList<String>();
       while( result.hasNext() ){
@@ -91,14 +91,14 @@ public class TreeService {
   @Transactional(readOnly = true)
   public Map<String, Integer> versions(String projectId, String root) {
     try ( Session session = driver.session() ) {
-      String query = String.format("MATCH (a {id:'%s'})", root) +
+      String query = "MATCH (a {id: $root})" +
       "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
       "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
       "UNWIND rel as ru\n" + 
       "WITH ru AS res ORDER BY res\n" + 
       "RETURN last(collect(distinct res)) as last";
         
-      StatementResult result = session.run(query);
+      StatementResult result = session.run(query, Values.parameters("root", root));
       Value last = result.single().get("last");
       int latestVersion = 0; 
       if (!last.isNull()) {
@@ -114,7 +114,7 @@ public class TreeService {
   public List<Map<String, Object>> versions(String projectId, String root, int version) {
     try ( Session session = driver.session() ) {
       String query ="MATCH (p)-[r:UPDATES]->(c)\n" +
-        String.format("WHERE r.version <= %s\n", version) +
+        "WHERE r.version <= $version\n" +
         "WITH p, c, r AS rs ORDER BY r.version DESC\n" +
         "WITH p, c, head(collect([p, rs, c])) AS removed\n" +
         "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n" +
@@ -125,22 +125,22 @@ public class TreeService {
         "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n" +
         // Remove modification relations newer than requested version
         "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n" +
-        String.format("WHERE eR.version > %s AND eR.type='MODIFIED'\n", version) +
+        "WHERE eR.version > $version AND eR.type='MODIFIED'\n" +
         "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n" +
         // Find any nodes added after wanted version
         "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n" +
         "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n" +
         "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n" +
-        String.format("WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1].version > %s | c[2]]) as added\n", version) +
+        "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1].version > $version | c[2]]) as added\n" +
         "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n" +
         // Get Paths
-        String.format("MATCH (h:Hazard {id: '%s'})\n", root) +
+        "MATCH (h:Hazard {id: $root})\n" +
         "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path\n" +
         // Prune unwanted nodes and relationships
         "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
         // Return a unique set of nodes and relationships
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
-      StatementResult result = session.run(query);
+      StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
       return parseArtifactTree(result);
     }
   }

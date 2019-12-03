@@ -84,28 +84,28 @@ public class TreeService {
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId, String root) {
-    int version = versions(projectId, root).get("latest");
+    int version = (Integer)versions(projectId, root).get("latest");
     return versions(projectId, root, version);
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Integer> versions(String projectId, String root) {
+  public Map<String, Object> versions(String projectId, String root) {
     try ( Session session = driver.session() ) {
       String query = "MATCH (a {id: $root})" +
       "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
       "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
       "UNWIND rel as ru\n" + 
       "WITH ru AS res ORDER BY res\n" + 
-      "RETURN last(collect(distinct res)) as last";
+      "RETURN collect(distinct res) as last";
         
       StatementResult result = session.run(query, Values.parameters("root", root));
-      Value last = result.single().get("last");
-      int latestVersion = 0; 
-      if (!last.isNull()) {
-        latestVersion = last.asInt();
-      }
-      Map<String, Integer> ret = new HashMap<String, Integer>();
-      ret.put("latest", latestVersion);
+      List<Integer> last = result.single().get("last").asList(Values.ofInteger());
+
+      Map<String, Object> ret = new HashMap<String, Object>();
+      if( last.size() == 0 ) return ret;
+
+      ret.put("latest", last.get(last.size()-1));
+      ret.put("available", last);
       return ret;
     }
   }

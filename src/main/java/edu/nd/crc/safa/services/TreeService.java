@@ -161,7 +161,18 @@ public class TreeService {
         // Return a unique set of nodes and relationships
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
       StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
-      return parseArtifactTree(result);
+
+      final List<Map<String, Object>> retVal = parseArtifactTree(result);
+
+      // Update warnings map
+      mWarnings.put(root, false);
+      for( Map<String, Object> v: retVal) {
+        if( v.containsKey("warnings") ){
+          mWarnings.put(root, true);
+        }
+      }
+      
+      return retVal;
     }
   }
 

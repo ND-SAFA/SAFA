@@ -222,7 +222,7 @@ public class TreeService {
 
       // Handle design definitions with no child nodes
       if( label.equals("DesignDefinition") ){
-        if( !containsChildOfType("Code", node, nodes, ids, values) ){
+        if( !containsChildOfType("Package", node, nodes, ids, values) ){
           warnings.add("Missing Code");
         }
       }

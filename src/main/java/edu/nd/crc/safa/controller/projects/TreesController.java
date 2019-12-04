@@ -28,6 +28,11 @@ public class TreesController {
     return treeService.hazards(projId);
   }
 
+  @GetMapping("/projects/{projId}/hazards/warnings")
+  public Map<String, Boolean> hazardWarnings(@PathVariable String projId) {
+    return treeService.hazardWarnings(projId);
+  }
+
   @GetMapping("/projects/{projId}/trees/")
   public List<Map<String, Object>> trees(@PathVariable String projId) {
     return treeService.trees(projId);

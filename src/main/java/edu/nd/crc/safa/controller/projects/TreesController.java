@@ -39,7 +39,7 @@ public class TreesController {
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/")
-  public Map<String, Integer> versions(@PathVariable String projId, @PathVariable String treeId) {
+  public Map<String, Object> versions(@PathVariable String projId, @PathVariable String treeId) {
     return treeService.versions(projId, treeId);
   }
 

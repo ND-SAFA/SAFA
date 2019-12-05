@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +26,30 @@ public class TreeService {
   @Autowired
   Driver driver;
 
-  private final static Logger LOG = LoggerFactory.getLogger(TreeService.class);
+  private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
   public TreeService() {
   }
   
   public TreeService(Driver driver) {
     this.driver = driver;
+  }
+
+  @PostConstruct
+  private void init() {
+    final List<Map<String, Object>> hazards = hazards("test");
+    for( Map<String, Object> node : hazards ){
+      final String id = (String)node.get("id");
+      final int version = (Integer)versions("test", id).get("latest"); 
+      final List<Map<String, Object>> data = versions("test", id, version);
+      mWarnings.put(id, false);
+      for( Map<String, Object> v: data) {
+        if( v.containsKey("warnings") ){
+          mWarnings.put(id, true);
+        }
+      }
+    }
+    System.out.println(mWarnings);
   }
 
   @Transactional(readOnly = true)
@@ -70,6 +85,11 @@ public class TreeService {
       }
       return set;
     }
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, Boolean> hazardWarnings(String projectId) {
+    return mWarnings;
   }
   
   @Transactional(readOnly = true)
@@ -141,7 +161,18 @@ public class TreeService {
         // Return a unique set of nodes and relationships
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
       StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
-      return parseArtifactTree(result);
+
+      final List<Map<String, Object>> retVal = parseArtifactTree(result);
+
+      // Update warnings map
+      mWarnings.put(root, false);
+      for( Map<String, Object> v: retVal) {
+        if( v.containsKey("warnings") ){
+          mWarnings.put(root, true);
+        }
+      }
+      
+      return retVal;
     }
   }
 

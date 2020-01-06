@@ -11,7 +11,7 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel/>
+              <LeftPanel v-bind:nodes="leftPanel.nodes"/>
               <SafetyArtifactTree/>
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
@@ -36,14 +36,18 @@
 
   export default {
     name: 'main-page',
+    components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTreeAnalysis, ConfigureDeltaModal },
     data: function () {
       return {
+        isFetchingFromServer: false,
         rightPanel: {
           isHidden: true
+        },
+        leftPanel: {
+          nodes: [{id: 'UAV-860', label: 'Hazard', data: {name: 'Some kind of name...'}, warnings: [true]}]
         }
       }
     },
-    components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTreeAnalysis, ConfigureDeltaModal },
     methods: {
       open (link) {
         this.$electron.shell.openExternal(link)

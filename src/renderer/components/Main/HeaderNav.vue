@@ -7,7 +7,7 @@
       </ul>
       <ul class="navbar-nav left">
         <li class="nav-item active">
-          <a id="menu-toggle" class="btn btn-outline-light" data-toggle="button" aria-pressed="false" href="#"><i class="fas fa-bars"></i></a>
+          <a @click="menuToggled" class="btn btn-outline-light" href="#"><i class="fas fa-bars"></i></a>
         </li>
       </ul>
     </nav>
@@ -16,7 +16,14 @@
 
 <script>
 export default {
-
+  props: {
+    rightPanel: {}
+  },
+  methods: {
+    menuToggled () {
+      this.rightPanel.isHidden = !this.rightPanel.isHidden
+    }
+  }
 }
 </script>
 

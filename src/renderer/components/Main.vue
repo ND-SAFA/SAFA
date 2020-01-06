@@ -2,7 +2,7 @@
   <div id="mainpage">
     
     <!-- Header Nav -->
-    <HeaderNav/>
+    <HeaderNav v-bind:right-panel="rightPanel"/>
 
     <div class="d-flex" id="wrapper">
 
@@ -14,7 +14,7 @@
               <LeftPanel/>
               <SafetyArtifactTree/>
               <FaultTreeAnalysis/>
-              <RightPanel/>
+              <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
             </div> 
             <ConfigureDeltaModal/>
           </div> 
@@ -36,6 +36,13 @@
 
   export default {
     name: 'main-page',
+    data: function () {
+      return {
+        rightPanel: {
+          isHidden: true
+        }
+      }
+    },
     components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTreeAnalysis, ConfigureDeltaModal },
     methods: {
       open (link) {

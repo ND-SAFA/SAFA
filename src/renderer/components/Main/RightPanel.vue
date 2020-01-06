@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-wash border-right" style="display: none;" id="sidebar-wrapper">
+  <div class="bg-wash border-right" v-show="!isHidden" id="sidebar-wrapper">
     <div class="details-panel border-left">
       <div class="list-group list-group-flush">
         <div class="list-group-item bg-wash border-bottom-0 pb-0 sidebar-heading">Hazard Hierarchy</div>
@@ -123,7 +123,9 @@
 
 <script>
 export default {
-
+  props: {
+    isHidden: true
+  }
 }
 </script>
 

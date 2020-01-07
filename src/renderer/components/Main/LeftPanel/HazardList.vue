@@ -21,11 +21,11 @@
 
     <div class="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="item in nodes" :key="item.id" @click="loadTree(item)">
+        <li class="nav-item vw-100" v-for="item in getHazards" :key="item.id" @click="loadTree(item)">
           <a class="nav-link">
             <div>
               <p class="hazard-title">{{item.label}} {{item.id}}</p>
-              <div v-if="item.data" class="desc" >{{item.data.name}}</div>
+              <div v-if="item.data" class="desc" >{{$truncate(item.data.name)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
               <i class="fas fa-exclamation-triangle"></i>
@@ -38,12 +38,16 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
-  props: {
-    nodes: Array
+  computed: {
+    ...mapGetters('projects.module', ['getHazards'])
   },
   methods: {
+    ...mapActions('projects.module', ['fetchHazards']),
     loadTree (hazard) {
+      console.log(hazard)
     }
   }
 }

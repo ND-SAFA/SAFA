@@ -11,7 +11,7 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-bind:nodes="leftPanel.nodes"/>
+              <LeftPanel/>
               <SafetyArtifactTree/>
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  import { mapActions, mapGetters } from 'vuex'
   import HeaderNav from './Main/HeaderNav'
   import LeftPanel from './Main/LeftPanel'
   import RightPanel from './Main/RightPanel'
@@ -37,6 +38,7 @@
   export default {
     name: 'main-page',
     components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTreeAnalysis, ConfigureDeltaModal },
+
     data: function () {
       return {
         isFetchingFromServer: false,
@@ -44,13 +46,23 @@
           isHidden: true
         },
         leftPanel: {
-          nodes: [{id: 'UAV-860', label: 'Hazard', data: {name: 'Some kind of name...'}, warnings: [true]}]
         }
       }
     },
+    computed: {
+      ...mapGetters('projects.module', ['getHazards'])
+    },
     methods: {
+      ...mapActions('projects.module', ['fetchHazards']),
       open (link) {
         this.$electron.shell.openExternal(link)
+      }
+    },
+    async mounted () {
+      if (this.getHazards.length === 0) {
+        this.isFetchingFromServer = true
+        await this.fetchHazards()
+        this.isFetchingFromServer = false
       }
     }
   }

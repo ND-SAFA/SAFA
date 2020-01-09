@@ -28,12 +28,12 @@
 
 <script>
   import { mapActions, mapGetters } from 'vuex'
-  import HeaderNav from './Main/HeaderNav'
-  import LeftPanel from './Main/LeftPanel'
-  import RightPanel from './Main/RightPanel'
-  import SafetyArtifactTree from './Main/SafetyArtifactTree'
-  import FaultTreeAnalysis from './Main/FaultTreeAnalysis'
-  import ConfigureDeltaModal from './Main/modals/ConfigureDelta'
+  import HeaderNav from '@/components/Main/HeaderNav'
+  import LeftPanel from '@/components/Main/LeftPanel'
+  import RightPanel from '@/components/Main/RightPanel'
+  import SafetyArtifactTree from '@/components/Main/SafetyArtifactTree'
+  import FaultTreeAnalysis from '@/components/Main/FaultTreeAnalysis'
+  import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
 
   export default {
     name: 'main-page',

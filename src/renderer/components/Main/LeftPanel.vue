@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import HazardList from './LeftPanel/HazardList'
+import HazardList from '@/components/Main/LeftPanel/HazardList'
 
 export default {
   components: { HazardList }

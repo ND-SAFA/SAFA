@@ -37,6 +37,7 @@ export default class CytoscapePrototype {
       }
     })
     self.postLayoutHook(cy)
+    this.cy = cy
     return cy
   }
 

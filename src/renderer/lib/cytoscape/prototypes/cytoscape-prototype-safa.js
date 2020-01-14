@@ -44,12 +44,11 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     // Layout peer nodes closer to ancestor node
     this.__layoutPeerNodes(cy)
     this.__layoutCodeNodes(cy)
-
-    this.__applyClickDragBehavior(cy)
   }
 
   // -----------------------------------------------------------------------------
   postLayoutHook (cy) {
+    this.__applyClickDragBehavior(cy)
     this.__applyBadges(cy)
     this.__applyNodeLabels(cy)
     this.__applyCustomEvents(cy)

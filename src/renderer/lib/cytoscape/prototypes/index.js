@@ -11,15 +11,15 @@ export default class CytoscapePrototype {
   }
 
   preLayoutHook () {
-    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement preLayoutHook()`)
+    throw new Error(`${this.prototype} extends CytoscapePrototype but does not implement preLayoutHook()`)
   }
 
   layoutHook () {
-    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement layoutHook()`)
+    throw new Error(`${this.prototype} extends CytoscapePrototype but does not implement layoutHook()`)
   }
 
   postLayoutHook () {
-    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement postLayoutHook()`)
+    throw new Error(`${this.prototype} extends CytoscapePrototype but does not implement postLayoutHook()`)
   }
 
   run () {

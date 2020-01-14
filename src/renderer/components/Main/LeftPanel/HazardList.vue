@@ -41,6 +41,7 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
+  name: 'HazardList',
   computed: {
     ...mapGetters('projects.module', ['getHazards'])
   },

@@ -59,7 +59,7 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
-    "config": "^3.2.3",
+    "config": "3.2.4",
     "cytoscape": "^3.10.0",
     "cytoscape-automove": "^1.10.2",
     "cytoscape-klay": "^3.1.3",

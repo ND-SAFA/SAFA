@@ -123,6 +123,7 @@
 
 <script>
 export default {
+  name: 'RightPanel',
   props: {
     isHidden: true
   }

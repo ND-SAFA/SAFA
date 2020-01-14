@@ -1,9 +1,46 @@
+import cytoscape from 'cytoscape'
 import Vue from 'vue'
 import uuid from 'uuid'
 
-export default class CytoscapeBuilder {
+export default class CytoscapePrototype {
+  constructor (container, elements, options, style) {
+    this.container = container
+    this.elements = elements
+    this.style = style
+    this.options = options
+  }
+
+  preLayoutHook () {
+    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement preLayoutHook()`)
+  }
+
+  layoutHook () {
+    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement layoutHook()`)
+  }
+
+  postLayoutHook () {
+    throw new Error(`${this.prototype} extends CytoscapeBuilderAbstract but does not implement postLayoutHook()`)
+  }
+
+  run () {
+    const self = this
+    const cy = cytoscape({
+      container: this.container,
+      elements: this.elements,
+      wheelSensitivity: this.options.CORE_WHEEL_SENSITIVITY,
+      style: this.style,
+      ready: function () {
+        const cy = this
+        cy.oldSize = { w: cy.container().clientWidth, h: cy.container().clientHeight }
+        self.preLayoutHook(cy)
+        self.layoutHook(cy)
+      }
+    })
+    self.postLayoutHook(cy)
+    return cy
+  }
+
   static addNode (acc, e) {
-    console.log(e)
     if (e.classes.startsWith('node')) {
       let data = {
         name: '',
@@ -41,6 +78,17 @@ export default class CytoscapeBuilder {
         id: data.id,
         data: data
       })
+    }
+    return acc
+  }
+
+  static addElement (acc, e) {
+    if (e.classes.startsWith('node')) {
+      acc = CytoscapePrototype.addNode(acc, e)
+    } else {
+      if (e.classes === 'edge') {
+        acc.push({ data: { id: e.id, type: e.type, target: e.source, source: e.target } })
+      }
     }
     return acc
   }

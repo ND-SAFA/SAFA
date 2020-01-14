@@ -45,6 +45,7 @@
 import HazardList from '@/components/Main/LeftPanel/HazardList'
 
 export default {
+  name: 'LeftPanel',
   components: { HazardList }
 }
 </script>

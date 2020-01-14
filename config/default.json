@@ -1,0 +1,8 @@
+{
+  "services": {"api": {"url": "https://www.notsafa.xyz/hzpRHpRn3Yu4JuDA"}},
+  "safa_tree": {
+    "peer_node_types": "Context,AcceptanceTest,EnvironmentalAssumption",
+    "ancestor_exact_types": "Hazard,DesignDefinition,Code",
+    "ancestor_sub_types": "Requirement"
+  }
+}

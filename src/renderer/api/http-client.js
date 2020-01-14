@@ -1,6 +1,7 @@
-const baseURL = process.env.ELECTRON_WEBPACK_APP_BASE_URL
+import config from 'config'
 
 export default async function httpClient (relativeUrl) {
+  const baseURL = config.get('services.api.url')
   return fetch(`${baseURL}/${relativeUrl}`, {
     headers: {
       'Content-Type': 'application/json'

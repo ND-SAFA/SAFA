@@ -53,17 +53,16 @@
       ...mapGetters('projects.module', ['getHazards'])
     },
     methods: {
-      ...mapActions('projects.module', ['fetchHazards']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree']),
       open (link) {
         this.$electron.shell.openExternal(link)
       }
     },
     async mounted () {
-      if (this.getHazards.length === 0) {
-        this.isFetchingFromServer = true
-        await this.fetchHazards()
-        this.isFetchingFromServer = false
-      }
+      this.isFetchingFromServer = true
+      await this.fetchHazards()
+      await this.fetchHazardTree()
+      this.isFetchingFromServer = false
     }
   }
 </script>

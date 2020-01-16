@@ -175,7 +175,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __applyPositioning (cy) {
-    cy.center(cy.nodes()[0])
+    cy.center(cy.nodes().leaves().first())
     cy.panBy({ y: -(cy.size().height / 2 - this.options.NODE_HEIGHT) })
   }
 

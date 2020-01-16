@@ -5,17 +5,17 @@ import nodeHtmlLabel from 'cytoscape-node-html-label'
 import popper from 'cytoscape-popper'
 import automove from 'cytoscape-automove'
 
+nodeHtmlLabel(cytoscape)
+cytoscape.use(klay)
+cytoscape.use(popper)
+cytoscape.use(automove)
+
 export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   constructor (container, elements, options, style, layoutTemplate, badgeFactory) {
     super(container, elements, options, style)
     this.layoutTemplate = layoutTemplate
     this.badgeFactory = badgeFactory
     this.badges = []
-
-    nodeHtmlLabel(cytoscape)
-    cytoscape.use(klay)
-    cytoscape.use(popper)
-    cytoscape.use(automove)
   }
 
   preLayoutHook (cy) {

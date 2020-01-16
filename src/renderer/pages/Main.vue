@@ -1,6 +1,6 @@
 <template>
   <div id="mainpage">
-    
+
     <!-- Header Nav -->
     <HeaderNav v-bind:right-panel="rightPanel"/>
 
@@ -11,13 +11,13 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel/>
-              <SafetyArtifactTree/>
+              <LeftPanel v-bind:left-panel="leftPanel"/>
+              <SafetyArtifactTree v-bind:tree-id="leftPanel.selectedTreeId"/>
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
-            </div> 
+            </div>
             <ConfigureDeltaModal/>
-          </div> 
+          </div>
         </main>
       </div>
       <!-- End Page Content -->
@@ -46,6 +46,7 @@
           isHidden: true
         },
         leftPanel: {
+          selectedTreeId: null
         }
       }
     },

@@ -4,7 +4,7 @@
       Hazard Hierarchy <a href="#" class="text-dark"><i class="fas fa-sync-alt"></i></a>
     </p>
 
-    <p class="text-center px-2"><a id="show_hazard" class="btn btn-outline-primary btn-sm btn-block text-primary">
+    <p class="text-center px-2"><a id="show_hazard" @click="loadTree(null, null)" class="btn btn-outline-primary btn-sm btn-block text-primary">
       View Hazard Tree</a>
     </p>
 
@@ -21,11 +21,11 @@
 
     <div class="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="item in getHazards" :key="item.id" @click="loadTree(item)">
-          <a class="nav-link">
+        <li class="nav-item vw-100" v-for="(item, index) in getHazards" :key="item.id" @click="loadTree(item, index)">
+          <a class="nav-link" :class="{ active: index === selectedIndex }">
             <div>
               <p class="hazard-title">{{item.label}} {{item.id}}</p>
-              <div v-if="item.data" class="desc" >{{$truncate(item.data.name)}}</div>
+              <div v-if="item.data" class="desc" :title="item.data.name">{{$truncate(item.data.name)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
               <i class="fas fa-exclamation-triangle"></i>
@@ -42,13 +42,22 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'HazardList',
+  props: ['leftPanel'],
+  data () {
+    return {
+      selectedIndex: null
+    }
+  },
   computed: {
     ...mapGetters('projects.module', ['getHazards'])
   },
   methods: {
     ...mapActions('projects.module', ['fetchHazards']),
-    loadTree (hazard) {
-      console.log(hazard)
+    loadTree (hazard, index) {
+      // load hazard tree if null arguments are passed
+      // otherwise load safety artifact tree
+      this.leftPanel.selectedTreeId = hazard ? hazard.id : null
+      this.selectedIndex = index
     }
   }
 }

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import BadgeTemplate from '@/lib/cytoscape/badges/badge-template'
 import BadgeFactory from '@/lib/cytoscape/badges/badge-factory'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
@@ -33,15 +33,22 @@ const B = BadgeTemplate
 
 export default {
   name: 'SafetyArtifactTree',
-
+  props: ['treeId'],
   computed: {
-    ...mapGetters('projects.module', ['getHazardTree']),
-    treeElements () {
-      if (this.getHazardTree) {
-        return JSON.parse(JSON.stringify(this.getHazardTree))
-      } else {
-        return []
+    ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree']),
+    treeElements: function () {
+      if (this.treeId) {
+        return JSON.parse(JSON.stringify(this.getSafetyArtifactTree))
       }
+      return JSON.parse(JSON.stringify(this.getHazardTree))
+    }
+  },
+  watch: {
+    treeId: async function (newTreeId) {
+      if (this.treeId) {
+        await this.fetchSafetyArtifactTree(newTreeId)
+      }
+      this.makeGraph(this.$refs.cy)
     }
   },
 
@@ -56,7 +63,8 @@ export default {
   },
 
   methods: {
-    makeGraph (container) {
+    ...mapActions('projects.module', ['fetchSafetyArtifactTree']),
+    makeGraph: async function (container) {
       const badgeTemplate = {
         trigger: B.TRIGGER.MANUAL,
         placement: B.PLACEMENT.BOTTOM_END,

@@ -5,17 +5,17 @@ import nodeHtmlLabel from 'cytoscape-node-html-label'
 import popper from 'cytoscape-popper'
 import automove from 'cytoscape-automove'
 
+nodeHtmlLabel(cytoscape)
+cytoscape.use(klay)
+cytoscape.use(popper)
+cytoscape.use(automove)
+
 export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   constructor (container, elements, options, style, layoutTemplate, badgeFactory) {
     super(container, elements, options, style)
     this.layoutTemplate = layoutTemplate
     this.badgeFactory = badgeFactory
     this.badges = []
-
-    nodeHtmlLabel(cytoscape)
-    cytoscape.use(klay)
-    cytoscape.use(popper)
-    cytoscape.use(automove)
   }
 
   preLayoutHook (cy) {
@@ -23,8 +23,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
       const badge = this.badges.pop()
       badge.destroy()
     }
-    this.__savePeerNodes(cy)
-    this.__saveAncestorNodes(cy)
+    this.__savePeerAncestorNodes(cy)
     this.__savePackageNodes(cy)
   }
 
@@ -175,7 +174,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __applyPositioning (cy) {
-    cy.center(cy.nodes()[0])
+    cy.center(cy.nodes().leaves().first())
     cy.panBy({ y: -(cy.size().height / 2 - this.options.NODE_HEIGHT) })
   }
 
@@ -219,17 +218,12 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   }
 
   // -----------------------------------------------------------------------------
-  __savePeerNodes (cy) {
+  __savePeerAncestorNodes (cy) {
     // Valid peer node types
     const peerNodeTypes = this.options.CORE_PEER_NODE_TYPES
     const peerSelector = peerNodeTypes.map(peerType => `[type="${peerType}"]`).join(',')
     // Get nodes that should be peers
     this.peerNodes = cy.nodes(peerSelector)
-    this.peerElements = this.peerNodes.union(this.peerNodes.connectedEdges()).remove()
-  }
-
-  // -----------------------------------------------------------------------------
-  __saveAncestorNodes (cy) {
     // Valid ancestor node types
     const ancestorExactTypes = this.options.CORE_ANCESTOR_EXACT_TYPES
     // Valid ancestor node types that contain the following text
@@ -249,6 +243,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
       this.ancestorNodes[i].scratch('numPeerNodes', numPeerNodes)
       this.ancestorNodes[i].style('width', this.options.NODE_WIDTH + (this.ancestorNodes[i].outerWidth() + this.options.CORE_PEER_SPACING) * (numPeerNodes + 1))
     }
+    this.peerElements = this.peerNodes.union(this.peerNodes.connectedEdges()).remove()
   }
 
   // -----------------------------------------------------------------------------

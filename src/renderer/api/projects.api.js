@@ -24,8 +24,16 @@ async function getProjectHazardTree (projId) {
   return json.reduce(addElement, [])
 }
 
+// /projects/{projId}/trees/{treeId}
+async function getProjectSafetyArtifactTree (projId, treeId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/`)
+  const json = await response.json()
+  return json.reduce(addElement, [])
+}
+
 export default {
   getProjectNodeParents,
   getProjectHazards,
-  getProjectHazardTree
+  getProjectHazardTree,
+  getProjectSafetyArtifactTree
 }

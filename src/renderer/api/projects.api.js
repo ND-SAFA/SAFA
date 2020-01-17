@@ -17,6 +17,12 @@ async function getProjectHazards (projId) {
   })
 }
 
+// /project/{projId}/hazards/warnings
+async function getProjectHazardsWarnings (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/hazards/warnings`)
+  return response.json()
+}
+
 // /project/{projId}/trees/
 async function getProjectHazardTree (projId) {
   const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/`)
@@ -34,6 +40,7 @@ async function getProjectSafetyArtifactTree (projId, treeId) {
 export default {
   getProjectNodeParents,
   getProjectHazards,
+  getProjectHazardsWarnings,
   getProjectHazardTree,
   getProjectSafetyArtifactTree
 }

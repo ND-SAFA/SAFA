@@ -33,6 +33,12 @@ const actions = {
   async fetchHazards ({ commit }) {
     try {
       const response = await projects.getProjectHazards(TEMP_PROJ_ID)
+      // Fetch hazard warnings at the same time
+      const warnings = await projects.getProjectHazardsWarnings(TEMP_PROJ_ID)
+      // Store warnings in corresponding hazard
+      for (const hazard of response) {
+        hazard.warnings = warnings[hazard.id]
+      }
       commit('SET_HAZARDS', response)
     } catch (error) {
       // handle the error here

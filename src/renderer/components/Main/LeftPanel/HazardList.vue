@@ -25,7 +25,7 @@
           <a class="nav-link" :class="{ active: index === selectedIndex }">
             <div>
               <p class="hazard-title">{{item.label}} {{item.id}}</p>
-              <div v-if="item.data" class="desc" :title="item.data.name">{{$truncate(item.data.name)}}</div>
+              <div v-if="item.data" class="desc" :title="item.data.name">{{$truncate(item.data.name, 40)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
               <i class="fas fa-exclamation-triangle"></i>

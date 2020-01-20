@@ -4,8 +4,9 @@ import { addNode, addElement } from '../lib/cytoscape/serializers'
 const RELATIVE_API_PATH = 'projects'
 
 // /project/{projId}/parents/{node}
-async function getProjectNodeParents (projId, node) {
-  return httpClient(`${RELATIVE_API_PATH}/${projId}/parents/${node}/`)
+async function getProjectNodeParents (projId, nodeId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/parents/${nodeId}/`)
+  return response.json()
 }
 
 // /{projId}/trees/

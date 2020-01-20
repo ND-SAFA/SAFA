@@ -24,8 +24,12 @@ const getters = {
     return state.projects.hazardTree
   },
 
-  getSafetyArtifactTree: (state) => {
+  getSafetyArtifactTree (state) {
     return state.projects.safetyArtifactTree
+  },
+
+  getNodeParents: (state) => async (nodeId) => {
+    return projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
   }
 }
 

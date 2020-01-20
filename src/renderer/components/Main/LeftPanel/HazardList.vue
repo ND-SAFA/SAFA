@@ -13,7 +13,7 @@
         <div class="form-group has-search mb-1">
           <i class="fa fa-search form-control-feedback"></i>
           <label class="w-100">
-            <input type="text" class="hazard-search-bar form-control rounded-pill" placeholder="Search">
+            <input type="text" class="hazard-search-bar form-control rounded-pill" v-model="searchText" v-on:keyup.esc="searchText = ''" placeholder="Search">
           </label>
         </div>
       </div>
@@ -21,7 +21,7 @@
 
     <div class="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="(item, index) in getHazards" :key="item.id" @click="loadTree(item, index)">
+        <li class="nav-item vw-100" v-for="(item, index) in getHazards" :key="item.id" @click="loadTree(item, index)" v-if="searchFilter[item.id]" >
           <a class="nav-link" :class="{ active: index === selectedIndex }">
             <div>
               <p class="hazard-title">{{item.label}} {{item.id}}</p>
@@ -45,11 +45,37 @@ export default {
   props: ['leftPanel'],
   data () {
     return {
-      selectedIndex: null
+      selectedIndex: null,
+      searchText: '',
+      searchFilter: {}
+    }
+  },
+  created () {
+    for (const hazard of this.getHazards) {
+      this.searchFilter[hazard.id] = true
     }
   },
   computed: {
-    ...mapGetters('projects.module', ['getHazards'])
+    ...mapGetters('projects.module', ['getHazards', 'getNodeParents'])
+  },
+  watch: {
+    searchText: async function () {
+      if (this.searchText === '') {
+        // clear filter
+        Object.keys(this.searchFilter).forEach(entry => { this.searchFilter[entry] = true })
+      } else {
+        const value = this.searchText.toLowerCase()
+        const treeId = value.startsWith('uav') ? value : `uav-${value}`
+        // TODO implement Vuejs compatible debounce
+        const found = await this.getNodeParents(treeId)
+        for (const hazard of this.getHazards) {
+          this.searchFilter[hazard.id] = hazard.data.name.includes(value)
+        }
+        for (const nodeId of found) {
+          this.searchFilter[nodeId] = true
+        }
+      }
+    }
   },
   methods: {
     ...mapActions('projects.module', ['fetchHazards']),

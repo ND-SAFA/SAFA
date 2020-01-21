@@ -80,7 +80,7 @@ export default {
       this.$emit('close')
     },
     async updateAvailableVersions () {
-      await this.fetchSafetyArtifactTreeVersions(this.leftPanel.selectedTreeId ? this.leftPanel.selectedTreeId : 'UAV-895')
+      await this.fetchSafetyArtifactTreeVersions(this.leftPanel.selectedTreeId ? this.leftPanel.selectedTreeId : this.getHazards[0].id)
       this.leftPanel.versions = {
         available: this.getSafetyArtifactTreeVersions,
         current: Math.max(...this.getSafetyArtifactTreeVersions),

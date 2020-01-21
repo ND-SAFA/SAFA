@@ -1,10 +1,14 @@
 <template>
   <div id="left-list-view" class="p-0 bg-light">
-    <p class="text-center pt-3 px-2 bg-wash mb-0">
-      <button type="button" class="btn btn-outline-secondary btn-sm btn-block">
+    <div class="d-flex flex-column pt-0 px-2 bg-wash mb-0">
+      <div class="custom-control custom-switch py-1">
+        <input v-model="leftPanel.deltaMode" type="checkbox" class="custom-control-input" id="delta-mode-switch">
+        <label class="custom-control-label d-flex justify-content-between font-weight-bold text-uppercase" for="delta-mode-switch">Delta View Mode<span><i class="fas fa-play fa-rotate-270"></i></span></label>
+      </div>
+      <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @click="leftPanel.showDeltaModal = true">
         Configure Delta
       </button>
-    </p>
+    </div>
 
     <ul id="top-tabs" role="tablist" class="nav nav-tabs nav-fill pt-3 mb-3 bg-wash">
       <li class="nav-item">
@@ -52,5 +56,8 @@ export default {
 </script>
 
 <style scoped>
-
+.custom-switch label {
+  font-size: 0.9rem;
+  padding-top: 0.1rem;
+}
 </style>

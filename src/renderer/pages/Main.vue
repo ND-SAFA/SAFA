@@ -2,7 +2,7 @@
   <div id="mainpage">
 
     <!-- Header Nav -->
-    <HeaderNav v-bind:right-panel="rightPanel"/>
+    <HeaderNav v-bind:right-panel="rightPanel" v-bind:versions="leftPanel.versions" v-bind:show-versions="leftPanel.deltaMode"/>
 
     <div class="d-flex" id="wrapper">
 
@@ -16,7 +16,7 @@
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
             </div>
-            <ConfigureDeltaModal/>
+            <ConfigureDeltaModal v-bind:is-hidden="!leftPanel.showDeltaModal" v-bind:left-panel="leftPanel" @close="leftPanel.showDeltaModal = false"/>
           </div>
         </main>
       </div>
@@ -46,7 +46,14 @@
           isHidden: true
         },
         leftPanel: {
-          selectedTreeId: null
+          selectedTreeId: null,
+          showDeltaModal: false,
+          deltaMode: false,
+          versions: {
+            available: [ 1 ],
+            current: 1,
+            baseline: 1
+          }
         }
       }
     },

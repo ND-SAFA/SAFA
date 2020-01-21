@@ -30,6 +30,10 @@ const getters = {
 
   getNodeParents: (state) => async (nodeId) => {
     return projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
+  },
+
+  getSafetyArtifactTreeVersions (state) {
+    return state.projects.safetyArtifactTreeVersions
   }
 }
 
@@ -64,6 +68,14 @@ const actions = {
     } catch (error) {
       // handle the error here
     }
+  },
+  async fetchSafetyArtifactTreeVersions ({ commit }, treeId) {
+    try {
+      const response = await projects.getProjectSafetyArtifactTreeVersions(TEMP_PROJ_ID, treeId)
+      commit('SET_SAFETY_ARTIFACT_TREE_VERSIONS', response)
+    } catch (error) {
+      // handle the error here
+    }
   }
 }
 
@@ -78,6 +90,10 @@ const mutations = {
 
   SET_SAFETY_ARTIFACT_TREE (state, data) {
     state.projects.safetyArtifactTree = data
+  },
+
+  SET_SAFETY_ARTIFACT_TREE_VERSIONS (state, data) {
+    state.projects.safetyArtifactTreeVersions = data
   }
 }
 

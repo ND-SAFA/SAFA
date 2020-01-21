@@ -21,18 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-public class TreeService {
+public class ProjectService {
 
   @Autowired
   Driver driver;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
-  public TreeService() {
+  public ProjectService() {
   }
   
-  public TreeService(Driver driver) {
+  public ProjectService(Driver driver) {
     this.driver = driver;
+  }
+
+  @Transactional(readOnly = true)
+  public boolean projectPull(String projId) {
+    return true;
   }
 
   @PostConstruct

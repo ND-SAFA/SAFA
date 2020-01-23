@@ -1,4 +1,4 @@
-import config from 'config'
+import CONFIG from 'config'
 
 export const NODE_WIDTH = 150
 export const NODE_HEIGHT = 60
@@ -34,9 +34,9 @@ let ancestorExactTypes = []
 let ancestorSubTypes = []
 let peerNodeTypes = []
 try {
-  peerNodeTypes = config.get('safa_tree.peer_node_types').split(',')
-  ancestorExactTypes = config.get('safa_tree.ancestor_exact_types').split(',')
-  ancestorSubTypes = config.get('safa_tree.ancestor_sub_types').split(',')
+  peerNodeTypes = CONFIG.get('safa_tree.peer_node_types').split(',')
+  ancestorExactTypes = CONFIG.get('safa_tree.ancestor_exact_types').split(',')
+  ancestorSubTypes = CONFIG.get('safa_tree.ancestor_sub_types').split(',')
 } catch (e) {
   // Types Not configured in environment
 }

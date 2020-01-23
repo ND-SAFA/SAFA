@@ -6,6 +6,7 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
+const ConfigWebpackPlugin = require("config-webpack")
 const MinifyPlugin = require("babel-minify-webpack-plugin")
 
 let mainConfig = {
@@ -49,7 +50,8 @@ let mainConfig = {
     path: path.join(__dirname, '../dist/electron')
   },
   plugins: [
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new ConfigWebpackPlugin()
   ],
   resolve: {
     extensions: ['.js', '.json', '.node']

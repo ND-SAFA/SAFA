@@ -38,4 +38,12 @@ export default class CytoscapePrototype {
     this.cy = cy
     return cy
   }
+
+  destroy () {
+    if (this.cy) {
+      this.cy.removeAllListeners()
+      this.cy.elements().removeAllListeners()
+      this.cy.destroy()
+    }
+  }
 }

@@ -12,7 +12,7 @@
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
               <LeftPanel v-bind:left-panel="leftPanel"/>
-              <SafetyArtifactTree v-bind:tree-id="leftPanel.selectedTreeId"/>
+              <SafetyArtifactTree v-bind:tree-id="leftPanel.selectedTreeId" v-on:unselect-node="unselectNode"/>
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
             </div>
@@ -43,7 +43,8 @@
       return {
         isFetchingFromServer: false,
         rightPanel: {
-          isHidden: true
+          isHidden: true,
+          selectedNode: null
         },
         leftPanel: {
           selectedTreeId: null,
@@ -64,6 +65,9 @@
       ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree']),
       open (link) {
         this.$electron.shell.openExternal(link)
+      },
+      unselectNode (evt, target, selector) {
+        console.log(evt, target, selector)
       }
     },
     async mounted () {

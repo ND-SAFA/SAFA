@@ -48,7 +48,7 @@ export function addElement (acc, e) {
     acc = addNode(acc, e)
   } else {
     if (e.classes === 'edge') {
-      acc.push({ data: { id: e.id, type: e.type, target: e.source, source: e.target } })
+      acc.push({ data: { id: e.id, type: e.type, target: e.target, source: e.source } })
     }
   }
   return acc

@@ -21,6 +21,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import Vue from 'vue'
 import BadgeTemplate from '@/lib/cytoscape/badges/badge-template'
 import BadgeFactory from '@/lib/cytoscape/badges/badge-factory'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
@@ -65,6 +66,10 @@ export default {
   methods: {
     ...mapActions('projects.module', ['fetchSafetyArtifactTree']),
     makeGraph: async function (container) {
+      if (!Vue.isEmpty(this.cytoscapeProto)) {
+        this.cytoscapeProto.destroy()
+      }
+
       const badgeTemplate = {
         trigger: B.TRIGGER.MANUAL,
         placement: B.PLACEMENT.BOTTOM_END,
@@ -86,7 +91,7 @@ export default {
       const klayLayoutTemplate = new LayoutTemplateKlay({
         zoom: 1.12,
         spacing: 15,
-        direction: L.DIRECTION.UP,
+        direction: L.DIRECTION.DOWN,
         fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
         layoutHierarchy: true,
         nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
@@ -95,6 +100,7 @@ export default {
 
       this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, klayLayoutTemplate, badgeFactory)
       this.cytoscapeProto.run()
+      this.cytoscapeProto.cy.on('unselect-node', this.$emit.bind(this, 'unselect-node'))
     }
   }
 }

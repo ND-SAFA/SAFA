@@ -1,7 +1,7 @@
-import config from 'config'
+import CONFIG from 'config'
 
 export default async function httpClient (relativeUrl) {
-  const baseURL = config.get('services.api.url')
+  const baseURL = CONFIG.get('services.api.url')
   return fetch(`${baseURL}/${relativeUrl}`, {
     headers: {
       'Content-Type': 'application/json'

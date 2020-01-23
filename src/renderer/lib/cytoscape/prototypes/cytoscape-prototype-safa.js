@@ -1,12 +1,14 @@
 import CytoscapePrototype from '.'
 import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay'
+import dagre from 'cytoscape-dagre'
 import nodeHtmlLabel from 'cytoscape-node-html-label'
 import popper from 'cytoscape-popper'
 import automove from 'cytoscape-automove'
 
 nodeHtmlLabel(cytoscape)
 cytoscape.use(klay)
+cytoscape.use(dagre)
 cytoscape.use(popper)
 cytoscape.use(automove)
 
@@ -61,7 +63,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     const allNodes = cy.nodes()
     allNodes.forEach(node => {
       const rule = cy.automove({
-        nodesMatching: node.predecessors('node'),
+        nodesMatching: node.successors('node'),
         reposition: 'drag',
         dragWith: node
       })
@@ -149,7 +151,9 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __applyCustomEvents (cy) {
-    // cy.on('unselect', removeNodeDetails)
+    cy.on('unselect', (evt, type, selector) => {
+      cy.emit('unselect-node', evt, type, selector)
+    })
 
     // cy.on('select', addNodeDetails)
 
@@ -174,7 +178,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __applyPositioning (cy) {
-    cy.center(cy.nodes().leaves().first())
+    cy.center(cy.nodes().roots().first())
     cy.panBy({ y: -(cy.size().height / 2 - this.options.NODE_HEIGHT) })
   }
 
@@ -183,7 +187,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     for (let i = 0; i < this.packageNodes.length; i++) {
       // Align each code node under package node
       const node = this.packageNodes[i]
-      const codeNodes = node.incomers('node')
+      const codeNodes = node.outgoers('node')
       codeNodes.forEach((codeNode, index) => {
         // Toggle height change
         codeNode.toggleClass('code-node')
@@ -199,7 +203,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   // -----------------------------------------------------------------------------
   __layoutPeerNodes (cy) {
     for (let i = 0; i < this.peerNodes.length; i++) {
-      const ancestorNode = this.peerNodes[i].outgoers('node').first()
+      const ancestorNode = this.peerNodes[i].incomers('node').first()
       if ((this.peerNodes[i].scratch('peerIndex') + 1) % 2) {
         this.peerNodes[i].position('x', ancestorNode.position('x') + (this.peerNodes[i].outerWidth() + this.options.CORE_PEER_SPACING) * (this.peerNodes[i].scratch('peerIndex') + 1))
       } else {
@@ -231,10 +235,10 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     const ancestorNodeTypes = ancestorExactTypes.map(exactType => `node[type="${exactType}"]`).concat(ancestorSubTypes.map(subType => `node[type*="${subType}"]`))
     const ancestorSelector = ancestorNodeTypes.join(',')
     // Get nodes connected to above peer nodes
-    this.ancestorNodes = this.peerNodes.outgoers(ancestorSelector)
+    this.ancestorNodes = this.peerNodes.incomers(ancestorSelector)
     // Save the number of peers in the ancestor node for layout purposes
     for (let i = 0; i < this.ancestorNodes.length; i++) {
-      const peers = this.ancestorNodes[i].incomers().intersection(this.peerNodes)
+      const peers = this.ancestorNodes[i].outgoers().intersection(this.peerNodes)
       for (let j = 0; j < peers.length; j++) {
         // Save the corresponding index in each peer node
         peers[j].scratch('peerIndex', j)
@@ -252,7 +256,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     this.packageNodes = cy.nodes('[type="Package"]')
     this.packageNodes.forEach(packageNode => {
       // Get number of code nodes in each package
-      const numCodeNodes = packageNode.incomers('edge').length
+      const numCodeNodes = packageNode.outgoers('edge').length
       // Calculate and set total height of package node
       packageNode.style('height', packageNode.outerHeight() + numCodeNodes * (this.options.NODE_CODE_HEIGHT + 2 * this.options.NODE_PADDING - this.options.NODE_BORDER_WIDTH))
     })

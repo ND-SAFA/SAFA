@@ -9,9 +9,11 @@ import java.util.UUID;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
@@ -115,17 +117,49 @@ public class ProjectService {
 
   @Transactional(readOnly = true)
   public Map<String, Object> versions(String projectId) {
+    int version = -1;
     try ( Session session = driver.session() ) {
-      String query = "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r.version DESC LIMIT 1";
-        
-      StatementResult result = session.run(query);
-      Integer last = result.single().get("version").asInt();
-      System.out.println(last);
-
-      Map<String, Object> ret = new HashMap<String, Object>();
-      ret.put("latest", last);
-      return ret;
+      StatementResult result = session.run("MATCH (v:VERSION) RETURN v.number");
+      if (result.hasNext()) {
+          Record record = result.next();
+          version = record.get("v.number").asInt();
+      }
     }
+
+    // If we have no version and but we have nodes then our current version is 0
+    if( version == -1 ){
+        int count = 0;
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n) RETURN count(*)");
+            if (result.hasNext()) {
+                Record record = result.next();
+                count = record.get("count(*)").asInt();
+            }
+        }
+        if( count > 0 ) {
+            version = 0;
+        }
+    }
+        
+    Map<String, Object> ret = new HashMap<String, Object>();
+    ret.put("latest", version);
+    return ret;
+  }
+
+  public Map<String, Object> versionsTag(String projectId) {
+      final int nextVersion = (Integer)this.versions(projectId).get("latest") + 1;
+      if( nextVersion != 0 ) {
+          System.out.println(String.format("Marking version %d as fixed, moving to %d", nextVersion-1, nextVersion));
+          try (Session session = driver.session()) {
+              try (Transaction tx = session.beginTransaction()) {
+                  tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=" + nextVersion + " RETURN v;");
+                  tx.success();
+              }
+          }
+      }
+      Map<String, Object> ret = new HashMap<String, Object>(); 
+      ret.put("version", nextVersion);
+      return ret;
   }
 
   // MARKED AS DEPRECATED

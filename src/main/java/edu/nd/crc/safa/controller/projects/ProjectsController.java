@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.nd.crc.safa.services.ProjectService;
@@ -46,6 +47,11 @@ public class ProjectsController {
   @GetMapping("/projects/{projId}/versions/")
   public Map<String, Object> versions(@PathVariable String projId) {
     return projectService.versions(projId);
+  }
+
+  @PostMapping("/projects/{projId}/versions/")
+  public Map<String, Object> versionsTag(@PathVariable String projId) {
+    return projectService.versionsTag(projId);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")

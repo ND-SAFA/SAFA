@@ -43,9 +43,9 @@ public class ProjectsController {
     return projectService.trees(projId, treeId);
   }
 
-  @GetMapping("/projects/{projId}/trees/{treeId}/versions/")
-  public Map<String, Object> versions(@PathVariable String projId, @PathVariable String treeId) {
-    return projectService.versions(projId, treeId);
+  @GetMapping("/projects/{projId}/versions/")
+  public Map<String, Object> versions(@PathVariable String projId) {
+    return projectService.versions(projId);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")

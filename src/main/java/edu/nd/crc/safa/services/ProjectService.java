@@ -45,7 +45,7 @@ public class ProjectService {
     final List<Map<String, Object>> hazards = hazards("test");
     for( Map<String, Object> node : hazards ){
       final String id = (String)node.get("id");
-      final int version = (Integer)versions("test", id).get("latest"); 
+      final int version = (Integer)versions("test").get("latest"); 
       final List<Map<String, Object>> data = versions("test", id, version);
       mWarnings.put(id, false);
       for( Map<String, Object> v: data) {
@@ -109,31 +109,50 @@ public class ProjectService {
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> trees(String projectId, String root) {
-    int version = (Integer)versions(projectId, root).get("latest");
+    int version = (Integer)versions(projectId).get("latest");
     return versions(projectId, root, version);
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Object> versions(String projectId, String root) {
+  public Map<String, Object> versions(String projectId) {
     try ( Session session = driver.session() ) {
-      String query = "MATCH (a {id: $root})" +
-      "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
-      "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
-      "UNWIND rel as ru\n" + 
-      "WITH ru AS res ORDER BY res\n" + 
-      "RETURN collect(distinct res) as last";
+      String query = "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r.version DESC LIMIT 1";
         
-      StatementResult result = session.run(query, Values.parameters("root", root));
-      List<Integer> last = result.single().get("last").asList(Values.ofInteger());
+      StatementResult result = session.run(query);
+      Integer last = result.single().get("version").asInt();
+      System.out.println(last);
 
       Map<String, Object> ret = new HashMap<String, Object>();
-      if( last.size() == 0 ) return ret;
-
-      ret.put("latest", last.get(last.size()-1));
-      ret.put("available", last);
+      ret.put("latest", last);
       return ret;
     }
   }
+
+  // MARKED AS DEPRECATED
+  //
+  // @Transactional(readOnly = true)
+  // public Map<String, Object> versions(String projectId, String root) {
+  //   try ( Session session = driver.session() ) {
+  //     String query = "MATCH (a {id: $root})" +
+  //     "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
+  //     "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
+  //     "UNWIND rel as ru\n" + 
+  //     "WITH ru AS res ORDER BY res\n" + 
+  //     "RETURN collect(distinct res) as last";
+        
+  //     StatementResult result = session.run(query, Values.parameters("root", root));
+  //     List<Integer> last = result.single().get("last").asList(Values.ofInteger());
+
+  //     Map<String, Object> ret = new HashMap<String, Object>();
+  //     if( last.size() == 0 ) return ret;
+
+  //     ret.put("latest", last.get(last.size()-1));
+  //     ret.put("available", last);
+  //     return ret;
+  //   }
+  // }
+  //
+  // END MARKED AS DEPRECATED
 
   @Transactional(readOnly = true)
   public List<Map<String, Object>> versions(String projectId, String root, int version) {

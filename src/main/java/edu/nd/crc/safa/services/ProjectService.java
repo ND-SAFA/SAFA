@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
@@ -20,6 +21,9 @@ import org.neo4j.driver.v1.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import edu.nd.crc.safa.importer.Puller;
 
 
 @Service
@@ -27,6 +31,9 @@ public class ProjectService {
 
   @Autowired
   Driver driver;
+
+  @Autowired
+  Puller mPuller;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
@@ -37,9 +44,40 @@ public class ProjectService {
     this.driver = driver;
   }
 
-  @Transactional(readOnly = true)
-  public boolean projectPull(String projId) {
-    return true;
+  public SseEmitter projectPull(String projId) {
+    SseEmitter emitter = new SseEmitter(0L);
+    ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
+    sseMvcExecutor.execute(() -> {
+        try {
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": false}")
+            .id(String.valueOf(0))
+            .name("update"));
+
+          mPuller.ParseJIRAIssues();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": false}")
+            .id(String.valueOf(1))
+            .name("update"));
+
+          mPuller.ParseSourceLinks();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": false}")
+            .id(String.valueOf(2))
+            .name("update"));
+
+          mPuller.Execute();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": true}")
+            .id(String.valueOf(3))
+            .name("update"));
+
+          emitter.complete();
+        } catch (Exception ex) {
+            emitter.completeWithError(ex);
+        }
+    });
+    return emitter;
   }
 
   @PostConstruct

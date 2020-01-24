@@ -2,6 +2,7 @@ package edu.nd.crc.safa.importer;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
@@ -319,7 +320,7 @@ public class Database implements AutoCloseable {
 
         Set<Triplet<String, String, String>> modified = mExternalNodeMap.stream().filter((n) -> {
             return mNodeMap.stream().anyMatch((o) -> {
-                return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && !o.getValue2().equals(n.getValue2());
+                return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && !o.getValue2().equals(Base64.getEncoder().encodeToString(n.getValue2().getBytes(StandardCharsets.UTF_8)));
             });
         }).collect(Collectors.toSet());
         //System.out.println(String.format("Modified Issues: %d", modified.size()));

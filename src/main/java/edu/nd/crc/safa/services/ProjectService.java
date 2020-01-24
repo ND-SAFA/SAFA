@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
 
 
@@ -186,7 +187,11 @@ public class ProjectService {
 
   public Map<String, Object> versionsTag(String projectId) {
       Map<String, Object> ret = new HashMap<String, Object>(); 
-      ret.put("version", mPuller.mDatabase.Tag(););
+      try {
+        ret.put("version", mPuller.mDatabase.Tag());
+      } catch (Exception e) {
+        //
+      }
       return ret;
   }
 
@@ -246,6 +251,7 @@ public class ProjectService {
         "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
         // Return a unique set of nodes and relationships
         "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
+
       StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
 
       final List<Map<String, Object>> retVal = parseArtifactTree(result);
@@ -284,7 +290,7 @@ public class ProjectService {
         final String root = ids.get(r.startNodeId());
         final int version = r.get("version").asInt();
 
-        if( maxModification.getOrDefault(root, 0) < version ){
+        if( maxModification.getOrDefault(root, -1) < version ){
           maxModification.put(root, version);
         }
       }

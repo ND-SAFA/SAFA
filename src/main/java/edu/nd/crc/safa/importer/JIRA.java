@@ -129,18 +129,17 @@ public class JIRA {
                 }
 
                 issue.links = new ArrayList<IssueLink>();
-                if (i.get("issuelinks").valueType() != ValueType.INVALID) {
-                    for (Any l : i.get("issuelinks").asList()) {
-                        IssueLink link = new IssueLink();
+                for (Any l : fields.get("issuelinks").asList()) {
 
-                        link.Type = l.get("type").get("name").toString().toUpperCase();
+                    IssueLink link = new IssueLink();
 
-                        Any inward = l.get("inwardIssue");
-                        link.InwardKey = inward.get("key").toString();
-                        link.InwardType = inward.get("issuetype").get("name").toString();
+                    link.Type = l.get("type").get("name").toString().toUpperCase();
 
-                        issue.links.add(link);
-                    }
+                    Any inward = l.get("inwardIssue");
+                    link.InwardKey = inward.get("key").toString();
+                    link.InwardType = inward.get("fields").get("issuetype").get("name").toString();
+
+                    issue.links.add(link);
                 }
 
                 downloaded++;

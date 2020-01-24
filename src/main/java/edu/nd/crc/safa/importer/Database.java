@@ -9,14 +9,15 @@ import java.util.stream.Collectors;
 
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;
-import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Database implements AutoCloseable {
     public class EmptyException extends Exception{
         private static final long serialVersionUID = 7123803818445430594L;
@@ -32,11 +33,11 @@ public class Database implements AutoCloseable {
     private Set<Triplet<String, String, String>> mNodeMap = new HashSet<Triplet<String, String, String>>();
     private Set<Quartet<String, String, String, String>> mSourceMap = new HashSet<Quartet<String, String, String, String>>();
 
-    public final Driver driver;
+    @Autowired
+    Driver driver;
     private static int mLatestVersion = 0;
 
-    public Database(String uri, String user, String password) {
-        driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+    public Database() {
     }
 
     public StatementResult Query(final String query) {

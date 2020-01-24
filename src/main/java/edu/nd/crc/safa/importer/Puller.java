@@ -1,27 +1,17 @@
 package edu.nd.crc.safa.importer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
-
 import com.jsoniter.output.JsonStream;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -36,40 +26,18 @@ import edu.nd.crc.safa.importer.JIRA.Issue;
 
 @Component
 public class Puller {
-    @Autowired @Value("${neo4j.host}") String neo4jHost;
-    @Autowired @Value("${neo4j.port}") String neo4jPort;
-    @Autowired @Value("${neo4j.username}") String neo4jUser;
-    @Autowired @Value("${neo4j.password}") String neo4jPassword;
-    @Autowired @Value("${neo4j.scheme:bolt}") String neo4jScheme;
-    
-    @Autowired @Value("${jira.username:}") String jiraUsername;
-    @Autowired @Value("${jira.password:}") String jiraPassword;
-
     @Autowired @Value("${git.username:}") String gitUsername;
     @Autowired  @Value("${git.password:}") String gitPassword;
     @Autowired @Value("${git.url:}") String gitURL;
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
+    @Autowired JIRA mJira;
+    @Autowired Database mDatabase;
 
-    private JIRA mJira;
-    private Database mDatabase;
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
 
     private Set<String> foundNodes = new HashSet<String>();
-
-    public Puller(){
-    }
-
-    @PostConstruct
-    public void init() {
-        try{
-            mJira = new JIRA(jiraUsername, jiraPassword);
-            mDatabase = new Database(String.format("%s://%s:%s", neo4jScheme, neo4jHost, neo4jPort), neo4jUser, neo4jPassword);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
 
     public void Execute(){
         mDatabase.Execute();

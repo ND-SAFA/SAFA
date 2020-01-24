@@ -17,6 +17,11 @@ import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class JIRA {
     public class Issue {
         String source;
@@ -38,15 +43,14 @@ public class JIRA {
     }
 
     private String uri;
-    private String mUsername;
-    private String mPassword;
+    @Autowired @Value("${jira.username:}") String mUsername;
+    @Autowired @Value("${jira.password:}") String mPassword;
 
-    public JIRA(String username, String password) throws Exception {
+
+    public JIRA() {
         uri = "http://spwd.cse.nd.edu:8080/";
-        mUsername = username;
-        mPassword = password;
     }
-
+    
     private String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());

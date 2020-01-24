@@ -46,7 +46,7 @@ public class Database implements AutoCloseable {
         }
     }
 
-    public void Tag() throws EmptyException{
+    public int Tag() throws EmptyException{
         final int nextVersion = this.CurrentVersion() + 1;
         if( nextVersion == 0 ){
             throw new EmptyException();
@@ -59,6 +59,7 @@ public class Database implements AutoCloseable {
                 tx.success();
             }
         }
+        return nextVersion;
     }
 
     public int CurrentVersion() {

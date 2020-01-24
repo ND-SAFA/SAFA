@@ -185,18 +185,8 @@ public class ProjectService {
   }
 
   public Map<String, Object> versionsTag(String projectId) {
-      final int nextVersion = (Integer)this.versions(projectId).get("latest") + 1;
-      if( nextVersion != 0 ) {
-          System.out.println(String.format("Marking version %d as fixed, moving to %d", nextVersion-1, nextVersion));
-          try (Session session = driver.session()) {
-              try (Transaction tx = session.beginTransaction()) {
-                  tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=" + nextVersion + " RETURN v;");
-                  tx.success();
-              }
-          }
-      }
       Map<String, Object> ret = new HashMap<String, Object>(); 
-      ret.put("version", nextVersion);
+      ret.put("version", mPuller.mDatabase.Tag(););
       return ret;
   }
 

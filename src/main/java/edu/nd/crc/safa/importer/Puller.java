@@ -32,7 +32,7 @@ public class Puller {
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
     @Autowired JIRA mJira;
-    @Autowired Database mDatabase;
+    @Autowired public Database mDatabase;
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");

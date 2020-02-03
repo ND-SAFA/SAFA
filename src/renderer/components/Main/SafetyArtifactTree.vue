@@ -21,6 +21,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import AppMenu from '@/menu'
 import Vue from 'vue'
 import BadgeTemplate from '@/lib/cytoscape/badges/badge-template'
 import BadgeFactory from '@/lib/cytoscape/badges/badge-factory'
@@ -57,6 +58,12 @@ export default {
     return {
       cytoscapeProto: Object()
     }
+  },
+
+  created () {
+    AppMenu.findMenuItemById('view.graph_zoom_in').click = this.graphZoomIn.bind(this)
+    AppMenu.findMenuItemById('view.graph_zoom_out').click = this.graphZoomOut.bind(this)
+    AppMenu.setApplicationMenu()
   },
 
   mounted () {
@@ -100,7 +107,14 @@ export default {
 
       this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, klayLayoutTemplate, badgeFactory)
       this.cytoscapeProto.run()
+
       this.cytoscapeProto.cy.on('unselect-node', this.$emit.bind(this, 'unselect-node'))
+    },
+    graphZoomIn () {
+      console.log('graphZoomIn()')
+    },
+    graphZoomOut () {
+      console.log('graphZoomOut()')
     }
   }
 }

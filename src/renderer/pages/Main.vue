@@ -28,6 +28,7 @@
 
 <script>
   import { mapActions, mapGetters } from 'vuex'
+  import AppMenu from '@/menu'
   import HeaderNav from '@/components/Main/HeaderNav'
   import LeftPanel from '@/components/Main/LeftPanel'
   import RightPanel from '@/components/Main/RightPanel'
@@ -61,6 +62,10 @@
     computed: {
       ...mapGetters('projects.module', ['getHazards'])
     },
+    created () {
+      AppMenu.findMenuItemById('view.refresh').click = this.reloadData.bind(this)
+      AppMenu.setApplicationMenu()
+    },
     methods: {
       ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree']),
       open (link) {
@@ -68,6 +73,9 @@
       },
       unselectNode (evt, target, selector) {
         console.log(evt, target, selector)
+      },
+      reloadData () {
+        console.log('reloadData()')
       }
     },
     async mounted () {

@@ -38,13 +38,14 @@ async function getProjectSafetyArtifactTree (projId, treeId) {
   return json.reduce(addElement, [])
 }
 
-// /projects/{projId}/trees/{treeId}/versions/
-async function getProjectSafetyArtifactTreeVersions (projId, treeId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/versions/`)
+// /projects/{projId}/versions/
+async function fetchProjectVersions (projId) {
+  const response = await fetch(`${RELATIVE_API_PATH}/${projId}/versions/`)
   const json = await response.json()
-  if (json.available) return json.available
-  if (json.latest) return json.latest
-  return 1
+  if (json.latest !== undefined && json.latest !== null) {
+    return json.latest
+  }
+  return 0
 }
 
 export default {
@@ -53,5 +54,5 @@ export default {
   getProjectHazardsWarnings,
   getProjectHazardTree,
   getProjectSafetyArtifactTree,
-  getProjectSafetyArtifactTreeVersions
+  fetchProjectVersions
 }

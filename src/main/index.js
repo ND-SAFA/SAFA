@@ -1,5 +1,7 @@
+/* eslint-disable */
 'use strict'
 
+import AppMenu from '../renderer/menu'
 import { app, BrowserWindow } from 'electron'
 
 /**
@@ -19,13 +21,13 @@ function createWindow () {
   /**
    * Initial window options
    */
+  AppMenu.setApplicationMenu()
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
     width: 1000,
     webPreferences: {webSecurity: false}
   })
-
   mainWindow.loadURL(winURL)
 
   mainWindow.on('closed', () => {

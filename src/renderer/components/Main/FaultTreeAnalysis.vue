@@ -13,8 +13,21 @@
 </template>
 
 <script>
+import AppMenu from '@/menu'
+
 export default {
-  name: 'FaultTreeAnalysis'
+  name: 'FaultTreeAnalysis',
+
+  created () {
+    AppMenu.findMenuItemById('file.open_fta').click = this.openFTAFile.bind(this)
+    AppMenu.setApplicationMenu()
+  },
+
+  methods: {
+    openFTAFile () {
+      console.log('openFTAFile()')
+    }
+  }
 }
 </script>
 

@@ -1,0 +1,84 @@
+import { remote, Menu } from 'electron'
+import Template from './template'
+
+const _MENU = remote ? remote.Menu : Menu
+
+export default class AppMenu {
+  static __template = new Template(
+    {
+      label: 'File',
+      id: 'file',
+      submenu: [
+        {
+          id: 'open_fta',
+          label: 'Open FTA File',
+          accelerator: 'CommandOrControl+O'
+        }
+      ]
+    },
+    {
+      label: 'View',
+      id: 'view',
+      submenu: [
+        {
+          id: 'refresh',
+          label: 'Refresh',
+          accelerator: 'CommandOrControl+R'
+        },
+        {
+          id: 'graph_zoom_in',
+          label: 'Graph Zoom In',
+          accelerator: 'CommandOrControl+='
+        },
+        {
+          id: 'graph_zoom_out',
+          label: 'Graph Zoom Out',
+          accelerator: 'CommandOrControl+-'
+        }
+      ]
+    },
+    {
+      label: 'Project',
+      id: 'project',
+      submenu: [
+        {
+          id: 'sync',
+          label: 'Synchronize Forest',
+          accelerator: 'CommandOrControl+P'
+        },
+        {
+          id: 'freeze',
+          label: 'Freeze Version',
+          accelerator: 'CommandOrControl+S'
+        }
+      ]
+    }
+  )
+
+  static findMenuItemById (id) {
+    try {
+      let [menuId, subMenuId] = id.split('.')
+      let menuItem = AppMenu.__template.find(i => i.id === menuId)
+      if (subMenuId) {
+        menuItem = menuItem.submenu.find(i => i.id === subMenuId)
+      }
+      return menuItem
+    } catch (e) {
+      return {}
+    }
+  }
+
+  static template (template) {
+    if (template instanceof Array) {
+      AppMenu.__template = template
+    }
+    return AppMenu.__template
+  }
+
+  static setApplicationMenu () {
+    if (AppMenu.__template) {
+      const menu = _MENU.buildFromTemplate(AppMenu.__template)
+      _MENU.setApplicationMenu(menu)
+    }
+  }
+}

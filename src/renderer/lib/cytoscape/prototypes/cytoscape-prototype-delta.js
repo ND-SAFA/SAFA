@@ -11,18 +11,19 @@ export default class CytoscapePrototypeDelta extends CytoscapePrototypeSAFA {
     this.badges = []
   }
 
-  preLayoutHook (cy) {
-    super.preLayoutHook(cy)
-    while (this.badges.length) {
-      const badge = this.badges.pop()
-      badge.destroy()
-    }
-  }
-
   // -----------------------------------------------------------------------------
   postLayoutHook (cy) {
     super.postLayoutHook(cy)
     this.__applyBadges(cy)
+  }
+
+  // -----------------------------------------------------------------------------
+  destroy () {
+    super.destroy()
+    while (this.badges.length) {
+      const badge = this.badges.pop()
+      badge.destroy()
+    }
   }
 
   // -----------------------------------------------------------------------------

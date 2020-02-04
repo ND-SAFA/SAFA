@@ -9,6 +9,7 @@ const TEMP_PROJ_ID = 'spwd.cse.nd.edu'
 
 const state = {
   projects: {
+    syncProgress: -1,
     delta: {
       trees: []
     },
@@ -47,6 +48,10 @@ const getters = {
 
   getDeltaTrees (state) {
     return state.projects.delta.trees
+  },
+
+  getSyncProgress (state) {
+    return state.projects.syncProgress
   }
 }
 
@@ -95,7 +100,6 @@ const actions = {
   async saveProjectVersion ({ commit }) {
     try {
       const response = await projects.postProjectVersion(TEMP_PROJ_ID)
-      console.log(response)
       commit('SET_PROJECT_VERSIONS', response)
     } catch (e) {
       // TODO(Adam): handle the error here
@@ -115,11 +119,29 @@ const actions = {
     const { treeId, baseline, current } = payload
     try {
       const response = await projects.getDeltaTrees(TEMP_PROJ_ID, treeId, [baseline, current])
-      console.log(response)
       commit('SET_DELTA_TREES', response)
     } catch (e) {
       // TODO(Adam): handle error
     }
+  },
+
+  async syncProject ({ commit }) {
+    const evtSource = projects.syncProject(TEMP_PROJ_ID)
+    commit('SET_SYNC_PROGRESS', 0)
+    return new Promise((resolve, reject) => {
+      evtSource.addEventListener('update', (message) => {
+        commit('SET_SYNC_PROGRESS', message.lastEventId)
+        if (JSON.parse(message.data).complete) {
+          evtSource.close()
+          commit('SET_SYNC_PROGRESS', -1)
+          resolve()
+        }
+      })
+      evtSource.onerror = (e) => {
+        commit('SET_SYNC_PROGRESS', -1)
+        reject(e)
+      }
+    })
   }
 }
 
@@ -146,6 +168,10 @@ const mutations = {
 
   SET_DELTA_TREES (state, data) {
     state.projects.delta.trees = data
+  },
+
+  SET_SYNC_PROGRESS (state, data) {
+    state.projects.syncProgress = data
   }
 }
 

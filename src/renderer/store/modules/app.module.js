@@ -9,7 +9,8 @@ const state = {
     delta: {
       enabled: false,
       baseline: 0,
-      current: 0
+      current: 0,
+      changed: 0
     }
   }
 }
@@ -28,11 +29,12 @@ const actions = {
 
 const mutations = {
   UPDATE_DELTA (state, data) {
-    if (data.baseline > data.current) {
+    if (data.current > data.baseline) {
       const swap = data.current
       data.current = data.baseline
       data.baseline = swap
     }
+    data.changed = Date.now()
     state.app.delta = data
   }
 }

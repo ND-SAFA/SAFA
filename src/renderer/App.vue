@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex'
+  import { mapActions, mapGetters } from 'vuex'
   import AppMenu from '@/menu'
 
   export default {
@@ -15,15 +15,22 @@
         myData: 10
       }
     },
+    computed: {
+      ...mapGetters('projects.module', ['getSyncProgress'])
+    },
     created () {
       AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.freeze').click = this.projectFreeze.bind(this)
       AppMenu.setApplicationMenu()
     },
     methods: {
-      ...mapActions('projects.module', ['saveProjectVersion']),
-      projectSync () {
-        console.log('projectSync()')
+      ...mapActions('projects.module', ['saveProjectVersion', 'syncProject']),
+      async projectSync () {
+        try {
+          await this.syncProject()
+        } catch (e) {
+
+        }
       },
       async projectFreeze () {
         await this.saveProjectVersion()

@@ -48,8 +48,7 @@ import {mapActions, mapGetters} from 'vuex'
 
 export default {
   props: {
-    isHidden: Boolean,
-    leftPanel: Object
+    isHidden: Boolean
   },
 
   data () {
@@ -93,10 +92,8 @@ export default {
 
     async updateAvailableVersions () {
       await this.fetchProjectVersions()
-      const deltaState = this.deltaState
-      deltaState.baseline = this.getProjectVersions.latest
-      deltaState.current = this.getProjectVersions.latest
-      this.updateDelta(deltaState)
+      this.versions.selectedBaseline = this.getDeltaState.baseline
+      this.versions.selectedCurrent = this.getDeltaState.current
     }
   }
 }

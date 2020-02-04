@@ -1,4 +1,5 @@
 import httpClient from './http-client'
+import eventSource from './event-source'
 import { addNode, addElement } from '../lib/cytoscape/serializers'
 
 const RELATIVE_API_PATH = 'projects'
@@ -66,6 +67,10 @@ async function getDeltaTrees (projId, treeId, versions) {
   return results.map(json => json.reduce(addElement, []))
 }
 
+function syncProject (projId) {
+  return eventSource(`${RELATIVE_API_PATH}/${projId}/pull/`)
+}
+
 export default {
   getProjectNodeParents,
   getProjectHazards,
@@ -74,5 +79,6 @@ export default {
   getProjectSafetyArtifactTree,
   getProjectVersions,
   postProjectVersion,
-  getDeltaTrees
+  getDeltaTrees,
+  syncProject
 }

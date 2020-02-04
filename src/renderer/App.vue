@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
   import AppMenu from '@/menu'
 
   export default {
@@ -20,11 +21,12 @@
       AppMenu.setApplicationMenu()
     },
     methods: {
+      ...mapActions('projects.module', ['saveProjectVersion']),
       projectSync () {
         console.log('projectSync()')
       },
-      projectFreeze () {
-        console.log('projectFreeze()')
+      async projectFreeze () {
+        await this.saveProjectVersion()
       }
     }
   }

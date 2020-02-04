@@ -2,29 +2,38 @@
 *   store/modules/app.module.js
 */
 
-// Electron App Data
+// Applications local cache
 
 const state = {
   app: {
-    menu: Object()
+    delta: {
+      enabled: false,
+      baseline: 0,
+      current: 0
+    }
   }
 }
 
 const getters = {
-  getAppMenu (state) {
-    return state.app.menu
+  getDeltaState (state) {
+    return state.app.delta
   }
 }
 
 const actions = {
-  async updateApplicationMenu ({ commit }, menu) {
-    commit('UPDATE_APPLICATION_MENU', menu)
+  updateDelta ({ commit }, delta) {
+    commit('UPDATE_DELTA', delta)
   }
 }
 
 const mutations = {
-  UPDATE_APPLICATION_MENU (state, data) {
-    state.app.menu = data
+  UPDATE_DELTA (state, data) {
+    if (data.baseline > data.current) {
+      const swap = data.current
+      data.current = data.baseline
+      data.baseline = swap
+    }
+    state.app.delta = data
   }
 }
 

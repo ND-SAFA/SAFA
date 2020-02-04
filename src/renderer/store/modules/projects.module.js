@@ -9,9 +9,18 @@ const TEMP_PROJ_ID = 'spwd.cse.nd.edu'
 
 const state = {
   projects: {
+    delta: {
+      trees: []
+    },
+    versions: {
+      latest: 0
+    },
     hazards: [],
     hazardTree: [],
-    safetyArtifactTree: []
+    safetyArtifactTree: [],
+    node: {
+      parents: []
+    }
   }
 }
 
@@ -28,12 +37,16 @@ const getters = {
     return state.projects.safetyArtifactTree
   },
 
-  getNodeParents: (state) => async (nodeId) => {
-    return projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
+  getNodeParents (state) {
+    return state.projects.node.parents
   },
 
-  getSafetyArtifactTreeVersions (state) {
-    return state.projects.safetyArtifactTreeVersions
+  getProjectVersions (state) {
+    return state.projects.versions
+  },
+
+  getDeltaTrees (state) {
+    return state.projects.delta.trees
   }
 }
 
@@ -49,7 +62,7 @@ const actions = {
       }
       commit('SET_HAZARDS', response)
     } catch (error) {
-      // handle the error here
+      // TODO(Adam): handle the error here
     }
   },
 
@@ -66,15 +79,46 @@ const actions = {
       const response = await projects.getProjectSafetyArtifactTree(TEMP_PROJ_ID, treeId)
       commit('SET_SAFETY_ARTIFACT_TREE', response)
     } catch (error) {
-      // handle the error here
+      // TODO(Adam): handle the error here
     }
   },
-  async fetchSafetyArtifactTreeVersions ({ commit }, treeId) {
+
+  async fetchProjectVersions ({ commit }) {
     try {
-      const response = await projects.getProjectSafetyArtifactTreeVersions(TEMP_PROJ_ID, treeId)
-      commit('SET_SAFETY_ARTIFACT_TREE_VERSIONS', response)
+      const response = await projects.getProjectVersions(TEMP_PROJ_ID)
+      commit('SET_PROJECT_VERSIONS', response)
     } catch (error) {
-      // handle the error here
+      // TODO(Adam): handle the error here
+    }
+  },
+
+  async saveProjectVersion ({ commit }) {
+    try {
+      const response = await projects.postProjectVersion(TEMP_PROJ_ID)
+      console.log(response)
+      commit('SET_PROJECT_VERSIONS', response)
+    } catch (e) {
+      // TODO(Adam): handle the error here
+    }
+  },
+
+  async fetchProjectNodeParents ({ commit }, nodeId) {
+    try {
+      const response = await projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
+      commit('SET_NODE_PARENTS', response)
+    } catch (error) {
+      // TODO(Adam): handle the error here
+    }
+  },
+
+  async fetchDeltaTrees ({ commit }, payload) {
+    const { treeId, baseline, current } = payload
+    try {
+      const response = await projects.getDeltaTrees(TEMP_PROJ_ID, treeId, [baseline, current])
+      console.log(response)
+      commit('SET_DELTA_TREES', response)
+    } catch (e) {
+      // TODO(Adam): handle error
     }
   }
 }
@@ -92,8 +136,16 @@ const mutations = {
     state.projects.safetyArtifactTree = data
   },
 
-  SET_SAFETY_ARTIFACT_TREE_VERSIONS (state, data) {
-    state.projects.safetyArtifactTreeVersions = data
+  SET_PROJECT_VERSIONS (state, data) {
+    state.projects.versions = data
+  },
+
+  SET_NODE_PARENTS (state, data) {
+    state.projects.node.parents = data
+  },
+
+  SET_DELTA_TREES (state, data) {
+    state.projects.delta.trees = data
   }
 }
 

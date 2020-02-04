@@ -2,10 +2,10 @@
   <div id="left-list-view" class="p-0 bg-light">
     <div class="d-flex flex-column pt-0 px-2 bg-wash mb-0">
       <div class="custom-control custom-switch py-1">
-        <input v-model="leftPanel.deltaMode" type="checkbox" class="custom-control-input" id="delta-mode-switch">
+        <input v-model="deltaEnabled" @change="toggleDelta" type="checkbox" class="custom-control-input" id="delta-mode-switch">
         <label class="custom-control-label d-flex justify-content-between font-weight-bold text-uppercase" for="delta-mode-switch">Delta View Mode<span><i class="fas fa-play fa-rotate-270"></i></span></label>
       </div>
-      <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @click="leftPanel.showDeltaModal = true">
+      <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @click="showDeltaModal">
         Configure Delta
       </button>
     </div>
@@ -46,12 +46,44 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import HazardList from '@/components/Main/LeftPanel/HazardList'
 
 export default {
   name: 'LeftPanel',
   props: ['leftPanel'],
-  components: { HazardList }
+
+  data () {
+    return {
+      deltaEnabled: false
+    }
+  },
+
+  components: { HazardList },
+
+  mounted () {
+    this.deltaEnabled = this.getDeltaState.enabled
+  },
+
+  computed: {
+    ...mapGetters('app.module', ['getDeltaState']),
+    deltaState () {
+      return JSON.parse(JSON.stringify(this.getDeltaState))
+    }
+  },
+
+  methods: {
+    ...mapActions('app.module', ['updateDelta']),
+    showDeltaModal () {
+      this.$emit('show-delta-modal')
+    },
+
+    toggleDelta () {
+      const deltaState = this.deltaState
+      deltaState.enabled = this.deltaEnabled
+      this.updateDelta(deltaState)
+    }
+  }
 }
 </script>
 

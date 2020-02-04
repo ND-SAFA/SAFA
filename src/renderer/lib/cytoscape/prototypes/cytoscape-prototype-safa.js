@@ -3,28 +3,20 @@ import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay'
 import dagre from 'cytoscape-dagre'
 import nodeHtmlLabel from 'cytoscape-node-html-label'
-import popper from 'cytoscape-popper'
 import automove from 'cytoscape-automove'
 
 nodeHtmlLabel(cytoscape)
 cytoscape.use(klay)
 cytoscape.use(dagre)
-cytoscape.use(popper)
 cytoscape.use(automove)
 
 export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
-  constructor (container, elements, options, style, layoutTemplate, badgeFactory) {
+  constructor (container, elements, options, style, layoutTemplate) {
     super(container, elements, options, style)
     this.layoutTemplate = layoutTemplate
-    this.badgeFactory = badgeFactory
-    this.badges = []
   }
 
   preLayoutHook (cy) {
-    while (this.badges.length) {
-      const badge = this.badges.pop()
-      badge.destroy()
-    }
     this.__savePeerAncestorNodes(cy)
     this.__savePackageNodes(cy)
   }
@@ -50,7 +42,6 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   // -----------------------------------------------------------------------------
   postLayoutHook (cy) {
     this.__applyClickDragBehavior(cy)
-    this.__applyBadges(cy)
     this.__applyNodeLabels(cy)
     this.__applyCustomEvents(cy)
     this.__applyPositioning(cy)
@@ -101,21 +92,6 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
           node.emit('drag')
         }
       })
-    })
-  }
-
-  // -----------------------------------------------------------------------------
-  __applyBadges (cy) {
-    cy.nodes('.modified,.added,.removed').forEach(node => {
-      // Find matching class
-      const classes = node.classes()
-      let theme = 'modified'
-      if (classes.find(element => element === 'added')) {
-        theme = 'added'
-      } else if (classes.find(element => element === 'removed')) {
-        theme = 'removed'
-      }
-      this.badges.push(this.badgeFactory.getBadgeForTemplate(node, theme))
     })
   }
 

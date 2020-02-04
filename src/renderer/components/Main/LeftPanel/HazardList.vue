@@ -67,18 +67,18 @@ export default {
         const value = this.searchText.toLowerCase()
         const treeId = value.startsWith('uav') ? value : `uav-${value}`
         // TODO implement Vuejs compatible debounce
-        const found = await this.getNodeParents(treeId)
+        await this.fetchProjectNodeParents(treeId)
         for (const hazard of this.getHazards) {
           this.searchFilter[hazard.id] = hazard.data.name.includes(value)
         }
-        for (const nodeId of found) {
+        for (const nodeId of this.getNodeParents) {
           this.searchFilter[nodeId] = true
         }
       }
     }
   },
   methods: {
-    ...mapActions('projects.module', ['fetchHazards']),
+    ...mapActions('projects.module', ['fetchHazards', 'fetchProjectNodeParents']),
     loadTree (hazard, index) {
       // load hazard tree if null arguments are passed
       // otherwise load safety artifact tree

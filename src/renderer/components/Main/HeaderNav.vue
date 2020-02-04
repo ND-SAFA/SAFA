@@ -9,8 +9,8 @@
       </ul>
       <ul class="navbar-nav mr-auto">
         <li class="navbar-text mr-5">Desktop App</li>
-        <li class="navbar-text delta-version-indicator ml-1 mr-1" v-show="showVersions"><i class="fas fa-play fa-rotate-270"></i> <span class="font-weight-bold">Current:</span> <span id="delta-current-indicator">{{ Math.max(versions.current, versions.baseline) }}</span></li>
-        <li class="navbar-text delta-version-indicator mx-1" v-show="showVersions"><span class="font-weight-bold">Baseline:</span> <span id="delta-baseline-indicator">{{ Math.min(versions.current, versions.baseline) }}</span></li>
+        <li class="navbar-text delta-version-indicator ml-1 mr-1" v-show="this.getDeltaState.enabled"><i class="fas fa-play fa-rotate-270"></i> <span class="font-weight-bold">Current:</span> <span id="delta-current-indicator">{{ current }}</span></li>
+        <li class="navbar-text delta-version-indicator mx-1" v-show="this.getDeltaState.enabled"><span class="font-weight-bold">Baseline:</span> <span id="delta-baseline-indicator">{{ baseline }}</span></li>
       </ul>
       <ul class="navbar-nav left">
         <li class="nav-item active">
@@ -22,16 +22,25 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'HeaderNav',
   props: {
-    rightPanel: Object,
-    versions: Object,
-    showVersions: Boolean
+    rightPanel: Object
   },
   methods: {
     menuToggled () {
       this.rightPanel.isHidden = !this.rightPanel.isHidden
+    }
+  },
+  computed: {
+    ...mapGetters('app.module', ['getDeltaState']),
+    current () {
+      return Math.max(this.getDeltaState.current, this.getDeltaState.baseline)
+    },
+    baseline () {
+      return Math.min(this.getDeltaState.current, this.getDeltaState.baseline)
     }
   }
 }

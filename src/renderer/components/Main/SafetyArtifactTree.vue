@@ -28,6 +28,7 @@ import BadgeFactory from '@/lib/cytoscape/badges/badge-factory'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
 import GraphStyle from '@/components/Main/SafetyArtifactTree/GraphStyle'
 import CytoscapePrototypeSAFA from '@/lib/cytoscape/prototypes/cytoscape-prototype-safa'
+import CytoscapePrototypeDelta from '@/lib/cytoscape/prototypes/cytoscape-prototype-delta'
 import LayoutTemplateKlay from '@/lib/cytoscape/layouts/layout-template-klay'
 
 const L = LayoutTemplateKlay
@@ -36,27 +37,54 @@ const B = BadgeTemplate
 export default {
   name: 'SafetyArtifactTree',
   props: ['treeId'],
+
   computed: {
-    ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree']),
-    treeElements: function () {
+    ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree', 'getDeltaTrees']),
+    ...mapGetters('app.module', ['getDeltaState']),
+    treeElements () {
       if (this.treeId) {
-        return JSON.parse(JSON.stringify(this.getSafetyArtifactTree))
+        if (this.deltaEnabled) {
+          return JSON.parse(JSON.stringify(this.getDeltaTrees))
+        } else {
+          return JSON.parse(JSON.stringify(this.getSafetyArtifactTree))
+        }
       }
       return JSON.parse(JSON.stringify(this.getHazardTree))
+    },
+    deltaEnabled () {
+      return this.getDeltaState.enabled
     }
   },
+
   watch: {
-    treeId: async function (newTreeId) {
+    async treeId () {
       if (this.treeId) {
-        await this.fetchSafetyArtifactTree(newTreeId)
+        if (this.deltaEnabled) {
+          this.renderDeltaTree(this.$refs.cy)
+        } else {
+          this.renderTree(this.$refs.cy)
+        }
       }
-      this.makeGraph(this.$refs.cy)
+    },
+    deltaEnabled (enabled) {
+      if (enabled) {
+        this.renderDeltaTree(this.$refs.cy)
+      }
     }
   },
 
   data () {
     return {
-      cytoscapeProto: Object()
+      cytoscapeProto: Object(),
+      layout: new LayoutTemplateKlay({
+        zoom: 1.12,
+        spacing: 15,
+        direction: L.DIRECTION.DOWN,
+        fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
+        layoutHierarchy: true,
+        nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
+        nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
+      })
     }
   },
 
@@ -67,15 +95,32 @@ export default {
   },
 
   mounted () {
-    this.makeGraph(this.$refs.cy)
+    this.renderTree(this.$refs.cy)
   },
 
   methods: {
-    ...mapActions('projects.module', ['fetchSafetyArtifactTree']),
-    makeGraph: async function (container) {
+    ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees']),
+
+    async renderTree (container) {
+      await this.fetchSafetyArtifactTree(this.treeId)
+
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.destroy()
       }
+
+      this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, this.layout)
+      this.cytoscapeProto.run()
+
+      // this.cytoscapeProto.cy.on('unselect-node', this.$emit.bind(this, 'unselect-node'))
+    },
+
+    async renderDeltaTree (container) {
+      if (!Vue.isEmpty(this.cytoscapeProto)) {
+        this.cytoscapeProto.destroy()
+      }
+
+      const { baseline, current } = this.getDeltaState
+      await this.fetchDeltaTrees({treeId: this.treeId, baseline, current})
 
       const badgeTemplate = {
         trigger: B.TRIGGER.MANUAL,
@@ -95,24 +140,17 @@ export default {
       badgeFactory.setTemplate('modified', new BadgeTemplate(Object.assign({}, {theme: 'modified'}, badgeTemplate)))
       badgeFactory.setTemplate('removed', new BadgeTemplate(Object.assign({}, {theme: 'removed'}, badgeTemplate)))
 
-      const klayLayoutTemplate = new LayoutTemplateKlay({
-        zoom: 1.12,
-        spacing: 15,
-        direction: L.DIRECTION.DOWN,
-        fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
-        layoutHierarchy: true,
-        nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
-        nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
-      })
+      console.log(this.elements)
+      const elements = CytoscapePrototypeDelta.calculateDeltas(this.treeElements, baseline, current)
 
-      this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, klayLayoutTemplate, badgeFactory)
+      this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, this.layout, badgeFactory)
       this.cytoscapeProto.run()
-
-      this.cytoscapeProto.cy.on('unselect-node', this.$emit.bind(this, 'unselect-node'))
     },
+
     graphZoomIn () {
       console.log('graphZoomIn()')
     },
+
     graphZoomOut () {
       console.log('graphZoomOut()')
     }

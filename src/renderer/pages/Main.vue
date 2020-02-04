@@ -2,7 +2,7 @@
   <div id="mainpage">
 
     <!-- Header Nav -->
-    <HeaderNav v-bind:right-panel="rightPanel" v-bind:versions="leftPanel.versions" v-bind:show-versions="leftPanel.deltaMode"/>
+    <HeaderNav v-bind:right-panel="rightPanel" />
 
     <div class="d-flex" id="wrapper">
 
@@ -11,12 +11,12 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-bind:left-panel="leftPanel"/>
+              <LeftPanel v-bind:left-panel="leftPanel" v-on:show-delta-modal="showDeltaModal = true"/>
               <SafetyArtifactTree v-bind:tree-id="leftPanel.selectedTreeId" v-on:unselect-node="unselectNode"/>
               <FaultTreeAnalysis/>
               <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
             </div>
-            <ConfigureDeltaModal v-bind:is-hidden="!leftPanel.showDeltaModal" v-bind:left-panel="leftPanel" @close="leftPanel.showDeltaModal = false"/>
+            <ConfigureDeltaModal v-bind:is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
           </div>
         </main>
       </div>
@@ -42,20 +42,14 @@
 
     data: function () {
       return {
+        showDeltaModal: false,
         isFetchingFromServer: false,
         rightPanel: {
           isHidden: true,
           selectedNode: null
         },
         leftPanel: {
-          selectedTreeId: null,
-          showDeltaModal: false,
-          deltaMode: false,
-          versions: {
-            available: [ 1 ],
-            current: 1,
-            baseline: 1
-          }
+          selectedTreeId: null
         }
       }
     },

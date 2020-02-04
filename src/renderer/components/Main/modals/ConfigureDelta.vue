@@ -18,7 +18,7 @@
                       Set current version:
                     </label>
                     <select v-model.number="versions.selectedCurrent" class="custom-select delta-current-select" id="inputGroupSelect01">
-                      <option v-for="version in leftPanel.versions.available">{{ version }}</option>
+                      <option v-for="(version, idx) in versionsRange" :key="idx">{{ version }}</option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -26,7 +26,7 @@
                       Choose baseline for comparison:
                     </label>
                     <select v-model.number="versions.selectedBaseline" class="custom-select delta-baseline-select" id="inputGroupSelect02">
-                      <option v-for="version in leftPanel.versions.available">{{ version }}</option>
+                      <option v-for="(version, idx) in versionsRange" :key="idx">{{ version }}</option>
                     </select>
                   </div>
                 </div>
@@ -51,43 +51,52 @@ export default {
     isHidden: Boolean,
     leftPanel: Object
   },
+
   data () {
     return {
       versions: {
-        selectedCurrent: 1,
-        selectedBaseline: 1
+        selectedCurrent: 0,
+        selectedBaseline: 0
       }
     }
   },
+
   async mounted () {
     await this.updateAvailableVersions()
   },
-  watch: {
-    // TODO remove this watch once the new versioning protocol is implemented in the backend
-    'leftPanel.selectedTreeId': async function () {
-      await this.updateAvailableVersions()
+
+  computed: {
+    ...mapGetters('projects.module', ['getHazards', 'getProjectVersions']),
+    ...mapGetters('app.module', ['getDeltaState']),
+
+    versionsRange () {
+      return Array.apply(null, Array(this.getProjectVersions.latest + 1)).map((i, j) => { return j })
+    },
+
+    deltaState () {
+      return JSON.parse(JSON.stringify(this.getDeltaState))
     }
   },
-  computed: {
-    ...mapGetters('projects.module', ['getHazards', 'getSafetyArtifactTreeVersions'])
-  },
+
   methods: {
-    ...mapActions('projects.module', ['fetchSafetyArtifactTreeVersions']),
+    ...mapActions('projects.module', ['fetchProjectVersions']),
+    ...mapActions('app.module', ['updateDelta']),
+
     enableDeltaMode () {
-      this.leftPanel.deltaMode = true
-      this.leftPanel.versions.current = this.versions.selectedCurrent
-      this.leftPanel.versions.baseline = this.versions.selectedBaseline
+      const deltaState = this.deltaState
+      deltaState.enabled = true
+      deltaState.baseline = this.versions.selectedBaseline
+      deltaState.current = this.versions.selectedCurrent
+      this.updateDelta(deltaState)
       this.$emit('close')
     },
+
     async updateAvailableVersions () {
-      await this.fetchSafetyArtifactTreeVersions(this.leftPanel.selectedTreeId ? this.leftPanel.selectedTreeId : this.getHazards[0].id)
-      this.leftPanel.versions = {
-        available: this.getSafetyArtifactTreeVersions,
-        current: Math.max(...this.getSafetyArtifactTreeVersions),
-        baseline: Math.max(...this.getSafetyArtifactTreeVersions)
-      }
-      this.versions.selectedCurrent = this.leftPanel.versions.current
-      this.versions.selectedBaseline = this.leftPanel.versions.baseline
+      await this.fetchProjectVersions()
+      const deltaState = this.deltaState
+      deltaState.baseline = this.getProjectVersions.latest
+      deltaState.current = this.getProjectVersions.latest
+      this.updateDelta(deltaState)
     }
   }
 }

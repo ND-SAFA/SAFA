@@ -41,7 +41,6 @@ export default {
     ...mapGetters('app.module', ['getDeltaState']),
     ...mapGetters('projects.module', ['getSyncProgress']),
     syncInProgress () {
-      console.log(this.getSyncProgress)
       return this.getSyncProgress > -1
     },
     current () {

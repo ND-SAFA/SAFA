@@ -1,4 +1,4 @@
-import CytoscapePrototypeSAFA from './cytoscape-prototype-safa'
+import CytoscapePrototypeSAFA from './safa'
 import cytoscape from 'cytoscape'
 import popper from 'cytoscape-popper'
 
@@ -27,7 +27,19 @@ export default class CytoscapePrototypeDelta extends CytoscapePrototypeSAFA {
   }
 
   // -----------------------------------------------------------------------------
-  static calculateDeltas (graphs, baseline, current) {
+  static calculateChangeLog (elements) {
+    elements = JSON.parse(JSON.stringify(elements))
+    let changeLog = {}
+    const changedNodes = elements.filter(element => /^node.+(modified|added|removed)/.test(element.classes))
+    const categories = ['modified', 'added', 'removed']
+    for (const category of categories) {
+      changeLog[category] = changedNodes.filter(node => node.classes.includes(category)).map(node => node.data)
+    }
+    return changeLog
+  }
+
+  // -----------------------------------------------------------------------------
+  static calculateDelta (graphs, baseline, current) {
     const cytos = graphs.map(elements => cytoscape({ elements: elements }))
     let changeCounter = 1
     // Intersection between current and baseline

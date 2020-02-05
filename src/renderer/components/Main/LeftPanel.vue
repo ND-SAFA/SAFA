@@ -19,7 +19,7 @@
       </li>
     </ul>
 
-    <HazardList v-bind:left-panel="leftPanel"/>
+    <HazardList />
 
     <div id="fta-list-panel" role="tabpanel" aria-labelledby="fault-tree-tab" class="d-none">
       <p class="font-weight-bold text-uppercase mb-2 px-2 d-flex justify-content-between align-items-center">
@@ -51,7 +51,6 @@ import HazardList from '@/components/Main/LeftPanel/HazardList'
 
 export default {
   name: 'LeftPanel',
-  props: ['leftPanel'],
 
   data () {
     return {

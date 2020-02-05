@@ -27,7 +27,7 @@ import BadgeTemplate from '@/lib/cytoscape/badges/badge-template'
 import BadgeFactory from '@/lib/cytoscape/badges/badge-factory'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
 import GraphStyle from '@/components/Main/SafetyArtifactTree/GraphStyle'
-import CytoscapePrototypeDelta from '@/lib/cytoscape/prototypes/cytoscape-prototype-delta'
+import CytoscapePrototypeDelta from '@/lib/cytoscape/prototypes/delta'
 import LayoutTemplateKlay from '@/lib/cytoscape/layouts/layout-template-klay'
 
 const L = LayoutTemplateKlay
@@ -50,10 +50,10 @@ export default {
 
   watch: {
     treeId () {
-      this.renderGraph()
+      this.renderDeltaTree(this.$refs.cy)
     },
     deltaChanged () {
-      this.renderGraph()
+      this.renderDeltaTree(this.$refs.cy)
     }
   },
 
@@ -70,15 +70,18 @@ export default {
   },
 
   mounted () {
+    this.setDeltaTreeChangeLog({})
     this.renderDeltaTree(this.$refs.cy)
   },
 
   methods: {
     ...mapActions('projects.module', ['fetchDeltaTrees']),
+    ...mapActions('app.module', ['setDeltaTreeChangeLog', 'setSelectedArtifact']),
 
     async renderDeltaTree (container) {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.destroy()
+        this.setSelectedArtifact({})
       }
 
       const { baseline, current } = this.getDeltaState
@@ -112,10 +115,15 @@ export default {
       badgeFactory.setTemplate('modified', new BadgeTemplate(Object.assign({}, {theme: 'modified'}, badgeTemplate)))
       badgeFactory.setTemplate('removed', new BadgeTemplate(Object.assign({}, {theme: 'removed'}, badgeTemplate)))
 
-      const elements = CytoscapePrototypeDelta.calculateDeltas(this.treeElements, baseline, current)
+      const elements = CytoscapePrototypeDelta.calculateDelta(this.treeElements, baseline, current)
+      const changeLog = CytoscapePrototypeDelta.calculateChangeLog(elements)
+      this.setDeltaTreeChangeLog(changeLog)
 
       this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, layout, badgeFactory)
       this.cytoscapeProto.run()
+
+      this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
+      this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
     },
 
     graphZoomIn () {

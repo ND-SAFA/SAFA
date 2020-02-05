@@ -21,7 +21,7 @@
 
     <div class="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="(item, index) in getHazards" :key="item.id" @click="loadTree(item, index)" v-if="searchFilter[item.id]" >
+        <li class="nav-item vw-100" v-for="(item, index) in hazardList" :key="item.id" @click="loadTree(item, index)"  >
           <a class="nav-link" :class="{ active: index === selectedIndex }">
             <div>
               <p class="hazard-title">{{item.label}} {{item.id}}</p>
@@ -38,11 +38,11 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'HazardList',
-  props: ['leftPanel'],
   data () {
     return {
       selectedIndex: null,
@@ -56,7 +56,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('projects.module', ['getHazards', 'getNodeParents'])
+    ...mapGetters('projects.module', ['getHazards', 'getNodeParents']),
+    hazardList () {
+      if (Vue.isEmpty(this.searchFilter)) {
+        return this.getHazards
+      }
+      return this.getHazards.filter(hazard => this.searchFilter[hazard.id])
+    }
   },
   watch: {
     searchText: async function () {
@@ -79,10 +85,12 @@ export default {
   },
   methods: {
     ...mapActions('projects.module', ['fetchHazards', 'fetchProjectNodeParents']),
+    ...mapActions('app.module', ['setSelectedTree']),
     loadTree (hazard, index) {
       // load hazard tree if null arguments are passed
       // otherwise load safety artifact tree
-      this.leftPanel.selectedTreeId = hazard ? hazard.id : null
+      const selected = hazard ? hazard.id : null
+      this.setSelectedTree(selected)
       this.selectedIndex = index
     }
   }

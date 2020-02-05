@@ -7,35 +7,10 @@
           safety
           tree.</div>
 
-        <!--Artifact details-->
-        <div class="d-none list-group-item bg-wash pt-0" id="node-details">
-          <p><a class="plain font-weight-bold text-uppercase mt-3 d-flex justify-content-between align-items-center" data-toggle="collapse" href="#node-details-content" aria-expanded="false">Selected Node <i class="fas fa-chevron-down"></i></a></p>
-          <div class="collapse show" id="node-details-content">
-          </div>
-        </div>
-        <!--End Artifact details-->
-
-        <!--FTA Node details-->
-        <div class="d-none list-group-item bg-wash pt-0" id="fta-node-details">
-          <p><a class="plain font-weight-bold text-uppercase mt-3 d-flex justify-content-between align-items-center" data-toggle="collapse" href="#fta-node-details-content" aria-expanded="false">Selected FTA Node <i class="fas fa-chevron-down"></i></a></p>
-          <div class="collapse show" id="fta-node-details-content">
-          </div>
-        </div>
-        <!--End FTA Node details-->
-
-        <div class="list-group-item bg-wash pt-0 delta-collapse d-none">
-          <p><a class="plain font-weight-bold text-uppercase mt-3 d-flex justify-content-between align-items-center" data-toggle="collapse" href="#delta-tree">Delta Tree <i class="fas fa-chevron-down"></i></a></p>
-          <div class="collapse show" id="delta-tree">
-            <div id="change-info">
-            </div> <!-- change-info -->
-          </div> <!-- delta-tree -->
-        </div>
-
-        <div class="list-group-item bg-wash pt-0 warnings-collapse d-none">
-          <p><a class="plain font-weight-bold text-uppercase mt-3 d-flex justify-content-between align-items-center" data-toggle="collapse" data-target=".warnings-info" href="#">WARNINGS <i class="fas fa-chevron-down"></i></a></p>
-          <div class="warnings-info collapse show">
-          </div> <!-- warnings-info -->
-        </div>
+        <ArtifactDetails v-show="!$isEmpty(getSelectedArtifact)" />
+        <FaultTreeDetails v-show="false" />
+        <DeltaTreeDetails v-show="getDeltaState.enabled && getSelectedTree" />
+        <WarningsDetails v-show="!getDeltaState.enabled && getSelectedTree" />
 
         <div class="list-group-item bg-wash pt-0">
           <p><a class="plain font-weight-bold text-uppercase mt-3 d-flex justify-content-between align-items-center collapsed" data-toggle="collapse" href="#general-safety" aria-expanded="false">Notation Key <i class="fas fa-chevron-down"></i></a></p>
@@ -122,10 +97,20 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import ArtifactDetails from '@/components/Main/RightPanel/ArtifactDetails'
+import FaultTreeDetails from '@/components/Main/RightPanel/FaultTreeDetails'
+import DeltaTreeDetails from '@/components/Main/RightPanel/DeltaTreeDetails'
+import WarningsDetails from '@/components/Main/RightPanel/WarningsDetails'
+
 export default {
   name: 'RightPanel',
+  components: { ArtifactDetails, DeltaTreeDetails, FaultTreeDetails, WarningsDetails },
   props: {
     isHidden: true
+  },
+  computed: {
+    ...mapGetters('app.module', ['getSelectedArtifact', 'getDeltaState', 'getSelectedTree'])
   }
 }
 </script>

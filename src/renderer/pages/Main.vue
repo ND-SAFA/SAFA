@@ -11,10 +11,11 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-bind:left-panel="leftPanel" v-on:show-delta-modal="showDeltaModal = true"/>
-              <SafetyArtifactTree v-bind:tree-id="leftPanel.selectedTreeId" v-on:unselect-node="unselectNode"/>
-              <FaultTreeAnalysis/>
-              <RightPanel v-bind:is-hidden="rightPanel.isHidden"/>
+              <LeftPanel v-on:show-delta-modal="showDeltaModal = true"/>
+              <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" v-bind:tree-id="getSelectedTree" />
+              <SafetyArtifactTree v-else v-bind:tree-id="getSelectedTree"/>
+              <FaultTree />
+              <RightPanel v-bind:is-hidden="rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal v-bind:is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
           </div>
@@ -33,28 +34,26 @@
   import LeftPanel from '@/components/Main/LeftPanel'
   import RightPanel from '@/components/Main/RightPanel'
   import SafetyArtifactTree from '@/components/Main/SafetyArtifactTree'
-  import FaultTreeAnalysis from '@/components/Main/FaultTreeAnalysis'
+  import FaultTree from '@/components/Main/FaultTree'
+  import DeltaTree from '@/components/Main/DeltaTree'
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
 
   export default {
     name: 'main-page',
-    components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTreeAnalysis, ConfigureDeltaModal },
+    components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTree, DeltaTree, ConfigureDeltaModal },
 
     data: function () {
       return {
         showDeltaModal: false,
         isFetchingFromServer: false,
         rightPanel: {
-          isHidden: true,
-          selectedNode: null
-        },
-        leftPanel: {
-          selectedTreeId: null
+          isHidden: true
         }
       }
     },
     computed: {
-      ...mapGetters('projects.module', ['getHazards'])
+      ...mapGetters('projects.module', ['getHazards']),
+      ...mapGetters('app.module', ['getDeltaState', 'getSelectedTree'])
     },
     created () {
       AppMenu.findMenuItemById('view.refresh').click = this.reloadData.bind(this)
@@ -64,9 +63,6 @@
       ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree']),
       open (link) {
         this.$electron.shell.openExternal(link)
-      },
-      unselectNode (evt, target, selector) {
-        console.log(evt, target, selector)
       },
       reloadData () {
         console.log('reloadData()')

@@ -1,7 +1,7 @@
 <template>
   <div id="hazard-list-panel">
     <p class="font-weight-bold text-uppercase mb-2 px-2 d-flex justify-content-between align-items-center">
-      Hazard Hierarchy <a href="#" class="text-dark"><i class="fas fa-sync-alt"></i></a>
+      Hazard Hierarchy <a href="#" class="text-dark"><i class="fas fa-sync-alt" @click="refreshView"></i></a>
     </p>
 
     <p class="text-center px-2"><a id="show_hazard" @click="loadTree(null, null)" class="btn btn-outline-primary btn-sm btn-block text-primary">
@@ -92,6 +92,9 @@ export default {
       const selected = hazard ? hazard.id : null
       this.setSelectedTree(selected)
       this.selectedIndex = index
+    },
+    refreshView () {
+      this.$parent.$emit('refresh:view')
     }
   }
 }

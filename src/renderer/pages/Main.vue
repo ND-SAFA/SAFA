@@ -11,13 +11,13 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-on:show-delta-modal="showDeltaModal = true"/>
-              <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" v-bind:tree-id="getSelectedTree" />
-              <SafetyArtifactTree v-else v-bind:tree-id="getSelectedTree"/>
+              <LeftPanel v-on:show-delta-modal="showDeltaModal = true" v-on:refresh:view="loadData"/>
+              <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" :tree-id="getSelectedTree" :is-fetching-from-server="isFetchingFromServer" />
+              <SafetyArtifactTree v-else :tree-id="getSelectedTree" :is-fetching-from-server="isFetchingFromServer" />
               <FaultTree />
-              <RightPanel v-bind:is-hidden="rightPanel.isHidden" v-on:open:link="open"/>
+              <RightPanel :is-hidden="rightPanel.isHidden" v-on:open:link="open"/>
             </div>
-            <ConfigureDeltaModal v-bind:is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
+            <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
           </div>
         </main>
       </div>
@@ -51,28 +51,32 @@
         }
       }
     },
+    async mounted () {
+      this.loadData()
+    },
     computed: {
       ...mapGetters('projects.module', ['getHazards']),
       ...mapGetters('app.module', ['getDeltaState', 'getSelectedTree'])
     },
     created () {
-      AppMenu.findMenuItemById('view.refresh').click = this.reloadData.bind(this)
+      AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
       AppMenu.setApplicationMenu()
     },
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree']),
       open (link) {
         this.$electron.shell.openExternal(link)
       },
-      reloadData () {
-        console.log('reloadData()')
+      async loadData () {
+        this.isFetchingFromServer = true
+        await this.fetchHazards()
+        if (this.getSelectedTree) {
+          await this.fetchSafetyArtifactTree(this.getSelectedTree)
+        } else {
+          await this.fetchHazardTree()
+        }
+        this.isFetchingFromServer = false
       }
-    },
-    async mounted () {
-      this.isFetchingFromServer = true
-      await this.fetchHazards()
-      await this.fetchHazardTree()
-      this.isFetchingFromServer = false
     }
   }
 </script>

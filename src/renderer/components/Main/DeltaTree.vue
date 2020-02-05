@@ -1,6 +1,6 @@
 <template>
   <div id="center-panel" role="tabpanel" aria-labelledby="artifact-tree-tab" class="fade col show active graph-view p-0">
-    <div id="loading-graph-spinner" style="display:none">
+    <div id="loading-graph-spinner" v-show="showSpinner">
       <div class="d-flex justify-content-center">
         <div class="spinner-border text-primary" role="status">
           <span class="sr-only">Loading...</span>
@@ -35,7 +35,10 @@ const B = BadgeTemplate
 
 export default {
   name: 'DeltaTree',
-  props: ['treeId'],
+  props: {
+    treeId: String,
+    isFetchingFromServer: Boolean
+  },
 
   computed: {
     ...mapGetters('projects.module', ['getDeltaTrees']),
@@ -45,6 +48,9 @@ export default {
     },
     deltaChanged () {
       return this.getDeltaState.changed
+    },
+    showSpinner () {
+      return this.isFetchingFromServer || this.isRefreshing
     }
   },
 
@@ -59,7 +65,8 @@ export default {
 
   data () {
     return {
-      cytoscapeProto: Object()
+      cytoscapeProto: Object(),
+      isRefreshing: false
     }
   },
 
@@ -85,45 +92,51 @@ export default {
       }
 
       const { baseline, current } = this.getDeltaState
-      await this.fetchDeltaTrees({treeId: this.treeId, baseline, current})
+      try {
+        this.isRefreshing = true
+        await this.fetchDeltaTrees({treeId: this.treeId, baseline, current})
 
-      const layout = new LayoutTemplateKlay({
-        zoom: 1.12,
-        spacing: 15,
-        direction: L.DIRECTION.DOWN,
-        fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
-        layoutHierarchy: true,
-        nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
-        nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
-      })
+        const layout = new LayoutTemplateKlay({
+          zoom: 1.12,
+          spacing: 15,
+          direction: L.DIRECTION.DOWN,
+          fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
+          layoutHierarchy: true,
+          nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
+          nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
+        })
 
-      const badgeTemplate = {
-        trigger: B.TRIGGER.MANUAL,
-        placement: B.PLACEMENT.BOTTOM_END,
-        hideOnClick: false,
-        sticky: true,
-        offset: '20, -15',
-        showOnInit: true,
-        animateFill: false,
-        zIndex: 1,
-        ignoreAttributes: true,
-        badgeSize: B.SIZE.SMALL
+        const badgeTemplate = {
+          trigger: B.TRIGGER.MANUAL,
+          placement: B.PLACEMENT.BOTTOM_END,
+          hideOnClick: false,
+          sticky: true,
+          offset: '20, -15',
+          showOnInit: true,
+          animateFill: false,
+          zIndex: 1,
+          ignoreAttributes: true,
+          badgeSize: B.SIZE.SMALL
+        }
+
+        const badgeFactory = new BadgeFactory()
+        badgeFactory.setTemplate('added', new BadgeTemplate(Object.assign({}, {theme: 'added'}, badgeTemplate)))
+        badgeFactory.setTemplate('modified', new BadgeTemplate(Object.assign({}, {theme: 'modified'}, badgeTemplate)))
+        badgeFactory.setTemplate('removed', new BadgeTemplate(Object.assign({}, {theme: 'removed'}, badgeTemplate)))
+
+        const elements = CytoscapePrototypeDelta.calculateDelta(this.treeElements, baseline, current)
+        const changeLog = CytoscapePrototypeDelta.calculateChangeLog(elements)
+        this.setDeltaTreeChangeLog(changeLog)
+
+        this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, layout, badgeFactory)
+        this.cytoscapeProto.run()
+
+        this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
+        this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
+      } catch (e) {
+        // TODO(Adam): handle error
       }
-
-      const badgeFactory = new BadgeFactory()
-      badgeFactory.setTemplate('added', new BadgeTemplate(Object.assign({}, {theme: 'added'}, badgeTemplate)))
-      badgeFactory.setTemplate('modified', new BadgeTemplate(Object.assign({}, {theme: 'modified'}, badgeTemplate)))
-      badgeFactory.setTemplate('removed', new BadgeTemplate(Object.assign({}, {theme: 'removed'}, badgeTemplate)))
-
-      const elements = CytoscapePrototypeDelta.calculateDelta(this.treeElements, baseline, current)
-      const changeLog = CytoscapePrototypeDelta.calculateChangeLog(elements)
-      this.setDeltaTreeChangeLog(changeLog)
-
-      this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, layout, badgeFactory)
-      this.cytoscapeProto.run()
-
-      this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
-      this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
+      this.isRefreshing = false
     },
 
     graphZoomIn () {
@@ -138,5 +151,11 @@ export default {
 </script>
 
 <style scoped>
-
+  #loading-graph-spinner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 1000;
+  }
 </style>

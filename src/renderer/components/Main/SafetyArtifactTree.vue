@@ -1,6 +1,6 @@
 <template>
   <div id="center-panel" role="tabpanel" aria-labelledby="artifact-tree-tab" class="fade col show active graph-view p-0">
-    <div id="loading-graph-spinner" style="display:none">
+    <div id="loading-graph-spinner" v-show="showSpinner">
       <div class="d-flex justify-content-center">
         <div class="spinner-border text-primary" role="status">
           <span class="sr-only">Loading...</span>
@@ -32,7 +32,10 @@ const L = LayoutTemplateKlay
 
 export default {
   name: 'SafetyArtifactTree',
-  props: ['treeId'],
+  props: {
+    treeId: String,
+    isFetchingFromServer: Boolean
+  },
 
   computed: {
     ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree']),
@@ -41,6 +44,9 @@ export default {
         return JSON.parse(JSON.stringify(this.getSafetyArtifactTree))
       }
       return JSON.parse(JSON.stringify(this.getHazardTree))
+    },
+    showSpinner () {
+      return this.isFetchingFromServer || this.isRefreshing
     }
   },
 
@@ -52,7 +58,8 @@ export default {
 
   data () {
     return {
-      cytoscapeProto: Object()
+      cytoscapeProto: Object(),
+      isRefreshing: false
     }
   },
 
@@ -71,26 +78,33 @@ export default {
     ...mapActions('app.module', ['setSelectedArtifact']),
 
     async renderTree (container) {
-      await this.fetchSafetyArtifactTree(this.treeId)
-      if (!Vue.isEmpty(this.cytoscapeProto)) {
-        this.cytoscapeProto.destroy()
-        this.setSelectedArtifact({})
+      try {
+        this.isRefreshing = true
+        await this.fetchSafetyArtifactTree(this.treeId)
+
+        if (!Vue.isEmpty(this.cytoscapeProto)) {
+          this.cytoscapeProto.destroy()
+          this.setSelectedArtifact({})
+        }
+
+        const layout = new LayoutTemplateKlay({
+          zoom: 1.12,
+          spacing: 15,
+          direction: L.DIRECTION.DOWN,
+          fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
+          layoutHierarchy: true,
+          nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
+          nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
+        })
+
+        this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
+        this.cytoscapeProto.run()
+        this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
+        this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
+      } catch (e) {
+        // TODO(Adam): Handle Error
       }
-
-      const layout = new LayoutTemplateKlay({
-        zoom: 1.12,
-        spacing: 15,
-        direction: L.DIRECTION.DOWN,
-        fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
-        layoutHierarchy: true,
-        nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
-        nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
-      })
-
-      this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
-      this.cytoscapeProto.run()
-      this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
-      this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
+      this.isRefreshing = false
     },
 
     graphZoomIn () {
@@ -105,5 +119,11 @@ export default {
 </script>
 
 <style scoped>
-
+  #loading-graph-spinner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 1000;
+  }
 </style>

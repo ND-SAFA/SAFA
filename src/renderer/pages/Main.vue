@@ -2,7 +2,7 @@
   <div id="mainpage">
 
     <!-- Header Nav -->
-    <HeaderNav v-bind:right-panel="rightPanel" />
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
 
     <div class="d-flex" id="wrapper">
 
@@ -11,11 +11,19 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-on:show-delta-modal="showDeltaModal = true" v-on:refresh:view="loadData"/>
-              <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" :tree-id="getSelectedTree" :is-fetching-from-server="isFetchingFromServer" />
-              <SafetyArtifactTree v-else :tree-id="getSelectedTree" :is-fetching-from-server="isFetchingFromServer" />
+              <LeftPanel v-show="!leftPanel.isHidden" 
+                      v-on:show-delta-modal="showDeltaModal = true" 
+                      v-on:refresh:view="loadData"/>
+              <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" 
+                      :tree-id="getSelectedTree" 
+                      :is-fetching-from-server="isFetchingFromServer" 
+                      :resize="resize" />
+              <SafetyArtifactTree v-else 
+                      :tree-id="getSelectedTree" 
+                      :is-fetching-from-server="isFetchingFromServer"
+                      :resize="resize"/>
               <FaultTree />
-              <RightPanel :is-hidden="rightPanel.isHidden" v-on:open:link="open"/>
+              <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
           </div>
@@ -40,28 +48,44 @@
 
   export default {
     name: 'main-page',
-    components: { HeaderNav, LeftPanel, RightPanel, SafetyArtifactTree, FaultTree, DeltaTree, ConfigureDeltaModal },
+    components: {
+      HeaderNav,
+      LeftPanel,
+      RightPanel,
+      SafetyArtifactTree,
+      FaultTree,
+      DeltaTree,
+      ConfigureDeltaModal
+    },
 
-    data: function () {
+    data () {
       return {
+        resize: Date.now(),
         showDeltaModal: false,
         isFetchingFromServer: false,
         rightPanel: {
           isHidden: true
+        },
+        leftPanel: {
+          isHidden: false
         }
       }
     },
-    async mounted () {
-      this.loadData()
-    },
+
     computed: {
       ...mapGetters('projects.module', ['getHazards']),
       ...mapGetters('app.module', ['getDeltaState', 'getSelectedTree'])
     },
+
     created () {
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
       AppMenu.setApplicationMenu()
     },
+
+    async mounted () {
+      this.loadData()
+    },
+
     methods: {
       ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree']),
       open (link) {
@@ -76,6 +100,9 @@
           await this.fetchHazardTree()
         }
         this.isFetchingFromServer = false
+      },
+      resizeView () {
+        this.resize = Date.now()
       }
     }
   }

@@ -43,8 +43,8 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   postLayoutHook (cy) {
     this.__applyClickDragBehavior(cy)
     this.__applyNodeLabels(cy)
-    this.__applyCustomEvents(cy)
     this.__applyPositioning(cy)
+    this.__applyCustomEvents(cy)
   }
 
   // ----------------------------------------------------------------------------

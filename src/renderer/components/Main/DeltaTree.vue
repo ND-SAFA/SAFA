@@ -36,6 +36,7 @@ const B = BadgeTemplate
 export default {
   name: 'DeltaTree',
   props: {
+    resize: Number,
     treeId: String,
     isFetchingFromServer: Boolean
   },
@@ -50,7 +51,7 @@ export default {
       return this.getDeltaState.changed
     },
     showSpinner () {
-      return this.isFetchingFromServer || this.isRefreshing
+      return this.isFetchingFromServer || this.isUpdating
     }
   },
 
@@ -60,13 +61,18 @@ export default {
     },
     deltaChanged () {
       this.renderDeltaTree(this.$refs.cy)
+    },
+    resize () {
+      if (!Vue.isEmpty(this.cytoscapeProto)) {
+        this.cytoscapeProto.cy.resize()
+      }
     }
   },
 
   data () {
     return {
       cytoscapeProto: Object(),
-      isRefreshing: false
+      isUpdating: false
     }
   },
 
@@ -93,7 +99,7 @@ export default {
 
       const { baseline, current } = this.getDeltaState
       try {
-        this.isRefreshing = true
+        this.isUpdating = true
         await this.fetchDeltaTrees({treeId: this.treeId, baseline, current})
 
         const layout = new LayoutTemplateKlay({
@@ -136,7 +142,7 @@ export default {
       } catch (e) {
         // TODO(Adam): handle error
       }
-      this.isRefreshing = false
+      this.isUpdating = false
     },
 
     graphZoomIn () {

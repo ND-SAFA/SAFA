@@ -9,6 +9,7 @@ const LibraryModule = {
     Vue.prototype.$truncate = Vue.truncate = truncate
     Vue.prototype.$isEmpty = Vue.isEmpty = isEmpty
     Vue.prototype.$capitalize = Vue.capitalize = capitalize
+
     // template filters
     Vue.filter('truncate', truncate)
     Vue.filter('isEmpty', isEmpty)

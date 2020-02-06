@@ -33,6 +33,7 @@ const L = LayoutTemplateKlay
 export default {
   name: 'SafetyArtifactTree',
   props: {
+    resize: Number,
     treeId: String,
     isFetchingFromServer: Boolean
   },
@@ -46,20 +47,25 @@ export default {
       return JSON.parse(JSON.stringify(this.getHazardTree))
     },
     showSpinner () {
-      return this.isFetchingFromServer || this.isRefreshing
+      return this.isFetchingFromServer || this.isUpdating
     }
   },
 
   watch: {
     treeId () {
       this.renderTree(this.$refs.cy)
+    },
+    resize () {
+      if (!Vue.isEmpty(this.cytoscapeProto)) {
+        this.cytoscapeProto.cy.resize()
+      }
     }
   },
 
   data () {
     return {
       cytoscapeProto: Object(),
-      isRefreshing: false
+      isUpdating: false
     }
   },
 
@@ -79,7 +85,7 @@ export default {
 
     async renderTree (container) {
       try {
-        this.isRefreshing = true
+        this.isUpdating = true
         await this.fetchSafetyArtifactTree(this.treeId)
 
         if (!Vue.isEmpty(this.cytoscapeProto)) {
@@ -104,7 +110,7 @@ export default {
       } catch (e) {
         // TODO(Adam): Handle Error
       }
-      this.isRefreshing = false
+      this.isUpdating = false
     },
 
     graphZoomIn () {

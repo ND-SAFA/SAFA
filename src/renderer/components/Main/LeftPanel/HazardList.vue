@@ -54,9 +54,13 @@ export default {
     for (const hazard of this.getHazards) {
       this.searchFilter[hazard.id] = true
     }
+    if (!this.selectedIndex && this.getSelectedTree) {
+      // this.selectedIndex = this.hazardList.findIndex(h => h.id === this.getSelectedTree)
+    }
   },
   computed: {
     ...mapGetters('projects.module', ['getHazards', 'getNodeParents']),
+    ...mapGetters('app.module', ['getSelectedTree']),
     hazardList () {
       if (Vue.isEmpty(this.searchFilter)) {
         return this.getHazards

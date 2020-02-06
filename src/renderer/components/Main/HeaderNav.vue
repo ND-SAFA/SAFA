@@ -3,7 +3,7 @@
     <nav id="navbar" class="navbar fixed-top navbar-expand-md navbar-dark bg-dark px-1">
       <ul class="navbar-nav">
         <li class="nav-item pr-1">
-          <a id="left-menu-toggle" class="btn btn-outline-light active" data-toggle="button" aria-pressed="true" href="#"><i class="fas fa-bars"></i></a>
+          <a @click="ltMenuToggled" class="btn btn-outline-light" href="#"><i :class="ltMenuToggleClass"></i></a>
         </li>
         <li id="logo" class="navbar-brand">Safety Forest</li>
       </ul>
@@ -15,7 +15,7 @@
       <ProgressBar v-show="syncInProgress"/>
       <ul class="navbar-nav left">
         <li class="nav-item active">
-          <a @click="menuToggled" class="btn btn-outline-light" href="#"><i class="fas fa-bars"></i></a>
+          <a @click="rtMenuToggled" class="btn btn-outline-light" href="#"><i :class="rtMenuToggleClass"></i></a>
         </li>
       </ul>
     </nav>
@@ -24,17 +24,23 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ProgressBar from '@/components/HeaderNav/ProgressBar'
+import ProgressBar from '@/components/Main/HeaderNav/ProgressBar'
 
 export default {
   name: 'HeaderNav',
   components: { ProgressBar },
   props: {
-    rightPanel: Object
+    rightPanel: Object,
+    leftPanel: Object
   },
   methods: {
-    menuToggled () {
+    rtMenuToggled () {
       this.rightPanel.isHidden = !this.rightPanel.isHidden
+      this.$emit('resize:view')
+    },
+    ltMenuToggled () {
+      this.leftPanel.isHidden = !this.leftPanel.isHidden
+      this.$emit('resize:view')
     }
   },
   computed: {
@@ -48,6 +54,14 @@ export default {
     },
     baseline () {
       return Math.min(this.getDeltaState.current, this.getDeltaState.baseline)
+    },
+    rtMenuToggleClass () {
+      const chevron = this.rightPanel.isHidden ? 'left' : 'right'
+      return `fas fa-chevron-${chevron}`
+    },
+    ltMenuToggleClass () {
+      const chevron = this.leftPanel.isHidden ? 'right' : 'left'
+      return `fas fa-chevron-${chevron}`
     }
   }
 }

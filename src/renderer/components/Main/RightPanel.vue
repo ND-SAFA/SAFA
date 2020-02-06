@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-wash border-right" v-show="!isHidden" id="sidebar-wrapper">
+  <div class="bg-wash border-right" id="sidebar-wrapper">
     <div class="details-panel border-left">
       <div class="list-group list-group-flush">
         <div class="list-group-item bg-wash border-bottom-0 pb-0 sidebar-heading">Hazard Hierarchy</div>
@@ -106,9 +106,6 @@ import WarningsDetails from '@/components/Main/RightPanel/WarningsDetails'
 export default {
   name: 'RightPanel',
   components: { ArtifactDetails, DeltaTreeDetails, FaultTreeDetails, WarningsDetails },
-  props: {
-    isHidden: true
-  },
   computed: {
     ...mapGetters('app.module', ['getSelectedArtifact', 'getDeltaState', 'getSelectedTree'])
   }

@@ -142,6 +142,10 @@ const actions = {
         reject(e)
       }
     })
+  },
+
+  resetProject ({ commit }) {
+    commit('RESET_PROJECT')
   }
 }
 
@@ -172,6 +176,24 @@ const mutations = {
 
   SET_SYNC_PROGRESS (state, data) {
     state.projects.syncProgress = data
+  },
+
+  RESET_PROJECT (state) {
+    state.projects = {
+      syncProgress: -1,
+      delta: {
+        trees: []
+      },
+      versions: {
+        latest: 0
+      },
+      hazards: [],
+      hazardTree: [],
+      safetyArtifactTree: [],
+      node: {
+        parents: []
+      }
+    }
   }
 }
 

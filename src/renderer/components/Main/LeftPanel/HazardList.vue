@@ -55,7 +55,7 @@ export default {
       this.searchFilter[hazard.id] = true
     }
     if (!this.selectedIndex && this.getSelectedTree) {
-      // this.selectedIndex = this.hazardList.findIndex(h => h.id === this.getSelectedTree)
+      this.selectedIndex = this.hazardList.findIndex(h => h.id === this.getSelectedTree)
     }
   },
   computed: {

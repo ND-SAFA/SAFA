@@ -91,7 +91,6 @@ export default {
     },
 
     async updateAvailableVersions () {
-      await this.fetchProjectVersions()
       this.versions.selectedBaseline = this.getDeltaState.baseline
       this.versions.selectedCurrent = this.getDeltaState.current
     }

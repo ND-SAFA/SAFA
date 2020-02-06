@@ -33,6 +33,7 @@ const L = LayoutTemplateKlay
 export default {
   name: 'SafetyArtifactTree',
   props: {
+    update: Number,
     resize: Number,
     treeId: String,
     isFetchingFromServer: Boolean
@@ -59,6 +60,9 @@ export default {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.cy.resize()
       }
+    },
+    update () {
+      this.renderTree(this.$refs.cy)
     }
   },
 
@@ -84,14 +88,13 @@ export default {
     ...mapActions('app.module', ['setSelectedArtifact']),
 
     async renderTree (container) {
+      if (!Vue.isEmpty(this.cytoscapeProto)) {
+        this.cytoscapeProto.destroy()
+        this.setSelectedArtifact({})
+      }
       try {
         this.isUpdating = true
         await this.fetchSafetyArtifactTree(this.treeId)
-
-        if (!Vue.isEmpty(this.cytoscapeProto)) {
-          this.cytoscapeProto.destroy()
-          this.setSelectedArtifact({})
-        }
 
         const layout = new LayoutTemplateKlay({
           zoom: 1.12,
@@ -108,6 +111,7 @@ export default {
         this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
         this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
       } catch (e) {
+        console.log(e)
         // TODO(Adam): Handle Error
       }
       this.isUpdating = false

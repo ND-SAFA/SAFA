@@ -9,13 +9,13 @@ const state = {
   app: {
     delta: {
       enabled: false,
-      baseline: 0,
-      current: 0,
+      baseline: -1,
+      current: -1,
       changeLog: {
         added: [], modified: [], removed: []
       }
     },
-    selectedArtifact: null,
+    selectedArtifact: {},
     selectedTree: null
   }
 }
@@ -53,6 +53,10 @@ const actions = {
 
   setDeltaTreeChangeLog ({ commit }, log) {
     commit('SET_DELTA_TREE_CHANGE_LOG', log)
+  },
+
+  resetApp ({ commit }) {
+    commit('RESET_APP')
   }
 }
 
@@ -80,6 +84,19 @@ const mutations = {
       data = { added: [], modified: [], removed: [] }
     }
     state.app.delta.changeLog = data
+  },
+
+  RESET_APP (state) {
+    state.app.selectedArtifact = {}
+    state.app.selectedTree = null
+    state.app.delta.changeLog = {
+      enabled: false,
+      baseline: -1,
+      current: -1,
+      added: [],
+      modified: [],
+      removed: []
+    }
   }
 }
 

@@ -36,6 +36,7 @@ const B = BadgeTemplate
 export default {
   name: 'DeltaTree',
   props: {
+    update: Number,
     resize: Number,
     treeId: String,
     isFetchingFromServer: Boolean
@@ -66,6 +67,9 @@ export default {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.cy.resize()
       }
+    },
+    update () {
+      this.renderDeltaTree(this.$refs.cy)
     }
   },
 

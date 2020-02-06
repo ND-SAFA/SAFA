@@ -66,8 +66,19 @@ export default {
 
   computed: {
     ...mapGetters('app.module', ['getDeltaState']),
+
     deltaState () {
       return JSON.parse(JSON.stringify(this.getDeltaState))
+    },
+
+    isProjectInitialized () {
+      return !(this.getDeltaState.current === -1)
+    }
+  },
+
+  watch: {
+    'deltaState.enabled' () {
+      this.deltaEnabled = this.deltaState.enabled
     }
   },
 

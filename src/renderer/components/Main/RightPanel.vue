@@ -7,7 +7,7 @@
           safety
           tree.</div>
 
-        <ArtifactDetails v-show="!$isEmpty(getSelectedArtifact)" />
+        <ArtifactDetails v-if="!$isEmpty(getSelectedArtifact)" />
         <FaultTreeDetails v-show="false" />
         <DeltaTreeDetails v-show="getDeltaState.enabled && getSelectedTree" />
         <WarningsDetails v-show="!getDeltaState.enabled && getSelectedTree" />

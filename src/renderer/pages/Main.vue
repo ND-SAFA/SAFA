@@ -13,15 +13,17 @@
             <div class="row vh-100 pad-navbar">
               <LeftPanel v-show="!leftPanel.isHidden" 
                       v-on:show-delta-modal="showDeltaModal = true" 
-                      v-on:refresh:view="loadData"/>
+                      v-on:refresh:view="refreshView"/>
               <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" 
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer" 
-                      :resize="resize" />
+                      :resize="resize" 
+                      :update="update"/>
               <SafetyArtifactTree v-else 
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer"
-                      :resize="resize"/>
+                      :resize="resize"
+                      :update="update"/>
               <FaultTree />
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
@@ -61,6 +63,7 @@
     data () {
       return {
         resize: Date.now(),
+        update: Date.now(),
         showDeltaModal: false,
         isFetchingFromServer: false,
         rightPanel: {
@@ -83,16 +86,24 @@
     },
 
     async mounted () {
+      // this.resetApp()
+      // this.resetProject()
       this.loadData()
     },
 
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions']),
+      ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
       },
+      refreshView () {
+        this.loadData()
+        this.updateView()
+      },
       async loadData () {
         this.isFetchingFromServer = true
+        await this.fetchProjectVersions()
         await this.fetchHazards()
         if (this.getSelectedTree) {
           await this.fetchSafetyArtifactTree(this.getSelectedTree)
@@ -103,6 +114,9 @@
       },
       resizeView () {
         this.resize = Date.now()
+      },
+      updateView () {
+        this.update = Date.now()
       }
     }
   }

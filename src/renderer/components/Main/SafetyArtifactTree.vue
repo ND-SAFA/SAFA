@@ -23,6 +23,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import AppMenu from '@/menu'
 import Vue from 'vue'
+import CytoscapeMixin from '@/mixins/cytoscape-graph'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
 import GraphStyle from '@/components/Main/SafetyArtifactTree/GraphStyle'
 import CytoscapePrototypeSAFA from '@/lib/cytoscape/prototypes/safa'
@@ -38,6 +39,7 @@ export default {
     treeId: String,
     isFetchingFromServer: Boolean
   },
+  mixins: [CytoscapeMixin],
 
   computed: {
     ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree']),
@@ -103,7 +105,9 @@ export default {
           fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
           layoutHierarchy: true,
           nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
-          nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
+          nodePlacement: L.NODE_PLACEMENT.BRANDES_KOEPF,
+          inLayerSpacingFactor: 0.4,
+          thoroughness: 10
         })
 
         this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
@@ -115,14 +119,6 @@ export default {
         // TODO(Adam): Handle Error
       }
       this.isUpdating = false
-    },
-
-    graphZoomIn () {
-      console.log('graphZoomIn()')
-    },
-
-    graphZoomOut () {
-      console.log('graphZoomOut()')
     }
   }
 }

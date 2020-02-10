@@ -12,53 +12,36 @@
 
     <ul id="top-tabs" role="tablist" class="nav nav-tabs nav-fill pt-3 mb-3 bg-wash">
       <li class="nav-item">
-        <a class="nav-link active" id="artifact-tree-tab" data-toggle="tab" href="#center-panel" role="tab" aria-controls="center-panel" aria-selected="true">Artifacts</a>
+        <a @click="toggleArtifactsTab" class="nav-link active" id="artifact-tree-tab" data-toggle="tab" href="#center-panel" role="tab" aria-controls="center-panel" aria-selected="true">Artifacts</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" id="fault-tree-tab" data-toggle="tab" href="#center-panel-2" role="tab" aria-controls="center-panel-2" aria-selected="false">Safety Model</a>
+        <a @click="toggleFTATab" class="nav-link" id="fault-tree-tab" data-toggle="tab" href="#center-panel-2" role="tab" aria-controls="center-panel-2" aria-selected="false">Safety Model</a>
       </li>
     </ul>
 
-    <HazardList />
+    <HazardList v-if="showTab === 'Artifacts'" />
 
-    <div id="fta-list-panel" role="tabpanel" aria-labelledby="fault-tree-tab" class="d-none">
-      <p class="font-weight-bold text-uppercase mb-2 px-2 d-flex justify-content-between align-items-center">
-        Fault Trees
-      </p>
+    <FTANodeList v-if="showTab === 'FTA'" />
 
-      <div class="row px-2">
-        <div class="col-sm-12">
-          <div class="form-group has-search mb-1">
-            <i class="fa fa-search form-control-feedback"></i>
-            <label class="w-100">
-              <input type="text" class="fta-search-bar form-control rounded-pill" placeholder="Search">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="scroll-nav">
-        <ul id="fta-list" class="nav"></ul>
-      </div>
-
-    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import HazardList from '@/components/Main/LeftPanel/HazardList'
+import FTANodeList from '@/components/Main/LeftPanel/FTANodeList'
 
 export default {
   name: 'LeftPanel',
 
   data () {
     return {
-      deltaEnabled: false
+      deltaEnabled: false,
+      showTab: 'Artifacts'
     }
   },
 
-  components: { HazardList },
+  components: { HazardList, FTANodeList },
 
   mounted () {
     this.deltaEnabled = this.getDeltaState.enabled
@@ -92,6 +75,14 @@ export default {
       const deltaState = this.deltaState
       deltaState.enabled = this.deltaEnabled
       this.updateDelta(deltaState)
+    },
+
+    toggleArtifactsTab () {
+      this.showTab = 'Artifacts'
+    },
+
+    toggleFTATab () {
+      this.showTab = 'FTA'
     }
   }
 }

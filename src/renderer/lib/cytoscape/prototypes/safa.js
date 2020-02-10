@@ -64,11 +64,12 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
       // ------------------------------------------------------
       node.on('tapstart', () => {
         if (node.data().type === 'Code') {
+          document.body.style.cursor = 'grabbing'
           node.lock()
         }
         rule.enable()
       })
-      node.on('tapend', () => {
+      node.on('tapend free dragfree', () => {
         node.unlock()
         rule.disable()
       })
@@ -87,7 +88,12 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
         rule.disable()
       })
       node.on('cxtdrag', (evt) => {
-        evt.target.renderedPosition(evt.renderedPosition)
+        document.body.style.cursor = 'grabbing'
+        const nodePosition = evt.target.renderedPosition()
+        evt.target.renderedPosition({
+          x: nodePosition.x + evt.originalEvent.movementX,
+          y: nodePosition.y + evt.originalEvent.movementY
+        })
         if (evt.target.data().type === 'Package') {
           node.emit('drag')
         }
@@ -149,6 +155,14 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
       const newPan = { x: currentPan.x + (widthChange * 0.5), y: currentPan.y + (heightChange * 0.5) }
       cy.pan(newPan)
       cy.oldSize = newSize
+    })
+
+    cy.on('drag', 'node', () => {
+      document.body.style.cursor = 'grabbing'
+    })
+
+    cy.on('dragfree free', 'node', () => {
+      document.body.style.cursor = 'auto'
     })
   }
 

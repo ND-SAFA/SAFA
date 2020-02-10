@@ -42,6 +42,8 @@ export default class LayoutTemplateKlay extends LayoutBaseTemplate {
     this.klay.layoutHierarchy = options.layoutHierarchy || true
     this.klay.nodeLayering = options.nodeLayering || LayoutTemplateKlay.NODE_LAYERING.NETWORK_SIMPLEX
     this.klay.nodePlacement = options.nodePlacement || LayoutTemplateKlay.NODE_PLACEMENT.LINEAR_SEGMENTS
+    this.klay.inLayerSpacingFactor = options.inLayerSpacingFactor || 0.4
+    this.klay.thoroughness = options.thoroughness || 10
   }
 
   makeLayout (cy) {

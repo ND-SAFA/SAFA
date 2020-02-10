@@ -13,7 +13,7 @@
             <div class="row vh-100 pad-navbar">
               <LeftPanel v-show="!leftPanel.isHidden" 
                       v-on:show-delta-modal="showDeltaModal = true" 
-                      v-on:refresh:view="refreshView"/>
+                      v-on:refresh:view="refreshView" />
               <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" 
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer" 

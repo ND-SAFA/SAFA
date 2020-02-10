@@ -16,7 +16,8 @@ export default [
       width: GraphOptions.NODE_WIDTH,
       height: GraphOptions.NODE_HEIGHT,
       'border-style': GraphOptions.NODE_BORDER_STYLE,
-      'border-width': GraphOptions.NODE_BORDER_WIDTH
+      'border-width': GraphOptions.NODE_BORDER_WIDTH,
+      'overlay-opacity': GraphOptions.NODE_OVERLAY_OPACITY
     }
   },
   {

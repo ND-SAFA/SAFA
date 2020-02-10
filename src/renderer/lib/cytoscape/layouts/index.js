@@ -1,8 +1,9 @@
 export default class LayoutBaseTemplate {
   __name = 'BaseLayout'
 
-  constructor (zoom) {
+  constructor (zoom, pan) {
     this.zoom = zoom
+    this.pan = pan
   }
 
   get name () {
@@ -10,7 +11,7 @@ export default class LayoutBaseTemplate {
   }
 
   factory (cy) {
-    const { name, zoom } = this
-    return cy.layout({name, zoom})
+    const { name, zoom, pan } = this
+    return cy.layout({name, zoom, pan})
   }
 }

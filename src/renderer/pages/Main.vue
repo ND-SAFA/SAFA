@@ -18,12 +18,14 @@
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer" 
                       :resize="resize" 
-                      :update="update"/>
+                      :update="update"
+                      v-on:select:node="openRightPanel"/>
               <SafetyArtifactTree v-else 
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer"
                       :resize="resize"
-                      :update="update"/>
+                      :update="update"
+                      v-on:select:node="openRightPanel"/>
               <FaultTree />
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
@@ -117,6 +119,10 @@
       },
       updateView () {
         this.update = Date.now()
+      },
+      openRightPanel () {
+        console.log('called')
+        this.rightPanel.isHidden = false
       }
     }
   }

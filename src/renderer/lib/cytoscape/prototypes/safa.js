@@ -18,6 +18,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   preLayoutHook (cy) {
     this.__savePeerAncestorNodes(cy)
+    this.__savePeerConnectingEdges(cy)
     this.__savePackageNodes(cy)
   }
 
@@ -32,6 +33,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
     // Restore code nodes
     this.codeElements.restore()
+    this.temporaryEdges.remove()
     this.peerElements.restore()
 
     // Layout peer nodes closer to ancestor node
@@ -133,12 +135,6 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __applyCustomEvents (cy) {
-    cy.on('unselect', (evt, type, selector) => {
-      cy.emit('unselect-node', evt, type, selector)
-    })
-
-    // cy.on('select', addNodeDetails)
-
     cy.on('mouseover', 'node', () => {
       document.body.style.cursor = 'pointer'
     })
@@ -208,6 +204,29 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
     this.ancestorNodes.removeStyle('width')
     for (let i = 0; i < this.ancestorNodes.length; i++) {
       this.ancestorNodes[i].shift('x', this.ancestorNodes[i].outerWidth() + this.options.CORE_PEER_SPACING)
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // needs to be called after saving peer nodes
+  __savePeerConnectingEdges (cy) {
+    this.temporaryEdges = cy.collection()
+    for (let i = 0; i < this.peerNodes.length; i++) {
+      // Get parent node
+      const ancestor = this.peerNodes[i].incomers('node')
+      // Get all outgoing edges
+      const childEdges = this.peerNodes[i].outgoers('edge')
+      for (let j = 0; j < childEdges.length; j++) {
+        // Create new edge with parent as source and current edge target
+        const newEdge = cy.add({
+          data: {
+            source: ancestor.id(),
+            target: childEdges[j].target().id()
+          }
+        })
+        // Add new edge to the collection of temporary edges
+        this.temporaryEdges = this.temporaryEdges.union(newEdge)
+      }
     }
   }
 

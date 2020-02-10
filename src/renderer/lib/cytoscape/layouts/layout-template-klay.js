@@ -33,7 +33,7 @@ export default class LayoutTemplateKlay extends LayoutBaseTemplate {
   }
 
   constructor (options) {
-    super(options.zoom || 1)
+    super(options.zoom || 1, options.pan || { x: 0, y: 0 })
     this.__name = 'klay'
     this.klay = {}
     this.klay.spacing = options.spacing || 15 // Overall setting for the minimal amount of space to be left between objects
@@ -47,7 +47,7 @@ export default class LayoutTemplateKlay extends LayoutBaseTemplate {
   }
 
   makeLayout (cy) {
-    const { name, zoom, klay } = this
-    return cy.layout({name, zoom, klay})
+    const { name, zoom, pan, klay } = this
+    return cy.layout({name, zoom, pan, klay})
   }
 }

@@ -110,9 +110,13 @@ export default {
           thoroughness: 10
         })
 
+        const component = this
         this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
         this.cytoscapeProto.run()
-        this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
+        this.cytoscapeProto.cy.on('select', 'node', evt => {
+          component.$emit('select:node')
+          component.setSelectedArtifact(evt.target.data())
+        })
         this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
       } catch (e) {
         console.log(e)

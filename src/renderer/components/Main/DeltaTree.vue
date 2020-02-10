@@ -141,7 +141,11 @@ export default {
         this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, layout, badgeFactory)
         this.cytoscapeProto.run()
 
-        this.cytoscapeProto.cy.on('select', 'node', evt => this.setSelectedArtifact(evt.target.data()))
+        const component = this
+        this.cytoscapeProto.cy.on('select', 'node', evt => {
+          component.$emit('select:node')
+          component.setSelectedArtifact(evt.target.data())
+        })
         this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
       } catch (e) {
         // TODO(Adam): handle error

@@ -20,13 +20,13 @@
                       :resize="resize" 
                       :update="update"
                       v-on:select:node="openRightPanel"/>
-              <SafetyArtifactTree v-else 
-                      :tree-id="getSelectedTree" 
+              <SafetyArtifactTree v-else
+                      :tree-id="getSelectedTree"
                       :is-fetching-from-server="isFetchingFromServer"
                       :resize="resize"
                       :update="update"
                       v-on:select:node="openRightPanel"/>
-              <FaultTree />
+              <FaultTree :resize="resize" v-on:select:node="openRightPanel"/>
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
@@ -121,7 +121,6 @@
         this.update = Date.now()
       },
       openRightPanel () {
-        console.log('called')
         this.rightPanel.isHidden = false
       }
     }

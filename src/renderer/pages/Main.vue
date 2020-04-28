@@ -64,6 +64,7 @@
 
     data () {
       return {
+        firstOpen: true,
         resize: Date.now(),
         update: Date.now(),
         showDeltaModal: false,
@@ -94,7 +95,7 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -113,6 +114,10 @@
           await this.fetchHazardTree()
         }
         this.isFetchingFromServer = false
+        if (this.firstOpen) {
+          this.firstOpen = false
+          this.updateView()
+        }
       },
       resizeView () {
         this.resize = Date.now()

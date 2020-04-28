@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import uuid from 'uuid'
+import ignoreList from '@/ignoreList'
 
 export function addNode (acc, e) {
-  if (e.classes.startsWith('node')) {
+  if (e.classes.startsWith('node') && !ignoreList[e.id]) {
     let data = {
       name: '',
       description: '',
@@ -14,6 +15,7 @@ export function addNode (acc, e) {
       data = JSON.parse(Buffer.from(e.DATA, 'base64'))
     }
     data.type = data.type ? `${data.type}${e.label}` : e.label
+    e.label = e.label === 'EnvironmentalAssumption' ? 'Environmental Assumption' : e.label
     data.id = e.id || uuid.v4()
     data.label = `<b>${e.label}</br></b><div class="default-node-header">${data.id}</div><span class="default-node-description">${Vue.truncate(data.name)}</span>`
     if (e.label === 'Package') {
@@ -48,7 +50,9 @@ export function addElement (acc, e) {
     acc = addNode(acc, e)
   } else {
     if (e.classes === 'edge') {
-      acc.push({ data: { id: e.id, type: e.type, target: e.target, source: e.source } })
+      if (!ignoreList[e.target] && !ignoreList[e.source]) {
+        acc.push({ data: { id: e.id, type: e.type, target: e.target, source: e.source } })
+      }
     }
   }
   return acc

@@ -108,12 +108,14 @@ export default {
 
         const layout = new LayoutTemplateKlay({
           zoom: 1.12,
-          spacing: 15,
+          spacing: 1,
           direction: L.DIRECTION.DOWN,
           fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
           layoutHierarchy: true,
           nodeLayering: L.NODE_LAYERING.NETWORK_SIMPLEX,
-          nodePlacement: L.NODE_PLACEMENT.LINEAR_SEGMENTS
+          nodePlacement: L.NODE_PLACEMENT.BRANDES_KOEPF,
+          inLayerSpacingFactor: 0.4,
+          thoroughness: 10
         })
 
         const badgeTemplate = {
@@ -139,7 +141,7 @@ export default {
         this.setDeltaTreeChangeLog(changeLog)
 
         this.cytoscapeProto = new CytoscapePrototypeDelta(container, elements, GraphOptions, GraphStyle, layout, badgeFactory)
-        this.cytoscapeProto.run()
+        await this.cytoscapeProto.run()
 
         const component = this
         this.cytoscapeProto.cy.on('select', 'node', evt => {

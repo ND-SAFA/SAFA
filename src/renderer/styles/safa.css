@@ -214,34 +214,32 @@ a:not([href]).btn-outline-secondary:hover {
   z-index: 1000;
 }
 
+.code-label {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .warning-node-label {
-  margin: -1px;
-  margin-top: 0px;
-  width: calc(100% + 2px);
-  height: 60px !important;
   padding:0;
-  border-bottom:1px solid black;
   background: white;
 }
 
 .warning-node-label.selected {
-  background-color: #ECE1FD;
+  background-color: #e2e2e2;
 }
 
 .warning-node-info {
+  background-color: #ffc107;
   padding: 0;
   margin: 0px;
-  margin-top:-8px;
-  height: 25px;
+  border-top: 1px solid;
   bottom: 0;
 }
 
 .warning-node-info.selected {
-  background-color: #ffc107;
-  margin: -1px;
-  margin-top: -10px;
-  padding-top: 2px;
-  height: 26px;
+  padding: 0;
+  margin: 0px;
 }
 
 /* Center-panel tree view */
@@ -279,8 +277,6 @@ a:not([href]).btn-outline-secondary:hover {
   width: 25px;
   padding: .5rem 0;
 }
-
-
 
 /* Right-panel info view */
 
@@ -434,9 +430,12 @@ table#delta-settings a {
 
 .safa-cy-node {
   text-align: center!important;
-  max-width: 150px;
-  min-width: 150px;
-  font-size: 11px;
+  max-width: 100px;
+  min-width: 100px;
+  max-height: 85px;
+  font-size: 9px;
+  margin: 0 !important;
+  padding: 0 !important;
   line-height: 1!important;
 }
 

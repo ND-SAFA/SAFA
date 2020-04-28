@@ -20,7 +20,7 @@ export default class CytoscapePrototype {
     throw new Error(`${this.prototype} extends CytoscapePrototype but does not implement postLayoutHook()`)
   }
 
-  run () {
+  async run () {
     const self = this
     const cy = cytoscape({
       container: this.container,
@@ -36,7 +36,14 @@ export default class CytoscapePrototype {
     })
     self.postLayoutHook(cy)
     this.cy = cy
-    return cy
+    let _resolve = null
+    let promise = new Promise((resolve) => {
+      _resolve = resolve
+    })
+    process.nextTick(() => {
+      _resolve(cy)
+    })
+    return promise
   }
 
   destroy () {

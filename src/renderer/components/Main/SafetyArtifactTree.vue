@@ -100,7 +100,7 @@ export default {
 
         const layout = new LayoutTemplateKlay({
           zoom: 1.12,
-          spacing: 15,
+          spacing: 1,
           direction: L.DIRECTION.DOWN,
           fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
           layoutHierarchy: true,
@@ -112,7 +112,7 @@ export default {
 
         const component = this
         this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
-        this.cytoscapeProto.run()
+        await this.cytoscapeProto.run()
         this.cytoscapeProto.cy.on('select', 'node', evt => {
           component.$emit('select:node')
           component.setSelectedArtifact(evt.target.data())

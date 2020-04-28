@@ -17,6 +17,8 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   }
 
   preLayoutHook (cy) {
+    this.__applyNodeLabels(cy)
+    this.__resizeNodes(cy)
     this.__savePeerAncestorNodes(cy)
     this.__savePeerConnectingEdges(cy)
     this.__savePackageNodes(cy)
@@ -25,7 +27,6 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   // -----------------------------------------------------------------------------
   layoutHook (cy) {
     this.layoutTemplate.makeLayout(cy).run()
-
     this.__layoutAncestorNodes(cy)
 
     // Reset package nodes height
@@ -44,7 +45,6 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
   // -----------------------------------------------------------------------------
   postLayoutHook (cy) {
     this.__applyClickDragBehavior(cy)
-    this.__applyNodeLabels(cy)
     this.__applyPositioning(cy)
     this.__applyCustomEvents(cy)
   }
@@ -113,7 +113,7 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
       valignBox: 'center',
       cssClass: 'safa-cy-node',
       tpl: function (data) {
-        return data.label
+        return `<div id="${data.id}_html_label">${data.label}</div>`
       }
     }, {
       query: 'node.warning',
@@ -123,14 +123,28 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
         if (data.delta) {
           deltaState = data.delta
         }
-        return `<div class="warning-node-label ${deltaState}">${data.label}</div></br><div class="warning-node-info"><i class="fas fa-exclamation-triangle"></i> <b>WARNING</b><div>${data.warnings[0]}</div></div>`
+        return `<div id="${data.id}_html_label" class="warning-node-label ${deltaState}">${data.label}</br><div class="warning-node-info"><i class="fas fa-exclamation-triangle"></i> <b>${data.warnings[0]}</b><div></div>`
       }
     }, {
       query: 'node.warning:selected',
       tpl: function (data) {
-        return `<div class="warning-node-label selected">${data.label}</div></br><div class="warning-node-info selected"><i class="fas fa-exclamation-triangle"></i> <b>WARNING</b><div>${data.warnings[0]}</div></div>`
+        return `<div id="${data.id}_html_label" class="warning-node-label selected">${data.label}</br><div class="warning-node-info selected"><i class="fas fa-exclamation-triangle"></i> <b>${data.warnings[0]}</b></div></div>`
       }
     }])
+  }
+
+  // -----------------------------------------------------------------------------
+  __resizeNodes (cy) {
+    process.nextTick(() => {
+      const nodes = cy.nodes('[type!="Code"]')
+      for (let i = 0; i < nodes.length; i++) {
+        let ele = document.getElementById(nodes[i].data().id + '_html_label')
+        if (ele !== null) {
+          nodes[i].css('height', ele.clientHeight)
+          nodes[i].css('width', ele.clientWidth)
+        }
+      }
+    })
   }
 
   // -----------------------------------------------------------------------------
@@ -170,20 +184,23 @@ export default class CytoscapePrototypeSAFA extends CytoscapePrototype {
 
   // -----------------------------------------------------------------------------
   __layoutCodeNodes (cy) {
-    for (let i = 0; i < this.packageNodes.length; i++) {
-      // Align each code node under package node
-      const node = this.packageNodes[i]
-      const codeNodes = node.outgoers('node')
-      codeNodes.forEach((codeNode, index) => {
-        // Toggle height change
-        codeNode.toggleClass('code-node')
-        codeNode.position('x', node.position('x'))
-        const yPosition = node.position('y') + node.outerHeight() / 2 + codeNode.outerHeight() / 2 + codeNode.outerHeight() * index - this.options.NODE_BORDER_WIDTH * (index + 1)
-        codeNode.position('y', yPosition)
-        // Hide any edges so they don't occlude the nodes
-        codeNode.connectedEdges().first().style('visibility', 'hidden')
-      })
-    }
+    process.nextTick((self = this) => {
+      for (let i = 0; i < self.packageNodes.length; i++) {
+        // Align each code node under package node
+        const node = self.packageNodes[i]
+        const codeNodes = node.outgoers('node')
+        codeNodes.forEach((codeNode, index) => {
+          // Toggle height change
+          codeNode.css('width', node.width())
+          codeNode.toggleClass('code-node')
+          codeNode.position('x', node.position('x'))
+          const yPosition = node.position('y') + node.outerHeight() / 2 + codeNode.outerHeight() / 2 + codeNode.outerHeight() * index - self.options.NODE_BORDER_WIDTH * (index + 1)
+          codeNode.position('y', yPosition)
+          // Hide any edges so they don't occlude the nodes
+          codeNode.connectedEdges().first().style('visibility', 'hidden')
+        })
+      }
+    })
   }
 
   // -----------------------------------------------------------------------------

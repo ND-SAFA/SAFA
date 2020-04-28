@@ -24,7 +24,7 @@ export function addNode (acc, e) {
     } else if (e.label === 'Code') {
       const slashIndex = e.id.lastIndexOf('/')
       const fileName = e.id.slice(slashIndex + 1)
-      data.label = `${Vue.truncate(fileName, 22)}`
+      data.label = `<div class="code-label">${Vue.truncate(fileName, 22)}</div>`
     }
     if (e.modified) {
       data.modified = e.modified

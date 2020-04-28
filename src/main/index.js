@@ -2,8 +2,9 @@
 'use strict'
 
 import AppMenu from '../renderer/menu'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, screen} from 'electron'
 
+// Outputs i.e : 1280x720
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -17,15 +18,15 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
-function createWindow () {
+function createWindow (h, w) {
   /**
    * Initial window options
    */
   AppMenu.setApplicationMenu()
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: h,
     useContentSize: true,
-    width: 1000,
+    width: w,
     webPreferences: {webSecurity: false}
   })
   mainWindow.loadURL(winURL)
@@ -35,7 +36,12 @@ function createWindow () {
   })
 }
 
-app.on('ready', createWindow)
+app.on('ready', () => {
+  var screenElectron = screen;
+  var mainScreen = screenElectron.getPrimaryDisplay();
+  var dimensions = mainScreen.size;
+  createWindow(dimensions.height, dimensions.width)
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

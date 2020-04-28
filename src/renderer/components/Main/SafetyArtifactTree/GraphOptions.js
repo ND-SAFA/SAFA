@@ -1,15 +1,14 @@
 import CONFIG from 'config'
 
-export const NODE_WIDTH = 150
-export const NODE_HEIGHT = 60
-export const NODE_PADDING = 2
+export const NODE_WIDTH = 105
+export const NODE_HEIGHT = 70
+export const NODE_PADDING = 1
 export const NODE_COLOR = 'white'
 export const NODE_SHAPE = 'rectangle'
 export const NODE_BORDER_STYLE = 'solid'
-export const NODE_BORDER_WIDTH = 2
+export const NODE_BORDER_WIDTH = 1.5
 export const NODE_WARNING_HEIGHT = 85
-export const NODE_WARNING_COLOR = '#ffc107'
-export const NODE_SELECTED_COLOR = '#ECE1FD'
+export const NODE_SELECTED_COLOR = '#e2e2e2'
 export const NODE_CODE_HEIGHT = 12
 export const NODE_OVERLAY_OPACITY = 0.0
 
@@ -28,7 +27,7 @@ export const DELTA_EDGE_REMOVED_LINE_COLOR = '#000000' // '#690000'
 
 export const EDGE_CURVE_STYLE = 'bezier'
 
-export const CORE_PEER_SPACING = 5
+export const CORE_PEER_SPACING = 1
 export const CORE_WHEEL_SENSITIVITY = 0.25
 export const ZOOM_INCREMENT = 0.005
 

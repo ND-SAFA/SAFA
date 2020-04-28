@@ -4,7 +4,9 @@ export default [
   {
     selector: 'edge',
     style: {
-      'curve-style': GraphOptions.EDGE_CURVE_STYLE
+      'curve-style': GraphOptions.EDGE_CURVE_STYLE,
+      'width': '1px',
+      'line-color': '#000000'
     }
   },
   {
@@ -54,7 +56,6 @@ export default [
   {
     selector: '.warning',
     style: {
-      'background-color': GraphOptions.NODE_WARNING_COLOR,
       height: GraphOptions.NODE_WARNING_HEIGHT
     }
   },

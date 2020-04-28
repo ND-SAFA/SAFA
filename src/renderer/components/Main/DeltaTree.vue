@@ -91,6 +91,12 @@ export default {
     this.renderDeltaTree(this.$refs.cy)
   },
 
+  beforeDestroy () {
+    if (!Vue.isEmpty(this.cytoscapeProto)) {
+      this.cytoscapeProto.destroy()
+    }
+  },
+
   methods: {
     ...mapActions('projects.module', ['fetchDeltaTrees']),
     ...mapActions('app.module', ['setDeltaTreeChangeLog', 'setSelectedArtifact']),

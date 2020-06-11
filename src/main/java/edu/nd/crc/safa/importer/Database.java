@@ -567,9 +567,9 @@ public class Database implements AutoCloseable {
                         System.out.println("Adding: " + file.getValue0() + " " + file.getValue1() + " " + mLatestVersion);
                         System.out.println(String.format("MERGE (:Package {id:'%s', issue:'%s'});", file.getValue0(), file.getValue3()));
                         System.out.println(String.format("MATCH (p {id:'%s' }) MATCH (c:Package {id:'%s', issue:'%s'}) MERGE (c)<-[:IMPLEMENTS]-(p);", file.getValue3(), file.getValue3(), file.getValue0()));
-                        System.out.println(String.format("MERGE (:Code {id:'%s', commit:'%s'});", file.getValue1(), file.getValue2()));
-                        System.out.println(String.format("MATCH (p:Package {id:'%s', issue:'%s'}) MATCH (c:Code {id:'%s', commit:'%s'}) MERGE (c)<-[:CONTAINED_BY]-(p);", file.getValue3(), file.getValue0(), file.getValue1(), file.getValue2()));
-                        System.out.println(String.format("MATCH (c:Code {id:'%s', commit:'%s'})<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES {type:'ADD', version: %d}]-(p);", file.getValue1(), file.getValue2(), file.getValue3(), file.getValue0(), mLatestVersion));
+                        System.out.println(String.format("MERGE (:Code {id:'%s', commit:'%s', issue:'%s'});", file.getValue1(), file.getValue2(), file.getValue3()));
+                        System.out.println(String.format("MATCH (p:Package {id:'%s', issue:'%s'}) MATCH (c:Code {id:'%s', commit:'%s', issue:'%s'}) MERGE (c)<-[:CONTAINED_BY]-(p);", file.getValue3(), file.getValue0(), file.getValue1(), file.getValue2(), file.getValue3()));
+                        System.out.println(String.format("MATCH (c:Code {id:'%s', commit:'%s', issue:'%s'})<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES {type:'ADD', version: %d}]-(p);", file.getValue1(), file.getValue2(), file.getValue3(), file.getValue3(), file.getValue0(), mLatestVersion));
                     }
 
                     // Create package
@@ -578,10 +578,10 @@ public class Database implements AutoCloseable {
                             parameters("pid", file.getValue3(), "package", file.getValue0(), "issue", file.getValue3()));
 
                     // Create file
-                    tx.run("MERGE (:Code {id:$file, commit:$commit})", parameters("file", file.getValue1(), "commit", file.getValue2()));
-                    tx.run("MATCH (p:Package {id:$pkg, issue:$issue}) MATCH (c:Code {id:$file, commit:$commit}) MERGE (c)<-[:CONTAINED_BY]-(p)",
+                    tx.run("MERGE (:Code {id:$file, commit:$commit, issue:$issue})", parameters("file", file.getValue1(), "commit", file.getValue2(), "issue", file.getValue3()));
+                    tx.run("MATCH (p:Package {id:$pkg, issue:$issue}) MATCH (c:Code {id:$file, commit:$commit, issue:$issue}) MERGE (c)<-[:CONTAINED_BY]-(p)",
                             parameters("pkg", file.getValue0(), "file", file.getValue1(), "issue", file.getValue3(), "commit", file.getValue2()));
-                    tx.run("MATCH (c:Code {id:$cid, commit:$commit})<-[:CONTAINED_BY]-(p:Package {id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'ADD', version: $version}]-(p)",
+                    tx.run("MATCH (c:Code {id:$cid, commit:$commit, issue:$issue})<-[:CONTAINED_BY]-(p:Package {id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'ADD', version: $version}]-(p)",
                             parameters("pid", file.getValue0(), "cid", file.getValue1(), "version", mLatestVersion, "issue", file.getValue3(), "commit", file.getValue2()));
                 });
 
@@ -597,9 +597,9 @@ public class Database implements AutoCloseable {
                 removed.forEach((file) -> {
                     if (VERBOSE) {
                         System.out.println("Removing: " + file.getValue0() + " " + file.getValue1() + " " + mLatestVersion);
-                        System.out.println(String.format("MATCH (c:Code {id:'%s'})<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: %d}]-(p);", file.getValue1(), file.getValue3(), file.getValue0(), mLatestVersion+1));
+                        System.out.println(String.format("MATCH (c:Code {id:'%s', issue:'%s'})<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: %d}]-(p);", file.getValue1(), file.getValue3(), file.getValue3(), file.getValue0(), mLatestVersion+1));
                     }
-                    tx.run("MATCH (c:Code {id:$cid})<-[:CONTAINED_BY]-(p:Package {id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: $version}]-(p)",
+                    tx.run("MATCH (c:Code {id:$cid, issue:$issue})<-[:CONTAINED_BY]-(p:Package {id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: $version}]-(p)",
                             parameters("pid", file.getValue0(), "cid", file.getValue1(), "version", mLatestVersion, "issue", file.getValue3()));
                 });
 

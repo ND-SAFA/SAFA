@@ -99,25 +99,36 @@ public class Puller {
 
             Iterable<RevCommit> logs = git.log().call();
             for (RevCommit rev : logs) {
-                Matcher commitMatcher = mCommitApplies.matcher(rev.getShortMessage());
-                if (commitMatcher.find()) {
-                    final String id = commitMatcher.group(1);
+                if( rev.getShortMessage().contains("UAV-")) {
+                    Set<String> commitFiles = new HashSet<String>();
 
-                    List<DiffEntry> mainEntries = diffFormatter.scan(rev, rev.getParent(0));
-                    mainEntries.forEach(entry -> {
-                        Matcher m = mPackagePattern.matcher(entry.getNewPath());
-                        if (m.find()) {
-                            final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
+                    String[] parts = rev.getShortMessage().split(" ");
+                    System.out.println("Message: " + rev.getShortMessage());
+                    for( String part: parts ){
+                        Matcher commitMatcher = mCommitApplies.matcher(part);
+                        if (commitMatcher.find()) {
+                            final String id = commitMatcher.group(1);
 
-                            // Only add it one time as the commits are newest to oldest
-                            if (!seenFiles.contains(entry.getNewPath())) {
-                                if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
-                                    mDatabase.AddSource(m.group(2), rev.name(), pkg, id);
+                            List<DiffEntry> mainEntries = diffFormatter.scan(rev, rev.getParent(0));
+                            mainEntries.forEach(entry -> {
+                                Matcher m = mPackagePattern.matcher(entry.getNewPath());
+                                if (m.find()) {
+                                    final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
+                                    System.out.println("\tFile: " + pkg + " " + m.group(2) + " - " + id);
+
+                                    // Only add it one time as the commits are newest to oldest
+                                    if (!seenFiles.contains(entry.getNewPath())) {
+                                        if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
+                                            mDatabase.AddSource(m.group(2), rev.name(), pkg, id);
+                                        }
+                                        commitFiles.add(entry.getNewPath());
+                                    }
                                 }
-                                seenFiles.add(entry.getNewPath());
-                            }
+                            });
                         }
-                    });
+                    }
+
+                    seenFiles.addAll(commitFiles);
                 }
             }
         } catch (Exception e) {

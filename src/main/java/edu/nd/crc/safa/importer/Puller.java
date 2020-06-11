@@ -1,12 +1,15 @@
 package edu.nd.crc.safa.importer;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,30 +97,59 @@ public class Puller {
 
             diffFormatter.setRepository(git.getRepository());
 
+            Properties prop = new Properties();
+            try (InputStream input = Puller.class.getClassLoader().getResourceAsStream("ignore.properties")) {
+                if (input == null) {
+                    System.out.println("Sorry, unable to find config.properties");
+                    return;
+                }
+                prop.load(input);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
             // Parse commit logs
             Set<String> seenFiles = new HashSet<String>();
 
             Iterable<RevCommit> logs = git.log().call();
             for (RevCommit rev : logs) {
-                Matcher commitMatcher = mCommitApplies.matcher(rev.getShortMessage());
-                if (commitMatcher.find()) {
-                    final String id = commitMatcher.group(1);
+                if( rev.getShortMessage().contains("UAV-")) {
+                    Set<String> commitFiles = new HashSet<String>();
 
-                    List<DiffEntry> mainEntries = diffFormatter.scan(rev, rev.getParent(0));
-                    mainEntries.forEach(entry -> {
-                        Matcher m = mPackagePattern.matcher(entry.getNewPath());
-                        if (m.find()) {
-                            final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
+                    String[] parts = rev.getShortMessage().split(" ");
+                    for( String part: parts ){
+                        Matcher commitMatcher = mCommitApplies.matcher(part);
+                        if (commitMatcher.find()) {
+                            final String id = commitMatcher.group(1);
 
-                            // Only add it one time as the commits are newest to oldest
-                            if (!seenFiles.contains(entry.getNewPath())) {
-                                if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
-                                    mDatabase.AddSource(m.group(2), rev.name(), pkg, id);
+                            List<DiffEntry> mainEntries = diffFormatter.scan(rev, rev.getParent(0));
+                            mainEntries.forEach(entry -> {
+                                Matcher m = mPackagePattern.matcher(entry.getNewPath());
+                                if (m.find()) {
+                                    final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
+
+                                    if( prop.containsKey(id) ){
+                                        for( String possible: prop.getProperty(id).split(",") ){
+                                            if (entry.getNewPath().contains(possible) ){
+                                                System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
+                                                return;
+                                            }
+                                        }
+                                    }
+
+                                    // Only add it one time as the commits are newest to oldest
+                                    if (!seenFiles.contains(entry.getNewPath())) {
+                                        if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
+                                            mDatabase.AddSource(m.group(2), rev.name(), pkg, id);
+                                        }
+                                        commitFiles.add(entry.getNewPath());
+                                    }
                                 }
-                                seenFiles.add(entry.getNewPath());
-                            }
+                            });
                         }
-                    });
+                    }
+
+                    seenFiles.addAll(commitFiles);
                 }
             }
         } catch (Exception e) {

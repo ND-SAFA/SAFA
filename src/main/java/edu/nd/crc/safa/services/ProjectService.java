@@ -404,7 +404,7 @@ public class ProjectService {
         mapping.put("id", nodeId);
         ids.put(node.id(), nodeId);
       } else {
-        if( label.equals("Package") ){
+        if( label.equals("Package") || label.equals("Code") ){
           ids.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
           mapping.put("id", node.get("issue").asString() + "." + node.get("id").asString());
         }else{

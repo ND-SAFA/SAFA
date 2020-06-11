@@ -1,12 +1,15 @@
 package edu.nd.crc.safa.importer;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,6 +97,17 @@ public class Puller {
 
             diffFormatter.setRepository(git.getRepository());
 
+            Properties prop = new Properties();
+            try (InputStream input = Puller.class.getClassLoader().getResourceAsStream("ignore.properties")) {
+                if (input == null) {
+                    System.out.println("Sorry, unable to find config.properties");
+                    return;
+                }
+                prop.load(input);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
             // Parse commit logs
             Set<String> seenFiles = new HashSet<String>();
 
@@ -103,7 +117,6 @@ public class Puller {
                     Set<String> commitFiles = new HashSet<String>();
 
                     String[] parts = rev.getShortMessage().split(" ");
-                    System.out.println("Message: " + rev.getShortMessage());
                     for( String part: parts ){
                         Matcher commitMatcher = mCommitApplies.matcher(part);
                         if (commitMatcher.find()) {
@@ -114,7 +127,11 @@ public class Puller {
                                 Matcher m = mPackagePattern.matcher(entry.getNewPath());
                                 if (m.find()) {
                                     final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
-                                    System.out.println("\tFile: " + pkg + " " + m.group(2) + " - " + id);
+
+                                    if( prop.containsKey(id) && entry.getNewPath().contains(prop.getProperty(id)) ){
+                                        System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
+                                        return;
+                                    }
 
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {

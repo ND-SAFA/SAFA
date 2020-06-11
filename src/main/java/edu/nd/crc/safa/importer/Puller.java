@@ -128,9 +128,13 @@ public class Puller {
                                 if (m.find()) {
                                     final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
 
-                                    if( prop.containsKey(id) && entry.getNewPath().contains(prop.getProperty(id)) ){
-                                        System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
-                                        return;
+                                    if( prop.containsKey(id) ){
+                                        for( String possible: prop.getProperty(id).split(",") ){
+                                            if (entry.getNewPath().contains(possible) ){
+                                                System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
+                                                return;
+                                            }
+                                        }
                                     }
 
                                     // Only add it one time as the commits are newest to oldest

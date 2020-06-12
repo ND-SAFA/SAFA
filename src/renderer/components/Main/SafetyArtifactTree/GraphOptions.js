@@ -12,16 +12,16 @@ export const NODE_SELECTED_COLOR = '#e2e2e2'
 export const NODE_CODE_HEIGHT = 12
 export const NODE_OVERLAY_OPACITY = 0.0
 
-export const DELTA_NODE_ADDED_COLOR = '#5eba17'
+export const DELTA_NODE_ADDED_COLOR = '#76c43b' // 9ed674' // #5eba17'
 export const DELTA_NODE_ADDED_BORDER_COLOR = '#000000' // '#019a01'
 export const DELTA_EDGE_ADDED_LINE_COLOR = '#000000' // '#23780a'
 
-export const DELTA_NODE_MODIFIED_COLOR = '#2999ff'
+export const DELTA_NODE_MODIFIED_COLOR = '#acd6fc' // '#2999ff'
 export const DELTA_NODE_MODIFIED_BORDER_COLOR = '#000000' // '#2e478b'
 export const DELTA_EDGE_MODIFIED_LINE_COLOR = '#000000' // '#2e478b'
 
-export const DELTA_NODE_REMOVED_SHAPE = 'round-rectangle'
-export const DELTA_NODE_REMOVED_COLOR = '#cf412a'
+export const DELTA_NODE_REMOVED_SHAPE = 'rounded_rectangle'
+export const DELTA_NODE_REMOVED_COLOR = '#eb7965' // #cf412a'
 export const DELTA_NODE_REMOVED_BORDER_COLOR = '#000000' // '#690000'
 export const DELTA_EDGE_REMOVED_LINE_COLOR = '#000000' // '#690000'
 

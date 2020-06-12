@@ -222,7 +222,7 @@ a:not([href]).btn-outline-secondary:hover {
 
 .warning-node-label {
   padding:0;
-  background: white;
+  /* background: blue; */
 }
 
 .warning-node-label.selected {
@@ -230,7 +230,7 @@ a:not([href]).btn-outline-secondary:hover {
 }
 
 .warning-node-info {
-  background-color: #ffc107;
+  background-color: #ffc107; 
   padding: 0;
   margin: 0px;
   border-top: 1px solid;
@@ -440,19 +440,19 @@ table#delta-settings a {
 }
 
 .tippy-tooltip.added-theme {
-  background-color: #019a01;
+  background-color: #538929; /* 019a01; */
   color: floralwhite;
   font-weight: bold;
 }
 
 .tippy-tooltip.removed-theme {
-  background-color: #690000;
+  background-color: #b52f17;
   color: floralwhite;
   font-weight: bold;
 }
 
 .tippy-tooltip.modified-theme {
-  background-color: #2e478b;
+  background-color: #0876dd;
   color: floralwhite;
   font-weight: bold;
 }

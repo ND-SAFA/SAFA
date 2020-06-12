@@ -24,8 +24,12 @@ export function addNode (acc, e) {
       const packageName = e.id.slice(dotIndex + 1)
       data.label = `<b><i class="fas fa-folder"></i> ${e.label}</b></br><span class="package-node-wrap">${Vue.truncate(packageName, 70)}</span>`
     } else if (e.label === 'Code') {
-      const slashIndex = e.id.lastIndexOf('/')
-      const fileName = e.id.slice(slashIndex + 1)
+      const dotIndex = e.id.indexOf('.')
+      const remaining = e.id.slice(dotIndex + 1)
+
+      const slashIndex = remaining.lastIndexOf('/')
+      const fileName = remaining.slice(slashIndex + 1)
+
       data.label = `<div class="code-label">${Vue.truncate(fileName, 22)}</div>`
     }
     if (e.modified) {

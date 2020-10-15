@@ -30,7 +30,7 @@ import edu.nd.crc.safa.importer.JIRA.Issue;
 @Component
 public class Puller {
     @Autowired @Value("${git.username:}") String gitUsername;
-    @Autowired  @Value("${git.password:}") String gitPassword;
+    @Autowired @Value("${git.password:}") String gitPassword;
     @Autowired @Value("${git.url:}") String gitURL;
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
@@ -47,11 +47,11 @@ public class Puller {
     }
 
     public void ParseJIRAIssues() {
-        // Get JIRA information
         try {
             String[] types = new String[] { "Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
                     "Acceptance Test", "Environmental Assumption", "Simulation" };
 
+            // Loop over issues returned from JIRA and add the found nodes and links
             for (Issue issue : mJira.getIssues(types)) {
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", issue.source);
@@ -65,6 +65,7 @@ public class Puller {
                 foundNodes.add(issue.key);
                 mDatabase.AddNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
 
+                // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
                     issue.links.stream().filter((link) -> {
                         return Arrays.asList(types).stream().anyMatch((type) -> {
@@ -80,8 +81,15 @@ public class Puller {
         }
     }
 
+    /**
+     * ParseSourceLinks clones the specified git repository, or pulls the changes of it, before
+     * looping through the commits, from the latest to the oldest, and parses the issue id and 
+     * files modified out of the commit log and adds them, if they are not ignored, to the sources
+     * to be applied to the databse.
+     */
     public void ParseSourceLinks() {
         try (DiffFormatter diffFormatter = new DiffFormatter(NullOutputStream.INSTANCE)) {
+
             File tmpDir = new File("./safa-git/");
 
             Git git;
@@ -113,21 +121,29 @@ public class Puller {
 
             Iterable<RevCommit> logs = git.log().call();
             for (RevCommit rev : logs) {
+                // Check that we have an issue id inside the commit message
                 if( rev.getShortMessage().contains("UAV-")) {
                     Set<String> commitFiles = new HashSet<String>();
 
+                    // Loop over sections of the commit message seperated by a space
                     String[] parts = rev.getShortMessage().split(" ");
                     for( String part: parts ){
+
+                        // Use a regex query to check if the part of the message contains an issue id
                         Matcher commitMatcher = mCommitApplies.matcher(part);
                         if (commitMatcher.find()) {
                             final String id = commitMatcher.group(1);
 
+                            // Get list of files changed between the current revision and its parent
                             List<DiffEntry> mainEntries = diffFormatter.scan(rev, rev.getParent(0));
                             mainEntries.forEach(entry -> {
+
+                                // Use a regex query to check if the file is a java file within the src directory
                                 Matcher m = mPackagePattern.matcher(entry.getNewPath());
                                 if (m.find()) {
                                     final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
 
+                                    // Check if the file and id have been specified to be ignored in the properties file
                                     if( prop.containsKey(id) ){
                                         for( String possible: prop.getProperty(id).split(",") ){
                                             if (entry.getNewPath().contains(possible) ){

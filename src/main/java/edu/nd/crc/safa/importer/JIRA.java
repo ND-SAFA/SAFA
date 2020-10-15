@@ -96,7 +96,7 @@ public class JIRA {
             // Close connection
             con.disconnect();
 
-            // Parse JSON
+            // Serialize issues and links from returned json values
             Any iter = JsonIterator.deserialize(content.toString());
             remaining = iter.get("total").toInt();
 

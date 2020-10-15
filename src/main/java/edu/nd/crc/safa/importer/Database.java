@@ -47,13 +47,15 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * This function creates a new tag within the database which stores the next version to be used by sucessive commands
+     */
     public int Tag() throws EmptyException{
         final int nextVersion = this.CurrentVersion() + 1;
         if( nextVersion == 0 ){
             throw new EmptyException();
         }
 
-        //System.out.println(String.format("Marking version %d as fixed, moving to %d", nextVersion-1, nextVersion));
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=$version RETURN v;", parameters("version", nextVersion));
@@ -63,6 +65,10 @@ public class Database implements AutoCloseable {
         return nextVersion;
     }
 
+    /**
+     * This function calculates the currenty version of the database by searching for the latest tagged version. If one
+     * doesn't exist the it checks to see if there are any nodes and if so then we are on the first version.
+     */
     public int CurrentVersion() {
         int version = -1;
         
@@ -93,6 +99,9 @@ public class Database implements AutoCloseable {
         return version;
     }
 
+    /**
+     * This function clears the entire database of nodes and links
+     */
     public void Clear(){
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
@@ -128,6 +137,9 @@ public class Database implements AutoCloseable {
             "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n";
     }
 
+    /**
+     * Retrieves nodes, sources and links from the database and stores them in hashsets for comparisons later
+     */
     public void UpdateDatabaseEntries(){
         mNodeLinkMap = new HashSet<Triplet<String, String, String>>();
         mNodeMap = new HashSet<Triplet<String, String, String>>();
@@ -135,8 +147,6 @@ public class Database implements AutoCloseable {
 
         // Find next version
         mLatestVersion = CurrentVersion();
-        //System.out.println(String.format("Version: %d", mLatestVersion));
-
         
         try (Session session = driver.session()) {
             String command = RemovedDataQuery(mLatestVersion) + " MATCH (n)\n"
@@ -276,7 +286,6 @@ public class Database implements AutoCloseable {
         // Delete old updates
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                //System.out.println(String.format("Removing old updates for version: %d", mLatestVersion));
                 tx.run("MATCH ()-[r:UPDATES]-() WHERE r.version = $version DELETE r", parameters("version", mLatestVersion));
                 tx.success();
             }
@@ -300,32 +309,32 @@ public class Database implements AutoCloseable {
         mExternalSourceMap = new HashSet<Quartet<String, String, String, String>>();
     }
 
+    /**
+     * This function processes the added, removed and modified links and updates the database to represent the new state.
+     */
     private void ProcessIssues(){
-        //System.out.println(String.format("Current Issues: %d", mExternalNodeMap.size()));
-        //System.out.println(String.format("Found Issues: %d", mNodeMap.size()));
-
+        // Find all added issues
         Set<Triplet<String, String, String>> added = mExternalNodeMap.stream().filter((n) -> {
             return !mNodeMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0());
             });
         }).collect(Collectors.toSet());
-        //System.out.println(String.format("Added Issues: %d", added.size()));
 
+        // Find all removed issues
         Set<Triplet<String, String, String>> removed = mNodeMap.stream().filter((n) -> {
             return !mExternalNodeMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0());
             });
         }).collect(Collectors.toSet());
-        //System.out.println(String.format("Removed Issues: %d", removed.size()));
 
+        // Find all modified issues
         Set<Triplet<String, String, String>> modified = mExternalNodeMap.stream().filter((n) -> {
             return mNodeMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(sanitizeType(n.getValue1())) && !o.getValue2().equals(new String(Base64.getEncoder().encodeToString(n.getValue2().getBytes())));
-                // return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && !o.getValue2().equals(Base64.getEncoder().encodeToString(n.getValue2().getBytes(StandardCharsets.UTF_8)));
             });
         }).collect(Collectors.toSet());
-        //System.out.println(String.format("Modified Issues: %d", modified.size()));
 
+        // Apply changes to the database
         Set<String> seenTypes = new HashSet<String>();
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
@@ -375,6 +384,10 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * This function first finds all issue nodes that match the current (untagged) version and then finds all issue nodes for the tagged version. 
+     * It then creates a set of nodes that are in the current version but not the tagged version and then removes them.
+     */
     private void ProcessOldIssues() {
         try (Session session = driver.session()) {
             // Get data for current version
@@ -434,24 +447,25 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * This function processes the added and removed links and updates the database to represent the new state.
+     */
     public void ProcessLinks(){
-        // System.out.println(String.format("Current Links: %d", mExternalNodeLinkMap.size()));
-        // System.out.println(String.format("Found Links: %d", mNodeLinkMap.size()));
-
+        // Find added links
         Set<Triplet<String, String, String>> added = mExternalNodeLinkMap.stream().filter((n) -> {
             return !mNodeLinkMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue2().equals(n.getValue2());
             });
         }).collect(Collectors.toSet());
-        // System.out.println(String.format("Added Links: %d", added.size()));
 
+        // Find removed links
         Set<Triplet<String, String, String>> removed = mNodeLinkMap.stream().filter((n) -> {
             return !mExternalNodeLinkMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue2().equals(n.getValue2());
             });
         }).collect(Collectors.toSet());
-        // System.out.println(String.format("Removed Links: %d", removed.size()));
 
+        // Apply changes to the database
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 added.forEach((link) -> {
@@ -481,6 +495,10 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * This function first finds all links that match the current (untagged) version and then finds all links for the tagged version. 
+     * It then creates a set of links that are in the current version but not the tagged version and then removes them.
+     */
     private void ProcessOldLinks(){
         try (Session session = driver.session()) {
             // Get data for current version
@@ -534,32 +552,32 @@ public class Database implements AutoCloseable {
         }
     }
 
-    // package, name, commit, issue
+    /**
+     * This function processes the added, removed and modified source nodes and updates the database to represent the new state.
+     */
     private void ProcesSources(){
-        // System.out.println(String.format("Current Sources: %d", mExternalSourceMap.size()));
-        // System.out.println(String.format("Found Sources: %d", mSourceMap.size()));
-
+        // Find all source added nodes since tagged version
         Set<Quartet<String, String, String, String>> added = mExternalSourceMap.stream().filter((n) -> {
             return !mSourceMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && o.getValue3().equals(n.getValue3());
             });
         }).collect(Collectors.toSet());
-        // System.out.println(String.format("Added Sources: %d", added.size()));
 
+        // Find all source nodes removed since tagged version
         Set<Quartet<String, String, String, String>> removed = mSourceMap.stream().filter((n) -> {
             return !mExternalSourceMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && o.getValue3().equals(n.getValue3());
             });
         }).collect(Collectors.toSet());
-        // System.out.println(String.format("Removed Sources: %d", removed.size()));
 
+        // Find all source nodes modified since tagged version
         Set<Quartet<String, String, String, String>> modified = mExternalSourceMap.stream().filter((n) -> {
             return mSourceMap.stream().anyMatch((o) -> {
                 return o.getValue0().equals(n.getValue0()) && o.getValue1().equals(n.getValue1()) && !o.getValue2().equals(n.getValue2()) && o.getValue3().equals(n.getValue3());
             });
         }).collect(Collectors.toSet());
-        // System.out.println(String.format("Modified Sources: %d", modified.size()));
 
+        // Apply changes to the database
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 added.forEach((file) -> {
@@ -608,6 +626,10 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * This function first finds all source nodes that match the current (untagged) version and then finds all source nodes for the tagged version. 
+     * It then creates a set of nodes that are in the current version but not the tagged version and then removes them.
+     */
     private void ProcessOldSources() {
         // Handles Sources
         try (Session session = driver.session()) {

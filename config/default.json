@@ -1,5 +1,5 @@
 {
-  "services": {"api": {"url": "https://www.notsafa.xyz/hzpRHpRn3Yu4JuDA"}},
+  "services": {"api": {"url": "https://safa.crc.nd.edu"}},
   "safa_tree": {
     "peer_node_types": "Context,AcceptanceTest,EnvironmentalAssumption",
     "ancestor_exact_types": "Hazard,DesignDefinition,Code",

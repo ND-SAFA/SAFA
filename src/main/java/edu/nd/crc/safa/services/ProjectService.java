@@ -73,6 +73,12 @@ public class ProjectService {
             .id(String.valueOf(3))
             .name("update"));
 
+          mPuller.parseFlatfiles();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": true}")
+            .id(String.valueOf(4))
+            .name("update"));
+
           emitter.complete();
         } catch (Exception ex) {
             emitter.completeWithError(ex);

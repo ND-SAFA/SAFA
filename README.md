@@ -49,24 +49,51 @@ cd SAFA-services-api
 docker build . -t safa-api
 ```
 
-## Changes to SAFA-Vue
-```bash
-cd SAFA-Vue/config/
-```
-1. Open `default.json`
-1. Change `"url": "https://safa.crc.nd.edu"` to `"url": "http://localhost:8080"`
-
 ## SAFA
 ```bash
 cd SAFA
 ```
 
 ```bash
+docker-compose up
+```
+
+Both neo4j and SAFA Services API should be up and running now
+
+## Changes SAFA-Vue
+```bash
+cd SAFA-Vue/config/
+```
+1. Open `default.json`
+1. Change `"url": "https://safa.crc.nd.edu"` to `"url": "http://localhost:8080"`
+
+```bash
+cd SAFA-Vue
+```
+
+```bash
 npm run dev
 ```
+
 
 ## Electron
 
 1. When Electron opens the database is originally empty.
 1. In Electron click on Project->Synchronize Forest
 1. This should update the database and the trees should appear.
+
+## Update Application with Backend Changes
+```bash
+cd SAFA-services-api
+```
+```bash
+docker build . -t saga-api
+```
+```bash
+cd SAFA
+```
+
+```bash
+docker-compose up
+```
+Backend change should appear on electron. If not click on Project->Synchronize Forest

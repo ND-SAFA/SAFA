@@ -3,11 +3,11 @@
 ## Installation Requirements
 Node.js v12+ https://nodejs.org/en/ \
 Docker MacOS: https://docs.docker.com/docker-for-mac/ Or for Windows: https://docs.docker.com/docker-for-windows/ \
-Docker Compose https://docs.docker.com/compose/install/ \
+Docker Compose https://docs.docker.com/compose/install/
 
 ## Project Requirements
 Jira Project Access for: http://spwd.cse.nd.edu:8080/ \
-GitHub Read Access for: https://github.com/SAREC-Lab/Dronology \
+GitHub Read Access for: https://github.com/SAREC-Lab/Dronology
 
 Log into Jira:
  1. Open a browser window, and navigate to http://spwd.cse.nd.edu:8080/

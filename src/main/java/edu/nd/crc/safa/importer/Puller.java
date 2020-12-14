@@ -35,6 +35,7 @@ public class Puller {
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
     @Autowired JIRA mJira;
+    @Autowired Flatfile mFlatfile;
     @Autowired public Database mDatabase;
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
@@ -172,4 +173,9 @@ public class Puller {
             System.err.println(e.toString());
         }
     }
+
+    public void parseFlatfiles() {
+        System.out.println(mFlatfile.parseFiles("tim.json")); 
+    }
+
 }

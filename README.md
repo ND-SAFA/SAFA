@@ -1,45 +1,72 @@
-# SAFA Services API
+# Running SAFA Services API Locally
 
-## Requirements
-JDK 1.8\
-Gradle 4+\
-neo4j (or docker)
+## Installation Requirements
+Node.js v12+ https://nodejs.org/en/ \
+Docker MacOS: https://docs.docker.com/docker-for-mac/ Or for Windows: https://docs.docker.com/docker-for-windows/ \
+Docker Compose https://docs.docker.com/compose/install/\
 
-## Dev Setup 
+## Project Requirements
+Jira Project Access for: http://spwd.cse.nd.edu:8080/\
+GitHub Read Access for: https://github.com/SAREC-Lab/Dronology\
+
+Log into Jira:
+ 1. Open a browser window, and navigate to http://spwd.cse.nd.edu:8080/
+ 1. Log in with your credentials and close browser
+
+Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/pulse
+
+## Changes to SAFA-services-api
 ```bash
-docker pull neo4j
+$ cd SAFA-services-api/src/main/resources/
+```
+
+1. Open `application.properties`
+1. Delete all the text in file
+1. Paste text below into the file
+1. Fill out jira.username, jira.password, git.username, git.password
+ 
+```bash
+src/main/resources/Application.properties:
+/src/main/resources
+neo4j.username=neo4j
+neo4j.password=secret
+neo4j.host=localhost
+neo4j.port=7687
+neo4j.scheme=bolt
+jira.username=
+jira.password=
+git.url=https://github.com/SAREC-Lab/Dronology.git
+git.branch=ICSE_2019_DATA_V1
+git.username=
+git.password=
+```
+## Build SAFA-services-api
+```bash
+cd SAFA-services-api
 ```
 
 ```bash
-docker run -d --name neo4j \
-    --publish=7474:7474 --publish=7687:7687 \
-    --volume=neo4j_data:/data \
-    --env=NEO4J_AUTH=none \
-    neo4j
+docker build . -t safa-api
 ```
 
-Reset neo4j password:
+## Changes to SAFA-Vue
 ```bash
-curl -v -u neo4j:neo4j -X POST localhost:7474/user/neo4j/password -H "Content-type:application/json" -d "{\"password\":\"secret\"}"
+cd SAFA-Vue/config/
 ```
+1. Open `default.json`
+1. Change `"url": "https://safa.crc.nd.edu"` to `"url": "http://localhost:8080"`
 
-## Build and Run
+## SAFA
+```bash
+cd SAFA
+```
 
 ```bash
-./gradlew clean build && ./gradlew bootRun
+npm run dev
 ```
 
-Should serve on localhost:8080
+## Electron
 
-## Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/gradle-plugin/reference/html/)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/{bootVersion}/reference/htmlsingle/#using-boot-devtools)
-
-### Additional Links
-These additional references should also help you:
-
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-
+1. When Electron opens the database is originally empty.
+1. In Electron click on Project->Synchronize Forest
+1. This should update the database and the trees should appear.

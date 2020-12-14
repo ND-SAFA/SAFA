@@ -9,8 +9,8 @@ import java.io.FileWriter;
 
 import com.jsoniter.JsonIterator;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -68,8 +68,35 @@ public class Flatfile {
     }
 
     public void errorGenerator(String file, int lineNumber, String message, ErrorText errorText){
-        String text = String.format("CSV: %s LINE: %d DESC: %s \n", file, lineNumber, message);
+        String text = String.format("ERROR: CSV: %s LINE: %d DESC: %s \n", file, lineNumber, message);
         errorText.text += text;
+    }
+
+    public void uniqueIDChecker(ParsedData parsedData, ErrorText errorText){
+        Set<String> totalIDs = new HashSet<String>();
+        for (Artifact artifact : parsedData.artifacts){
+            totalIDs.addAll(artifact.uniqueIDs);
+        }
+
+        for (String ID : totalIDs){
+            String warning = "Warning: Files:";
+            int count = 0;
+
+            for (Artifact artifact : parsedData.artifacts){
+                if (artifact.uniqueIDs.contains(ID)){
+                    if (count == 0){
+                        warning += String.format(" %s", artifact.file);
+                    } else {
+                        warning += String.format(", %s", artifact.file);
+                    }
+                    count++;
+                }
+            }
+            if (count > 1){
+                warning += String.format(" each have an entry with the same ID: %s.\n", ID);
+                errorText.text += warning;
+            }
+        }
     }
 
     public void generateErrorReport(String errorText, String fileName) {
@@ -380,6 +407,7 @@ public class Flatfile {
             
             parsedData.artifacts = artifacts;
             parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
+            uniqueIDChecker(parsedData, errorText);
             generateErrorReport(errorText.text, "ErrorReport.txt"); 
             //generateInitialDirectories("testProject"); 
             //generateNextVersion("testProject", "nextVersionName"); 
@@ -389,7 +417,4 @@ public class Flatfile {
         return parsedData; 
 
     }
-
-
-
 }

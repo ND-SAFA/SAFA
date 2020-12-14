@@ -60,7 +60,7 @@ docker-compose up
 
 Both neo4j and SAFA Services API should be up and running now
 
-## Changes SAFA-Vue
+## Changes to SAFA-Vue
 ```bash
 cd SAFA-Vue/config/
 ```
@@ -87,7 +87,7 @@ npm run dev
 cd SAFA-services-api
 ```
 ```bash
-docker build . -t saga-api
+docker build . -t safa-api
 ```
 ```bash
 cd SAFA

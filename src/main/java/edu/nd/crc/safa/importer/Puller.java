@@ -175,7 +175,7 @@ public class Puller {
     }
 
     public void parseFlatfiles() {
-        System.out.println(mFlatfile.parseFiles("tim.json")); 
+        System.out.println(mFlatfile.parseFiles("flatfile_data/tim.json")); 
     }
 
 }

@@ -180,7 +180,7 @@ public class Puller {
     }
 
     public void parseFlatfiles() {
-        ParsedData parsedData = mFlatfile.parseFiles("tim.json"); 
+        ParsedData parsedData = mFlatfile.parseFiles("flatfile_data/tim.json"); 
         System.out.println("PARSED DATA: "); 
         System.out.println(parsedData); 
         for (Artifact artifact : parsedData.artifacts) {

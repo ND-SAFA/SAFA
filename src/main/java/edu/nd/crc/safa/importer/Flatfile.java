@@ -403,7 +403,7 @@ public class Flatfile {
 
         try {
             Tim tim = parseTim(fileName); 
-            // List<Artifact> artifacts = parseDataFiles(tim, errorText);
+            List<Artifact> artifacts = parseDataFiles(tim, errorText);
             
             parsedData.artifacts = artifacts;
             parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);

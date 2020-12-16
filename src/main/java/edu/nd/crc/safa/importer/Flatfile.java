@@ -403,12 +403,12 @@ public class Flatfile {
 
         try {
             Tim tim = parseTim(fileName); 
-            List<Artifact> artifacts = parseDataFiles(tim, errorText);
+            // List<Artifact> artifacts = parseDataFiles(tim, errorText);
             
-            parsedData.artifacts = artifacts;
-            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
-            uniqueIDChecker(parsedData, errorText);
-            generateErrorReport(errorText.text, "ErrorReport.txt"); 
+            // parsedData.artifacts = artifacts;
+            // parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
+            // uniqueIDChecker(parsedData, errorText);
+            // generateErrorReport(errorText.text, "ErrorReport.txt"); 
             //generateInitialDirectories("testProject"); 
             //generateNextVersion("testProject", "nextVersionName"); 
         } catch(Exception e) {

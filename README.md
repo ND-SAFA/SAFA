@@ -97,3 +97,7 @@ cd SAFA
 docker-compose up
 ```
 Backend change should appear on electron. If not click on Project->Synchronize Forest
+
+## Neo4j Username and Password for Logging into Remote Interface
+Username: neo4j
+Password: secret

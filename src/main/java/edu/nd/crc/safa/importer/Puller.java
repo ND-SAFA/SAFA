@@ -190,10 +190,10 @@ public class Puller {
                 System.out.println(dataEntry.id); 
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", "Flatfile");
-                // data.put("isDelegated", null);
-                // data.put("status", issue.status);
+                data.put("isDelegated", "N/A");
+                data.put("status", "N/A");
                 data.put("name", dataEntry.summary);
-                // data.put("href", issue.href);
+                data.put("href", "N/A");
                 data.put("description", dataEntry.content);
                 data.put("type", artifact.type);
 

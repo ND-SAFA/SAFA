@@ -55,25 +55,25 @@ public class ProjectService {
             .id(String.valueOf(0))
             .name("update"));
 
-          // mPuller.ParseJIRAIssues();
+          mPuller.ParseJIRAIssues();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": false}")
             .id(String.valueOf(1))
             .name("update"));
 
-          // mPuller.ParseSourceLinks();
+          mPuller.ParseSourceLinks();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": false}")
             .id(String.valueOf(2))
             .name("update"));
 
-          mPuller.Execute();
+          mPuller.parseFlatfiles();
           emitter.send(SseEmitter.event()
-            .data("{\"complete\": true}")
+            .data("{\"complete\": false}")
             .id(String.valueOf(3))
             .name("update"));
 
-          mPuller.parseFlatfiles();
+          mPuller.Execute();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": true}")
             .id(String.valueOf(4))

@@ -183,31 +183,31 @@ public class Puller {
         ParsedData parsedData = mFlatfile.parseFiles("tim.json"); 
         System.out.println("PARSED DATA: "); 
         System.out.println(parsedData); 
-        // for (Artifact artifact : parsedData.artifacts) {
-        //     System.out.println(artifact.type); 
-        //     for (DataEntry dataEntry : artifact.entries) {
+        for (Artifact artifact : parsedData.artifacts) {
+            System.out.println(artifact.type); 
+            for (DataEntry dataEntry : artifact.entries) {
 
-        //         System.out.println(dataEntry.id); 
-        //         Map<String, Object> data = new HashMap<String, Object>();
-        //         data.put("source", "Flatfile");
-        //         // data.put("isDelegated", null);
-        //         // data.put("status", issue.status);
-        //         data.put("name", dataEntry.summary);
-        //         // data.put("href", issue.href);
-        //         data.put("description", dataEntry.content);
-        //         data.put("type", artifact.type);
+                System.out.println(dataEntry.id); 
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("source", "Flatfile");
+                // data.put("isDelegated", null);
+                // data.put("status", issue.status);
+                data.put("name", dataEntry.summary);
+                // data.put("href", issue.href);
+                data.put("description", dataEntry.content);
+                data.put("type", artifact.type);
 
-        //         foundNodes.add(dataEntry.id);
-        //         mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
+                foundNodes.add(dataEntry.id);
+                mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
 
-        //     }
-        // }
+            }
+        }
 
-        // for (Connection connection : parsedData.connections) {
-        //     for (Link link : connection.links) {
-        //         System.out.println(link.target); 
-        //     }
-        // }
+        for (Connection connection : parsedData.connections) {
+            for (Link link : connection.links) {
+                System.out.println(link.target); 
+            }
+        }
 
     }
 

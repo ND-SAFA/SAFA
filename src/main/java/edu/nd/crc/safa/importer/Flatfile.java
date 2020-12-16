@@ -257,7 +257,7 @@ public class Flatfile {
     public List<Artifact> parseDataFiles(Tim tim, ErrorText errorText) throws Exception {
         /* Parse Data Files */  
         List<Artifact> artifacts = new ArrayList<Artifact>(); 
-        String RELATIVE_PATH = "SAFA-DroneResponseData/";
+        String RELATIVE_PATH = "flatfile_data/SAFA-DroneResponseData/";
         
         for (DataFile d : tim.dataFiles) {
             String path = RELATIVE_PATH + d.file; 
@@ -355,7 +355,7 @@ public class Flatfile {
             connection.targetType   = t.target;
             connection.links        = new ArrayList<Link>(); 
 
-            String RELATIVE_PATH = "SAFA-DroneResponseData/";
+            String RELATIVE_PATH = "flatfile_data/SAFA-DroneResponseData/";
             String path = RELATIVE_PATH + t.file;  
             File dataFile = new File(path); 
             Scanner rowScanner = new Scanner(dataFile); 
@@ -405,10 +405,10 @@ public class Flatfile {
             Tim tim = parseTim(fileName); 
             // List<Artifact> artifacts = parseDataFiles(tim, errorText);
             
-            // parsedData.artifacts = artifacts;
-            // parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
-            // uniqueIDChecker(parsedData, errorText);
-            // generateErrorReport(errorText.text, "ErrorReport.txt"); 
+            parsedData.artifacts = artifacts;
+            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
+            uniqueIDChecker(parsedData, errorText);
+            generateErrorReport(errorText.text, "flatfile_data/ErrorReport.txt"); 
             //generateInitialDirectories("testProject"); 
             //generateNextVersion("testProject", "nextVersionName"); 
         } catch(Exception e) {

@@ -412,7 +412,7 @@ public class Flatfile {
             parsedData.artifacts = artifacts;
             parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
             uniqueIDChecker(parsedData, errorText);
-            generateErrorReport(errorText.text, "flatfile_data/ErrorReport.txt"); 
+            generateErrorReport(errorText.text, "flatfile_data/ErrorReport.txt");
             //generateInitialDirectories("testProject"); 
             //generateNextVersion("testProject", "nextVersionName"); 
         } catch(Exception e) {

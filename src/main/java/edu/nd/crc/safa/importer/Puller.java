@@ -181,17 +181,14 @@ public class Puller {
 
     public void parseFlatfiles() {
         ParsedData parsedData = mFlatfile.parseFiles("flatfile_data/tim.json"); 
-
-        String[] types = new String[] { "Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
-        "Acceptance Test", "Environmental Assumption", "Simulation" };
         
-        System.out.println("PARSED DATA: "); 
-        System.out.println(parsedData); 
+        // System.out.println("PARSED DATA: "); 
+        // System.out.println(parsedData); 
         for (Artifact artifact : parsedData.artifacts) {
-            System.out.println(artifact.type); 
+            // System.out.println(artifact.type); 
             for (DataEntry dataEntry : artifact.entries) {
 
-                System.out.println(dataEntry.id); 
+                // System.out.println(dataEntry.id); 
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", "Flatfile");
                 data.put("isDelegated", "N/A");
@@ -209,8 +206,8 @@ public class Puller {
 
         for (Connection connection : parsedData.connections) {
             for (Link link : connection.links) {
-                System.out.println(link.target); 
-                mDatabase.AddLink(link.source, link.sourceType, link.target);
+                // System.out.println(link.target);
+                mDatabase.AddLink(link.target, link.sourceType, link.source);
             }
         }
 

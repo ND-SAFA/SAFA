@@ -48,6 +48,8 @@ public class Flatfile {
     public class Link {
         public String source; 
         public String target; 
+        public String sourceType; 
+        public String targetType; 
     }
 
     public class Connection {
@@ -384,6 +386,8 @@ public class Flatfile {
                     }
                 }
                 
+                link.sourceType = connection.sourceType; 
+                link.targetType = connection.targetType; 
                 if (linkValidator(connection, artifacts, link, errorText, lineNumber)){
                     connection.links.add(link); 
                 }

@@ -1,13 +1,23 @@
 <template>
   <div id="left-list-view" class="p-0 bg-light">
     <div class="d-flex flex-column pt-0 px-2 bg-wash mb-0">
-      <div class="custom-control custom-switch py-1">
+      <div class="custom-control custom-switch py-1 mb-10">
         <input v-model="deltaEnabled" @change="toggleDelta" type="checkbox" class="custom-control-input" id="delta-mode-switch">
         <label class="custom-control-label d-flex justify-content-between font-weight-bold text-uppercase" for="delta-mode-switch">Delta View Mode<span><i class="fas fa-play fa-rotate-270"></i></span></label>
       </div>
       <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @click="showDeltaModal">
         Configure Delta
       </button>
+    </div>
+
+    <div class="d-flex flex-column pt-0 px-2 bg-wash mb-0">
+      <div style="padding-top: 10px; ">
+        <p class="font-weight-bold text-uppercase mb-2 d-flex justify-content-between align-items-center">
+          Manage Data
+        </p>
+        <input type="file" id="selectedFile" style="display: none;" />
+        <input type="button" class="btn btn-outline-secondary btn-sm btn-block" value="Upload Flatfiles" onclick="document.getElementById('selectedFile').click();" />
+      </div>
     </div>
 
     <ul id="top-tabs" role="tablist" class="nav nav-tabs nav-fill pt-3 mb-3 bg-wash">
@@ -83,6 +93,10 @@ export default {
 
     toggleFTATab () {
       this.showTab = 'FTA'
+    },
+
+    uploadFiles () {
+      console.log('uploading files bb')
     }
   }
 }

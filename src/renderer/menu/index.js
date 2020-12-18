@@ -43,7 +43,7 @@ export default class AppMenu {
       submenu: [
         {
           id: 'sync',
-          label: 'Synchronize Forest',
+          label: 'Update Data',
           accelerator: 'CommandOrControl+P'
         },
         {

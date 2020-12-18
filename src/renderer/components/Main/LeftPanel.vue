@@ -15,7 +15,7 @@
         <p class="font-weight-bold text-uppercase mb-2 d-flex justify-content-between align-items-center">
           Manage Data
         </p>
-        <input type="file" id="selectedFile" style="display: none;" />
+        <input type="file" id="selectedFile" style="display: none;" @change="uploadFiles"/>
         <input type="button" class="btn btn-outline-secondary btn-sm btn-block" value="Upload Flatfiles" onclick="document.getElementById('selectedFile').click();" />
       </div>
     </div>
@@ -95,8 +95,9 @@ export default {
       this.showTab = 'FTA'
     },
 
-    uploadFiles () {
+    uploadFiles (e) {
       console.log('uploading files bb')
+      console.log(e.target.files[0])
     }
   }
 }

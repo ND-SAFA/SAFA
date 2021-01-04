@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -55,8 +56,8 @@ public class ProjectsController {
     return projectService.versionsTag(projId);
   }
 
-  @PostMapping("/projects/{projId}/upload/{encodedStr}") 
-  public String uploadFile(@PathVariable String projId, @PathVariable String encodedStr) {
+  @PostMapping("/projects/{projId}/upload/") 
+  public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
     return projectService.uploadFile(projId, encodedStr); 
   } 
 

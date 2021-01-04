@@ -15,7 +15,7 @@
         <p class="font-weight-bold text-uppercase mb-2 d-flex justify-content-between align-items-center">
           Manage Data
         </p>
-        <input type="file" id="selectedFile" style="display: none;" @change="uploadFiles"/>
+        <input type="file" id="selectedFile" style="display: none;" multiple="multiple" @change="uploadFiles"/>
         <input type="button" class="btn btn-outline-secondary btn-sm btn-block" value="Upload Flatfiles" onclick="document.getElementById('selectedFile').click();" />
       </div>
     </div>
@@ -77,6 +77,7 @@ export default {
 
   methods: {
     ...mapActions('app.module', ['updateDelta']),
+    ...mapActions('projects.module', ['uploadFlatfileData', 'saveProjectVersion']),
     showDeltaModal () {
       this.$emit('show-delta-modal')
     },
@@ -96,9 +97,36 @@ export default {
     },
 
     uploadFiles (e) {
-      console.log('uploading files bb')
-      console.log(e.target.files[0])
+      let reader = new FileReader()
+      var fileEncodings = []
+      var fileNum = e.target.files.length
+
+      var i = 0
+      var finished = false
+
+      // for (var i = 0; i < fileNum; i++) { 
+      while (i < fileNum) {
+        reader.readAsDataURL(e.target.files[i])
+        finished = false
+
+        reader.onload = async function () {
+          fileEncodings.push(reader.result)
+          i += 1
+          finished = true
+          if (i === fileNum - 1) {
+            await self.uploadFlatfileData(JSON.stringify(fileEncodings))
+          }
+        }
+
+        reader.onerror = function () {
+          console.log(reader.error)
+        }
+
+        while (!finished) {}
+      }
+      console.log(fileEncodings)
     }
+
   }
 }
 </script>

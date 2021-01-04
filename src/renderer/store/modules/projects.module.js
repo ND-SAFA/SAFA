@@ -106,6 +106,18 @@ const actions = {
     }
   },
 
+  async uploadFlatfileData ({ commit }, encodedStr) {
+    try {
+      const response = await projects.postFlatfileData(TEMP_PROJ_ID, encodedStr)
+      console.log(response)
+      console.log('api success')
+      // commit('UPLOAD_FILES', response)
+    } catch (e) {
+      console.log(e)
+      console.log('failed to upload flatfile data')
+    }
+  },
+
   async fetchProjectNodeParents ({ commit }, nodeId) {
     try {
       const response = await projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)

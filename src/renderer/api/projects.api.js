@@ -60,6 +60,14 @@ async function postProjectVersion (projId) {
   return {latest: 0}
 }
 
+async function postFlatfileData (projId, encodedStr) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/upload/${encodedStr}`, { method: 'POST', body: JSON.stringify(encodedStr) })
+  const json = await response.json()
+  console.log('response from api on front end: ')
+  console.log(json)
+  return json
+}
+
 // /projects/{projId}/trees/{treeId}/versions/{version}
 async function getDeltaTrees (projId, treeId, versions) {
   const responses = await Promise.all(versions.map(version => httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/versions/${version}`)))
@@ -79,6 +87,7 @@ export default {
   getProjectSafetyArtifactTree,
   getProjectVersions,
   postProjectVersion,
+  postFlatfileData,
   getDeltaTrees,
   syncProject
 }

@@ -15,7 +15,7 @@
         <p class="font-weight-bold text-uppercase mb-2 d-flex justify-content-between align-items-center">
           Manage Data
         </p>
-        <input type="file" id="selectedFile" style="display: none;" multiple="multiple" @change="uploadFiles"/>
+        <input type="file" id="selectedFile" style="display: none;" multiple="multiple" @change="submitFlatfiles"/>
         <input type="button" class="btn btn-outline-secondary btn-sm btn-block" value="Upload Flatfiles" onclick="document.getElementById('selectedFile').click();" />
       </div>
     </div>
@@ -96,35 +96,42 @@ export default {
       this.showTab = 'FTA'
     },
 
-    uploadFiles (e) {
-      let reader = new FileReader()
-      var fileEncodings = []
-      var fileNum = e.target.files.length
+    readFiles (filename) {
+      return new Promise((resolve, reject) => {
+        let reader = new FileReader()
 
-      var i = 0
-      var finished = false
-
-      // for (var i = 0; i < fileNum; i++) { 
-      while (i < fileNum) {
-        reader.readAsDataURL(e.target.files[i])
-        finished = false
-
-        reader.onload = async function () {
-          fileEncodings.push(reader.result)
-          i += 1
-          finished = true
-          if (i === fileNum - 1) {
-            await self.uploadFlatfileData(JSON.stringify(fileEncodings))
-          }
+        reader.onload = () => {
+          resolve(reader.result)
         }
+        reader.readAsDataURL(filename)
 
         reader.onerror = function () {
-          console.log(reader.error)
+          reject(reader.error)
         }
+      })
+    },
 
-        while (!finished) {}
+    async uploadFiles (e) {
+      var files = []
+      for (var i = 0; i < e.target.files.length; i++) {
+        files.push(e.target.files[i])
       }
-      console.log(fileEncodings)
+
+      let results = await Promise.all(
+        files.map(async file => {
+          let data = await this.readFiles(file)
+          return data
+        })
+      )
+      return results
+    },
+
+    submitFlatfiles (e) {
+      this.uploadFiles(e).then(result => {
+        console.log('sending to api: ', result)
+        console.log(JSON.stringify(result))
+        this.uploadFlatfileData(JSON.stringify(result))
+      })
     }
 
   }

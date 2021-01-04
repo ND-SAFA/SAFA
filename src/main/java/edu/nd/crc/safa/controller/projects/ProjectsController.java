@@ -55,6 +55,11 @@ public class ProjectsController {
     return projectService.versionsTag(projId);
   }
 
+  @PostMapping("/projects/{projId}/upload/{encodedStr}") 
+  public String uploadFile(@PathVariable String projId, @PathVariable String encodedStr) {
+    return projectService.uploadFile(projId, encodedStr); 
+  } 
+
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
   public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version) {
     return projectService.versions(projId, treeId, version);

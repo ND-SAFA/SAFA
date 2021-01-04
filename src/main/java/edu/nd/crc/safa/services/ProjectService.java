@@ -92,19 +92,25 @@ public class ProjectService {
     return emitter;
   }
 
-  public void uploadFile(String test){
-    byte[] bytes = Base64.getDecoder().decode(test);
-    String string = new String(bytes);
-    String fileName = "test";
+  public String uploadFile(String projId, String test){
 
-    try {
-        Files.write(Paths.get(fileName), string.getBytes());
-    } catch (IOException e) {
-        System.out.println("Could not open " + fileName);  
-    }
+    System.out.println("filename received in uploadfile: "); 
+    System.out.println(test); 
 
-    System.out.println(Paths.get(fileName));
-    System.out.println(fileName);
+    // byte[] bytes = Base64.getDecoder().decode(test);
+    // String string = new String(bytes);
+    // String fileName = "test";
+
+    // try {
+    //     Files.write(Paths.get(fileName), string.getBytes());
+    // } catch (IOException e) {
+    //     System.out.println("Could not open " + fileName);  
+    // }
+
+    // System.out.println(Paths.get(fileName));
+    // System.out.println(fileName);
+
+    System.out.println("test string from backend printed in upload file"); 
     
     // File userFile = new File("/");
     // File timFile = null;
@@ -126,7 +132,7 @@ public class ProjectService {
 
     // FileChannel sourceChannel = null;
     // FileChannel destChannel = null;
-
+    return "{ \"success\": true, \"message\": \"Flatfile upload successful.\"}";
 
   }
 

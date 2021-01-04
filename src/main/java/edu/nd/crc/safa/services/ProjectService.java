@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.nio.channels.FileChannel;
+// import java.io.File;
+import java.util.Base64;
+import java.io.*;
+import java.nio.file.*;
 
 import javax.annotation.PostConstruct;
 
@@ -85,6 +90,44 @@ public class ProjectService {
         }
     });
     return emitter;
+  }
+
+  public void uploadFile(String test){
+    byte[] bytes = Base64.getDecoder().decode(test);
+    String string = new String(bytes);
+    String fileName = "test";
+
+    try {
+        Files.write(Paths.get(fileName), string.getBytes());
+    } catch (IOException e) {
+        System.out.println("Could not open " + fileName);  
+    }
+
+    System.out.println(Paths.get(fileName));
+    System.out.println(fileName);
+    
+    // File userFile = new File("/");
+    // File timFile = null;
+    // File safaFile = null;
+
+    // if (userFile.isDirectory()){
+    //     for (File file : userFile.listFiles()){
+    //       String name = file.getName();
+    //       if (name.equals("tim.json")){
+    //         timFile = file;
+    //       }
+    //       if (name.equals("SAFA-DroneResponseData")){
+    //         safaFile = file;
+    //       }
+    //     }
+    // }
+
+    // File flatfile_data = new File("/flatfile_data");
+
+    // FileChannel sourceChannel = null;
+    // FileChannel destChannel = null;
+
+
   }
 
   @PostConstruct

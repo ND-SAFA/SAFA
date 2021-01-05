@@ -63,23 +63,23 @@ public class ProjectService {
             .id(String.valueOf(0))
             .name("update"));
 
-          // mPuller.ParseJIRAIssues();
-          // emitter.send(SseEmitter.event()
-          //   .data("{\"complete\": false}")
-          //   .id(String.valueOf(1))
-          //   .name("update"));
-
-          // mPuller.ParseSourceLinks();
-          // emitter.send(SseEmitter.event()
-          //   .data("{\"complete\": false}")
-          //   .id(String.valueOf(2))
-          //   .name("update"));
-
-          mPuller.parseFlatfiles();
+          mPuller.ParseJIRAIssues();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": false}")
-            .id(String.valueOf(3))
+            .id(String.valueOf(1))
             .name("update"));
+
+          mPuller.ParseSourceLinks();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": false}")
+            .id(String.valueOf(2))
+            .name("update"));
+
+          // mPuller.parseFlatfiles();
+          // emitter.send(SseEmitter.event()
+          //   .data("{\"complete\": false}")
+          //   .id(String.valueOf(3))
+          //   .name("update"));
 
           mPuller.Execute();
           emitter.send(SseEmitter.event()
@@ -95,26 +95,24 @@ public class ProjectService {
     return emitter;
   }
 
-  public String uploadFile(String projId, String test) {
+  public String uploadFile(String projId, String jsonfiles) {
+    System.out.println("PROJECTSERVICE CALL");
+    Path currentRelativePath = Paths.get("");
+    String s = currentRelativePath.toAbsolutePath().toString();
+    System.out.println("Current relative path is: " + s);
 
-    System.out.println("filename received in uploadfile: "); 
-    System.out.println(test); 
-
-    // Any obj = JsonIterator.deserialize(test); 
-    // System.out.println(obj); 
-
-    JsonIterator iterator = JsonIterator.parse(test);
-    try {
-      for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-        System.out.println("field");
-        System.out.println(field);
-        System.out.println("value");
-        System.out.println(iterator.readString()); 
-      }
-    }
-    catch (IOException e) {
-      System.out.println("Could not parse JSON object received in message."); 
-    }
+    // new File("/directory").mkdirs();
+    // JsonIterator iterator = JsonIterator.parse(jsonfiles);
+    // try {
+    //   for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
+    //     String encodedData = iterator.readString();
+    //     byte[] bytes = Base64.getDecoder().decode(encodedData);
+    //     Files.write(Paths.get(filename), bytes);
+    //   }
+    // }
+    // catch (IOException e) {
+    //   System.out.println("Could not parse JSON object received in message."); 
+    // }
 
 
     // for (String key : obj.keys()) {
@@ -136,7 +134,7 @@ public class ProjectService {
     // System.out.println(Paths.get(fileName));
     // System.out.println(fileName);
 
-    System.out.println("test string from backend printed in upload file"); 
+    // System.out.println("test string from backend printed in upload file"); 
     
     // File userFile = new File("/");
     // File timFile = null;

@@ -13,7 +13,8 @@
             <div class="row vh-100 pad-navbar">
               <LeftPanel v-show="!leftPanel.isHidden" 
                       v-on:show-delta-modal="showDeltaModal = true" 
-                      v-on:refresh:view="refreshView" />
+                      v-on:refresh:view="refreshView" 
+                      v-on:show-upload-modal="triggerUploadModal"/>
               <DeltaTree v-if="getDeltaState.enabled && getSelectedTree" 
                       :tree-id="getSelectedTree" 
                       :is-fetching-from-server="isFetchingFromServer" 
@@ -30,6 +31,7 @@
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
+            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" />
           </div>
         </main>
       </div>
@@ -49,6 +51,7 @@
   import FaultTree from '@/components/Main/FaultTree'
   import DeltaTree from '@/components/Main/DeltaTree'
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
+  import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
 
   export default {
     name: 'main-page',
@@ -59,7 +62,8 @@
       SafetyArtifactTree,
       FaultTree,
       DeltaTree,
-      ConfigureDeltaModal
+      ConfigureDeltaModal,
+      FileUploadResultsModal
     },
 
     data () {
@@ -68,6 +72,8 @@
         resize: Date.now(),
         update: Date.now(),
         showDeltaModal: false,
+        showUploadModal: false,
+        uploadResult: null,
         isFetchingFromServer: false,
         rightPanel: {
           isHidden: true
@@ -127,6 +133,10 @@
       },
       openRightPanel () {
         this.rightPanel.isHidden = false
+      },
+      triggerUploadModal (uploadResponse) {
+        this.uploadResult = uploadResponse
+        this.showUploadModal = true
       }
     }
   }

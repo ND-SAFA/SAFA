@@ -82,6 +82,11 @@ export default {
       this.$emit('show-delta-modal')
     },
 
+    showUploadModal (response) {
+      console.log('gonna submit this: ', response)
+      this.$emit('show-upload-modal', response)
+    },
+
     toggleDelta () {
       const deltaState = this.deltaState
       deltaState.enabled = this.deltaEnabled
@@ -135,10 +140,7 @@ export default {
 
     submitFlatfiles (e) {
       this.uploadFiles(e).then(result => {
-        // console.log(result)
-        // console.log('sending to api: ', result)
-        console.log(JSON.stringify(result))
-        this.uploadFlatfileData(JSON.stringify(result))
+        this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.showUploadModal(response) })
       })
     }
 

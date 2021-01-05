@@ -111,6 +111,7 @@ const actions = {
       const response = await projects.postFlatfileData(TEMP_PROJ_ID, encodedStr)
       console.log(response)
       console.log('api success')
+      return response
       // commit('UPLOAD_FILES', response)
     } catch (e) {
       console.log(e)

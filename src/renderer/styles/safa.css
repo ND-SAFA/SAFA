@@ -477,3 +477,7 @@ p.selected-artifact {
 .default-node-description {
   word-break: break-word;
 }
+
+.custom-modal-footer {
+  border: none !important; 
+}

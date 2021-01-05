@@ -130,7 +130,6 @@ export default {
         var data = result[1]
         dict[filename] = data
       }
-
       return dict
     },
 
@@ -138,7 +137,7 @@ export default {
       this.uploadFiles(e).then(result => {
         // console.log(result)
         // console.log('sending to api: ', result)
-        // console.log(JSON.stringify(result))
+        console.log(JSON.stringify(result))
         this.uploadFlatfileData(JSON.stringify(result))
       })
     }

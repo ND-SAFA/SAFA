@@ -61,7 +61,7 @@ async function postProjectVersion (projId) {
 }
 
 async function postFlatfileData (projId, encodedStr) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/upload/`, { method: 'POST', body: JSON.stringify(encodedStr) })
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/upload/`, { method: 'POST', body: encodedStr })
   const json = await response.json()
   console.log('response from api on front end: ')
   console.log(json)

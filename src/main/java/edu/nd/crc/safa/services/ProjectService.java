@@ -96,24 +96,34 @@ public class ProjectService {
   }
 
   public String uploadFile(String projId, String jsonfiles) {
-    System.out.println("PROJECTSERVICE CALL");
     Path currentRelativePath = Paths.get("");
     String s = currentRelativePath.toAbsolutePath().toString();
-    System.out.println("Current relative path is: " + s);
 
-    // new File("/directory").mkdirs();
-    // JsonIterator iterator = JsonIterator.parse(jsonfiles);
-    // try {
-    //   for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
-    //     String encodedData = iterator.readString();
-    //     byte[] bytes = Base64.getDecoder().decode(encodedData);
-    //     Files.write(Paths.get(filename), bytes);
-    //   }
-    // }
-    // catch (IOException e) {
-    //   System.out.println("Could not parse JSON object received in message."); 
-    // }
+    String dir = "/flatfilesDir";
+    File myDir = new File(dir);
 
+    if (!myDir.exists()) {
+      boolean createdDir = myDir.mkdirs();
+    }
+
+    if (myDir.isDirectory()) {
+      JsonIterator iterator = JsonIterator.parse(jsonfiles);
+      try {
+        for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
+          String encodedData = iterator.readString();
+          String base64Image = encodedData.split(",")[1];
+          byte[] bytes = Base64.getDecoder().decode(base64Image);
+          String fullPath = dir + '/' + filename; 
+          Files.write(Paths.get(fullPath), bytes);
+        }
+      }
+      catch (IOException e) {
+        System.out.println("Could not parse JSON object received in message."); 
+      }
+    }
+    else {
+      System.out.println("Error creating flatfiles directory.");
+    }
 
     // for (String key : obj.keys()) {
     //   System.out.println(key); 

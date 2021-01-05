@@ -101,3 +101,7 @@ Backend change should appear on electron. If not click on Project->Synchronize F
 ## Neo4j Username and Password for Logging into Remote Interface
 Username: neo4j
 Password: secret
+
+## Known Problems Google Doc Link
+
+https://docs.google.com/document/d/10BCZqpCamrEYQa5RNjLQl_gHcCQc7RFusLTfo2OH_mA/edit?usp=sharing

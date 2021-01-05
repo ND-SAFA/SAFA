@@ -100,12 +100,27 @@ public class ProjectService {
     System.out.println("filename received in uploadfile: "); 
     System.out.println(test); 
 
-    Any obj = JsonIterator.deserialize(test); 
-    System.out.println(obj); 
-    for (String key : Object.keys(obj)) {
-      System.out.println(key); 
-      // System.out.println(obj.get(key)); 
+    // Any obj = JsonIterator.deserialize(test); 
+    // System.out.println(obj); 
+
+    JsonIterator iterator = JsonIterator.parse(test);
+    try {
+      for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
+        System.out.println("field");
+        System.out.println(field);
+        System.out.println("value");
+        System.out.println(iterator.readString()); 
+      }
     }
+    catch (IOException e) {
+      System.out.println("Could not parse JSON object received in message."); 
+    }
+
+
+    // for (String key : obj.keys()) {
+    //   System.out.println(key); 
+      // System.out.println(obj.get(key)); 
+    // }
     
     // byte[] bytes = Base64.getDecoder().decode(test);
     // System.out.println(bytes); 

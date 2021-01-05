@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.ValueType;
+import com.jsoniter.any.Any;
 
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
@@ -92,12 +95,20 @@ public class ProjectService {
     return emitter;
   }
 
-  public String uploadFile(String projId, String test){
+  public String uploadFile(String projId, String test) {
 
     System.out.println("filename received in uploadfile: "); 
     System.out.println(test); 
 
+    Any obj = JsonIterator.deserialize(test); 
+    System.out.println(obj); 
+    for (String key : Object.keys(obj)) {
+      System.out.println(key); 
+      // System.out.println(obj.get(key)); 
+    }
+    
     // byte[] bytes = Base64.getDecoder().decode(test);
+    // System.out.println(bytes); 
     // String string = new String(bytes);
     // String fileName = "test";
 

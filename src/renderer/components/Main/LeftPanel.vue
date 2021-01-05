@@ -120,16 +120,25 @@ export default {
       let results = await Promise.all(
         files.map(async file => {
           let data = await this.readFiles(file)
-          return data
+          return [file.name, data]
         })
       )
-      return results
+
+      var dict = {}
+      for (var result of results) {
+        var filename = result[0]
+        var data = result[1]
+        dict[filename] = data
+      }
+
+      return dict
     },
 
     submitFlatfiles (e) {
       this.uploadFiles(e).then(result => {
-        console.log('sending to api: ', result)
-        console.log(JSON.stringify(result))
+        // console.log(result)
+        // console.log('sending to api: ', result)
+        // console.log(JSON.stringify(result))
         this.uploadFlatfileData(JSON.stringify(result))
       })
     }

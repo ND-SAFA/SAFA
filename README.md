@@ -13,7 +13,7 @@ Log into Jira:
  1. Open a browser window, and navigate to http://spwd.cse.nd.edu:8080/
  1. Log in with your credentials and close browser
 
-Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/pulse
+Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/
 
 ## Changes to SAFA-services-api
 ```bash
@@ -101,3 +101,7 @@ Backend change should appear on electron. If not click on Project->Synchronize F
 ## Neo4j Username and Password for Logging into Remote Interface
 Username: neo4j
 Password: secret
+
+## Known Problems Google Doc Link
+
+https://docs.google.com/document/d/10BCZqpCamrEYQa5RNjLQl_gHcCQc7RFusLTfo2OH_mA/edit?usp=sharing

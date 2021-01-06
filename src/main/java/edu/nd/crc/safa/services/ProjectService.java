@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.Base64;
-import java.io.*;
-import java.nio.file.*;
-
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
@@ -26,8 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.jsoniter.JsonIterator;
-import com.jsoniter.ValueType;
-import com.jsoniter.any.Any;
+// import com.jsoniter.ValueType;
+// import com.jsoniter.any.Any;
+import java.util.Set;
+import java.util.HashSet;
 
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
@@ -93,22 +97,34 @@ public class ProjectService {
     return emitter;
   }
 
-  public String uploadFile(String projId, String jsonfiles) {
-    // Path currentRelativePath = Paths.get("");
-    // String s = currentRelativePath.toAbsolutePath().toString();
+  public boolean deleteDirectory(File directoryToBeDeleted) {
+    File[] allContents = directoryToBeDeleted.listFiles();
+    if (allContents != null) {
+        for (File file : allContents) {
+            deleteDirectory(file);
+        }
+    }
+    return directoryToBeDeleted.delete();
+  }
 
+  public boolean deleteUploadFile(){
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
     
-    // TESTING Create new directory every call
     if (myDir.exists()) {
-      myDir.delete();
-    } 
-    myDir.mkdirs();
+      return deleteDirectory(myDir);
+    } else {
+      return false;
+    }
+  }
 
-    // if (!myDir.exists()) {
-    //   myDir.mkdirs();
-    // }
+  public String uploadFile(String projId, String jsonfiles) {
+    String dir = "/flatfilesDir";
+    File myDir = new File(dir);
+    
+    if (!myDir.exists()) {
+      myDir.mkdirs();
+    }
 
     if (myDir.isDirectory()) {
       JsonIterator iterator = JsonIterator.parse(jsonfiles);
@@ -122,63 +138,83 @@ public class ProjectService {
         }
       }
       catch (IOException e) {
-        System.out.println("Could not parse JSON object received in message."); 
+        System.out.println("Could not parse JSON object received in message.");
+        return "{ \"success\": false, \"message\": \"Could not parse JSON object received in message.\"}";
       }
     }
     else {
       System.out.println("Error creating flatfiles directory.");
+      return "{ \"success\": false, \"message\": \"Error creating flatfiles directory.\"}";
     }
 
+    File tim = new File("/flatfilesDir/tim.json");
+
+    if (tim.exists()){
+      try {
+
+        String data = new String(Files.readAllBytes(Paths.get("/flatfilesDir/tim.json")));
+        JsonIterator iterator = JsonIterator.parse(data);
+        List<String> dataFiles = new ArrayList<String>();
+        List<String> linkFiles = new ArrayList<String>();
+
+        for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
+          if (field.equals("DataFiles")) {
+            for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
+              for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
+                  dataFiles.add(iterator.readString());
+              }
+            }
+          }
+          else {
+            for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
+              if (!attr.equals("File")){
+                iterator.readString();
+                continue;
+              } else {
+                  linkFiles.add(iterator.readString());
+              }
+            }
+          }
+        }
+
+        List<String> fileNames = Arrays.asList(myDir.list());
+
+        for(String file : dataFiles) {
+          System.out.println("File list in JSON");
+          System.out.println(file);
+
+          if(!fileNames.contains(file)){
+            System.out.println("DOES NOT CONTAIN");
+            System.out.println(file);
+          }
+        }
+
+        for(String file : linkFiles) {
+          System.out.println("File list in JSON");
+          System.out.println(file);
+          
+          if(!fileNames.contains(file)){
+            System.out.println("DOES NOT CONTAIN");
+            System.out.println(file);
+          }
+        }
+
+      }
+      catch (IOException e) {
+        System.out.println("Error reading Tim.");
+        return "{ \"success\": false, \"message\": \"Error reading Tim.\"}";
+      }
+    }
+   
     // TESTING print files inside directory
-    String fileNames[] = myDir.list();
-    System.out.println("List of files and directories in the specified directory:");
-    for(String name : fileNames) {
-       System.out.println(name);
-    }
+    // String fileNames[] = myDir.list();
 
-    // for (String key : obj.keys()) {
-    //   System.out.println(key); 
-      // System.out.println(obj.get(key)); 
-    // }
-    
-    // byte[] bytes = Base64.getDecoder().decode(test);
-    // System.out.println(bytes); 
-    // String string = new String(bytes);
-    // String fileName = "test";
-
-    // try {
-    //     Files.write(Paths.get(fileName), string.getBytes());
-    // } catch (IOException e) {
-    //     System.out.println("Could not open " + fileName);  
+    // System.out.println("List of files and directories in the specified directory:");
+    // for(String name : fileNames) {
+    //    System.out.println(name);
     // }
 
-    // System.out.println(Paths.get(fileName));
-    // System.out.println(fileName);
-
-    // System.out.println("test string from backend printed in upload file"); 
-    
-    // File userFile = new File("/");
-    // File timFile = null;
-    // File safaFile = null;
-
-    // if (userFile.isDirectory()){
-    //     for (File file : userFile.listFiles()){
-    //       String name = file.getName();
-    //       if (name.equals("tim.json")){
-    //         timFile = file;
-    //       }
-    //       if (name.equals("SAFA-DroneResponseData")){
-    //         safaFile = file;
-    //       }
-    //     }
-    // }
-
-    // File flatfile_data = new File("/flatfile_data");
-
-    // FileChannel sourceChannel = null;
-    // FileChannel destChannel = null;
     return "{ \"success\": true, \"message\": \"Flatfile upload successful.\"}";
-
   }
 
   @PostConstruct

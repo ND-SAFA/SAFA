@@ -5,7 +5,10 @@ import java.util.Scanner;
 import java.io.IOException; 
 import java.util.*; 
 import java.nio.file.*;
-import java.io.FileWriter; 
+import java.io.FileWriter;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import com.jsoniter.JsonIterator;
 
@@ -256,10 +259,10 @@ public class Flatfile {
         return validSource && validTarget;
     }
     
-    public List<Artifact> parseDataFiles(Tim tim, ErrorText errorText) throws Exception {
+    public List<Artifact> parseDataFiles(Tim tim, ErrorText errorText, String folderName) throws Exception {
         /* Parse Data Files */  
         List<Artifact> artifacts = new ArrayList<Artifact>(); 
-        String RELATIVE_PATH = "flatfile_data/SAFA-DroneResponseData/";
+        String RELATIVE_PATH = folderName + '/';
         
         for (DataFile d : tim.dataFiles) {
             String path = RELATIVE_PATH + d.file; 
@@ -344,7 +347,7 @@ public class Flatfile {
         return artifacts; 
     }
 
-    public List<Connection> parseConnectionFiles(Tim tim, List<Artifact> artifacts, ErrorText errorText) throws Exception {
+    public List<Connection> parseConnectionFiles(Tim tim, List<Artifact> artifacts, ErrorText errorText, String folderName) throws Exception {
         /* Parse TIM files */ 
         List<Connection> connections = new ArrayList<Connection>(); 
 
@@ -357,7 +360,7 @@ public class Flatfile {
             connection.targetType   = t.target;
             connection.links        = new ArrayList<Link>(); 
 
-            String RELATIVE_PATH = "flatfile_data/SAFA-DroneResponseData/";
+            String RELATIVE_PATH = folderName + '/';
             String path = RELATIVE_PATH + t.file;  
             File dataFile = new File(path); 
             Scanner rowScanner = new Scanner(dataFile); 
@@ -400,19 +403,31 @@ public class Flatfile {
         return connections; 
     }
 
-    public ParsedData parseFiles(String fileName) {
+    public ParsedData parseFiles(String folderName) {
         
         ParsedData parsedData = new ParsedData();
         ErrorText errorText = new ErrorText();
 
         try {
-            Tim tim = parseTim(fileName); 
-            List<Artifact> artifacts = parseDataFiles(tim, errorText);
+            String timFileName = folderName + '/' + "tim.json";
+            Tim tim = parseTim(timFileName); 
+            List<Artifact> artifacts = parseDataFiles(tim, errorText, folderName);
             
             parsedData.artifacts = artifacts;
-            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText);
+            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText, folderName);
             uniqueIDChecker(parsedData, errorText);
-            generateErrorReport(errorText.text, "flatfile_data/ErrorReport.txt");
+
+            String errorFileName = folderName + '/' + "ErrorReport.txt";
+            generateErrorReport(errorText.text, errorFileName);
+
+            // Prints error file in terminal
+            // try (BufferedReader br = new BufferedReader(new FileReader(errorFileName))) {
+            //     String line;
+            //     while ((line = br.readLine()) != null) {
+            //         System.out.println(line);
+            //     }
+            //  }
+            
             //generateInitialDirectories("testProject"); 
             //generateNextVersion("testProject", "nextVersionName"); 
         } catch(Exception e) {

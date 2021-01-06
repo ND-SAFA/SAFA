@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.nio.channels.FileChannel;
-// import java.io.File;
 import java.util.Base64;
 import java.io.*;
 import java.nio.file.*;
@@ -63,11 +61,11 @@ public class ProjectService {
             .id(String.valueOf(0))
             .name("update"));
 
-          mPuller.ParseJIRAIssues();
-          emitter.send(SseEmitter.event()
-            .data("{\"complete\": false}")
-            .id(String.valueOf(1))
-            .name("update"));
+          // mPuller.ParseJIRAIssues();
+          // emitter.send(SseEmitter.event()
+          //   .data("{\"complete\": false}")
+          //   .id(String.valueOf(1))
+          //   .name("update"));
 
           mPuller.ParseSourceLinks();
           emitter.send(SseEmitter.event()
@@ -75,11 +73,11 @@ public class ProjectService {
             .id(String.valueOf(2))
             .name("update"));
 
-          // mPuller.parseFlatfiles();
-          // emitter.send(SseEmitter.event()
-          //   .data("{\"complete\": false}")
-          //   .id(String.valueOf(3))
-          //   .name("update"));
+          mPuller.parseFlatfiles();
+          emitter.send(SseEmitter.event()
+            .data("{\"complete\": false}")
+            .id(String.valueOf(3))
+            .name("update"));
 
           mPuller.Execute();
           emitter.send(SseEmitter.event()
@@ -96,15 +94,21 @@ public class ProjectService {
   }
 
   public String uploadFile(String projId, String jsonfiles) {
-    Path currentRelativePath = Paths.get("");
-    String s = currentRelativePath.toAbsolutePath().toString();
+    // Path currentRelativePath = Paths.get("");
+    // String s = currentRelativePath.toAbsolutePath().toString();
 
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
+    
+    // TESTING Create new directory every call
+    if (myDir.exists()) {
+      myDir.delete();
+    } 
+    myDir.mkdirs();
 
-    if (!myDir.exists()) {
-      boolean createdDir = myDir.mkdirs();
-    }
+    // if (!myDir.exists()) {
+    //   myDir.mkdirs();
+    // }
 
     if (myDir.isDirectory()) {
       JsonIterator iterator = JsonIterator.parse(jsonfiles);
@@ -123,6 +127,13 @@ public class ProjectService {
     }
     else {
       System.out.println("Error creating flatfiles directory.");
+    }
+
+    // TESTING print files inside directory
+    String fileNames[] = myDir.list();
+    System.out.println("List of files and directories in the specified directory:");
+    for(String name : fileNames) {
+       System.out.println(name);
     }
 
     // for (String key : obj.keys()) {

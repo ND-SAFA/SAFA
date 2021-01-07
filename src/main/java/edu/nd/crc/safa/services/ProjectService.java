@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.jsoniter.JsonIterator;
-// import com.jsoniter.ValueType;
-// import com.jsoniter.any.Any;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -97,14 +95,14 @@ public class ProjectService {
     return emitter;
   }
 
-  public boolean deleteDirectory(File directoryToBeDeleted) {
-    File[] allContents = directoryToBeDeleted.listFiles();
-    if (allContents != null) {
-        for (File file : allContents) {
+  public boolean deleteDirectory(File dir) {
+    File[] files = dir.listFiles();
+    if (files != null) {
+        for (File file : files) {
             deleteDirectory(file);
         }
     }
-    return directoryToBeDeleted.delete();
+    return dir.delete();
   }
 
   public boolean deleteUploadFile(){
@@ -118,7 +116,7 @@ public class ProjectService {
     }
   }
 
-  public String uploadFile(String projId, String jsonfiles) {
+  public String uploadFileSaver(String jsonfiles) {
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
     
@@ -135,7 +133,7 @@ public class ProjectService {
           byte[] bytes = Base64.getDecoder().decode(base64Image);
           String fullPath = dir + '/' + filename; 
           Files.write(Paths.get(fullPath), bytes);
-        }
+        }   
       }
       catch (IOException e) {
         System.out.println("Could not parse JSON object received in message.");
@@ -147,65 +145,6 @@ public class ProjectService {
       return "{ \"success\": false, \"message\": \"Error creating flatfiles directory.\"}";
     }
 
-    File tim = new File("/flatfilesDir/tim.json");
-
-    if (tim.exists()){
-      try {
-
-        String data = new String(Files.readAllBytes(Paths.get("/flatfilesDir/tim.json")));
-        JsonIterator iterator = JsonIterator.parse(data);
-        List<String> dataFiles = new ArrayList<String>();
-        List<String> linkFiles = new ArrayList<String>();
-
-        for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-          if (field.equals("DataFiles")) {
-            for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
-              for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
-                  dataFiles.add(iterator.readString());
-              }
-            }
-          }
-          else {
-            for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
-              if (!attr.equals("File")){
-                iterator.readString();
-                continue;
-              } else {
-                  linkFiles.add(iterator.readString());
-              }
-            }
-          }
-        }
-
-        List<String> fileNames = Arrays.asList(myDir.list());
-
-        for(String file : dataFiles) {
-          System.out.println("File list in JSON");
-          System.out.println(file);
-
-          if(!fileNames.contains(file)){
-            System.out.println("DOES NOT CONTAIN");
-            System.out.println(file);
-          }
-        }
-
-        for(String file : linkFiles) {
-          System.out.println("File list in JSON");
-          System.out.println(file);
-          
-          if(!fileNames.contains(file)){
-            System.out.println("DOES NOT CONTAIN");
-            System.out.println(file);
-          }
-        }
-
-      }
-      catch (IOException e) {
-        System.out.println("Error reading Tim.");
-        return "{ \"success\": false, \"message\": \"Error reading Tim.\"}";
-      }
-    }
-   
     // TESTING print files inside directory
     // String fileNames[] = myDir.list();
 
@@ -213,6 +152,87 @@ public class ProjectService {
     // for(String name : fileNames) {
     //    System.out.println(name);
     // }
+
+    return "{ \"success\": true, \"message\": \"Parse successful\"}";
+  }
+
+  public String missingFiles(){
+    File tim = new File("/flatfilesDir/tim.json");
+    if (!tim.exists()){
+      return "{ \"success\": true, \"message\": \"tim.json does not exist.\"}";
+    }
+    
+    List<String> dataFiles = new ArrayList<String>();
+    List<String> linkFiles = new ArrayList<String>();
+
+    try {
+      String data = new String(Files.readAllBytes(Paths.get("/flatfilesDir/tim.json")));
+      JsonIterator iterator = JsonIterator.parse(data);
+
+      for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
+        if (field.equals("DataFiles")) {
+          for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
+            for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
+                dataFiles.add(iterator.readString());
+            }
+          }
+        }
+        else {
+          for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
+            if (!attr.equals("File")){
+              iterator.readString();
+              continue;
+            } else {
+                linkFiles.add(iterator.readString());
+            }
+          }
+        }
+      }
+    } 
+    catch (IOException e) {
+      System.out.println("Error parsing tim.json.");
+      return "{ \"success\": false, \"message\": \"Error parsing tim.json.\"}";
+    }
+    
+    File myDir = new File("/flatfilesDir");
+    List<String> fileNames = Arrays.asList(myDir.list());
+    List<String> missingFiles = new ArrayList<String>();
+
+    for(String file : dataFiles) {
+      System.out.println("File list in JSON");
+      System.out.println(file);
+
+      if(!fileNames.contains(file)){
+        System.out.println("DOES NOT CONTAIN");
+        System.out.println(file);
+        missingFiles.add(file);
+      }
+    }
+
+    for(String file : linkFiles) {
+      System.out.println("File list in JSON");
+      System.out.println(file);
+      
+      if(!fileNames.contains(file)){
+        System.out.println("DOES NOT CONTAIN");
+        System.out.println(file);
+        missingFiles.add(file);
+      }
+    }
+
+    return "{ \"success\": true, \"message\": \"missing Files found\"}";
+  }
+
+  public String uploadFile(String projId, String jsonfiles) {
+    String uploadSaverResult = uploadFileSaver(jsonfiles);
+    if (!uploadSaverResult.equals("{ \"success\": true, \"message\": \"Parse successful\"}")){
+      return uploadSaverResult;
+    }
+
+    String missingFilesResult = missingFiles();
+    if (!missingFilesResult.equals( "{ \"success\": true, \"message\": \"tim.json does not exist.\"}") || !missingFilesResult.equals("{ \"success\": true, \"message\": \"missing Files found\"}") ){
+      return missingFilesResult;
+    }
 
     return "{ \"success\": true, \"message\": \"Flatfile upload successful.\"}";
   }

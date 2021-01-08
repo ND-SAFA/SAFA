@@ -167,13 +167,13 @@ public class ProjectService {
       }
     }
 
-    message += "\"allFiles\"[:";
+    message += ",\"allFiles\":[\"tim.json\",";
     for (int i = 0; i < parsedDataFiles.size(); i++){
       if (i == 0){
         message += "\"" + parsedDataFiles.get(i) + "\"";
       } 
       else if (i == parsedDataFiles.size() - 1){
-        message += ",\"" + parsedDataFiles.get(i) + "\"";
+        message += ",\"" + parsedDataFiles.get(i) + "\",";
       }
       else {
         message += ",\"" + parsedDataFiles.get(i) + "\"";
@@ -212,13 +212,13 @@ public class ProjectService {
     List<List<String>> parsedFiles = timParser(dir);
     
     List<String> parsedDataFiles = parsedFiles.get(0);
-    List<String> parsedLinkFiles = parsedFiles.get(0);
+    List<String> parsedLinkFiles = parsedFiles.get(1);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
     
     String data = fileJsonCreator(uploadedFiles, parsedDataFiles, parsedLinkFiles);
     
-    return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
-    // return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s", data);
+    return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
+    // return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
   }
 
   public void uploadFile(String projId, String jsonfiles) throws Exception{

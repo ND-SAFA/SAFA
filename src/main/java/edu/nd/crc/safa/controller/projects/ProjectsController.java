@@ -60,25 +60,26 @@ public class ProjectsController {
   public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
     System.out.println("/projects/{projId}/upload/");
     try {
-      // projectService.uploadFile(projId, encodedStr);
-      System.out.println("Random giberrish");
-      return "{ \"success\": false, \"message\": \"Upload successful.\"}";
+      projectService.deleteUploadFile(); // only keep for testing if you want directory to clear before re-uploading. 
+      projectService.uploadFile(projId, encodedStr);
+      // System.out.println("Random giberrish");
+      // return "{ \"success\": false, \"message\": \"Upload successful.\"}";
       // System.out.println("uploadFile Success");
 
-      // try {
-      //   return projectService.missingFiles(projId);
-      // } 
-      // catch(Exception e){
-      //   System.out.println("Missing Files Error");
-      //   if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-      //     System.out.println("com.jsoniter.spi.JsonException");
-      //     return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
-      //   }
-      //   else {
-      //     System.out.println("Error checking for missing files: OTHER");
-      //     return String.format("{ \"success\": false, \"message\": \"Error checking for missing files: %s\"}", e.toString());
-      //   }
-      // }
+      try {
+        return projectService.missingFiles(projId);
+      } 
+      catch(Exception e){
+        System.out.println("Missing Files Error");
+        if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+          System.out.println("com.jsoniter.spi.JsonException");
+          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
+        }
+        else {
+          System.out.println("Error checking for missing files: OTHER");
+          return String.format("{ \"success\": false, \"message\": \"Error checking for missing files: %s\"}", e.toString());
+        }
+      }
 
     } 
     catch(Exception e){

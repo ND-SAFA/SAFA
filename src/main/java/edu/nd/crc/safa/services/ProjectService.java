@@ -215,12 +215,13 @@ public class ProjectService {
     List<String> parsedLinkFiles = parsedFiles.get(0);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
     
-    String message = fileJsonCreator(uploadedFiles, parsedDataFiles, parsedLinkFiles);
-
-    return String.format("{ \"success\": true, \"message\": %s", message);
+    String data = fileJsonCreator(uploadedFiles, parsedDataFiles, parsedLinkFiles);
+    
+    return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
+    // return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s", data);
   }
 
-  public String uploadFile(String projId, String jsonfiles) throws Exception{
+  public void uploadFile(String projId, String jsonfiles) throws Exception{
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
     
@@ -249,7 +250,7 @@ public class ProjectService {
     //    System.out.println(name);
     // }
 
-    return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
+    // return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
   }
 
   @PostConstruct

@@ -3,16 +3,36 @@
     <transition name="modal">
       <div class="modal-mask">
         <div class="modal modal-wrapper">
-          <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 v-if="modalResult.success" class="modal-title delta-modal-title" id="exampleModalCenterTitle">Success!</h5>
+                <h5 v-if="modalResult.success === true && this.allFilesPresent === true" class="modal-title delta-modal-title" id="exampleModalCenterTitle">Success!</h5>
+                <h5 v-else-if="modalResult.success === true && this.allFilesPresent === false" class="modal-title delta-modal-title" id="exampleModalCenterTitle">Please Add More Files</h5>
                 <h5 v-else class="modal-title delta-modal-title" id="exampleModalCenterTitle">Something went wrong.</h5>
                 <button type="button" class="close" aria-label="Close" @click="$emit('close')">
                   &times;
                 </button>
               </div>
-              <form v-if="modalResult.success" class="delta-form" @submit="enableDeltaMode">
+              <span v-if="modalResult.success === true && this.allFilesPresent === false">
+                  <div class="files-needed-caption sml">
+                    More files are needed to accurately match system described in the TIM. Please upload missing files or upload a new TIM. 
+                  </div>
+                <table class="table table-bordered table-sm upload-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">FileName</th>
+                      <th scope="col">Present</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in fileMap" :key="item.name" v-bind:class="{ 'table-danger bold-missing-files': item.found == false }" >
+                      <td scope="row">{{item.name}}</td>
+                      <td>{{item.status}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </span>
+              <form v-if="modalResult.success === true && this.allFilesPresent === true" class="delta-form">
                 <div class="modal-body">
                   <div class="form-group">
                     <label for="inputGroupSelect01" class="sml">
@@ -25,16 +45,17 @@
                   <button id="sync" type="submit" class="btn btn-primary delta-save-button">Synchronize Data</button>
                 </div>
               </form>
-              <form v-else class="delta-form" @submit="enableDeltaMode">
+              <form v-else class="delta-form">
                 <div class="modal-body">
                   <div class="form-group">
-                    <label for="inputGroupSelect01" class="sml">
-                        {{modalResult.status}} - {{modalResult.error}}.
+                    <label for="inputGroupSelect01" class="sml" v-if="modalResult.success === false">
+                        Could not upload flatfiles. Please try again.
                     </label>
                   </div>
                 </div>
                 <div class="modal-footer custom-modal-footer">
                   <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button">Add Additional Files</button>
                 </div>
               </form>
             </div>
@@ -46,7 +67,6 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex'
 
 export default {
   props: {
@@ -56,48 +76,62 @@ export default {
 
   data () {
     return {
-      versions: {
-        selectedCurrent: 0,
-        selectedBaseline: 0
-      }
+      allFilesPresent: false,
+      fileMap: [],
+      items: [
+        {age: 30, first_name: 'Emma', last_name: 'Watson'},
+        {age: 31, first_name: 'Daniel', last_name: 'Radcliff'}
+      ]
     }
   },
 
-  async mounted () {
-    await this.updateAvailableVersions()
-  },
-
-  computed: {
-    ...mapGetters('projects.module', ['getHazards', 'getProjectVersions']),
-    ...mapGetters('app.module', ['getDeltaState']),
-
-    versionsRange () {
-      return Array.apply(null, Array(this.getProjectVersions.latest + 1)).map((i, j) => { return j })
-    },
-
-    deltaState () {
-      return JSON.parse(JSON.stringify(this.getDeltaState))
+  watch: {
+    'isHidden' () {
+      this.compareFileLists()
     }
   },
 
   methods: {
-    ...mapActions('projects.module', ['fetchProjectVersions']),
-    ...mapActions('app.module', ['updateDelta']),
+    compareFileLists () {
+      var allFiles = this.modalResult.message.allFiles
+      var currentFiles = this.modalResult.message.currentFiles
+      var missingFiles = false
+      var entry = {}
 
-    enableDeltaMode () {
-      const deltaState = this.deltaState
-      deltaState.enabled = true
-      deltaState.baseline = this.versions.selectedBaseline
-      deltaState.current = this.versions.selectedCurrent
-      this.updateDelta(deltaState)
-      this.$emit('close')
-    },
+      for (var i = 0; i < allFiles.length; i++) {
+        var found = false
+        for (var j = 0; j < currentFiles.length; j++) {
+          if (allFiles[i] === currentFiles[j]) {
+            entry = {}
+            entry.name = allFiles[i]
+            entry.status = 'Present'
+            entry.found = true
+            found = true
+            this.fileMap.push(entry)
+          }
+        }
 
-    async updateAvailableVersions () {
-      this.versions.selectedBaseline = this.getDeltaState.baseline
-      this.versions.selectedCurrent = this.getDeltaState.current
+        if (!found) {
+          entry = {}
+          entry.name = allFiles[i]
+          entry.status = 'Missing'
+          entry.found = false
+          missingFiles = true
+          this.fileMap.push(entry)
+        }
+      }
+
+      if (!missingFiles) {
+        this.allFilesPresent = true
+      } else {
+        this.allFilesPresent = false
+      }
+
+      console.log(this.allFilesPresent)
+      console.log(this.fileMap)
     }
   }
+
 }
 </script>
 
@@ -117,5 +151,19 @@ export default {
   .modal-wrapper {
     display: table-cell;
     vertical-align: middle;
+  }
+
+  .bold-missing-files {
+    font-weight: bold;
+  }
+
+  .upload-table {
+    margin: 2% 5% 1%; 
+    width: 90%; 
+    font-size: 14px; 
+  }
+
+  .files-needed-caption {
+    padding: 1rem; 
   }
 </style>

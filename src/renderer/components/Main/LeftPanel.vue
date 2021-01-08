@@ -104,7 +104,6 @@ export default {
     readFiles (filename) {
       return new Promise((resolve, reject) => {
         let reader = new FileReader()
-
         reader.onload = () => {
           resolve(reader.result)
         }

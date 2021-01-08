@@ -114,8 +114,7 @@ const actions = {
       return response
       // commit('UPLOAD_FILES', response)
     } catch (e) {
-      console.log(e)
-      console.log('failed to upload flatfile data')
+      return 'Could not receive response from API'
     }
   },
 

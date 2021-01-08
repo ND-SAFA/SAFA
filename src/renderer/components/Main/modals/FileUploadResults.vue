@@ -18,10 +18,10 @@
                     More files are needed to accurately match system described in the TIM. Please upload missing files or upload a new TIM. 
                   </div>
                 <table class="table table-bordered table-sm upload-table">
-                  <thead>
+                  <thead class="thead-light">
                     <tr>
                       <th scope="col">FileName</th>
-                      <th scope="col">Present</th>
+                      <th scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -54,8 +54,9 @@
                   </div>
                 </div>
                 <div class="modal-footer custom-modal-footer">
-                  <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button">Add Additional Files</button>
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
+                  <button v-else type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('select-files')">Add Additional Files</button>
                 </div>
               </form>
             </div>
@@ -93,8 +94,8 @@ export default {
 
   methods: {
     compareFileLists () {
-      var allFiles = this.modalResult.message.allFiles
-      var currentFiles = this.modalResult.message.currentFiles
+      var allFiles = this.modalResult.data.allFiles
+      var currentFiles = this.modalResult.data.currentFiles
       var missingFiles = false
       var entry = {}
 
@@ -104,7 +105,7 @@ export default {
           if (allFiles[i] === currentFiles[j]) {
             entry = {}
             entry.name = allFiles[i]
-            entry.status = 'Present'
+            entry.status = 'Uploaded'
             entry.found = true
             found = true
             this.fileMap.push(entry)

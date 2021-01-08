@@ -139,6 +139,7 @@ export default {
 
     submitFlatfiles (e) {
       this.uploadFiles(e).then(result => {
+        console.log(JSON.stringify(result))
         this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.showUploadModal(response) })
       })
     }

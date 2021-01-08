@@ -31,7 +31,7 @@
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
-            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" />
+            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="triggerUploadModal"/>
           </div>
         </main>
       </div>
@@ -135,6 +135,7 @@
         this.rightPanel.isHidden = false
       },
       triggerUploadModal (uploadResponse) {
+        console.log('uploading modal in main.vue')
         this.uploadResult = uploadResponse
         this.showUploadModal = true
       }

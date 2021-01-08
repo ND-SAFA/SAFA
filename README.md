@@ -13,7 +13,7 @@ Log into Jira:
  1. Open a browser window, and navigate to http://spwd.cse.nd.edu:8080/
  1. Log in with your credentials and close browser
 
-Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/pulse
+Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/
 
 ## Changes to SAFA-services-api
 ```bash

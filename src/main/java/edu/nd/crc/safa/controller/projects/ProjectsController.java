@@ -56,10 +56,39 @@ public class ProjectsController {
     return projectService.versionsTag(projId);
   }
 
-  @PostMapping("/projects/{projId}/upload/") 
+  @PostMapping("/projects/{projId}/upload/")
   public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
-    return projectService.uploadFile(projId, encodedStr); 
-  } 
+    System.out.println("/projects/{projId}/upload/");
+
+    try {
+      return projectService.uploadFile(projId, encodedStr);
+    } 
+    catch(Exception e){
+      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+        return "{ \"success\": false, \"message\": \"Error parsing API response object.\"}";
+      }
+      else {
+        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+      }
+    }
+  }
+
+  @PostMapping("/projects/{projId}/missingfiles/")
+  public String missingFiles(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/missingfiles/");
+
+    try {
+      return projectService.missingFiles(projId);
+    } 
+    catch(Exception e){
+      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+        return "{ \"success\": false, \"message\": \"Error parsing tim.json file. File does not match expected tim.json structure\"}";
+      }
+      else {
+        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+      }
+    }
+  }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
   public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version) {

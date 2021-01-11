@@ -62,10 +62,6 @@ public class ProjectsController {
     try {
       projectService.deleteUploadFile(); // only keep for testing if you want directory to clear before re-uploading. 
       projectService.uploadFile(projId, encodedStr);
-      // System.out.println("Random giberrish");
-      // return "{ \"success\": false, \"message\": \"Upload successful.\"}";
-      // System.out.println("uploadFile Success");
-
       try {
         return projectService.missingFiles(projId);
       } 

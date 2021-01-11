@@ -69,11 +69,11 @@ public class ProjectService {
           //   .id(String.valueOf(1))
           //   .name("update"));
 
-          mPuller.ParseSourceLinks();
-          emitter.send(SseEmitter.event()
-            .data("{\"complete\": false}")
-            .id(String.valueOf(2))
-            .name("update"));
+          // mPuller.ParseSourceLinks();
+          // emitter.send(SseEmitter.event()
+          //   .data("{\"complete\": false}")
+          //   .id(String.valueOf(2))
+          //   .name("update"));
 
           mPuller.parseFlatfiles();
           emitter.send(SseEmitter.event()
@@ -116,7 +116,48 @@ public class ProjectService {
     }
   }
 
-  public List<List<String>> timParser(String dirName) throws Exception{
+  public class ParsedFiles{
+    private List<String> requiredFiles;
+    private List<GeneratedFiles> generatedFiles;
+
+    public ParsedFiles(List<String> requiredFiles, List<GeneratedFiles> generatedFiles){
+      this.requiredFiles = requiredFiles;
+      this.generatedFiles = generatedFiles;
+    }
+
+    public List<String> getRequired(){
+      return requiredFiles;
+    }
+
+    public List<GeneratedFiles> getGenerated(){
+      return generatedFiles;
+    }
+  }
+  public class GeneratedFiles {
+    private final String filename;
+    private final String source;
+    private final String target;
+
+    public GeneratedFiles(String filename, String source, String target){
+      this.filename = filename;
+      this.source = source;
+      this.target = target;
+    }
+
+    public String getName(){
+      return filename;
+    }
+
+    public String getSource(){
+      return source;
+    }
+
+    public String getTarget(){
+      return target;
+    }
+  }
+
+  public ParsedFiles timParser(String dirName) throws Exception{
     String fileName = dirName + '/' + "tim.json";
     File tim = new File(fileName);
     if (!tim.exists()){
@@ -126,75 +167,85 @@ public class ProjectService {
     String data = new String(Files.readAllBytes(Paths.get(fileName)));
     JsonIterator iterator = JsonIterator.parse(data);
 
-    List<String> dataFiles = new ArrayList<String>();
-    List<String> linkFiles = new ArrayList<String>();
+    List<String> requiredFiles = new ArrayList<String>();
+    List<GeneratedFiles> generatedFiles = new ArrayList<GeneratedFiles>();
+
 
     for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
       if (field.equals("DataFiles")) {
         for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
           for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
-              dataFiles.add(iterator.readString());
+              requiredFiles.add(iterator.readString());
           }
         }
       }
       else {
+        String filename = "";
+        String source = "";
+        String target = "";
+        Boolean val = false;
+
         for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
-          if (!attr.equals("File")){
-            iterator.readString();
-            continue;
-          } else {
-              linkFiles.add(iterator.readString());
+          if (attr.equals("File")){
+            filename = iterator.readString();
           }
+
+          if (attr.equals("Source")){
+            source = iterator.readString();
+          }
+
+          if (attr.equals("Target")){
+            target = iterator.readString();
+          }
+
+          if (attr.equals("generateLinks")){
+            val = iterator.readString().equals("True") ? true : false;
+          }
+        }
+
+        if (val){
+          generatedFiles.add(new GeneratedFiles(filename,source,target));
+        }
+        else {
+          requiredFiles.add(filename);
         }
       }
     }
     
-    return Arrays.asList(dataFiles, linkFiles);
+    return new ParsedFiles(requiredFiles, generatedFiles);
   }
 
-  public String fileJsonCreator(List<String> uploadedFiles, List<String> parsedDataFiles, List<String> parsedLinkFiles){
-    String message = "{\"currentFiles\":";
+  public String fileJsonCreator(List<String> uploadedFiles, List<String> requiredFiles){
+    String data = "{\"uploadedFiles\":";
 
     for (int i = 0; i < uploadedFiles.size(); i++){
       if (i == 0){
-        message += "[\"" + uploadedFiles.get(i) + "\"";
+        data += "[\"" + uploadedFiles.get(i) + "\"";
       } 
       else if (i == uploadedFiles.size() - 1){
-        message += ",\"" + uploadedFiles.get(i) + "\"]";
+        data += ",\"" + uploadedFiles.get(i) + "\"]";
       }
       else {
-        message += ",\"" + uploadedFiles.get(i) + "\"";
+        data += ",\"" + uploadedFiles.get(i) + "\"";
       }
     }
 
-    message += ",\"allFiles\":[\"tim.json\",";
-    for (int i = 0; i < parsedDataFiles.size(); i++){
+    data += ",\"expectedFiles\":[\"tim.json\",";
+    for (int i = 0; i < requiredFiles.size(); i++){
       if (i == 0){
-        message += "\"" + parsedDataFiles.get(i) + "\"";
+        data += "\"" + requiredFiles.get(i) + "\"";
       } 
-      else if (i == parsedDataFiles.size() - 1){
-        message += ",\"" + parsedDataFiles.get(i) + "\",";
+      else if (i == requiredFiles.size() - 1){
+        data += ",\"" + requiredFiles.get(i) + "\"";
       }
       else {
-        message += ",\"" + parsedDataFiles.get(i) + "\"";
+        data += ",\"" + requiredFiles.get(i) + "\"";
       }
     }
 
-    for (int i = 0; i < parsedLinkFiles.size(); i++){
-      if (i == 0){
-        message += "\"" + parsedLinkFiles.get(i) + "\"";
-      } 
-      else if (i == parsedLinkFiles.size() - 1){
-        message += ",\"" + parsedLinkFiles.get(i) + "\"";
-      }
-      else {
-        message += ",\"" + parsedLinkFiles.get(i) + "\"";
-      }
-    }
+    data += "]}";
 
-    message += "]}";
-
-    return message;
+    return data;
   }
   
   public String missingFiles(String projId) throws Exception{
@@ -209,16 +260,19 @@ public class ProjectService {
       throw new Exception("Error opening directory. The path: '/flatfilesDir' is not a directory.");
     }
 
-    List<List<String>> parsedFiles = timParser(dir);
-    
-    List<String> parsedDataFiles = parsedFiles.get(0);
-    List<String> parsedLinkFiles = parsedFiles.get(1);
+    ParsedFiles parsedfiles = timParser(dir);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
-    
-    String data = fileJsonCreator(uploadedFiles, parsedDataFiles, parsedLinkFiles);
+
+    // for(GeneratedFiles generated : parsedfiles.getGenerated()) {
+    //    System.out.println(generated.getName());
+    //    System.out.println(generated.getSource());
+    //    System.out.println(generated.getTarget());
+    // }
+    // System.out.println(parsedfiles.getGenerated());
+
+    String data = fileJsonCreator(uploadedFiles, parsedfiles.getRequired());
     
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
-    // return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
   }
 
   public void uploadFile(String projId, String jsonfiles) throws Exception{

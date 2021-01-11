@@ -71,8 +71,10 @@ public class ProjectsController {
           System.out.println("com.jsoniter.spi.JsonException");
           return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
         }
+        else if (e.getMessage().equals("Please upload a tim.json file")){
+          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
         else {
-          System.out.println("Error checking for missing files: OTHER");
           return String.format("{ \"success\": false, \"message\": \"Error checking for missing files: %s\"}", e.toString());
         }
       }

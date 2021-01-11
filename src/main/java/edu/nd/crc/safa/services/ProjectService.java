@@ -161,15 +161,14 @@ public class ProjectService {
     String fileName = dirName + '/' + "tim.json";
     File tim = new File(fileName);
     if (!tim.exists()){
-      throw new Exception("tim.json does not exist.");
+      throw new Exception("Please upload a tim.json file");
     }
-    
+
     String data = new String(Files.readAllBytes(Paths.get(fileName)));
     JsonIterator iterator = JsonIterator.parse(data);
 
     List<String> requiredFiles = new ArrayList<String>();
     List<GeneratedFiles> generatedFiles = new ArrayList<GeneratedFiles>();
-
 
     for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
       if (field.equals("DataFiles")) {
@@ -211,40 +210,51 @@ public class ProjectService {
         }
       }
     }
-    
     return new ParsedFiles(requiredFiles, generatedFiles);
   }
 
   public String fileJsonCreator(List<String> uploadedFiles, List<String> requiredFiles){
     String data = "{\"uploadedFiles\":";
 
-    for (int i = 0; i < uploadedFiles.size(); i++){
-      if (i == 0){
-        data += "[\"" + uploadedFiles.get(i) + "\"";
-      } 
-      else if (i == uploadedFiles.size() - 1){
-        data += ",\"" + uploadedFiles.get(i) + "\"]";
-      }
-      else {
-        data += ",\"" + uploadedFiles.get(i) + "\"";
+    if (uploadedFiles.size() == 0){
+      data += "[]";
+    } 
+    else if (uploadedFiles.size() == 1){
+      data += String.format("[\"%s\"]", uploadedFiles.get(0));
+    }
+    else {
+      for (int i = 0; i < uploadedFiles.size(); i++){
+        if (i == 0){
+          data += "[\"" + uploadedFiles.get(i) + "\"";
+        } 
+        else if (i == uploadedFiles.size() - 1){
+          data += ",\"" + uploadedFiles.get(i) + "\"]";
+        }
+        else {
+          data += ",\"" + uploadedFiles.get(i) + "\"";
+        }
       }
     }
 
-    data += ",\"expectedFiles\":[\"tim.json\",";
-    for (int i = 0; i < requiredFiles.size(); i++){
-      if (i == 0){
-        data += "\"" + requiredFiles.get(i) + "\"";
-      } 
-      else if (i == requiredFiles.size() - 1){
-        data += ",\"" + requiredFiles.get(i) + "\"";
-      }
-      else {
-        data += ",\"" + requiredFiles.get(i) + "\"";
+    data += ",\"expectedFiles\":[\"tim.json\"";
+    if (requiredFiles.size() == 0){
+      data += "]";
+    } 
+    else if (requiredFiles.size() == 1){
+      data += String.format(",\"%s\"]", uploadedFiles.get(0));
+    }
+    else {
+      for (int i = 0; i < requiredFiles.size(); i++){
+        if (i == requiredFiles.size() - 1){
+          data += ",\"" + requiredFiles.get(i) + "\"]";
+        }
+        else {
+          data += ",\"" + requiredFiles.get(i) + "\"";
+        }
       }
     }
 
-    data += "]}";
-
+    data += "}";
     return data;
   }
   
@@ -271,7 +281,7 @@ public class ProjectService {
     // System.out.println(parsedfiles.getGenerated());
 
     String data = fileJsonCreator(uploadedFiles, parsedfiles.getRequired());
-    
+    System.out.println(data);
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
   }
 

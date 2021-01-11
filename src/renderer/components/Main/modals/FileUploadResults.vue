@@ -95,30 +95,51 @@ export default {
   methods: {
     compareFileLists () {
       var allFiles = this.modalResult.data.allFiles
-      var currentFiles = this.modalResult.data.currentFiles
+      var uploadedFiles = this.modalResult.data.currentFiles
       var missingFiles = false
       var entry = {}
 
-      for (var i = 0; i < allFiles.length; i++) {
-        var found = false
-        for (var j = 0; j < currentFiles.length; j++) {
-          if (allFiles[i] === currentFiles[j]) {
+      var previouslyUploaded = false
+      if (this.fileMap.length > 0) {
+        previouslyUploaded = true
+      }
+
+      if (!previouslyUploaded) {
+        for (var i = 0; i < allFiles.length; i++) {
+          var found = false
+          for (var j = 0; j < uploadedFiles.length; j++) {
+            if (allFiles[i] === uploadedFiles[j]) {
+              entry = {}
+              entry.name = allFiles[i]
+              entry.status = 'Uploaded'
+              entry.found = true
+              found = true
+              this.fileMap.push(entry)
+            }
+          }
+
+          if (!found) {
             entry = {}
             entry.name = allFiles[i]
-            entry.status = 'Uploaded'
-            entry.found = true
-            found = true
+            entry.status = 'Missing'
+            entry.found = false
+            missingFiles = true
             this.fileMap.push(entry)
           }
         }
-
-        if (!found) {
-          entry = {}
-          entry.name = allFiles[i]
-          entry.status = 'Missing'
-          entry.found = false
-          missingFiles = true
-          this.fileMap.push(entry)
+      } else {
+        for (var k = 0; k < this.fileMap.length; k++) {
+          found = false
+          for (var l = 0; l < uploadedFiles.length; l++) {
+            if (this.fileMap[k].name === uploadedFiles[l]) {
+              this.fileMap[k].status = 'Uploaded'
+              this.fileMap[k].found = true
+              found = true
+            }
+          }
+          if (!found) {
+            missingFiles = true
+          }
         }
       }
 

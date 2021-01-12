@@ -91,6 +91,7 @@
 
     created () {
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
+      AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
       AppMenu.setApplicationMenu()
     },
 
@@ -101,7 +102,7 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -138,6 +139,38 @@
         console.log('uploading modal in main.vue')
         this.uploadResult = uploadResponse
         this.showUploadModal = true
+      },
+      readFiles (filename) {
+        return new Promise((resolve, reject) => {
+          var fs = require('fs')
+          fs.readFile(filename, {encoding: 'base64'}, (err, data) => {
+            if (err) {
+              reject(err)
+            }
+            resolve(data)
+          })
+        })
+      },
+      async uploadFiles (files) {
+        let results = await Promise.all(
+          files.map(async file => {
+            let data = await this.readFiles(file)
+            var pieces = file.split('/')
+            return [pieces[pieces.length - 1], data]
+          })
+        )
+        var dict = {}
+        for (var result of results) {
+          dict[result[0]] = result[1]
+        }
+        return dict
+      },
+      async projectUpload () {
+        const { dialog } = require('electron').remote
+        const chosenFolders = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
+        this.uploadFiles(chosenFolders).then(result => {
+          this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.triggerUploadModal(response) })
+        })
       }
     }
   }

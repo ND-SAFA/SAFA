@@ -106,13 +106,12 @@ const actions = {
     }
   },
 
-  async uploadFlatfileData ({ commit }, encodedStr) {
+  async uploadFlatfileData ({ commit }, filesStr) {
     try {
-      const response = await projects.postFlatfileData(TEMP_PROJ_ID, encodedStr)
+      const response = await projects.postFlatfileData(TEMP_PROJ_ID, filesStr)
       console.log(response)
       console.log('api success')
       return response
-      // commit('UPLOAD_FILES', response)
     } catch (e) {
       return 'Could not receive response from API'
     }

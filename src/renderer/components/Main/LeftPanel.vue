@@ -10,16 +10,6 @@
       </button>
     </div>
 
-    <div class="d-flex flex-column pt-0 px-2 bg-wash mb-0">
-      <div style="padding-top: 10px; ">
-        <p class="font-weight-bold text-uppercase mb-2 d-flex justify-content-between align-items-center">
-          Manage Data
-        </p>
-        <input type="file" id="selectedFile" style="display: none;" multiple="multiple" @change="submitFlatfiles"/>
-        <input type="button" class="btn btn-outline-secondary btn-sm btn-block" value="Upload Flatfiles" onclick="document.getElementById('selectedFile').click();" />
-      </div>
-    </div>
-
     <ul id="top-tabs" role="tablist" class="nav nav-tabs nav-fill pt-3 mb-3 bg-wash">
       <li class="nav-item">
         <a @click="toggleArtifactsTab" class="nav-link active" id="artifact-tree-tab" data-toggle="tab" href="#center-panel" role="tab" aria-controls="center-panel" aria-selected="true">Artifacts</a>
@@ -99,51 +89,7 @@ export default {
 
     toggleFTATab () {
       this.showTab = 'FTA'
-    },
-
-    readFiles (filename) {
-      return new Promise((resolve, reject) => {
-        let reader = new FileReader()
-        reader.onload = () => {
-          resolve(reader.result)
-        }
-        reader.readAsDataURL(filename)
-
-        reader.onerror = function () {
-          reject(reader.error)
-        }
-      })
-    },
-
-    async uploadFiles (e) {
-      var files = []
-      for (var i = 0; i < e.target.files.length; i++) {
-        files.push(e.target.files[i])
-      }
-
-      let results = await Promise.all(
-        files.map(async file => {
-          let data = await this.readFiles(file)
-          return [file.name, data]
-        })
-      )
-
-      var dict = {}
-      for (var result of results) {
-        var filename = result[0]
-        var data = result[1]
-        dict[filename] = data
-      }
-      return dict
-    },
-
-    submitFlatfiles (e) {
-      this.uploadFiles(e).then(result => {
-        console.log(JSON.stringify(result))
-        this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.showUploadModal(response) })
-      })
     }
-
   }
 }
 </script>

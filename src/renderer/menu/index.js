@@ -50,6 +50,11 @@ export default class AppMenu {
           id: 'freeze',
           label: 'Freeze Version',
           accelerator: 'CommandOrControl+S'
+        },
+        {
+          id: 'upload',
+          label: 'Upload Flatfiles',
+          accelerator: 'CommandOrControl+Q'
         }
       ]
     }

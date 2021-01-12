@@ -78,11 +78,7 @@ export default {
   data () {
     return {
       allFilesPresent: false,
-      fileMap: [],
-      items: [
-        {age: 30, first_name: 'Emma', last_name: 'Watson'},
-        {age: 31, first_name: 'Daniel', last_name: 'Radcliff'}
-      ]
+      fileMap: []
     }
   },
 
@@ -94,8 +90,8 @@ export default {
 
   methods: {
     compareFileLists () {
-      var allFiles = this.modalResult.data.allFiles
-      var uploadedFiles = this.modalResult.data.currentFiles
+      var allFiles = this.modalResult.data.expectedFiles
+      var uploadedFiles = this.modalResult.data.uploadedFiles
       var missingFiles = false
       var entry = {}
 

@@ -98,22 +98,28 @@ public class ProjectService {
   public boolean deleteDirectory(File dir) throws Exception {
     File[] files = dir.listFiles();
     if (files != null) {
-        for (File file : files) {
-            deleteDirectory(file);
-        }
+      for (File file : files) {
+          deleteDirectory(file);
+      }
     }
     return dir.delete();
   }
 
-  public String deleteUploadFile() throws Exception {
-    String dir = "/flatfilesDir";
-    File myDir = new File(dir);
+  public String clearFlatfileDir() throws Exception {
+    File myDir = createFlatfilesDir();
+    File[] fileList = myDir.listFiles();
     
-    if (myDir.exists()) {
-      return deleteDirectory(myDir) ? "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}" : "{ \"success\": false, \"message\": \"Directory could not be cleared.\"}";
-    } else {
-      return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
-    }
+    if (fileList.length > 0){
+      if (deleteDirectory(myDir)){
+        createFlatfilesDir();
+        return "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}";
+      } 
+      else {
+        return "{ \"success\": false, \"message\": \"Directory could not be cleared.\"}";
+      }
+    } 
+
+    return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
   }
 
   public class ParsedFiles{
@@ -257,20 +263,33 @@ public class ProjectService {
     data += "}";
     return data;
   }
-  
-  public String missingFiles(String projId) throws Exception{
+
+  public File createFlatfilesDir() throws Exception{
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
 
     if (!myDir.exists()) {
-      throw new Exception("Directory: '/flatfilesDir' does not exist.");
+      if (!myDir.mkdirs()){
+        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
+      }
     }
 
     if (!myDir.isDirectory()) {
-      throw new Exception("Error opening directory. The path: '/flatfilesDir' is not a directory.");
+      if (!myDir.delete()){
+        throw new Exception("Error deleting Flatfile file: Path: /flatfilesDir");
+      }
+      if (!myDir.mkdirs()){
+        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
+      }
     }
 
-    ParsedFiles parsedfiles = timParser(dir);
+    return myDir;
+  }
+  
+  public String missingFiles(String projId) throws Exception{
+    File myDir = createFlatfilesDir();
+
+    ParsedFiles parsedfiles = timParser("/flatfilesDir");
     List<String> uploadedFiles = Arrays.asList(myDir.list());
 
     // for(GeneratedFiles generated : parsedfiles.getGenerated()) {
@@ -286,21 +305,13 @@ public class ProjectService {
   }
 
   public void uploadFile(String projId, String jsonfiles) throws Exception{
-    String dir = "/flatfilesDir";
-    File myDir = new File(dir);
-    
-    if (!myDir.exists()) {
-      myDir.mkdirs();
-    }
+    createFlatfilesDir();
 
-    if (!myDir.isDirectory()) {
-      throw new Exception("Error creating flatfiles directory. The path: '/flatfilesDir' is not a directory.");
-    }
     JsonIterator iterator = JsonIterator.parse(jsonfiles);
     for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
       String encodedData = iterator.readString();
       byte[] bytes = Base64.getDecoder().decode(encodedData);
-      String fullPath = dir + '/' + filename; 
+      String fullPath = "/flatfilesDir/" + filename; 
       Files.write(Paths.get(fullPath), bytes);
     }
  

@@ -56,10 +56,10 @@ public class ProjectsController {
     return projectService.versionsTag(projId);
   }
 
-  @PostMapping("/projects/{projId}/clear/")
-  public String deleteUploadFile(){
+  @GetMapping("/projects/{projId}/clear/")
+  public String clearFlatfileDir(){
     try {
-      return projectService.deleteUploadFile();  // only keep for testing if you want directory to clear before re-uploading. 
+      return projectService.clearFlatfileDir();  // only keep for testing if you want directory to clear before re-uploading. 
     }
     catch(Exception e){
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());

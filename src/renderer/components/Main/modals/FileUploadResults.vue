@@ -78,7 +78,7 @@ export default {
   data () {
     return {
       allFilesPresent: false,
-      fileMap: []
+      fileMap: {}
     }
   },
 
@@ -92,64 +92,34 @@ export default {
     compareFileLists () {
       var allFiles = this.modalResult.data.expectedFiles
       var uploadedFiles = this.modalResult.data.uploadedFiles
-      var missingFiles = false
       var entry = {}
 
-      console.log('ALL FILES: ', allFiles)
-      console.log('UPLOADED FILES: ', uploadedFiles)
-
-      var previouslyUploaded = false
-      if (this.fileMap.length > 0) {
-        previouslyUploaded = true
+      for (var i = 0; i < allFiles.length; i++) {
+        entry = {}
+        entry.name = allFiles[i]
+        entry.status = 'Missing'
+        entry.found = false
+        this.fileMap[allFiles[i]] = (entry)
       }
 
-      if (!previouslyUploaded) {
-        for (var i = 0; i < allFiles.length; i++) {
-          var found = false
-          for (var j = 0; j < uploadedFiles.length; j++) {
-            if (allFiles[i] === uploadedFiles[j]) {
-              entry = {}
-              entry.name = allFiles[i]
-              entry.status = 'Uploaded'
-              entry.found = true
-              found = true
-              this.fileMap.push(entry)
-            }
-          }
-
-          if (!found) {
-            entry = {}
-            entry.name = allFiles[i]
-            entry.status = 'Missing'
-            entry.found = false
-            missingFiles = true
-            this.fileMap.push(entry)
-          }
-        }
-      } else {
-        for (var k = 0; k < this.fileMap.length; k++) {
-          found = false
-          for (var l = 0; l < uploadedFiles.length; l++) {
-            if (this.fileMap[k].name === uploadedFiles[l]) {
-              this.fileMap[k].status = 'Uploaded'
-              this.fileMap[k].found = true
-              found = true
-            }
-          }
-          if (!found) {
-            missingFiles = true
+      for (var j = 0; j < allFiles.length; j++) {
+        for (var k = 0; k < uploadedFiles.length; k++) {
+          if (allFiles[j] === uploadedFiles[k]) {
+            console.log('found file: ', allFiles[j])
+            var myEntry = this.fileMap[allFiles[j]]
+            myEntry.status = 'Uploaded'
+            myEntry.found = true
+            this.fileMap[allFiles[j]] = myEntry
           }
         }
       }
 
-      if (!missingFiles) {
-        this.allFilesPresent = true
-      } else {
-        this.allFilesPresent = false
+      this.allFilesPresent = true
+      for (var key in this.fileMap) {
+        if (this.fileMap[key].found === false) {
+          this.allFilesPresent = false
+        }
       }
-
-      console.log(this.allFilesPresent)
-      console.log(this.fileMap)
     }
   }
 

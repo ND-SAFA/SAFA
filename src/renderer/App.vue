@@ -38,7 +38,7 @@
         await this.saveProjectVersion()
       },
       getHelp () {
-        shell.openExternal('http://www.google.com')
+        shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
       }
     }
   }

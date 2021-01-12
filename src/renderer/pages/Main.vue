@@ -31,7 +31,8 @@
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
-            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="triggerUploadModal"/>
+            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles"/>
+            <StatusInfoModal :is-hidden="!showInfoModal" @close="showInfoModal = false" :modal-result="showInfoResult"/>
           </div>
         </main>
       </div>
@@ -52,6 +53,7 @@
   import DeltaTree from '@/components/Main/DeltaTree'
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
   import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
+  import StatusInfoModal from '@/components/Main/modals/StatusInfo'
 
   export default {
     name: 'main-page',
@@ -63,7 +65,8 @@
       FaultTree,
       DeltaTree,
       ConfigureDeltaModal,
-      FileUploadResultsModal
+      FileUploadResultsModal,
+      StatusInfoModal
     },
 
     data () {
@@ -74,6 +77,8 @@
         showDeltaModal: false,
         showUploadModal: false,
         uploadResult: null,
+        showInfoModal: false,
+        showInfoResult: null,
         isFetchingFromServer: false,
         rightPanel: {
           isHidden: true
@@ -167,14 +172,24 @@
         return dict
       },
       async projectUpload () {
+        console.log('starting project upload func')
         const { dialog } = require('electron').remote
         const chosenFolders = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
         this.uploadFiles(chosenFolders).then(result => {
           this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.triggerUploadModal(response) })
         })
       },
+      async uploadMoreFiles () {
+        this.showUploadModal = false
+        this.projectUpload()
+      },
+      triggerInfoModal (infoResponse) {
+        console.log('info response modal in main.vue')
+        this.showInfoResult = infoResponse
+        this.showInfoModal = true
+      },
       async clearFiles () {
-        this.clearUploads().then(result => { console.log(result) })
+        this.clearUploads().then(result => { this.triggerInfoModal(result) })
       }
     }
   }

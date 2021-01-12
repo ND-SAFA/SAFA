@@ -49,7 +49,7 @@
                 <div class="modal-body">
                   <div class="form-group">
                     <label for="inputGroupSelect01" class="sml" v-if="modalResult.success === false">
-                        Could not upload flatfiles. Please try again.
+                        Error: {{modalResult.message}}. For more info, please visit our <a @click="getHelp()" class="help-link">Help Page</a>. 
                     </label>
                   </div>
                 </div>
@@ -68,62 +68,70 @@
 </template>
 
 <script>
+  import { shell } from 'electron'
+  export default {
+    props: {
+      isHidden: Boolean,
+      modalResult: Object
+    },
 
-export default {
-  props: {
-    isHidden: Boolean,
-    modalResult: Object
-  },
-
-  data () {
-    return {
-      allFilesPresent: false,
-      fileMap: {}
-    }
-  },
-
-  watch: {
-    'isHidden' () {
-      this.compareFileLists()
-    }
-  },
-
-  methods: {
-    compareFileLists () {
-      var allFiles = this.modalResult.data.expectedFiles
-      var uploadedFiles = this.modalResult.data.uploadedFiles
-      var entry = {}
-
-      for (var i = 0; i < allFiles.length; i++) {
-        entry = {}
-        entry.name = allFiles[i]
-        entry.status = 'Missing'
-        entry.found = false
-        this.fileMap[allFiles[i]] = (entry)
+    data () {
+      return {
+        allFilesPresent: false,
+        fileMap: {}
       }
+    },
 
-      for (var j = 0; j < allFiles.length; j++) {
-        for (var k = 0; k < uploadedFiles.length; k++) {
-          if (allFiles[j] === uploadedFiles[k]) {
-            console.log('found file: ', allFiles[j])
-            var myEntry = this.fileMap[allFiles[j]]
-            myEntry.status = 'Uploaded'
-            myEntry.found = true
-            this.fileMap[allFiles[j]] = myEntry
+    watch: {
+      isHidden: function (newVal, oldVal) {
+        if (newVal === false) {
+          this.compareFileLists()
+        }
+      }
+    },
+
+    methods: {
+      compareFileLists () {
+        if (this.modalResult.data) {
+          var allFiles = this.modalResult.data.expectedFiles
+          var uploadedFiles = this.modalResult.data.uploadedFiles
+          var entry = {}
+
+          for (var i = 0; i < allFiles.length; i++) {
+            entry = {}
+            entry.name = allFiles[i]
+            entry.status = 'Missing'
+            entry.found = false
+            this.fileMap[allFiles[i]] = (entry)
+          }
+
+          for (var j = 0; j < allFiles.length; j++) {
+            for (var k = 0; k < uploadedFiles.length; k++) {
+              if (allFiles[j] === uploadedFiles[k]) {
+                console.log('found file: ', allFiles[j])
+                var myEntry = this.fileMap[allFiles[j]]
+                myEntry.status = 'Uploaded'
+                myEntry.found = true
+                this.fileMap[allFiles[j]] = myEntry
+              }
+            }
+          }
+
+          this.allFilesPresent = true
+          for (var key in this.fileMap) {
+            if (this.fileMap[key].found === false) {
+              this.allFilesPresent = false
+            }
           }
         }
-      }
+      },
 
-      this.allFilesPresent = true
-      for (var key in this.fileMap) {
-        if (this.fileMap[key].found === false) {
-          this.allFilesPresent = false
-        }
+      getHelp () {
+        shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
       }
     }
-  }
 
-}
+  }
 </script>
 
 <style scoped>
@@ -156,5 +164,15 @@ export default {
 
   .files-needed-caption {
     padding: 1rem; 
+  }
+
+  .help-link {
+    text-decoration: underline;
+    color: blue; 
+  }
+  .help-link:hover {
+    text-decoration: underline;
+    color: blue; 
+    cursor: pointer;
   }
 </style>

@@ -296,12 +296,10 @@ public class ProjectService {
     if (!myDir.isDirectory()) {
       throw new Exception("Error creating flatfiles directory. The path: '/flatfilesDir' is not a directory.");
     }
-
     JsonIterator iterator = JsonIterator.parse(jsonfiles);
     for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
       String encodedData = iterator.readString();
-      String base64Image = encodedData.split(",")[1];
-      byte[] bytes = Base64.getDecoder().decode(base64Image);
+      byte[] bytes = Base64.getDecoder().decode(encodedData);
       String fullPath = dir + '/' + filename; 
       Files.write(Paths.get(fullPath), bytes);
     }

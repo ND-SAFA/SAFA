@@ -58,48 +58,13 @@ public class ProjectsController {
 
   @GetMapping("/projects/{projId}/clear/")
   public String clearFlatfileDir(){
-    try {
-      return projectService.clearFlatfileDir();  // only keep for testing if you want directory to clear before re-uploading. 
-    }
-    catch(Exception e){
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
+    return projectService.clearFlatfileDir();
   }
 
   @PostMapping("/projects/{projId}/upload/")
   public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
     System.out.println("/projects/{projId}/upload/");
-    try {
-      projectService.uploadFile(projId, encodedStr);
-      try {
-        return projectService.getMissingFiles(projId);
-      } 
-      catch(Exception e){
-        System.out.println("Missing Files Error");
-        if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-          System.out.println("com.jsoniter.spi.JsonException");
-          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
-        }
-        else if (e.getMessage().equals("Please upload a tim.json file")){
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
-        else {
-          return String.format("{ \"success\": false, \"message\": \"Error checking for missing files: %s\"}", e.toString());
-        }
-      }
-
-    } 
-    catch(Exception e){
-      System.out.println("uploadFile Error");
-      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-        System.out.println("com.jsoniter.spi.JsonException");
-        return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
-      }
-      else {
-        System.out.println("Error uploading Flatfiles: OTHER");
-        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.toString());
-      }
-    }
+    return projectService.uploadFile(projId, encodedStr);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")

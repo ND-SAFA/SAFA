@@ -95,7 +95,7 @@ public class ProjectService {
     return emitter;
   }
 
-  public boolean deleteDirectory(File dir) {
+  public boolean deleteDirectory(File dir) throws Exception {
     File[] files = dir.listFiles();
     if (files != null) {
         for (File file : files) {
@@ -105,14 +105,14 @@ public class ProjectService {
     return dir.delete();
   }
 
-  public boolean deleteUploadFile(){
+  public String deleteUploadFile() throws Exception {
     String dir = "/flatfilesDir";
     File myDir = new File(dir);
     
     if (myDir.exists()) {
-      return deleteDirectory(myDir);
+      return deleteDirectory(myDir) ? "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}" : "{ \"success\": false, \"message\": \"Directory could not be cleared.\"}";
     } else {
-      return false;
+      return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
     }
   }
 

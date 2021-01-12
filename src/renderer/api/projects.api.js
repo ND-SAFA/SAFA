@@ -68,6 +68,13 @@ async function postFlatfileData (projId, encodedStr) {
   return json
 }
 
+async function clearProjectFiles (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/clear/`)
+  const json = await response.json()
+  console.log('response from api for clear project files: ', json)
+  return json
+}
+
 // /projects/{projId}/trees/{treeId}/versions/{version}
 async function getDeltaTrees (projId, treeId, versions) {
   const responses = await Promise.all(versions.map(version => httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/versions/${version}`)))
@@ -88,6 +95,7 @@ export default {
   getProjectVersions,
   postProjectVersion,
   postFlatfileData,
+  clearProjectFiles,
   getDeltaTrees,
   syncProject
 }

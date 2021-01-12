@@ -155,6 +155,11 @@ const actions = {
     })
   },
 
+  async clearUploads ({ commit }) {
+    const response = await projects.clearProjectFiles(TEMP_PROJ_ID)
+    return response
+  },
+
   resetProject ({ commit }) {
     commit('RESET_PROJECT')
   }

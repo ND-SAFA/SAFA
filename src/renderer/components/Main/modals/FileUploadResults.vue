@@ -95,6 +95,9 @@ export default {
       var missingFiles = false
       var entry = {}
 
+      console.log('ALL FILES: ', allFiles)
+      console.log('UPLOADED FILES: ', uploadedFiles)
+
       var previouslyUploaded = false
       if (this.fileMap.length > 0) {
         previouslyUploaded = true

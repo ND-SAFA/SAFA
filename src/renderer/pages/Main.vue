@@ -92,6 +92,7 @@
     created () {
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
       AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
+      AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.setApplicationMenu()
     },
 
@@ -102,7 +103,7 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData']),
+      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -171,6 +172,9 @@
         this.uploadFiles(chosenFolders).then(result => {
           this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.triggerUploadModal(response) })
         })
+      },
+      async clearFiles () {
+        this.clearUploads().then(result => { console.log(result) })
       }
     }
   }

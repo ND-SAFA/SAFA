@@ -51,10 +51,21 @@ export default class AppMenu {
           label: 'Freeze Version',
           accelerator: 'CommandOrControl+S'
         },
+        { type: 'separator' },
         {
           id: 'upload',
           label: 'Upload Flatfiles',
           accelerator: 'CommandOrControl+Q'
+        },
+        {
+          id: 'clear',
+          label: 'Clear Current Uploads',
+          accelerator: 'CommandOrControl+D'
+        },
+        {
+          id: 'help',
+          label: 'More Info',
+          accelerator: 'CommandOrControl+I'
         }
       ]
     }

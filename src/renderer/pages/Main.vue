@@ -31,7 +31,7 @@
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
-            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles"/>
+            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles" @sync-data="projectSync"/>
             <StatusInfoModal :is-hidden="!showInfoModal" @close="showInfoModal = false" :modal-result="showInfoResult"/>
           </div>
         </main>
@@ -96,6 +96,7 @@
 
     created () {
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
+      AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.setApplicationMenu()
@@ -108,7 +109,7 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'clearUploads']),
+      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -130,6 +131,21 @@
         if (this.firstOpen) {
           this.firstOpen = false
           this.updateView()
+        }
+      },
+      async projectSync () {
+        this.showUploadModal = false
+        var response = {}
+        try {
+          await this.syncProject().then(() => {
+            response.success = true
+            response.message = 'Project Sync Successful.'
+            this.triggerInfoModal(response)
+          })
+        } catch (e) {
+          response.success = false
+          response.message = e
+          this.triggerInfoModal(response)
         }
       },
       resizeView () {

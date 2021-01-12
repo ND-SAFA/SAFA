@@ -42,7 +42,7 @@
                 </div>
                 <div class="modal-footer custom-modal-footer">
                   <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button id="sync" type="submit" class="btn btn-primary delta-save-button">Synchronize Data</button>
+                  <button type="submit" class="btn btn-primary delta-save-button" @click="$emit('sync-data')">Synchronize Data</button>
                 </div>
               </form>
               <form v-else class="delta-form">

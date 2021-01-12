@@ -64,8 +64,7 @@ export default class AppMenu {
         },
         {
           id: 'help',
-          label: 'More Info',
-          accelerator: 'CommandOrControl+I'
+          label: 'More Info'
         }
       ]
     }

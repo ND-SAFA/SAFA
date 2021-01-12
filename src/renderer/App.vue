@@ -20,7 +20,7 @@
       ...mapGetters('projects.module', ['getSyncProgress'])
     },
     created () {
-      AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
+      // AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.freeze').click = this.projectFreeze.bind(this)
       AppMenu.findMenuItemById('project.help').click = this.getHelp.bind(this)
       AppMenu.setApplicationMenu()
@@ -30,8 +30,9 @@
       async projectSync () {
         try {
           await this.syncProject()
+          console.log('it worked fine!')
         } catch (e) {
-
+          console.log('it did not work fine')
         }
       },
       async projectFreeze () {

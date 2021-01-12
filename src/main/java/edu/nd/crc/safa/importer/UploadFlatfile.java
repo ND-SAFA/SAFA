@@ -68,12 +68,14 @@ public class UploadFlatfile {
   }
 
   public String getMissingFiles(String projId) throws Exception {
+    String dir = "/flatfilesDir";
     File myDir = createFlatfilesDir();
 
-    ParsedFiles parsedfiles = parseTim("/flatfilesDir");
+    ParsedFiles parsedfiles = parseTim(dir);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
+    String filePath = dir + "/requiredData.json";
 
-    String data = createMissingFilesJson(uploadedFiles, parsedfiles.getRequired());
+    String data = createMissingFilesJson(uploadedFiles, parsedfiles.getRequired(), filePath);
     
     System.out.println(data);
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
@@ -196,8 +198,11 @@ public class UploadFlatfile {
   }
     
   
-  public String createMissingFilesJson(List<String> uploadedFiles, List<String> requiredFiles){
-    return "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(requiredFiles) + "}";
+  public String createMissingFilesJson(List<String> uploadedFiles, List<String> requiredFiles, String filePath) throws Exception {
+    String data = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(requiredFiles) + "}";
+    Files.write(Paths.get(filePath), data.getBytes());
+    
+    return data;
   }
   
   public File createFlatfilesDir() throws Exception{

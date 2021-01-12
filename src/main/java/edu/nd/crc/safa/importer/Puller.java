@@ -180,7 +180,11 @@ public class Puller {
     }
 
     public void parseFlatfiles() {
-        ParsedData parsedData = mFlatfile.parseFiles("/flatfilesDir"); 
+        String dir = "/flatfilesDir";
+        
+        // mFlatfile.requiredDataChecker(dir);
+
+        ParsedData parsedData = mFlatfile.parseFiles(dir); 
         
         // System.out.println("PARSED DATA: "); 
         // System.out.println(parsedData); 

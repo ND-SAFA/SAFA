@@ -72,6 +72,24 @@ public class Flatfile {
         String text = "";
     }
 
+    public class RequiredDataFile {
+        String[] uploadedFiles;
+        String[] expectedFiles;
+
+        public RequiredDataFile(String[] uploadedFiles, String[] expectedFiles){
+            this.uploadedFiles = uploadedFiles;
+            this.expectedFiles = expectedFiles;
+        }
+
+        public String[] getUploadedFiles(){
+            return uploadedFiles;
+        }
+
+        public String[] getExpectedFiles(){
+            return expectedFiles;
+        }
+    }
+
     public void errorGenerator(String file, int lineNumber, String message, ErrorText errorText){
         String text = String.format("ERROR: CSV: %s LINE: %d DESC: %s \n", file, lineNumber, message);
         errorText.text += text;
@@ -435,5 +453,26 @@ public class Flatfile {
         }
         return parsedData; 
 
+    }
+
+    public Boolean requiredDataChecker(String dir) throws Exception {
+        String filename = dir + "/requiredData.json";
+        File myDir = new File(filename);
+
+        if (myDir.exists()){
+            String data = readFileAsString(filename);
+
+            RequiredDataFile requiredDataFile = JsonIterator.deserialize(data, RequiredDataFile.class);
+            String[] expectedFiles = requiredDataFile.getExpectedFiles();
+            String[] uploadedFiles = requiredDataFile.getUploadedFiles();
+
+            Arrays.sort(expectedFiles);
+            Arrays.sort(uploadedFiles);
+
+            return Arrays.equals(expectedFiles, uploadedFiles);
+        }
+        else {
+            return false;
+        }
     }
 }

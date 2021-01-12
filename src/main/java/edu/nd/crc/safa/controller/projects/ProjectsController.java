@@ -72,7 +72,7 @@ public class ProjectsController {
     try {
       projectService.uploadFile(projId, encodedStr);
       try {
-        return projectService.missingFiles(projId);
+        return projectService.getMissingFiles(projId);
       } 
       catch(Exception e){
         System.out.println("Missing Files Error");

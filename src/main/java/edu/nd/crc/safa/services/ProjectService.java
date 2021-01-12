@@ -1,18 +1,12 @@
 package edu.nd.crc.safa.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Base64;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
@@ -27,12 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.jsoniter.JsonIterator;
-import java.util.Set;
-import java.util.HashSet;
 
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.importer.UploadFlatfile;
 
 
 @Service
@@ -43,6 +35,9 @@ public class ProjectService {
 
   @Autowired
   Puller mPuller;
+
+  @Autowired
+  UploadFlatfile uploadFlatfile;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
@@ -95,235 +90,16 @@ public class ProjectService {
     return emitter;
   }
 
-  public boolean deleteDirectory(File dir) throws Exception {
-    File[] files = dir.listFiles();
-    if (files != null) {
-      for (File file : files) {
-          deleteDirectory(file);
-      }
-    }
-    return dir.delete();
+  public void uploadFile(String projId, String encodedStr) throws Exception {
+    uploadFlatfile.uploadFile(projId, encodedStr);
   }
 
   public String clearFlatfileDir() throws Exception {
-    File myDir = createFlatfilesDir();
-    File[] fileList = myDir.listFiles();
-    
-    if (fileList.length > 0){
-      if (deleteDirectory(myDir)){
-        createFlatfilesDir();
-        return "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}";
-      } 
-      else {
-        return "{ \"success\": false, \"message\": \"Directory could not be cleared.\"}";
-      }
-    } 
-
-    return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
+    return uploadFlatfile.clearFlatfileDir();
   }
 
-  public class ParsedFiles{
-    private List<String> requiredFiles;
-    private List<GeneratedFiles> generatedFiles;
-
-    public ParsedFiles(List<String> requiredFiles, List<GeneratedFiles> generatedFiles){
-      this.requiredFiles = requiredFiles;
-      this.generatedFiles = generatedFiles;
-    }
-
-    public List<String> getRequired(){
-      return requiredFiles;
-    }
-
-    public List<GeneratedFiles> getGenerated(){
-      return generatedFiles;
-    }
-  }
-  public class GeneratedFiles {
-    private final String filename;
-    private final String source;
-    private final String target;
-
-    public GeneratedFiles(String filename, String source, String target){
-      this.filename = filename;
-      this.source = source;
-      this.target = target;
-    }
-
-    public String getName(){
-      return filename;
-    }
-
-    public String getSource(){
-      return source;
-    }
-
-    public String getTarget(){
-      return target;
-    }
-  }
-
-  public ParsedFiles timParser(String dirName) throws Exception{
-    String fileName = dirName + '/' + "tim.json";
-    File tim = new File(fileName);
-    if (!tim.exists()){
-      throw new Exception("Please upload a tim.json file");
-    }
-
-    String data = new String(Files.readAllBytes(Paths.get(fileName)));
-    JsonIterator iterator = JsonIterator.parse(data);
-
-    List<String> requiredFiles = new ArrayList<String>();
-    List<GeneratedFiles> generatedFiles = new ArrayList<GeneratedFiles>();
-
-    for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-      if (field.equals("DataFiles")) {
-        for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
-          for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
-              requiredFiles.add(iterator.readString());
-          }
-        }
-      }
-      else {
-        String filename = "";
-        String source = "";
-        String target = "";
-        Boolean val = false;
-
-        for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
-          if (attr.equals("File")){
-            filename = iterator.readString();
-          }
-
-          if (attr.equals("Source")){
-            source = iterator.readString();
-          }
-
-          if (attr.equals("Target")){
-            target = iterator.readString();
-          }
-
-          if (attr.equals("generateLinks")){
-            val = iterator.readString().equals("True") ? true : false;
-          }
-        }
-
-        if (val){
-          generatedFiles.add(new GeneratedFiles(filename,source,target));
-        }
-        else {
-          requiredFiles.add(filename);
-        }
-      }
-    }
-    return new ParsedFiles(requiredFiles, generatedFiles);
-  }
-
-  public String fileJsonCreator(List<String> uploadedFiles, List<String> requiredFiles){
-    String data = "{\"uploadedFiles\":";
-
-    if (uploadedFiles.size() == 0){
-      data += "[]";
-    } 
-    else if (uploadedFiles.size() == 1){
-      data += String.format("[\"%s\"]", uploadedFiles.get(0));
-    }
-    else {
-      for (int i = 0; i < uploadedFiles.size(); i++){
-        if (i == 0){
-          data += "[\"" + uploadedFiles.get(i) + "\"";
-        } 
-        else if (i == uploadedFiles.size() - 1){
-          data += ",\"" + uploadedFiles.get(i) + "\"]";
-        }
-        else {
-          data += ",\"" + uploadedFiles.get(i) + "\"";
-        }
-      }
-    }
-
-    data += ",\"expectedFiles\":[\"tim.json\"";
-    if (requiredFiles.size() == 0){
-      data += "]";
-    } 
-    else if (requiredFiles.size() == 1){
-      data += String.format(",\"%s\"]", uploadedFiles.get(0));
-    }
-    else {
-      for (int i = 0; i < requiredFiles.size(); i++){
-        if (i == requiredFiles.size() - 1){
-          data += ",\"" + requiredFiles.get(i) + "\"]";
-        }
-        else {
-          data += ",\"" + requiredFiles.get(i) + "\"";
-        }
-      }
-    }
-
-    data += "}";
-    return data;
-  }
-
-  public File createFlatfilesDir() throws Exception{
-    String dir = "/flatfilesDir";
-    File myDir = new File(dir);
-
-    if (!myDir.exists()) {
-      if (!myDir.mkdirs()){
-        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
-      }
-    }
-
-    if (!myDir.isDirectory()) {
-      if (!myDir.delete()){
-        throw new Exception("Error deleting Flatfile file: Path: /flatfilesDir");
-      }
-      if (!myDir.mkdirs()){
-        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
-      }
-    }
-
-    return myDir;
-  }
-  
-  public String missingFiles(String projId) throws Exception{
-    File myDir = createFlatfilesDir();
-
-    ParsedFiles parsedfiles = timParser("/flatfilesDir");
-    List<String> uploadedFiles = Arrays.asList(myDir.list());
-
-    // for(GeneratedFiles generated : parsedfiles.getGenerated()) {
-    //    System.out.println(generated.getName());
-    //    System.out.println(generated.getSource());
-    //    System.out.println(generated.getTarget());
-    // }
-    // System.out.println(parsedfiles.getGenerated());
-
-    String data = fileJsonCreator(uploadedFiles, parsedfiles.getRequired());
-    System.out.println(data);
-    return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
-  }
-
-  public void uploadFile(String projId, String jsonfiles) throws Exception{
-    createFlatfilesDir();
-
-    JsonIterator iterator = JsonIterator.parse(jsonfiles);
-    for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
-      String encodedData = iterator.readString();
-      byte[] bytes = Base64.getDecoder().decode(encodedData);
-      String fullPath = "/flatfilesDir/" + filename; 
-      Files.write(Paths.get(fullPath), bytes);
-    }
- 
-    // TESTING print files inside directory
-    // String fileNames[] = myDir.list();
-
-    // System.out.println("List of files and directories in the specified directory:");
-    // for(String name : fileNames) {
-    //    System.out.println(name);
-    // }
-
-    // return "{ \"success\": true, \"message\": \"Upload successful.\"}"; 
+  public String getMissingFiles(String projId) throws Exception {
+    return uploadFlatfile.getMissingFiles(projId);
   }
 
   @PostConstruct

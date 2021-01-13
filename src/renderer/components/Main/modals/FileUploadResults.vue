@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isHidden">
+  <div id="upload-modal" v-if="!isHidden">
     <transition name="modal">
       <div class="modal-mask">
         <div class="modal modal-wrapper">

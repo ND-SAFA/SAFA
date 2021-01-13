@@ -77,6 +77,7 @@
         showDeltaModal: false,
         showUploadModal: false,
         uploadResult: null,
+        needMoreFiles: false,
         showInfoModal: false,
         showInfoResult: null,
         isFetchingFromServer: false,
@@ -107,6 +108,17 @@
       // this.resetProject()
       this.loadData()
     },
+
+    // watch: {
+    //   showUploadModal: function (newVal, oldVal) {
+    //     if (newVal === false && this.needMoreFiles === true) {
+    //       console.log('calling project upload and file picker')
+    //       this.$nextTick(() => { this.projectUpload() })
+    //       this.needMoreFiles = false
+    //     }
+    //     console.log('ok done')
+    //   }
+    // },
 
     methods: {
       ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'clearUploads']),
@@ -145,7 +157,7 @@
         } catch (e) {
           response.success = false
           response.message = e
-          this.triggerInfoModal(response)
+          this.triggerInfoModal(response, 'upload')
         }
       },
       resizeView () {
@@ -196,16 +208,29 @@
         })
       },
       async uploadMoreFiles () {
+        console.log('upload more files functions started')
         this.showUploadModal = false
-        this.projectUpload()
+        this.$nextTick(() => { this.projectUpload() })
       },
-      triggerInfoModal (infoResponse) {
+      triggerInfoModal (infoResponse, type) {
+        var response = {}
+        response.success = infoResponse.success
+        response.message = infoResponse.message
+        response.data = infoResponse.data
+
+        if (type === 'upload') {
+          response.upload = true
+        } else {
+          response.upload = false
+        }
+
         console.log('info response modal in main.vue')
+        console.log(infoResponse)
         this.showInfoResult = infoResponse
         this.showInfoModal = true
       },
       async clearFiles () {
-        this.clearUploads().then(result => { this.triggerInfoModal(result) })
+        this.clearUploads().then(result => { this.triggerInfoModal(result, 'delete') })
       }
     }
   }

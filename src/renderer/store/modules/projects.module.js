@@ -21,7 +21,8 @@ const state = {
     safetyArtifactTree: [],
     node: {
       parents: []
-    }
+    },
+    uploadFiles: null
   }
 }
 
@@ -52,6 +53,10 @@ const getters = {
 
   getSyncProgress (state) {
     return state.projects.syncProgress
+  },
+
+  getUploadFiles (state) {
+    return state.projects.uploadFiles
   }
 }
 
@@ -142,7 +147,13 @@ const actions = {
     return new Promise((resolve, reject) => {
       evtSource.addEventListener('update', (message) => {
         commit('SET_SYNC_PROGRESS', message.lastEventId)
-        if (JSON.parse(message.data).complete) {
+        var obj = JSON.parse(message.data)
+        if (obj.files) {
+          console.log('yup this is an upload.')
+          console.log(obj.files)
+          commit('UPLOAD_FILES', obj.files)
+        }
+        if (obj.complete) {
           evtSource.close()
           commit('SET_SYNC_PROGRESS', -1)
           resolve()
@@ -150,6 +161,7 @@ const actions = {
       })
       evtSource.onerror = (e) => {
         commit('SET_SYNC_PROGRESS', -1)
+        console.log(e)
         reject(e)
       }
     })
@@ -192,6 +204,10 @@ const mutations = {
 
   SET_SYNC_PROGRESS (state, data) {
     state.projects.syncProgress = data
+  },
+
+  UPLOAD_FILES (state, data) {
+    state.projects.uploadFiles = data
   },
 
   RESET_PROJECT (state) {

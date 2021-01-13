@@ -7,13 +7,9 @@ import java.util.*;
 import java.nio.file.*;
 import java.io.FileWriter;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import com.jsoniter.JsonIterator;
+import com.jsoniter.any.Any;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -70,24 +66,6 @@ public class Flatfile {
 
     public class ErrorText {
         String text = "";
-    }
-
-    public class RequiredDataFile {
-        String[] uploadedFiles;
-        String[] expectedFiles;
-
-        public RequiredDataFile(String[] uploadedFiles, String[] expectedFiles){
-            this.uploadedFiles = uploadedFiles;
-            this.expectedFiles = expectedFiles;
-        }
-
-        public String[] getUploadedFiles(){
-            return uploadedFiles;
-        }
-
-        public String[] getExpectedFiles(){
-            return expectedFiles;
-        }
     }
 
     public void errorGenerator(String file, int lineNumber, String message, ErrorText errorText){
@@ -455,24 +433,40 @@ public class Flatfile {
 
     }
 
-    public Boolean requiredDataChecker(String dir) throws Exception {
+    public void requiredDataChecker(String dir) throws Exception {
         String filename = dir + "/requiredData.json";
         File myDir = new File(filename);
-
+    
         if (myDir.exists()){
             String data = readFileAsString(filename);
-
-            RequiredDataFile requiredDataFile = JsonIterator.deserialize(data, RequiredDataFile.class);
-            String[] expectedFiles = requiredDataFile.getExpectedFiles();
-            String[] uploadedFiles = requiredDataFile.getUploadedFiles();
-
-            Arrays.sort(expectedFiles);
-            Arrays.sort(uploadedFiles);
-
-            return Arrays.equals(expectedFiles, uploadedFiles);
+            Any iter = JsonIterator.deserialize(data);
+    
+            Any uploaded = iter.get("uploadedFiles");
+            Any expected = iter.get("expectedFiles");
+    
+            List<String> uploadedFiles = new ArrayList<String>();
+            List<String> expectedFiles = new ArrayList<String>();
+            
+            for (Any i : uploaded) {
+                uploadedFiles.add(i.toString());
+                System.out.println(i.toString());
+            }
+    
+            for (Any i : expected) {
+                expectedFiles.add(i.toString());
+                System.out.println(i.toString());
+            }
+    
+            Collections.sort(expectedFiles);
+            Collections.sort(uploadedFiles);
+         
+            if (!expectedFiles.equals(uploadedFiles)){
+                System.out.println("Lists don't equal each other");
+                throw new Exception("Lists don't equal");
+            }
         }
         else {
-            return false;
+            throw new Exception("Please upload files");
         }
     }
 }

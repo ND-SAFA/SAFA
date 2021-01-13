@@ -179,20 +179,14 @@ public class Puller {
         }
     }
 
-    public void parseFlatfiles() {
+    public void parseFlatfiles() throws Exception {
         String dir = "/flatfilesDir";
-        
-        // mFlatfile.requiredDataChecker(dir);
+        mFlatfile.requiredDataChecker(dir);
 
         ParsedData parsedData = mFlatfile.parseFiles(dir); 
-        
-        // System.out.println("PARSED DATA: "); 
-        // System.out.println(parsedData); 
+    
         for (Artifact artifact : parsedData.artifacts) {
-            // System.out.println(artifact.type); 
             for (DataEntry dataEntry : artifact.entries) {
-
-                // System.out.println(dataEntry.id); 
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", "Flatfile");
                 data.put("isDelegated", "N/A");
@@ -204,13 +198,11 @@ public class Puller {
 
                 foundNodes.add(dataEntry.id);
                 mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
-
             }
         }
 
         for (Connection connection : parsedData.connections) {
             for (Link link : connection.links) {
-                // System.out.println(link.target);
                 mDatabase.AddLink(link.target, link.sourceType, link.source);
             }
         }

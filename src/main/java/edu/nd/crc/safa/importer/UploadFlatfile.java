@@ -161,7 +161,7 @@ public class UploadFlatfile {
         target = iterator.readString();
       }
 
-      if (attr.equals("generateLinks")){
+      if (attr.toLowerCase().equals("generatelinks")){
         val = iterator.readString().equals("True") ? true : false;
       }
     }

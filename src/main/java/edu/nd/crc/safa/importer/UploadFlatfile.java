@@ -3,6 +3,9 @@ package edu.nd.crc.safa.importer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.transform.Source;
+
 import java.util.Base64;
 import java.io.File;
 import java.nio.file.Files;
@@ -73,9 +76,11 @@ public class UploadFlatfile {
 
     ParsedFiles parsedfiles = parseTim(dir);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
-    String filePath = dir + "/requiredData.json";
+    String requiredFilePath = dir + "/requiredData.json";
+    String generatedFilePath = dir + "/generatedData.json";
 
-    String data = createMissingFilesJson(uploadedFiles, parsedfiles.getRequired(), filePath);
+
+    String data = storeFilesAsJSON(uploadedFiles, parsedfiles, requiredFilePath, generatedFilePath);
     
     System.out.println(data);
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
@@ -196,13 +201,44 @@ public class UploadFlatfile {
 
     return jsonArr;
   }
+
+  public String createGeneratedFileObj(List<GeneratedFiles> generatedFiles) {
+    String data = "";
+
+    if (generatedFiles.size() == 0){
+      return "[]";
+    }
+
+    else if (generatedFiles.size() == 1){
+      return "[{\"filename\":" + generatedFiles.get(0).getName() + ",\"source\":" + generatedFiles.get(0).getSource() + ",\"target\":" + generatedFiles.get(0).getTarget() + "}]";
+    }
+    
+    else {
+      for (int i = 0; i < generatedFiles.size(); i++){
+        if (i == 0){
+          data += "[{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}";
+        } 
+        else if (i == generatedFiles.size() - 1){
+          data += ",{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}]";
+        }
+        else {
+          data += ",{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}";
+        }
+      }
+    }
+
+    return data;
+  }
     
   
-  public String createMissingFilesJson(List<String> uploadedFiles, List<String> requiredFiles, String filePath) throws Exception {
-    String data = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(requiredFiles) + "}";
-    Files.write(Paths.get(filePath), data.getBytes());
-    
-    return data;
+  public String storeFilesAsJSON(List<String> uploadedFiles, ParsedFiles timFiles, String requiredFilePath, String generatedFilePath) throws Exception {
+    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + "}";
+    Files.write(Paths.get(requiredFilePath), requiredData.getBytes());
+
+    String generatedData = createGeneratedFileObj(timFiles.getGenerated());
+    Files.write(Paths.get(generatedFilePath), generatedData.getBytes());
+
+    return requiredData;
   }
   
   public File createFlatfilesDir() throws Exception{

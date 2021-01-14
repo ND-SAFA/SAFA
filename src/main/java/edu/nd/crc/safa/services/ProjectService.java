@@ -90,6 +90,15 @@ public class ProjectService {
     return emitter;
   }
 
+  public String generateLinks(String projId){
+    try {
+      return "{ \"success\": true, \"message\": \"Success\"}";
+    } 
+    catch (Exception e) {
+      return "{ \"success\": false, \"message\": \"Success\"}";
+    }
+  }
+
   public String uploadFile(String projId, String encodedStr) {
     try {
       uploadFlatfile.uploadFile(projId, encodedStr);

@@ -444,25 +444,23 @@ public class Flatfile {
             Any uploaded = iter.get("uploadedFiles");
             Any expected = iter.get("expectedFiles");
     
-            List<String> uploadedFiles = new ArrayList<String>();
-            List<String> expectedFiles = new ArrayList<String>();
+            Set<String> uploadedFiles = new HashSet<String>(); 
+            Set<String> expectedFiles = new HashSet<String>(); 
             
             for (Any i : uploaded) {
                 uploadedFiles.add(i.toString());
                 System.out.println(i.toString());
             }
-    
+
             for (Any i : expected) {
                 expectedFiles.add(i.toString());
                 System.out.println(i.toString());
             }
-    
-            Collections.sort(expectedFiles);
-            Collections.sort(uploadedFiles);
-         
-            if (!expectedFiles.equals(uploadedFiles)){
-                System.out.println("Lists don't equal each other");
-                throw new Exception("Lists don't equal");
+            
+            for (String name : expectedFiles){
+                if (!uploadedFiles.contains(name)){
+                    throw new Exception("Missing Required Files: " + data);
+                }
             }
         }
         else {

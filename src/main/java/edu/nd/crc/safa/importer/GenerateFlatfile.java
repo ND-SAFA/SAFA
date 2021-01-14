@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.importer;
 // import sun.awt.windows.WPrinterJob;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Collection;
 import java.util.Arrays;
 
+import com.jsoniter.JsonIterator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -48,4 +50,48 @@ public class GenerateFlatfile {
         }
         Files.write(dfile, lines);
     }
+
+    public String generateFiles() throws Exception {
+        String fullPath = "/flatfilesDir/generatedData.json";
+        System.out.println(fullPath);
+        
+        File file = new File(fullPath);
+        if (!file.exists()) {
+            return "{ \"success\": true, \"message\": \"Please upload files.\"}";
+        }
+
+        String data = new String(Files.readAllBytes(Paths.get(fullPath)));
+        if (data.equals("[]")){
+            return "{ \"success\": true, \"message\": \"No links needed to be generated.\"}";
+        }
+
+        JsonIterator iterator = JsonIterator.parse(data);
+
+        System.out.println(data);
+        System.out.println("Before reading Array");
+        while (iterator.readArray()) {
+            String filename = "";
+            String source = "";
+            String target = "";
+            System.out.println("In iterator.readArray");
+            for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
+                System.out.println("In iterator.readObject");
+                if (field.equals("filename")) {
+                    filename = iterator.readString();
+                }
+                else if (field.equals("source")) {
+                    source = iterator.readString();
+                }
+                else {
+                    target = iterator.readString();
+                }
+            }
+
+            System.out.println(filename);
+            System.out.println(source);
+            System.out.println(target);
+
+        }
+        return "{ \"success\": true}";
+    } 
 }

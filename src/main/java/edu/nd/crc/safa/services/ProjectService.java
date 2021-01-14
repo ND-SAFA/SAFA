@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
+import edu.nd.crc.safa.importer.GenerateFlatfile;
 import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
 
 
@@ -39,6 +40,9 @@ public class ProjectService {
 
   @Autowired
   UploadFlatfile uploadFlatfile;
+
+  @Autowired
+  GenerateFlatfile generateFlatfile;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
@@ -103,10 +107,10 @@ public class ProjectService {
 
   public String generateLinks(String projId){
     try {
-      return "{ \"success\": true, \"message\": \"Success\"}";
+      return generateFlatfile.generateFiles();
     } 
     catch (Exception e) {
-      return "{ \"success\": false, \"message\": \"Success\"}";
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
   }
 

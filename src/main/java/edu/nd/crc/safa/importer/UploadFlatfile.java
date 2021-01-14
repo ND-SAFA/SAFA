@@ -148,7 +148,7 @@ public class UploadFlatfile {
     String target = "";
     Boolean val = false;
 
-    for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
+    for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
       if (attr.equals("File")){
         filename = iterator.readString();
       }
@@ -210,19 +210,19 @@ public class UploadFlatfile {
     }
 
     else if (generatedFiles.size() == 1){
-      return "[{\"filename\":" + generatedFiles.get(0).getName() + ",\"source\":" + generatedFiles.get(0).getSource() + ",\"target\":" + generatedFiles.get(0).getTarget() + "}]";
+      return "[{\"filename\":" + "\"" + generatedFiles.get(0).getName() + "\"" + ",\"source\":" + "\"" + generatedFiles.get(0).getSource() + "\"" + ",\"target\":" + "\"" + generatedFiles.get(0).getTarget() + "\"" + "}]";
     }
     
     else {
       for (int i = 0; i < generatedFiles.size(); i++){
         if (i == 0){
-          data += "[{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}";
+          data += "[{\"filename\":" + "\"" + generatedFiles.get(i).getName() + "\"" + ",\"source\":" + "\"" + generatedFiles.get(i).getSource() + "\"" + ",\"target\":" + "\"" + generatedFiles.get(i).getTarget() + "\"" + "}";
         } 
         else if (i == generatedFiles.size() - 1){
-          data += ",{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}]";
+          data += ",{\"filename\":" + "\"" + generatedFiles.get(i).getName() + "\"" + ",\"source\":" + "\"" + generatedFiles.get(i).getSource() + "\"" + ",\"target\":" + "\"" + generatedFiles.get(i).getTarget() + "\"" + "}]";
         }
         else {
-          data += ",{\"filename\":" + generatedFiles.get(i).getName() + ",\"source\":" + generatedFiles.get(i).getSource() + ",\"target\":" + generatedFiles.get(i).getTarget() + "}";
+          data += ",{\"filename\":" + "\"" + generatedFiles.get(i).getName() + "\"" + ",\"source\":" + "\"" + generatedFiles.get(i).getSource() + "\"" + ",\"target\":" + "\"" + generatedFiles.get(i).getTarget() + "\"" + "}";
         }
       }
     }

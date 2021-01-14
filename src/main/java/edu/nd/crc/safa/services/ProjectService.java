@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
+import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
 
 
 @Service
@@ -69,12 +70,22 @@ public class ProjectService {
           //   .data("{\"complete\": false}")
           //   .id(String.valueOf(2))
           //   .name("update"));
-
-          mPuller.parseFlatfiles();
+          
+          String data = "{\"complete\": false}";
+          try {
+            mPuller.parseFlatfiles();
+            System.out.println("Completed ParseFlatfiles without exceptions");
+          } catch (MissingFileException e) {
+            System.out.println("MissingFileException");
+            data = String.format("{\"complete\": false, \"file\": %s}", e.getMessage());
+          } catch (Exception e) {
+            System.out.println("Regular Exception");
+            data = String.format("{\"complete\": false, \"message\": \"%s\"}", e.getMessage());
+          }
           emitter.send(SseEmitter.event()
-            .data("{\"complete\": false}")
-            .id(String.valueOf(3))
-            .name("update"));
+              .data(data)
+              .id(String.valueOf(3))
+              .name("update"));
 
           mPuller.Execute();
           emitter.send(SseEmitter.event()

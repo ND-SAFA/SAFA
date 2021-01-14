@@ -14,6 +14,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Flatfile {
+    public class MissingFileException extends Exception { 
+        public MissingFileException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
     public static class Tim {
         List<DataFile> dataFiles; 
         List<LinkFile> linkFiles; 
@@ -449,22 +454,22 @@ public class Flatfile {
             
             for (Any i : uploaded) {
                 uploadedFiles.add(i.toString());
-                System.out.println(i.toString());
             }
 
             for (Any i : expected) {
                 expectedFiles.add(i.toString());
-                System.out.println(i.toString());
             }
             
             for (String name : expectedFiles){
                 if (!uploadedFiles.contains(name)){
-                    throw new Exception("Missing Required Files: " + data);
+                    System.out.println("Throwing MissingFileException");
+                    throw new MissingFileException(data);
                 }
             }
         }
         else {
-            throw new Exception("Please upload files");
+            System.out.println("Throwing Missing tim.json exception");
+            throw new Exception("Missing tim.json file. Please upload files.");
         }
     }
 }

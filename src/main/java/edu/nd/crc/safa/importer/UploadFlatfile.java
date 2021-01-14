@@ -19,18 +19,24 @@ public class UploadFlatfile {
   public class ParsedFiles {
     private List<String> requiredFiles;
     private List<GeneratedFiles> generatedFiles;
+    private List<String> generatedFileNames;
 
-    public ParsedFiles(List<String> requiredFiles, List<GeneratedFiles> generatedFiles){
+    public ParsedFiles(List<String> requiredFiles, List<GeneratedFiles> generatedFiles, List<String> generatedFileNames){
       this.requiredFiles = requiredFiles;
       this.generatedFiles = generatedFiles;
+      this.generatedFileNames = generatedFileNames;
     }
 
     public List<String> getRequired(){
       return requiredFiles;
     }
 
-    public List<GeneratedFiles> getGenerated(){
+    public List<GeneratedFiles> getGenerated() {
       return generatedFiles;
+    }
+
+    public List<String> getGeneratedNames() {
+      return generatedFileNames;
     }
   }
 
@@ -124,6 +130,7 @@ public class UploadFlatfile {
     JsonIterator iterator = JsonIterator.parse(data);
 
     List<String> requiredFiles = new ArrayList<String>();
+    List<String> generatedFileNames = new ArrayList<String>();
     List<GeneratedFiles> generatedFiles = new ArrayList<GeneratedFiles>();
 
     requiredFiles.add("tim.json");
@@ -136,13 +143,13 @@ public class UploadFlatfile {
         }
       }
       else {
-        addLinkFile(iterator, requiredFiles, generatedFiles);
+        addLinkFile(iterator, requiredFiles, generatedFiles, generatedFileNames);
       }
     }
-    return new ParsedFiles(requiredFiles, generatedFiles);
+    return new ParsedFiles(requiredFiles, generatedFiles, generatedFileNames);
   }
 
-  public void addLinkFile(JsonIterator iterator, List<String> requiredFiles, List<GeneratedFiles> generatedFiles) throws Exception {
+  public void addLinkFile(JsonIterator iterator, List<String> requiredFiles, List<GeneratedFiles> generatedFiles, List<String> generatedFileNames) throws Exception {
     String filename = "";
     String source = "";
     String target = "";
@@ -167,6 +174,7 @@ public class UploadFlatfile {
     }
 
     if (val){
+      generatedFileNames.add(filename);
       generatedFiles.add(new GeneratedFiles(filename,source,target));
     }
     else {
@@ -232,9 +240,9 @@ public class UploadFlatfile {
     
   
   public String storeFilesAsJSON(List<String> uploadedFiles, ParsedFiles timFiles, String requiredFilePath, String generatedFilePath) throws Exception {
-    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + "}";
+    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + ",\"generatedFiles\":" + createJsonArray(timFiles.getGeneratedNames()) + "}";
     Files.write(Paths.get(requiredFilePath), requiredData.getBytes());
-
+    
     String generatedData = createGeneratedFileObj(timFiles.getGenerated());
     Files.write(Paths.get(generatedFilePath), generatedData.getBytes());
 

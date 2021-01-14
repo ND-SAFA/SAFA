@@ -58,6 +58,11 @@ export default class AppMenu {
           accelerator: 'CommandOrControl+Q'
         },
         {
+          id: 'generate',
+          label: 'Generate Trace Links',
+          accelerator: 'CommandOrControl+L'
+        },
+        {
           id: 'clear',
           label: 'Clear Current Uploads',
           accelerator: 'CommandOrControl+D'

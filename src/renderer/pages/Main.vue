@@ -77,7 +77,6 @@
         showDeltaModal: false,
         showUploadModal: false,
         uploadResult: null,
-        needMoreFiles: false,
         showInfoModal: false,
         showInfoResult: null,
         isFetchingFromServer: false,
@@ -99,6 +98,7 @@
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
       AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
+      AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.setApplicationMenu()
     },
@@ -109,19 +109,8 @@
       this.loadData()
     },
 
-    // watch: {
-    //   showUploadModal: function (newVal, oldVal) {
-    //     if (newVal === false && this.needMoreFiles === true) {
-    //       console.log('calling project upload and file picker')
-    //       this.$nextTick(() => { this.projectUpload() })
-    //       this.needMoreFiles = false
-    //     }
-    //     console.log('ok done')
-    //   }
-    // },
-
     methods: {
-      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'clearUploads']),
+      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'generateTraceLinks', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -149,12 +138,25 @@
         this.showUploadModal = false
         var response = {}
         try {
-          await this.syncProject().then(() => {
-            response.success = true
-            response.message = 'Project Sync Successful.'
-            this.triggerInfoModal(response)
+          await this.syncProject().then((apiResponse) => {
+            console.log(apiResponse)
+            if (apiResponse.file) {
+              response.data = apiResponse.file
+              response.success = true
+              response.message = 'Missing the following files from upload: '
+              this.triggerUploadModal(response)
+            } else if (apiResponse.message) {
+              response.success = false
+              response.message = apiResponse.message
+              this.triggerInfoModal(response, 'upload')
+            } else {
+              response.success = true
+              response.message = 'Data Upload Successful'
+              this.triggerInfoModal(response, 'upload')
+            }
           })
         } catch (e) {
+          console.log('e returned on front end: ', e)
           response.success = false
           response.message = e
           this.triggerInfoModal(response, 'upload')
@@ -170,7 +172,6 @@
         this.rightPanel.isHidden = false
       },
       triggerUploadModal (uploadResponse) {
-        console.log('uploading modal in main.vue')
         this.uploadResult = uploadResponse
         this.showUploadModal = true
       },
@@ -188,9 +189,9 @@
       async uploadFiles (files) {
         let results = await Promise.all(
           files.map(async file => {
-            let data = await this.readFiles(file)
+            let myData = await this.readFiles(file)
             var pieces = file.split('/')
-            return [pieces[pieces.length - 1], data]
+            return [pieces[pieces.length - 1], myData]
           })
         )
         var dict = {}
@@ -224,10 +225,11 @@
           response.upload = false
         }
 
-        console.log('info response modal in main.vue')
-        console.log(infoResponse)
-        this.showInfoResult = infoResponse
+        this.showInfoResult = response
         this.showInfoModal = true
+      },
+      async projectGenerate () {
+        this.generateTraceLinks().then(result => { console.log(result) })
       },
       async clearFiles () {
         this.clearUploads().then(result => { this.triggerInfoModal(result, 'delete') })

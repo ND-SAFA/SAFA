@@ -142,29 +142,34 @@ const actions = {
   },
 
   async syncProject ({ commit }) {
+    console.log('starting syncProject function in projecst.module')
     const evtSource = projects.syncProject(TEMP_PROJ_ID)
     commit('SET_SYNC_PROGRESS', 0)
     return new Promise((resolve, reject) => {
       evtSource.addEventListener('update', (message) => {
-        commit('SET_SYNC_PROGRESS', message.lastEventId)
         var obj = JSON.parse(message.data)
-        if (obj.files) {
-          console.log('yup this is an upload.')
-          console.log(obj.files)
-          commit('UPLOAD_FILES', obj.files)
-        }
+        commit('SET_SYNC_PROGRESS', message.lastEventId)
         if (obj.complete) {
           evtSource.close()
           commit('SET_SYNC_PROGRESS', -1)
-          resolve()
+          resolve(obj)
         }
       })
       evtSource.onerror = (e) => {
         commit('SET_SYNC_PROGRESS', -1)
-        console.log(e)
         reject(e)
       }
     })
+  },
+
+  async generateTraceLinks ({ commit }) {
+    try {
+      const response = await projects.generateTraceLinks(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      // TODO(Adam): handle the error here
+      console.log(error)
+    }
   },
 
   async clearUploads ({ commit }) {

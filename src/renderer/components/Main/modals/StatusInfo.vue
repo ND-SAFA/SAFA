@@ -22,13 +22,14 @@
                 </div>
                 <div class="modal-footer custom-modal-footer">
                   <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
+                  <button v-if="modalResult.upload === true" download="fileName" href="fileData" type="button" class="btn btn-primary delta-save-button" @click="downloadFile()">Download Error Log</button>
                 </div>
               </form>
               <form v-else class="delta-form">
                 <div class="modal-body">
                   <div class="form-group">
                     <label for="inputGroupSelect01" class="sml" v-if="modalResult.success === false">
-                        Error: {{modalResult.message}}. For more info, please visit our <a @click="getHelp()" class="help-link">Help Page</a>. 
+                        Error: {{modalResult.message}} For more info, please visit our <a @click="getHelp()" class="help-link">Help Page</a>. 
                     </label>
                   </div>
                 </div>
@@ -52,9 +53,17 @@
       modalResult: Object
     },
 
+    data: {
+      fileName: 'SAFAErrorLog.txt',
+      fileData: 'SGVsbG9AV29ybGQ='
+    },
+
     methods: {
       getHelp () {
         shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
+      },
+      downloadFile () {
+        console.log('will download file here')
       }
     }
   }

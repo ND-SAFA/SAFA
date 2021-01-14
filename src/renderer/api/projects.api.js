@@ -68,6 +68,14 @@ async function postFlatfileData (projId, encodedStr) {
   return json
 }
 
+async function generateTraceLinks (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/generate/`)
+  const json = await response.json()
+  console.log('response for generate trace links')
+  console.log(json)
+  return json
+}
+
 async function clearProjectFiles (projId) {
   const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/clear/`)
   const json = await response.json()
@@ -95,6 +103,7 @@ export default {
   getProjectVersions,
   postProjectVersion,
   postFlatfileData,
+  generateTraceLinks,
   clearProjectFiles,
   getDeltaTrees,
   syncProject

@@ -77,10 +77,10 @@ public class ProjectService {
             System.out.println("Completed ParseFlatfiles without exceptions");
           } catch (MissingFileException e) {
             System.out.println("MissingFileException");
-            data = String.format("{\"complete\": false, \"file\": %s}", e.getMessage());
+            data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
           } catch (Exception e) {
             System.out.println("Regular Exception");
-            data = String.format("{\"complete\": false, \"message\": \"%s\"}", e.getMessage());
+            data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
           }
           emitter.send(SseEmitter.event()
               .data(data)

@@ -449,10 +449,12 @@ public class Flatfile {
             Any uploaded = iter.get("uploadedFiles");
             Any expected = iter.get("expectedFiles");
             Any generated = iter.get("generatedFiles");
+            Any expectedGenerated = iter.get("expectedGeneratedFiles");
     
             Set<String> uploadedFiles = new HashSet<String>(); 
-            Set<String> expectedFiles = new HashSet<String>(); 
+            Set<String> expectedFiles = new HashSet<String>();
             Set<String> generatedFiles = new HashSet<String>(); 
+            Set<String> expectedGeneratedFiles = new HashSet<String>(); 
             
             for (Any i : uploaded) {
                 uploadedFiles.add(i.toString());
@@ -465,9 +467,20 @@ public class Flatfile {
             for (Any i : generated) {
                 generatedFiles.add(i.toString());
             }
+
+            for (Any i : expectedGenerated) {
+                expectedGeneratedFiles.add(i.toString());
+            }
             
             for (String name : expectedFiles){
                 if (!uploadedFiles.contains(name)){
+                    System.out.println("Throwing MissingFileException");
+                    throw new MissingFileException(data);
+                }
+            }
+
+            for (String name : expectedGeneratedFiles){
+                if (!generatedFiles.contains(name)){
                     System.out.println("Throwing MissingFileException");
                     throw new MissingFileException(data);
                 }

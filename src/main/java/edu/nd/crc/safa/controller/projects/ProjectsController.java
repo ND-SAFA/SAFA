@@ -79,6 +79,12 @@ public class ProjectsController {
     return projectService.generateLinks(projId);
   }
 
+  @GetMapping("/projects/{projId}/remove/")
+  public String removeLinks(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/generate/");
+    return projectService.removeLinks(projId);
+  }
+
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
   public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version) {
     return projectService.versions(projId, treeId, version);

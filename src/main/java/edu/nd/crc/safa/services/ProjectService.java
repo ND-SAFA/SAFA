@@ -79,7 +79,7 @@ public class ProjectService {
           //   .id(String.valueOf(2))
           //   .name("update"));
           
-          String data = "{\"complete\": false}";
+          String data = "{\"complete\": false}";     
           try {
             mPuller.parseFlatfiles();
             System.out.println("Completed ParseFlatfiles without exceptions");
@@ -118,6 +118,10 @@ public class ProjectService {
     }
   }
 
+  public String removeLinks(String projId) {
+    return "{ \"success\": true, \"message\": \"Successfully removed generated trace links.\"}"; 
+  }
+
   public String uploadFile(String projId, String encodedStr) {
     try {
       uploadFlatfile.uploadFile(projId, encodedStr);
@@ -153,7 +157,6 @@ public class ProjectService {
       File myObj = new File("/flatfilesDir/ErrorReport.txt");
       byte[] fileContent = Files.readAllBytes(myObj.toPath());
       String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      System.out.println(returnStr); 
       return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
     } catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());

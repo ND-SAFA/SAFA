@@ -79,7 +79,7 @@ public class ProjectService {
           //   .id(String.valueOf(2))
           //   .name("update"));
           
-          String data = "{\"complete\": false}";
+          String data = "{\"complete\": false}";     
           try {
             mPuller.parseFlatfiles();
             System.out.println("Completed ParseFlatfiles without exceptions");
@@ -116,6 +116,10 @@ public class ProjectService {
     catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
+  }
+
+  public String removeLinks(String projId) {
+    return "{ \"success\": true, \"message\": \"Successfully removed generated trace links.\"}"; 
   }
 
   public String uploadFile(String projId, String encodedStr) {

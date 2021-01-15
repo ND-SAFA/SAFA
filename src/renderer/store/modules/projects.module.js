@@ -177,7 +177,15 @@ const actions = {
       const response = await projects.generateTraceLinks(TEMP_PROJ_ID)
       return response
     } catch (error) {
-      // TODO(Adam): handle the error here
+      console.log(error)
+    }
+  },
+
+  async removeTraceLinks ({ commit }) {
+    try {
+      const response = await projects.removeTraceLinks(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
       console.log(error)
     }
   },

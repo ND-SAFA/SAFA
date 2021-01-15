@@ -22,7 +22,7 @@
                 </div>
                 <div class="modal-footer custom-modal-footer">
                   <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button v-if="modalResult.upload === true" download="fileName" href="fileData" type="button" class="btn btn-primary delta-save-button" @click="downloadFile()">Download Error Log</button>
+                  <button v-if="modalResult.upload === true && showDownloadButton === true" download="fileName" href="fileData" type="button" class="btn btn-primary delta-save-button" @click="downloadFile()">Download Error Log</button>
                 </div>
               </form>
               <form v-else class="delta-form">
@@ -55,18 +55,36 @@
 
     data () {
       return {
-        fileName: 'SAFAErrorLog.txt'
+        fileName: 'SAFAErrorLog.txt',
+        showDownloadButton: false
       }
+    },
+
+    updated () {
+      this.checkErrorLogSize()
     },
 
     methods: {
       getHelp () {
         shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
       },
+
+      checkErrorLogSize () {
+        if (this.modalResult.upload === true && this.modalResult.data.data) {
+          if (this.modalResult.data.data.length > 0) {
+            this.showDownloadButton = true
+          }
+        }
+      },
+
       downloadFile () {
         var newDate = new Date()
         var datetime = 'SAFA Upload Error Log, Downloaded ' + newDate.toLocaleString() + '\n'
         const decodedData = datetime + window.atob(this.modalResult.data.data)
+        if (decodedData.length === 0) {
+          this.showDownloadButton = false
+          return
+        }
         var blob = new Blob([decodedData], { type: 'text/plain' })
         var a = document.createElement('a')
         a.download = this.fileName

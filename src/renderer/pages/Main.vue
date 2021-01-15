@@ -98,8 +98,9 @@
       AppMenu.findMenuItemById('view.refresh').click = this.loadData.bind(this)
       AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
-      AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
+      AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
+      AppMenu.findMenuItemById('project.remove').click = this.projectRemove.bind(this)
       AppMenu.setApplicationMenu()
     },
 
@@ -111,7 +112,7 @@
 
     methods: {
       ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
-        'fetchErrorLog', 'generateTraceLinks', 'clearUploads']),
+        'fetchErrorLog', 'generateTraceLinks', 'removeTraceLinks', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -140,8 +141,6 @@
         var response = {}
         try {
           await this.syncProject().then((syncResponse) => {
-            console.log(syncResponse)
-            console.log('sync Response')
             if (syncResponse.file) {
               response.data = syncResponse.file
               response.success = true
@@ -153,8 +152,6 @@
               this.triggerInfoModal(response, 'upload')
             } else {
               this.fetchErrorLog().then((encodedLog) => { // only do if successful
-                console.log('encoded log result: ')
-                console.log(encodedLog)
                 response.success = true
                 response.message = 'Data Upload Successful.'
                 response.data = encodedLog
@@ -163,7 +160,6 @@
             }
           })
         } catch (e) {
-          console.log('e returned on front end: ', e)
           response.success = false
           response.message = e
           this.triggerInfoModal(response, 'upload')
@@ -208,7 +204,6 @@
         return dict
       },
       async projectUpload () {
-        console.log('starting project upload func')
         const { dialog } = require('electron').remote
         const chosenFolders = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
         this.uploadFiles(chosenFolders).then(result => {
@@ -216,7 +211,6 @@
         })
       },
       async uploadMoreFiles () {
-        console.log('upload more files functions started')
         this.showUploadModal = false
         this.$nextTick(() => { this.projectUpload() })
       },
@@ -237,6 +231,9 @@
       },
       async projectGenerate () {
         this.generateTraceLinks().then(result => { console.log(result) })
+      },
+      async projectRemove () {
+        this.removeTraceLinks().then(result => { console.log(result) })
       },
       async clearFiles () {
         this.clearUploads().then(result => { this.triggerInfoModal(result, 'delete') })

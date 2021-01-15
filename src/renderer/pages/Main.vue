@@ -141,6 +141,7 @@
         try {
           await this.syncProject().then((syncResponse) => {
             console.log(syncResponse)
+            console.log('sync Response')
             if (syncResponse.file) {
               response.data = syncResponse.file
               response.success = true

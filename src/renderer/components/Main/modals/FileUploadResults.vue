@@ -15,7 +15,8 @@
               </div>
               <span v-if="modalResult.success === true && this.allFilesPresent === false">
                   <div class="files-needed-caption sml">
-                    More files are needed to accurately match system described in the TIM. Please upload missing files or upload a new TIM. 
+                    More files are needed to accurately match system described in the TIM. If files are missing, please upload the correct files. If trace links need generating, click 'Project' -> 'Generate Trace 
+                    Links' and approve links. Or, upload a new TIM to change the configuration. 
                   </div>
                 <table class="table table-bordered table-sm upload-table">
                   <thead class="thead-light">
@@ -25,8 +26,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in fileMap" :key="item.name" v-bind:class="{ 'table-danger bold-missing-files': item.found == false }" >
-                      <td scope="row">{{item.name}}</td>
+                    <tr v-for="item in fileMap" :key="item.name" v-bind:class="{'table-danger bold-missing-files': item.status === 'Missing', 'table-warning bold-missing-files': item.status === 'Needs to be Generated'}">
+                      <td scope="row">{{item.name}}</td> 
                       <td>{{item.status}}</td>
                     </tr>
                   </tbody>
@@ -56,7 +57,7 @@
                 <div class="modal-footer custom-modal-footer">
                   <button v-if="modalResult.success === true && this.allFilesPresent === false" type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
                   <button v-else type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('select-files')">Add Additional Files</button>
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('select-files')">Upload Additional Files</button>
                 </div>
               </form>
             </div>
@@ -84,6 +85,8 @@
 
     watch: {
       isHidden: function (newVal, oldVal) {
+        console.log('running watcher')
+        console.log(newVal)
         if (newVal === false) {
           this.compareFileLists()
         }
@@ -93,34 +96,37 @@
     methods: {
       compareFileLists () {
         if (this.modalResult.data) {
-          var allFiles = this.modalResult.data.expectedFiles
-          var uploadedFiles = this.modalResult.data.uploadedFiles
-          var entry = {}
-
-          for (var i = 0; i < allFiles.length; i++) {
-            entry = {}
-            entry.name = allFiles[i]
-            entry.status = 'Missing'
-            entry.found = false
-            this.fileMap[allFiles[i]] = (entry)
-          }
-
-          for (var j = 0; j < allFiles.length; j++) {
-            for (var k = 0; k < uploadedFiles.length; k++) {
-              if (allFiles[j] === uploadedFiles[k]) {
-                console.log('found file: ', allFiles[j])
-                var myEntry = this.fileMap[allFiles[j]]
-                myEntry.status = 'Uploaded'
-                myEntry.found = true
-                this.fileMap[allFiles[j]] = myEntry
-              }
-            }
-          }
-
+          this.findMissingFiles(this.modalResult.data.uploadedFiles, this.modalResult.data.expectedFiles, false)
+          this.findMissingFiles(this.modalResult.data.generatedFiles, this.modalResult.data.expectedGeneratedFiles, true)
+          console.log('FILE MAP:')
+          console.log(this.fileMap)
           this.allFilesPresent = true
           for (var key in this.fileMap) {
-            if (this.fileMap[key].found === false) {
-              this.allFilesPresent = false
+            if (this.fileMap[key].status === 'Missing' || this.fileMap[key].status === 'Needs to be Generated') this.allFilesPresent = false
+          }
+        }
+      },
+
+      findMissingFiles (foundFiles, expectedFiles, traceLinks) {
+        console.log('found files: ', foundFiles)
+        console.log('expected files: ', expectedFiles)
+        for (var i = 0; i < expectedFiles.length; i++) {
+          var entry = {}
+          entry.name = expectedFiles[i]
+          if (!traceLinks) {
+            entry.status = 'Missing'
+          } else {
+            entry.status = 'Needs to be Generated'
+          }
+          this.fileMap[expectedFiles[i]] = (entry)
+        }
+
+        for (var j = 0; j < expectedFiles.length; j++) {
+          for (var k = 0; k < foundFiles.length; k++) {
+            if (foundFiles[k] === expectedFiles[j]) {
+              var myEntry = this.fileMap[expectedFiles[j]]
+              myEntry.status = 'Uploaded'
+              this.fileMap[expectedFiles[j]] = myEntry
             }
           }
         }

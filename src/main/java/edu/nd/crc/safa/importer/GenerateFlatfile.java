@@ -75,7 +75,6 @@ public class GenerateFlatfile {
 
     public String generateFiles() throws Exception {
         String fullPath = "/flatfilesDir/generatedData.json";
-        System.out.println(fullPath);
         
         File file = new File(fullPath);
         if (!file.exists()) {
@@ -93,15 +92,15 @@ public class GenerateFlatfile {
         
         JsonIterator iterator = JsonIterator.parse(data);
 
+        List<String> generatedFiles = new ArrayList<String>();
         System.out.println(data);
         System.out.println("Before reading Array");
         while (iterator.readArray()) {
             String filename = "";
             String source = "";
             String target = "";
-            System.out.println("In iterator.readArray");
-            for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-                System.out.println("In iterator.readObject");
+
+            for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
                 if (field.equals("filename")) {
                     filename = iterator.readString();
                 }
@@ -116,10 +115,30 @@ public class GenerateFlatfile {
             String destPath = generatedDir + "/" + filename;
             String sourcePath = flatfileDir + "/" + source + ".csv";
             String targetPath = flatfileDir + "/" + target + ".csv";
-
-            generateLinks(sourcePath, targetPath, destPath);
-
+            System.out.println(destPath);
+            System.out.println(sourcePath);
+            System.out.println(targetPath);
+            // generateLinks(sourcePath, targetPath, destPath);
+            generatedFiles.add(filename);
         }
+        System.out.println("Done reading Array");
+        if (generatedFiles.size() > 0) {
+            String requiredFilePath = "/flatfilesDir/requiredData.json";
+
+            File requiredFile = new File(requiredFilePath);
+            if (!requiredFile.exists()) {
+                return "{ \"success\": false, \"message\": \"Error Path: /flatfilesDir/requiredData.json does not exist.\"}";
+            }
+
+            String jsonArr = UploadFlatfile.createJsonArray(generatedFiles);
+            String requiredData = new String(Files.readAllBytes(Paths.get(requiredFilePath)));
+            String regex =  "\"generatedFiles\":\\[.*\\],\"expectedGeneratedFiles\"";
+            String replacement =  String.format("\"generatedFiles\":%s,\"expectedGeneratedFiles\"", jsonArr);
+            
+            String newRequiredData = requiredData.replaceAll(regex, replacement);
+            Files.write(Paths.get(requiredFilePath), newRequiredData.getBytes());
+        }
+        
         return "{ \"success\": true}";
     } 
 }

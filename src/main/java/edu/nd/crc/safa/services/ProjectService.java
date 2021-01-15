@@ -153,7 +153,6 @@ public class ProjectService {
       File myObj = new File("/flatfilesDir/ErrorReport.txt");
       byte[] fileContent = Files.readAllBytes(myObj.toPath());
       String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      System.out.println(returnStr); 
       return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
     } catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
@@ -162,7 +161,8 @@ public class ProjectService {
 
   public String clearFlatfileDir() {
     try {
-      return uploadFlatfile.clearFlatfileDir();
+      String dir = "/flatfilesDir";
+      return uploadFlatfile.deleteDirectory(dir);
     }
     catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());

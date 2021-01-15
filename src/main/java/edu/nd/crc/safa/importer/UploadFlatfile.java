@@ -65,20 +65,21 @@ public class UploadFlatfile {
   }
 
   public void uploadFile(String projId, String jsonfiles) throws Exception {
-    createFlatfilesDir();
+    String dir = "/flatfilesDir";
+    createDirectory(dir);
     
     JsonIterator iterator = JsonIterator.parse(jsonfiles);
     for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
       String encodedData = iterator.readString();
       byte[] bytes = Base64.getDecoder().decode(encodedData);
-      String fullPath = "/flatfilesDir/" + filename; 
+      String fullPath = dir + "/" + filename; 
       Files.write(Paths.get(fullPath), bytes);
     }
   }
 
   public String getMissingFiles(String projId) throws Exception {
     String dir = "/flatfilesDir";
-    File myDir = createFlatfilesDir();
+    File myDir = createDirectory(dir);
 
     ParsedFiles parsedfiles = parseTim(dir);
     List<String> uploadedFiles = Arrays.asList(myDir.list());
@@ -92,13 +93,13 @@ public class UploadFlatfile {
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
   }
 
-  public String clearFlatfileDir() throws Exception {
-    File myDir = createFlatfilesDir();
+  public String deleteDirectory(String dir) throws Exception {
+    File myDir = createDirectory(dir);
     File[] fileList = myDir.listFiles();
     
-    if (fileList.length > 0){
-      if (deleteDirectory(myDir)){
-        createFlatfilesDir();
+    if (fileList.length > 0) {
+      if (deleteDirectoryHelper(myDir)){
+        createDirectory(dir);
         return "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}";
       } 
       else {
@@ -109,11 +110,11 @@ public class UploadFlatfile {
     return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
   }
 
-  public boolean deleteDirectory(File dir) throws Exception {
+  public boolean deleteDirectoryHelper(File dir) throws Exception {
     File[] files = dir.listFiles();
     if (files != null) {
       for (File file : files) {
-        deleteDirectory(file);
+        deleteDirectoryHelper(file);
       }
     }
     return dir.delete();
@@ -182,7 +183,7 @@ public class UploadFlatfile {
     }
   }
   
-  public String createJsonArray(List<String> files) {
+  public static String createJsonArray(List<String> files) {
     String jsonArr = "";
 
     if (files.size() == 0){
@@ -249,8 +250,7 @@ public class UploadFlatfile {
     return requiredData;
   }
   
-  public File createFlatfilesDir() throws Exception{
-    String dir = "/flatfilesDir";
+  public File createDirectory(String dir) throws Exception{
     File myDir = new File(dir);
 
     if (!myDir.exists()) {

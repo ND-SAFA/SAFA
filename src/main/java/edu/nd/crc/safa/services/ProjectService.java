@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Base64;
+import java.io.File;
+import java.io.FileNotFoundException; 
+import java.nio.file.Files;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
@@ -141,6 +145,18 @@ public class ProjectService {
         System.out.println("Error uploading Flatfiles: OTHER");
         return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.toString());
       }
+    }
+  }
+
+  public String getErrorLog(String projId) {
+    try {
+      File myObj = new File("/flatfilesDir/ErrorReport.txt");
+      byte[] fileContent = Files.readAllBytes(myObj.toPath());
+      String returnStr = Base64.getEncoder().encodeToString(fileContent);
+      System.out.println(returnStr); 
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+    } catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }
 

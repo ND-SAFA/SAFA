@@ -110,7 +110,8 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData', 'generateTraceLinks', 'clearUploads']),
+      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
+        'fetchErrorLog', 'generateTraceLinks', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -138,21 +139,26 @@
         this.showUploadModal = false
         var response = {}
         try {
-          await this.syncProject().then((apiResponse) => {
-            console.log(apiResponse)
-            if (apiResponse.file) {
-              response.data = apiResponse.file
+          await this.syncProject().then((syncResponse) => {
+            console.log(syncResponse)
+            if (syncResponse.file) {
+              response.data = syncResponse.file
               response.success = true
               response.message = 'Missing the following files from upload: '
               this.triggerUploadModal(response)
-            } else if (apiResponse.message) {
+            } else if (syncResponse.message) {
               response.success = false
-              response.message = apiResponse.message
+              response.message = syncResponse.message
               this.triggerInfoModal(response, 'upload')
             } else {
-              response.success = true
-              response.message = 'Data Upload Successful'
-              this.triggerInfoModal(response, 'upload')
+              this.fetchErrorLog().then((encodedLog) => { // only do if successful
+                console.log('encoded log result: ')
+                console.log(encodedLog)
+                response.success = true
+                response.message = 'Data Upload Successful.'
+                response.data = encodedLog
+                this.triggerInfoModal(response, 'upload')
+              })
             }
           })
         } catch (e) {

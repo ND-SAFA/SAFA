@@ -162,6 +162,16 @@ const actions = {
     })
   },
 
+  async fetchErrorLog ({ commit }) {
+    console.log('fetching error log')
+    try {
+      const response = await projects.fetchErrorLog(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   async generateTraceLinks ({ commit }) {
     try {
       const response = await projects.generateTraceLinks(TEMP_PROJ_ID)

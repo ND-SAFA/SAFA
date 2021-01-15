@@ -53,9 +53,10 @@
       modalResult: Object
     },
 
-    data: {
-      fileName: 'SAFAErrorLog.txt',
-      fileData: 'SGVsbG9AV29ybGQ='
+    data () {
+      return {
+        fileName: 'SAFAErrorLog.txt'
+      }
     },
 
     methods: {
@@ -63,7 +64,18 @@
         shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
       },
       downloadFile () {
-        console.log('will download file here')
+        var newDate = new Date()
+        var datetime = 'SAFA Upload Error Log, Downloaded ' + newDate.toLocaleString() + '\n'
+        const decodedData = datetime + window.atob(this.modalResult.data.data)
+        var blob = new Blob([decodedData], { type: 'text/plain' })
+        var a = document.createElement('a')
+        a.download = this.fileName
+        a.href = URL.createObjectURL(blob)
+        a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':')
+        a.style.display = 'none'
+        document.body.appendChild(a)
+        a.click()
+        URL.revokeObjectURL(a.href)
       }
     }
   }

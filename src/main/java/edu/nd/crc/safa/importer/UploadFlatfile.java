@@ -240,7 +240,7 @@ public class UploadFlatfile {
     
   
   public String storeFilesAsJSON(List<String> uploadedFiles, ParsedFiles timFiles, String requiredFilePath, String generatedFilePath) throws Exception {
-    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + ",\"generatedFiles\":" + createJsonArray(timFiles.getGeneratedNames()) + "}";
+    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + ",\"generatedFiles\":[]" + ",\"expectedGeneratedFiles\":" + createJsonArray(timFiles.getGeneratedNames()) + "}";
     Files.write(Paths.get(requiredFilePath), requiredData.getBytes());
     
     String generatedData = createGeneratedFileObj(timFiles.getGenerated());

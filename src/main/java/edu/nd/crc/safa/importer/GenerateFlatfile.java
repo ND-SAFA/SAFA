@@ -17,6 +17,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GenerateFlatfile {
+    public File createGeneratedFilesDir() throws Exception {
+        String dir = "/generatedFilesDir";
+        File myDir = new File(dir);
+
+        if (!myDir.exists()) {
+            if (!myDir.mkdirs()){
+                throw new Exception("Error creating Generated Files folder: Path: /generatedFilesDir");
+            }
+        }
+
+        if (!myDir.isDirectory()) {
+            if (!myDir.delete()){
+                throw new Exception("Error deleting Generated Files file: Path: /generatedFilesDir");
+            }
+            if (!myDir.mkdirs()){
+                throw new Exception("Error creating Generated Files folder: Path: /generatedFilesDir");
+            }
+        }
+
+        return myDir;
+    }
+
     public void generateLinks(String sourcePath, String targetPath, String destPath) throws Exception {
         Path sfile = Paths.get(sourcePath);
         Path tfile = Paths.get(targetPath);
@@ -65,6 +87,10 @@ public class GenerateFlatfile {
             return "{ \"success\": true, \"message\": \"No links needed to be generated.\"}";
         }
 
+        String flatfileDir = "/flatfilesDir";
+        String generatedDir = "/generatedFilesDir";
+        createGeneratedFilesDir();
+        
         JsonIterator iterator = JsonIterator.parse(data);
 
         System.out.println(data);
@@ -87,9 +113,11 @@ public class GenerateFlatfile {
                 }
             }
 
-            System.out.println(filename);
-            System.out.println(source);
-            System.out.println(target);
+            String destPath = generatedDir + "/" + filename;
+            String sourcePath = flatfileDir + "/" + source + ".csv";
+            String targetPath = flatfileDir + "/" + target + ".csv";
+
+            generateLinks(sourcePath, targetPath, destPath);
 
         }
         return "{ \"success\": true}";

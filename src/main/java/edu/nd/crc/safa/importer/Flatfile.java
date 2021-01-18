@@ -19,17 +19,17 @@ public class Flatfile {
             super(errorMessage);
         }
     }
-    public static class Tim {
+    public class Tim {
         List<DataFile> dataFiles; 
         List<LinkFile> linkFiles; 
     }
 
-    public static class DataFile {
+    public class DataFile {
         public String type; 
         public String file; 
     }
 
-    public static class LinkFile {
+    public class LinkFile {
         public String source; 
         public String target; 
         public String file; 
@@ -154,13 +154,13 @@ public class Flatfile {
         
     }
 
-    public static String readFileAsString(String fileName) throws Exception { 
+    public String readFileAsString(String fileName) throws Exception { 
         String data = ""; 
         data = new String(Files.readAllBytes(Paths.get(fileName))); 
         return data; 
     }
 
-    public static List<DataFile> readDatafile(JsonIterator iterator) throws Exception {
+    public List<DataFile> readDatafile(JsonIterator iterator) throws Exception {
         List<DataFile> dataFiles = new ArrayList<DataFile>();
         for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
             DataFile data = new DataFile();
@@ -173,7 +173,7 @@ public class Flatfile {
         return dataFiles;
     }
 
-    public static LinkFile readLink(JsonIterator iterator, String linkName) throws Exception {
+    public LinkFile readLink(JsonIterator iterator, String linkName) throws Exception {
         LinkFile linkFile = new LinkFile();
         linkFile.name = linkName;
         for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
@@ -189,7 +189,7 @@ public class Flatfile {
     }
 
 
-    public static Tim parseTim(String fileName) throws Exception{
+    public Tim parseTim(String fileName) throws Exception{
         String data = readFileAsString(fileName);
         JsonIterator iterator = JsonIterator.parse(data);
         Tim tim = new Tim();

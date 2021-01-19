@@ -230,10 +230,10 @@
         this.showInfoModal = true
       },
       async projectGenerate () {
-        this.generateTraceLinks().then(result => { console.log(result) })
+        this.generateTraceLinks().then(result => { this.triggerInfoModal(result, 'generate') })
       },
       async projectRemove () {
-        this.removeTraceLinks().then(result => { console.log(result) })
+        this.removeTraceLinks().then(result => { this.triggerInfoModal(result, 'remove') })
       },
       async clearFiles () {
         this.clearUploads().then(result => { this.triggerInfoModal(result, 'delete') })

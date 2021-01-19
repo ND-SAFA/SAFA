@@ -82,7 +82,7 @@ public class ProjectsController {
   @GetMapping("/projects/{projId}/remove/")
   public String removeLinks(@PathVariable String projId) {
     System.out.println("/projects/{projId}/generate/");
-    return projectService.removeLinks(projId);
+    return projectService.clearGeneratedFilesDir(projId);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")

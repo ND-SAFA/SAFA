@@ -118,8 +118,14 @@ public class ProjectService {
     }
   }
 
-  public String removeLinks(String projId) {
-    return "{ \"success\": true, \"message\": \"Successfully removed generated trace links.\"}"; 
+  public String clearGeneratedFilesDir(String projId) {
+    try {
+      String dir = "/generatedFilesDir";
+      return uploadFlatfile.deleteDirectory(dir);
+    }
+    catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
   }
 
   public String uploadFile(String projId, String encodedStr) {

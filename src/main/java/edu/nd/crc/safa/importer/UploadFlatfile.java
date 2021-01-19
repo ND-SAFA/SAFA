@@ -177,7 +177,7 @@ public class UploadFlatfile {
       }
 
       if (attr.toLowerCase().equals("generatelinks")){
-        val = iterator.readString().equals("True") ? true : false;
+        val = iterator.readString().toLowerCase().equals("true") ? true : false;
       }
     }
 

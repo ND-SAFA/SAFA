@@ -158,9 +158,20 @@ public class ProjectService {
     }
   }
 
-  public String getErrorLog(String projId) {
+  public String getUploadFilesErrorLog(String projId) {
     try {
       File myObj = new File("/flatfilesDir/ErrorReport.txt");
+      byte[] fileContent = Files.readAllBytes(myObj.toPath());
+      String returnStr = Base64.getEncoder().encodeToString(fileContent);
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+    } catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
+  public String getGenerateLinksErrorLog(String projId) {
+    try {
+      File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
       byte[] fileContent = Files.readAllBytes(myObj.toPath());
       String returnStr = Base64.getEncoder().encodeToString(fileContent);
       return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);

@@ -1,11 +1,7 @@
 package edu.nd.crc.safa.importer;
-// import sun.awt.windows.WPrinterJob;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.File;
 import java.nio.file.Files;
-// import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,26 +18,77 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GenerateFlatfile {
-    public File createGeneratedFilesDir() throws Exception {
-        String dir = "/generatedFilesDir";
-        File myDir = new File(dir);
+    public String generateFiles() throws Exception {
+        String flatfileDir = "/flatfilesDir";
+        String generatedDir = "/generatedFilesDir";
 
-        if (!myDir.exists()) {
-            if (!myDir.mkdirs()){
-                throw new Exception("Error creating Generated Files folder: Path: /generatedFilesDir");
+        String requiredFilePath = flatfileDir + "/requiredData.json";
+        String generatedFilePath = flatfileDir + "/generatedData.json";
+        String errorFileName = generatedDir + '/' + "ErrorText.csv";
+
+        UploadFlatfile.createDirectory(flatfileDir);
+        UploadFlatfile.createDirectory(generatedDir);
+
+        try {
+            pathErrorChecking(requiredFilePath, generatedFilePath);
+        } catch(Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
+        
+        String data = new String(Files.readAllBytes(Paths.get(generatedFilePath)));
+        if (data.equals("[]")){
+            return "{ \"success\": true, \"message\": \"No links needed to be generated.\"}";
+        }
+        
+        List<String> generatedFiles = generateFilesHelper(flatfileDir, generatedDir, errorFileName, data);
+
+        updateRequiredJson(requiredFilePath, generatedFiles);
+
+        return "{ \"success\": true, \"message\": \"Successfully generated links\"}";
+    }
+
+    public List<String> generateFilesHelper(String flatfileDir, String generatedDir, String errorFileName, String data) throws Exception {
+        Flatfile mFlatfile = new Flatfile();
+        Flatfile.ErrorText errorText = mFlatfile.new ErrorText();
+
+        List<String> generatedFiles = new ArrayList<String>();
+        JsonIterator iterator = JsonIterator.parse(data);
+
+        System.out.println("Start reading Array");
+        System.out.println(data);
+       
+        while (iterator.readArray()) {
+            String filename = "";
+            String source = "";
+            String target = "";
+
+            for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
+                if (field.equals("filename")) {
+                    filename = iterator.readString();
+                }
+                else if (field.equals("source")) {
+                    source = iterator.readString();
+                }
+                else {
+                    target = iterator.readString();
+                }
             }
+
+            String destPath = generatedDir + "/" + filename;
+            String sourcePath = flatfileDir + "/" + source + ".csv";
+            String targetPath = flatfileDir + "/" + target + ".csv";
+
+            System.out.println("generateLinks start");
+            generateLinks(sourcePath, targetPath, destPath, mFlatfile, errorText);
+            System.out.println("generateLinks complete");
+
+            generatedFiles.add(filename);
         }
 
-        if (!myDir.isDirectory()) {
-            if (!myDir.delete()){
-                throw new Exception("Error deleting Generated Files file: Path: /generatedFilesDir");
-            }
-            if (!myDir.mkdirs()){
-                throw new Exception("Error creating Generated Files folder: Path: /generatedFilesDir");
-            }
-        }
+        System.out.println("Completed reading Array");
+        mFlatfile.generateErrorReport(errorText.text, errorFileName);
 
-        return myDir;
+        return generatedFiles;
     }
 
     public void generateLinks(String sourcePath, String targetPath, String destPath, Flatfile mFlatfile, Flatfile.ErrorText errorText) throws Exception {
@@ -74,80 +121,20 @@ public class GenerateFlatfile {
         Files.write(Paths.get(dfile), lines);
     }
 
-    public String generateFiles() throws Exception {
-        Flatfile mFlatfile = new Flatfile();
-        Flatfile.ErrorText errorText = mFlatfile.new ErrorText();
-        
-        String fullPath = "/flatfilesDir/generatedData.json";
-        
-        File file = new File(fullPath);
-        if (!file.exists()) {
-            return "{ \"success\": true, \"message\": \"Please upload files.\"}";
+    public void pathErrorChecking(String requiredFilePath, String generatedFilePath) throws Exception {
+        File requiredFile = new File(requiredFilePath);
+        if (!requiredFile.exists()) {
+            throw new Exception("Please upload files. No files have been uploaded");
         }
 
-        String data = new String(Files.readAllBytes(Paths.get(fullPath)));
-        if (data.equals("[]")){
-            return "{ \"success\": true, \"message\": \"No links needed to be generated.\"}";
+        File generatedFile = new File(generatedFilePath);
+        if (!generatedFile.exists()) {
+            throw new Exception("Please upload files. No files have been uploaded");
         }
+    }
 
-        String flatfileDir = "/flatfilesDir";
-        String generatedDir = "/generatedFilesDir";
-        String errorFileName = generatedDir + '/' + "ErrorText.csv";
-        createGeneratedFilesDir();
-        
-        JsonIterator iterator = JsonIterator.parse(data);
-
-        List<String> generatedFiles = new ArrayList<String>();
-        System.out.println(data);
-        System.out.println("Before reading Array");
-        while (iterator.readArray()) {
-            String filename = "";
-            String source = "";
-            String target = "";
-
-            for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
-                if (field.equals("filename")) {
-                    filename = iterator.readString();
-                }
-                else if (field.equals("source")) {
-                    source = iterator.readString();
-                }
-                else {
-                    target = iterator.readString();
-                }
-            }
-
-            String destPath = generatedDir + "/" + filename;
-            String sourcePath = flatfileDir + "/" + source + ".csv";
-            String targetPath = flatfileDir + "/" + target + ".csv";
-            // System.out.println(destPath);
-            // System.out.println(sourcePath);
-            // System.out.println(targetPath);
-            System.out.println("generateLinks start");
-            generateLinks(sourcePath, targetPath, destPath, mFlatfile, errorText);
-            System.out.println("generateLinks complete");
-             
-            // Prints files tracematrix in terminal
-            // System.out.println(destPath);
-            // try (BufferedReader br = new BufferedReader(new FileReader(destPath))) {
-            //     String line;
-            //     while ((line = br.readLine()) != null) {
-            //         System.out.println(line);
-            //     }
-            // }
-            // System.out.println();
-
-            generatedFiles.add(filename);
-        }
-        System.out.println("Done reading Array");
+    public void updateRequiredJson(String requiredFilePath, List<String> generatedFiles) throws Exception {
         if (generatedFiles.size() > 0) {
-            String requiredFilePath = "/flatfilesDir/requiredData.json";
-
-            File requiredFile = new File(requiredFilePath);
-            if (!requiredFile.exists()) {
-                return "{ \"success\": false, \"message\": \"Error Path: /flatfilesDir/requiredData.json does not exist.\"}";
-            }
-
             String jsonArr = UploadFlatfile.createJsonArray(generatedFiles);
             String requiredData = new String(Files.readAllBytes(Paths.get(requiredFilePath)));
             String regex =  "\"generatedFiles\":\\[.*\\],\"expectedGeneratedFiles\"";
@@ -155,23 +142,10 @@ public class GenerateFlatfile {
             
             String newRequiredData = requiredData.replaceAll(regex, replacement);
             Files.write(Paths.get(requiredFilePath), newRequiredData.getBytes());
-
-            mFlatfile.generateErrorReport(errorText.text, errorFileName);
         }
-
-         // Prints ErrorFile in terminal
-        //  System.out.println(errorFileName);
-        //  try (BufferedReader br = new BufferedReader(new FileReader(errorFileName))) {
-        //      String line;
-        //      while ((line = br.readLine()) != null) {
-        //          System.out.println(line);
-        //      }
-        //  }
-        //  System.out.println();
-        
-        return "{ \"success\": true}";
     }
-    
+
+    // Function is a modified version of ParseDataFiles in Flatfile.java. Needs refactoring
     public List<Flatfile.DataEntry> parseDataFiles(String filePath, Flatfile.ErrorText errorText, Flatfile mFlatfile) throws Exception {
         /* Parse Data Files */  
        

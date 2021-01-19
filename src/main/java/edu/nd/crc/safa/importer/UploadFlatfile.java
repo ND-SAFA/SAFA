@@ -250,21 +250,21 @@ public class UploadFlatfile {
     return requiredData;
   }
   
-  public File createDirectory(String dir) throws Exception{
+  public static File createDirectory(String dir) throws Exception {
     File myDir = new File(dir);
 
     if (!myDir.exists()) {
       if (!myDir.mkdirs()){
-        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
+        throw new Exception(String.format("Error creating Flatfile folder: Path: %s", dir));
       }
     }
 
     if (!myDir.isDirectory()) {
       if (!myDir.delete()){
-        throw new Exception("Error deleting Flatfile file: Path: /flatfilesDir");
+        throw new Exception(String.format("Error deleting Flatfile file: Path: %s", dir));
       }
       if (!myDir.mkdirs()){
-        throw new Exception("Error creating Flatfile folder: Path: /flatfilesDir");
+        throw new Exception(String.format("Error creating Flatfile folder: Path: %s", dir));
       }
     }
 

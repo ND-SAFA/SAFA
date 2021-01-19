@@ -130,30 +130,36 @@ public class ProjectService {
 
   public String uploadFile(String projId, String encodedStr) {
     try {
+      System.out.println("Try statement for uploadFile");
       uploadFlatfile.uploadFile(projId, encodedStr);
 
       try {
+        System.out.println("Try statement for getMissingFiles");
         return uploadFlatfile.getMissingFiles(projId);
       }
       catch(Exception e){
+        System.out.println("Catch exception for getMissingFiles");
         if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+          System.out.println("First");
           return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
         }
         else if (e.getMessage().equals("Please upload a tim.json file")) {
+          System.out.println("Second");
           return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         }
         else {
-          return String.format("{ \"success\": false, \"message\": \"Error checking for missing files: %s\"}", e.toString());
-        }
+          System.out.println("Third");
+          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());        }
       }
     }
     catch(Exception e){
+      System.out.println("Catch exception for uploadFlatfile");
       if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
         return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
       }
       else {
         System.out.println("Error uploading Flatfiles: OTHER");
-        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.toString());
+        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
       }
     }
   }

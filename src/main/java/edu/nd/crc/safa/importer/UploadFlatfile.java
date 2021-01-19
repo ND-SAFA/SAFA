@@ -127,6 +127,7 @@ public class UploadFlatfile {
     return dir.delete();
   }
   
+  // Modified file from Flatfile.java
   public ParsedFiles parseTim(String dirName) throws Exception {
     String fileName = dirName + '/' + "tim.json";
     File tim = new File(fileName);
@@ -143,45 +144,67 @@ public class UploadFlatfile {
 
     requiredFiles.add("tim.json");
     for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-      if (field.equals("DataFiles")) {
+      if (field.toLowerCase().equals("datafiles")) {
         for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
+          if (!artifact.toLowerCase().matches("hazard|requirement|design")) {
+            throw new Exception(String.format("'%s' is not an accepted Artifact. Expected Artifacts are: Hazard, Requirement, or Design", artifact));
+          }
           for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
+            if (!file.toLowerCase().equals("file")){
+              throw new Exception(String.format("Artifact: %s. Expected File attribute. The File attribute should appear as 'File': 'FileName'", artifact));
+            }
             requiredFiles.add(iterator.readString());
           }
         }
       }
       else {
-        addLinkFile(iterator, requiredFiles, generatedFiles, generatedFileNames);
+        addLinkFile(field, iterator, requiredFiles, generatedFiles, generatedFileNames);
       }
     }
     return new ParsedFiles(requiredFiles, generatedFiles, generatedFileNames);
   }
 
-  public void addLinkFile(JsonIterator iterator, List<String> requiredFiles, List<GeneratedFiles> generatedFiles, List<String> generatedFileNames) throws Exception {
+  public void addLinkFile(String field, JsonIterator iterator, List<String> requiredFiles, List<GeneratedFiles> generatedFiles, List<String> generatedFileNames) throws Exception {
     String filename = "";
     String source = "";
     String target = "";
-    Boolean val = false;
+    Boolean generated = false;
 
     for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
-      if (attr.equals("File")){
+      if (!attr.toLowerCase().matches("file|source|target|generatelinks")) {
+        throw new Exception(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', 'Source', 'Target', or 'generateLinks'", field, attr));
+      }
+
+      if (attr.toLowerCase().equals("file")){
         filename = iterator.readString();
       }
 
-      if (attr.equals("Source")){
+      if (attr.toLowerCase().equals("source")){
         source = iterator.readString();
       }
 
-      if (attr.equals("Target")){
+      if (attr.toLowerCase().equals("target")){
         target = iterator.readString();
       }
 
       if (attr.toLowerCase().equals("generatelinks")){
-        val = iterator.readString().toLowerCase().equals("true") ? true : false;
+        generated = iterator.readString().toLowerCase().equals("true") ? true : false;
       }
     }
 
-    if (val){
+    if (source.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    if (target.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    if (filename.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    if (generated){
       generatedFileNames.add(filename);
       generatedFiles.add(new GeneratedFiles(filename,source,target));
     }

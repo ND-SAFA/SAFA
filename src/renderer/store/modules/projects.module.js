@@ -181,6 +181,15 @@ const actions = {
     }
   },
 
+  async getGenerateLinksErrorLog ({ commit }) {
+    try {
+      const response = await projects.fetchGenerateLinksErrorLog(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   async removeTraceLinks ({ commit }) {
     try {
       const response = await projects.removeTraceLinks(TEMP_PROJ_ID)

@@ -84,6 +84,14 @@ async function generateTraceLinks (projId) {
   return json
 }
 
+async function fetchGenerateLinksErrorLog (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linkserrorlog/`)
+  const json = await response.json()
+  console.log('response for generate trace links')
+  console.log(json)
+  return json
+}
+
 async function removeTraceLinks (projId) {
   const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/remove/`)
   const json = await response.json()
@@ -119,6 +127,7 @@ export default {
   postFlatfileData,
   fetchErrorLog,
   generateTraceLinks,
+  fetchGenerateLinksErrorLog,
   removeTraceLinks,
   clearProjectFiles,
   getDeltaTrees,

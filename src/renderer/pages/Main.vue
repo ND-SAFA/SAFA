@@ -112,7 +112,7 @@
 
     methods: {
       ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
-        'fetchErrorLog', 'generateTraceLinks', 'removeTraceLinks', 'clearUploads']),
+        'fetchErrorLog', 'generateTraceLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -214,23 +214,25 @@
         this.showUploadModal = false
         this.$nextTick(() => { this.projectUpload() })
       },
-      triggerInfoModal (infoResponse, type) {
-        var response = {}
-        response.success = infoResponse.success
-        response.message = infoResponse.message
-        response.data = infoResponse.data
-
-        if (type === 'upload') {
-          response.upload = true
+      triggerInfoModal (response, type) {
+        if (type === 'upload' || type === 'generate') {
+          response.errorLog = true
         } else {
-          response.upload = false
+          response.errorLog = false
         }
-
+        response.type = type
         this.showInfoResult = response
         this.showInfoModal = true
       },
       async projectGenerate () {
-        this.generateTraceLinks().then(result => { this.triggerInfoModal(result, 'generate') })
+        await this.generateTraceLinks().then(response => {
+          this.getGenerateLinksErrorLog().then(errorresult => {
+            console.log(errorresult)
+            console.log('finished api call for generate links')
+            response.data = errorresult
+            this.triggerInfoModal(response, 'generate')
+          })
+        })
       },
       async projectRemove () {
         this.removeTraceLinks().then(result => { this.triggerInfoModal(result, 'remove') })

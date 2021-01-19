@@ -141,7 +141,7 @@ public class ProjectService {
         System.out.println("Catch exception for getMissingFiles");
         if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
           System.out.println("First");
-          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure\"}";
+          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure. Please check for trailing comas, mismatched curly braces, etc\"}";
         }
         else if (e.getMessage().equals("Please upload a tim.json file")) {
           System.out.println("Second");

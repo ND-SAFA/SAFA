@@ -100,21 +100,21 @@ public class UploadFlatfile {
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
   }
 
-  public String deleteDirectory(String dir) throws Exception {
+  public String deleteDirectory(String dir, String name) throws Exception {
     File myDir = createDirectory(dir);
     File[] fileList = myDir.listFiles();
     
     if (fileList.length > 0) {
       if (deleteDirectoryHelper(myDir)){
         createDirectory(dir);
-        return "{ \"success\": true, \"message\": \"Directory has successfully been cleared.\"}";
+        return String.format("{ \"success\": true, \"message\": \"%s have successfully been cleared.\"}", name);
       } 
       else {
-        return "{ \"success\": false, \"message\": \"Directory could not be cleared.\"}";
+        return String.format("{ \"success\": false, \"message\": \"%s could not be cleared.\"}", name);
       }
     }
 
-    return "{ \"success\": true, \"message\": \"Directory has already been cleared.\"}";
+    return String.format("{ \"success\": true, \"message\": \"%s have already been cleared.\"}", name);
   }
 
   public boolean deleteDirectoryHelper(File dir) throws Exception {

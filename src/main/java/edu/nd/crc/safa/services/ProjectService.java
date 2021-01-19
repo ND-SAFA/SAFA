@@ -121,7 +121,7 @@ public class ProjectService {
   public String clearGeneratedFilesDir(String projId) {
     try {
       String dir = "/generatedFilesDir";
-      return uploadFlatfile.deleteDirectory(dir);
+      return uploadFlatfile.deleteDirectory(dir, "Generated Links");
     }
     catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
@@ -183,7 +183,7 @@ public class ProjectService {
   public String clearFlatfileDir() {
     try {
       String dir = "/flatfilesDir";
-      return uploadFlatfile.deleteDirectory(dir);
+      return uploadFlatfile.deleteDirectory(dir, "Flatfile Uploads");
     }
     catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());

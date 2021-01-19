@@ -23,7 +23,7 @@ public class GenerateFlatfile {
         String generatedDir = "/generatedFilesDir";
 
         String requiredFilePath = flatfileDir + "/requiredData.json";
-        String generatedFilePath = flatfileDir + "/generatedData.json";
+        String generatedFilePath = generatedDir + "/generatedData.json";
         String errorFileName = generatedDir + '/' + "ErrorText.csv";
 
         UploadFlatfile.createDirectory(flatfileDir);

@@ -65,29 +65,36 @@ public class UploadFlatfile {
   }
 
   public void uploadFile(String projId, String jsonfiles) throws Exception {
-    String dir = "/flatfilesDir";
-    createDirectory(dir);
+    String flatfileDir = "/flatfilesDir";
+    String generatedDir = "/generatedFilesDir";
+    createDirectory(flatfileDir);
+    createDirectory(generatedDir);
     
     JsonIterator iterator = JsonIterator.parse(jsonfiles);
     for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()){
       String encodedData = iterator.readString();
       byte[] bytes = Base64.getDecoder().decode(encodedData);
-      String fullPath = dir + "/" + filename; 
+      String fullPath = flatfileDir + "/" + filename; 
       Files.write(Paths.get(fullPath), bytes);
     }
   }
 
   public String getMissingFiles(String projId) throws Exception {
-    String dir = "/flatfilesDir";
-    File myDir = createDirectory(dir);
+    String flatfileDir = "/flatfilesDir";
+    String generatedDir = "/generatedFilesDir";
 
-    ParsedFiles parsedfiles = parseTim(dir);
-    List<String> uploadedFiles = Arrays.asList(myDir.list());
-    String requiredFilePath = dir + "/requiredData.json";
-    String generatedFilePath = dir + "/generatedData.json";
+    File flatDir = createDirectory(flatfileDir);
+    File genDir = createDirectory(generatedDir);
 
-
-    String data = storeFilesAsJSON(uploadedFiles, parsedfiles, requiredFilePath, generatedFilePath);
+    ParsedFiles parsedfiles = parseTim(flatfileDir);
+    List<String> uploadedFiles = Arrays.asList(flatDir.list());
+    List<String> generatedFiles = Arrays.asList(genDir.list());
+    
+    String requiredJSONPath = flatfileDir + "/requiredData.json";
+    String generatedJSONPath = generatedDir + "/generatedData.json";
+    
+    
+    String data = storeFilesAsJSON(uploadedFiles, parsedfiles, generatedFiles, requiredJSONPath, generatedJSONPath);
     
     System.out.println(data);
     return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
@@ -240,12 +247,12 @@ public class UploadFlatfile {
   }
     
   
-  public String storeFilesAsJSON(List<String> uploadedFiles, ParsedFiles timFiles, String requiredFilePath, String generatedFilePath) throws Exception {
-    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + ",\"generatedFiles\":[]" + ",\"expectedGeneratedFiles\":" + createJsonArray(timFiles.getGeneratedNames()) + "}";
-    Files.write(Paths.get(requiredFilePath), requiredData.getBytes());
+  public String storeFilesAsJSON(List<String> uploadedFiles, ParsedFiles timFiles, List<String> generatedFiles, String requiredJSONPath, String generatedJSONPath) throws Exception {
+    String requiredData = "{\"uploadedFiles\":" + createJsonArray(uploadedFiles) + ",\"expectedFiles\":" + createJsonArray(timFiles.getRequired()) + ",\"generatedFiles\":" + createJsonArray(generatedFiles) + ",\"expectedGeneratedFiles\":" + createJsonArray(timFiles.getGeneratedNames()) + "}";
+    Files.write(Paths.get(requiredJSONPath), requiredData.getBytes());
     
     String generatedData = createGeneratedFileObj(timFiles.getGenerated());
-    Files.write(Paths.get(generatedFilePath), generatedData.getBytes());
+    Files.write(Paths.get(generatedJSONPath), generatedData.getBytes());
 
     return requiredData;
   }

@@ -146,9 +146,6 @@ public class UploadFlatfile {
     for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
       if (field.toLowerCase().equals("datafiles")) {
         for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
-          if (!artifact.toLowerCase().matches("hazard|requirement|design")) {
-            throw new Exception(String.format("'%s' is not an accepted Artifact. Expected Artifacts are: Hazard, Requirement, or Design", artifact));
-          }
           for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
             if (!file.toLowerCase().equals("file")){
               throw new Exception(String.format("Artifact: %s. Expected File attribute. The File attribute should appear as 'File': 'FileName'", artifact));

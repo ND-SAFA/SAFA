@@ -79,9 +79,14 @@
 
       downloadFile () {
         var newDate = new Date()
-        console.log(this.modalResult.type)
-        var datetime = 'SAFA Upload Error Log, Downloaded ' + newDate.toLocaleString() + '\n'
-        const decodedData = datetime + window.atob(this.modalResult.data.data)
+        var dateStr = 'SAFA'
+        if (this.modalResult.type === 'upload') {
+          dateStr += ' Upload '
+        } else {
+          dateStr += ' Generate Links '
+        }
+        dateStr += 'Error Log, Downloaded ' + newDate.toLocaleString() + '\n'
+        const decodedData = dateStr + window.atob(this.modalResult.data.data)
         if (decodedData.length === 0) {
           this.showDownloadButton = false
           return

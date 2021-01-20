@@ -30,6 +30,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-rest")
     compile("org.neo4j.driver:neo4j-java-driver:1.7.5")
+    compile("mysql:mysql-connector-java:6.0.6")
 
     compile('commons-cli:commons-cli:1.4')
     compile('com.jsoniter:jsoniter:0.9.23')

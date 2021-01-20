@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import edu.nd.crc.safa.importer.Database;
+import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
@@ -47,6 +48,8 @@ public class ProjectService {
 
   @Autowired
   GenerateFlatfile generateFlatfile;
+
+  @Autowired MySQL mySQL;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
@@ -111,6 +114,8 @@ public class ProjectService {
 
   public String generateLinks(String projId){
     try {
+      System.out.println("Trying to run mySQL: "); 
+      MySQL.simpleTransaction(); 
       return generateFlatfile.generateFiles();
     } 
     catch (Exception e) {

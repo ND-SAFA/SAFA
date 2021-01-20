@@ -176,15 +176,24 @@ public class Flatfile {
     public LinkFile readLink(JsonIterator iterator, String linkName) throws Exception {
         LinkFile linkFile = new LinkFile();
         linkFile.name = linkName;
+        Boolean generated = false;
+
         for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()){
-            if (attr.equals("Source")){
+            if (attr.toLowerCase().equals("source")){
                 linkFile.source = iterator.readString();
-            } else if (attr.equals("Target")) {
+            } else if (attr.toLowerCase().equals("target")) {
                 linkFile.target = iterator.readString();
+            } else if (attr.toLowerCase().equals("generatelinks")){
+                generated = iterator.readString().toLowerCase().equals("true") ? true : false;
             } else {
                 linkFile.file = iterator.readString();
             }
         }
+
+        if (generated){
+            linkFile.file = "/GENERATED/" + linkFile.file;
+        }
+
         return linkFile;
     }
 
@@ -196,7 +205,7 @@ public class Flatfile {
         List<DataFile> dataFiles = new ArrayList<DataFile>();
         List<LinkFile> linkFiles = new ArrayList<LinkFile>();
         for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
-            if (field.equals("DataFiles")) {
+            if (field.toLowerCase().equals("datafiles")) {
                 dataFiles = readDatafile(iterator);
             } 
             else {
@@ -211,13 +220,13 @@ public class Flatfile {
     public DataEntry createDataEntry(String[] headersArray, List<String> data) {
         DataEntry dataEntry = new DataEntry(); 
         for (int i = 0; i < 3; i++) {
-            if (headersArray[i].equals("ID")) {
+            if (headersArray[i].toLowerCase().equals("id")) {
                 dataEntry.id = data.get(i); 
             }
-            else if (headersArray[i].equals("Summary")) {
+            else if (headersArray[i].toLowerCase().equals("summary")) {
                 dataEntry.summary = data.get(i); 
             }
-            else if (headersArray[i].equals("Content")) {
+            else if (headersArray[i].toLowerCase().equals("content")) {
                 dataEntry.content = data.get(i); 
             }
         }
@@ -229,7 +238,7 @@ public class Flatfile {
         String sourceFile = "N/A";
 
         for (Artifact artifact : artifacts){
-            if (artifact.type.equals(connection.sourceType)){
+            if (artifact.type.toLowerCase().equals(connection.sourceType)){
                 sourceFile = artifact.file;
                 validSource = artifact.uniqueIDs.contains(link.source);
                 break;
@@ -240,7 +249,7 @@ public class Flatfile {
         String targetFile = "N/A";
 
         for (Artifact artifact : artifacts){
-            if (artifact.type.equals(connection.targetType)){
+            if (artifact.type.toLowerCase().equals(connection.targetType)){
                 targetFile = artifact.file;
                 validTarget = artifact.uniqueIDs.contains(link.target);
                 break;
@@ -348,11 +357,22 @@ public class Flatfile {
         return artifacts; 
     }
 
-    public List<Connection> parseConnectionFiles(Tim tim, List<Artifact> artifacts, ErrorText errorText, String folderName) throws Exception {
+    public List<Connection> parseConnectionFiles(Tim tim, List<Artifact> artifacts, ErrorText errorText, String flatfileDir, String generatedDir) throws Exception {
         /* Parse TIM files */ 
         List<Connection> connections = new ArrayList<Connection>(); 
 
         for (LinkFile t : tim.linkFiles) {
+            String path = "";
+            Boolean generated = false;
+
+            if (t.file.matches("\\/GENERATED\\/.*")) {
+                generated = true;
+                t.file = t.file.replace("/GENERATED/","");
+
+                path = generatedDir + '/' + t.file;
+            } else {
+                path = flatfileDir + '/' + t.file;  
+            }
 
             Connection connection   = new Connection(); 
             connection.name         = t.name;
@@ -361,8 +381,7 @@ public class Flatfile {
             connection.targetType   = t.target;
             connection.links        = new ArrayList<Link>(); 
 
-            String RELATIVE_PATH = folderName + '/';
-            String path = RELATIVE_PATH + t.file;  
+            
             File dataFile = new File(path); 
             Scanner rowScanner = new Scanner(dataFile); 
             String headers = rowScanner.nextLine(); 
@@ -371,21 +390,28 @@ public class Flatfile {
             int lineNumber = 2;
 
             while (rowScanner.hasNextLine()) {
-    
                 String data = rowScanner.nextLine(); 
                 Link link = new Link(); 
                 String[] dataArray = data.split(",");
 
-                if (dataArray.length < 2) {     /* skip invalid lines - error report */ 
+                if (generated) {
+                    Float score = Float.parseFloat(dataArray[2]);
+                    if (score < 0.2) { // Skipped because score is less than threshold
+                        continue;
+                    }
+                }
+
+                if (dataArray.length < 2) {     /* skip invalid lines - error report */
+                    errorGenerator(connection.file, lineNumber, "Invalid Line.", errorText);
                     continue; 
                 }
 
                 /* Account for CSV Headers not always in same order */ 
                 for (int i = 0; i < 2; i++) {
-                    if (headersArray[i].equals("Source")) {
+                    if (headersArray[i].toLowerCase().equals("source")) {
                         link.source = dataArray[i]; 
                     }
-                    else if (headersArray[i].equals("Target")) {
+                    else if (headersArray[i].toLowerCase().equals("target")) {
                         link.target = dataArray[i]; 
                     }
                 }
@@ -404,21 +430,21 @@ public class Flatfile {
         return connections; 
     }
 
-    public ParsedData parseFiles(String folderName) {
+    public ParsedData parseFiles(String flatfileDir, String generatedDir) {
         
         ParsedData parsedData = new ParsedData();
         ErrorText errorText = new ErrorText();
 
         try {
-            String timFileName = folderName + '/' + "tim.json";
+            String timFileName = flatfileDir + '/' + "tim.json";
             Tim tim = parseTim(timFileName); 
-            List<Artifact> artifacts = parseDataFiles(tim, errorText, folderName);
+            List<Artifact> artifacts = parseDataFiles(tim, errorText, flatfileDir);
             
             parsedData.artifacts = artifacts;
-            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText, folderName);
+            parsedData.connections = parseConnectionFiles(tim, artifacts, errorText, flatfileDir, generatedDir);
             uniqueIDChecker(parsedData, errorText);
 
-            String errorFileName = folderName + '/' + "ErrorReport.txt";
+            String errorFileName = flatfileDir + '/' + "ErrorReport.txt";
             generateErrorReport(errorText.text, errorFileName);
 
             // Prints error file in terminal

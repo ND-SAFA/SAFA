@@ -130,25 +130,19 @@ public class ProjectService {
 
   public String uploadFile(String projId, String encodedStr) {
     try {
-      System.out.println("Try statement for uploadFile");
       uploadFlatfile.uploadFile(projId, encodedStr);
 
       try {
-        System.out.println("Try statement for getMissingFiles");
         return uploadFlatfile.getMissingFiles(projId);
       }
       catch(Exception e){
-        System.out.println("Catch exception for getMissingFiles");
         if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-          System.out.println("First");
           return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure. Please check for trailing comas, mismatched curly braces, etc\"}";
         }
         else if (e.getMessage().equals("Please upload a tim.json file")) {
-          System.out.println("Second");
           return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         }
         else {
-          System.out.println("Third");
           return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());        }
       }
     }

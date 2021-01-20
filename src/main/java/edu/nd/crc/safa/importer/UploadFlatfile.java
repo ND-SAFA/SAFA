@@ -146,11 +146,18 @@ public class UploadFlatfile {
     for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
       if (field.toLowerCase().equals("datafiles")) {
         for (String artifact = iterator.readObject(); artifact != null; artifact = iterator.readObject()){
+          Boolean fileCheck = false;
+
           for (String file = iterator.readObject(); file != null; file = iterator.readObject()){
             if (!file.toLowerCase().equals("file")){
               throw new Exception(String.format("Artifact: %s. Expected File attribute. The File attribute should appear as 'File': 'FileName'", artifact));
             }
+            fileCheck = true;
             requiredFiles.add(iterator.readString());
+          }
+
+          if (!fileCheck) {
+            throw new Exception(String.format("Did not provide a File attribute for Artifact: %s. The File attribute should appear as 'File': 'FileName'", artifact));
           }
         }
       }

@@ -180,10 +180,11 @@ public class Puller {
     }
 
     public void parseFlatfiles() throws Exception {
-        String dir = "/flatfilesDir";
-        mFlatfile.requiredDataChecker(dir);
+        String flatfileDir = "/flatfilesDir";
+        String generatedDir = "/generatedFilesDir";
+        mFlatfile.requiredDataChecker(flatfileDir);
 
-        ParsedData parsedData = mFlatfile.parseFiles(dir); 
+        ParsedData parsedData = mFlatfile.parseFiles(flatfileDir, generatedDir); 
     
         for (Artifact artifact : parsedData.artifacts) {
             for (DataEntry dataEntry : artifact.entries) {

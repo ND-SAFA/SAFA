@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Scanner; 
 import java.util.Set;
 import java.util.HashSet;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import com.jsoniter.JsonIterator;
 import org.springframework.stereotype.Component;
@@ -111,7 +113,7 @@ public class GenerateFlatfile {
         VSM vsm = new VSM();
         vsm.buildIndex(tTokens.values());
         List<String> lines = new ArrayList<>();
-        lines.add("sid,tid,score");
+        lines.add("Source,Target,Score");
         for (String sid : sTokens.keySet()) {
             for (String tid : tTokens.keySet()) {
                 double score = vsm.getRelevance(sTokens.get(sid), tTokens.get(tid));
@@ -119,6 +121,14 @@ public class GenerateFlatfile {
             }
         }
         Files.write(Paths.get(dfile), lines);
+
+        // try (BufferedReader br = new BufferedReader(new FileReader(dfile))) {
+        //     String line;
+        //     while ((line = br.readLine()) != null) {
+        //         System.out.println(line);
+        //     }
+        //  }
+        //  System.out.println();
     }
 
     public void pathErrorChecking(String requiredFilePath, String generatedFilePath) throws Exception {

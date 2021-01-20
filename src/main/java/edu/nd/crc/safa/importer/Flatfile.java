@@ -238,7 +238,7 @@ public class Flatfile {
         String sourceFile = "N/A";
 
         for (Artifact artifact : artifacts){
-            if (artifact.type.toLowerCase().equals(connection.sourceType)){
+            if (artifact.type.equals(connection.sourceType)){
                 sourceFile = artifact.file;
                 validSource = artifact.uniqueIDs.contains(link.source);
                 break;
@@ -249,7 +249,7 @@ public class Flatfile {
         String targetFile = "N/A";
 
         for (Artifact artifact : artifacts){
-            if (artifact.type.toLowerCase().equals(connection.targetType)){
+            if (artifact.type.equals(connection.targetType)){
                 targetFile = artifact.file;
                 validTarget = artifact.uniqueIDs.contains(link.target);
                 break;
@@ -367,6 +367,7 @@ public class Flatfile {
 
             if (t.file.matches("\\/GENERATED\\/.*")) {
                 generated = true;
+                // System.out.println("GENERATED!");
                 t.file = t.file.replace("/GENERATED/","");
 
                 path = generatedDir + '/' + t.file;
@@ -396,13 +397,15 @@ public class Flatfile {
 
                 if (generated) {
                     Float score = Float.parseFloat(dataArray[2]);
+                    // System.out.println(score);
                     if (score < 0.2) { // Skipped because score is less than threshold
+                        // System.out.println("Skipped");
                         continue;
                     }
                 }
 
                 if (dataArray.length < 2) {     /* skip invalid lines - error report */
-                    errorGenerator(connection.file, lineNumber, "Invalid Line.", errorText);
+                    errorGenerator(connection.file, lineNumber, "Invalid Line: Missing columns. Expecting two columns.", errorText);
                     continue; 
                 }
 

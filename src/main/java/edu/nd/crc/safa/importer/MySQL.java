@@ -13,13 +13,15 @@ public class MySQL {
    
     public static void simpleTransaction() {
 
-        String databaseURL = "jdbc:mysql://localhost:3306/safa-db";
+        String databaseURL = "jdbc:mysql://mysql:3306/safa-db";
         String user = "user";
         String password = "secret3";
         Connection conn = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(databaseURL, user, password);
+            // conn = DriverManager.getConnection("jdbc:mysql://localhost/safa-db?" +
+            // "user=root&password=secret2");
+            conn = DriverManager.getConnection(databaseURL,user,password);
             if (conn != null) {
                 System.out.println("Connected to the database");
             }

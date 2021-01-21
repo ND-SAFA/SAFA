@@ -50,6 +50,13 @@ public class MySQL {
             sql = "SELECT * FROM TEST";
             ResultSet rs = stmt.executeQuery(sql);
             List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+            
+            ArrayList<Object> header = new ArrayList<Object>();
+            header.add("source");
+            header.add("target");
+            header.add("score");
+            header.add("approval");
+            result.add(header);
 
             while (rs.next()) {
                 ArrayList<Object> row = new ArrayList<Object>();

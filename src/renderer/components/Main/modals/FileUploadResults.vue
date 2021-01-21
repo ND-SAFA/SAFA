@@ -96,6 +96,7 @@
     methods: {
       compareFileLists () {
         if (this.modalResult.data) {
+          this.fileMap = {}
           this.findMissingFiles(this.modalResult.data.uploadedFiles, this.modalResult.data.expectedFiles, false)
           this.findMissingFiles(this.modalResult.data.generatedFiles, this.modalResult.data.expectedGeneratedFiles, true)
           console.log('FILE MAP:')
@@ -118,14 +119,14 @@
           } else {
             entry.status = 'Needs to be Generated'
           }
-          this.fileMap[expectedFiles[i]] = (entry)
+          this.fileMap[expectedFiles[i]] = entry
         }
 
         for (var j = 0; j < expectedFiles.length; j++) {
           for (var k = 0; k < foundFiles.length; k++) {
             if (foundFiles[k] === expectedFiles[j]) {
               var myEntry = this.fileMap[expectedFiles[j]]
-              myEntry.status = 'Uploaded'
+              myEntry.status = 'Ready'
               this.fileMap[expectedFiles[j]] = myEntry
             }
           }

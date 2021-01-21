@@ -32,6 +32,7 @@ import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
+import java.sql.SQLException;
 
 
 @Service
@@ -49,7 +50,8 @@ public class ProjectService {
   @Autowired
   GenerateFlatfile generateFlatfile;
 
-  @Autowired MySQL mySQL;
+  @Autowired
+  MySQL mySQL;
 
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
@@ -115,10 +117,33 @@ public class ProjectService {
   public String generateLinks(String projId){
     try {
       System.out.println("Trying to run mySQL: "); 
-      MySQL.simpleTransaction(); 
-      return generateFlatfile.generateFiles();
-    } 
+      String generateResult = generateFlatfile.generateFiles();
+
+      System.out.println("Encoded Str");
+      String encodedStr = MySQL.simpleTransaction();
+      System.out.println(encodedStr);
+      
+      System.out.println("Generate Result");
+      System.out.println(generateResult);
+
+      System.out.println("Generate Result + Data");
+      String result = generateResult.replace("}", String.format(", \"data\": \"%s\"}", encodedStr));
+      System.out.println(result);
+
+      return result;
+    }
+    catch (ClassNotFoundException e) {
+        System.out.println("Could not find database driver class");
+        e.printStackTrace();
+        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+    }
+    catch (SQLException e) {
+      System.out.println("An error occurred. Maybe user/password is invalid");
+      e.printStackTrace();
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+    }
     catch (Exception e) {
+      System.out.println("Exception");
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
   }

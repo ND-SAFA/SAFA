@@ -52,16 +52,16 @@ public class MySQL {
             List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
             
             ArrayList<Object> header = new ArrayList<Object>();
-            header.add("source");
-            header.add("target");
-            header.add("score");
-            header.add("approval");
+            header.add("\"source\"");
+            header.add("\"target\"");
+            header.add("\"score\"");
+            header.add("\"approval\"");
             result.add(header);
 
             while (rs.next()) {
                 ArrayList<Object> row = new ArrayList<Object>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
+                row.add(String.format("\"%s\"",rs.getString(1)));
+                row.add(String.format("\"%s\"",rs.getString(2)));
                 row.add(rs.getFloat(3));
                 row.add(rs.getInt(4));
                 result.add(row);

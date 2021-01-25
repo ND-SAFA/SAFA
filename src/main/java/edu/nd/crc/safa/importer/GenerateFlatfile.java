@@ -49,6 +49,23 @@ public class GenerateFlatfile {
         return "{ \"success\": true, \"message\": \"Successfully generated links\"}";
     }
 
+    public void updateMySQLTables() throws Exception {
+        String generatedDir = "/generatedFilesDir";
+        File genDir = UploadFlatfile.createDirectory(generatedDir);
+        List<String> generatedFiles = Arrays.asList(genDir.list());
+
+        for (String filename : generatedFiles) {
+            if (filename.equals("generatedData.json") || filename.equals("ErrorText.csv") ) { // We need to skip these files.
+                continue;
+            }
+
+            String tableName = filename.replace(".csv","");
+            String filePath = generatedDir + '/' + filename;
+
+            MySQL.createGeneratedTable(tableName, filePath);
+        }
+    }
+
     public List<String> generateFilesHelper(String flatfileDir, String generatedDir, String errorFileName, String data) throws Exception {
         Flatfile mFlatfile = new Flatfile();
         Flatfile.ErrorText errorText = mFlatfile.new ErrorText();

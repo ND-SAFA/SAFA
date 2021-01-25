@@ -1,6 +1,5 @@
 <template>
-  <div id="mainpage">
-
+  <div v-if="!approvalView" id="mainpage">
     <!-- Header Nav -->
     <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
 
@@ -31,8 +30,28 @@
               <RightPanel v-show="!rightPanel.isHidden" v-on:open:link="open"/>
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
-            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles" @sync-data="projectSync"/>
+            <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles" @generate-links="projectGenerate" @sync-data="projectSync"/>
             <StatusInfoModal :is-hidden="!showInfoModal" @close="showInfoModal = false" :modal-result="showInfoResult"/>
+          </div>
+        </main>
+      </div>
+      <!-- End Page Content -->
+
+    </div>
+  </div>
+  <div v-else id="mainpage">
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <div class="d-flex" id="wrapper">
+      <div id="page-content-wrapper">
+        <main role="main">
+          <div class="container-fluid">
+            <div class="row vh-100 pad-navbar">
+              <LeftPanel v-show="!leftPanel.isHidden" 
+                      v-on:show-delta-modal="showDeltaModal = true" 
+                      v-on:refresh:view="refreshView" 
+                      v-on:show-upload-modal="triggerUploadModal"/>
+              <ApproveLinks/>
+            </div>
           </div>
         </main>
       </div>
@@ -51,6 +70,7 @@
   import SafetyArtifactTree from '@/components/Main/SafetyArtifactTree'
   import FaultTree from '@/components/Main/FaultTree'
   import DeltaTree from '@/components/Main/DeltaTree'
+  import ApproveLinks from '@/components/Main/ApproveLinks'
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
   import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
   import StatusInfoModal from '@/components/Main/modals/StatusInfo'
@@ -64,6 +84,7 @@
       SafetyArtifactTree,
       FaultTree,
       DeltaTree,
+      ApproveLinks,
       ConfigureDeltaModal,
       FileUploadResultsModal,
       StatusInfoModal
@@ -72,6 +93,7 @@
     data () {
       return {
         firstOpen: true,
+        approvalView: false,
         resize: Date.now(),
         update: Date.now(),
         showDeltaModal: false,
@@ -100,6 +122,7 @@
       AppMenu.findMenuItemById('project.upload').click = this.projectUpload.bind(this)
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
+      AppMenu.findMenuItemById('project.approve').click = this.switchToApprovalView.bind(this)
       AppMenu.findMenuItemById('project.remove').click = this.projectRemove.bind(this)
       AppMenu.setApplicationMenu()
     },
@@ -112,7 +135,7 @@
 
     methods: {
       ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
-        'fetchErrorLog', 'generateTraceLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads']),
+        'fetchErrorLog', 'generateTraceLinks', 'getGeneratedLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -164,6 +187,9 @@
           response.message = e
           this.triggerInfoModal(response, 'upload')
         }
+      },
+      switchToApprovalView () {
+        this.approvalView = !this.approvalView
       },
       resizeView () {
         this.resize = Date.now()
@@ -225,13 +251,17 @@
         this.showInfoModal = true
       },
       async projectGenerate () {
+        this.showUploadModal = false
         await this.generateTraceLinks().then(response => {
-          this.getGenerateLinksErrorLog().then(errorresult => {
-            console.log(errorresult)
-            console.log('finished api call for generate links')
-            response.data = errorresult
+          console.log(response.message)
+          if (response.success) {
+            this.getGenerateLinksErrorLog().then(errorresult => {
+              response.data = errorresult
+              this.triggerInfoModal(response, 'generate')
+            })
+          } else {
             this.triggerInfoModal(response, 'generate')
-          })
+          }
         })
       },
       async projectRemove () {

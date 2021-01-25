@@ -55,9 +55,10 @@
                   </div>
                 </div>
                 <div class="modal-footer custom-modal-footer">
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('select-files')">Upload Files</button>
+                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('generate-links')">Generate Links</button>
                   <button v-if="modalResult.success === true && this.allFilesPresent === false" type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
                   <button v-else type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button v-if="modalResult.success === true && this.allFilesPresent === false" type="submit" class="btn btn-primary delta-save-button" @click="$emit('select-files')">Upload Additional Files</button>
                 </div>
               </form>
             </div>

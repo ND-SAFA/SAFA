@@ -43,7 +43,7 @@ export default class AppMenu {
       submenu: [
         {
           id: 'sync',
-          label: 'Update Data',
+          label: 'Synchronize Data',
           accelerator: 'CommandOrControl+P'
         },
         {
@@ -61,15 +61,22 @@ export default class AppMenu {
           id: 'clear',
           label: 'Clear Current Uploads'
         },
+        { type: 'separator' },
         {
           id: 'generate',
           label: 'Generate Trace Links',
           accelerator: 'CommandOrControl+L'
         },
         {
+          id: 'approve',
+          label: 'Approve Trace Links',
+          accelerator: 'CommandOrControl+A'
+        },
+        {
           id: 'remove',
           label: 'Clear Generated Trace Links'
         },
+        { type: 'separator' },
         {
           id: 'help',
           label: 'More Info'

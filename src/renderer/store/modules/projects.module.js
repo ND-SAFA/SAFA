@@ -181,6 +181,15 @@ const actions = {
     }
   },
 
+  async getGeneratedLinks ({ commit }) {
+    try {
+      const response = await projects.getGeneratedLinks(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   async getGenerateLinksErrorLog ({ commit }) {
     try {
       const response = await projects.fetchGenerateLinksErrorLog(TEMP_PROJ_ID)

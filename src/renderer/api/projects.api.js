@@ -84,6 +84,13 @@ async function generateTraceLinks (projId) {
   return json
 }
 
+async function getGeneratedLinks (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linksapprover/`)
+  const json = await response.json()
+  console.log(json)
+  return json
+}
+
 async function fetchGenerateLinksErrorLog (projId) {
   const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linkserrorlog/`)
   const json = await response.json()
@@ -127,6 +134,7 @@ export default {
   postFlatfileData,
   fetchErrorLog,
   generateTraceLinks,
+  getGeneratedLinks,
   fetchGenerateLinksErrorLog,
   removeTraceLinks,
   clearProjectFiles,

@@ -49,6 +49,29 @@ public class GenerateFlatfile {
         return "{ \"success\": true, \"message\": \"Successfully generated links\"}";
     }
 
+    public String getLinkTypesJSON() throws Exception {
+        String generatedDir = "/generatedFilesDir";
+        File genDir = UploadFlatfile.createDirectory(generatedDir);
+        List<String> generatedFiles = Arrays.asList(genDir.list());
+        Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
+
+        for (String filename : generatedFiles) {
+            if (filename.equals("generatedData.json") || filename.equals("ErrorText.csv") ) { // We need to skip these files.
+                continue;
+            }
+
+            String[] artifacts = filename.replace(".csv","").split("2", 2);
+            artifacts[0] = String.format("\"%s\"", artifacts[0]);
+            artifacts[1] = String.format("\"%s\"", artifacts[1]);
+
+            sourceTargetMap.computeIfAbsent(artifacts[0], k -> new ArrayList<>()).add(artifacts[1]);
+        }
+
+        String data = sourceTargetMap.toString().replace("=", ":");
+        System.out.println(data);
+        return String.format("{ \"success\": true, \"data\": %s}", data);
+    }
+
     public void updateMySQLTables() throws Exception {
         String generatedDir = "/generatedFilesDir";
         File genDir = UploadFlatfile.createDirectory(generatedDir);

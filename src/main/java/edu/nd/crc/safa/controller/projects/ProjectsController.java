@@ -85,11 +85,11 @@ public class ProjectsController {
     return projectService.getGenerateLinksErrorLog(projId);
   }
 
-  // @GetMapping("/projects/{projId}/linksapprover/")
-  // public String linksApprover(@PathVariable String projId) {
-  //   System.out.println("/projects/{projId}/linksapprover/");
-    // return projectService.clearGeneratedFilesDir(projId);
-  // }
+  @GetMapping("/projects/{projId}/linktypes/")
+  public String getLinkTypes(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/linktypes/");
+    return projectService.getLinkTypes(projId);
+  }
 
   @GetMapping("/projects/{projId}/remove/")
   public String removeLinks(@PathVariable String projId) {

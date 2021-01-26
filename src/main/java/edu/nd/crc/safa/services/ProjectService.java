@@ -133,6 +133,15 @@ public class ProjectService {
     }
   }
 
+  public String getLinkTypes(String projId) {
+    try {
+        return generateFlatfile.getLinkTypesJSON();
+    } catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+
+  }
+
   public String uploadFile(String projId, String encodedStr) {
     try {
       uploadFlatfile.uploadFile(projId, encodedStr);

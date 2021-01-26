@@ -47,7 +47,7 @@ public class MySQL {
                             "SOURCE VARCHAR(255) NOT NULL,\n" +
                             "TARGET VARCHAR(255) NOT NULL,\n" + 
                             "SCORE FLOAT NOT NULL,\n" + 
-                            "APPROVAL INT DEFAULT 2,\n" + 
+                            "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
                             "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
                             ");";
         
@@ -96,18 +96,30 @@ public class MySQL {
         stmt.executeUpdate(sqlLoadData);
         System.out.println("Loaded Data into Temporary Table.");
 
-        String sqlJoin = String.format("CREATE TABLE %s SELECT\n", newTable) +
-            "TEMP.ID, TEMP.SOURCE, TEMP.TARGET, TEMP.SCORE, IFNULL(OLD.APPROVAL,2)\n" +
+        String sqlCreateNewTable = String.format("CREATE TABLE %s (\n", newTable) + // Create New Table.
+        "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
+        "SOURCE VARCHAR(255) NOT NULL,\n" +
+        "TARGET VARCHAR(255) NOT NULL,\n" + 
+        "SCORE FLOAT NOT NULL,\n" + 
+        "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
+        "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
+        ");";
+
+        stmt.executeUpdate(sqlCreateNewTable);
+        System.out.println("Created New Table.");
+
+        String sqlJoin = String.format("INSERT INTO %s (SOURCE, TARGET, SCORE, APPROVAL)\n", newTable) +
+            "SELECT TEMP.SOURCE, TEMP.TARGET, TEMP.SCORE, IFNULL(OLD.APPROVAL,2)\n" +
             String.format("FROM %s TEMP\n", tempTableName) +
             String.format("LEFT JOIN %s OLD\n", tableName) +
             "ON TEMP.SOURCE = OLD.SOURCE AND TEMP.TARGET = OLD.TARGET\n";
 
         stmt.executeUpdate(sqlJoin);
-        System.out.println("Performed Join operation between Temporary Table and Old Table. Created New Table.");
+        System.out.println("Performed Join operation between Temporary Table and Old Table. Stored result in New Table.");
 
         String dropTables = String.format(String.format("DROP TABLES %s, %s", tempTableName, tableName));
         stmt.executeUpdate(dropTables);
-        System.out.println("Deleted Old Table and Temporary Table.");
+        System.out.println("Deleted Temporary Table and Old Table.");
 
         String renameNewTable = String.format("RENAME TABLE %s TO %s", newTable, tableName);
         stmt.executeUpdate(renameNewTable);

@@ -4,16 +4,16 @@
       <p class="font-weight-bold text-uppercase mb-2 mt-2 px-2 d-flex justify-content-between align-items-center">
         Source Type<a href="#" class="text-dark"></a>
       </p>
-        <select class="custom-select mb-3" id="inputGroupSelect01" v-model="selected">
+        <select class="custom-select mb-3" id="inputGroupSelect01" v-model="sourceSelected">
           <option v-for="source in sourceTypes" :key="source.id" v-bind:value="{ item: source }">{{source}}</option>
         </select>
       <p class="font-weight-bold text-uppercase mb-2 mt-2 px-2 d-flex justify-content-between align-items-center">
         Target Type<a href="#" class="text-dark"></a>
       </p>
-        <select class="custom-select" id="inputGroupSelect01">
-          <option v-for="target in linkData[selected.item]" :key="target.id">{{target}}</option>
+        <select class="custom-select" id="inputGroupSelect01" v-model="targetSelected">
+          <option v-for="target in linkData[sourceSelected.item]" :key="target.id">{{target}}</option>
         </select>
-        <button type="button" class="btn btn-primary btn-sm mb-3">
+        <button type="button" class="btn btn-primary btn-sm mb-3" @click="requestLinkData">
         Fetch Links
       </button>
     </div>
@@ -40,7 +40,8 @@ export default {
       showTab: 'Artifacts',
       sourceTypes: {},
       linkData: {},
-      selected: ''
+      sourceSelected: '',
+      targetSelected: ''
     }
   },
 
@@ -53,13 +54,16 @@ export default {
 
   computed: {
     ...mapGetters('projects.module', ['getLinkTypes'])
+  },
+
+  methods: {
+    requestLinkData () {
+      var selectedDict = {
+        'source': this.sourceSelected.item,
+        'target': this.targetSelected
+      }
+      console.log(selectedDict)
+    }
   }
 }
 </script>
-
-<style scoped>
-.custom-switch label {
-  font-size: 0.9rem;
-  padding-top: 0.1rem;
-}
-</style>

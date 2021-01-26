@@ -190,6 +190,24 @@ const actions = {
     }
   },
 
+  async getApproverData ({ commit }) {
+    try {
+      const response = await projects.getApproverData(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async saveApproverData ({ commit }) {
+    try {
+      const response = await projects.saveApproverData(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   async getGenerateLinksErrorLog ({ commit }) {
     try {
       const response = await projects.fetchGenerateLinksErrorLog(TEMP_PROJ_ID)

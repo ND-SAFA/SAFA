@@ -13,11 +13,11 @@
 
     <div id="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="(item, index) in hazardList" :key="item.id" @click="loadTree(item, index)"  >
+        <li class="nav-item vw-100" v-for="(item, index) in Object.keys(artifacts)" :key="item.id" >
           <a class="nav-link" :class="{ active: index === selectedIndex }">
             <div>
-              <p class="hazard-title">{{item.id}}</p>
-              <div v-if="item.data" class="desc" :title="item.data.name">{{$truncate(item.data.name, 40)}}</div>
+              <p class="hazard-title">{{item}}</p>
+              <div class="desc" :title="artifacts[item].description">{{$truncate(artifacts[item].description, 40)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
               <i class="fas fa-exclamation-triangle"></i>
@@ -30,7 +30,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
@@ -39,59 +38,17 @@ export default {
     return {
       selectedIndex: null,
       searchText: '',
-      searchFilter: {}
-    }
-  },
-  created () {
-    for (const hazard of this.getHazards) {
-      this.searchFilter[hazard.id] = true
-    }
-    if (!this.selectedIndex && this.getSelectedTree) {
-      this.selectedIndex = this.hazardList.findIndex(h => h.id === this.getSelectedTree)
+      searchFilter: {},
+      artifacts: { 'UAV-10': {'description': 'This is a test description'}, 'UAV-11': {'description': 'This is a test description'}, 'UAV-12': {'description': 'This is a test description'}, 'UAV-13': {'description': 'This is a test description'}, 'UAV-14': {'description': 'This is a test description'} }
     }
   },
   computed: {
     ...mapGetters('projects.module', ['getHazards', 'getNodeParents']),
-    ...mapGetters('app.module', ['getSelectedTree']),
-    hazardList () {
-      if (Vue.isEmpty(this.searchFilter)) {
-        return this.getHazards
-      }
-      return this.getHazards.filter(hazard => this.searchFilter[hazard.id])
-    }
-  },
-  watch: {
-    searchText: async function () {
-      if (this.searchText === '') {
-        // clear filter
-        Object.keys(this.searchFilter).forEach(entry => { this.searchFilter[entry] = true })
-      } else {
-        const value = this.searchText.toLowerCase()
-        const treeId = value.startsWith('uav') ? value : `uav-${value}`
-        // TODO implement Vuejs compatible debounce
-        await this.fetchProjectNodeParents(treeId)
-        for (const hazard of this.getHazards) {
-          this.searchFilter[hazard.id] = hazard.data.name.includes(value)
-        }
-        for (const nodeId of this.getNodeParents) {
-          this.searchFilter[nodeId] = true
-        }
-      }
-    }
+    ...mapGetters('app.module', ['getSelectedTree'])
   },
   methods: {
     ...mapActions('projects.module', ['fetchHazards', 'fetchProjectNodeParents']),
-    ...mapActions('app.module', ['setSelectedTree']),
-    loadTree (hazard, index) {
-      // load hazard tree if null arguments are passed
-      // otherwise load safety artifact tree
-      const selected = hazard ? hazard.id : null
-      this.setSelectedTree(selected)
-      this.selectedIndex = index
-    },
-    refreshView () {
-      this.$parent.$emit('refresh:view')
-    }
+    ...mapActions('app.module', ['setSelectedTree'])
   }
 }
 </script>

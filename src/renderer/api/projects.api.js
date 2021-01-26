@@ -85,7 +85,25 @@ async function generateTraceLinks (projId) {
 }
 
 async function getLinkTypes (projId) {
-  // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linktypes/`)
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linktypes/`)
+  const json = await response.json()
+  // const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
+  // const json = JSON.parse(response)
+  console.log(json)
+  return json
+}
+
+async function getApproverData (projId) {
+  // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/getapproverdata/`)
+  // const json = await response.json()
+  const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
+  const json = JSON.parse(response)
+  console.log(json)
+  return json
+}
+
+async function saveApproverData (projId, encodedStr) {
+  // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/saveapproverdata/`, { method: 'POST', body: encodedStr })
   // const json = await response.json()
   const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
   const json = JSON.parse(response)
@@ -137,6 +155,8 @@ export default {
   fetchErrorLog,
   generateTraceLinks,
   getLinkTypes,
+  getApproverData,
+  saveApproverData,
   fetchGenerateLinksErrorLog,
   removeTraceLinks,
   clearProjectFiles,

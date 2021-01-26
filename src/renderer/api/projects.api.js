@@ -84,9 +84,11 @@ async function generateTraceLinks (projId) {
   return json
 }
 
-async function getGeneratedLinks (projId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linksapprover/`)
-  const json = await response.json()
+async function getLinkTypes (projId) {
+  // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/linktypes/`)
+  // const json = await response.json()
+  const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
+  const json = JSON.parse(response)
   console.log(json)
   return json
 }
@@ -134,7 +136,7 @@ export default {
   postFlatfileData,
   fetchErrorLog,
   generateTraceLinks,
-  getGeneratedLinks,
+  getLinkTypes,
   fetchGenerateLinksErrorLog,
   removeTraceLinks,
   clearProjectFiles,

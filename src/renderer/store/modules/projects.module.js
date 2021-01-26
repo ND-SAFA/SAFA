@@ -181,9 +181,9 @@ const actions = {
     }
   },
 
-  async getGeneratedLinks ({ commit }) {
+  async getLinkTypes ({ commit }) {
     try {
-      const response = await projects.getGeneratedLinks(TEMP_PROJ_ID)
+      const response = await projects.getLinkTypes(TEMP_PROJ_ID)
       return response
     } catch (error) {
       console.log(error)

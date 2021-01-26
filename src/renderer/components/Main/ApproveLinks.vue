@@ -8,98 +8,117 @@
       </div>
     </div> -->
     <div id="center-panel-container">
-      <div id="source-container"><span id="source-name">UAV-1800</span><span id="source-description">This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long. </span></div>
+      <div id="source-container"><span id="source-name">UAV-1800</span><span id="source-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at</span></div>
       <hr/>
-      <div id="target-info"><b>UAV-200:</b> This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long </div>
+      <div id="target-info" @dblclick="expandDesc()"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
       <div id="target-right-info">
         <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 60%; height: 20px"></div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
         </div>
         <form class="form" id="radio-buttons">
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio" checked>Not Vetted</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Approved</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Rejected</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
             </div>
         </form>
-      </div>
-      <div id="target-info"><b>UAV-500:</b> This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long </div>
+      </div>  
+      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
       <div id="target-right-info">
         <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%; height: 20px"></div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
         </div>
         <form class="form" id="radio-buttons">
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio" checked>Not Vetted</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Approved</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Rejected</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
             </div>
         </form>
-      </div>
-      <div id="target-info"><b>UAV-1200:</b> This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long. This one can even be a bit longer because the div size will adjust to how long the text is. </div>
+      </div>  
+      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
       <div id="target-right-info">
         <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 30%; height: 20px"></div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
         </div>
         <form class="form" id="radio-buttons">
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio" checked>Not Vetted</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Approved</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Rejected</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
             </div>
         </form>
-      </div>
-      <div id="target-info"><b>UAV-1400:</b> This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long. This one can even be a bit longer because the div size will adjust to how long the text is. </div>
+      </div>  
+      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
       <div id="target-right-info">
         <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 10%; height: 20px"></div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
         </div>
         <form class="form" id="radio-buttons">
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio" checked>Not Vetted</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Approved</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Rejected</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
             </div>
         </form>
-      </div>
-      <div id="target-info"><b>UAV-1400:</b> This artifact description will be moderately long, not too long though since we're still figuring things out. It will be kind of long though, so that it's definitely at least 2 or more lines and just goes on for awhile. It could go on for even a bit longer tbh because we know its gonna be long. This one can even be a bit longer because the div size will adjust to how long the text is. </div>
+      </div>  
+      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
       <div id="target-right-info">
         <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 10%; height: 20px"></div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
         </div>
         <form class="form" id="radio-buttons">
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio" checked>Not Vetted</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Approved</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
             </div>
-            <div class="radio">
-              <label><input type="radio" id="radio-input" name="optradio">Rejected</label>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
             </div>
         </form>
       </div>     
-          <div id="footer">
-        <button type="button" class="btn btn-outline-primary">Primary</button>
-        <button type="button" class="btn btn-outline-secondary">Secondary</button>
-        <button type="button" class="btn btn-outline-success">Success</button>
-    </div>   
+      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
+      <div id="target-right-info">
+        <div id="progress-bar">
+          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
+        </div>
+        <form class="form" id="radio-buttons">
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
+            </div>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
+            </div>
+            <div>
+              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
+            </div>
+        </form>
+      </div>  
+      <div id="footer">
+        <div id="save-buttons">
+            <button id="save-button" type="button" class="btn btn-outline-primary">Save All</button>
+            <button id="save-button" type="button" class="btn btn-outline-primary">Save All and Exit</button>
+            <button id="save-button" type="button" class="btn btn-outline-danger">Exit without Saving</button>
+        </div>
+      </div>   
     </div>
   </div>
 </template>
@@ -110,12 +129,15 @@ export default {
   name: 'ApproveLinks',
 
   computed: {
-    ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree'])
+    ...mapGetters('projects.module', ['getHazardTree'])
   },
 
   methods: {
-    ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees']),
-    ...mapActions('app.module', ['setSelectedArtifact'])
+    ...mapActions('projects.module', ['fetchDeltaTrees']),
+    ...mapActions('app.module', ['setSelectedArtifact']),
+    testfunc () {
+      console.log('test info')
+    }
   }
 }
 </script>
@@ -128,7 +150,7 @@ export default {
     z-index: 1000;
   }
   #center-panel-container {
-    line-height: 1.8; 
+    line-height: 1.6; 
     margin: 20px 20px 0px; 
     max-height: calc(100vh - 140px);
     overflow: auto; 
@@ -141,7 +163,7 @@ export default {
     padding: 10px; 
     margin-bottom: 30px; 
     border-radius: 10px;
-    font-size: 18px; 
+    font-size: 15px; 
   }
   #source-name {
     border-width: 2px; 
@@ -150,12 +172,13 @@ export default {
     margin-right: 10px; 
     font-weight: bold; 
     font-size: 20px; 
+    border-radius: 5px;
   }
   #target-info {
-    width: 75%; 
+    width: 85%; 
     float: left;
-    margin: 15px 0px 15px; 
-    max-height: 130px; 
+    margin: 8px 0px 8px; 
+    max-height: 68px; 
     text-overflow: ellipsis; 
     display: block;
     overflow: hidden; 
@@ -163,39 +186,48 @@ export default {
     border-width: 1px; 
     border-style: solid;
     border-color: #c2c2c2;
-    padding: 10px; 
+    padding: 5px; 
     padding-right: 20px; 
     border-radius: 10px;
-    font-size: 16px; 
+    font-size: 13px; 
+    line-height: 1.2; 
   }
   #target-right-info {
-    width: 25%; 
+    width: 15%; 
     float: left; 
-    line-height: 1.2; 
-    margin: 15px 0px 15px; 
+    margin: 5px 0px 5px; 
+    font-size: 11px; 
   }
   #progress-bar {
-    background-color: #919191;
+    background-color: #adadad;
     width: 60%; 
     margin: auto; 
-    height: 20px; 
+    height: 10px; 
   }
   #radio-buttons {
-    margin: auto; 
     width: 60%; 
-    margin-top: 15px; 
+    margin-top: 5px; 
     margin-left: 25%; 
   }
   #radio-input {
+    margin-bottom: 2px; 
+  }
+  #radio-label {
     margin-right: 5px; 
   }
   #footer {
-   position:fixed;
-   right:0px;
-   bottom:0px;
-   height:80px;
-   width:100%;
+   position: fixed;
+   bottom: 0px;
+   height: 80px;
+   width: 100%;
    margin: auto; 
-   float: right; 
+  }
+  #save-buttons {
+    position: fixed;
+    right: 20px; 
+    padding-top: 20px;
+  }
+  #save-button {
+    margin: 0px 5px 0px; 
   }
 </style>

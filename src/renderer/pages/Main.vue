@@ -46,10 +46,7 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LeftPanel v-show="!leftPanel.isHidden" 
-                      v-on:show-delta-modal="showDeltaModal = true" 
-                      v-on:refresh:view="refreshView" 
-                      v-on:show-upload-modal="triggerUploadModal"/>
+              <LinksLeftPanel :type-data="linkTypeData"/>
               <ApproveLinks/>
             </div>
           </div>
@@ -70,6 +67,7 @@
   import SafetyArtifactTree from '@/components/Main/SafetyArtifactTree'
   import FaultTree from '@/components/Main/FaultTree'
   import DeltaTree from '@/components/Main/DeltaTree'
+  import LinksLeftPanel from '@/components/Main/LinksLeftPanel'
   import ApproveLinks from '@/components/Main/ApproveLinks'
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
   import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
@@ -84,6 +82,7 @@
       SafetyArtifactTree,
       FaultTree,
       DeltaTree,
+      LinksLeftPanel,
       ApproveLinks,
       ConfigureDeltaModal,
       FileUploadResultsModal,
@@ -98,6 +97,7 @@
         update: Date.now(),
         showDeltaModal: false,
         showUploadModal: false,
+        linkTypeData: null,
         uploadResult: null,
         showInfoModal: false,
         showInfoResult: null,
@@ -135,7 +135,7 @@
 
     methods: {
       ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
-        'fetchErrorLog', 'generateTraceLinks', 'getGeneratedLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads']),
+        'fetchErrorLog', 'generateTraceLinks', 'getGeneratedLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads', 'getLinkTypes']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -188,7 +188,10 @@
           this.triggerInfoModal(response, 'upload')
         }
       },
-      switchToApprovalView () {
+      async switchToApprovalView () {
+        await this.getLinkTypes().then(result => {
+          this.linkTypeData = result
+        })
         this.approvalView = !this.approvalView
       },
       resizeView () {

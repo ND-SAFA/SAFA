@@ -34,35 +34,86 @@ public class MySQL {
         return conn;
     }
 
-    public static void createGeneratedTable(String tableName, String filePath) throws Exception {
+    public static void createGeneratedTable(String name, String filePath) throws Exception {
         Connection conn = startDB();
         //STEP 4: Execute a query
         System.out.println("Creating table in given database...");
         Statement stmt = conn.createStatement();
+        String tableName = name.toUpperCase();
         
-        String sqlCreateTable = String.format("CREATE TABLE IF NOT EXISTS %s (\n", tableName.toUpperCase()) +
-                        "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
-                        "SOURCE VARCHAR(255) NOT NULL,\n" +
-                        "TARGET VARCHAR(255) NOT NULL,\n" + 
-                        "SCORE FLOAT NOT NULL,\n" + 
-                        "APROVAL INT DEFAULT 2,\n" + 
-                        "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
-                        ");";
-    
-        stmt.executeUpdate(sqlCreateTable);
-        System.out.println(String.format("Created table: %s in given database...", tableName));
+        try {
+            String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) +
+                            "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
+                            "SOURCE VARCHAR(255) NOT NULL,\n" +
+                            "TARGET VARCHAR(255) NOT NULL,\n" + 
+                            "SCORE FLOAT NOT NULL,\n" + 
+                            "APPROVAL INT DEFAULT 2,\n" + 
+                            "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
+                            ");";
+        
+            stmt.executeUpdate(sqlCreateTable);
+            System.out.println(String.format("Created table: %s in given database...", tableName));
 
-        String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName.toUpperCase()) +
-            "FIELDS TERMINATED BY ','\n" +
-            "ENCLOSED BY '\"'\n" +
-            "LINES TERMINATED BY '\\n'\n" +
-            "IGNORE 1 ROWS\n" +
-            "(SOURCE, TARGET, SCORE);\n";
+            String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
+                "FIELDS TERMINATED BY ','\n" +
+                "ENCLOSED BY '\"'\n" +
+                "LINES TERMINATED BY '\\n'\n" +
+                "IGNORE 1 ROWS\n" +
+                "(SOURCE, TARGET, SCORE);";
 
-        stmt.executeUpdate(sqlLoadData);
-        System.out.println(String.format("Loaded file: %s into table: %s...", filePath, tableName));
+            stmt.executeUpdate(sqlLoadData);
+            System.out.println(String.format("Loaded file: %s into table: %s...", filePath, tableName));
+        } catch(SQLException e) {
+            if (e.getErrorCode() == 1050){ // Table already exists error
+                modifyGeneratedTable(stmt, tableName, filePath);
+            } else {
+                throw new SQLException(e);
+            }
+        }
         conn.close();
     }
+
+    public static void modifyGeneratedTable(Statement stmt, String tableName, String filePath) throws Exception {
+        System.out.println("Modify Generated Table...");
+
+        String tempTableName = String.format("TEMP_%s", tableName);
+        String newTable = String.format("NEW_%s", tableName);
+
+        String sqlCreateTempTable = String.format("CREATE TEMPORARY TABLE %s\n", tempTableName) + 
+        String.format("SELECT * FROM %s\n", tableName) +
+        "LIMIT 0;";
+        
+        stmt.executeUpdate(sqlCreateTempTable);
+        System.out.println("Created Temporary Table.");
+
+        String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tempTableName) +
+        "FIELDS TERMINATED BY ','\n" +
+        "ENCLOSED BY '\"'\n" +
+        "LINES TERMINATED BY '\\n'\n" +
+        "IGNORE 1 ROWS\n" +
+        "(SOURCE, TARGET, SCORE);";
+
+        stmt.executeUpdate(sqlLoadData);
+        System.out.println("Loaded Data into Temporary Table.");
+
+        String sqlJoin = String.format("CREATE TABLE %s SELECT\n", newTable) +
+            "TEMP.ID, TEMP.SOURCE, TEMP.TARGET, TEMP.SCORE, IFNULL(OLD.APPROVAL,2)\n" +
+            String.format("FROM %s TEMP\n", tempTableName) +
+            String.format("LEFT JOIN %s OLD\n", tableName) +
+            "ON TEMP.SOURCE = OLD.SOURCE AND TEMP.TARGET = OLD.TARGET\n";
+
+        stmt.executeUpdate(sqlJoin);
+        System.out.println("Performed Join operation between Temporary Table and Old Table. Created New Table.");
+
+        String dropTables = String.format(String.format("DROP TABLES %s, %s", tempTableName, tableName));
+        stmt.executeUpdate(dropTables);
+        System.out.println("Deleted Old Table and Temporary Table.");
+
+        String renameNewTable = String.format("RENAME TABLE %s TO %s", newTable, tableName);
+        stmt.executeUpdate(renameNewTable);
+        System.out.println("Renamed New Table to Old Table. Modify Generated Table Complete!");
+    }
+
 
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);

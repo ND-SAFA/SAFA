@@ -32,7 +32,8 @@ public class GenerateFlatfile {
         UploadFlatfile.createDirectory(generatedDir);
 
         try {
-            pathErrorChecking(requiredFilePath, generatedFilePath);
+            pathErrorChecking(requiredFilePath);
+            pathErrorChecking(generatedFilePath);
         } catch(Exception e) {
             return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         }
@@ -51,25 +52,50 @@ public class GenerateFlatfile {
 
     public String getLinkTypesJSON() throws Exception {
         String generatedDir = "/generatedFilesDir";
-        File genDir = UploadFlatfile.createDirectory(generatedDir);
-        List<String> generatedFiles = Arrays.asList(genDir.list());
+        UploadFlatfile.createDirectory(generatedDir);
         Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
 
-        for (String filename : generatedFiles) {
-            if (filename.equals("generatedData.json") || filename.equals("ErrorText.csv") ) { // We need to skip these files.
-                continue;
-            }
+        String generatedDataPath = generatedDir + "/generatedData.json";
+        pathErrorChecking(generatedDataPath);
 
-            String[] artifacts = filename.replace(".csv","").split("2", 2);
-            artifacts[0] = String.format("\"%s\"", artifacts[0]);
-            artifacts[1] = String.format("\"%s\"", artifacts[1]);
-
-            sourceTargetMap.computeIfAbsent(artifacts[0], k -> new ArrayList<>()).add(artifacts[1]);
+        String data = new String(Files.readAllBytes(Paths.get(generatedDataPath)));
+        if (data.equals("[]")){
+            throw new Exception("No links available");
         }
 
-        String data = sourceTargetMap.toString().replace("=", ":");
-        System.out.println(data);
-        return String.format("{ \"success\": true, \"data\": %s}", data);
+        JsonIterator iterator = JsonIterator.parse(data);
+        System.out.println("Start reading Array");
+
+        while (iterator.readArray()) {
+            String source = "";
+            String target = "";
+
+            for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
+                if (field.equals("filename")) {
+                    iterator.readString();
+                }
+                else if (field.equals("source")) {
+                    source = iterator.readString();
+                }
+                else {
+                    target = iterator.readString();
+                }
+            }
+
+            if (source.isEmpty() || target.isEmpty()){
+                throw new Exception("Error finding source,target links");
+            }
+
+            String key = String.format("\"%s\"", source);
+            String val = String.format("\"%s\"", target);
+            
+            sourceTargetMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
+        }
+        System.out.println("Completed reading Array");
+
+        String dataDict = sourceTargetMap.toString().replace("=", ":");
+        System.out.println(dataDict);
+        return String.format("{ \"success\": true, \"data\": %s}", dataDict);
     }
 
     public void updateMySQLTables() throws Exception {
@@ -114,6 +140,10 @@ public class GenerateFlatfile {
                 else {
                     target = iterator.readString();
                 }
+            }
+
+            if (filename.isEmpty() || source.isEmpty() || target.isEmpty()){
+                throw new Exception("Error finding source,target links");
             }
 
             String destPath = generatedDir + "/" + filename;
@@ -161,26 +191,15 @@ public class GenerateFlatfile {
             }
         }
         Files.write(Paths.get(dfile), lines);
-
-        // try (BufferedReader br = new BufferedReader(new FileReader(dfile))) {
-        //     String line;
-        //     while ((line = br.readLine()) != null) {
-        //         System.out.println(line);
-        //     }
-        //  }
-        //  System.out.println();
     }
 
-    public void pathErrorChecking(String requiredFilePath, String generatedFilePath) throws Exception {
-        File requiredFile = new File(requiredFilePath);
+    public File pathErrorChecking(String filePath) throws Exception {
+        File requiredFile = new File(filePath);
         if (!requiredFile.exists()) {
             throw new Exception("Please upload files. No files have been uploaded");
         }
 
-        File generatedFile = new File(generatedFilePath);
-        if (!generatedFile.exists()) {
-            throw new Exception("Please upload files. No files have been uploaded");
-        }
+        return requiredFile;
     }
 
     public void updateRequiredJson(String requiredFilePath, List<String> generatedFiles) throws Exception {

@@ -7,111 +7,37 @@
         </div>
       </div>
     </div> -->
-    <div id="center-panel-container">
-      <div id="source-container"><span id="source-name">UAV-1800</span><span id="source-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at</span></div>
+    <div v-if="chosenArtifact != ''" id="center-panel-container">
+      <div id="source-container"><span id="source-name">{{chosenArtifact}}</span><span id="source-description">{{artifactData[chosenArtifact].desc}}</span></div>
       <hr/>
-      <div id="target-info" @dblclick="expandDesc()"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
+      <span v-for="(artifact) in artifactData[chosenArtifact].links" :key="artifact.target">
+        <div id="target-info"><b>{{artifact.target}}:</b> {{artifact.desc}}</div>
+        <div id="target-right-info">
+          <div id="progress-bar">
+            <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="height: 10px" v-bind:style="{ width: (artifact.score*100) + '%' }"></div>
+          </div>
+          <form class="form" id="radio-buttons">
             <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
+              <label id="radio-input">
+                <input type="radio" value=0 v-model="artifact.approval">
+                Not Vetted
+              </label>
             </div>
             <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
+              <label id="radio-input">
+                <input type="radio" value=1 v-model="artifact.approval">
+                Approved
+              </label>            
             </div>
             <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
+              <label id="radio-input">
+                <input type="radio" value=2 v-model="artifact.approval">
+                Rejected
+              </label>            
             </div>
-        </form>
-      </div>  
-      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
-            </div>
-        </form>
-      </div>  
-      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
-            </div>
-        </form>
-      </div>  
-      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
-            </div>
-        </form>
-      </div>  
-      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
-            </div>
-        </form>
-      </div>     
-      <div id="target-info"><b>UAV-1400:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nunc velit, lobortis ac leo vitae, lobortis rhoncus erat. Fusce sapien turpis, hendrerit eget tempus eget, egestas ut erat. Nullam odio purus, egestas sit amet pulvinar vitae, mollis et eros. Donec pretium fermentum luctus. Fusce a orci tristique, semper mauris at, ornare neque. Mauris in enim nibh. Nullam eu odio eget elit lacinia maximus. Nulla vitae magna dui. Fusce vel lectus scelerisque enim rutrum consequat at et ante. Morbi non  </div>
-      <div id="target-right-info">
-        <div id="progress-bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 20%; height: 10px"></div>
-        </div>
-        <form class="form" id="radio-buttons">
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label" checked>Not Vetted</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Approved</label>
-            </div>
-            <div>
-              <label id="radio-input" ><input type="radio" name="optradio" id="radio-label">Rejected</label>
-            </div>
-        </form>
-      </div>  
+          </form>
+        </div>  
+      </span>
       <div id="footer">
         <div id="save-buttons">
             <button id="save-button" type="button" class="btn btn-outline-primary">Save All</button>
@@ -119,6 +45,9 @@
             <button id="save-button" type="button" class="btn btn-outline-danger">Exit without Saving</button>
         </div>
       </div>   
+    </div>
+    <div v-else id="center-panel-container">
+      Please choose source and target types to get started approving links. 
     </div>
   </div>
 </template>
@@ -128,6 +57,30 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'ApproveLinks',
 
+  props: {
+    artifactData: Object,
+    artifactIndex: Number
+  },
+
+  data () {
+    return {
+      chosenArtifact: ''
+    }
+  },
+
+  mounted () {
+    this.updateChosenArtifact()
+  },
+
+  watch: {
+    artifactIndex () {
+      this.updateChosenArtifact()
+    },
+    artifactData () {
+      this.updateChosenArtifact()
+    }
+  },
+
   computed: {
     ...mapGetters('projects.module', ['getHazardTree'])
   },
@@ -135,8 +88,11 @@ export default {
   methods: {
     ...mapActions('projects.module', ['fetchDeltaTrees']),
     ...mapActions('app.module', ['setSelectedArtifact']),
-    testfunc () {
-      console.log('test info')
+    updateChosenArtifact () {
+      if (this.artifactData != null) {
+        this.chosenArtifact = Object.keys(this.artifactData)[this.artifactIndex]
+        console.log('chosen artifact: ', this.chosenArtifact)
+      }
     }
   }
 }
@@ -171,7 +127,7 @@ export default {
     padding: 3px; 
     margin-right: 10px; 
     font-weight: bold; 
-    font-size: 20px; 
+    font-size: 18px; 
     border-radius: 5px;
   }
   #target-info {

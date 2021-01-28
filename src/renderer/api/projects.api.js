@@ -93,10 +93,10 @@ async function getLinkTypes (projId) {
   return json
 }
 
-async function getApproverData (projId) {
+async function fetchApproverData (projId) {
   // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/getapproverdata/`)
   // const json = await response.json()
-  const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
+  const response = '{ "success": true, "message": "send approver success", "data": {"UAV-200": {"desc":"test", "links": [ {"target": "UAV-700", "score": 0.8, "approval": 1, "desc": "demo description" }]}, "UAV-400": { "desc": "test 2", "links": [{"target": "UAV-1000", "score": 0.5, "approval": 2, "desc": "demo description 2" }, {"target": "UAV-12000", "score": 0.2, "approval": 0, "desc": "another description" }]} } }'
   const json = JSON.parse(response)
   console.log(json)
   return json
@@ -105,7 +105,7 @@ async function getApproverData (projId) {
 async function saveApproverData (projId, encodedStr) {
   // const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/saveapproverdata/`, { method: 'POST', body: encodedStr })
   // const json = await response.json()
-  const response = '{ "success": true, "message": "get link types success", "data": {"UAV-2": ["UAV-3", "UAV-4"], "UAV-6": ["UAV-9", "UAV-8"]}}'
+  const response = '{ "success": true, "message": "send approver success", "data": {"UAV-200": {desc: “test”, links: [ {"target": "UAV-300", "score": 0.5, "approval": "not vetted", “desc”: “Demo descr” }]}, "UAV-400": { "desc": “test 2”, "links": [{"target": "UAV-700", "score": 0.2, "approval": "not vetted", “desc”: “Descr 2” }, {"target": "UAV-500", "score": 0.2, "approval": "not vetted", “desc”: "different description" }]} } }'
   const json = JSON.parse(response)
   console.log(json)
   return json
@@ -155,7 +155,7 @@ export default {
   fetchErrorLog,
   generateTraceLinks,
   getLinkTypes,
-  getApproverData,
+  fetchApproverData,
   saveApproverData,
   fetchGenerateLinksErrorLog,
   removeTraceLinks,

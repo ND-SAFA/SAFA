@@ -13,11 +13,11 @@
 
     <div id="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="(item, index) in Object.keys(artifacts)" :key="item.id" >
-          <a class="nav-link" :class="{ active: index === selectedIndex }">
+        <li class="nav-item vw-100" v-for="(item, index) in Object.keys(artifactData)" :key="item.id" >
+          <a class="nav-link" :class="{ active: index === selectedIndex }" @click="onClickArtifact(index)">
             <div>
               <p class="hazard-title">{{item}}</p>
-              <div class="desc" :title="artifacts[item].description">{{$truncate(artifacts[item].description, 40)}}</div>
+              <div class="desc" :title="artifactData[item].desc">{{$truncate(artifactData[item].desc, 40)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
               <i class="fas fa-exclamation-triangle"></i>
@@ -33,22 +33,33 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  name: 'HazardList',
+  name: 'SourceLinksList',
+
+  props: {
+    artifactData: Object
+  },
+
   data () {
     return {
       selectedIndex: null,
       searchText: '',
-      searchFilter: {},
-      artifacts: { 'UAV-10': {'description': 'This is a test description'}, 'UAV-11': {'description': 'This is a test description'}, 'UAV-12': {'description': 'This is a test description'}, 'UAV-13': {'description': 'This is a test description'}, 'UAV-14': {'description': 'This is a test description'} }
+      searchFilter: {}
+      // artifacts: { 'UAV-10': {'description': 'This is a test description'}, 'UAV-11': {'description': 'This is a test description'}, 'UAV-12': {'description': 'This is a test description'}, 'UAV-13': {'description': 'This is a test description'}, 'UAV-14': {'description': 'This is a test description'} }
     }
   },
+
   computed: {
     ...mapGetters('projects.module', ['getHazards', 'getNodeParents']),
     ...mapGetters('app.module', ['getSelectedTree'])
   },
+
   methods: {
     ...mapActions('projects.module', ['fetchHazards', 'fetchProjectNodeParents']),
-    ...mapActions('app.module', ['setSelectedTree'])
+    ...mapActions('app.module', ['setSelectedTree']),
+    onClickArtifact (event) {
+      console.log('emitting event: ', event)
+      this.$emit('artifact-chosen', event)
+    }
   }
 }
 </script>
@@ -86,6 +97,6 @@ export default {
   #scroll-nav {
     height: calc(100vh - 296px);
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 </style>

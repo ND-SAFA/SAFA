@@ -192,7 +192,7 @@ const actions = {
 
   async getApproverData ({ commit }) {
     try {
-      const response = await projects.getApproverData(TEMP_PROJ_ID)
+      const response = await projects.fetchApproverData(TEMP_PROJ_ID)
       return response
     } catch (error) {
       console.log(error)

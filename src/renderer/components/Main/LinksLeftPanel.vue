@@ -4,13 +4,13 @@
       <p class="font-weight-bold text-uppercase mb-2 mt-2 px-2 d-flex justify-content-between align-items-center">
         Source Type<a href="#" class="text-dark"></a>
       </p>
-        <select class="custom-select mb-3" id="inputGroupSelect01" v-model="sourceSelected">
+        <select class="custom-select" id="inputGroupSelect01" v-model="sourceSelected">
           <option v-for="source in sourceTypes" :key="source.id" v-bind:value="{ item: source }">{{source}}</option>
         </select>
       <p class="font-weight-bold text-uppercase mb-2 mt-2 px-2 d-flex justify-content-between align-items-center">
         Target Type<a href="#" class="text-dark"></a>
       </p>
-        <select class="custom-select" id="inputGroupSelect01" v-model="targetSelected">
+        <select class="custom-select mb-3" id="inputGroupSelect01" v-model="targetSelected">
           <option v-for="target in linkData[sourceSelected.item]" :key="target.id">{{target}}</option>
         </select>
         <button type="button" class="btn btn-primary btn-sm mb-3" @click="requestLinkData">
@@ -18,13 +18,13 @@
       </button>
     </div>
 
-    <SourceLinksList />
+    <SourceLinksList :artifact-data="artifactData" :chosen-artifact="artifactChosen" @artifact-chosen="chooseArtifact"/>
 
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import SourceLinksList from '@/components/Main/LeftPanel/SourceLinksList'
 
 export default {
@@ -40,8 +40,10 @@ export default {
       showTab: 'Artifacts',
       sourceTypes: {},
       linkData: {},
+      artifactData: {},
       sourceSelected: '',
-      targetSelected: ''
+      targetSelected: '',
+      artifactChosen: 0
     }
   },
 
@@ -50,10 +52,17 @@ export default {
   mounted () {
     this.sourceTypes = Object.keys(this.typeData.data)
     this.linkData = this.typeData.data
+    console.log(this.linkData)
+  },
+
+  watch: {
+    update () {
+      console.log('watching for new index: ', this.artifactChosen)
+    }
   },
 
   computed: {
-    ...mapGetters('projects.module', ['getLinkTypes'])
+    ...mapActions('projects.module', ['getApproverData'])
   },
 
   methods: {
@@ -63,6 +72,15 @@ export default {
         'target': this.targetSelected
       }
       console.log(selectedDict)
+      this.getApproverData.then(result => {
+        this.artifactData = result.data
+        this.$emit('artifact-data', this.artifactData)
+      })
+    },
+    chooseArtifact (result) {
+      console.log('new artifact chosen? ', result)
+      this.artifactChosen = result
+      this.$emit('chosen-artifact', result)
     }
   }
 }

@@ -46,8 +46,8 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <LinksLeftPanel :type-data="linkTypeData"/>
-              <ApproveLinks/>
+              <LinksLeftPanel :type-data="linkTypeData" @artifact-data="choseArtifactData" @chosen-artifact="selectArtifactIndex"/>
+              <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex"/>
             </div>
           </div>
         </main>
@@ -98,6 +98,8 @@
         showDeltaModal: false,
         showUploadModal: false,
         linkTypeData: null,
+        chosenArtifactData: {},
+        chosenArtifactIndex: 0,
         uploadResult: null,
         showInfoModal: false,
         showInfoResult: null,
@@ -272,6 +274,13 @@
       },
       async clearFiles () {
         this.clearUploads().then(result => { this.triggerInfoModal(result, 'delete') })
+      },
+      selectArtifactIndex (index) {
+        console.log('new artifact found in main? ', index)
+        this.chosenArtifactIndex = index
+      },
+      choseArtifactData (linkdata) {
+        this.chosenArtifactData = linkdata
       }
     }
   }

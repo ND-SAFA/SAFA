@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -34,25 +36,24 @@ public class MySQL {
         return conn;
     }
 
-    public static void createGeneratedTable(String name, String filePath) throws Exception {
+    public static void createGeneratedTable(String tableName, String filePath) throws Exception {
         Connection conn = startDB();
         //STEP 4: Execute a query
         System.out.println("Creating table in given database...");
         Statement stmt = conn.createStatement();
-        String tableName = name.toUpperCase();
         
         try {
             String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) +
-                            "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
-                            "SOURCE VARCHAR(255) NOT NULL,\n" +
-                            "TARGET VARCHAR(255) NOT NULL,\n" + 
-                            "SCORE FLOAT NOT NULL,\n" + 
-                            "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
-                            "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
-                            ");";
-        
+                "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
+                "SOURCE VARCHAR(255) NOT NULL,\n" +
+                "TARGET VARCHAR(255) NOT NULL,\n" + 
+                "SCORE FLOAT NOT NULL,\n" + 
+                "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
+                "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
+            ");";
+
             stmt.executeUpdate(sqlCreateTable);
-            System.out.println(String.format("Created table: %s in given database...", tableName));
+            System.out.println(String.format("Created GENERATED table: %s in given database...", tableName));
 
             String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
                 "FIELDS TERMINATED BY ','\n" +
@@ -62,15 +63,24 @@ public class MySQL {
                 "(SOURCE, TARGET, SCORE);";
 
             stmt.executeUpdate(sqlLoadData);
-            System.out.println(String.format("Loaded file: %s into table: %s...", filePath, tableName));
+            System.out.println(String.format("Loaded GENERATED file: %s into table: %s...", filePath, tableName));
+
+            String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
+            "SOURCE = TRIM(TRIM(BOTH '\r' from SOURCE)),\n" +
+            "TARGET = TRIM(TRIM(BOTH '\r' from TARGET));";
+
+            stmt.executeUpdate(sqlTrim);
+            System.out.println("Trimming whitespaces");
+
         } catch(SQLException e) {
             if (e.getErrorCode() == 1050){ // Table already exists error
                 modifyGeneratedTable(stmt, tableName, filePath);
             } else {
                 throw new SQLException(e);
             }
+        } finally {
+            conn.close();
         }
-        conn.close();
     }
 
     public static void modifyGeneratedTable(Statement stmt, String tableName, String filePath) throws Exception {
@@ -80,33 +90,39 @@ public class MySQL {
         String newTable = String.format("NEW_%s", tableName);
 
         String sqlCreateTempTable = String.format("CREATE TEMPORARY TABLE %s\n", tempTableName) + 
-        String.format("SELECT * FROM %s\n", tableName) +
-        "LIMIT 0;";
+        String.format("SELECT * FROM %s\n", tableName) + "LIMIT 0;";
         
         stmt.executeUpdate(sqlCreateTempTable);
         System.out.println("Created Temporary Table.");
 
         String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tempTableName) +
-        "FIELDS TERMINATED BY ','\n" +
-        "ENCLOSED BY '\"'\n" +
-        "LINES TERMINATED BY '\\n'\n" +
-        "IGNORE 1 ROWS\n" +
-        "(SOURCE, TARGET, SCORE);";
+            "FIELDS TERMINATED BY ','\n" +
+            "ENCLOSED BY '\"'\n" +
+            "LINES TERMINATED BY '\\n'\n" +
+            "IGNORE 1 ROWS\n" +
+            "(SOURCE, TARGET, SCORE);";
 
         stmt.executeUpdate(sqlLoadData);
         System.out.println("Loaded Data into Temporary Table.");
 
+        String sqlTrim = String.format("UPDATE %s SET\n", tempTableName) + 
+            "SOURCE = TRIM(TRIM(BOTH '\r' from SOURCE)),\n" +
+            "TARGET = TRIM(TRIM(BOTH '\r' from TARGET));";
+            
+        stmt.executeUpdate(sqlTrim);
+        System.out.println("Trimming whitespaces");
+
         String sqlCreateNewTable = String.format("CREATE TABLE %s (\n", newTable) + // Create New Table.
-        "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
-        "SOURCE VARCHAR(255) NOT NULL,\n" +
-        "TARGET VARCHAR(255) NOT NULL,\n" + 
-        "SCORE FLOAT NOT NULL,\n" + 
-        "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
-        "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
+            "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
+            "SOURCE VARCHAR(255) NOT NULL,\n" +
+            "TARGET VARCHAR(255) NOT NULL,\n" + 
+            "SCORE FLOAT NOT NULL,\n" + 
+            "APPROVAL INT NOT NULL DEFAULT 2,\n" + 
+            "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
         ");";
 
         stmt.executeUpdate(sqlCreateNewTable);
-        System.out.println("Created New Table.");
+        System.out.println("Created New GENERATED Table.");
 
         String sqlJoin = String.format("INSERT INTO %s (SOURCE, TARGET, SCORE, APPROVAL)\n", newTable) +
             "SELECT TEMP.SOURCE, TEMP.TARGET, TEMP.SCORE, IFNULL(OLD.APPROVAL,2)\n" +
@@ -126,6 +142,144 @@ public class MySQL {
         System.out.println("Renamed New Table to Old Table. Modify Generated Table Complete!");
     }
 
+    public static void createArtifactTable(String tableName, String filePath, String colHeader) throws Exception {
+        Connection conn = startDB();
+        //STEP 4: Execute a query
+        System.out.println("Creating Artifact table in given database...");
+        Statement stmt = conn.createStatement();
+        
+        try {
+            String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) + 
+                "ID VARCHAR(255) PRIMARY KEY,\n" +
+                "SUMMARY TEXT NOT NULL,\n" + 
+                "CONTENT TEXT NOT NULL\n" +
+            ");";
+        
+            stmt.executeUpdate(sqlCreateTable);
+            System.out.println(String.format("Created Artifact table: %s in given database...", tableName));
+
+            String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
+                "FIELDS TERMINATED BY ','\n" +
+                "ENCLOSED BY '\"'\n" +
+                "LINES TERMINATED BY '\\n'\n" +
+                "IGNORE 1 ROWS\n" +
+                colHeader + ";";
+
+            stmt.executeUpdate(sqlLoadData);
+            System.out.println(String.format("Loaded file: %s into Artifact table: %s...", filePath, tableName));
+
+            String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
+            "SUMMARY = TRIM(TRIM(BOTH '\r' from SUMMARY)),\n" +
+            "CONTENT = TRIM(TRIM(BOTH '\r' from CONTENT));";
+
+            stmt.executeUpdate(sqlTrim);
+            System.out.println("Trimming whitespaces");
+
+        } catch(SQLException e) {
+            if (e.getErrorCode() == 1050){ // Table already exists error
+                overwriteArtifactTable(stmt, tableName, filePath, colHeader);
+            } else {
+                throw new SQLException(e);
+            }
+        } finally {
+            conn.close();
+        }
+    }
+
+    public static void overwriteArtifactTable(Statement stmt, String tableName, String filePath, String colHeader) throws Exception {
+        System.out.println("Overwrite Artifact Table");
+        String sqlClearTable = String.format("TRUNCATE TABLE %s\n", tableName);
+        stmt.executeUpdate(sqlClearTable);
+
+        System.out.println(String.format("Cleared Artifact table: %s in given database...", tableName));
+
+        String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
+            "FIELDS TERMINATED BY ','\n" +
+            "ENCLOSED BY '\"'\n" +
+            "LINES TERMINATED BY '\\n'\n" +
+            "IGNORE 1 ROWS\n" +
+            colHeader + ";";
+
+        stmt.executeUpdate(sqlLoadData);
+        System.out.println(String.format("Loaded file: %s into Artifact table: %s...", filePath, tableName));
+
+        String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
+        "SUMMARY = TRIM(TRIM(BOTH '\r' from SUMMARY)),\n" +
+        "CONTENT = TRIM(TRIM(BOTH '\r' from CONTENT));";
+
+        stmt.executeUpdate(sqlTrim);
+        System.out.println("Trimming whitespaces");
+    }
+
+    public static void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws Exception {
+        Connection conn = startDB();
+        //STEP 4: Execute a query
+        System.out.println("Creating Trace Matrix table in given database...");
+        Statement stmt = conn.createStatement();
+        
+        try {
+            String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) + 
+                "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
+                "SOURCE VARCHAR(255) NOT NULL,\n" +
+                "TARGET VARCHAR(255) NOT NULL,\n" +
+                "UNIQUE KEY SOURCE_TARGET (SOURCE,TARGET)\n" +
+            ");";
+        
+            stmt.executeUpdate(sqlCreateTable);
+            System.out.println(String.format("Created Trace Matrix table: %s in given database...", tableName));
+
+            String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
+                "FIELDS TERMINATED BY ','\n" +
+                "ENCLOSED BY '\"'\n" +
+                "LINES TERMINATED BY '\\n'\n" +
+                "IGNORE 1 ROWS\n" +
+                colHeader + ";";
+
+            stmt.executeUpdate(sqlLoadData);
+            System.out.println(String.format("Loaded file: %s into Artifact table: %s...", filePath, tableName));
+
+            String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
+            "SOURCE = TRIM(TRIM(BOTH '\r' from SOURCE)),\n" +
+            "TARGET = TRIM(TRIM(BOTH '\r' from TARGET));";
+
+            stmt.executeUpdate(sqlTrim);
+            System.out.println("Trimming whitespaces");
+
+        } catch(SQLException e) {
+            if (e.getErrorCode() == 1050){ // Table already exists error
+                overwriteTraceMatrixTable(stmt, tableName, filePath, colHeader);
+            } else {
+                throw new SQLException(e);
+            }
+        } finally {
+            conn.close();
+        }
+    }
+
+    public static void overwriteTraceMatrixTable(Statement stmt, String tableName, String filePath, String colHeader) throws Exception {
+        System.out.println("Overwrite Trace Matrix Table");
+        String sqlClearTable = String.format("TRUNCATE TABLE %s\n", tableName);
+        stmt.executeUpdate(sqlClearTable);
+
+        System.out.println(String.format("Cleared Trace Matrix table: %s in given database...", tableName));
+
+        String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
+            "FIELDS TERMINATED BY ','\n" +
+            "ENCLOSED BY '\"'\n" +
+            "LINES TERMINATED BY '\\n'\n" +
+            "IGNORE 1 ROWS\n" +
+            colHeader + ";";
+
+        stmt.executeUpdate(sqlLoadData);
+        System.out.println(String.format("Loaded file: %s into Trace Matrix table: %s...", filePath, tableName));
+
+        String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
+        "SOURCE = TRIM(TRIM(BOTH '\r' from SOURCE)),\n" +
+        "TARGET = TRIM(TRIM(BOTH '\r' from TARGET));";
+
+        stmt.executeUpdate(sqlTrim);
+        System.out.println("Trimming whitespaces");
+    }
 
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);

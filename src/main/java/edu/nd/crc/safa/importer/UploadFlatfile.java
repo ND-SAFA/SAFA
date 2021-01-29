@@ -10,6 +10,10 @@ import java.util.Base64;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+
 import com.jsoniter.JsonIterator;
 import org.springframework.stereotype.Component;
 
@@ -76,6 +80,68 @@ public class UploadFlatfile {
       byte[] bytes = Base64.getDecoder().decode(encodedData);
       String fullPath = flatfileDir + "/" + filename; 
       Files.write(Paths.get(fullPath), bytes);
+      
+      if (filename.equals("tim.json")) {
+        continue;
+      }
+
+      try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))){
+        String[] headers = uploadedFileReader.readLine().split(",");
+        System.out.println(headers);
+
+        if (headers.length == 2) {
+          Boolean source = false;
+          Boolean target = false;
+          List<String> cols = new ArrayList<String>();
+
+          for (String header : headers) {
+            if (header.toUpperCase().equals("SOURCE")) {
+              source = true;
+              cols.add("SOURCE");
+            }
+            else if (header.toUpperCase().equals("TARGET")) {
+              target = true;
+              cols.add("TARGET");
+            }
+          }
+
+          if (source && target) {
+            String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
+            String colHeader = cols.toString().replace("[","(").replace("]", ")");
+            MySQL.createTraceMatrixTable(tableName,fullPath, colHeader);
+          }        
+        }
+        else if (headers.length == 3) {
+          Boolean id = false;
+          Boolean summary = false;
+          Boolean content = false;
+          List<String> cols = new ArrayList<String>();
+
+          for (String header : headers) {
+            if (header.toUpperCase().equals("ID")) {
+              id = true;
+              cols.add("ID");
+            }
+            else if (header.toUpperCase().equals("SUMMARY")) {
+              summary = true;
+              cols.add("SUMMARY");
+            }
+            else if (header.toUpperCase().equals("CONTENT")) {
+              content = true;
+              cols.add("CONTENT");
+            }
+          }
+
+          if (id && summary && content) {
+            String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
+            String colHeader = cols.toString().replace("[","(").replace("]", ")");
+            MySQL.createArtifactTable(tableName,fullPath, colHeader);
+          }
+        }
+        else {
+          System.out.println(String.format("Do not recognize file: ", filename));
+        }
+      }
     }
   }
 

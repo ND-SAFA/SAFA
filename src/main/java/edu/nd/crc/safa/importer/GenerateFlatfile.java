@@ -108,7 +108,7 @@ public class GenerateFlatfile {
                 continue;
             }
 
-            String tableName = filename.replace(".csv","");
+            String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
             String filePath = generatedDir + '/' + filename;
 
             MySQL.createGeneratedTable(tableName, filePath);

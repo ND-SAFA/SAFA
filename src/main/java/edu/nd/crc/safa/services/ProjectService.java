@@ -157,7 +157,8 @@ public class ProjectService {
           return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         }
         else {
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());        }
+          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
       }
     }
     catch(Exception e){
@@ -167,7 +168,9 @@ public class ProjectService {
       }
       else {
         System.out.println("Error uploading Flatfiles: OTHER");
-        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
+        System.out.println(e.getMessage());
+        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        // return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
       }
     }
   }

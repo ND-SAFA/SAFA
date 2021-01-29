@@ -1,12 +1,5 @@
 <template>
   <div id="center-panel" role="tabpanel" aria-labelledby="artifact-tree-tab" class="fade col show active graph-view p-0">
-    <!-- <div id="loading-graph-spinner" v-show="showSpinner">
-      <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-    </div> -->
     <div v-if="chosenArtifact != ''" id="center-panel-container">
       <div id="source-container"><span id="source-name">{{chosenArtifact}}</span><span id="source-description">{{artifactData[chosenArtifact].desc}}</span></div>
       <hr/>
@@ -40,9 +33,9 @@
       </span>
       <div id="footer">
         <div id="save-buttons">
-            <button id="save-button" type="button" class="btn btn-outline-primary">Save All</button>
-            <button id="save-button" type="button" class="btn btn-outline-primary">Save All and Exit</button>
-            <button id="save-button" type="button" class="btn btn-outline-danger">Exit without Saving</button>
+            <button id="save-button" type="button" class="btn btn-outline-primary" @click="saveAll">Save All</button>
+            <button id="save-button" type="button" class="btn btn-outline-primary" @click="saveAllAndExit">Save All and Exit</button>
+            <button id="save-button" type="button" class="btn btn-outline-danger" @click="exitWithoutSaving">Exit without Saving</button>
         </div>
       </div>   
     </div>
@@ -93,6 +86,17 @@ export default {
         this.chosenArtifact = Object.keys(this.artifactData)[this.artifactIndex]
         console.log('chosen artifact: ', this.chosenArtifact)
       }
+    },
+    saveAll () {
+      console.log('save all')
+    },
+    saveAllAndExit () {
+      console.log('save all and exit')
+      this.$emit('close-approver')
+    },
+    exitWithoutSaving () {
+      console.log('exit')
+      this.$emit('close-approver')
     }
   }
 }

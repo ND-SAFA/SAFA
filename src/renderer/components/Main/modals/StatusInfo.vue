@@ -22,7 +22,8 @@
                 </div>
                 <div class="modal-footer custom-modal-footer">
                   <button type="button" class="btn btn-outline-secondary" @click="$emit('close')">Close</button>
-                  <button v-if="modalResult.errorLog === true && showDownloadButton === true" download="fileName" href="fileData" type="button" class="btn btn-primary delta-save-button" @click="downloadFile()">Download Error Log</button>
+                  <button v-if="modalResult.errorLog === true && showDownloadButton === true" download="fileName" href="fileData" type="button" class="btn btn-outline-secondary delta-save-button" @click="downloadFile()">Download Error Log</button>
+                  <button v-if="type === 'generate'" class="btn btn-primary delta-save-button" @click="$emit('approve-links')">Approve Links</button>
                 </div>
               </form>
               <form v-else class="delta-form">
@@ -50,7 +51,8 @@
   export default {
     props: {
       isHidden: Boolean,
-      modalResult: Object
+      modalResult: Object,
+      type: String
     },
 
     data () {

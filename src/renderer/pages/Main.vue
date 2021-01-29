@@ -31,7 +31,7 @@
             </div>
             <ConfigureDeltaModal :is-hidden="!showDeltaModal" @close="showDeltaModal = false" />
             <FileUploadResultsModal :is-hidden="!showUploadModal" :modal-result="uploadResult" @close="showUploadModal = false" @select-files="uploadMoreFiles" @generate-links="projectGenerate" @sync-data="projectSync"/>
-            <StatusInfoModal :is-hidden="!showInfoModal" @close="showInfoModal = false" :modal-result="showInfoResult"/>
+            <StatusInfoModal :is-hidden="!showInfoModal" @close="showInfoModal = false" :modal-result="showInfoResult" :type="uploadModalType" @approve-links="switchToApprovalView"/>
           </div>
         </main>
       </div>
@@ -47,7 +47,7 @@
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
               <LinksLeftPanel :type-data="linkTypeData" @artifact-data="choseArtifactData" @chosen-artifact="selectArtifactIndex"/>
-              <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex"/>
+              <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex" @close-approver="approvalView = false"/>
             </div>
           </div>
         </main>
@@ -97,6 +97,7 @@
         update: Date.now(),
         showDeltaModal: false,
         showUploadModal: false,
+        uploadModalType: '',
         linkTypeData: null,
         chosenArtifactData: {},
         chosenArtifactIndex: 0,
@@ -194,7 +195,8 @@
         await this.getLinkTypes().then(result => {
           this.linkTypeData = result
         })
-        this.approvalView = !this.approvalView
+        this.showInfoModal = false
+        this.approvalView = true
       },
       resizeView () {
         this.resize = Date.now()
@@ -246,6 +248,7 @@
         this.$nextTick(() => { this.projectUpload() })
       },
       triggerInfoModal (response, type) {
+        this.uploadModalType = type
         if (type === 'upload' || type === 'generate') {
           response.errorLog = true
         } else {

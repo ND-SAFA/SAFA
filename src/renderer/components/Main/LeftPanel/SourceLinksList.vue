@@ -13,10 +13,10 @@
 
     <div id="scroll-nav">
       <ul id="hazard-list" class="nav">
-        <li class="nav-item vw-100" v-for="(item, index) in Object.keys(artifactData)" :key="item.id" >
+        <li class="nav-item vw-100" v-for="(item, index) in Object.keys(artifactData)" :key="item.id">
           <a class="nav-link" :class="{ active: index === selectedIndex }" @click="onClickArtifact(index)">
             <div>
-              <p class="hazard-title">{{item}}</p>
+              <p class="hazard-title">{{item}}{{index}}</p>
               <div class="desc" :title="artifactData[item].desc">{{$truncate(artifactData[item].desc, 40)}}</div>
             </div>
             <span v-if="item.warnings" class="badge badge-pill badge-warning px-1">
@@ -41,10 +41,9 @@ export default {
 
   data () {
     return {
-      selectedIndex: null,
+      selectedIndex: 0,
       searchText: '',
       searchFilter: {}
-      // artifacts: { 'UAV-10': {'description': 'This is a test description'}, 'UAV-11': {'description': 'This is a test description'}, 'UAV-12': {'description': 'This is a test description'}, 'UAV-13': {'description': 'This is a test description'}, 'UAV-14': {'description': 'This is a test description'} }
     }
   },
 
@@ -58,6 +57,7 @@ export default {
     ...mapActions('app.module', ['setSelectedTree']),
     onClickArtifact (event) {
       console.log('emitting event: ', event)
+      this.selectedIndex = event
       this.$emit('artifact-chosen', event)
     }
   }

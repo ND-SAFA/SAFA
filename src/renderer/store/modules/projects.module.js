@@ -10,6 +10,7 @@ const TEMP_PROJ_ID = 'spwd.cse.nd.edu'
 const state = {
   projects: {
     syncProgress: -1,
+    generateProgress: -1,
     delta: {
       trees: []
     },
@@ -53,6 +54,10 @@ const getters = {
 
   getSyncProgress (state) {
     return state.projects.syncProgress
+  },
+
+  getGenerateProgress (state) {
+    return state.projects.generateProgress
   },
 
   getUploadFiles (state) {
@@ -174,9 +179,13 @@ const actions = {
 
   async generateTraceLinks ({ commit }) {
     try {
+      commit('SET_GENERATE_PROGRESS', -1)
+      commit('SET_GENERATE_PROGRESS', 1)
       const response = await projects.generateTraceLinks(TEMP_PROJ_ID)
+      commit('SET_GENERATE_PROGRESS', -1)
       return response
     } catch (error) {
+      commit('SET_GENERATE_PROGRESS', -1)
       console.log(error)
     }
   },
@@ -265,6 +274,10 @@ const mutations = {
     state.projects.syncProgress = data
   },
 
+  SET_GENERATE_PROGRESS (state, data) {
+    state.projects.generateProgress = data
+  },
+
   UPLOAD_FILES (state, data) {
     state.projects.uploadFiles = data
   },
@@ -272,6 +285,7 @@ const mutations = {
   RESET_PROJECT (state) {
     state.projects = {
       syncProgress: -1,
+      generateProgress: -1,
       delta: {
         trees: []
       },

@@ -118,6 +118,12 @@ public class MySQL {
         stmt.executeUpdate(sqlTrim);
         System.out.println("TRIMMED WHITESPACE STORED IN COLUMNS");
 
+        if (tableExists(stmt, newTable)){
+            String sqlDelete = String.format("DROP TABLE %s",newTable);
+            stmt.executeUpdate(sqlDelete);
+            System.out.println("DELETED ABANDONED GENERATED TABLE");
+        }
+
         String sqlCreateNewTable = String.format("CREATE TABLE %s (\n", newTable) + // Create New Table.
             "ID INT AUTO_INCREMENT PRIMARY KEY,\n" + 
             "SOURCE VARCHAR(255) NOT NULL,\n" +

@@ -124,7 +124,6 @@ public class UploadFlatfile {
   public void parseRegFileDB(String filename, String fullPath) throws Exception {
     try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))) {
       String[] headers = uploadedFileReader.readLine().split(",");
-      System.out.println(headers);
 
       if (headers.length == 2) {
         Boolean source = false;

@@ -1,5 +1,5 @@
 <template>
-  <div id="center-panel-2" role="tabpanel" aria-labelledby="fault-tree-tab" class="fade col d-none graph-view p-0">
+  <div id="center-panel-2" role="tabpanel" aria-labelledby="fault-tree-tab" aria-hidden="true" class="col d-none graph-view p-0">
     <div id="loading-graph-spinner" v-show="showSpinner">
       <div class="d-flex justify-content-center">
         <div class="spinner-border text-primary" role="status">
@@ -12,6 +12,9 @@
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
+    </div>
+    <div v-if="elements.length==0" id="message">
+        <p>Load a fault tree by selecting "File <i class="fas fa-arrow-right"></i> Open FTA File" from the application menu.</p>
     </div>
     <div id="cy-fta-parent">
       <div id="cy-fta" ref="cyfta"></div>
@@ -102,7 +105,7 @@ export default {
       try {
         this.isUpdating = true
         const layout = new LayoutTemplateKlay({
-          zoom: 1.5,
+          zoom: 1.1,
           spacing: 30,
           direction: L.DIRECTION.DOWN,
           fixedAlignment: L.FIXED_ALIGNMENT.BALANCED,
@@ -137,5 +140,18 @@ export default {
     height: 100%;
     background: white;
     z-index: 1000;
+  }
+
+  #message {
+    padding-top: 25%;
+  }
+
+  #message p {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  #message i {
+    font-size: .8rem;
   }
 </style>

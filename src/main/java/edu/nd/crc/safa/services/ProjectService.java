@@ -115,7 +115,7 @@ public class ProjectService {
   public String generateLinks(String projId){
     try {
       String generateFileResult = generateFlatfile.generateFiles();
-      generateFlatfile.updateMySQLTables();
+      generateFlatfile.createGeneratedTraceMatrixTables();
       return generateFileResult;
     } 
     catch (Exception e) {

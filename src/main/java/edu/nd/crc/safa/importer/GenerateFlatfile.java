@@ -98,7 +98,7 @@ public class GenerateFlatfile {
         return String.format("{ \"success\": true, \"data\": %s}", dataDict);
     }
 
-    public void updateMySQLTables() throws Exception {
+    public void createGeneratedTraceMatrixTables() throws Exception {
         String generatedDir = "/generatedFilesDir";
         File genDir = UploadFlatfile.createDirectory(generatedDir);
         List<String> generatedFiles = Arrays.asList(genDir.list());
@@ -111,7 +111,7 @@ public class GenerateFlatfile {
             String tableName = "generated_" + filename.replaceAll("(?i)\\.csv","").toLowerCase();
             String filePath = generatedDir + '/' + filename;
 
-            MySQL.createGeneratedTable(tableName, filePath);
+            MySQL.createGeneratedTraceMatrixTable(tableName, filePath);
         }
     }
 

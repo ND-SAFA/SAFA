@@ -82,66 +82,152 @@ public class UploadFlatfile {
       Files.write(Paths.get(fullPath), bytes);
       
       if (filename.equals("tim.json")) {
-        continue;
+        MySQL.clearTimTables();
+        parseTimDB(fullPath);
+      } else {
+        parseRegFileDB(filename, fullPath);
       }
+    }
+  }
 
-      try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))){
-        String[] headers = uploadedFileReader.readLine().split(",");
-        System.out.println(headers);
+  public void parseTimDB(String fullPath) throws Exception {
+    String data = new String(Files.readAllBytes(Paths.get(fullPath)));
+    JsonIterator iterator = JsonIterator.parse(data);
 
-        if (headers.length == 2) {
-          Boolean source = false;
-          Boolean target = false;
-          List<String> cols = new ArrayList<String>();
+    for (String field = iterator.readObject(); field != null; field = iterator.readObject()){
+      if (field.toLowerCase().equals("datafiles")) {
+        for (String artifactName = iterator.readObject(); artifactName != null; artifactName = iterator.readObject()){
+          String fileName = "";
 
-          for (String header : headers) {
-            if (header.toUpperCase().equals("SOURCE")) {
-              source = true;
-              cols.add("SOURCE");
+          for (String field2 = iterator.readObject(); field2 != null; field2 = iterator.readObject()){
+            if (!field2.toLowerCase().equals("file")){
+              throw new Exception(String.format("Artifact: %s. Expected File attribute. The File attribute should appear as 'File': 'FileName'", artifactName));
             }
-            else if (header.toUpperCase().equals("TARGET")) {
-              target = true;
-              cols.add("TARGET");
-            }
+
+            fileName = iterator.readString();
           }
 
-          if (source && target) {
-            String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-            String colHeader = cols.toString().replace("[","(").replace("]", ")");
-            MySQL.createTraceMatrixTable(tableName,fullPath, colHeader);
-          }        
-        }
-        else if (headers.length == 3) {
-          Boolean id = false;
-          Boolean summary = false;
-          Boolean content = false;
-          List<String> cols = new ArrayList<String>();
-
-          for (String header : headers) {
-            if (header.toUpperCase().equals("ID")) {
-              id = true;
-              cols.add("ID");
-            }
-            else if (header.toUpperCase().equals("SUMMARY")) {
-              summary = true;
-              cols.add("SUMMARY");
-            }
-            else if (header.toUpperCase().equals("CONTENT")) {
-              content = true;
-              cols.add("CONTENT");
-            }
+          if (fileName.isEmpty()) {
+            throw new Exception(String.format("Did not provide a File for Artifact: %s. The File attribute should appear as 'File': 'FileName.csv'", artifactName));
           }
 
-          if (id && summary && content) {
-            String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-            String colHeader = cols.toString().replace("[","(").replace("]", ")");
-            MySQL.createArtifactTable(tableName,fullPath, colHeader);
-          }
-        }
-        else {
-          System.out.println(String.format("Do not recognize file: ", filename));
+          String artifactTableName = fileName.replaceAll("(?i)\\.csv","").toLowerCase();
+          MySQL.createTimArtifactsTable(artifactName, artifactTableName);
         }
       }
+      else {
+        parseLinkDB(field, iterator);
+      }
+    }
+  }
+
+  public void parseRegFileDB(String filename, String fullPath) throws Exception {
+    try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))) {
+      String[] headers = uploadedFileReader.readLine().split(",");
+      System.out.println(headers);
+
+      if (headers.length == 2) {
+        Boolean source = false;
+        Boolean target = false;
+        List<String> cols = new ArrayList<String>();
+
+        for (String header : headers) {
+          if (header.toLowerCase().equals("source")) {
+            source = true;
+            cols.add("source");
+          }
+          else if (header.toLowerCase().equals("target")) {
+            target = true;
+            cols.add("target");
+          }
+        }
+
+        if (source && target) {
+          String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
+          String colHeader = cols.toString().replace("[","(").replace("]", ")");
+          MySQL.createTraceMatrixTable(tableName,fullPath, colHeader);
+        }        
+      }
+      else if (headers.length == 3) {
+        Boolean id = false;
+        Boolean summary = false;
+        Boolean content = false;
+        List<String> cols = new ArrayList<String>();
+
+        for (String header : headers) {
+          if (header.toLowerCase().equals("id")) {
+            id = true;
+            cols.add("id");
+          }
+          else if (header.toLowerCase().equals("summary")) {
+            summary = true;
+            cols.add("summary");
+          }
+          else if (header.toLowerCase().equals("content")) {
+            content = true;
+            cols.add("content");
+          }
+        }
+
+        if (id && summary && content) {
+          String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
+          String colHeader = cols.toString().replace("[","(").replace("]", ")");
+          MySQL.createArtifactTable(tableName,fullPath, colHeader);
+        }
+      }
+      else {
+        System.out.println(String.format("Do not recognize file: %s", filename));
+      }
+    }
+  }
+
+  public void parseLinkDB(String field, JsonIterator iterator) throws Exception {
+    String filename = "";
+    String source = "";
+    String target = "";
+    Boolean generated = false;
+
+    for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
+      if (!attr.toLowerCase().matches("file|source|target|generatelinks")) {
+        throw new Exception(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', 'Source', 'Target', or 'generateLinks'", field, attr));
+      }
+
+      if (attr.toLowerCase().equals("file")){
+        filename = iterator.readString();
+      }
+
+      if (attr.toLowerCase().equals("source")){
+        source = iterator.readString();
+      }
+
+      if (attr.toLowerCase().equals("target")){
+        target = iterator.readString();
+      }
+
+      if (attr.toLowerCase().equals("generatelinks")){
+        generated = iterator.readString().toLowerCase().equals("true") ? true : false;
+      }
+    }
+
+    if (source.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    if (target.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    if (filename.isEmpty()) {
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are 'File', 'Source', 'Target'", field));
+    }
+
+    String artifactTableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
+
+    if (generated){
+      MySQL.createTimTraceMatrixTable(field, artifactTableName, source, target, generated);
+    }
+    else {
+      MySQL.createTimTraceMatrixTable(field, artifactTableName, source, target, generated);
     }
   }
 

@@ -129,6 +129,10 @@ export default {
           component.$emit('select:node')
           component.setSelectedArtifact(evt.target.data())
         })
+        this.cytoscapeProto.cy.on('select', 'edge', evt => {
+          component.$emit('select:edge')
+          component.setSelectedArtifact(evt.target.data())
+        })
         this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
       } catch (e) {
         console.log(e)

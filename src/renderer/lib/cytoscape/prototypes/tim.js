@@ -75,6 +75,7 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
         targetNode.on('position', update)
         sourceNode.on('remove', destroy)
         targetNode.on('remove', destroy)
+        addedEles.on('remove', destroy)
         cy.on('pan zoom resize', update)
       }
     })

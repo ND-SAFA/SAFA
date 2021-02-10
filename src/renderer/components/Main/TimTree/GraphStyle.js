@@ -51,5 +51,11 @@ export default [
       'target-arrow-color': 'red',
       'source-arrow-color': 'red'
     }
+  },
+  {
+    selector: 'edge:selected',
+    style: {
+      'line-color': 'blue'
+    }
   }
 ]

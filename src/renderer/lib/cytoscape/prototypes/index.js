@@ -24,7 +24,7 @@ export default class CytoscapePrototype {
     const self = this
     const cy = cytoscape({
       container: this.container,
-      elements: this.elements,
+      elements: this.elements ? this.elements : null,
       wheelSensitivity: this.options.CORE_WHEEL_SENSITIVITY,
       style: this.style,
       ready: function () {
@@ -34,7 +34,7 @@ export default class CytoscapePrototype {
         self.layoutHook(cy)
       }
     })
-    self.postLayoutHook(cy)
+    this.cy = self.postLayoutHook(cy)
     this.cy = cy
     let _resolve = null
     let promise = new Promise((resolve) => {

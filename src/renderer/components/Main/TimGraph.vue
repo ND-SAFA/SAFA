@@ -15,6 +15,7 @@
     </div>
     <div id="cy-parent">
       <div id="cy" ref="cy"></div>
+      <v-mousetrap :shortcode="'backspace'" @trigger="eraseNode"/>
     </div>
   </div>
 </template>
@@ -25,11 +26,23 @@ import AppMenu from '@/menu'
 import Vue from 'vue'
 import CytoscapeMixin from '@/mixins/cytoscape-graph'
 import * as GraphOptions from '@/components/Main/SafetyArtifactTree/GraphOptions'
-import GraphStyle from '@/components/Main/SafetyArtifactTree/GraphStyle'
-import CytoscapePrototypeSAFA from '@/lib/cytoscape/prototypes/safa'
+import GraphStyle from '@/components/Main/TimTree/GraphStyle'
+import CytoscapePrototypeTIM from '@/lib/cytoscape/prototypes/tim'
 import LayoutTemplateKlay from '@/lib/cytoscape/layouts/layout-template-klay'
+import Mousetrap from 'mousetrap'
 
 const L = LayoutTemplateKlay
+
+const VMousetrap = {
+  props: ['shortcode', 'modifier'],
+  render: () => null,
+  mounted () {
+    Mousetrap.bind(this.shortcode, evt => this.$emit('trigger', evt), this.modifier)
+  },
+  beforeDestroy () {
+    Mousetrap.unbind(this.shortcode, this.modifier)
+  }
+}
 
 export default {
   name: 'SafetyArtifactTree',
@@ -40,6 +53,7 @@ export default {
     isFetchingFromServer: Boolean
   },
   mixins: [CytoscapeMixin],
+  components: { VMousetrap },
 
   computed: {
     ...mapGetters('projects.module', ['getHazardTree', 'getSafetyArtifactTree']),
@@ -85,6 +99,7 @@ export default {
   methods: {
     ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees']),
     ...mapActions('app.module', ['setSelectedArtifact']),
+    ...mapGetters('app.module', ['getSelectedArtifact']),
 
     async renderTree (container) {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
@@ -108,7 +123,7 @@ export default {
         })
 
         const component = this
-        this.cytoscapeProto = new CytoscapePrototypeSAFA(container, this.treeElements, GraphOptions, GraphStyle, layout)
+        this.cytoscapeProto = new CytoscapePrototypeTIM(container, null, GraphOptions, GraphStyle, layout)
         await this.cytoscapeProto.run()
         this.cytoscapeProto.cy.on('select', 'node', evt => {
           component.$emit('select:node')
@@ -120,6 +135,14 @@ export default {
         // TODO(Adam): Handle Error
       }
       this.isUpdating = false
+    },
+    eraseNode () {
+      var id = this.getSelectedArtifact()
+      console.log('id: ', id)
+      var j = this.cytoscapeProto.cy.getElementById(id.id)
+      if (j.length > 0) {
+        this.cytoscapeProto.cy.remove(j)
+      }
     }
   }
 }

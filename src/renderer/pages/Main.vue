@@ -47,7 +47,8 @@
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
               <LinksLeftPanel :type-data="linkTypeData" @artifact-data="choseArtifactData" @chosen-artifact="selectArtifactIndex"/>
-              <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex" @close-approver="approvalView = false"/>
+              <!-- <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex" @close-approver="approvalView = false"/> -->
+              <TimGraph/>
             </div>
           </div>
         </main>
@@ -72,6 +73,7 @@
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
   import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
   import StatusInfoModal from '@/components/Main/modals/StatusInfo'
+  import TimGraph from '@/components/Main/TimGraph'
 
   export default {
     name: 'main-page',
@@ -86,7 +88,8 @@
       ApproveLinks,
       ConfigureDeltaModal,
       FileUploadResultsModal,
-      StatusInfoModal
+      StatusInfoModal,
+      TimGraph
     },
 
     data () {

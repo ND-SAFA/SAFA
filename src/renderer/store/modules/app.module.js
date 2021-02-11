@@ -44,6 +44,8 @@ const actions = {
   },
 
   setSelectedArtifact ({ commit }, artifact) {
+    console.log('selecting artifact')
+    console.log(artifact)
     commit('SET_SELECTED_ARTIFACT', artifact)
   },
 

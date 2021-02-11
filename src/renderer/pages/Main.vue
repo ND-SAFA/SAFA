@@ -1,5 +1,6 @@
 <template>
-  <div v-if="!approvalView" id="mainpage">
+<div>
+  <div v-if="!approvalView && !timView" id="mainpage">
     <!-- Header Nav -->
     <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
 
@@ -39,7 +40,7 @@
 
     </div>
   </div>
-  <div v-else id="mainpage">
+  <div v-if="approvalView === true" id="mainpage">
     <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
     <div class="d-flex" id="wrapper">
       <div id="page-content-wrapper">
@@ -47,7 +48,23 @@
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
               <LinksLeftPanel :type-data="linkTypeData" @artifact-data="choseArtifactData" @chosen-artifact="selectArtifactIndex"/>
-              <!-- <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex" @close-approver="approvalView = false"/> -->
+              <ApproveLinks :artifact-data="chosenArtifactData" :artifact-index="chosenArtifactIndex" @close-approver="approvalView = false"/>
+            </div>
+          </div>
+        </main>
+      </div>
+      <!-- End Page Content -->
+
+    </div>
+  </div>
+  <div v-if="timView === true" id="mainpage">
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <div class="d-flex" id="wrapper">
+      <div id="page-content-wrapper">
+        <main role="main">
+          <div class="container-fluid">
+            <div class="row vh-100 pad-navbar">
+              <LinksLeftPanel :type-data="linkTypeData" @artifact-data="choseArtifactData" @chosen-artifact="selectArtifactIndex"/>
               <TimGraph/>
             </div>
           </div>
@@ -57,6 +74,7 @@
 
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -96,6 +114,7 @@
       return {
         firstOpen: true,
         approvalView: false,
+        timView: false,
         resize: Date.now(),
         update: Date.now(),
         showDeltaModal: false,
@@ -129,6 +148,7 @@
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
       AppMenu.findMenuItemById('project.approve').click = this.switchToApprovalView.bind(this)
+      AppMenu.findMenuItemById('project.tim').click = this.switchToTIMView.bind(this)
       AppMenu.findMenuItemById('project.remove').click = this.projectRemove.bind(this)
       AppMenu.setApplicationMenu()
     },
@@ -200,6 +220,12 @@
         })
         this.showInfoModal = false
         this.approvalView = true
+        this.timView = false
+      },
+      switchToTIMView () {
+        this.showInfoModal = false
+        this.timView = true
+        this.approvalView = false
       },
       resizeView () {
         this.resize = Date.now()

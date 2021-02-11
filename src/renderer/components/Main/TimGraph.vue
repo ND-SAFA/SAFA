@@ -96,6 +96,10 @@ export default {
     this.renderTree(this.$refs.cy)
   },
 
+  beforeDestroy () {
+    this.cytoscapeProto.cy.destroy()  // destroy cytoscape instance when changing views so 'poppers' on edges get destroyed
+  },
+
   methods: {
     ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees']),
     ...mapActions('app.module', ['setSelectedArtifact']),
@@ -142,7 +146,6 @@ export default {
     },
     eraseNode () {
       var id = this.getSelectedArtifact()
-      console.log('id: ', id)
       var j = this.cytoscapeProto.cy.getElementById(id.id)
       if (j.length > 0) {
         this.cytoscapeProto.cy.remove(j)

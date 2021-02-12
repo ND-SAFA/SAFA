@@ -56,10 +56,10 @@ public class ProjectsController {
     return projectService.versionsTag(projId);
   }
 
-  @GetMapping("/projects/{projId}/clear/")
-  public String clearFlatfileDir(){
-    return projectService.clearFlatfileDir();
-  }
+  // @GetMapping("/projects/{projId}/clear/")
+  // public String clearFlatfileDir(){
+  //   return projectService.clearFlatfileDir();
+  // }
 
   @PostMapping("/projects/{projId}/upload/")
   public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
@@ -67,35 +67,35 @@ public class ProjectsController {
     return projectService.uploadFile(projId, encodedStr);
   }
 
-  @GetMapping("/projects/{projId}/errorlog/")
-  public String getUploadFilesErrorLog(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
-    return projectService.getUploadFilesErrorLog(projId);
-  }
+  // @GetMapping("/projects/{projId}/errorlog/")
+  // public String getUploadFilesErrorLog(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/generate/");
+  //   return projectService.getUploadFilesErrorLog(projId);
+  // }
 
-  @GetMapping("/projects/{projId}/generate/")
-  public String generateLinks(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
-    return projectService.generateLinks(projId);
-  }
+  // @GetMapping("/projects/{projId}/generate/")
+  // public String generateLinks(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/generate/");
+  //   return projectService.generateLinks(projId);
+  // }
 
-  @GetMapping("/projects/{projId}/linkserrorlog/")
-  public String getGenerateLinksErrorLog(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
-    return projectService.getGenerateLinksErrorLog(projId);
-  }
+  // @GetMapping("/projects/{projId}/linkserrorlog/")
+  // public String getGenerateLinksErrorLog(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/generate/");
+  //   return projectService.getGenerateLinksErrorLog(projId);
+  // }
 
-  @GetMapping("/projects/{projId}/linktypes/")
-  public String getLinkTypes(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/linktypes/");
-    return projectService.getLinkTypes(projId);
-  }
+  // @GetMapping("/projects/{projId}/linktypes/")
+  // public String getLinkTypes(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/linktypes/");
+  //   return projectService.getLinkTypes(projId);
+  // }
 
-  @GetMapping("/projects/{projId}/remove/")
-  public String removeLinks(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
-    return projectService.clearGeneratedFilesDir(projId);
-  }
+  // @GetMapping("/projects/{projId}/remove/")
+  // public String removeLinks(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/generate/");
+  //   return projectService.clearGeneratedFilesDir(projId);
+  // }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
   public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version) {

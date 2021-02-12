@@ -112,100 +112,84 @@ public class ProjectService {
     return emitter;
   }
 
-  public String generateLinks(String projId){
-    try {
-      String generateFileResult = generateFlatfile.generateFiles();
-      generateFlatfile.createGeneratedTraceMatrixTables();
-      return generateFileResult;
-    } 
-    catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
-    }
-  }
+  // public String generateLinks(String projId){
+  //   try {
+  //     return generateFlatfile.generateFiles();
+  //     // generateFlatfile.createGeneratedTraceMatrixTables();
+  //     // return generateFileResult;
+  //   } 
+  //   catch (Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+  //   }
+  // }
 
-  public String clearGeneratedFilesDir(String projId) {
-    try {
-      String dir = "/generatedFilesDir";
-      return uploadFlatfile.deleteDirectory(dir, "Generated Links");
-    }
-    catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
+  // public String clearGeneratedFilesDir(String projId) {
+  //   try {
+  //     String dir = "/generatedFilesDir";
+  //     return uploadFlatfile.deleteDirectory(dir, "Generated Links");
+  //   }
+  //   catch(Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
 
-  public String getLinkTypes(String projId) {
-    try {
-        return generateFlatfile.getLinkTypesJSON();
-    } catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-
-  }
+  // public String getLinkTypes(String projId) {
+  //   try {
+  //       return generateFlatfile.getLinkTypesJSON();
+  //   } catch(Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
 
   public String uploadFile(String projId, String encodedStr) {
     try {
-      uploadFlatfile.uploadFile(projId, encodedStr);
-
-      try {
-        return uploadFlatfile.getMissingFiles(projId);
-      }
-      catch(Exception e){
-        if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure. Please check for trailing comas, mismatched curly braces, etc\"}";
-        }
-        else if (e.getMessage().equals("Please upload a tim.json file")) {
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
-        else {
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
-      }
-    }
-    catch(Exception e){
-      System.out.println("Catch exception for uploadFlatfile");
-      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-        return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
-      }
-      else {
-        System.out.println("Error uploading Flatfiles: OTHER");
-        System.out.println(e.getMessage());
-        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        // return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
-      }
-    }
-  }
-
-  public String getUploadFilesErrorLog(String projId) {
-    try {
-      File myObj = new File("/flatfilesDir/ErrorReport.txt");
-      byte[] fileContent = Files.readAllBytes(myObj.toPath());
-      String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
-    } catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  public String getGenerateLinksErrorLog(String projId) {
-    try {
-      File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
-      byte[] fileContent = Files.readAllBytes(myObj.toPath());
-      String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
-    } catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  public String clearFlatfileDir() {
-    try {
-      String dir = "/flatfilesDir";
-      return uploadFlatfile.deleteDirectory(dir, "Flatfile Uploads");
+      return uploadFlatfile.uploadFiles(projId, encodedStr);
     }
     catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+      System.out.println("Catch exception for uploadFlatfile");
+
+      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+        return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
+      } else {
+        System.out.println("Error uploading Flatfiles: OTHER");
+        System.out.println(e.getMessage());
+        // return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
+      }
     }
   }
+
+  // public String getUploadFilesErrorLog(String projId) {
+  //   try {
+  //     File myObj = new File("/flatfilesDir/ErrorReport.txt");
+  //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
+  //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
+  //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+  //   } catch (Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
+
+  // public String getGenerateLinksErrorLog(String projId) {
+  //   try {
+  //     File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
+  //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
+  //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
+  //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+  //   } catch (Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
+
+  // public String clearFlatfileDir() {
+  //   try {
+  //     String dir = "/flatfilesDir";
+  //     return uploadFlatfile.deleteDirectory(dir, "Flatfile Uploads");
+  //   }
+  //   catch(Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
 
   @PostConstruct
   private void init() {

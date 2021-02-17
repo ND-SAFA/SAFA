@@ -2,6 +2,11 @@ import CytoscapePrototype from '.'
 import edgehandles from 'cytoscape-edgehandles'
 import cytoscape from 'cytoscape'
 
+import jQuery from 'jquery'
+import cyqtip from 'cytoscape-qtip'
+cyqtip(cytoscape, jQuery)
+
+window.$ = window.jQuery = jQuery
 cytoscape.use(edgehandles)
 
 export default class CytoscapePrototypeTIM extends CytoscapePrototype {
@@ -88,19 +93,39 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
     cy.on('tap', function (e) {
       var evtTarget = e.target
       if (evtTarget === cy) { // clicked on background
-        cy.add([{
+        var eles = cy.add([{
           group: 'nodes',
           data: {
             id: self.id,
-            label: '<b style="font-size:12px;">Hazards</b><br/><span style="font-size:11px;">hazards.txt</span>',
-            type: 0,
-            name: 'demo'
+            type: 'node',
+            name: 'Hazards',
+            label: '',
+            file: 'hazards.csv'
           },
           renderedPosition: {
             x: e.renderedPosition.x,
             y: e.renderedPosition.y
           }
         }])
+        console.log('should be adding element... qtip??? for this id: ', self.id)
+        console.log('eles: ', eles.data('name'))
+        var name = eles.data('name')
+        eles.qtip({
+          content: {
+            text: '<div>Name:</div><form id="eles.data("name")"><input type="text" value="' + name + '" /><button class="nameSaveButton">Save</button></form><div>File Name</div><form id="eles.data("file")"><input type="text" value="' + eles.data('file') + '" />  <button id="saveFile">Save</button></form>' // we use $this now to reference the element that was outside qtip
+          },
+          style: {
+            background: 'white'
+          },
+          events: {
+            render: function (e, api) {
+              window.$('.nameSaveButton').on('click', function () {
+                alert('something')
+                console.log('something else idk')
+              })
+            }
+          }
+        })
         self.__clearAndApplyNodeLabels(cy, self.id)
         self.id += 1
       }
@@ -182,7 +207,7 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
       dragWith: node
     })
 
-    console.log(cy.json())
+    console.log('json: ', cy.json())
 
     // let popper = node.popper({
     //   content: () => {

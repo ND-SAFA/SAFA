@@ -97,7 +97,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.cytoscapeProto.cy.destroy()  // destroy cytoscape instance when changing views so 'poppers' on edges get destroyed
+    this.cytoscapeProto.cy.destroy() // destroy cytoscape instance when changing views so 'poppers' on edges get destroyed
   },
 
   methods: {
@@ -154,6 +154,9 @@ export default {
   }
 }
 </script>
+<style>
+@import 'http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.css';
+</style> 
 
 <style scoped>
   #loading-graph-spinner {

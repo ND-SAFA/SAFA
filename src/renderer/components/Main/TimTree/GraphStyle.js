@@ -20,7 +20,12 @@ export default [
       height: 50,
       'border-style': GraphOptions.NODE_BORDER_STYLE,
       'border-width': GraphOptions.NODE_BORDER_WIDTH,
-      'overlay-opacity': GraphOptions.NODE_OVERLAY_OPACITY
+      'overlay-opacity': GraphOptions.NODE_OVERLAY_OPACITY,
+      'label': function (node) {
+        return `${node.data('name')}\n ${node.data('file')}`
+      },
+      'text-valign': 'center',
+      'text-halign': 'center'
     }
   },
   {

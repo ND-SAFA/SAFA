@@ -4,9 +4,18 @@ import cytoscape from 'cytoscape'
 
 import jQuery from 'jquery'
 import cyqtip from 'cytoscape-qtip'
-cyqtip(cytoscape, jQuery)
+import edgeEditing from 'cytoscape-edge-editing'
+import konva from 'konva'
+
+import contextMenus from 'cytoscape-context-menus'
+import 'cytoscape-context-menus/cytoscape-context-menus.css'
 
 window.$ = window.jQuery = jQuery
+
+cyqtip(cytoscape, jQuery)
+cytoscape.use(contextMenus)
+edgeEditing(cytoscape, jQuery, konva)
+
 cytoscape.use(edgehandles)
 
 export default class CytoscapePrototypeTIM extends CytoscapePrototype {
@@ -54,38 +63,127 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
   // PRIVATE FUNCTIONS
   // -----------------------------------------------------------------------------
   __addEdgeHandles (cy) {
-    var eh = cy.edgehandles({
-      snap: true,
+    // var eh = cy.edgehandles({
+    //   snap: true,
+    //   complete: function (sourceNode, targetNode, addedEles) {
+    //     // fired when edgehandles is done and elements are added
+    //     let popper = addedEles.popper({
+    //       content: () => {
+    //         let div = document.createElement('div')
+    //         div.innerHTML = '<form><input/></form>'
+    //         document.body.appendChild(div)
+    //         return div
+    //       },
+    //       popper: {} // my popper options here
+    //     })
+
+    //     let update = () => {
+    //       popper.update()
+    //     }
+
+    //     let destroy = () => {
+    //       popper.destroy()
+    //     }
+
+    //     sourceNode.on('position', update)
+    //     targetNode.on('position', update)
+    //     sourceNode.on('remove', destroy)
+    //     targetNode.on('remove', destroy)
+    //     addedEles.on('remove', destroy)
+    //     cy.on('destroy', destroy)
+    //     cy.on('pan zoom resize', update)
+    //   }
+    // })
+
+    let defaults = {
+      preview: true, // whether to show added edges preview before releasing selection
+      hoverDelay: 150, // time spent hovering over a target node before it is considered selected
+      handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+      snap: false, // when enabled, the edge can be drawn by just moving close to a target node
+      snapThreshold: 50, // the target node must be less than or equal to this many pixels away from the cursor/finger
+      snapFrequency: 15, // the number of times per second (Hz) that snap checks done (lower is less expensive)
+      noEdgeEventsInDraw: false, // set events:no to edges during draws, prevents mouseouts on compounds
+      disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
+      toggleOffOnLeave: true,
+      handleSize: 10,
+      ehGhostEdge: '',
+      ehGhost: '',
+      handlePosition: function (node) {
+        return 'middle top' // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+      },
+      handleInDrawMode: true, // whether to show the handle in draw mode
+      edgeType: function (sourceNode, targetNode) {
+        // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
+        // returning null/undefined means an edge can't be added between the two nodes
+        return 'flat'
+      },
+      loopAllowed: function (node) {
+        // for the specified node, return whether edges from itself to itself are allowed
+        return false
+      },
+      nodeLoopOffset: -50, // offset for edgeType: 'node' loops
+      nodeParams: function (sourceNode, targetNode) {
+        // for edges between the specified source and target
+        // return element object to be passed to cy.add() for intermediary node
+        return {}
+      },
+      edgeParams: function (sourceNode, targetNode, i) {
+        // for edges between the specified source and target
+        // return element object to be passed to cy.add() for edge
+        // NB: i indicates edge index in case of edgeType: 'node'
+        return {}
+      },
+      ghostEdgeParams: function (targetNode) {
+        // return element object to be passed to cy.add() for the ghost edge
+        // (default classes are always added for you)
+        return {targetNode}
+      },
+      show: function (sourceNode) {
+        // fired when handle is shown
+        console.log('show?')
+      },
+      hide: function (sourceNode) {
+        // fired when the handle is hidden
+        console.log('hide')
+      },
+      start: function (sourceNode) {
+        // fired when edgehandles interaction starts (drag on handle)
+      },
       complete: function (sourceNode, targetNode, addedEles) {
         // fired when edgehandles is done and elements are added
-        let popper = addedEles.popper({
-          content: () => {
-            let div = document.createElement('div')
-            div.innerHTML = '<form><input/></form>'
-            document.body.appendChild(div)
-            return div
-          },
-          popper: {} // my popper options here
-        })
-
-        let update = () => {
-          popper.update()
-        }
-
-        let destroy = () => {
-          popper.destroy()
-        }
-
-        sourceNode.on('position', update)
-        targetNode.on('position', update)
-        sourceNode.on('remove', destroy)
-        targetNode.on('remove', destroy)
-        addedEles.on('remove', destroy)
-        cy.on('destroy', destroy)
-        cy.on('pan zoom resize', update)
+      },
+      stop: function (sourceNode) {
+        // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
+      },
+      cancel: function (sourceNode, cancelledTargets) {
+        // fired when edgehandles are cancelled (incomplete gesture)
+      },
+      hoverover: function (sourceNode, targetNode) {
+        // fired when a target is hovered
+      },
+      hoverout: function (sourceNode, targetNode) {
+        // fired when a target isn't hovered anymore
+      },
+      previewon: function (sourceNode, targetNode, previewEles) {
+        // fired when preview is shown
+      },
+      previewoff: function (sourceNode, targetNode, previewEles) {
+        // fired when preview is hidden
+      },
+      drawon: function () {
+        // fired when draw mode enabled
+      },
+      drawoff: function () {
+        // fired when draw mode disabled
       }
-    })
+    }
+    var eh = cy.edgehandles({defaults})
     eh.enableDrawMode()
+    console.log('this fine?')
+    console.log('thisfine/?')
+    // cy.edgeEditing({options})
+    console.log('this FINE?')
+    // cy.style().update()
   }
 
   __applyClickDragBehavior (cy) {
@@ -98,9 +196,9 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
           data: {
             id: self.id,
             type: 'node',
-            name: 'Hazards',
+            name: 'Untitled',
             label: '',
-            file: 'hazards.csv'
+            file: 'test'
           },
           renderedPosition: {
             x: e.renderedPosition.x,
@@ -112,16 +210,23 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
         var name = eles.data('name')
         eles.qtip({
           content: {
-            text: '<div>Name:</div><form id="eles.data("name")"><input type="text" value="' + name + '" /><button class="nameSaveButton">Save</button></form><div>File Name</div><form id="eles.data("file")"><input type="text" value="' + eles.data('file') + '" />  <button id="saveFile">Save</button></form>' // we use $this now to reference the element that was outside qtip
-          },
-          style: {
-            background: 'white'
+            text: '<div>Name:</div><form><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></form><div>File Name</div><form id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></form>'
           },
           events: {
             render: function (e, api) {
-              window.$('.nameSaveButton').on('click', function () {
-                alert('something')
-                console.log('something else idk')
+              var buttonstr = '.nameSaveButton' + eles.data('id')
+              var filebuttonstr = '.fileSaveButton' + eles.data('id')
+              window.$(buttonstr).on('click', function () {
+                var input = document.getElementById('name' + eles.data('id')).value
+                eles.data('name', input)
+              })
+              window.$(filebuttonstr).on('click', function () {
+                var input = document.getElementById('file' + eles.data('id')).value
+                eles.data('file', input)
+              })
+              eles.on('remove', () => {
+                console.log('found something to remove??')
+                eles.qtip('api').destroy()
               })
             }
           }

@@ -33,7 +33,7 @@ import Mousetrap from 'mousetrap'
 
 const L = LayoutTemplateKlay
 
-const VMousetrap = {
+const VMousetrap = { // to bind backspace to deleting a node
   props: ['shortcode', 'modifier'],
   render: () => null,
   mounted () {
@@ -132,12 +132,17 @@ export default {
         this.cytoscapeProto.cy.on('select', 'node', evt => {
           component.$emit('select:node')
           component.setSelectedArtifact(evt.target.data())
+          console.log('setting artifact 1')
         })
         this.cytoscapeProto.cy.on('select', 'edge', evt => {
           component.$emit('select:edge')
           component.setSelectedArtifact(evt.target.data())
+          console.log('setting artifact 2')
         })
-        this.cytoscapeProto.cy.on('click', () => this.setSelectedArtifact({}))
+        this.cytoscapeProto.cy.on('click', () => {
+          // this.setSelectedArtifact({})
+          console.log('setting artifact 3')
+        })
       } catch (e) {
         console.log(e)
         // TODO(Adam): Handle Error
@@ -156,6 +161,7 @@ export default {
 </script>
 <style>
 @import 'http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.css';
+@import 'https://unpkg.com/cytoscape-context-menus/cytoscape-context-menus.css';
 </style> 
 
 <style scoped>

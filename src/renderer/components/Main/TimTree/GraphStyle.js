@@ -18,11 +18,12 @@ export default [
       shape: GraphOptions.NODE_SHAPE,
       width: 200,
       height: 50,
+      'font-size': '12px',
       'border-style': GraphOptions.NODE_BORDER_STYLE,
       'border-width': GraphOptions.NODE_BORDER_WIDTH,
       'overlay-opacity': GraphOptions.NODE_OVERLAY_OPACITY,
       'label': function (node) {
-        return `${node.data('name')}\n ${node.data('file')}`
+        return `${node.data('name')}\n${node.data('file')}`
       },
       'text-valign': 'center',
       'text-halign': 'center'
@@ -57,6 +58,12 @@ export default [
       'source-arrow-color': 'red'
     }
   },
+  // {
+  //   selector: 'source-label',
+  //   style: {
+  //     'label': ''
+  //   }
+  // },
   {
     selector: 'edge:selected',
     style: {

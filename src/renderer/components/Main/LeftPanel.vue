@@ -19,7 +19,7 @@
       </li>
     </ul>
 
-    <HazardList v-if="showTab === 'Artifacts'" />
+    <NodeList v-if="showTab === 'Artifacts'" />
 
     <FTANodeList v-if="showTab === 'FTA'" />
 
@@ -28,7 +28,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import HazardList from '@/components/Main/LeftPanel/HazardList'
+import NodeList from '@/components/Main/LeftPanel/NodeList'
 import FTANodeList from '@/components/Main/LeftPanel/FTANodeList'
 
 export default {
@@ -41,7 +41,7 @@ export default {
     }
   },
 
-  components: { HazardList, FTANodeList },
+  components: { NodeList, FTANodeList },
 
   mounted () {
     this.deltaEnabled = this.getDeltaState.enabled

@@ -17,8 +17,8 @@ const state = {
     versions: {
       latest: 0
     },
-    hazards: [],
-    hazardTree: [],
+    nodes: [],
+    nodeTree: [],
     safetyArtifactTree: [],
     node: {
       parents: []
@@ -28,12 +28,12 @@ const state = {
 }
 
 const getters = {
-  getHazards (state) {
-    return state.projects.hazards
+  getNodes (state) {
+    return state.projects.nodes
   },
 
-  getHazardTree (state) {
-    return state.projects.hazardTree
+  getHierarchyTree (state) {
+    return state.projects.hierarchyTree
   },
 
   getSafetyArtifactTree (state) {
@@ -66,32 +66,35 @@ const getters = {
 }
 
 const actions = {
-  async fetchHazards ({ commit }) {
+  async fetchNodes ({ commit }, nodeType) {
     try {
-      const response = await projects.getProjectHazards(TEMP_PROJ_ID)
-      // Fetch hazard warnings at the same time
-      const warnings = await projects.getProjectHazardsWarnings(TEMP_PROJ_ID)
-      // Store warnings in corresponding hazard
-      for (const hazard of response) {
-        hazard.warnings = warnings[hazard.id]
+      const response = await projects.getProjectNodes(TEMP_PROJ_ID, nodeType)
+      // Fetch node warnings at the same time
+      const warnings = await projects.getProjectNodesWarnings(TEMP_PROJ_ID)
+      // Store warnings in corresponding node
+      for (const node of response) {
+        node.warnings = warnings[node.id]
       }
-      commit('SET_HAZARDS', response)
+      commit('SET_NODES', response)
     } catch (error) {
+      console.log(error)
       // TODO(Adam): handle the error here
     }
   },
 
-  async fetchHazardTree ({ commit }) {
+  async fetchHierarchyTree ({ commit }, rootType) {
     try {
-      const response = await projects.getProjectHazardTree(TEMP_PROJ_ID)
-      commit('SET_HAZARD_TREE', response)
+      const response = await projects.getProjectHierarchyTree(TEMP_PROJ_ID, rootType)
+      commit('SET_HIERARCHY_TREE', response)
     } catch (error) {
     }
   },
 
-  async fetchSafetyArtifactTree ({ commit }, treeId) {
+  async fetchSafetyArtifactTree ({ commit }, payload) {
+    const { treeId, rootType } = payload
+    console.log(treeId, rootType)
     try {
-      const response = await projects.getProjectSafetyArtifactTree(TEMP_PROJ_ID, treeId)
+      const response = await projects.getProjectSafetyArtifactTree(TEMP_PROJ_ID, treeId, rootType)
       commit('SET_SAFETY_ARTIFACT_TREE', response)
     } catch (error) {
       // TODO(Adam): handle the error here
@@ -127,9 +130,10 @@ const actions = {
     }
   },
 
-  async fetchProjectNodeParents ({ commit }, nodeId) {
+  async fetchProjectNodeParents ({ commit }, payload) {
+    const { nodeId, rootType } = payload
     try {
-      const response = await projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
+      const response = await projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId, rootType)
       commit('SET_NODE_PARENTS', response)
     } catch (error) {
       // TODO(Adam): handle the error here
@@ -137,9 +141,9 @@ const actions = {
   },
 
   async fetchDeltaTrees ({ commit }, payload) {
-    const { treeId, baseline, current } = payload
+    const { treeId, baseline, current, rootType } = payload
     try {
-      const response = await projects.getDeltaTrees(TEMP_PROJ_ID, treeId, [baseline, current])
+      const response = await projects.getDeltaTrees(TEMP_PROJ_ID, treeId, [baseline, current], rootType)
       commit('SET_DELTA_TREES', response)
     } catch (e) {
       // TODO(Adam): handle error
@@ -246,12 +250,12 @@ const actions = {
 }
 
 const mutations = {
-  SET_HAZARDS (state, data) {
-    state.projects.hazards = data
+  SET_NODES (state, data) {
+    state.projects.nodes = data
   },
 
-  SET_HAZARD_TREE (state, data) {
-    state.projects.hazardTree = data
+  SET_HIERARCHY_TREE (state, data) {
+    state.projects.hierarchyTree = data
   },
 
   SET_SAFETY_ARTIFACT_TREE (state, data) {
@@ -292,8 +296,8 @@ const mutations = {
       versions: {
         latest: 0
       },
-      hazards: [],
-      hazardTree: [],
+      nodes: [],
+      hierarchyTree: [],
       safetyArtifactTree: [],
       node: {
         parents: []

@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import config from 'config'
 import { mapActions, mapGetters } from 'vuex'
 import AppMenu from '@/menu'
 import Vue from 'vue'
@@ -112,7 +113,7 @@ export default {
       }
       try {
         this.isUpdating = true
-        await this.fetchSafetyArtifactTree(this.treeId)
+        await this.fetchSafetyArtifactTree({treeId: this.treeId, rootType: config.safa_tree.root_node_type})
 
         const layout = new LayoutTemplateKlay({
           zoom: 1.12,

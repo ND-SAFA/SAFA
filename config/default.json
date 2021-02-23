@@ -1,6 +1,7 @@
 {
   "services": {"api": {"url": "http://localhost:8080"}},
   "safa_tree": {
+    "root_node_type": "Hazard",
     "peer_node_types": "Context,AcceptanceTest,EnvironmentalAssumption",
     "ancestor_exact_types": "Hazard,DesignDefinition,Code",
     "ancestor_sub_types": "Requirement"

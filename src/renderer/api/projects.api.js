@@ -5,36 +5,36 @@ import { addNode, addElement } from '../lib/cytoscape/serializers'
 const RELATIVE_API_PATH = 'projects'
 
 // /project/{projId}/parents/{node}
-async function getProjectNodeParents (projId, nodeId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/parents/${nodeId}/`)
+async function getProjectNodeParents (projId, nodeId, rootType) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/parents/${nodeId}/?rootType=${rootType}`)
   return response.json()
 }
 
 // /{projId}/trees/
-async function getProjectHazards (projId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/hazards/`)
+async function getProjectNodes (projId, nodeType) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/nodes/?nodeType=${nodeType}`)
   const json = await response.json()
   return json.reduce(addNode, []).sort((a, b) => {
     return (/UAV-(\d*)/.exec(a.id)[1]) - (/UAV-(\d*)/.exec(b.id)[1])
   })
 }
 
-// /project/{projId}/hazards/warnings
-async function getProjectHazardsWarnings (projId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/hazards/warnings`)
+// /project/{projId}/nodes/warnings
+async function getProjectNodesWarnings (projId) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/nodes/warnings`)
   return response.json()
 }
 
 // /project/{projId}/trees/
-async function getProjectHazardTree (projId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/`)
+async function getProjectHierarchyTree (projId, rootType) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/?rootType=${rootType}`)
   const json = await response.json()
   return json.reduce(addElement, [])
 }
 
 // /projects/{projId}/trees/{treeId}
-async function getProjectSafetyArtifactTree (projId, treeId) {
-  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/`)
+async function getProjectSafetyArtifactTree (projId, treeId, rootType) {
+  const response = await httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/?rootType=${rootType}`)
   const json = await response.json()
   return json.reduce(addElement, [])
 }
@@ -133,8 +133,8 @@ async function clearProjectFiles (projId) {
 }
 
 // /projects/{projId}/trees/{treeId}/versions/{version}
-async function getDeltaTrees (projId, treeId, versions) {
-  const responses = await Promise.all(versions.map(version => httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/versions/${version}`)))
+async function getDeltaTrees (projId, treeId, versions, rootType) {
+  const responses = await Promise.all(versions.map(version => httpClient(`${RELATIVE_API_PATH}/${projId}/trees/${treeId}/versions/${version}/?rootType=${rootType}`)))
   const results = await Promise.all(responses.map(response => response.json()))
   return results.map(json => json.reduce(addElement, []))
 }
@@ -145,9 +145,9 @@ function syncProject (projId) {
 
 export default {
   getProjectNodeParents,
-  getProjectHazards,
-  getProjectHazardsWarnings,
-  getProjectHazardTree,
+  getProjectNodes,
+  getProjectNodesWarnings,
+  getProjectHierarchyTree,
   getProjectSafetyArtifactTree,
   getProjectVersions,
   postProjectVersion,

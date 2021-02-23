@@ -48,12 +48,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters('projects.module', ['getHazards', 'getNodeParents']),
+    ...mapGetters('projects.module', ['getNodes', 'getNodeParents']),
     ...mapGetters('app.module', ['getSelectedTree'])
   },
 
   methods: {
-    ...mapActions('projects.module', ['fetchHazards', 'fetchProjectNodeParents']),
+    ...mapActions('projects.module', ['fetchNodes', 'fetchProjectNodeParents']),
     ...mapActions('app.module', ['setSelectedTree']),
     onClickArtifact (event) {
       console.log('emitting event: ', event)

@@ -77,6 +77,7 @@
 </template>
 
 <script>
+  import config from 'config'
   import { mapActions, mapGetters } from 'vuex'
   import AppMenu from '@/menu'
   import HeaderNav from '@/components/Main/HeaderNav'
@@ -159,7 +160,7 @@
     },
 
     methods: {
-      ...mapActions('projects.module', ['syncProject', 'fetchHazards', 'fetchHazardTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
+      ...mapActions('projects.module', ['syncProject', 'fetchNodes', 'fetchHierarchyTree', 'fetchSafetyArtifactTree', 'fetchProjectVersions', 'resetProject', 'uploadFlatfileData',
         'fetchErrorLog', 'generateTraceLinks', 'getGeneratedLinks', 'getGenerateLinksErrorLog', 'removeTraceLinks', 'clearUploads', 'getLinkTypes']),
       ...mapActions('app.module', ['resetApp']),
       open (link) {
@@ -172,11 +173,11 @@
       async loadData () {
         this.isFetchingFromServer = true
         await this.fetchProjectVersions()
-        await this.fetchHazards()
+        await this.fetchNodes(config.safa_tree.root_node_type)
         if (this.getSelectedTree) {
-          await this.fetchSafetyArtifactTree(this.getSelectedTree)
+          await this.fetchSafetyArtifactTree({treeId: this.treeId, rootType: config.safa_tree.root_node_type})
         } else {
-          await this.fetchHazardTree()
+          await this.fetchHierarchyTree(config.safa_tree.root_node_type)
         }
         this.isFetchingFromServer = false
         if (this.firstOpen) {

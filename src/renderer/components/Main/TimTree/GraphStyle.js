@@ -18,6 +18,7 @@ export default [
       shape: GraphOptions.NODE_SHAPE,
       width: 200,
       height: 50,
+      'text-wrap': 'wrap',
       'font-size': '12px',
       'border-style': GraphOptions.NODE_BORDER_STYLE,
       'border-width': GraphOptions.NODE_BORDER_WIDTH,
@@ -26,7 +27,8 @@ export default [
         return `${node.data('name')}\n${node.data('file')}`
       },
       'text-valign': 'center',
-      'text-halign': 'center'
+      'text-halign': 'center',
+      'line-height': '1.3'
     }
   },
   {

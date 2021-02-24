@@ -27,35 +27,14 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
 
   preLayoutHook (cy) {
     this.__addEdgeHandles(cy)
-    this.__applyNodeLabels(cy)
     this.__resizeNodes(cy)
-    this.__savePeerAncestorNodes(cy)
-    this.__savePeerConnectingEdges(cy)
-    this.__savePackageNodes(cy)
   }
 
-  // -----------------------------------------------------------------------------
-  layoutHook (cy) {
-    this.layoutTemplate.makeLayout(cy).run()
-    this.__layoutAncestorNodes(cy)
-
-    // Reset package nodes height
-    this.packageNodes.removeStyle('height')
-
-    // Restore code nodes
-    this.codeElements.restore()
-    this.temporaryEdges.remove()
-    this.peerElements.restore()
-
-    // Layout peer nodes closer to ancestor node
-    this.__layoutPeerNodes(cy)
-    this.__layoutCodeNodes(cy)
-  }
+  layoutHook (cy) {}
 
   // -----------------------------------------------------------------------------
   postLayoutHook (cy) {
     this.__applyClickDragBehavior(cy)
-    this.__applyPositioning(cy)
     this.__applyCustomEvents(cy)
   }
 
@@ -126,7 +105,8 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
         var name = eles.data('name')
         eles.qtip({
           content: {
-            text: '<div>Name:</div><form><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></form><div>File Name</div><form id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></form>'
+            // text: '<div>Name:</div><form><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></form><div>File Name</div><form id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></form>'
+            text: '<div>Name:</div><div><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></div><div>File Name</div><div id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></div>'
           },
           events: {
             render: function (e, api) {
@@ -185,37 +165,6 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
         }
       })
     })
-  }
-
-  // -----------------------------------------------------------------------------
-  __applyNodeLabels (cy) {
-    console.log('running 1!')
-    cy.nodeHtmlLabel([{
-      query: 'node',
-      halign: 'center',
-      valign: 'center',
-      halignBox: 'center',
-      valignBox: 'center',
-      cssClass: 'safa-cy-node',
-      tpl: function (data) {
-        return `<div id="${data.id}_html_label">${data.label}</div>`
-      }
-    }, {
-      query: 'node.warning',
-      cssClass: 'safa-cy-node-warning',
-      tpl: function (data) {
-        let deltaState = ''
-        if (data.delta) {
-          deltaState = data.delta
-        }
-        return `<div id="${data.id}_html_label" class="warning-node-label ${deltaState}">${data.label}</br><div class="warning-node-info"><i class="fas fa-exclamation-triangle"></i> <b>${data.warnings[0]}</b><div></div>`
-      }
-    }, {
-      query: 'node.warning:selected',
-      tpl: function (data) {
-        return `<div id="${data.id}_html_label" class="warning-node-label selected">${data.label}</br><div class="warning-node-info selected"><i class="fas fa-exclamation-triangle"></i> <b>${data.warnings[0]}</b></div></div>`
-      }
-    }])
   }
 
   __clearAndApplyNodeLabels (cy, id) {
@@ -314,121 +263,5 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
     cy.on('dragfree free', 'node', () => {
       document.body.style.cursor = 'auto'
     })
-  }
-
-  // -----------------------------------------------------------------------------
-  __applyPositioning (cy) {
-    cy.center(cy.nodes().roots().first())
-    cy.panBy({ y: -(cy.size().height / 2 - this.options.NODE_HEIGHT) })
-  }
-
-  // -----------------------------------------------------------------------------
-  __layoutCodeNodes (cy) {
-    process.nextTick((self = this) => {
-      for (let i = 0; i < self.packageNodes.length; i++) {
-        // Align each code node under package node
-        const node = self.packageNodes[i]
-        const codeNodes = node.outgoers('node')
-        codeNodes.forEach((codeNode, index) => {
-          // Toggle height change
-          codeNode.css('width', node.width())
-          codeNode.toggleClass('code-node')
-          codeNode.position('x', node.position('x'))
-          const yPosition = node.position('y') + node.outerHeight() / 2 + codeNode.outerHeight() / 2 + codeNode.outerHeight() * index - self.options.NODE_BORDER_WIDTH * (index + 1)
-          codeNode.position('y', yPosition)
-          // Hide any edges so they don't occlude the nodes
-          codeNode.connectedEdges().first().style('visibility', 'hidden')
-        })
-      }
-    })
-  }
-
-  // -----------------------------------------------------------------------------
-  __layoutPeerNodes (cy) {
-    for (let i = 0; i < this.peerNodes.length; i++) {
-      const ancestorNode = this.peerNodes[i].incomers('node').first()
-      if ((this.peerNodes[i].scratch('peerIndex') + 1) % 2) {
-        this.peerNodes[i].position('x', ancestorNode.position('x') + (this.peerNodes[i].outerWidth() + this.options.CORE_PEER_SPACING) * (this.peerNodes[i].scratch('peerIndex') + 1))
-      } else {
-        this.peerNodes[i].position('x', ancestorNode.position('x') - (this.peerNodes[i].outerWidth() + this.options.CORE_PEER_SPACING) * (this.peerNodes[i].scratch('peerIndex')))
-      }
-      this.peerNodes[i].position('y', ancestorNode.position('y'))
-    }
-  }
-
-  // -----------------------------------------------------------------------------
-  __layoutAncestorNodes (cy) {
-    this.ancestorNodes.removeStyle('width')
-    for (let i = 0; i < this.ancestorNodes.length; i++) {
-      this.ancestorNodes[i].shift('x', this.ancestorNodes[i].outerWidth() + this.options.CORE_PEER_SPACING)
-    }
-  }
-
-  // -----------------------------------------------------------------------------
-  // needs to be called after saving peer nodes
-  __savePeerConnectingEdges (cy) {
-    this.temporaryEdges = cy.collection()
-    for (let i = 0; i < this.peerNodes.length; i++) {
-      // Get parent node
-      const ancestor = this.peerNodes[i].incomers('node')
-      // Get all outgoing edges
-      const childEdges = this.peerNodes[i].outgoers('edge')
-      for (let j = 0; j < childEdges.length; j++) {
-        // Create new edge with parent as source and current edge target
-        const newEdge = cy.add({
-          data: {
-            source: ancestor.id(),
-            target: childEdges[j].target().id()
-          }
-        })
-        // Add new edge to the collection of temporary edges
-        this.temporaryEdges = this.temporaryEdges.union(newEdge)
-      }
-    }
-  }
-
-  // -----------------------------------------------------------------------------
-  __savePeerAncestorNodes (cy) {
-    // Valid peer node types
-    const peerNodeTypes = this.options.CORE_PEER_NODE_TYPES
-    const peerSelector = peerNodeTypes.map(peerType => `[type="${peerType}"]`).join(',')
-    // Get nodes that should be peers
-    this.peerNodes = cy.nodes(peerSelector)
-    // Valid ancestor node types
-    const ancestorExactTypes = this.options.CORE_ANCESTOR_EXACT_TYPES
-    // Valid ancestor node types that contain the following text
-    const ancestorSubTypes = this.options.CORE_ANCESTOR_SUB_TYPES
-    const ancestorNodeTypes = ancestorExactTypes.map(exactType => `node[type="${exactType}"]`).concat(ancestorSubTypes.map(subType => `node[type*="${subType}"]`))
-    const ancestorSelector = ancestorNodeTypes.join(',')
-    // Get nodes connected to above peer nodes
-    this.ancestorNodes = this.peerNodes.incomers(ancestorSelector)
-    // Save the number of peers in the ancestor node for layout purposes
-    for (let i = 0; i < this.ancestorNodes.length; i++) {
-      const peers = this.ancestorNodes[i].outgoers().intersection(this.peerNodes)
-      for (let j = 0; j < peers.length; j++) {
-        // Save the corresponding index in each peer node
-        peers[j].scratch('peerIndex', j)
-      }
-      const numPeerNodes = peers.length
-      this.ancestorNodes[i].scratch('numPeerNodes', numPeerNodes)
-      this.ancestorNodes[i].style('width', this.options.NODE_WIDTH + (this.ancestorNodes[i].outerWidth() + this.options.CORE_PEER_SPACING) * (numPeerNodes + 1))
-    }
-    this.peerElements = this.peerNodes.union(this.peerNodes.connectedEdges()).remove()
-  }
-
-  // -----------------------------------------------------------------------------
-  __savePackageNodes (cy) {
-    // Get all package nodes
-    this.packageNodes = cy.nodes('[type="Package"]')
-    this.packageNodes.forEach(packageNode => {
-      // Get number of code nodes in each package
-      const numCodeNodes = packageNode.outgoers('edge').length
-      // Calculate and set total height of package node
-      packageNode.style('height', packageNode.outerHeight() + numCodeNodes * (this.options.NODE_CODE_HEIGHT + 2 * this.options.NODE_PADDING - this.options.NODE_BORDER_WIDTH))
-    })
-
-    // Remove code nodes and edges
-    this.codeNodes = cy.nodes('[type="Code"]')
-    this.codeElements = this.codeNodes.union(this.codeNodes.connectedEdges()).remove()
   }
 }

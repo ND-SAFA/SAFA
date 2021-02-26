@@ -64,7 +64,7 @@
         <main role="main">
           <div class="container-fluid">
             <div class="row vh-100 pad-navbar">
-              <TimGraph/>
+              <TimGraph @undo-tim="switchOffTIMView"/>
             </div>
           </div>
         </main>
@@ -224,6 +224,11 @@
       switchToTIMView () {
         this.showInfoModal = false
         this.timView = true
+        this.approvalView = false
+      },
+      switchOffTIMView () {
+        this.showInfoModal = false
+        this.timView = false
         this.approvalView = false
       },
       resizeView () {

@@ -1,19 +1,16 @@
 import CytoscapePrototype from '.'
 import edgehandles from 'cytoscape-edgehandles'
 import cytoscape from 'cytoscape'
+import Vue from 'vue'
 
 import jQuery from 'jquery'
 import cyqtip from 'cytoscape-qtip'
 import edgeEditing from 'cytoscape-edge-editing'
 import konva from 'konva'
 
-import contextMenus from 'cytoscape-context-menus'
-import 'cytoscape-context-menus/cytoscape-context-menus.css'
-
 window.$ = window.jQuery = jQuery
 
 cyqtip(cytoscape, jQuery)
-cytoscape.use(contextMenus)
 edgeEditing(cytoscape, jQuery, konva)
 
 cytoscape.use(edgehandles)
@@ -43,42 +40,43 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
   // -----------------------------------------------------------------------------
   __addEdgeHandles (cy) {
     var eh = cy.edgehandles({
-      snap: true,
-      complete: function (sourceNode, targetNode, addedEles) {
-        // fired when edgehandles is done and elements are added
-        let popper = addedEles.popper({
-          content: () => {
-            let div = document.createElement('div')
-            div.innerHTML = '<form><input/></form>'
-            document.body.appendChild(div)
-            return div
-          },
-          popper: {} // my popper options here
-        })
+      snap: true
+      // complete: function (sourceNode, targetNode, addedEles) {
+      //   // fired when edgehandles is done and elements are added
+      //   let popper = addedEles.popper({
+      //     content: () => {
+      //       let div = document.createElement('div')
+      //       div.innerHTML = '<form><input/></form>'
+      //       document.body.appendChild(div)
+      //       return div
+      //     },
+      //     popper: {} // my popper options here
+      //   })
 
-        let update = () => {
-          popper.update()
-        }
+      //   let update = () => {
+      //     popper.update()
+      //   }
 
-        let destroy = () => {
-          popper.destroy()
-        }
+      //   let destroy = () => {
+      //     popper.destroy()
+      //   }
 
-        sourceNode.on('position', update)
-        targetNode.on('position', update)
-        sourceNode.on('remove', destroy)
-        targetNode.on('remove', destroy)
-        addedEles.on('remove', destroy)
-        cy.on('destroy', destroy)
-        cy.on('pan zoom resize', update)
-      }
+      //   sourceNode.on('position', update)
+      //   targetNode.on('position', update)
+      //   sourceNode.on('remove', destroy)
+      //   targetNode.on('remove', destroy)
+      //   addedEles.on('remove', destroy)
+      //   cy.on('destroy', destroy)
+      //   cy.on('pan zoom resize', update)
+      // }
     })
     eh.enableDrawMode()
-    console.log('this fine?')
-    console.log('thisfine/?')
-    // cy.edgeEditing({options})
-    console.log('this FINE?')
-    // cy.style().update()
+    console.log(eh)
+    // cy.edgeEditing({
+    //   bendPositionsFunction: function (ele) {
+    //     return ele.data('bendPointPositions')
+    //   }
+    // })
   }
 
   __applyClickDragBehavior (cy) {
@@ -100,6 +98,7 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
             y: e.renderedPosition.y
           }
         }])
+        Vue.nonreactive(eles[0]._private.data)
         console.log('should be adding element... qtip??? for this id: ', self.id)
         console.log('eles: ', eles.data('name'))
         var name = eles.data('name')
@@ -176,25 +175,6 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
       dragWith: node
     })
 
-    console.log('json: ', cy.json())
-
-    // let popper = node.popper({
-    //   content: () => {
-    //     let div = document.createElement('div')
-    //     div.innerHTML = '<form><input/></form>'
-    //     document.body.appendChild(div)
-    //     return div
-    //   },
-    //   popper: {} // my popper options here
-    // })
-
-    // let update = () => {
-    //   popper.update()
-    // }
-
-    // node.on('position', update)
-    // cy.on('pan zoom resize', update)
-
     // ------------------------------------------------------
     // LEFT CLICK = DRAG SUB-TREE RIGHT CLICK = DRAG SINGLE
     // ------------------------------------------------------
@@ -262,6 +242,37 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
 
     cy.on('dragfree free', 'node', () => {
       document.body.style.cursor = 'auto'
+    })
+
+    cy.on('ehcomplete', (edge) => {
+      var len = cy.edges().length
+      var curr = cy.edges()[len - 1]
+      console.log('curr: ', curr._private)
+      Vue.nonreactive(curr[0]._private.data)
+      curr.data('file', 'undefined.csv')
+      console.log(curr.data())
+      var file = curr.data('file')
+      curr.qtip({
+        content: {
+          text: '<div>Connections File Name:</div><div><input id="edgeFile' + curr.data('id') + '" type="text" value="' + file + '" /><button class="edgeFileSaveButton' + curr.data('id') + '">Save</button></div>'
+        },
+        position: {
+          my: 'top left',
+          at: 'top left'
+        },
+        events: {
+          render: function (e, api) {
+            var filebuttonstr = '.edgeFileSaveButton' + curr.data('id')
+            window.$(filebuttonstr).on('click', function () {
+              var input = document.getElementById('edgeFile' + curr.data('id')).value
+              curr.data('file', input)
+            })
+            curr.on('remove', () => {
+              curr.qtip('api').destroy()
+            })
+          }
+        }
+      })
     })
   }
 }

@@ -17,6 +17,15 @@
       <div id="cy" ref="cy"></div>
       <v-mousetrap :shortcode="'backspace'" @trigger="eraseNode"/>
     </div>
+    <div id="footer">
+      <div id="save-buttons">
+        <span content="To use the TIM Builder, click anywhere to create an Artifact node. Click and drag between two nodes to create a connection between them. Click on a node to change its name with the tooltip that appears, and can right-click and drag to move a node. Click on an edge to change its connection file name." v-tippy="{ placement : 'top',  arrow: true }">
+          <button id="help-button" type="button" class="btn btn-outline-primary">Help</button>
+        </span>
+        <button id="save-button" type="button" class="btn btn-outline-primary" @click="exportTim">Export TIM</button>
+        <button id="save-button" type="button" class="btn btn-outline-danger" @click="$emit('undo-tim')">Exit</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -30,6 +39,10 @@ import GraphStyle from '@/components/Main/TimTree/GraphStyle'
 import CytoscapePrototypeTIM from '@/lib/cytoscape/prototypes/tim'
 import LayoutTemplateKlay from '@/lib/cytoscape/layouts/layout-template-klay'
 import Mousetrap from 'mousetrap'
+import VueTippy, { TippyComponent } from 'vue-tippy'
+
+Vue.use(VueTippy)
+Vue.component('tippy', TippyComponent)
 
 const L = LayoutTemplateKlay
 
@@ -155,6 +168,74 @@ export default {
       if (j.length > 0) {
         this.cytoscapeProto.cy.remove(j)
       }
+    },
+    downloadFile (timStr) {
+      var newDate = new Date()
+      var fileName = 'SAFA TIM ' + (newDate.getMonth() + 1) + '/' + newDate.getDate() + '/' + newDate.getFullYear()
+      var blob = new Blob([timStr], { type: 'text/plain' })
+      var a = document.createElement('a')
+      a.download = fileName
+      a.href = URL.createObjectURL(blob)
+      a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':')
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      URL.revokeObjectURL(a.href)
+    },
+    exportTim () {
+      var data = this.cytoscapeProto.cy.json()
+      var nodes = data.elements.nodes
+      var edges = data.elements.edges
+      var nodeDict = {}
+
+      for (const node of nodes) {
+        nodeDict[node.data.id] = {
+          'name': node.data.name,
+          'file': node.data.file
+        }
+      }
+
+      var timFile = '{\n\t"DataFiles":\n\t{\n'
+      var linecount = 1
+
+      for (const id of Object.keys(nodeDict)) {
+        var name = nodeDict[id].name
+        var file = nodeDict[id].file
+        var addStr = '\t\t"' + name + '": {\n\t\t\t"File": "' + file + '"\n\t\t}'
+        if (linecount < Object.keys(nodeDict).length) {
+          addStr += ','
+        }
+        addStr += '\n'
+        timFile = timFile + addStr
+        linecount += 1
+      }
+
+      timFile += '\t},\n'
+
+      linecount = 1
+      for (const edge of edges) {
+        var sourceid = edge.data.source
+        var targetid = edge.data.target
+        var sourcename = nodeDict[sourceid].name
+        var filename = edge.data.file
+
+        sourcename = sourcename.charAt(0).toUpperCase() + sourcename.slice(1)
+        var targetname = nodeDict[targetid].name
+        targetname = targetname.charAt(0).toUpperCase() + targetname.slice(1)
+        var jointName = sourcename + 'To' + targetname
+
+        var newstr = '\t"' + jointName + '":\n\t\t"Source": "' + sourcename + '",\n\t\t"Target": "' + targetname + '",\n\t\t"File": "' + filename + '"\n\t}'
+        if (linecount < edges.length) {
+          newstr += ','
+        }
+        newstr += '\n'
+        timFile = timFile + newstr
+        linecount += 1
+      }
+
+      timFile += '\n}'
+      console.log('TIM STR: \n', timFile)
+      this.downloadFile(timFile)
     }
   }
 }
@@ -171,5 +252,21 @@ export default {
     height: 100%;
     background: white;
     z-index: 1000;
+  }
+  #footer {
+   position: fixed;
+   bottom: 0px;
+   height: 80px;
+   width: 100%;
+   margin: auto; 
+   background: #f8f9fa;
+  }
+  #save-buttons {
+    position: fixed;
+    right: 20px; 
+    padding-top: 20px;
+  }
+  #save-button {
+    margin: 0px 5px 0px; 
   }
 </style>

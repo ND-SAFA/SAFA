@@ -220,16 +220,19 @@
         this.showInfoModal = false
         this.approvalView = true
         this.timView = false
+        this.enableOptions(false)
       },
       switchToTIMView () {
         this.showInfoModal = false
         this.timView = true
         this.approvalView = false
+        this.enableOptions(false)
       },
       switchOffTIMView () {
         this.showInfoModal = false
         this.timView = false
         this.approvalView = false
+        this.enableOptions(true)
       },
       resizeView () {
         this.resize = Date.now()
@@ -318,6 +321,15 @@
       },
       choseArtifactData (linkdata) {
         this.chosenArtifactData = linkdata
+      },
+      enableOptions (status) {
+        AppMenu.findMenuItemById('project.sync').enabled = status
+        AppMenu.findMenuItemById('project.freeze').enabled = status
+        AppMenu.findMenuItemById('project.upload').enabled = status
+        AppMenu.findMenuItemById('project.clear').enabled = status
+        AppMenu.findMenuItemById('project.generate').enabled = status
+        AppMenu.findMenuItemById('project.approve').enabled = status
+        AppMenu.findMenuItemById('project.remove').enabled = status
       }
     }
   }

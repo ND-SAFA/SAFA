@@ -104,15 +104,6 @@ export default {
   created () {
     AppMenu.findMenuItemById('view.graph_zoom_in').click = this.graphZoomIn.bind(this)
     AppMenu.findMenuItemById('view.graph_zoom_out').click = this.graphZoomOut.bind(this)
-
-    AppMenu.findMenuItemById('project.sync').enabled = false
-    AppMenu.findMenuItemById('project.freeze').enabled = false
-    AppMenu.findMenuItemById('project.upload').enabled = false
-    AppMenu.findMenuItemById('project.clear').enabled = false
-    AppMenu.findMenuItemById('project.generate').enabled = false
-    AppMenu.findMenuItemById('project.approve').enabled = false
-    AppMenu.findMenuItemById('project.remove').enabled = false
-
     AppMenu.setApplicationMenu()
   },
 

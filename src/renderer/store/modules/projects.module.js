@@ -147,7 +147,7 @@ const actions = {
   },
 
   async syncProject ({ commit }) {
-    console.log('starting syncProject function in projecst.module')
+    console.log('starting syncProject function in projects.module')
     const evtSource = projects.syncProject(TEMP_PROJ_ID)
     commit('SET_SYNC_PROGRESS', 0)
     return new Promise((resolve, reject) => {

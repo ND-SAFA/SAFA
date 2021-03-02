@@ -190,6 +190,8 @@
         try {
           await this.syncProject().then((syncResponse) => {
             if (syncResponse.file) {
+              console.log('first option??')
+              console.log('sync: ', syncResponse)
               response.data = syncResponse.file
               response.success = true
               response.message = 'Missing the following files from upload: '
@@ -244,6 +246,7 @@
         this.rightPanel.isHidden = false
       },
       triggerUploadModal (uploadResponse) {
+        console.log('triggering upload modal?')
         this.uploadResult = uploadResponse
         this.showUploadModal = true
       },

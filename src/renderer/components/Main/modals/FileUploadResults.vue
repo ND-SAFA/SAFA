@@ -125,7 +125,7 @@
 
         for (var j = 0; j < expectedFiles.length; j++) {
           for (var k = 0; k < foundFiles.length; k++) {
-            if (foundFiles[k] === expectedFiles[j]) {
+            if (foundFiles[k].toLowerCase() === expectedFiles[j].toLowerCase()) {
               var myEntry = this.fileMap[expectedFiles[j]]
               myEntry.status = 'Ready'
               this.fileMap[expectedFiles[j]] = myEntry

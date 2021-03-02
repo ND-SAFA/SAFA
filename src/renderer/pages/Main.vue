@@ -2,7 +2,7 @@
 <div>
   <div v-if="!approvalView && !timView" id="mainpage">
     <!-- Header Nav -->
-    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="true" v-on:resize:view="resizeView"/>
 
     <div class="d-flex" id="wrapper">
 
@@ -41,7 +41,7 @@
     </div>
   </div>
   <div v-if="approvalView === true" id="mainpage">
-    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="false" v-on:resize:view="resizeView"/>
     <div class="d-flex" id="wrapper">
       <div id="page-content-wrapper">
         <main role="main">
@@ -58,7 +58,7 @@
     </div>
   </div>
   <div v-if="timView === true" id="mainpage">
-    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="false" v-on:resize:view="resizeView"/>
     <div class="d-flex" id="wrapper">
       <div id="page-content-wrapper">
         <main role="main">
@@ -131,7 +131,8 @@
         },
         leftPanel: {
           isHidden: false
-        }
+        },
+        showPanels: true
       }
     },
 
@@ -223,18 +224,21 @@
         this.approvalView = true
         this.timView = false
         this.enableOptions(false)
+        this.showPanels = false
       },
       switchToTIMView () {
         this.showInfoModal = false
         this.timView = true
         this.approvalView = false
         this.enableOptions(false)
+        this.showPanels = false
       },
       switchOffTIMView () {
         this.showInfoModal = false
         this.timView = false
         this.approvalView = false
         this.enableOptions(true)
+        this.showPanels = true
       },
       resizeView () {
         this.resize = Date.now()

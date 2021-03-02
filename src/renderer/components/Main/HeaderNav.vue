@@ -3,7 +3,8 @@
     <nav id="navbar" class="navbar fixed-top navbar-expand-md navbar-dark bg-dark px-1">
       <ul class="navbar-nav">
         <li class="nav-item pr-1">
-          <a @click="ltMenuToggled" class="btn btn-outline-light" href="#"><i :class="ltMenuToggleClass"></i></a>
+          <a v-if="showPanels===true" @click="ltMenuToggled" class="btn btn-outline-light" href="#"><i :class="ltMenuToggleClass"></i></a>
+          <span v-else id="no-sidebar-brand"/>
         </li>
         <li id="logo" class="navbar-brand">Safety Forest</li>
       </ul>
@@ -15,7 +16,7 @@
       <ProgressBar :status-type="statusType" v-show="syncInProgress || generateInProgress"/>
       <ul class="navbar-nav left">
         <li class="nav-item active">
-          <a @click="rtMenuToggled" class="btn btn-outline-light" href="#"><i :class="rtMenuToggleClass"></i></a>
+          <a v-if="showPanels===true" @click="rtMenuToggled" class="btn btn-outline-light" href="#"><i :class="rtMenuToggleClass"></i></a>
         </li>
       </ul>
     </nav>
@@ -31,7 +32,8 @@ export default {
   components: { ProgressBar },
   props: {
     rightPanel: Object,
-    leftPanel: Object
+    leftPanel: Object,
+    showPanels: Boolean
   },
   data () {
     return {
@@ -84,5 +86,8 @@ export default {
 </script>
 
 <style scoped>
+  #no-sidebar-brand {
+    margin-left: 35px;
+  }
 
 </style>

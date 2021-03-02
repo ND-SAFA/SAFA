@@ -71,7 +71,6 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
       // }
     })
     eh.enableDrawMode()
-    console.log(eh)
     // cy.edgeEditing({
     //   bendPositionsFunction: function (ele) {
     //     return ele.data('bendPointPositions')
@@ -99,13 +98,10 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
           }
         }])
         Vue.nonreactive(eles[0]._private.data)
-        console.log('should be adding element... qtip??? for this id: ', self.id)
-        console.log('eles: ', eles.data('name'))
-        var name = eles.data('name')
         eles.qtip({
           content: {
             // text: '<div>Name:</div><form><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></form><div>File Name</div><form id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></form>'
-            text: '<div>Name:</div><div><input id="name' + eles.data('id') + '" type="text" value="' + name + '" /><button class="nameSaveButton' + eles.data('id') + '">Save</button></div><div>File Name</div><div id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></div>'
+            text: '<div>Name:</div><div><input id="name' + eles.data('id') + '" type="text" value="' + eles.data('name') + '" />  <button class="nameSaveButton' + eles.data('id') + '">Save</button></div><div style="margin-top: 3px;">File Name</div><div id="eles.data("file")"><input id="file' + eles.data('id') + '" type="text" value="' + eles.data('file') + '" />  <button class="fileSaveButton' + eles.data('id') + '">Save</button></div>'
           },
           events: {
             render: function (e, api) {
@@ -113,10 +109,14 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
               var filebuttonstr = '.fileSaveButton' + eles.data('id')
               window.$(buttonstr).on('click', function () {
                 var input = document.getElementById('name' + eles.data('id')).value
+                console.log('node num: ', eles.data('id'))
+                console.log('input for name..? ', input)
                 eles.data('name', input)
               })
               window.$(filebuttonstr).on('click', function () {
                 var input = document.getElementById('file' + eles.data('id')).value
+                console.log('node num: ', eles.data('id'))
+                console.log('input for file..? ', input)
                 eles.data('file', input)
               })
               eles.on('remove', () => {
@@ -130,7 +130,6 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
       }
     })
     var allNodes = cy.nodes()
-    console.log(allNodes)
     allNodes.forEach(node => {
       const rule = cy.automove({
         nodesMatching: node.successors('node'),
@@ -167,7 +166,6 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
   }
 
   __clearAndApplyNodeLabels (cy, id) {
-    console.log('running 2')
     var node = cy.getElementById(id)
     const rule = cy.automove({
       nodesMatching: node.successors('node'),
@@ -247,14 +245,14 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
     cy.on('ehcomplete', (edge) => {
       var len = cy.edges().length
       var curr = cy.edges()[len - 1]
-      console.log('curr: ', curr._private)
-      Vue.nonreactive(curr[0]._private.data)
+      console.log('info: ', curr[0])
       curr.data('file', 'undefined.csv')
-      console.log(curr.data())
+      curr.data('generateLinks', false)
+      Vue.nonreactive(curr[0]._private.data)
       var file = curr.data('file')
       curr.qtip({
         content: {
-          text: '<div>Connections File Name:</div><div><input id="edgeFile' + curr.data('id') + '" type="text" value="' + file + '" /><button class="edgeFileSaveButton' + curr.data('id') + '">Save</button></div>'
+          text: '<div><div>Connections File Name:</div><div><input id="edgeFile' + curr.data('id') + '" type="text" value="' + file + '" /><button class="edgeFileSaveButton' + curr.data('id') + '">Save</button></div><div><span style="display: inline-block; width:80px; margin-top: 3px;">Generate Links?</span><input type="checkbox" class="generateLinks' + curr.data('id') + '"></div></div>'
         },
         position: {
           my: 'top left',
@@ -266,6 +264,17 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
             window.$(filebuttonstr).on('click', function () {
               var input = document.getElementById('edgeFile' + curr.data('id')).value
               curr.data('file', input)
+              if (curr.data('file') !== 'undefined.csv') {
+                var myid = '[id = "' + curr.data('id') + '"]'
+                cy.edges(myid).style('line-color', 'black')
+                cy.edges(myid).style('target-arrow-color', 'black')
+              }
+            })
+            var generatestr = '.generateLinks' + curr.data('id')
+            console.log(generatestr)
+            window.$(generatestr).on('click', function (e) {
+              var checked = window.$(generatestr).prop('checked')
+              curr.data('generateLinks', checked)
             })
             curr.on('remove', () => {
               curr.qtip('api').destroy()
@@ -273,6 +282,22 @@ export default class CytoscapePrototypeTIM extends CytoscapePrototype {
           }
         }
       })
+      var myid = '[id = "' + curr.data('id') + '"]'
+      cy.edges(myid).style('line-color', 'red')
+      cy.edges(myid).style('target-arrow-color', 'red')
+    })
+
+    cy.on('destroy', () => {
+      var allNodes = cy.nodes()
+      allNodes.forEach(element => {
+        console.log('before: ', element.qtip('api'))
+        element.qtip('api').destroy()
+        console.log('after: ', element.qtip('api'))
+      })
+
+      cy.elements().remove()
+      console.log(cy.elements())
+      console.log('getting destroyed in tim.js')
     })
   }
 }

@@ -19,11 +19,13 @@
     </div>
     <div id="footer">
       <div id="save-buttons">
-        <span content="To use the TIM Builder, click anywhere to create an Artifact node. Click and drag between two nodes to create a connection between them. Click on a node to change its name with the tooltip that appears, and can right-click and drag to move a node. Click on an edge to change its connection file name." v-tippy="{ placement : 'top',  arrow: true }">
+        <button id="save-button" type="button" class="btn btn-outline-primary" @click="retrieveTim">Retrieve TIM</button>
+        <button id="save-button" type="button" class="btn btn-outline-primary" @click="uploadTim">Save TIM</button>
+        <button id="save-button" type="button" class="btn btn-outline-primary" @click="downloadTim">Download</button>
+        <span content="To use the TIM Builder, click anywhere to create an Artifact node. Click and drag between two nodes to create a connection between them. Click on a node to change its name with the tooltip that appears, and right-click and drag to move a node. Click on an edge to change its connection file name." v-tippy="{ placement : 'top',  arrow: true }">
           <button id="help-button" type="button" class="btn btn-outline-primary">Help</button>
         </span>
-        <button id="save-button" type="button" class="btn btn-outline-primary" @click="exportTim">Export TIM</button>
-        <button id="save-button" type="button" class="btn btn-outline-danger" @click="$emit('undo-tim')">Exit</button>
+        <button id="save-button" type="button" class="btn btn-outline-danger" @click="exitTim">Exit</button>
       </div>
     </div>
   </div>
@@ -114,7 +116,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees']),
+    ...mapActions('projects.module', ['fetchSafetyArtifactTree', 'fetchDeltaTrees', 'uploadFlatfileData']),
     ...mapActions('app.module', ['setSelectedArtifact']),
     ...mapGetters('app.module', ['getSelectedArtifact']),
 
@@ -145,16 +147,10 @@ export default {
         this.cytoscapeProto.cy.on('select', 'node', evt => {
           component.$emit('select:node')
           component.setSelectedArtifact(evt.target.data())
-          console.log('setting artifact 1')
         })
         this.cytoscapeProto.cy.on('select', 'edge', evt => {
           component.$emit('select:edge')
           component.setSelectedArtifact(evt.target.data())
-          console.log('setting artifact 2')
-        })
-        this.cytoscapeProto.cy.on('click', () => {
-          // this.setSelectedArtifact({})
-          console.log('setting artifact 3')
         })
       } catch (e) {
         console.log(e)
@@ -169,7 +165,12 @@ export default {
         this.cytoscapeProto.cy.remove(j)
       }
     },
-    downloadFile (timStr) {
+    retrieveTim () {
+      this.cytoscapeProto.cy.destroy()
+      this.renderTree(this.$refs.cy)
+    },
+    downloadTim () {
+      var timStr = this.exportTim()
       var newDate = new Date()
       var fileName = 'SAFA TIM ' + (newDate.getMonth() + 1) + '/' + newDate.getDate() + '/' + newDate.getFullYear()
       var blob = new Blob([timStr], { type: 'text/plain' })
@@ -188,6 +189,14 @@ export default {
       var edges = data.elements.edges
       var nodeDict = {}
 
+      var timFile = '{\n\t"DataFiles": {\n'
+
+      if (!nodes) {
+        timFile += '\t}\n}'
+        console.log(timFile)
+        return timFile
+      }
+
       for (const node of nodes) {
         nodeDict[node.data.id] = {
           'name': node.data.name,
@@ -195,7 +204,6 @@ export default {
         }
       }
 
-      var timFile = '{\n\t"DataFiles":\n\t{\n'
       var linecount = 1
 
       for (const id of Object.keys(nodeDict)) {
@@ -210,32 +218,56 @@ export default {
         linecount += 1
       }
 
-      timFile += '\t},\n'
-
       linecount = 1
-      for (const edge of edges) {
-        var sourceid = edge.data.source
-        var targetid = edge.data.target
-        var sourcename = nodeDict[sourceid].name
-        var filename = edge.data.file
+      if (edges) {
+        timFile += '\t},\n'
+        for (const edge of edges) {
+          var sourceid = edge.data.source
+          var targetid = edge.data.target
+          var sourcename = nodeDict[sourceid].name
+          var filename = edge.data.file
+          var generate = edge.data.generateLinks
 
-        sourcename = sourcename.charAt(0).toUpperCase() + sourcename.slice(1)
-        var targetname = nodeDict[targetid].name
-        targetname = targetname.charAt(0).toUpperCase() + targetname.slice(1)
-        var jointName = sourcename + 'To' + targetname
+          sourcename = sourcename.charAt(0).toUpperCase() + sourcename.slice(1)
+          var targetname = nodeDict[targetid].name
+          targetname = targetname.charAt(0).toUpperCase() + targetname.slice(1)
+          var jointName = sourcename + 'To' + targetname
 
-        var newstr = '\t"' + jointName + '":\n\t\t"Source": "' + sourcename + '",\n\t\t"Target": "' + targetname + '",\n\t\t"File": "' + filename + '"\n\t}'
-        if (linecount < edges.length) {
-          newstr += ','
+          var newstr = '\t"' + jointName + '": {\n\t\t"Source": "' + sourcename + '",\n\t\t"Target": "' + targetname + '",\n\t\t"File": "' + filename + '"'
+          if (generate) {
+            newstr += ',\n\t\t"generateLinks": "True"'
+          }
+          newstr += '\n\t}'
+          if (linecount < edges.length) {
+            newstr += ','
+          }
+          newstr += '\n'
+          timFile = timFile + newstr
+          linecount += 1
+          //  timFile += '\n}'
         }
-        newstr += '\n'
-        timFile = timFile + newstr
-        linecount += 1
+      } else if (!edges && nodes) {
+        timFile += '\t}\n'
       }
 
       timFile += '\n}'
-      console.log('TIM STR: \n', timFile)
-      this.downloadFile(timFile)
+
+      console.log('TIM to be exported: \n', timFile)
+      return timFile
+    },
+    uploadTim () {
+      var timStr = this.exportTim()
+      if (timStr) {
+        var encodedStr = '{"tim.json": "' + (btoa(timStr)).toString() + '"}'
+        console.log('encodedStr: ', encodedStr)
+        this.uploadFlatfileData(encodedStr).then(response => { console.log(response) })
+      } else {
+        console.log('Tim cannot be empty!') // change this to a modal?
+      }
+    },
+    exitTim () {
+      this.cytoscapeProto.cy.destroy()
+      this.$emit('undo-tim')
     }
   }
 }

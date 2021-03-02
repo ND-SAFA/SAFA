@@ -273,6 +273,7 @@
         const { dialog } = require('electron').remote
         const chosenFolders = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
         this.uploadFiles(chosenFolders).then(result => {
+          console.log(result)
           this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.triggerUploadModal(response) })
         })
       },

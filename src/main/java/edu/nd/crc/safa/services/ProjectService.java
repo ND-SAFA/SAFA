@@ -209,11 +209,11 @@ public class ProjectService {
 
   @PostConstruct
   private void init() {
-    final List<Map<String, Object>> hazards = hazards("test");
-    for( Map<String, Object> node : hazards ){
+    final List<Map<String, Object>> nodes = nodes("test", "Hazard");
+    for( Map<String, Object> node : nodes ){
       final String id = (String)node.get("id");
       final int version = (Integer)versions("test").get("latest"); 
-      final List<Map<String, Object>> data = versions("test", id, version);
+      final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
       mWarnings.put(id, false);
       for( Map<String, Object> v: data) {
         if( v.containsKey("warnings") ){
@@ -225,12 +225,12 @@ public class ProjectService {
   }
 
   @Transactional(readOnly = true)
-  public List<String> parents(String projectId, String node) {
+  public List<String> parents(String projectId, String node, String rootType) {
     try ( Session session = driver.session() ) {
       String query = "MATCH (a)\n" +
         "WHERE a.id =~ $node\n" +
-        "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/Hazard', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
-        "RETURN CASE WHEN LABELS(a)[0]='Hazard' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten(collect(last(nodes(path))))) END AS nodes";
+        "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/"+ rootType + "', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
+        "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten(collect(last(nodes(path))))) END AS nodes";
       StatementResult result = session.run(query, Values.parameters("node", "(?i)"+node.replace(".", "\\\\.")));
 
       List<String> ret = new ArrayList<String>();
@@ -245,10 +245,10 @@ public class ProjectService {
   }
 
   @Transactional(readOnly = true)
-  public List<Map<String, Object>> hazards(String projectId) {
+  public List<Map<String, Object>> nodes(String projectId, String nodeType) {
     List<Map<String, Object>> set = new ArrayList<>();
     try ( Session session = driver.session() ) {
-      String query = "MATCH (n:Hazard) WITH n ORDER BY n.id ASC RETURN n";
+      String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
       StatementResult result = session.run(query);
       List<Record> records = result.list();
       for(int i = 0; i < records.size(); i++) {
@@ -260,14 +260,14 @@ public class ProjectService {
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Boolean> hazardWarnings(String projectId) {
+  public Map<String, Boolean> nodeWarnings(String projectId) {
     return mWarnings;
   }
   
   @Transactional(readOnly = true)
-  public List<Map<String, Object>> trees(String projectId) {
+  public List<Map<String, Object>> trees(String projectId, String rootType) {
     try ( Session session = driver.session() ) {
-      String query = "MATCH path=(root:Hazard)-[rel*]->(artifact:Hazard)\n" +
+      String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n" +
                      "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
       StatementResult result = session.run(query);
       return parseArtifactTree(result);
@@ -275,9 +275,9 @@ public class ProjectService {
   }
 
   @Transactional(readOnly = true)
-  public List<Map<String, Object>> trees(String projectId, String root) {
+  public List<Map<String, Object>> tree(String projectId, String root, String rootType) {
     int version = (Integer)versions(projectId).get("latest");
-    return versions(projectId, root, version);
+    return versions(projectId, root, version, rootType);
   }
 
   @Transactional(readOnly = true)
@@ -348,7 +348,7 @@ public class ProjectService {
   // END MARKED AS DEPRECATED
 
   @Transactional(readOnly = true)
-  public List<Map<String, Object>> versions(String projectId, String root, int version) {
+  public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType) {
     try ( Session session = driver.session() ) {
       String query ="MATCH (p)-[r:UPDATES]->(c)\n" +
         "WHERE r.version <= $version\n" +
@@ -371,7 +371,7 @@ public class ProjectService {
         "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1].version > $version | c[2]]) as added\n" +
         "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n" +
         // Get Paths
-        "MATCH (h:Hazard {id: $root})\n" +
+        "MATCH (h:" + rootType + " {id: $root})\n" +
         "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path\n" +
         // Prune unwanted nodes and relationships
         "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +

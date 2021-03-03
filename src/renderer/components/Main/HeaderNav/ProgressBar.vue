@@ -1,6 +1,7 @@
 <template>
   <ul class="navbar-nav ma sync-notif" style="">
-    <li class="navbar-text mr-1">Synchronizing With Project Repository</li>
+    <li v-if="statusType === 'sync'" class="navbar-text mr-1">Synchronizing With Project Repository</li>
+    <li v-else class="navbar-text mr-1">Generating Trace Links</li>
     <li class="navbar-text mr-5">
       <div class="progress">
         <div v-bind:class="[progressBar, percentComplete]"></div>
@@ -14,10 +15,18 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'ProgressBar',
+  props: {
+    statusType: String
+  },
   computed: {
-    ...mapGetters('projects.module', ['getSyncProgress']),
+    ...mapGetters('projects.module', ['getSyncProgress', 'getGenerateProgress']),
     percentComplete () {
-      return `w-${25 + (25 * this.getSyncProgress)}`
+      if (this.statusType === 'sync') {
+        return `w-${25 + (25 * this.getSyncProgress)}`
+      } else {
+        console.log(this.getGenerateProgress)
+        return `w-${100 * this.getGenerateProgress}`
+      }
     }
   },
   data () {

@@ -43,13 +43,48 @@ export default class AppMenu {
       submenu: [
         {
           id: 'sync',
-          label: 'Synchronize Forest',
+          label: 'Synchronize Data',
           accelerator: 'CommandOrControl+P'
         },
         {
           id: 'freeze',
           label: 'Freeze Version',
           accelerator: 'CommandOrControl+S'
+        },
+        { type: 'separator' },
+        {
+          id: 'upload',
+          label: 'Upload Flatfiles',
+          accelerator: 'CommandOrControl+Q'
+        },
+        {
+          id: 'tim',
+          label: 'Create a TIM',
+          accelerator: 'CommandOrControl+T'
+        },
+        {
+          id: 'clear',
+          label: 'Clear Current Uploads'
+        },
+        { type: 'separator' },
+        {
+          id: 'generate',
+          label: 'Generate Trace Links',
+          accelerator: 'CommandOrControl+L'
+        },
+        {
+          id: 'approve',
+          label: 'Approve Trace Links',
+          accelerator: 'CommandOrControl+A'
+        },
+        {
+          id: 'remove',
+          label: 'Clear Generated Trace Links'
+        },
+        { type: 'separator' },
+        {
+          id: 'help',
+          label: 'More Info'
         }
       ]
     }

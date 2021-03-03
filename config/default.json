@@ -1,5 +1,5 @@
 {
-  "services": {"api": {"url": "https://safa.crc.nd.edu"}},
+  "services": {"api": {"url": "http://localhost:8080"}},
   "safa_tree": {
     "peer_node_types": "Context,AcceptanceTest,EnvironmentalAssumption",
     "ancestor_exact_types": "Hazard,DesignDefinition,Code",

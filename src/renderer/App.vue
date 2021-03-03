@@ -7,6 +7,7 @@
 <script>
   import { mapActions, mapGetters } from 'vuex'
   import AppMenu from '@/menu'
+  import { shell } from 'electron'
 
   export default {
     name: 'safa-vue',
@@ -19,21 +20,26 @@
       ...mapGetters('projects.module', ['getSyncProgress'])
     },
     created () {
-      AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
+      // AppMenu.findMenuItemById('project.sync').click = this.projectSync.bind(this)
       AppMenu.findMenuItemById('project.freeze').click = this.projectFreeze.bind(this)
+      AppMenu.findMenuItemById('project.help').click = this.getHelp.bind(this)
       AppMenu.setApplicationMenu()
     },
     methods: {
-      ...mapActions('projects.module', ['saveProjectVersion', 'syncProject']),
+      ...mapActions('projects.module', ['saveProjectVersion', 'syncProject', 'clearFiles']),
       async projectSync () {
         try {
           await this.syncProject()
+          console.log('it worked fine!')
         } catch (e) {
-
+          console.log('it did not work fine')
         }
       },
       async projectFreeze () {
         await this.saveProjectVersion()
+      },
+      getHelp () {
+        shell.openExternal('https://github.com/SAREC-Lab/SAFA-Documentation')
       }
     }
   }

@@ -10,6 +10,7 @@ const TEMP_PROJ_ID = 'spwd.cse.nd.edu'
 const state = {
   projects: {
     syncProgress: -1,
+    generateProgress: -1,
     delta: {
       trees: []
     },
@@ -21,7 +22,8 @@ const state = {
     safetyArtifactTree: [],
     node: {
       parents: []
-    }
+    },
+    uploadFiles: null
   }
 }
 
@@ -52,6 +54,14 @@ const getters = {
 
   getSyncProgress (state) {
     return state.projects.syncProgress
+  },
+
+  getGenerateProgress (state) {
+    return state.projects.generateProgress
+  },
+
+  getUploadFiles (state) {
+    return state.projects.uploadFiles
   }
 }
 
@@ -106,6 +116,17 @@ const actions = {
     }
   },
 
+  async uploadFlatfileData ({ commit }, filesStr) {
+    try {
+      const response = await projects.postFlatfileData(TEMP_PROJ_ID, filesStr)
+      console.log(response)
+      console.log('api success')
+      return response
+    } catch (e) {
+      return 'Could not receive response from API'
+    }
+  },
+
   async fetchProjectNodeParents ({ commit }, nodeId) {
     try {
       const response = await projects.getProjectNodeParents(TEMP_PROJ_ID, nodeId)
@@ -126,15 +147,17 @@ const actions = {
   },
 
   async syncProject ({ commit }) {
+    console.log('starting syncProject function in projects.module')
     const evtSource = projects.syncProject(TEMP_PROJ_ID)
     commit('SET_SYNC_PROGRESS', 0)
     return new Promise((resolve, reject) => {
       evtSource.addEventListener('update', (message) => {
+        var obj = JSON.parse(message.data)
         commit('SET_SYNC_PROGRESS', message.lastEventId)
-        if (JSON.parse(message.data).complete) {
+        if (obj.complete) {
           evtSource.close()
           commit('SET_SYNC_PROGRESS', -1)
-          resolve()
+          resolve(obj)
         }
       })
       evtSource.onerror = (e) => {
@@ -142,6 +165,79 @@ const actions = {
         reject(e)
       }
     })
+  },
+
+  async fetchErrorLog ({ commit }) {
+    console.log('fetching error log')
+    try {
+      const response = await projects.fetchErrorLog(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async generateTraceLinks ({ commit }) {
+    try {
+      commit('SET_GENERATE_PROGRESS', -1)
+      commit('SET_GENERATE_PROGRESS', 1)
+      const response = await projects.generateTraceLinks(TEMP_PROJ_ID)
+      commit('SET_GENERATE_PROGRESS', -1)
+      return response
+    } catch (error) {
+      commit('SET_GENERATE_PROGRESS', -1)
+      console.log(error)
+    }
+  },
+
+  async getLinkTypes ({ commit }) {
+    try {
+      const response = await projects.getLinkTypes(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async getApproverData ({ commit }) {
+    try {
+      const response = await projects.fetchApproverData(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async saveApproverData ({ commit }) {
+    try {
+      const response = await projects.saveApproverData(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async getGenerateLinksErrorLog ({ commit }) {
+    try {
+      const response = await projects.fetchGenerateLinksErrorLog(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async removeTraceLinks ({ commit }) {
+    try {
+      const response = await projects.removeTraceLinks(TEMP_PROJ_ID)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  async clearUploads ({ commit }) {
+    const response = await projects.clearProjectFiles(TEMP_PROJ_ID)
+    return response
   },
 
   resetProject ({ commit }) {
@@ -178,9 +274,18 @@ const mutations = {
     state.projects.syncProgress = data
   },
 
+  SET_GENERATE_PROGRESS (state, data) {
+    state.projects.generateProgress = data
+  },
+
+  UPLOAD_FILES (state, data) {
+    state.projects.uploadFiles = data
+  },
+
   RESET_PROJECT (state) {
     state.projects = {
       syncProgress: -1,
+      generateProgress: -1,
       delta: {
         trees: []
       },

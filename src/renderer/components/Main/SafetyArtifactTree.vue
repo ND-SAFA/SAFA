@@ -1,5 +1,5 @@
 <template>
-  <div id="center-panel" role="tabpanel" aria-labelledby="artifact-tree-tab" class="fade col show active graph-view p-0">
+  <div id="center-panel" role="tabpanel" aria-labelledby="artifact-tree-tab" aria-hidden="false" class="col show active graph-view p-0">
     <div id="loading-graph-spinner" v-show="showSpinner">
       <div class="d-flex justify-content-center">
         <div class="spinner-border text-primary" role="status">
@@ -55,9 +55,6 @@ export default {
   },
 
   watch: {
-    treeId () {
-      this.renderTree(this.$refs.cy)
-    },
     resize () {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.cy.resize()

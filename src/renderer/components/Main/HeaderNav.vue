@@ -3,7 +3,8 @@
     <nav id="navbar" class="navbar fixed-top navbar-expand-md navbar-dark bg-dark px-1">
       <ul class="navbar-nav">
         <li class="nav-item pr-1">
-          <a @click="ltMenuToggled" class="btn btn-outline-light" href="#"><i :class="ltMenuToggleClass"></i></a>
+          <a v-if="showPanels===true" @click="ltMenuToggled" class="btn btn-outline-light" href="#"><i :class="ltMenuToggleClass"></i></a>
+          <span v-else id="no-sidebar-brand"/>
         </li>
         <li id="logo" class="navbar-brand">Safety Forest</li>
       </ul>
@@ -12,10 +13,10 @@
         <li class="navbar-text delta-version-indicator ml-1 mr-1" v-show="this.getDeltaState.enabled"><i class="fas fa-play fa-rotate-270"></i> <span class="font-weight-bold">Current:</span> <span id="delta-current-indicator">{{ current }}</span></li>
         <li class="navbar-text delta-version-indicator mx-1" v-show="this.getDeltaState.enabled"><span class="font-weight-bold">Baseline:</span> <span id="delta-baseline-indicator">{{ baseline }}</span></li>
       </ul>
-      <ProgressBar v-show="syncInProgress"/>
+      <ProgressBar :status-type="statusType" v-show="syncInProgress || generateInProgress"/>
       <ul class="navbar-nav left">
         <li class="nav-item active">
-          <a @click="rtMenuToggled" class="btn btn-outline-light" href="#"><i :class="rtMenuToggleClass"></i></a>
+          <a v-if="showPanels===true" @click="rtMenuToggled" class="btn btn-outline-light" href="#"><i :class="rtMenuToggleClass"></i></a>
         </li>
       </ul>
     </nav>
@@ -31,7 +32,13 @@ export default {
   components: { ProgressBar },
   props: {
     rightPanel: Object,
-    leftPanel: Object
+    leftPanel: Object,
+    showPanels: Boolean
+  },
+  data () {
+    return {
+      statusType: null
+    }
   },
   methods: {
     rtMenuToggled () {
@@ -45,9 +52,20 @@ export default {
   },
   computed: {
     ...mapGetters('app.module', ['getDeltaState']),
-    ...mapGetters('projects.module', ['getSyncProgress']),
+    ...mapGetters('projects.module', ['getSyncProgress', 'getGenerateProgress']),
     syncInProgress () {
+      if (this.getSyncProgress > -1) {
+        console.log('syncing fr fr ')
+        this.statusType = 'sync'
+      }
       return this.getSyncProgress > -1
+    },
+    generateInProgress () {
+      if (this.getGenerateProgress > -1) {
+        console.log('generating links')
+        this.statusType = 'generate'
+      }
+      return this.getGenerateProgress > -1
     },
     current () {
       return Math.max(this.getDeltaState.current, this.getDeltaState.baseline)
@@ -68,5 +86,8 @@ export default {
 </script>
 
 <style scoped>
+  #no-sidebar-brand {
+    margin-left: 35px;
+  }
 
 </style>

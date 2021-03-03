@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,28 +23,28 @@ public class ProjectsController {
   }
 
   @GetMapping("/projects/{projId}/parents/{node}")
-  public List<String> hazards(@PathVariable String projId, @PathVariable String node) {
-    return projectService.parents(projId, node);
+  public List<String> parents(@PathVariable String projId, @PathVariable String node, @RequestParam String rootType) {
+    return projectService.parents(projId, node, rootType);
   }
 
-  @GetMapping("/projects/{projId}/hazards/")
-  public List<Map<String, Object>> hazards(@PathVariable String projId) {
-    return projectService.hazards(projId);
+  @GetMapping("/projects/{projId}/nodes/")
+  public List<Map<String, Object>> nodes(@PathVariable String projId, @RequestParam String nodeType) {
+    return projectService.nodes(projId, nodeType);
   }
 
-  @GetMapping("/projects/{projId}/hazards/warnings")
-  public Map<String, Boolean> hazardWarnings(@PathVariable String projId) {
-    return projectService.hazardWarnings(projId);
+  @GetMapping("/projects/{projId}/nodes/warnings")
+  public Map<String, Boolean> nodeWarnings(@PathVariable String projId) {
+    return projectService.nodeWarnings(projId);
   }
 
   @GetMapping("/projects/{projId}/trees/")
-  public List<Map<String, Object>> trees(@PathVariable String projId) {
-    return projectService.trees(projId);
+  public List<Map<String, Object>> trees(@PathVariable String projId, @RequestParam String rootType) {
+    return projectService.trees(projId, rootType);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/")
-  public List<Map<String, Object>> trees(@PathVariable String projId, @PathVariable String treeId) {
-    return projectService.trees(projId, treeId);
+  public List<Map<String, Object>> tree(@PathVariable String projId, @PathVariable String treeId, @RequestParam String rootType) {
+    return projectService.tree(projId, treeId, rootType);
   }
 
   @GetMapping("/projects/{projId}/versions/")
@@ -98,8 +99,8 @@ public class ProjectsController {
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
-  public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version) {
-    return projectService.versions(projId, treeId, version);
+  public List<Map<String, Object>> versions(@PathVariable String projId, @PathVariable String treeId, @PathVariable int version, @RequestParam String rootType) {
+    return projectService.versions(projId, treeId, version, rootType);
   }
 
   @GetMapping("/projects/{projId}/pull/")

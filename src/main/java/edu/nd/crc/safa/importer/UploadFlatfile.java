@@ -68,6 +68,41 @@ public class UploadFlatfile {
   //   }
   // }
 
+  // public String uploadFiles(String projId, String jsonfiles) throws Exception {
+  //   String path = "/uploadedFlatfiles";
+  //   createDirectory(path);
+
+  //   // String generatedDir = "/generatedFilesDir";
+  //   // createDirectory(flatfileDir);
+  //   // createDirectory(generatedDir);
+    
+  //   JsonIterator iterator = JsonIterator.parse(jsonfiles);
+  //   for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
+  //     String encodedData = iterator.readString();
+  //     byte[] bytes = Base64.getDecoder().decode(encodedData);
+  //     String fullPath = path + "/" + filename; 
+  //     Files.write(Paths.get(fullPath), bytes);
+      
+  //     if (filename.equals("tim.json")) {
+  //       MySQL.clearTimTables();
+  //       parseTimFile(fullPath);
+  //     } else {
+  //       parseRegFile(filename, fullPath);
+  //     }
+  //   }
+
+  //   deleteDirectory(path);
+
+  //   MySQL.missingTraceArtifactsCheck();
+  //   MySQL.FileInfo fileInfo = MySQL.getFileInfo();
+
+  //   String data = "{\"uploadedFiles\":" + fileInfo.uploadedFiles.toString() + ",\"expectedFiles\":" +
+  //                 fileInfo.expectedFiles.toString() + ",\"generatedFiles\":" + fileInfo.generatedFiles.toString() +
+  //                 ",\"expectedGeneratedFiles\":" + fileInfo.expectedGeneratedFiles.toString() + "}";
+    
+  //   System.out.println(data);
+  //   return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s }", data);
+  // }
   public String uploadFiles(String projId, String jsonfiles) throws Exception {
     String path = "/uploadedFlatfiles";
     createDirectory(path);
@@ -93,7 +128,7 @@ public class UploadFlatfile {
 
     deleteDirectory(path);
 
-    MySQL.missingTraceArtifactsCheck();
+    MySQL.traceArtifactCheck();
     MySQL.FileInfo fileInfo = MySQL.getFileInfo();
 
     String data = "{\"uploadedFiles\":" + fileInfo.uploadedFiles.toString() + ",\"expectedFiles\":" +
@@ -148,11 +183,11 @@ public class UploadFlatfile {
         for (String header : headers) {
           if (header.toLowerCase().equals("source")) {
             source = true;
-            cols.add("source");
+            cols.add("source_id");
           }
           else if (header.toLowerCase().equals("target")) {
             target = true;
-            cols.add("target");
+            cols.add("target_id");
           }
         }
 
@@ -195,7 +230,7 @@ public class UploadFlatfile {
     }
   }
 
-  public void parseTraceMatrix(String field, JsonIterator iterator) throws Exception {
+  public void parseTraceMatrix(String tracename, JsonIterator iterator) throws Exception {
     String filename = "";
     String source = "";
     String target = "";
@@ -203,7 +238,7 @@ public class UploadFlatfile {
 
     for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
       if (!attr.toLowerCase().matches("file|source|target|generatelinks")) {
-        throw new Exception(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', 'Source', 'Target', or 'generateLinks'", field, attr));
+        throw new Exception(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', 'Source', 'Target', or 'generateLinks'", tracename, attr));
       }
 
       if (attr.toLowerCase().equals("file")){
@@ -224,29 +259,28 @@ public class UploadFlatfile {
     }
 
     if (source.isEmpty()) {
-      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes are 'File', 'Source', 'Target'", field));
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes are 'File', 'Source', 'Target'", tracename));
     }
 
     if (target.isEmpty()) {
-      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes are 'File', 'Source', 'Target'", field));
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes are 'File', 'Source', 'Target'", tracename));
     }
 
     if (!generated && filename.isEmpty()) {
-      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are 'File', 'Source', 'Target'", field));
+      throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are 'File', 'Source', 'Target'", tracename));
     }
 
     if (generated && !filename.isEmpty()) {
-      throw new Exception(String.format("Link: %s is a generated file and does not have a File attribute. Please delete the link attribute 'File: %s' or remove 'generateLinks: True'.", field, filename));
+      throw new Exception(String.format("Link: %s is a generated file and does not have a File attribute. Please delete the link attribute 'File: %s' or remove 'generateLinks: True'.", tracename, filename));
     }
 
     if (generated) {
-      String traceMatrixTableName = "$generated_" + field.toLowerCase();
-      MySQL.createTimTraceMatrixTable(field, traceMatrixTableName, source, target, generated);
+      String traceMatrixTableName = tracename.toLowerCase();
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
     }
     else {
       String traceMatrixTableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-
-      MySQL.createTimTraceMatrixTable(field, traceMatrixTableName, source, target, generated);
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
     }
   }
 
@@ -305,7 +339,7 @@ public class UploadFlatfile {
 }
 
 //   public String getMissingFiles(String projId) throws Exception {
-//     String flatfileDir = "/flatfilesDir";
+//     String flatfileDir = "/uploadedFlatfiles";
 //     String generatedDir = "/generatedFilesDir";
 
 //     File flatDir = createDirectory(flatfileDir);

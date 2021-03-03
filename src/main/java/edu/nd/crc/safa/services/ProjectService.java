@@ -159,9 +159,19 @@ public class ProjectService {
     }
   }
 
+  public String getUploadFilesErrorLog(String projId) {
+    try {
+      String errorStr = MySQL.getUploadErrorLog();
+
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
+    } catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
   // public String getUploadFilesErrorLog(String projId) {
   //   try {
-  //     File myObj = new File("/flatfilesDir/ErrorReport.txt");
+  //     File myObj = new File("/uploadedFlatfiles/ErrorReport.txt");
   //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
   //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
   //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
@@ -181,15 +191,25 @@ public class ProjectService {
   //   }
   // }
 
-  // public String clearFlatfileDir() {
-  //   try {
-  //     String dir = "/flatfilesDir";
-  //     return uploadFlatfile.deleteDirectory(dir, "Flatfile Uploads");
-  //   }
-  //   catch(Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-  //   }
-  // }
+  public String clearUploadedFlatfiles(String projid) {
+    try {
+      String message = MySQL.clearUploadedFlatfiles();
+      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
+    }
+    catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
+  public String clearGeneratedFlatfiles(String projid) {
+    try {
+      String message = MySQL.clearGeneratedFlatfiles();
+      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
+    }
+    catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
 
   @PostConstruct
   private void init() {

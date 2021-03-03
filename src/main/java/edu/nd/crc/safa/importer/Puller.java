@@ -180,7 +180,7 @@ public class Puller {
     }
 
     public void parseFlatfiles() throws Exception {
-        String flatfileDir = "/flatfilesDir";
+        String flatfileDir = "/uploadedFlatfiles";
         String generatedDir = "/generatedFilesDir";
         mFlatfile.requiredDataChecker(flatfileDir);
 

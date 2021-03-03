@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import config from 'config'
 import { mapActions, mapGetters } from 'vuex'
 import AppMenu from '@/menu'
 import Vue from 'vue'
@@ -110,7 +111,7 @@ export default {
       const { baseline, current } = this.getDeltaState
       try {
         this.isUpdating = true
-        await this.fetchDeltaTrees({treeId: this.treeId, baseline, current})
+        await this.fetchDeltaTrees({treeId: this.treeId, baseline, current, rootType: config.safa_tree.root_node_type})
 
         const layout = new LayoutTemplateKlay({
           zoom: 1.12,

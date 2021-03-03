@@ -26,6 +26,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
+import edu.nd.crc.safa.importer.Flatfile.ParsedData;
+import edu.nd.crc.safa.importer.Flatfile.Artifact;
+import edu.nd.crc.safa.importer.Flatfile.Connection;
+import edu.nd.crc.safa.importer.Flatfile.DataEntry;
+import edu.nd.crc.safa.importer.Flatfile.Link;
 
 @Component
 public class Puller {
@@ -35,6 +40,7 @@ public class Puller {
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
     @Autowired JIRA mJira;
+    @Autowired Flatfile mFlatfile;
     @Autowired public Database mDatabase;
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
@@ -172,4 +178,36 @@ public class Puller {
             System.err.println(e.toString());
         }
     }
+
+    public void parseFlatfiles() throws Exception {
+        String flatfileDir = "/flatfilesDir";
+        String generatedDir = "/generatedFilesDir";
+        mFlatfile.requiredDataChecker(flatfileDir);
+
+        ParsedData parsedData = mFlatfile.parseFiles(flatfileDir, generatedDir); 
+    
+        for (Artifact artifact : parsedData.artifacts) {
+            for (DataEntry dataEntry : artifact.entries) {
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("source", "Flatfile");
+                data.put("isDelegated", "N/A");
+                data.put("status", "N/A");
+                data.put("name", dataEntry.summary);
+                data.put("href", "N/A");
+                data.put("description", dataEntry.content);
+                data.put("type", artifact.type);
+
+                foundNodes.add(dataEntry.id);
+                mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
+            }
+        }
+
+        for (Connection connection : parsedData.connections) {
+            for (Link link : connection.links) {
+                mDatabase.AddLink(link.target, link.sourceType, link.source);
+            }
+        }
+
+    }
+
 }

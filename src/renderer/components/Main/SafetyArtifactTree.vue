@@ -55,9 +55,6 @@ export default {
   },
 
   watch: {
-    treeId () {
-      this.renderTree(this.$refs.cy)
-    },
     resize () {
       if (!Vue.isEmpty(this.cytoscapeProto)) {
         this.cytoscapeProto.cy.resize()

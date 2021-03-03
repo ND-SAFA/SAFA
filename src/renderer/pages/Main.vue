@@ -1,7 +1,8 @@
 <template>
-  <div v-if="!approvalView" id="mainpage">
+<div>
+  <div v-if="!approvalView && !timView" id="mainpage">
     <!-- Header Nav -->
-    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="true" v-on:resize:view="resizeView"/>
 
     <div class="d-flex" id="wrapper">
 
@@ -39,8 +40,8 @@
 
     </div>
   </div>
-  <div v-else id="mainpage">
-    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" v-on:resize:view="resizeView"/>
+  <div v-if="approvalView === true" id="mainpage">
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="false" v-on:resize:view="resizeView"/>
     <div class="d-flex" id="wrapper">
       <div id="page-content-wrapper">
         <main role="main">
@@ -56,6 +57,23 @@
 
     </div>
   </div>
+  <div v-if="timView === true" id="mainpage">
+    <HeaderNav :right-panel="rightPanel" :left-panel="leftPanel" :show-panels="false" v-on:resize:view="resizeView"/>
+    <div class="d-flex" id="wrapper">
+      <div id="page-content-wrapper">
+        <main role="main">
+          <div class="container-fluid">
+            <div class="row vh-100 pad-navbar">
+              <TimGraph @undo-tim="switchOffTIMView"/>
+            </div>
+          </div>
+        </main>
+      </div>
+      <!-- End Page Content -->
+
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -72,6 +90,7 @@
   import ConfigureDeltaModal from '@/components/Main/modals/ConfigureDelta'
   import FileUploadResultsModal from '@/components/Main/modals/FileUploadResults'
   import StatusInfoModal from '@/components/Main/modals/StatusInfo'
+  import TimGraph from '@/components/Main/TimGraph'
 
   export default {
     name: 'main-page',
@@ -86,13 +105,15 @@
       ApproveLinks,
       ConfigureDeltaModal,
       FileUploadResultsModal,
-      StatusInfoModal
+      StatusInfoModal,
+      TimGraph
     },
 
     data () {
       return {
         firstOpen: true,
         approvalView: false,
+        timView: false,
         resize: Date.now(),
         update: Date.now(),
         showDeltaModal: false,
@@ -110,7 +131,8 @@
         },
         leftPanel: {
           isHidden: false
-        }
+        },
+        showPanels: true
       }
     },
 
@@ -126,6 +148,7 @@
       AppMenu.findMenuItemById('project.clear').click = this.clearFiles.bind(this)
       AppMenu.findMenuItemById('project.generate').click = this.projectGenerate.bind(this)
       AppMenu.findMenuItemById('project.approve').click = this.switchToApprovalView.bind(this)
+      AppMenu.findMenuItemById('project.tim').click = this.switchToTIMView.bind(this)
       AppMenu.findMenuItemById('project.remove').click = this.projectRemove.bind(this)
       AppMenu.setApplicationMenu()
     },
@@ -168,6 +191,8 @@
         try {
           await this.syncProject().then((syncResponse) => {
             if (syncResponse.file) {
+              console.log('first option??')
+              console.log('sync: ', syncResponse)
               response.data = syncResponse.file
               response.success = true
               response.message = 'Missing the following files from upload: '
@@ -197,6 +222,23 @@
         })
         this.showInfoModal = false
         this.approvalView = true
+        this.timView = false
+        this.enableOptions(false)
+        this.showPanels = false
+      },
+      switchToTIMView () {
+        this.showInfoModal = false
+        this.timView = true
+        this.approvalView = false
+        this.enableOptions(false)
+        this.showPanels = false
+      },
+      switchOffTIMView () {
+        this.showInfoModal = false
+        this.timView = false
+        this.approvalView = false
+        this.enableOptions(true)
+        this.showPanels = true
       },
       resizeView () {
         this.resize = Date.now()
@@ -208,6 +250,7 @@
         this.rightPanel.isHidden = false
       },
       triggerUploadModal (uploadResponse) {
+        console.log('triggering upload modal?')
         this.uploadResult = uploadResponse
         this.showUploadModal = true
       },
@@ -240,6 +283,7 @@
         const { dialog } = require('electron').remote
         const chosenFolders = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
         this.uploadFiles(chosenFolders).then(result => {
+          console.log(result)
           this.uploadFlatfileData(JSON.stringify(result)).then(response => { this.triggerUploadModal(response) })
         })
       },
@@ -284,6 +328,15 @@
       },
       choseArtifactData (linkdata) {
         this.chosenArtifactData = linkdata
+      },
+      enableOptions (status) {
+        AppMenu.findMenuItemById('project.sync').enabled = status
+        AppMenu.findMenuItemById('project.freeze').enabled = status
+        AppMenu.findMenuItemById('project.upload').enabled = status
+        AppMenu.findMenuItemById('project.clear').enabled = status
+        AppMenu.findMenuItemById('project.generate').enabled = status
+        AppMenu.findMenuItemById('project.approve').enabled = status
+        AppMenu.findMenuItemById('project.remove').enabled = status
       }
     }
   }

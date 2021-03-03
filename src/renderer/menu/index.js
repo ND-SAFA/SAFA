@@ -58,6 +58,11 @@ export default class AppMenu {
           accelerator: 'CommandOrControl+Q'
         },
         {
+          id: 'tim',
+          label: 'Create a TIM',
+          accelerator: 'CommandOrControl+T'
+        },
+        {
           id: 'clear',
           label: 'Clear Current Uploads'
         },

@@ -782,6 +782,56 @@ public class MySQL {
         }
     }
 
+    public static List<List<String>> generateInfo() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+    
+            String sqlUploadedFiles = "SELECT tim_source.tablename as source_tablename,\n" +
+                "tim_target.tablename as target_tablename,\n" +
+                "tim_trace_matrix.tablename as dest_tablename\n" +
+                "FROM tim_trace_matrix\n" +
+                "LEFT JOIN tim_artifact as tim_source\n" + 
+                "ON tim_source.artifact = tim_trace_matrix.source_artifact\n" +
+                "AND is_generated = 1\n" +
+                "LEFT JOIN tim_artifact as tim_target\n" +
+                "ON tim_target.artifact = tim_trace_matrix.target_artifact\n" +
+                "AND is_generated = 1\n" +
+                "where tim_source.tablename IS NOT NULL AND tim_target.tablename IS NOT NULL;";
+            
+            ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
+            
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                row.add(rs.getString(3));
+                data.add(row);
+            }
+
+            return data;
+        }
+    }
+
+    public static List<List<String>> getArtifactData(String tablename) throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+    
+            String sqlGetData = String.format("SELECT id, summary, content FROM %s;", tablename);
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
+            
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                row.add(rs.getString(3));
+                data.add(row);
+            }
+
+            return data;
+        }
+    }
+
     // public static void missingTraceArtifactsCheck() throws Exception {
     //     try (Statement stmt = startDB().createStatement()) {
     //         Boolean timTraceExists = tableExists("tim_trace_matrix");

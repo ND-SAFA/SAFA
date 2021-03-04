@@ -74,11 +74,11 @@ public class ProjectsController {
     return projectService.getUploadFilesErrorLog(projId);
   }
 
-  // @GetMapping("/projects/{projId}/generate/")
-  // public String generateLinks(@PathVariable String projId) {
-  //   System.out.println("/projects/{projId}/generate/");
-  //   return projectService.generateLinks(projId);
-  // }
+  @GetMapping("/projects/{projId}/generate/")
+  public String generateLinks(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/generate/");
+    return projectService.generateLinks(projId);
+  }
 
   // @GetMapping("/projects/{projId}/linkserrorlog/")
   // public String getGenerateLinksErrorLog(@PathVariable String projId) {

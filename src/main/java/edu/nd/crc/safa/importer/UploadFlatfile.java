@@ -305,29 +305,15 @@ public class UploadFlatfile {
     return myDir;
   }
 
-  public String deleteDirectory(String dir) throws Exception {
+  public static void deleteDirectory(String dir) throws Exception {
     File myDir = new File(dir);
     
-    if (!myDir.isDirectory()) {
-      throw new Exception(String.format("Error deleting file: Path: %s", dir));
+    if (myDir.isDirectory()) {
+      deleteDirectoryHelper(myDir);
     }
-
-    File[] fileList = myDir.listFiles();
-    
-    if (fileList.length > 0) {
-      if (deleteDirectoryHelper(myDir)){
-        createDirectory(dir);
-        return String.format("{ \"success\": true, \"message\": \"%s has successfully been cleared.\"}", dir);
-      } 
-      else {
-        return String.format("{ \"success\": false, \"message\": \"%s could not be cleared.\"}", dir);
-      }
-    }
-
-    return String.format("{ \"success\": true, \"message\": \"%s has already been cleared.\"}", dir);
   }
 
-  public boolean deleteDirectoryHelper(File dir) throws Exception {
+  public static boolean deleteDirectoryHelper(File dir) throws Exception {
     File[] files = dir.listFiles();
     if (files != null) {
       for (File file : files) {

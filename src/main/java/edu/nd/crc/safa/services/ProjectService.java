@@ -112,16 +112,16 @@ public class ProjectService {
     return emitter;
   }
 
-  // public String generateLinks(String projId){
-  //   try {
-  //     return generateFlatfile.generateFiles();
-  //     // generateFlatfile.createGeneratedTraceMatrixTables();
-  //     // return generateFileResult;
-  //   } 
-  //   catch (Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
-  //   }
-  // }
+  public String generateLinks(String projId){
+    try {
+      return generateFlatfile.generateFiles();
+      // generateFlatfile.createGeneratedTraceMatrixTables();
+      // return generateFileResult;
+    } 
+    catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
+    }
+  }
 
   // public String clearGeneratedFilesDir(String projId) {
   //   try {

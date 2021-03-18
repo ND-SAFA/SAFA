@@ -3,6 +3,7 @@ package edu.nd.crc.safa.controller.projects;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import edu.nd.crc.safa.services.ProjectService;
+import edu.nd.crc.safa.dao.Layout;
 
 @RestController
 public class ProjectsController {
@@ -106,5 +110,23 @@ public class ProjectsController {
   @GetMapping("/projects/{projId}/pull/")
   public SseEmitter projectPull(@PathVariable String projId) {
     return projectService.projectPull(projId);
+  }
+
+  @PostMapping("/projects/{projId}/trees/{treeId}/layout/")
+  public String postTreeLayout(@PathVariable String projId, @PathVariable String treeId, @RequestBody String b64EncodedLayout) {
+    try {
+      return projectService.postTreeLayout(projId, treeId, b64EncodedLayout);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+  }
+  
+  @GetMapping(value = "/projects/{projId}/trees/{treeId}/layout/")
+  public String getTreeLayout(@PathVariable String projId, @PathVariable String treeId) {
+    try {
+      return projectService.getTreeLayout(projId, treeId);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
   }
 }

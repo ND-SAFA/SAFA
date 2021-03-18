@@ -31,7 +31,7 @@ import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
-import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
+// import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
 
 @Service
 public class ProjectService {
@@ -82,21 +82,27 @@ public class ProjectService {
           //   .id(String.valueOf(2))
           //   .name("update"));
           
-          String data = "{\"complete\": false}";     
-          try {
-            mPuller.parseFlatfiles();
-            System.out.println("Completed ParseFlatfiles without exceptions");
-          } catch (MissingFileException e) {
-            System.out.println("MissingFileException");
-            data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
-          } catch (Exception e) {
-            System.out.println("Regular Exception");
-            data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
-          }
+          String Mysql2NeoData = mPuller.Mysql2Neo();
           emitter.send(SseEmitter.event()
-              .data(data)
+              .data(Mysql2NeoData)
               .id(String.valueOf(3))
               .name("update"));
+
+          // String data = "{\"complete\": false}";     
+          // try {
+          //   mPuller.parseFlatfiles();
+          //   System.out.println("Completed ParseFlatfiles without exceptions");
+          // } catch (MissingFileException e) {
+          //   System.out.println("MissingFileException");
+          //   data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
+          // } catch (Exception e) {
+          //   System.out.println("Regular Exception");
+          //   data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
+          // }
+          // emitter.send(SseEmitter.event()
+          //     .data(data)
+          //     .id(String.valueOf(3))
+          //     .name("update"));
 
           mPuller.Execute();
           emitter.send(SseEmitter.event()
@@ -115,23 +121,11 @@ public class ProjectService {
   public String generateLinks(String projId){
     try {
       return generateFlatfile.generateFiles();
-      // generateFlatfile.createGeneratedTraceMatrixTables();
-      // return generateFileResult;
     } 
     catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
   }
-
-  // public String clearGeneratedFilesDir(String projId) {
-  //   try {
-  //     String dir = "/generatedFilesDir";
-  //     return uploadFlatfile.deleteDirectory(dir, "Generated Links");
-  //   }
-  //   catch(Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-  //   }
-  // }
 
   // public String getLinkTypes(String projId) {
   //   try {

@@ -26,11 +26,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.importer.Flatfile.ParsedData;
-import edu.nd.crc.safa.importer.Flatfile.Artifact;
-import edu.nd.crc.safa.importer.Flatfile.Connection;
-import edu.nd.crc.safa.importer.Flatfile.DataEntry;
-import edu.nd.crc.safa.importer.Flatfile.Link;
+// import edu.nd.crc.safa.importer.Flatfile.ParsedData;
+// import edu.nd.crc.safa.importer.Flatfile.Artifact;
+// import edu.nd.crc.safa.importer.Flatfile.Connection;
+// import edu.nd.crc.safa.importer.Flatfile.DataEntry;
+// import edu.nd.crc.safa.importer.Flatfile.Link;
 
 @Component
 public class Puller {
@@ -179,35 +179,137 @@ public class Puller {
         }
     }
 
-    public void parseFlatfiles() throws Exception {
-        String flatfileDir = "/uploadedFlatfiles";
-        String generatedDir = "/generatedFilesDir";
-        mFlatfile.requiredDataChecker(flatfileDir);
+    public void insertArtifacts() throws Exception {
+        List<List<String>> artifacts = MySQL.getTimArtifactData();
+        for (List<String> artifact : artifacts) {
+            String type = artifact.get(0);
+            List<List<String>> rows = MySQL.getArtifactData(artifact.get(1));
 
-        ParsedData parsedData = mFlatfile.parseFiles(flatfileDir, generatedDir); 
-    
-        for (Artifact artifact : parsedData.artifacts) {
-            for (DataEntry dataEntry : artifact.entries) {
+            for (List<String> row : rows) {
+                String id = row.get(0);
+                String summary = row.get(1);
+                String content = row.get(2);
+
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", "Flatfile");
                 data.put("isDelegated", "N/A");
                 data.put("status", "N/A");
-                data.put("name", dataEntry.summary);
+                data.put("name", summary);
                 data.put("href", "N/A");
-                data.put("description", dataEntry.content);
-                data.put("type", artifact.type);
+                data.put("description", content);
+                data.put("type", type);
 
-                foundNodes.add(dataEntry.id);
-                mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
+                foundNodes.add(id);
+                mDatabase.AddNode(id, type, JsonStream.serialize(data).toString());
             }
         }
-
-        for (Connection connection : parsedData.connections) {
-            for (Link link : connection.links) {
-                mDatabase.AddLink(link.target, link.sourceType, link.source);
-            }
-        }
-
     }
+
+    public void insertNonGeneratedConnections() throws Exception {
+        List<List<String>> traces = MySQL.getTimTraceNonGeneratedData();
+        for (List<String> trace : traces) {
+            String sourcetype = trace.get(0);
+            List<List<String>> rows = MySQL.getNonGeneratedTraceData(trace.get(3));
+
+            for (List<String> row : rows) {
+                String source = row.get(0);
+                String target = row.get(1);
+                mDatabase.AddLink(target, sourcetype, source);
+            }
+        }
+    }
+
+    public void insertGeneratedConnections() throws Exception {
+        List<List<String>> traces = MySQL.getTimTraceGeneratedData();
+        for (List<String> trace : traces) {
+            String sourcetype = trace.get(0);
+            List<List<String>> rows = MySQL.getGeneratedTraceData(trace.get(3));
+
+            for (List<String> row : rows) {
+                String source = row.get(0).toString();
+                String target = row.get(1).toString();
+                Float score = Float.parseFloat(row.get(2));
+                int approval = Integer.parseInt(row.get(3));
+
+                if ((approval == 1) || ((approval == 2) && score > 0.3)) {
+                    mDatabase.AddLink(target, sourcetype, source);
+                }
+            }
+        }
+    }
+
+    public String Mysql2Neo() {
+        try {
+            insertArtifacts();
+            insertNonGeneratedConnections();
+            insertGeneratedConnections();
+            System.out.println("Completed MysqlToNeo4j without exceptions");
+            return "{\"complete\": false}";  
+        } 
+        catch (Exception e) {
+            System.out.println(String.format("Completed MysqlToNeo4j with exceptions: %s", e.getMessage()));
+            return String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
+        }
+    }
+    //     String flatfileDir = "/uploadedFlatfiles";
+    //     String generatedDir = "/generatedFilesDir";
+    //     mFlatfile.requiredDataChecker(flatfileDir);
+
+    //     ParsedData parsedData = mFlatfile.parseFiles(flatfileDir, generatedDir); 
+    
+    //     for (Artifact artifact : parsedData.artifacts) {
+    //         for (DataEntry dataEntry : artifact.entries) {
+    //             Map<String, Object> data = new HashMap<String, Object>();
+    //             data.put("source", "Flatfile");
+    //             data.put("isDelegated", "N/A");
+    //             data.put("status", "N/A");
+    //             data.put("name", dataEntry.summary);
+    //             data.put("href", "N/A");
+    //             data.put("description", dataEntry.content);
+    //             data.put("type", artifact.type);
+
+    //             foundNodes.add(dataEntry.id);
+    //             mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
+    //         }
+    //     }
+
+    //     for (Connection connection : parsedData.connections) {
+    //         for (Link link : connection.links) {
+    //             mDatabase.AddLink(link.target, link.sourceType, link.source);
+    //         }
+    //     }
+
+    // }
+
+    // public void parseFlatfiles() throws Exception {
+    //     String flatfileDir = "/uploadedFlatfiles";
+    //     String generatedDir = "/generatedFilesDir";
+    //     mFlatfile.requiredDataChecker(flatfileDir);
+
+    //     ParsedData parsedData = mFlatfile.parseFiles(flatfileDir, generatedDir); 
+    
+    //     for (Artifact artifact : parsedData.artifacts) {
+    //         for (DataEntry dataEntry : artifact.entries) {
+    //             Map<String, Object> data = new HashMap<String, Object>();
+    //             data.put("source", "Flatfile");
+    //             data.put("isDelegated", "N/A");
+    //             data.put("status", "N/A");
+    //             data.put("name", dataEntry.summary);
+    //             data.put("href", "N/A");
+    //             data.put("description", dataEntry.content);
+    //             data.put("type", artifact.type);
+
+    //             foundNodes.add(dataEntry.id);
+    //             mDatabase.AddNode(dataEntry.id, artifact.type, JsonStream.serialize(data).toString());
+    //         }
+    //     }
+
+    //     for (Connection connection : parsedData.connections) {
+    //         for (Link link : connection.links) {
+    //             mDatabase.AddLink(link.target, link.sourceType, link.source);
+    //         }
+    //     }
+
+    // }
 
 }

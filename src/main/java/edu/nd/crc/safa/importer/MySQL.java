@@ -65,17 +65,6 @@ public class MySQL {
             return rs.getRow() != 0;
         }  
     }
-
-    // public static Boolean tableEmpty(String tableName) throws Exception {
-    //     try (Statement stmt = startDB().createStatement()) {
-    //         System.out.println(String.format("Checking if %s is empty", tableName));
-    //         String sqlTableCheck = String.format("SELECT 1 FROM '%s' LIMIT 1;", tableName);
-    //         ResultSet rs = stmt.executeQuery(sqlTableCheck);
-    //         rs.next();
-    
-    //         return rs.getRow() != 0;
-    //     }  
-    // }
     
     public static void createTableList(String tableName, Boolean generated) throws Exception {
         try (Statement stmt = startDB().createStatement()) {
@@ -700,31 +689,12 @@ public class MySQL {
                     "WHERE is_generated = 0;";
 
                 ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
-
                 ArrayList<String> tables = new ArrayList<String>();
 
                 while (rs.next()) {
                     tables.add(rs.getString(1));
                 }
 
-                String deleteTables = tables.toString().replace("[","").replace("]", "");
-                String sqlDropTables = String.format("DROP TABLES %s;", deleteTables);
-                stmt.executeUpdate(sqlDropTables);
-
-                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables\n" +
-                    "WHERE is_generated = 0;";
-            
-                stmt.executeUpdate(sqlDeleteTables);
-
-                System.out.println(String.format("Checking if uploaded_and_generated_tables is empty"));
-                String sqlTableCheck = String.format("SELECT 1 FROM %s LIMIT 1;", "uploaded_and_generated_tables");
-                ResultSet rs2 = stmt.executeQuery(sqlTableCheck);
-                rs2.next();
-        
-                if (rs2.getRow() == 0) {
-                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
-                }
-                
                 if (tableExists("artifact_error")) {
                     stmt.executeUpdate("DROP TABLE artifact_error");
                 }
@@ -732,6 +702,18 @@ public class MySQL {
                 if (tableExists("trace_matrix_error")) {
                     stmt.executeUpdate("DROP TABLE trace_matrix_error");
                 }
+
+                if (tables.size() == 0) {
+                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
+                    return "No generated files";
+                }
+
+                String deleteTables = tables.toString().replace("[","").replace("]", "");
+                String sqlDropTables = String.format("DROP TABLES %s;", deleteTables);
+                stmt.executeUpdate(sqlDropTables);
+
+                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables WHERE is_generated = 0;";
+                stmt.executeUpdate(sqlDeleteTables);
 
                 return "Uploaded files have successfully been cleared";
             }
@@ -749,30 +731,23 @@ public class MySQL {
                     "WHERE is_generated = 1;";
 
                 ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
-
                 ArrayList<String> tables = new ArrayList<String>();
 
                 while (rs.next()) {
                     tables.add(rs.getString(1));
                 }
 
+                if (tables.size() == 0) {
+                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
+                    return "No generated files";
+                }
+
                 String deleteTables = tables.toString().replace("[","").replace("]", "");
                 String sqlDropTables = String.format("DROP TABLES %s;", deleteTables);
                 stmt.executeUpdate(sqlDropTables);
 
-                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables\n" +
-                    "WHERE is_generated = 1;";
-            
+                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables WHERE is_generated = 1;";
                 stmt.executeUpdate(sqlDeleteTables);
-
-                System.out.println(String.format("Checking if uploaded_and_generated_tables is empty"));
-                String sqlTableCheck = String.format("SELECT 1 FROM %s LIMIT 1;", "uploaded_and_generated_tables");
-                ResultSet rs2 = stmt.executeQuery(sqlTableCheck);
-                rs2.next();
-
-                if (rs2.getRow() == 1) {
-                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
-                }
 
                 return "Generated files have successfully been cleared";
             }
@@ -832,90 +807,107 @@ public class MySQL {
         }
     }
 
-    // public static void missingTraceArtifactsCheck() throws Exception {
-    //     try (Statement stmt = startDB().createStatement()) {
-    //         Boolean timTraceExists = tableExists("tim_trace_matrix");
-    //         Boolean timArtifactsExists = tableExists("tim_artifact");
-
-    //         if (!(timArtifactsExists && timTraceExists)) {
-    //             throw new Exception("Please upload Tim file");
-    //         }
-
-    //         String sqlTempTable =
-    //             "CREATE TEMPORARY TABLE temp_artifact_check\n" +
-    //             "select trace.artifact, IF(tim_artifact.artifact IS NULL, 0, 1) as does_exists\n" +
-    //             "from (SELECT source_artifact as artifact FROM tim_trace_matrix\n" +
-    //             "UNION SELECT target_artifact FROM tim_trace_matrix) as trace\n" +
-    //             "LEFT JOIN tim_artifact ON trace.artifact = tim_artifact.artifact;";
+    public static List<List<String>> getNonGeneratedTraceData(String tablename) throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+    
+            String sqlGetData = String.format("SELECT source_id, target_id FROM %s;", tablename);
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
             
-    //         stmt.executeUpdate(sqlTempTable);
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                data.add(row);
+            }
+
+            return data;
+        }
+    }
+
+    public static List<List<String>> getGeneratedTraceData(String tablename) throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+    
+            String sqlGetData = String.format("SELECT source, target, score, approval FROM %s;", tablename);
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
             
-    //         String sqlMissing = "select artifact from temp_artifact_check where does_exists = 0;";
-    //         ResultSet rs = stmt.executeQuery(sqlMissing);
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                row.add(Float.toString(rs.getFloat(3)));
+                row.add(String.valueOf(rs.getInt(4)));
+                data.add(row);
+            }
+
+            return data;
+        }
+    }
+
+    public static List<List<String>> getTimArtifactData() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+
+            String sqlGetData = String.format("SELECT artifact, tablename FROM %s;", "tim_artifact");
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
             
-    //         List<String> missingArtifacts = new ArrayList<String>();
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                data.add(row);
+            }
+
+            return data;
+        }
+    }
+
+    public static List<List<String>> getTimTraceNonGeneratedData() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
+
+            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 0;", "tim_trace_matrix");
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
             
-    //         while (rs.next()) {
-    //             missingArtifacts.add(rs.getString(1));
-    //         }
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                row.add(rs.getString(3));
+                row.add(rs.getString(4));
+                data.add(row);
+            }
 
-    //         if (missingArtifacts.size() != 0) {
-    //             throw new Exception(String.format("Artifacts: %s do not appear under the datafiles section of your tim.json", missingArtifacts.toString()));
-    //         }
-    //     }
-    // }
+            return data;
+        }
+    }
 
-    // public static FileInfo getFileInfo() throws Exception {
-    //     try (Statement stmt = startDB().createStatement()) {
-    //         System.out.println("getFileInfo");
-    //         FileInfo fileInfo = new FileInfo();
+    public static List<List<String>> getTimTraceGeneratedData() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            List<List<String>> data = new ArrayList<List<String>>();
 
-    //         String sqlArtifactSelect = "select filename from tim_artifact";
-    //         ResultSet artifactRs = stmt.executeQuery(sqlArtifactSelect);
+            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 1;", "tim_trace_matrix");
+             
+            ResultSet rs = stmt.executeQuery(sqlGetData);
             
-    //         System.out.println("tim_artifact");
-    //         while (artifactRs.next()) {
-    //             String fileName = String.format("\"%s.csv\"", artifactRs.getString(1));
-    //             System.out.println(String.format("Filename: %s, tablename: %s",fileName,artifactRs.getString(1)));
+            while (rs.next()) {
+                List<String> row = new ArrayList<String>();
+                row.add(rs.getString(1));
+                row.add(rs.getString(2));
+                row.add(rs.getString(3));
+                row.add(rs.getString(4));
+                data.add(row);
+            }
 
-    //             fileInfo.expectedFiles.add(fileName);
-
-    //             if (tableExists(artifactRs.getString(1))) {
-    //                 fileInfo.uploadedFiles.add(fileName);
-    //             }
-    //         }
-            
-    //         String sqlTraceSelect = "select filename, is_generated from tim_trace_matrix";
-    //         ResultSet traceRs = stmt.executeQuery(sqlTraceSelect);
-
-    //         System.out.println("tim_trace_matrix");
-    //         while (traceRs.next()) {
-    //             String fileName = String.format("\"%s.csv\"", traceRs.getString(1));
-    //             System.out.println(String.format("Filename: %s, tablename: %s",fileName,traceRs.getString(1)));
-
-    //             if (traceRs.getBoolean(2)){ //Generated
-    //                 System.out.println("Generated");
-    //                 fileInfo.expectedGeneratedFiles.add(fileName);
-
-    //                 if (tableExists(traceRs.getString(1))) {
-    //                     System.out.println("Exists");
-    //                     fileInfo.generatedFiles.add(fileName);
-    //                 }
-    //             } else {
-    //                 fileInfo.expectedFiles.add(fileName);
-
-    //                 if (tableExists(traceRs.getString(1))) {
-    //                     System.out.println("Exists");
-    //                     fileInfo.uploadedFiles.add(fileName);
-    //                 }
-    //             }
-    //         }
-
-    //         String.format("Done getFileInfo");
-    //         return fileInfo;
-    //     }
-    // }
-
+            return data;
+        }
+    }
+    
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);
         // List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();

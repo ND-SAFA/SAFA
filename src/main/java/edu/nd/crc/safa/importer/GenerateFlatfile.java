@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.importer;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,13 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collection;
 import java.util.Arrays;
-import java.util.Scanner; 
-import java.util.Set;
-import java.util.HashSet;
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-import com.jsoniter.JsonIterator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,53 +37,19 @@ public class GenerateFlatfile {
         return "{ \"success\": true, \"message\": \"Successfully generated links\"}";
     }
 
-    // public String getLinkTypesJSON() throws Exception {
-    //     String generatedDir = "/generatedFilesDir";
-    //     UploadFlatfile.createDirectory(generatedDir);
-    //     Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
+    public String getLinkTypes() throws Exception {
+        List<List<String>> traces = MySQL.getTimTraceData();
+        Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
+        for (List<String> trace : traces) {
+            String key = String.format("\"%s\"", trace.get(1));
+            String val = String.format("\"%s\"", trace.get(2));
+            sourceTargetMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
+        }
 
-    //     String generatedDataPath = generatedDir + "/generatedData.json";
-    //     pathErrorChecking(generatedDataPath);
-
-    //     String data = new String(Files.readAllBytes(Paths.get(generatedDataPath)));
-    //     if (data.equals("[]")){
-    //         throw new Exception("No links available");
-    //     }
-
-    //     JsonIterator iterator = JsonIterator.parse(data);
-    //     System.out.println("Start reading Array");
-
-    //     while (iterator.readArray()) {
-    //         String source = "";
-    //         String target = "";
-
-    //         for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
-    //             if (field.equals("filename")) {
-    //                 iterator.readString();
-    //             }
-    //             else if (field.equals("source")) {
-    //                 source = iterator.readString();
-    //             }
-    //             else {
-    //                 target = iterator.readString();
-    //             }
-    //         }
-
-    //         if (source.isEmpty() || target.isEmpty()){
-    //             throw new Exception("Error finding source,target links");
-    //         }
-
-    //         String key = String.format("\"%s\"", source);
-    //         String val = String.format("\"%s\"", target);
-            
-    //         sourceTargetMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
-    //     }
-    //     System.out.println("Completed reading Array");
-
-    //     String dataDict = sourceTargetMap.toString().replace("=", ":");
-    //     System.out.println(dataDict);
-    //     return String.format("{ \"success\": true, \"data\": %s}", dataDict);
-    // }
+        String dataDict = sourceTargetMap.toString().replace("=", ":");
+        System.out.println(dataDict);
+        return String.format("{ \"success\": true, \"data\": %s}", dataDict);
+    }
 
     public void generateTraceMatrixFile(String sourceTable, String targetTable, String destFilePath, String destTable) throws Exception {
         List<List<String>> sourceData = MySQL.getArtifactData(sourceTable);

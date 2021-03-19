@@ -3,16 +3,9 @@ package edu.nd.crc.safa.importer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
-
-import javax.naming.spi.DirStateFactory.Result;
-
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -494,61 +487,6 @@ public class MySQL {
         }
     }
 
-    // public static void newTraceMatrixTable(Statement stmt, String tableName, String filePath, String colHeader) throws Exception {
-    //     System.out.println(String.format("CREATING NEW TRACE MATRIX TABLE: %s...", tableName));
-    //     String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) + 
-    //         "id INT AUTO_INCREMENT PRIMARY KEY,\n" + 
-    //         "source VARCHAR(255) NOT NULL,\n" +
-    //         "target VARCHAR(255) NOT NULL,\n" +
-    //         "UNIQUE KEY source_target (source,target)" +
-    //     ");";
-
-    //     stmt.executeUpdate(sqlCreateTable);
-    //     System.out.println(String.format("CREATED TRACE MATRIX TABLE: %s.", tableName));
-
-    //     String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
-    //         "FIELDS TERMINATED BY ','\n" +
-    //         "ENCLOSED BY '\"'\n" +
-    //         "LINES TERMINATED BY '\\n'\n" +
-    //         "IGNORE 1 ROWS\n" +
-    //         colHeader + ";";
-
-    //     stmt.executeUpdate(sqlLoadData);
-    //     System.out.println(String.format("LOADED FILE: %s INTO ARTIFACT TABLE: %s.", filePath, tableName));
-
-    //     String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
-    //     "source = TRIM(TRIM(BOTH '\r' from source)),\n" +
-    //     "target = TRIM(TRIM(BOTH '\r' from target));";
-
-    //     stmt.executeUpdate(sqlTrim);
-    //     System.out.println("TRIMMED WHITESPACE STORED IN COLUMNS");
-    // }
-
-    // public static void overwriteTraceMatrixTable(Statement stmt, String tableName, String filePath, String colHeader) throws Exception {
-    //     System.out.println(String.format("OVERWRITING TRACE MATRIX TABLE: %s", tableName));
-    //     String sqlClearTable = String.format("TRUNCATE TABLE %s\n", tableName);
-    //     stmt.executeUpdate(sqlClearTable);
-
-    //     System.out.println(String.format("CLEARED TRACE MATRIX TABLE: %s.", tableName));
-
-    //     String sqlLoadData = String.format("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s\n", filePath, tableName) +
-    //         "FIELDS TERMINATED BY ','\n" +
-    //         "ENCLOSED BY '\"'\n" +
-    //         "LINES TERMINATED BY '\\n'\n" +
-    //         "IGNORE 1 ROWS\n" +
-    //         colHeader + ";";
-
-    //     stmt.executeUpdate(sqlLoadData);
-    //     System.out.println(String.format("LOADED FILE: %s INTO TRACE MATRIX TABLE: %s.", filePath, tableName));
-
-    //     String sqlTrim = String.format("UPDATE %s SET\n", tableName) + 
-    //     "source = TRIM(TRIM(BOTH '\r' from source)),\n" +
-    //     "target = TRIM(TRIM(BOTH '\r' from target));";
-
-    //     stmt.executeUpdate(sqlTrim);
-    //     System.out.println("TRIMMED WHITESPACE STORED IN COLUMNS");
-    // }
-
     public static FileInfo getFileInfo() throws Exception {
         try (Statement stmt = startDB().createStatement()) {
             Boolean timTraceExists = tableExists("tim_trace_matrix");
@@ -866,11 +804,11 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getTimTraceNonGeneratedData() throws Exception {
+    public static List<List<String>> getTimTraceData() throws Exception {
         try (Statement stmt = startDB().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
 
-            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 0;", "tim_trace_matrix");
+            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, is_generated, tablename FROM %s;", "tim_trace_matrix");
              
             ResultSet rs = stmt.executeQuery(sqlGetData);
             
@@ -880,57 +818,11 @@ public class MySQL {
                 row.add(rs.getString(2));
                 row.add(rs.getString(3));
                 row.add(rs.getString(4));
+                row.add(rs.getString(5));
                 data.add(row);
             }
 
             return data;
         }
     }
-
-    public static List<List<String>> getTimTraceGeneratedData() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
-            List<List<String>> data = new ArrayList<List<String>>();
-
-            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 1;", "tim_trace_matrix");
-             
-            ResultSet rs = stmt.executeQuery(sqlGetData);
-            
-            while (rs.next()) {
-                List<String> row = new ArrayList<String>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
-                row.add(rs.getString(3));
-                row.add(rs.getString(4));
-                data.add(row);
-            }
-
-            return data;
-        }
-    }
-    
-        // sql = "SELECT * FROM TEST";
-        // ResultSet rs = stmt.executeQuery(sql);
-        // List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
-        
-        // ArrayList<Object> header = new ArrayList<Object>();
-        // header.add("\"SOURCE\"");
-        // header.add("\"TARGET\"");
-        // header.add("\"SCORE\"");
-        // header.add("\"APPROVAL\"");
-        // result.add(header);
-
-        // while (rs.next()) {
-        //     ArrayList<Object> row = new ArrayList<Object>();
-        //     row.add(String.format("\"%s\"",rs.getString(1)));
-        //     row.add(String.format("\"%s\"",rs.getString(2)));
-        //     row.add(rs.getFloat(3));
-        //     row.add(rs.getInt(4));
-        //     result.add(row);
-        // }
-
-        // byte[] content = result.toString().getBytes();
-        // String returnStr = Base64.getEncoder().encodeToString(content);
-        
-        // conn.close();
-        // return returnStr;
 }

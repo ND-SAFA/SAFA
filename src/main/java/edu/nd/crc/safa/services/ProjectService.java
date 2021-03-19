@@ -88,22 +88,6 @@ public class ProjectService {
               .id(String.valueOf(3))
               .name("update"));
 
-          // String data = "{\"complete\": false}";     
-          // try {
-          //   mPuller.parseFlatfiles();
-          //   System.out.println("Completed ParseFlatfiles without exceptions");
-          // } catch (MissingFileException e) {
-          //   System.out.println("MissingFileException");
-          //   data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
-          // } catch (Exception e) {
-          //   System.out.println("Regular Exception");
-          //   data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
-          // }
-          // emitter.send(SseEmitter.event()
-          //     .data(data)
-          //     .id(String.valueOf(3))
-          //     .name("update"));
-
           mPuller.Execute();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": true}")
@@ -127,13 +111,13 @@ public class ProjectService {
     }
   }
 
-  // public String getLinkTypes(String projId) {
-  //   try {
-  //       return generateFlatfile.getLinkTypesJSON();
-  //   } catch(Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-  //   }
-  // }
+  public String getLinkTypes(String projId) {
+    try {
+      return generateFlatfile.getLinkTypes();
+    } catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
 
   public String uploadFile(String projId, String encodedStr) {
     try {
@@ -147,7 +131,6 @@ public class ProjectService {
       } else {
         System.out.println("Error uploading Flatfiles: OTHER");
         System.out.println(e.getMessage());
-        // return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
       }
     }
@@ -162,17 +145,6 @@ public class ProjectService {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }
-
-  // public String getUploadFilesErrorLog(String projId) {
-  //   try {
-  //     File myObj = new File("/uploadedFlatfiles/ErrorReport.txt");
-  //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
-  //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
-  //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
-  //   } catch (Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-  //   }
-  // }
 
   // public String getGenerateLinksErrorLog(String projId) {
   //   try {

@@ -17,7 +17,8 @@ class TreeVerifierSpec extends Specification {
     then:
     def rules = verifier.getRules()
     rules.size() == 1
-    rules[0].Requirement == TreeVerifier.Requirement.ATLEASTONE
+    rules[0].Count == 1
+    rules[0].Requirement == TreeVerifier.Requirement.ATLEAST
     rules[0].Target == "hazard"
     rules[0].Relationship == TreeVerifier.Relationship.CHILD
     rules[0].RequiredTarget == "requirement"
@@ -39,14 +40,33 @@ class TreeVerifierSpec extends Specification {
     then:
     def rules = verifier.getRules()
     rules.size() == 1
-    rules[0].Requirement == TreeVerifier.Requirement.ATLEASTONE
+    rules[0].Count == 1
+    rules[0].Requirement == TreeVerifier.Requirement.ATLEAST
     rules[0].Target == "hazard"
     rules[0].Relationship == TreeVerifier.Relationship.CHILD
     rules[0].RequiredTarget == "requirement"
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals("is missing at least one child of type requirement")
+    warnings.get("UAV-0001").get(0).equals("is missing at least 1 child of type requirement")
+  }
+
+  def "adding a rule for at least two child node of type requirement for hazard nodes"(){
+    given:
+    def verifier = new TreeVerifier()
+    def rule = "at-least-n(2, hazard, child, requirement)"
+
+    when:
+    verifier.addRule(rule)
+
+    then:
+    def rules = verifier.getRules()
+    rules.size() == 1
+    rules[0].Count == 2
+    rules[0].Requirement == TreeVerifier.Requirement.ATLEAST
+    rules[0].Target == "hazard"
+    rules[0].Relationship == TreeVerifier.Relationship.CHILD
+    rules[0].RequiredTarget == "requirement"
   }
 
   def "adding a rule for exactly one child node of type requirement for hazard nodes"(){
@@ -60,7 +80,8 @@ class TreeVerifierSpec extends Specification {
     then:
     def rules = verifier.getRules()
     rules.size() == 1
-    rules[0].Requirement == TreeVerifier.Requirement.EXACTLYONE
+    rules[0].Count == 1
+    rules[0].Requirement == TreeVerifier.Requirement.EXACTLY
     rules[0].Target == "hazard"
     rules[0].Relationship == TreeVerifier.Relationship.CHILD
     rules[0].RequiredTarget == "requirement"
@@ -84,13 +105,79 @@ class TreeVerifierSpec extends Specification {
     then:
     def rules = verifier.getRules()
     rules.size() == 1
-    rules[0].Requirement == TreeVerifier.Requirement.EXACTLYONE
+    rules[0].Count == 1
+    rules[0].Requirement == TreeVerifier.Requirement.EXACTLY
     rules[0].Target == "hazard"
     rules[0].Relationship == TreeVerifier.Relationship.CHILD
     rules[0].RequiredTarget == "requirement"
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals("does not have exactly one child of type requirement")
+    warnings.get("UAV-0001").get(0).equals("does not have exactly 1 child of type requirement")
+  }
+
+  def "adding a rule for exactly two child node of type requirement for hazard nodes"(){
+    given:
+    def verifier = new TreeVerifier()
+    def rule = "exactly-n(2, hazard, child, requirement)"
+
+    when:
+    verifier.addRule(rule)
+
+    then:
+    def rules = verifier.getRules()
+    rules.size() == 1
+    rules[0].Count == 2
+    rules[0].Requirement == TreeVerifier.Requirement.EXACTLY
+    rules[0].Target == "hazard"
+    rules[0].Relationship == TreeVerifier.Relationship.CHILD
+    rules[0].RequiredTarget == "requirement"
+  }
+
+  def "adding a rule for less than two child node of type requirement for hazard nodes"(){
+    given:
+    def verifier = new TreeVerifier()
+    def rule = "less-than-n(2, hazard, child, requirement)"
+
+    when:
+    verifier.addRule(rule)
+
+    then:
+    def rules = verifier.getRules()
+    rules.size() == 1
+    rules[0].Count == 2
+    rules[0].Requirement == TreeVerifier.Requirement.LESSTHAN
+    rules[0].Target == "hazard"
+    rules[0].Relationship == TreeVerifier.Relationship.CHILD
+    rules[0].RequiredTarget == "requirement"
+  }
+
+  def "a graph with a hazard that has multiple requirements should fail a rule that states it must have less than two"(){
+    given:
+    def verifier = new TreeVerifier()
+    def rule = "less-than-n(2, hazard, child, requirement)"
+    def nodes = new HashMap<String,String>()
+    def edges = new ArrayList<TreeVerifier.Edge>()
+
+    when:
+    verifier.addRule(rule)
+    nodes.put("UAV-0001", "Hazard")
+    nodes.put("UAV-0002", "Requirement")
+    nodes.put("UAV-0003", "Requirement")
+    edges.push(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))
+    edges.push(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0003", "REQUIRES"))
+
+    then:
+    def rules = verifier.getRules()
+    rules.size() == 1
+    rules[0].Count == 2
+    rules[0].Requirement == TreeVerifier.Requirement.LESSTHAN
+    rules[0].Target == "hazard"
+    rules[0].Relationship == TreeVerifier.Relationship.CHILD
+    rules[0].RequiredTarget == "requirement"
+    def warnings = verifier.verify(nodes, edges);
+    warnings.size() == 1
+    warnings.get("UAV-0001").size() == 1
+    warnings.get("UAV-0001").get(0).equals("has more than 2 child of type requirement")
   }
 }

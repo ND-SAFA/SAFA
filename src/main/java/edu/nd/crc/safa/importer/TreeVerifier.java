@@ -19,7 +19,7 @@ public class TreeVerifier {
     }
 
     public enum Requirement {
-        ATLEASTONE, EXACTLYONE,
+        ATLEAST, EXACTLY, LESSTHAN,
     }
 
 
@@ -28,6 +28,7 @@ public class TreeVerifier {
     }
 
     public class Rule {
+        public int Count;
         public Requirement Requirement;
         public String Target;
         public Relationship Relationship;
@@ -67,26 +68,56 @@ public class TreeVerifier {
 
         String command = rule.split("\\(")[0].trim().toLowerCase();
         String[] arguments = rule.split("\\(")[1].split("\\)")[0].split(",");
-        if( arguments.length != 3 ){
-            throw new InvalidRuleException("rule contains an invalid number of arguments");
-        }
 
+        int argOffset = 0;
         switch(command){
             case "at-least-one":
-                r.Requirement = Requirement.ATLEASTONE;
+                if( arguments.length != 3  ){
+                    throw new InvalidRuleException("rule contains an invalid number of arguments");
+                }
+                r.Requirement = Requirement.ATLEAST;
+                r.Count = 1;
+                break;
+            case "at-least-n":
+                if( arguments.length != 4 ){
+                    throw new InvalidRuleException("rule contains an invalid number of arguments");
+                }
+                r.Requirement = Requirement.ATLEAST;
+                r.Count = Integer.parseInt(arguments[0].trim());
+                argOffset++;
                 break;
             case "exactly-one":
-                r.Requirement = Requirement.EXACTLYONE;
+                if( arguments.length != 3 ){
+                    throw new InvalidRuleException("rule contains an invalid number of arguments");
+                }
+                r.Requirement = Requirement.EXACTLY;
+                r.Count = 1;
+                break;
+            case "exactly-n":
+                if( arguments.length != 4 ){
+                    throw new InvalidRuleException("rule contains an invalid number of arguments");
+                }
+                r.Requirement = Requirement.EXACTLY;
+                r.Count = Integer.parseInt(arguments[0].trim());
+                argOffset++;
+                break;
+            case "less-than-n":
+                if( arguments.length != 4 ){
+                    throw new InvalidRuleException("rule contains an invalid number of arguments");
+                }
+                r.Requirement = Requirement.LESSTHAN;
+                r.Count = Integer.parseInt(arguments[0].trim());
+                argOffset++;
                 break;
         }
 
-        r.Target = arguments[0].trim().toLowerCase();
-        switch(arguments[1].trim().toLowerCase()){
+        r.Target = arguments[argOffset].trim().toLowerCase();
+        switch(arguments[argOffset+1].trim().toLowerCase()){
             case "child":
                 r.Relationship = Relationship.CHILD;
                 break;
         }
-        r.RequiredTarget = arguments[2].trim().toLowerCase();
+        r.RequiredTarget = arguments[argOffset+2].trim().toLowerCase();
 
         mRules.add(r);
 
@@ -169,14 +200,19 @@ public class TreeVerifier {
 
         String result = "";
         switch(r.Requirement){
-            case ATLEASTONE:
-                if(!(childCount >= 1)){
-                    result = String.format("is missing at least one child of type %s", r.RequiredTarget);  
+            case ATLEAST:
+                if(!(childCount >= r.Count)){
+                    result = String.format("is missing at least %d child of type %s", r.Count, r.RequiredTarget);  
                 }
                 break;
-            case EXACTLYONE:
-                if(!(childCount == 1)){
-                    result = String.format("does not have exactly one child of type %s", r.RequiredTarget);  
+            case EXACTLY:
+                if(!(childCount == r.Count)){
+                    result = String.format("does not have exactly %d child of type %s", r.Count, r.RequiredTarget);  
+                }
+                break;
+            case LESSTHAN:
+                if(!(childCount < r.Count)){
+                    result = String.format("has more than %d child of type %s", r.Count, r.RequiredTarget);  
                 }
                 break;
         }

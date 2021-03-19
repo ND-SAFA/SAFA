@@ -29,6 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.importer.TreeVerifier;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 // import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
@@ -459,30 +460,23 @@ public class ProjectService {
       }
     }
 
+    TreeVerifier verifier = new TreeVerifier();
+    try{
+      verifier.addRule("at-least-one(DesignDefinition, child, Package)");
+      verifier.addRule("at-least-one(Requirement, child, DesignDefinition)");
+    }catch( Exception e ){
+      System.out.println(e.toString());
+    }
+    Map<String, List<String>> results = verifier.verify(nodes, ids, values);
+
     // Warnings
     for(int i = 0; i < nodes.size(); i++) {
       final Node node = nodes.get(i);
       final String id = ids.get(node.id());
-      final String label = ((List<String>)node.labels()).get(0).toString();
 
-      List<String> warnings = new ArrayList<String>();
+      List<String> warnings = results.get(id);
 
-      // Handle design definitions with no child nodes
-      if( label.equals("DesignDefinition") ){
-        if( !containsChildOfType("Package", node, nodes, ids, values) ){
-          warnings.add("Missing Code");
-        }
-      }
-
-      // Handle requirements with no design definitions
-      if( label.equals("Requirement") ){
-        if( !containsChildOfType("DesignDefinition", node, nodes, ids, values) ){
-          warnings.add("Missing Design Definition");
-        }
-      }
-
-      if( !warnings.isEmpty() ) {
-        // Find this node's values
+      if( warnings != null && !warnings.isEmpty() ) {
         for( Map<String,Object> value : values ){
           if( value.getOrDefault("id", "").equals(id) ){
             value.put("warnings", warnings.toArray());
@@ -493,30 +487,6 @@ public class ProjectService {
 
     return values;
   } 
-
-  private boolean containsChildOfType(final String type, final Node node, final List<Node> nodes, final Map<Long, String> ids, final List<Map<String, Object>> values) {
-    final String id = ids.get(node.id());
-
-    List<String> nChildren = new ArrayList<String>();
-    for( Map<String,Object> value : values ){
-      if( value.getOrDefault("source", "").equals(id) && !value.getOrDefault("type", "").equals("UPDATES") ){
-        String target = (String)value.getOrDefault("target", "");
-        if (!target.isEmpty()){
-          nChildren.add(target);
-        }
-      }
-    }
-
-    for( String child: nChildren) {
-      for( Node n: nodes ){
-        if( ids.get(n.id()).equals(child) && ((List<String>)n.labels()).get(0).toString().equals(type)){
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
 
   private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
     if (!ids.containsKey(node.id())) {

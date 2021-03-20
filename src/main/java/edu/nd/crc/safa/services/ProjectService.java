@@ -29,10 +29,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.TreeVerifier;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 // import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
+
+import edu.nd.crc.safa.warnings.TreeVerifier;
 
 @Service
 public class ProjectService {
@@ -462,8 +463,12 @@ public class ProjectService {
 
     TreeVerifier verifier = new TreeVerifier();
     try{
+      verifier.addRule("at-least-one(Hazard, child, Requirement)");
+      
+      verifier.addRule("at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
+      verifier.addRule("exactly-n(0, Requirement, child, Package)");
+
       verifier.addRule("at-least-one(DesignDefinition, child, Package)");
-      verifier.addRule("at-least-one(Requirement, child, DesignDefinition)");
     }catch( Exception e ){
       System.out.println(e.toString());
     }

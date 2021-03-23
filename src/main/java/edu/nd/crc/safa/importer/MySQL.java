@@ -827,17 +827,17 @@ public class MySQL {
         }
     }
     public static void SaveLayout(String hash, String b64EncodedLayout) throws Exception {
+        Boolean exists = tableExists("saved_layouts");
+        
         try (Statement stmt = startDB().createStatement()) {
-            Boolean exists = tableExists(stmt, "saved_layouts");
-
             if (!exists) {
                 String sqlCreateTable = String.format("CREATE TABLE saved_layouts (\n") +
-                    "hash VARCHAR(255) PRIMARY KEY,\n" + 
-                    "b64e_layout BLOB NOT NULL\n" +
-                 ");";
-                 stmt.executeUpdate(sqlCreateTable);
+                "hash VARCHAR(255) PRIMARY KEY,\n" + 
+                "b64e_layout BLOB NOT NULL\n" +
+                ");";
+                stmt.executeUpdate(sqlCreateTable);
             }
-
+            
             String sqlUpsertLayout = String.format("INSERT INTO saved_layouts (hash, b64e_layout) VALUES ('%s', '%s')\n", hash, b64EncodedLayout) +
                                      String.format("ON DUPLICATE KEY UPDATE b64e_layout='%s';", b64EncodedLayout);
             stmt.executeUpdate(sqlUpsertLayout);

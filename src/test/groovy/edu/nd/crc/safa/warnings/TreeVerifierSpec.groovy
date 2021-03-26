@@ -3,7 +3,7 @@ import edu.nd.crc.safa.warnings.TreeVerifier
 
 class TreeVerifierSpec extends Specification {
   //Simple Rules
-  def "a graph with a hazard that has no requirements should fail a rule that states it must have at least one"(){
+  def "a graph with a hazard that has no requirements should fail a rule that states it must have at least one child node with one"(){
     given:
     def verifier = new TreeVerifier()
     def rule = "at-least-one(hazard, child, requirement)"
@@ -24,6 +24,31 @@ class TreeVerifierSpec extends Specification {
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
     warnings.get("UAV-0001").get(0).equals(rule)
+  }
+
+  def "a graph with a hazard that has no requirements should fail a rule that states it must have at least one sibling node with one"(){
+    given:
+    def verifier = new TreeVerifier()
+    def rule = "at-least-one(hazard, sibling, requirement)"
+    def nodes = new HashMap<String,String>()
+    def edges = new ArrayList<TreeVerifier.Edge>()
+
+    when:
+    verifier.addRule(rule)
+    nodes.put("UAV-0001", "Package")
+    nodes.put("UAV-0002", "Hazard")
+    nodes.put("UAV-0003", "Package")
+    edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))
+    edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0003", "REQUIRES"))
+
+    then:
+    def rules = verifier.getRules()
+    rules.size() == 1
+    rules.get(0).mTokens.size() == 5
+    def warnings = verifier.verify(nodes, edges);
+    warnings.size() == 1
+    warnings.get("UAV-0002").size() == 1
+    warnings.get("UAV-0002").get(0).equals(rule)
   }
 
   def "a graph with a hazard that has multiple requirements should fail a rule that states it must have exactly one"(){

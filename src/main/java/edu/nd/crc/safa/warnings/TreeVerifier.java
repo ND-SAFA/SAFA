@@ -126,6 +126,8 @@ public class TreeVerifier {
         switch(r.Relationship){
             case CHILD:
                 return handleChildFunction(r, index, nodes, edges);
+            case SIBLING:
+                return handleSiblingFunction(r, index, nodes, edges);
         }
         return true;
     }
@@ -135,6 +137,30 @@ public class TreeVerifier {
             .filter( e -> e.Source.equals(index) ) // Get all edges where we are the source
             .filter( e -> nodes.get(e.Target).toLowerCase().equals(r.RequiredTarget) ) // Get all edges where the target matches the required target type
             .count();
+        switch(r.Requirement){
+            case ATLEAST:
+                return childCount >= r.Count;
+            case EXACTLY:
+                return childCount == r.Count;
+            case LESSTHAN:
+                return childCount < r.Count;
+        }
+        return true;
+    }
+
+    public boolean handleSiblingFunction(final Rule.Function r, final String index, final Map<String,String> nodes, final List<Edge> edges){
+        Integer childCount = edges.stream()
+            .filter( e -> e.Target.equals(index) ) // Get edges that finish with this node
+            .map( e -> e.Source ) // Convert to parent id
+            .map( n ->
+                edges.stream()
+                    .filter( e -> e.Source.equals(n) ) // Get all edges where we are the source
+                    .filter( e -> nodes.get(e.Target).toLowerCase().equals(r.RequiredTarget) ) // Get all edges where the target matches the required target type
+                    .count()
+            )
+            .map( v -> v.intValue())
+            .reduce(0, Integer::sum);
+
         switch(r.Requirement){
             case ATLEAST:
                 return childCount >= r.Count;

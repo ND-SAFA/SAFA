@@ -11,7 +11,7 @@ public class Rule {
     }
 
     public enum Relationship {
-        CHILD,
+        CHILD, SIBLING,
     }
 
     public class Function {
@@ -135,6 +135,9 @@ public class Rule {
         switch(arguments.get(argOffset+1).trim().toLowerCase()){
             case "child":
                 r.Relationship = Relationship.CHILD;
+                break;
+            case "sibling":
+                r.Relationship = Relationship.SIBLING;
                 break;
         }
         r.RequiredTarget = arguments.get(argOffset+2).trim().toLowerCase();

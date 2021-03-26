@@ -150,4 +150,42 @@ class RuleSpec extends Specification {
     rule.mTokens.size() == 1
     rule.Result() == true
   }
+
+  def "a rule with an unbalanced number of brackets is invalid"(){
+    given:
+    def rule = new Rule()
+
+    when:
+    rule.mTokens.add(new Token(Type.LPAREN, "("))
+    rule.mTokens.add(new Token(Type.TRUE, "True"))
+
+    then:
+    rule.IsValid() == false
+  }
+
+  def "a rule with a function start but no function end is invalid"(){
+    given:
+    def rule = new Rule()
+
+    when:
+    rule.mTokens.add(new Token(Type.FUNCS, "at-least-one"))
+    rule.mTokens.add(new Token(Type.ARGUMENT, "hazard"))
+    rule.mTokens.add(new Token(Type.ARGUMENT, "child"))
+    rule.mTokens.add(new Token(Type.ARGUMENT, "requirement"))
+
+    then:
+    rule.IsValid() == false
+  }
+
+  def "a rule with a function that is not implemented is invalid"(){
+    given:
+    def rule = new Rule()
+
+    when:
+    rule.mTokens.add(new Token(Type.FUNCS, "test"))
+    rule.mTokens.add(new Token(Type.FUNCE, ")"))
+
+    then:
+    rule.IsValid() == false
+  }
 }

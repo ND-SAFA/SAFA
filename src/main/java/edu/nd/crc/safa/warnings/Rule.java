@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.warnings;
 
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -20,6 +21,14 @@ public class Rule {
         public Relationship Relationship;
         public String RequiredTarget;
     }
+
+    List<String> ImplementedFunctions = Arrays.asList(
+        "at-least-one",
+        "at-least-n",
+        "exactly-one",
+        "exactly-n",
+        "less-than-n"
+    );
 
     String mText;
     public List<Tokenizer.Token> mTokens;
@@ -45,6 +54,30 @@ public class Rule {
 
     public boolean Result(){
         return mTokens.get(0).t == Tokenizer.Type.TRUE;
+    }
+
+    public boolean IsValid(){
+        // Handle unbalanced parenthesis
+        long lParenCount = mTokens.stream().filter(t -> t.t == Tokenizer.Type.LPAREN).count();
+        long rParenCount = mTokens.stream().filter(t -> t.t == Tokenizer.Type.RPAREN).count();
+        if(lParenCount != rParenCount){
+            return false;
+        }
+
+        // Handle unbalanced function
+        long fStartCount = mTokens.stream().filter(t -> t.t == Tokenizer.Type.FUNCS).count();
+        long fEndCount = mTokens.stream().filter(t -> t.t == Tokenizer.Type.FUNCE).count();
+        if(fStartCount != fEndCount){
+            return false;
+        }
+
+        // Handle functions that are not implemented
+        boolean isImplemented = mTokens.stream().filter(t -> t.t == Tokenizer.Type.FUNCS).anyMatch(t -> ImplementedFunctions.contains(t.c));
+        if(!isImplemented){
+            return false;
+        }
+
+        return true;
     }
 
     public Optional<Function> NextFunction(){

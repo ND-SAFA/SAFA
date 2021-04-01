@@ -146,6 +146,16 @@ public class ProjectService {
     }
   }
 
+  public String getLinkErrorLog(String projId) {
+    try {
+      String errorStr = MySQL.getLinkErrors();
+
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
+    } catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
   // public String getGenerateLinksErrorLog(String projId) {
   //   try {
   //     File myObj = new File("/generatedFilesDir/ErrorText.csv"); 

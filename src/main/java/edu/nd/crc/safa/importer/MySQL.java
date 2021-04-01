@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
 
 @Component
 public class MySQL {
@@ -559,6 +562,79 @@ public class MySQL {
                 }
             }
         }
+    }
+
+    public static String getLinkErrors() throws Exception {
+        HashMap<String, Set<String>> artifact_map = new HashMap<String, Set<String>>();
+        String errorText = "";
+        
+        List<List<String>> artifact_rows = getTimArtifactData();
+
+        for (List<String> artifact_row : artifact_rows) {
+            String artifact_name = artifact_row.get(0);
+            String artifact_tablename  = artifact_row.get(1);
+            Set<String> ids = new HashSet<String>();
+
+            List<List<String>> artifact_data_rows = getArtifactData(artifact_tablename);
+            for (List<String> row : artifact_data_rows) {
+                ids.add(row.get(0));
+            }
+
+            artifact_map.put(artifact_name,ids);
+        }
+
+        List<List<String>> trace_rows = getTimTraceData();
+
+        for (List<String> trace_row : trace_rows) {
+            if (trace_row.get(3).equals("1")) {
+                continue;
+            }
+
+            String tracematrix = trace_row.get(0);
+
+            String source_artifact = trace_row.get(1);
+            Set<String> source_ids = artifact_map.get(source_artifact);
+
+            String target_artifact = trace_row.get(2);
+            Set<String> target_ids = artifact_map.get(target_artifact);
+
+            String trace_tablename = trace_row.get(4);
+
+            if (source_ids == null && target_ids == null){
+                errorText += String.format("ERROR: TRACE MATRIX: %s DESC: source artifact: %s and target artifact: %s does not exist in the database. Make sure these artifacts are part of your tim file.\n", tracematrix, source_artifact, target_artifact);
+                continue;
+            }
+
+            if (source_ids == null){
+                errorText += String.format("ERROR: TRACE MATRIX: %s DESC: source artifact %s does not exist in the database. Make sure this artifact is part of your tim file.\n", tracematrix, source_artifact);
+                continue;
+            } 
+
+            if (target_ids == null){
+                errorText += String.format("ERROR: TRACE MATRIX: %s DESC: target artifact %s does not exist in the database. Make sure this artifact is part of your tim file.\n", tracematrix, target_artifact);
+                continue;
+            } 
+
+            int line_num = 0;
+            List<List<String>> trace_data_rows = getNonGeneratedTraceData(trace_tablename);
+            
+            for (List<String> row : trace_data_rows) {
+                String sid = row.get(0);
+                String tid = row.get(1);
+                line_num++;
+
+                if (!source_ids.contains(sid)) {
+                    errorText += String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s does not contain ID: %s\n", tracematrix, line_num, source_artifact, sid);
+
+                }
+
+                if (!target_ids.contains(tid)) {
+                    errorText += String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s does not contain ID: %s\n", tracematrix, line_num, target_artifact, tid);
+                }                
+            }
+        }
+        
+        return Base64.getEncoder().encodeToString(errorText.getBytes());
     }
 
     public static String getUploadErrorLog() throws Exception {

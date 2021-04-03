@@ -69,7 +69,7 @@ public class UploadFlatfile {
           }
 
           String artifactTableName = fileName.replaceAll("(?i)\\.csv","").toLowerCase();
-          MySQL.createTimArtifactsTable(artifactName, artifactTableName);
+          MySQL.createTimArtifactsTable(artifactName, artifactTableName, fileName);
         }
       }
       else {
@@ -183,11 +183,11 @@ public class UploadFlatfile {
 
     if (generated) {
       String traceMatrixTableName = tracename.toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
     }
     else {
       String traceMatrixTableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
     }
   }
 

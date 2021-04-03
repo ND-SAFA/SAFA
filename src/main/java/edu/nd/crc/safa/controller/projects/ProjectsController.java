@@ -58,8 +58,8 @@ public class ProjectsController {
   }
 
   @GetMapping("/projects/{projId}/clear/")
-  public String clearFlatfileDir(){
-    return projectService.clearFlatfileDir();
+  public String clearUploadedFlatfiles(@PathVariable String projId){
+    return projectService.clearUploadedFlatfiles(projId);
   }
 
   @PostMapping("/projects/{projId}/upload/")
@@ -68,10 +68,16 @@ public class ProjectsController {
     return projectService.uploadFile(projId, encodedStr);
   }
 
-  @GetMapping("/projects/{projId}/errorlog/")
+  @GetMapping("/projects/{projId}/uploaderrorlog/")
   public String getUploadFilesErrorLog(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
+    System.out.println("/projects/{projId}/uploaderrorlog/");
     return projectService.getUploadFilesErrorLog(projId);
+  }
+
+  @GetMapping("/projects/{projId}/linkerrorlog/")
+  public String getLinkErrorLog(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/errorlog/");
+    return projectService.getLinkErrorLog(projId);
   }
 
   @GetMapping("/projects/{projId}/generate/")
@@ -80,11 +86,11 @@ public class ProjectsController {
     return projectService.generateLinks(projId);
   }
 
-  @GetMapping("/projects/{projId}/linkserrorlog/")
-  public String getGenerateLinksErrorLog(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/generate/");
-    return projectService.getGenerateLinksErrorLog(projId);
-  }
+  // @GetMapping("/projects/{projId}/linkserrorlog/")
+  // public String getGenerateLinksErrorLog(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/generate/");
+  //   return projectService.getGenerateLinksErrorLog(projId);
+  // }
 
   @GetMapping("/projects/{projId}/linktypes/")
   public String getLinkTypes(@PathVariable String projId) {
@@ -93,9 +99,9 @@ public class ProjectsController {
   }
 
   @GetMapping("/projects/{projId}/remove/")
-  public String removeLinks(@PathVariable String projId) {
+  public String clearGeneratedFlatfiles(@PathVariable String projId) {
     System.out.println("/projects/{projId}/generate/");
-    return projectService.clearGeneratedFilesDir(projId);
+    return projectService.clearGeneratedFlatfiles(projId);
   }
 
   @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")

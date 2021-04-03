@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Base64;
-import java.io.File;
-import java.io.FileNotFoundException; 
-import java.nio.file.Files;
+// import java.util.Base64;
+// import java.io.File;
+// import java.io.FileNotFoundException; 
+// import java.nio.file.Files;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
@@ -31,7 +31,7 @@ import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
-import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
+// import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
 
 @Service
 public class ProjectService {
@@ -82,19 +82,9 @@ public class ProjectService {
           //   .id(String.valueOf(2))
           //   .name("update"));
           
-          String data = "{\"complete\": false}";     
-          try {
-            mPuller.parseFlatfiles();
-            System.out.println("Completed ParseFlatfiles without exceptions");
-          } catch (MissingFileException e) {
-            System.out.println("MissingFileException");
-            data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
-          } catch (Exception e) {
-            System.out.println("Regular Exception");
-            data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
-          }
+          String Mysql2NeoData = mPuller.Mysql2Neo();
           emitter.send(SseEmitter.event()
-              .data(data)
+              .data(Mysql2NeoData)
               .id(String.valueOf(3))
               .name("update"));
 
@@ -114,93 +104,83 @@ public class ProjectService {
 
   public String generateLinks(String projId){
     try {
-      String generateFileResult = generateFlatfile.generateFiles();
-      generateFlatfile.createGeneratedTraceMatrixTables();
-      return generateFileResult;
+      return generateFlatfile.generateFiles();
     } 
     catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
   }
 
-  public String clearGeneratedFilesDir(String projId) {
-    try {
-      String dir = "/generatedFilesDir";
-      return uploadFlatfile.deleteDirectory(dir, "Generated Links");
-    }
-    catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
   public String getLinkTypes(String projId) {
     try {
-        return generateFlatfile.getLinkTypesJSON();
+      return generateFlatfile.getLinkTypes();
     } catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
-
   }
 
   public String uploadFile(String projId, String encodedStr) {
     try {
-      uploadFlatfile.uploadFile(projId, encodedStr);
-
-      try {
-        return uploadFlatfile.getMissingFiles(projId);
-      }
-      catch(Exception e){
-        if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-          return "{ \"success\": false, \"message\": \"Error parsing tim.json file: File does not match expected tim.json structure. Please check for trailing comas, mismatched curly braces, etc\"}";
-        }
-        else if (e.getMessage().equals("Please upload a tim.json file")) {
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
-        else {
-          return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
-      }
+      return uploadFlatfile.uploadFiles(projId, encodedStr);
     }
-    catch(Exception e){
+    catch(Exception e) {
       System.out.println("Catch exception for uploadFlatfile");
+
       if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
         return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
-      }
-      else {
+      } else {
         System.out.println("Error uploading Flatfiles: OTHER");
         System.out.println(e.getMessage());
-        return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        // return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
+        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
       }
     }
   }
 
   public String getUploadFilesErrorLog(String projId) {
     try {
-      File myObj = new File("/flatfilesDir/ErrorReport.txt");
-      byte[] fileContent = Files.readAllBytes(myObj.toPath());
-      String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+      String errorStr = MySQL.getUploadErrorLog();
+
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
     } catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }
 
-  public String getGenerateLinksErrorLog(String projId) {
+  public String getLinkErrorLog(String projId) {
     try {
-      File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
-      byte[] fileContent = Files.readAllBytes(myObj.toPath());
-      String returnStr = Base64.getEncoder().encodeToString(fileContent);
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+      String errorStr = MySQL.getLinkErrors();
+
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
     } catch (Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }
 
-  public String clearFlatfileDir() {
+  // public String getGenerateLinksErrorLog(String projId) {
+  //   try {
+  //     File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
+  //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
+  //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
+  //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+  //   } catch (Exception e) {
+  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+  //   }
+  // }
+
+  public String clearUploadedFlatfiles(String projid) {
     try {
-      String dir = "/flatfilesDir";
-      return uploadFlatfile.deleteDirectory(dir, "Flatfile Uploads");
+      String message = MySQL.clearUploadedFlatfiles();
+      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
+    }
+    catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
+  public String clearGeneratedFlatfiles(String projid) {
+    try {
+      String message = MySQL.clearGeneratedFlatfiles();
+      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
     }
     catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());

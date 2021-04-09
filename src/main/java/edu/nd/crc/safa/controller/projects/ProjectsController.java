@@ -107,4 +107,9 @@ public class ProjectsController {
   public SseEmitter projectPull(@PathVariable String projId) {
     return projectService.projectPull(projId);
   }
+
+  @GetMapping("/projects/{projId}/warnings/")
+  public Map<String,String> getWarnings(@PathVariable String projId) {
+    return projectService.getWarnings(projId);
+  }
 }

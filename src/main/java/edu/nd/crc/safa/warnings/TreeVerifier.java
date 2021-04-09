@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
-import static java.util.stream.Collectors.toList;
 
 public class TreeVerifier {
     public class MultipleRuleException extends Exception { 
@@ -23,13 +22,13 @@ public class TreeVerifier {
     
     List<Rule> mRules = new ArrayList<>();
 
-    public boolean addRule(final String rule) throws Exception{
-        if( rule.chars().filter(ch -> ch == '(').count() != rule.chars().filter(ch -> ch == ')').count()){
-            throw new MultipleRuleException("there are an unbalanced amount of brackets");
-        }
+    public boolean addRule(final String name, final String rule) throws Exception{
+        mRules.add(new Rule(name, rule));
+        return true;
+    }
 
-        mRules.add(new Rule(rule));
-
+    public boolean addRule(final Rule rule) throws Exception{
+        mRules.add(rule);
         return true;
     }
 

@@ -9,6 +9,9 @@ import java.sql.Statement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import edu.nd.crc.safa.warnings.Rule;
+
 import java.util.List;
 
 import javax.naming.spi.DirStateFactory.Result;
@@ -906,6 +909,34 @@ public class MySQL {
 
             return data;
         }
+    }
+
+    public static void createWarningsTable() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            if (!tableExists("project_warning_rules")) {
+                String sqlCreateErrorTable = "CREATE TABLE project_warning_rules (\n" +
+                    "db_id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "projectId VARCHAR(1024),\n" + 
+                    "name VARCHAR(1024) NOT NULL,\n" + 
+                    "rule VARCHAR(1024) NOT NULL);";
+                stmt.executeUpdate(sqlCreateErrorTable);
+            }
+        }
+    }
+
+    public static List<Rule> getWarnings(String project) throws Exception {
+        List<Rule> result = new ArrayList<Rule>();
+        try (Statement stmt = startDB().createStatement()) {
+            createWarningsTable();
+
+            ResultSet rs = stmt.executeQuery(String.format("SELECT name, rule FROM project_warning_rules WHERE projectId = %s;", project));            
+            while (rs.next()) {
+                String name = rs.getString(1);
+                String rule = rs.getString(2);
+                result.add(new Rule(name, rule));
+            }
+        }
+        return result;
     }
     
         // sql = "SELECT * FROM TEST";

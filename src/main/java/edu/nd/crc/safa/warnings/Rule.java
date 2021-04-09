@@ -30,25 +30,33 @@ public class Rule {
         "less-than-n"
     );
 
+    String mName;
     String mText;
     public List<Tokenizer.Token> mTokens;
 
     public Rule(){
+        mName = "";
         mText = "";
         mTokens = new ArrayList<>();
     }
 
     public Rule(Rule that){
+        mName = that.mName;
         mText = that.mText;
         mTokens = new ArrayList<>(that.mTokens);
     }
 
-    public Rule(final String rule){
+    public Rule(final String name, final String rule){
+        mName = name;
         mText = rule;
         mTokens = Tokenizer.lex(mText);
     }
 
     public String toString() {
+        return mName;
+    }
+
+    public String UnprocessedRule(){
         return mText;
     }
 

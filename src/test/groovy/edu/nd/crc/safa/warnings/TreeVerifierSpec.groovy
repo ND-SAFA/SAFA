@@ -11,7 +11,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule)
+    verifier.addRule(rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Package")
     edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))
@@ -34,7 +34,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule)
+    verifier.addRule(rule, rule)
     nodes.put("UAV-0001", "Package")
     nodes.put("UAV-0002", "Hazard")
     nodes.put("UAV-0003", "Package")
@@ -59,7 +59,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule)
+    verifier.addRule(rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Requirement")
     nodes.put("UAV-0003", "Requirement")
@@ -84,7 +84,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule)
+    verifier.addRule(rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Requirement")
     nodes.put("UAV-0003", "Requirement")
@@ -110,7 +110,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule)
+    verifier.addRule(rule, rule)
     nodes.put("UAV-0001", "Requirement")
     nodes.put("UAV-0002", "Hazard")
     edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))

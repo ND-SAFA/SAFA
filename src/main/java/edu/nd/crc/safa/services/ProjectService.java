@@ -32,7 +32,7 @@ import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 // import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
-
+import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
 @Service
@@ -270,7 +270,7 @@ public class ProjectService {
       String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n" +
                      "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
       StatementResult result = session.run(query);
-      return parseArtifactTree(result);
+      return parseArtifactTree(result, projectId);
     }
   }
 
@@ -380,7 +380,7 @@ public class ProjectService {
 
       StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
 
-      final List<Map<String, Object>> retVal = parseArtifactTree(result);
+      final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
 
       // Update warnings map
       mWarnings.put(root, false);
@@ -394,7 +394,7 @@ public class ProjectService {
     }
   }
 
-  private List<Map<String, Object>> parseArtifactTree(StatementResult result) {
+  private List<Map<String, Object>> parseArtifactTree(StatementResult result, String projectId) {
     List<Map<String, Object>> values = new ArrayList<>();
     Map<Long, String> ids = new HashMap<>();
     Map<Long, Boolean> edges = new HashMap<>();
@@ -463,12 +463,16 @@ public class ProjectService {
 
     TreeVerifier verifier = new TreeVerifier();
     try{
-      verifier.addRule("at-least-one(Hazard, child, Requirement)");
+      verifier.addRule("At least one requirement child for hazards", "at-least-one(Hazard, child, Requirement)");
       
-      verifier.addRule("at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
-      verifier.addRule("exactly-n(0, Requirement, child, Package)");
+      verifier.addRule("At least one requirement, design or process child for requirements", "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
+      verifier.addRule("Requirements must not have package children", "exactly-n(0, Requirement, child, Package)");
 
-      verifier.addRule("at-least-one(DesignDefinition, child, Package)");
+      verifier.addRule("At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
+
+      for( Rule r : MySQL.getWarnings(projectId)){
+        verifier.addRule(r);
+      }
     }catch( Exception e ){
       System.out.println(e.toString());
     }
@@ -533,5 +537,18 @@ public class ProjectService {
       mapping.put("target", ids.get(rel.endNodeId()));
       values.add(mapping);
     }
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, String> getWarnings(String projectId) {
+    Map<String, String> result = new HashMap<String, String>();
+    try {
+      for( Rule r : MySQL.getWarnings(projectId)){
+        result.put(r.toString(), r.UnprocessedRule());
+      }
+    }catch(Exception e) {
+      System.out.println(e.toString());
+    }
+    return result;
   }
 }

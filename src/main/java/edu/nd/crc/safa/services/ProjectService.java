@@ -551,4 +551,12 @@ public class ProjectService {
     }
     return result;
   }
+
+  public void newWarning(String projectId, String name, String rule) {
+    try {
+      MySQL.newWarning(projectId, name, rule);
+    }catch(Exception e) {
+      System.out.println(e.toString());
+    }
+  }
 }

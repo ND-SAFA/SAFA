@@ -2,6 +2,7 @@ package edu.nd.crc.safa.importer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -926,18 +927,37 @@ public class MySQL {
 
     public static List<Rule> getWarnings(String project) throws Exception {
         List<Rule> result = new ArrayList<Rule>();
-        try (Statement stmt = startDB().createStatement()) {
-            createWarningsTable();
 
-            ResultSet rs = stmt.executeQuery(String.format("SELECT name, rule FROM project_warning_rules WHERE projectId = %s;", project));            
-            while (rs.next()) {
-                String name = rs.getString(1);
-                String rule = rs.getString(2);
-                result.add(new Rule(name, rule));
-            }
+        createWarningsTable();
+        Connection conn = startDB();
+
+        PreparedStatement preparedStmt = conn.prepareStatement("SELECT name, rule FROM project_warning_rules WHERE projectId = ?");
+        preparedStmt.setString (1, project);
+
+        ResultSet rs = preparedStmt.executeQuery();
+        while (rs.next()) {
+            System.out.println(rs.toString());
+            String name = rs.getString(1);
+            String rule = rs.getString(2);
+            result.add(new Rule(name, rule));
         }
+        conn.close();
+
         return result;
     }
+
+    public static void newWarning(String project, String name, String rule) throws Exception {
+        createWarningsTable();
+        
+        Connection conn = startDB();
+        PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, name, rule) VALUES (?, ?, ?);");
+        preparedStmt.setString (1, project);
+        preparedStmt.setString (2, name);
+        preparedStmt.setString (3, rule);
+        System.out.println(preparedStmt.execute());
+        conn.close();
+    }
+    
     
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);

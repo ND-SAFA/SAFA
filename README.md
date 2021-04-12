@@ -102,6 +102,10 @@ Backend change should appear on electron. If not click on Project->Synchronize F
 Username: neo4j
 Password: secret
 
+## Flatfile Workflow
+MySQL DB Password: secret2
+https://docs.google.com/document/d/1z2j8eH8UfnCP5d9z2G-0B6a83mtnvlAS_0aclvhZBLs/edit?usp=sharing
+
 ## Known Problems Google Doc Link
 
 https://docs.google.com/document/d/10BCZqpCamrEYQa5RNjLQl_gHcCQc7RFusLTfo2OH_mA/edit?usp=sharing

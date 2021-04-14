@@ -8,15 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collection;
 import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GenerateFlatfile {
+    @Autowired private MySQL sql = new MySQL();
+
     public String generateFiles() throws Exception {
         String generatedDir = "/generatedFiles";
         UploadFlatfile.createDirectory(generatedDir);
         
-        List<List<String>> data = MySQL.generateInfo();
+        List<List<String>> data = sql.generateInfo();
         System.out.println("Generate Info Works");
 
         if (data.size() == 0) {
@@ -38,7 +42,7 @@ public class GenerateFlatfile {
     }
 
     public String getLinkTypes() throws Exception {
-        List<List<String>> traces = MySQL.getTimTraceData();
+        List<List<String>> traces = sql.getTimTraceData();
         Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
         for (List<String> trace : traces) {
             String key = String.format("\"%s\"", trace.get(1));
@@ -52,8 +56,8 @@ public class GenerateFlatfile {
     }
 
     public void generateTraceMatrixFile(String sourceTable, String targetTable, String destFilePath, String destTable) throws Exception {
-        List<List<String>> sourceData = MySQL.getArtifactData(sourceTable);
-        List<List<String>> targetData = MySQL.getArtifactData(targetTable);
+        List<List<String>> sourceData = sql.getArtifactData(sourceTable);
+        List<List<String>> targetData = sql.getArtifactData(targetTable);
 
         Map<String, Collection<String>> sTokens = new HashMap<>(), tTokens = new HashMap<>();
         for (List<String> doc : sourceData) {
@@ -76,6 +80,6 @@ public class GenerateFlatfile {
         }
 
         Files.write(Paths.get(destFilePath), lines);
-        MySQL.createGeneratedTraceMatrixTable(destTable, destFilePath);
+        sql.createGeneratedTraceMatrixTable(destTable, destFilePath);
     }
 }

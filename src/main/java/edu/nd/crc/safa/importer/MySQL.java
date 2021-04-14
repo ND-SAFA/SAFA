@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.nd.crc.safa.warnings.Rule;
@@ -18,35 +20,27 @@ import java.util.HashSet;
 
 @Component
 public class MySQL {
-
-    public MySQL() {}
-
     public static class FileInfo {
         public List<String> uploadedFiles = new ArrayList<String>();
         public List<String> expectedFiles = new ArrayList<String>();
         public List<String> generatedFiles = new ArrayList<String>();
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
+    @Value("${mysql.host}") String mysqlHost;
+    @Value("${mysql.port}") String mysqlPort;
+    @Value("${mysql.username}") String mysqlUser;
+    @Value("${mysql.password}") String mysqlPassword;
+    @Value("${mysql.database}") String mysqlDatabase;
 
-    public static Connection startDB() throws Exception {
-        String databaseURL = "jdbc:mysql://mysql:3306/safa-db?useSSL=false";
-        String user = "user";
-        String password = "secret3";
-        Connection conn = null;
-        
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        conn = DriverManager.getConnection(databaseURL,user,password);
-        if (conn == null) {
-            throw new Exception("COULD NOT CONNECT TO DATABASE");
-        }
+    public MySQL() {}
+    
+    public Connection getConnection() throws Exception {
+        String databaseURL = String.format("jdbc:mysql://%s:%s/%s?useSSL=false", mysqlHost, mysqlPort, mysqlDatabase);
+        return DriverManager.getConnection(databaseURL,mysqlUser,mysqlPassword);
+    };
 
-        System.out.println("CONNECTED TO THE DATABASE.");
-
-        return conn;
-    }
-
-    public static Boolean tableExists(String tableName) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public Boolean tableExists(String tableName) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             System.out.println(String.format("Checking if %s exists", tableName));
             String sqlTableCheck = String.format("SELECT 1 FROM information_schema.tables where table_schema = 'safa-db' AND table_name = '%s' limit 1;", tableName);
             ResultSet rs = stmt.executeQuery(sqlTableCheck);
@@ -56,8 +50,8 @@ public class MySQL {
         }  
     }
     
-    public static void createTableList(String tableName, Boolean generated) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createTableList(String tableName, Boolean generated) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             if (!tableExists("uploaded_and_generated_tables")) {
                 String sqlCreateTable = String.format("CREATE TABLE %s (\n", "uploaded_and_generated_tables") + 
                     "tablename VARCHAR(255) PRIMARY KEY,\n" +
@@ -78,8 +72,8 @@ public class MySQL {
         }
     }
 
-    public static void createGeneratedTraceMatrixTable(String tableName, String filePath) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createGeneratedTraceMatrixTable(String tableName, String filePath) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             Boolean exists = tableExists(tableName);
 
             if (exists) {
@@ -90,7 +84,7 @@ public class MySQL {
         }
     }
 
-    public static void newGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws Exception {
+    public void newGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws Exception {
         System.out.println(String.format("CREATING NEW GENERATED TABLE: %s...", tableName));
 
         String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) +
@@ -125,7 +119,7 @@ public class MySQL {
         createTableList(tableName, true);
     }
 
-    public static void updateGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws Exception {
+    public void updateGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws Exception {
         System.out.println(String.format("UPDATING GENERATED TABLE: %s...", tableName));
 
         String tempTableName = String.format("temp_%s", tableName);
@@ -190,8 +184,8 @@ public class MySQL {
         System.out.println("RENAMED NEW TABLE TO OLD TABLE.");
     }
 
-    public static void clearTimTables() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void clearTimTables() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             Boolean artifactsExists = tableExists("tim_artifact");
             Boolean traceExists = tableExists("tim_trace_matrix");
 
@@ -209,8 +203,8 @@ public class MySQL {
         }
     }
 
-    public static void createTimArtifactsTable(String artifact, String tablename, String filename) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createTimArtifactsTable(String artifact, String tablename, String filename) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             Boolean exists = tableExists("tim_artifact");
 
             if (exists) {
@@ -222,7 +216,7 @@ public class MySQL {
         }
     }
 
-    public static void newTimArtifactsTable(Statement stmt) throws Exception {
+    public void newTimArtifactsTable(Statement stmt) throws Exception {
         System.out.println(String.format("CREATING NEW TIM ARTIFACTS TABLE: %s...", "tim_artifact"));
         String sqlCreateTable = String.format("CREATE TABLE %s (\n", "tim_artifact") + 
             "artifact VARCHAR(255) PRIMARY KEY,\n" +
@@ -234,7 +228,7 @@ public class MySQL {
         System.out.println(String.format("CREATED NEW TIM ARTIFACTS TABLE: %s.", "tim_artifact"));
     }
 
-    public static void updateTimArtifactsTable(Statement stmt, String artifact, String tablename, String filename) throws Exception {
+    public void updateTimArtifactsTable(Statement stmt, String artifact, String tablename, String filename) throws Exception {
         System.out.println(String.format("Updating TIM ARTIFACTS TABLE: %s...", "tim_artifact"));
         String sqlUpdateTable = String.format("INSERT INTO %s (artifact, tablename, filename)\n", "tim_artifact") + 
             String.format("VALUES ('%s', '%s', '%s')\n", artifact, tablename, filename) +
@@ -244,8 +238,8 @@ public class MySQL {
         System.out.println(String.format("UPDATED TIM ARTIFACTS TABLE: %s.", "tim_artifact"));
     }
 
-    public static void createTimTraceMatrixTable(String traceMatrixName, String traceMatrixTableName, String sourceArtifact, String targetArtifact, Boolean generated, String filename) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createTimTraceMatrixTable(String traceMatrixName, String traceMatrixTableName, String sourceArtifact, String targetArtifact, Boolean generated, String filename) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             Boolean exists = tableExists("tim_trace_matrix");
 
             if (exists) {
@@ -257,7 +251,7 @@ public class MySQL {
         }
     }
 
-    public static void newTimTraceMatrixTable(Statement stmt) throws Exception {
+    public void newTimTraceMatrixTable(Statement stmt) throws Exception {
         String sqlCreateTable = String.format("CREATE TABLE %s (\n", "tim_trace_matrix") + 
             "trace_matrix VARCHAR(255) PRIMARY KEY,\n" +
             "source_artifact VARCHAR(255) NOT NULL,\n" +
@@ -270,7 +264,7 @@ public class MySQL {
         stmt.executeUpdate(sqlCreateTable);
     }
 
-    public static void updateTimTraceMatrixTable(Statement stmt, String traceMatrixName, String traceMatrixTableName, String sourceArtifact, String targetArtifact, Boolean generated, String filename) throws Exception {
+    public void updateTimTraceMatrixTable(Statement stmt, String traceMatrixName, String traceMatrixTableName, String sourceArtifact, String targetArtifact, Boolean generated, String filename) throws Exception {
         System.out.println(String.format("Updating TIM ARTIFACTS TABLE: %s...", "tim_trace_matrix"));
         String sqlUpdateTable = String.format("INSERT INTO %s (trace_matrix, source_artifact, target_artifact, is_generated, tablename, filename)\n", "tim_trace_matrix") + 
             String.format("VALUES ('%s', '%s', '%s', %s, '%s', '%s')\n", traceMatrixName, sourceArtifact, targetArtifact, generated, traceMatrixTableName, filename) +
@@ -281,7 +275,7 @@ public class MySQL {
         System.out.println(String.format("UPDATED TIM TRACE MATRIX TABLE: %s.", "tim_trace_matrix"));
     }
 
-    public static void createArtifactTableHelper (Statement stmt, String intTableName, String tableName, String filePath, String colHeader) throws Exception {
+    public void createArtifactTableHelper (Statement stmt, String intTableName, String tableName, String filePath, String colHeader) throws Exception {
 
         if (tableExists(intTableName)) {
             String sqlTruncate = String.format("TRUNCATE TABLE %s", intTableName);
@@ -336,8 +330,8 @@ public class MySQL {
         System.out.println("Updated Line numbers.\n");
     }
     
-    public static void createArtifactTable(String tableName, String filePath, String colHeader) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createArtifactTable(String tableName, String filePath, String colHeader) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             String intTableName = "intermediate_" + tableName;
             if (!tableExists("artifact_error")) {
                 System.out.println("CREATING NEW ARTIFACT ERROR TABLE: artifact_error...");
@@ -384,7 +378,7 @@ public class MySQL {
         }
     }
 
-    public static void createTraceMatrixHelper (Statement stmt, String intTableName, String tableName, String filePath, String colHeader) throws Exception {
+    public void createTraceMatrixHelper (Statement stmt, String intTableName, String tableName, String filePath, String colHeader) throws Exception {
         if (tableExists(intTableName)) {
             String sqlTruncate = String.format("TRUNCATE TABLE %s", intTableName);
             stmt.executeUpdate(sqlTruncate);
@@ -436,8 +430,8 @@ public class MySQL {
         System.out.println("Updated Line numbers.\n");
     }
 
-    public static void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             String intTableName = "intermediate_" + tableName;
 
             if (!tableExists("trace_matrix_error")) {
@@ -486,7 +480,7 @@ public class MySQL {
         }
     }
 
-    public static FileInfo getFileInfo() throws Exception {
+    public FileInfo getFileInfo() throws Exception {
         FileInfo fileInfo = new FileInfo();
 
         List<List<String>> artifact_rows = getTimArtifactData();
@@ -528,8 +522,8 @@ public class MySQL {
         return fileInfo;
     }
 
-    public static void traceArtifactCheck() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void traceArtifactCheck() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             Boolean timTraceExists = tableExists("tim_trace_matrix");
             Boolean timArtifactsExists = tableExists("tim_artifact");
 
@@ -554,7 +548,7 @@ public class MySQL {
         }
     }
 
-    public static String getLinkErrors() throws Exception {
+    public String getLinkErrors() throws Exception {
         HashMap<String, Set<String>> artifact_map = new HashMap<String, Set<String>>();
         String errorText = "";
         
@@ -627,8 +621,8 @@ public class MySQL {
         return Base64.getEncoder().encodeToString(errorText.getBytes());
     }
 
-    public static String getUploadErrorLog() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public String getUploadErrorLog() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             System.out.println("Upload Flatfile Error Log...");
 
             if ( !(tableExists("artifact_error") && tableExists("trace_matrix_error")) ){
@@ -685,8 +679,8 @@ public class MySQL {
         }
     }
 
-    public static String clearUploadedFlatfiles() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public String clearUploadedFlatfiles() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             if (tableExists("uploaded_and_generated_tables")) {
                 String sqlUploadedFiles = "SELECT tablename\n" +
                     "FROM uploaded_and_generated_tables\n" +
@@ -727,8 +721,8 @@ public class MySQL {
         }
     }
 
-    public static String clearGeneratedFlatfiles() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public String clearGeneratedFlatfiles() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             if (tableExists("uploaded_and_generated_tables")) {
                 String sqlUploadedFiles = "SELECT tablename\n" +
                     "FROM uploaded_and_generated_tables\n" +
@@ -761,8 +755,8 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> generateInfo() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public List<List<String>> generateInfo() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
     
             String sqlUploadedFiles = "SELECT tim_source.tablename as source_tablename,\n" +
@@ -791,8 +785,8 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getArtifactData(String tablename) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public List<List<String>> getArtifactData(String tablename) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
     
             String sqlGetData = String.format("SELECT id, summary, content FROM %s;", tablename);
@@ -811,8 +805,8 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getNonGeneratedTraceData(String tablename) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public List<List<String>> getNonGeneratedTraceData(String tablename) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
     
             String sqlGetData = String.format("SELECT source_id, target_id FROM %s;", tablename);
@@ -830,8 +824,8 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getGeneratedTraceData(String tablename) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public List<List<String>> getGeneratedTraceData(String tablename) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
     
             String sqlGetData = String.format("SELECT source, target, score, approval FROM %s;", tablename);
@@ -851,13 +845,13 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getTimArtifactData() throws Exception {
+    public List<List<String>> getTimArtifactData() throws Exception {
         List<List<String>> data = new ArrayList<List<String>>();
         if (!tableExists("tim_artifact")) {
             return data;
         }
 
-        try (Statement stmt = startDB().createStatement()) {
+        try (Statement stmt = getConnection().createStatement()) {
             String sqlGetData = String.format("SELECT artifact, tablename, filename FROM %s;", "tim_artifact");
              
             ResultSet rs = stmt.executeQuery(sqlGetData);
@@ -874,13 +868,13 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getTimTraceData() throws Exception {
+    public List<List<String>> getTimTraceData() throws Exception {
         List<List<String>> data = new ArrayList<List<String>>();
         if (!tableExists("tim_trace_matrix")) {
             return data;
         }
         
-        try (Statement stmt = startDB().createStatement()) {
+        try (Statement stmt = getConnection().createStatement()) {
             String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, is_generated, tablename, filename FROM %s;", "tim_trace_matrix");
             ResultSet rs = stmt.executeQuery(sqlGetData);
             
@@ -898,10 +892,10 @@ public class MySQL {
             return data;
         }
     }
-    public static void SaveLayout(String hash, String b64EncodedLayout) throws Exception {
+    public void SaveLayout(String hash, String b64EncodedLayout) throws Exception {
         Boolean exists = tableExists("saved_layouts");
         
-        try (Statement stmt = startDB().createStatement()) {
+        try (Statement stmt = getConnection().createStatement()) {
             if (!exists) {
                 String sqlCreateTable = String.format("CREATE TABLE saved_layouts (\n") +
                 "hash VARCHAR(255) PRIMARY KEY,\n" + 
@@ -916,8 +910,8 @@ public class MySQL {
         }
     }
 
-    public static String FetchLayout(String hash) throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public String FetchLayout(String hash) throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             String sqlQueryLayout = String.format("SELECT b64e_layout FROM saved_layouts WHERE hash='%s';", hash);
             ResultSet rs = stmt.executeQuery(sqlQueryLayout);
             rs.first();
@@ -925,8 +919,8 @@ public class MySQL {
         }
     }
 
-    public static void createWarningsTable() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
+    public void createWarningsTable() throws Exception {
+        try (Statement stmt = getConnection().createStatement()) {
             if (!tableExists("project_warning_rules")) {
                 String sqlCreateErrorTable = "CREATE TABLE project_warning_rules (\n" +
                     "db_id INT AUTO_INCREMENT PRIMARY KEY," +
@@ -938,11 +932,11 @@ public class MySQL {
         }
     }
 
-    public static List<Rule> getWarnings(String project) throws Exception {
+    public List<Rule> getWarnings(String project) throws Exception {
         List<Rule> result = new ArrayList<Rule>();
 
         createWarningsTable();
-        Connection conn = startDB();
+        Connection conn = getConnection();
 
         PreparedStatement preparedStmt = conn.prepareStatement("SELECT name, rule FROM project_warning_rules WHERE projectId = ?");
         preparedStmt.setString (1, project);
@@ -959,10 +953,10 @@ public class MySQL {
         return result;
     }
 
-    public static void newWarning(String project, String name, String rule) throws Exception {
+    public void newWarning(String project, String name, String rule) throws Exception {
         createWarningsTable();
         
-        Connection conn = startDB();
+        Connection conn = getConnection();
         PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, name, rule) VALUES (?, ?, ?);");
         preparedStmt.setString (1, project);
         preparedStmt.setString (2, name);

@@ -38,6 +38,7 @@ public class Puller {
 
     @Autowired JIRA mJira;
     @Autowired public Database mDatabase;
+    @Autowired private MySQL sql = new MySQL();
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
@@ -176,10 +177,10 @@ public class Puller {
     }
 
     public void insertArtifacts() throws Exception {
-        List<List<String>> artifacts = MySQL.getTimArtifactData();
+        List<List<String>> artifacts = sql.getTimArtifactData();
         for (List<String> artifact : artifacts) {
             String type = artifact.get(0);
-            List<List<String>> rows = MySQL.getArtifactData(artifact.get(1));
+            List<List<String>> rows = sql.getArtifactData(artifact.get(1));
 
             for (List<String> row : rows) {
                 String id = row.get(0);
@@ -202,12 +203,12 @@ public class Puller {
     }
 
     public void insertConnections() throws Exception {
-        List<List<String>> traces = MySQL.getTimTraceData();
+        List<List<String>> traces = sql.getTimTraceData();
         for (List<String> trace : traces) {
             String sourcetype = trace.get(0);
 
             if (Integer.parseInt(trace.get(3)) == 0) {
-                List<List<String>> rows = MySQL.getNonGeneratedTraceData(trace.get(4));
+                List<List<String>> rows = sql.getNonGeneratedTraceData(trace.get(4));
 
                 for (List<String> row : rows) {
                     String source = row.get(0);
@@ -216,7 +217,7 @@ public class Puller {
                 }
             }
             else {
-                List<List<String>> rows = MySQL.getGeneratedTraceData(trace.get(4));
+                List<List<String>> rows = sql.getGeneratedTraceData(trace.get(4));
 
                 for (List<String> row : rows) {
                     String source = row.get(0).toString();

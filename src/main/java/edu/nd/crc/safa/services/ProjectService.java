@@ -43,9 +43,7 @@ public class ProjectService {
   @Autowired
   GenerateFlatfile generateFlatfile;
 
-  @Autowired
-  MySQL mySQL;
-
+  @Autowired private MySQL sql = new MySQL();
   private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
   public ProjectService() {
@@ -133,7 +131,7 @@ public class ProjectService {
 
   public String getUploadFilesErrorLog(String projId) {
     try {
-      String errorStr = MySQL.getUploadErrorLog();
+      String errorStr = sql.getUploadErrorLog();
 
       return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
     } catch (Exception e) {
@@ -143,7 +141,7 @@ public class ProjectService {
 
   public String getLinkErrorLog(String projId) {
     try {
-      String errorStr = MySQL.getLinkErrors();
+      String errorStr = sql.getLinkErrors();
 
       return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
     } catch (Exception e) {
@@ -164,7 +162,7 @@ public class ProjectService {
 
   public String clearUploadedFlatfiles(String projid) {
     try {
-      String message = MySQL.clearUploadedFlatfiles();
+      String message = sql.clearUploadedFlatfiles();
       return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
     }
     catch(Exception e) {
@@ -174,7 +172,7 @@ public class ProjectService {
 
   public String clearGeneratedFlatfiles(String projid) {
     try {
-      String message = MySQL.clearGeneratedFlatfiles();
+      String message = sql.clearGeneratedFlatfiles();
       return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
     }
     catch(Exception e) {
@@ -299,13 +297,13 @@ public class ProjectService {
   @Transactional(readOnly = true)
   public String getTreeLayout(String projId, String hash) throws Exception {
     // TODO(Adam): Do something with the projId?
-    String b64EncodedLayout = MySQL.FetchLayout(hash);
+    String b64EncodedLayout = sql.FetchLayout(hash);
     return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
   }
 
   public String postTreeLayout(String projId, String hash, String b64EncodedLayout) throws Exception {
     // TODO(Adam): Do something with the projId?
-    MySQL.SaveLayout(hash, b64EncodedLayout);
+    sql.SaveLayout(hash, b64EncodedLayout);
     return "{\"success\": true, \"message\": \"Layout saved\"}";
   }
 
@@ -458,7 +456,7 @@ public class ProjectService {
 
       verifier.addRule("At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
 
-      for( Rule r : MySQL.getWarnings(projectId)){
+      for( Rule r : sql.getWarnings(projectId)){
         verifier.addRule(r);
       }
     }catch( Exception e ){
@@ -531,7 +529,7 @@ public class ProjectService {
   public Map<String, String> getWarnings(String projectId) {
     Map<String, String> result = new HashMap<String, String>();
     try {
-      for( Rule r : MySQL.getWarnings(projectId)){
+      for( Rule r : sql.getWarnings(projectId)){
         result.put(r.toString(), r.UnprocessedRule());
       }
     }catch(Exception e) {
@@ -542,7 +540,7 @@ public class ProjectService {
 
   public void newWarning(String projectId, String name, String rule) {
     try {
-      MySQL.newWarning(projectId, name, rule);
+      sql.newWarning(projectId, name, rule);
     }catch(Exception e) {
       System.out.println(e.toString());
     }

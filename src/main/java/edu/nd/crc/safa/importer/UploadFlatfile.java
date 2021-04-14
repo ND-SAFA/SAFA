@@ -11,10 +11,14 @@ import java.io.FileReader;
 
 
 import com.jsoniter.JsonIterator;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UploadFlatfile {
+  @Autowired private MySQL sql = new MySQL();
+  
   public static class TimBackend {
     public List<List<String>> artifacts = new ArrayList<List<String>>();
     public List<List<String>> traces = new ArrayList<List<String>>();
@@ -32,7 +36,7 @@ public class UploadFlatfile {
       Files.write(Paths.get(fullPath), bytes);
       
       if (filename.equals("tim.json")) {
-        MySQL.clearTimTables();
+        sql.clearTimTables();
         parseTimFile(fullPath);
       } else {
         parseRegFile(filename, fullPath);
@@ -41,8 +45,8 @@ public class UploadFlatfile {
 
     deleteDirectory(path);
 
-    MySQL.traceArtifactCheck();
-    MySQL.FileInfo fileInfo = MySQL.getFileInfo();
+    sql.traceArtifactCheck();
+    MySQL.FileInfo fileInfo = sql.getFileInfo();
 
     String data = "{\"uploadedFiles\":" + fileInfo.uploadedFiles.toString() + ",\"expectedFiles\":" +
                   fileInfo.expectedFiles.toString() + ",\"generatedFiles\":" + fileInfo.generatedFiles.toString() +
@@ -74,7 +78,7 @@ public class UploadFlatfile {
           }
 
           String artifactTableName = fileName.replaceAll("(?i)\\.csv","").toLowerCase();
-          MySQL.createTimArtifactsTable(artifactName, artifactTableName, fileName);
+          sql.createTimArtifactsTable(artifactName, artifactTableName, fileName);
         }
       }
       else {
@@ -106,7 +110,7 @@ public class UploadFlatfile {
         if (source && target) {
           String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
           String colHeader = cols.toString().replace("[","(").replace("]", ")");
-          MySQL.createTraceMatrixTable(tableName,fullPath, colHeader);
+          sql.createTraceMatrixTable(tableName,fullPath, colHeader);
         }        
       }
       else if (headers.length == 3) {
@@ -133,7 +137,7 @@ public class UploadFlatfile {
         if (id && summary && content) {
           String tableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
           String colHeader = cols.toString().replace("[","(").replace("]", ")");
-          MySQL.createArtifactTable(tableName,fullPath, colHeader);
+          sql.createArtifactTable(tableName,fullPath, colHeader);
         }
       }
       else {
@@ -188,11 +192,11 @@ public class UploadFlatfile {
 
     if (generated) {
       String traceMatrixTableName = tracename.toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
+      sql.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
     }
     else {
       String traceMatrixTableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
+      sql.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
     }
   }
 
@@ -238,7 +242,7 @@ public class UploadFlatfile {
   public TimBackend getTimFile() throws Exception {
     TimBackend timBackend = new TimBackend();
 
-    List<List<String>> artifact_rows = MySQL.getTimArtifactData();
+    List<List<String>> artifact_rows = sql.getTimArtifactData();
     for (List<String> artifact_row : artifact_rows) {
       List<String> artifacts = new ArrayList<String>();
       
@@ -250,7 +254,7 @@ public class UploadFlatfile {
       timBackend.artifacts.add(artifacts);
     }
 
-    List<List<String>> trace_rows = MySQL.getTimTraceData();
+    List<List<String>> trace_rows = sql.getTimTraceData();
     for (List<String> trace_row : trace_rows) {
       List<String> traces = new ArrayList<String>();
       

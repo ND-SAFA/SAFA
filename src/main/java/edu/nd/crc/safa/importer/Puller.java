@@ -34,6 +34,8 @@ public class Puller {
     @Autowired @Value("${git.url:}") String gitURL;
     @Autowired @Value("${git.branch:master}") String gitBranch;
 
+    @Autowired @Value("${tim.requiredTraceScore:}") Double traceRequiredScore;
+
     @Autowired JIRA mJira;
     @Autowired public Database mDatabase;
 
@@ -222,7 +224,7 @@ public class Puller {
                     Float score = Float.parseFloat(row.get(2));
                     int approval = Integer.parseInt(row.get(3));
 
-                    if ((approval == 1) || ((approval == 2) && score > 0.3)) {
+                    if ((approval == 1) || ((approval == 2) && score > traceRequiredScore)) {
                         mDatabase.AddLink(target, sourcetype, source);
                     }
                 }

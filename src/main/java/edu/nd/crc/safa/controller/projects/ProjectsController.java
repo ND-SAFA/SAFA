@@ -165,7 +165,7 @@ public class ProjectsController {
   }
 
   @GetMapping("/projects/{projId}/artifact/{source}/links")
-  public Map<String, Object> getArtifactLinks(@PathVariable String projId, @PathVariable String source, @RequestParam("target") String target) {
-    return projectService.getArtifactLinks(projId, source, target);
+  public Map<String, Object> getArtifactLinks(@PathVariable String projId, @PathVariable String source, @RequestParam("target") String target, @RequestParam(name="minScore", defaultValue="0.0") Double minScore) {
+    return projectService.getArtifactLinks(projId, source, target, minScore);
   }
 }

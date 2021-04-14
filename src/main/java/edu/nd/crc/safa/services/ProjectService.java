@@ -583,10 +583,10 @@ public class ProjectService {
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Object> getArtifactLinks(String projectId, String source, String target) {
+  public Map<String, Object> getArtifactLinks(String projectId, String source, String target, Double minScore) {
     Map<String, Object> result = new HashMap<String, Object>();
     try {
-      result.put("links", sql.getArtifactLinks(projectId, source, target));
+      result.put("links", sql.getArtifactLinks(projectId, source, target, minScore));
     }catch(Exception e) {
       result.put("success", "false");
       result.put("message", e.toString());

@@ -1040,7 +1040,7 @@ public class MySQL {
         return result;
     }
 
-    public List<Map<String, Object>> getArtifactLinks(String project, String source, String target) throws Exception{
+    public List<Map<String, Object>> getArtifactLinks(String project, String source, String target, Double minScore) throws Exception{
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         try(Connection conn = getConnection()){
             PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE source_artifact = ? AND target_artifact = ? AND is_generated = 1");
@@ -1054,7 +1054,10 @@ public class MySQL {
             String linkTable = rsSource.getString(1);
 
             try(Statement sLink = conn.createStatement()){
-                ResultSet rs = sLink.executeQuery(String.format("SELECT source, target, score, approval FROM %s ORDER BY score DESC", linkTable));
+                PreparedStatement sLinks = conn.prepareStatement(String.format("SELECT source, target, score, approval FROM %s WHERE SCORE >= ? ORDER BY score DESC", linkTable));
+                sLinks.setDouble(1, minScore);
+
+                ResultSet rs = sLinks.executeQuery();
                 while (rs.next()) {
                     Map<String, Object> link = new HashMap<String, Object>();
                     link.put("source", rs.getString(1));

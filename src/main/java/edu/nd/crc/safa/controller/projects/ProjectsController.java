@@ -96,11 +96,11 @@ public class ProjectsController {
   //   return projectService.getGenerateLinksErrorLog(projId);
   // }
 
-  @GetMapping("/projects/{projId}/linktypes/")
-  public String getLinkTypes(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/linktypes/");
-    return projectService.getLinkTypes(projId);
-  }
+  // @GetMapping("/projects/{projId}/linktypes/")
+  // public String getLinkTypes(@PathVariable String projId) {
+  //   System.out.println("/projects/{projId}/linktypes/");
+  //   return projectService.getLinkTypes(projId);
+  // }
 
   @GetMapping("/projects/{projId}/remove/")
   public String clearGeneratedFlatfiles(@PathVariable String projId) {
@@ -134,5 +134,15 @@ public class ProjectsController {
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
+  }
+  
+  @GetMapping("/projects/{projId}/warnings/")
+  public Map<String,String> getWarnings(@PathVariable String projId) {
+    return projectService.getWarnings(projId);
+  }
+
+  @PostMapping("/projects/{projId}/warnings/")
+  public void newWarning(@PathVariable String projId, @RequestParam("name") String name, @RequestParam("rule") String rule) {
+    projectService.newWarning(projId, name, rule);
   }
 }

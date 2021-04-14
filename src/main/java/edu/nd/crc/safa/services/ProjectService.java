@@ -91,6 +91,22 @@ public class ProjectService {
               .id(String.valueOf(3))
               .name("update"));
 
+          // String data = "{\"complete\": false}";     
+          // try {
+          //   mPuller.parseFlatfiles();
+          //   System.out.println("Completed ParseFlatfiles without exceptions");
+          // } catch (MissingFileException e) {
+          //   System.out.println("MissingFileException");
+          //   data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
+          // } catch (Exception e) {
+          //   System.out.println("Regular Exception");
+          //   data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
+          // }
+          // emitter.send(SseEmitter.event()
+          //     .data(data)
+          //     .id(String.valueOf(3))
+          //     .name("update"));
+
           mPuller.Execute();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": true}")
@@ -118,6 +134,16 @@ public class ProjectService {
     try {
       return generateFlatfile.getLinkTypes();
     } catch(Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+  
+  public String clearGeneratedFilesDir(String projId) {
+    try {
+      String dir = "/generatedFilesDir";
+      return uploadFlatfile.deleteDirectory(dir, "Generated Links");
+    }
+    catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }
@@ -253,7 +279,7 @@ public class ProjectService {
       String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n" +
                      "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
       StatementResult result = session.run(query);
-      return parseArtifactTree(result);
+      return parseArtifactTree(result, projectId);
     }
   }
 
@@ -376,7 +402,7 @@ public class ProjectService {
 
       StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
 
-      final List<Map<String, Object>> retVal = parseArtifactTree(result);
+      final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
 
       // Update warnings map
       mWarnings.put(root, false);
@@ -390,7 +416,7 @@ public class ProjectService {
     }
   }
 
-  private List<Map<String, Object>> parseArtifactTree(StatementResult result) {
+  private List<Map<String, Object>> parseArtifactTree(StatementResult result, String projectId) {
     List<Map<String, Object>> values = new ArrayList<>();
     Map<Long, String> ids = new HashMap<>();
     Map<Long, Boolean> edges = new HashMap<>();
@@ -457,30 +483,31 @@ public class ProjectService {
       }
     }
 
+    TreeVerifier verifier = new TreeVerifier();
+    try{
+      verifier.addRule("At least one requirement child for hazards", "at-least-one(Hazard, child, Requirement)");
+      
+      verifier.addRule("At least one requirement, design or process child for requirements", "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
+      verifier.addRule("Requirements must not have package children", "exactly-n(0, Requirement, child, Package)");
+
+      verifier.addRule("At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
+
+      for( Rule r : MySQL.getWarnings(projectId)){
+        verifier.addRule(r);
+      }
+    }catch( Exception e ){
+      System.out.println(e.toString());
+    }
+    Map<String, List<String>> results = verifier.verify(nodes, ids, values);
+
     // Warnings
     for(int i = 0; i < nodes.size(); i++) {
       final Node node = nodes.get(i);
       final String id = ids.get(node.id());
-      final String label = ((List<String>)node.labels()).get(0).toString();
 
-      List<String> warnings = new ArrayList<String>();
+      List<String> warnings = results.get(id);
 
-      // Handle design definitions with no child nodes
-      if( label.equals("DesignDefinition") ){
-        if( !containsChildOfType("Package", node, nodes, ids, values) ){
-          warnings.add("Missing Code");
-        }
-      }
-
-      // Handle requirements with no design definitions
-      if( label.equals("Requirement") ){
-        if( !containsChildOfType("DesignDefinition", node, nodes, ids, values) ){
-          warnings.add("Missing Design Definition");
-        }
-      }
-
-      if( !warnings.isEmpty() ) {
-        // Find this node's values
+      if( warnings != null && !warnings.isEmpty() ) {
         for( Map<String,Object> value : values ){
           if( value.getOrDefault("id", "").equals(id) ){
             value.put("warnings", warnings.toArray());
@@ -491,30 +518,6 @@ public class ProjectService {
 
     return values;
   } 
-
-  private boolean containsChildOfType(final String type, final Node node, final List<Node> nodes, final Map<Long, String> ids, final List<Map<String, Object>> values) {
-    final String id = ids.get(node.id());
-
-    List<String> nChildren = new ArrayList<String>();
-    for( Map<String,Object> value : values ){
-      if( value.getOrDefault("source", "").equals(id) && !value.getOrDefault("type", "").equals("UPDATES") ){
-        String target = (String)value.getOrDefault("target", "");
-        if (!target.isEmpty()){
-          nChildren.add(target);
-        }
-      }
-    }
-
-    for( String child: nChildren) {
-      for( Node n: nodes ){
-        if( ids.get(n.id()).equals(child) && ((List<String>)n.labels()).get(0).toString().equals(type)){
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
 
   private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
     if (!ids.containsKey(node.id())) {
@@ -555,6 +558,27 @@ public class ProjectService {
       mapping.put("source", ids.get(rel.startNodeId()));
       mapping.put("target", ids.get(rel.endNodeId()));
       values.add(mapping);
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, String> getWarnings(String projectId) {
+    Map<String, String> result = new HashMap<String, String>();
+    try {
+      for( Rule r : MySQL.getWarnings(projectId)){
+        result.put(r.toString(), r.UnprocessedRule());
+      }
+    }catch(Exception e) {
+      System.out.println(e.toString());
+    }
+    return result;
+  }
+
+  public void newWarning(String projectId, String name, String rule) {
+    try {
+      MySQL.newWarning(projectId, name, rule);
+    }catch(Exception e) {
+      System.out.println(e.toString());
     }
   }
 }

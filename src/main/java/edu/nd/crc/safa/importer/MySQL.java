@@ -925,48 +925,6 @@ public class MySQL {
         }
     }
 
-    public static List<List<String>> getTimTraceNonGeneratedData() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
-            List<List<String>> data = new ArrayList<List<String>>();
-
-            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 0;", "tim_trace_matrix");
-             
-            ResultSet rs = stmt.executeQuery(sqlGetData);
-            
-            while (rs.next()) {
-                List<String> row = new ArrayList<String>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
-                row.add(rs.getString(3));
-                row.add(rs.getString(4));
-                data.add(row);
-            }
-
-            return data;
-        }
-    }
-
-    public static List<List<String>> getTimTraceGeneratedData() throws Exception {
-        try (Statement stmt = startDB().createStatement()) {
-            List<List<String>> data = new ArrayList<List<String>>();
-
-            String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, tablename FROM %s WHERE is_generated = 1;", "tim_trace_matrix");
-             
-            ResultSet rs = stmt.executeQuery(sqlGetData);
-            
-            while (rs.next()) {
-                List<String> row = new ArrayList<String>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
-                row.add(rs.getString(3));
-                row.add(rs.getString(4));
-                data.add(row);
-            }
-
-            return data;
-        }
-    }
-
     public static void createWarningsTable() throws Exception {
         try (Statement stmt = startDB().createStatement()) {
             if (!tableExists("project_warning_rules")) {

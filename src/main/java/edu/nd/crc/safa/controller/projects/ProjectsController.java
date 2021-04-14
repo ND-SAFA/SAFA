@@ -96,11 +96,11 @@ public class ProjectsController {
   //   return projectService.getGenerateLinksErrorLog(projId);
   // }
 
-  // @GetMapping("/projects/{projId}/linktypes/")
-  // public String getLinkTypes(@PathVariable String projId) {
-  //   System.out.println("/projects/{projId}/linktypes/");
-  //   return projectService.getLinkTypes(projId);
-  // }
+  @GetMapping("/projects/{projId}/linktypes/")
+  public String getLinkTypes(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/linktypes/");
+    return projectService.getLinkTypes(projId);
+  }
 
   @GetMapping("/projects/{projId}/remove/")
   public String clearGeneratedFlatfiles(@PathVariable String projId) {

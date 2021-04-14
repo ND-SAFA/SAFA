@@ -91,22 +91,6 @@ public class ProjectService {
               .id(String.valueOf(3))
               .name("update"));
 
-          // String data = "{\"complete\": false}";     
-          // try {
-          //   mPuller.parseFlatfiles();
-          //   System.out.println("Completed ParseFlatfiles without exceptions");
-          // } catch (MissingFileException e) {
-          //   System.out.println("MissingFileException");
-          //   data = String.format("{\"complete\": true, \"file\": %s}", e.getMessage());
-          // } catch (Exception e) {
-          //   System.out.println("Regular Exception");
-          //   data = String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
-          // }
-          // emitter.send(SseEmitter.event()
-          //     .data(data)
-          //     .id(String.valueOf(3))
-          //     .name("update"));
-
           mPuller.Execute();
           emitter.send(SseEmitter.event()
             .data("{\"complete\": true}")
@@ -134,16 +118,6 @@ public class ProjectService {
     try {
       return generateFlatfile.getLinkTypes();
     } catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-  
-  public String clearGeneratedFilesDir(String projId) {
-    try {
-      String dir = "/generatedFilesDir";
-      return uploadFlatfile.deleteDirectory(dir, "Generated Links");
-    }
-    catch(Exception e) {
       return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
     }
   }

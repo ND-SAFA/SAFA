@@ -1054,17 +1054,18 @@ public class MySQL {
             String linkTable = rsSource.getString(1);
 
             try(Statement sLink = conn.createStatement()){
-                ResultSet rs = sLink.executeQuery(String.format("SELECT source, target, score, approval FROM %s", linkTable));
+                ResultSet rs = sLink.executeQuery(String.format("SELECT source, target, score, approval FROM %s ORDER BY score DESC", linkTable));
                 while (rs.next()) {
                     Map<String, Object> link = new HashMap<String, Object>();
                     link.put("source", rs.getString(1));
                     link.put("target", rs.getString(2));
-                    link.put("score", rs.getInt(3));
+                    link.put("score", rs.getDouble(3));
                     link.put("approval", rs.getString(4));
                     result.add(link);
                 }
             }
         }
+
         return result;
     }
     

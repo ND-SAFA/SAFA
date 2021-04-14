@@ -545,4 +545,27 @@ public class ProjectService {
       System.out.println(e.toString());
     }
   }
+
+  // Links
+  @Transactional(readOnly = true)
+  public Map<String, String> getLink(String projectId, String source, String target) {
+    Map<String, String> result = new HashMap<String, String>();
+    try {
+      result.put("approval", sql.getLinkApproval(projectId, source, target).toString());
+    }catch(Exception e) {
+      System.out.println(e.toString());
+    }
+    return result;
+  }
+
+  public Map<String, String> updateLink(String projectId, String source, String target, Integer approval) {
+    Map<String, String> result = new HashMap<String, String>();
+    try {
+      result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
+    }catch(Exception e) {
+      result.put("success", "false");
+      result.put("message", e.toString());
+    }
+    return result;
+  }
 }

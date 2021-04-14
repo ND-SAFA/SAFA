@@ -136,6 +136,7 @@ public class ProjectsController {
     }
   }
   
+  // Warnings
   @GetMapping("/projects/{projId}/warnings/")
   public Map<String,String> getWarnings(@PathVariable String projId) {
     return projectService.getWarnings(projId);
@@ -144,5 +145,16 @@ public class ProjectsController {
   @PostMapping("/projects/{projId}/warnings/")
   public void newWarning(@PathVariable String projId, @RequestParam("name") String name, @RequestParam("rule") String rule) {
     projectService.newWarning(projId, name, rule);
+  }
+
+  // Links
+  @GetMapping("/projects/{projId}/link/")
+  public Map<String, String> getLink(@PathVariable String projId, @RequestParam("source") String source, @RequestParam("target") String target) {
+    return projectService.getLink(projId, source, target);
+  }
+
+  @PostMapping("/projects/{projId}/link/")
+  public Map<String, String> updateLink(@PathVariable String projId, @RequestParam("source") String source, @RequestParam("target") String target, @RequestParam("approval") Integer approval) {
+    return projectService.updateLink(projId, source, target, approval);
   }
 }

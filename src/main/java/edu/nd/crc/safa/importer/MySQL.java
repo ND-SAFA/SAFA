@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.stdDSA;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -919,6 +920,7 @@ public class MySQL {
         }
     }
 
+    // Warnings
     public void createWarningsTable() throws Exception {
         try (Statement stmt = getConnection().createStatement()) {
             if (!tableExists("project_warning_rules")) {
@@ -965,6 +967,66 @@ public class MySQL {
         conn.close();
     }
     
+    // Links
+    public Integer getLinkApproval(String project, String source, String target) throws Exception {
+        Integer result = Integer.valueOf(-1);
+        try(Connection conn = getConnection()){
+            List<String> tables = new ArrayList<String>();
+            try(Statement s = conn.createStatement()){
+                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
+                while (rs.next()) {
+                    tables.add(rs.getString(1));
+                }
+            }
+
+            boolean found = false;
+            for( String table : tables ){
+                PreparedStatement p = conn.prepareStatement(String.format("SELECT approval FROM %s WHERE source = ? AND target = ?", table));
+                p.setString(1, source);
+                p.setString(2, target);
+
+                ResultSet rs = p.executeQuery();
+                if( rs.first() ){
+                    if(found){
+                        throw new Exception(String.format("multiple generated links found between %s and %s", source, target));
+                    }
+                    found = true;
+                    result = rs.getInt(1);
+                }
+            }
+            if(!found){
+                throw new Exception(String.format("generated link not found"));
+            }
+        }
+        return result;
+    }
+
+    public boolean updateLink(String project, String source, String target, Integer value) throws Exception {
+        if(value < 0 || value > 2){
+            throw new Exception(String.format("Invalid link approval value"));
+        }
+
+        boolean succeeded = false;
+        try(Connection conn = getConnection()){
+            List<String> tables = new ArrayList<String>();
+            try(Statement s = conn.createStatement()){
+                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
+                while (rs.next()) {
+                    tables.add(rs.getString(1));
+                }
+            }
+
+            for( String table : tables ){
+                System.out.println(String.format("%s %s %s %d", table, source, target, value));
+                PreparedStatement s = conn.prepareStatement(String.format("UPDATE %s SET approval = ? WHERE source = ? AND target = ?", table));
+                s.setInt(1, value);
+                s.setString(2, source);
+                s.setString(3, target);
+                succeeded |= (s.executeUpdate() > 0);
+            }
+        }
+        return succeeded;
+    }
     
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);

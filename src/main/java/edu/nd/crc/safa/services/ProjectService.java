@@ -7,17 +7,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-// import java.util.Base64;
-// import java.io.File;
-// import java.io.FileNotFoundException; 
-// import java.nio.file.Files;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
@@ -26,15 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.importer.UploadFlatfile;
+import edu.nd.crc.safa.warnings.Rule;
+import edu.nd.crc.safa.warnings.TreeVerifier;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
-// import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
-
-import edu.nd.crc.safa.dao.Layout;
-import edu.nd.crc.safa.dao.Position;
 
 @Service
 public class ProjectService {

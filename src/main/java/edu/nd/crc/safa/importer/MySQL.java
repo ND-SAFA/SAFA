@@ -2,9 +2,13 @@ package edu.nd.crc.safa.importer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import org.springframework.stereotype.Component;
+
+import edu.nd.crc.safa.warnings.Rule;
+
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
@@ -921,6 +925,53 @@ public class MySQL {
         }
     }
 
+    public static void createWarningsTable() throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            if (!tableExists("project_warning_rules")) {
+                String sqlCreateErrorTable = "CREATE TABLE project_warning_rules (\n" +
+                    "db_id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "projectId VARCHAR(1024),\n" + 
+                    "name VARCHAR(1024) NOT NULL,\n" + 
+                    "rule VARCHAR(1024) NOT NULL);";
+                stmt.executeUpdate(sqlCreateErrorTable);
+            }
+        }
+    }
+
+    public static List<Rule> getWarnings(String project) throws Exception {
+        List<Rule> result = new ArrayList<Rule>();
+
+        createWarningsTable();
+        Connection conn = startDB();
+
+        PreparedStatement preparedStmt = conn.prepareStatement("SELECT name, rule FROM project_warning_rules WHERE projectId = ?");
+        preparedStmt.setString (1, project);
+
+        ResultSet rs = preparedStmt.executeQuery();
+        while (rs.next()) {
+            System.out.println(rs.toString());
+            String name = rs.getString(1);
+            String rule = rs.getString(2);
+            result.add(new Rule(name, rule));
+        }
+        conn.close();
+
+        return result;
+    }
+
+    public static void newWarning(String project, String name, String rule) throws Exception {
+        createWarningsTable();
+        
+        Connection conn = startDB();
+        PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, name, rule) VALUES (?, ?, ?);");
+        preparedStmt.setString (1, project);
+        preparedStmt.setString (2, name);
+        preparedStmt.setString (3, rule);
+        System.out.println(preparedStmt.execute());
+        conn.close();
+    }
+    
+    
         // sql = "SELECT * FROM TEST";
         // ResultSet rs = stmt.executeQuery(sql);
         // List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();

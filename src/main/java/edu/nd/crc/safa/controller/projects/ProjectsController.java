@@ -157,4 +157,15 @@ public class ProjectsController {
   public Map<String, String> updateLink(@PathVariable String projId, @RequestParam("source") String source, @RequestParam("target") String target, @RequestParam("approval") Integer approval) {
     return projectService.updateLink(projId, source, target, approval);
   }
+
+  // Artifacts
+  @GetMapping("/projects/{projId}/artifact/")
+  public Map<String, Object> getArtifacts(@PathVariable String projId) {
+    return projectService.getArtifacts(projId);
+  }
+
+  @GetMapping("/projects/{projId}/artifact/{source}/links")
+  public Map<String, Object> getArtifactLinks(@PathVariable String projId, @PathVariable String source, @RequestParam("target") String target) {
+    return projectService.getArtifactLinks(projId, source, target);
+  }
 }

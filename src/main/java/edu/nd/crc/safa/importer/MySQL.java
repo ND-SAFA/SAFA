@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import edu.nd.crc.safa.warnings.Rule;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -1017,7 +1018,6 @@ public class MySQL {
             }
 
             for( String table : tables ){
-                System.out.println(String.format("%s %s %s %d", table, source, target, value));
                 PreparedStatement s = conn.prepareStatement(String.format("UPDATE %s SET approval = ? WHERE source = ? AND target = ?", table));
                 s.setInt(1, value);
                 s.setString(2, source);
@@ -1026,6 +1026,46 @@ public class MySQL {
             }
         }
         return succeeded;
+    }
+
+    // Artifacts
+    public List<String> getArtifacts(String project) throws Exception{
+        List<String> result = new ArrayList<String>();
+        try(Statement s = getConnection().createStatement()){
+            ResultSet rs = s.executeQuery("SELECT artifact FROM tim_artifact");
+            while (rs.next()) {
+                result.add(rs.getString(1));
+            }
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getArtifactLinks(String project, String source, String target) throws Exception{
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        try(Connection conn = getConnection()){
+            PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE source_artifact = ? AND target_artifact = ? AND is_generated = 1");
+            s.setString(1, source);
+            s.setString(2, target);
+
+            ResultSet rsSource = s.executeQuery();
+            if( !rsSource.first() ){
+                throw new Exception(String.format("generated links table not found between %s and %s", source, target));
+            }
+            String linkTable = rsSource.getString(1);
+
+            try(Statement sLink = conn.createStatement()){
+                ResultSet rs = sLink.executeQuery(String.format("SELECT source, target, score, approval FROM %s", linkTable));
+                while (rs.next()) {
+                    Map<String, Object> link = new HashMap<String, Object>();
+                    link.put("source", rs.getString(1));
+                    link.put("target", rs.getString(2));
+                    link.put("score", rs.getInt(3));
+                    link.put("approval", rs.getString(4));
+                    result.add(link);
+                }
+            }
+        }
+        return result;
     }
     
         // sql = "SELECT * FROM TEST";

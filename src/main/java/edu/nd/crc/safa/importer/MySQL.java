@@ -37,6 +37,7 @@ public class MySQL {
         }
 
         System.out.println("CONNECTED TO THE DATABASE.");
+
         return conn;
     }
 
@@ -893,4 +894,56 @@ public class MySQL {
             return data;
         }
     }
+    public static void SaveLayout(String hash, String b64EncodedLayout) throws Exception {
+        Boolean exists = tableExists("saved_layouts");
+        
+        try (Statement stmt = startDB().createStatement()) {
+            if (!exists) {
+                String sqlCreateTable = String.format("CREATE TABLE saved_layouts (\n") +
+                "hash VARCHAR(255) PRIMARY KEY,\n" + 
+                "b64e_layout BLOB NOT NULL\n" +
+                ");";
+                stmt.executeUpdate(sqlCreateTable);
+            }
+            
+            String sqlUpsertLayout = String.format("INSERT INTO saved_layouts (hash, b64e_layout) VALUES ('%s', '%s')\n", hash, b64EncodedLayout) +
+                                     String.format("ON DUPLICATE KEY UPDATE b64e_layout='%s';", b64EncodedLayout);
+            stmt.executeUpdate(sqlUpsertLayout);
+        }
+    }
+
+    public static String FetchLayout(String hash) throws Exception {
+        try (Statement stmt = startDB().createStatement()) {
+            String sqlQueryLayout = String.format("SELECT b64e_layout FROM saved_layouts WHERE hash='%s';", hash);
+            ResultSet rs = stmt.executeQuery(sqlQueryLayout);
+            rs.first();
+            return rs.getString("b64e_layout");
+        }
+    }
+
+        // sql = "SELECT * FROM TEST";
+        // ResultSet rs = stmt.executeQuery(sql);
+        // List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+        
+        // ArrayList<Object> header = new ArrayList<Object>();
+        // header.add("\"SOURCE\"");
+        // header.add("\"TARGET\"");
+        // header.add("\"SCORE\"");
+        // header.add("\"APPROVAL\"");
+        // result.add(header);
+
+        // while (rs.next()) {
+        //     ArrayList<Object> row = new ArrayList<Object>();
+        //     row.add(String.format("\"%s\"",rs.getString(1)));
+        //     row.add(String.format("\"%s\"",rs.getString(2)));
+        //     row.add(rs.getFloat(3));
+        //     row.add(rs.getInt(4));
+        //     result.add(row);
+        // }
+
+        // byte[] content = result.toString().getBytes();
+        // String returnStr = Base64.getEncoder().encodeToString(content);
+        
+        // conn.close();
+        // return returnStr;
 }

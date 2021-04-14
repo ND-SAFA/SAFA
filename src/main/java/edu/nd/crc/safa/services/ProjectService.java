@@ -33,6 +33,9 @@ import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 // import edu.nd.crc.safa.importer.Flatfile.MissingFileException;
 
+import edu.nd.crc.safa.dao.Layout;
+import edu.nd.crc.safa.dao.Position;
+
 @Service
 public class ProjectService {
 
@@ -299,6 +302,19 @@ public class ProjectService {
         //
       }
       return ret;
+  }
+
+  @Transactional(readOnly = true)
+  public String getTreeLayout(String projId, String hash) throws Exception {
+    // TODO(Adam): Do something with the projId?
+    String b64EncodedLayout = MySQL.FetchLayout(hash);
+    return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
+  }
+
+  public String postTreeLayout(String projId, String hash, String b64EncodedLayout) throws Exception {
+    // TODO(Adam): Do something with the projId?
+    MySQL.SaveLayout(hash, b64EncodedLayout);
+    return "{\"success\": true, \"message\": \"Layout saved\"}";
   }
 
   // MARKED AS DEPRECATED

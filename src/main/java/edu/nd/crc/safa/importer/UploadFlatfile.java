@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UploadFlatfile {
+  public static class TimBackend {
+    public List<List<String>> artifacts = new ArrayList<List<String>>();
+    public List<List<String>> traces = new ArrayList<List<String>>();
+  }
+
   public String uploadFiles(String projId, String jsonfiles) throws Exception {
     String path = "/uploadedFlatfiles";
     createDirectory(path);
@@ -69,7 +74,7 @@ public class UploadFlatfile {
           }
 
           String artifactTableName = fileName.replaceAll("(?i)\\.csv","").toLowerCase();
-          MySQL.createTimArtifactsTable(artifactName, artifactTableName);
+          MySQL.createTimArtifactsTable(artifactName, artifactTableName, fileName);
         }
       }
       else {
@@ -183,11 +188,11 @@ public class UploadFlatfile {
 
     if (generated) {
       String traceMatrixTableName = tracename.toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
     }
     else {
       String traceMatrixTableName = filename.replaceAll("(?i)\\.csv","").toLowerCase();
-      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated);
+      MySQL.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
     }
   }
 
@@ -228,5 +233,44 @@ public class UploadFlatfile {
       }
     }
     return dir.delete();
+  }
+
+  public TimBackend getTimFile() throws Exception {
+    TimBackend timBackend = new TimBackend();
+
+    List<List<String>> artifact_rows = MySQL.getTimArtifactData();
+    for (List<String> artifact_row : artifact_rows) {
+      List<String> artifacts = new ArrayList<String>();
+      
+      String artifact  = String.format("\"%s\"",artifact_row.get(0));
+      String filename  = String.format("\"%s\"",artifact_row.get(2));
+
+      artifacts.add(artifact);
+      artifacts.add(filename);
+      timBackend.artifacts.add(artifacts);
+    }
+
+    List<List<String>> trace_rows = MySQL.getTimTraceData();
+    for (List<String> trace_row : trace_rows) {
+      List<String> traces = new ArrayList<String>();
+      
+      String trace  = String.format("\"%s\"",trace_row.get(0));
+      String source  = String.format("\"%s\"",trace_row.get(1));
+      String target  = String.format("\"%s\"",trace_row.get(2));
+      String filename  = String.format("\"%s\"",trace_row.get(5));
+
+      if (trace_rows.get(3).equals('1')) {
+        filename  = String.format("\"generateLinks\"");
+      }
+
+      traces.add(trace);
+      traces.add(source);
+      traces.add(target);
+      traces.add(filename);
+
+      timBackend.traces.add(traces);
+    }
+
+    return timBackend;
   }
 }

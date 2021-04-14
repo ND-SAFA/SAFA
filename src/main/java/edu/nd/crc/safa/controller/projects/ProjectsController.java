@@ -72,10 +72,16 @@ public class ProjectsController {
     return projectService.uploadFile(projId, encodedStr);
   }
 
-  @GetMapping("/projects/{projId}/errorlog/")
+  @GetMapping("/projects/{projId}/uploaderrorlog/")
   public String getUploadFilesErrorLog(@PathVariable String projId) {
-    System.out.println("/projects/{projId}/errorlog/");
+    System.out.println("/projects/{projId}/uploaderrorlog/");
     return projectService.getUploadFilesErrorLog(projId);
+  }
+
+  @GetMapping("/projects/{projId}/linkerrorlog/")
+  public String getLinkErrorLog(@PathVariable String projId) {
+    System.out.println("/projects/{projId}/errorlog/");
+    return projectService.getLinkErrorLog(projId);
   }
 
   @GetMapping("/projects/{projId}/generate/")

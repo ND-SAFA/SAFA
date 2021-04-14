@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Base64;
-import java.io.File;
-import java.io.FileNotFoundException; 
-import java.nio.file.Files;
+// import java.util.Base64;
+// import java.io.File;
+// import java.io.FileNotFoundException; 
+// import java.nio.file.Files;
 import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.Driver;
@@ -142,6 +142,16 @@ public class ProjectService {
   public String getUploadFilesErrorLog(String projId) {
     try {
       String errorStr = MySQL.getUploadErrorLog();
+
+      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
+    } catch (Exception e) {
+      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    }
+  }
+
+  public String getLinkErrorLog(String projId) {
+    try {
+      String errorStr = MySQL.getLinkErrors();
 
       return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
     } catch (Exception e) {

@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import edu.nd.crc.safa.services.ProjectService;
-import edu.nd.crc.safa.dao.Layout;
+import edu.nd.crc.safa.dao.Links;
 
 @RestController
 public class ProjectsController {
@@ -154,8 +154,9 @@ public class ProjectsController {
   }
 
   @PostMapping("/projects/{projId}/link/")
-  public Map<String, String> updateLink(@PathVariable String projId, @RequestParam("source") String source, @RequestParam("target") String target, @RequestParam("approval") Integer approval) {
-    return projectService.updateLink(projId, source, target, approval);
+  // public Map<String, String> updateLink(@PathVariable String projId, @RequestParam("source") String source, @RequestParam("target") String target, @RequestParam("approval") Integer approval) {
+  public Map<String, String> updateLink(@PathVariable String projId, @RequestBody Links links) {
+    return projectService.updateLink(projId, links);
   }
 
   // Artifacts

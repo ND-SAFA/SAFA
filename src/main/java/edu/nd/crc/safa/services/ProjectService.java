@@ -27,6 +27,7 @@ import edu.nd.crc.safa.importer.UploadFlatfile;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
+import edu.nd.crc.safa.dao.Links;
 
 @Service
 public class ProjectService {
@@ -558,10 +559,12 @@ public class ProjectService {
     return result;
   }
 
-  public Map<String, String> updateLink(String projectId, String source, String target, Integer approval) {
+  // public Map<String, String> updateLink(String projectId, String source, String target, Integer approval) {
+  public Map<String, String> updateLink(String projectId, Links links) {
     Map<String, String> result = new HashMap<String, String>();
     try {
-      result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
+      result.put("success", String.format("%b", sql.updateLink(projectId, links)));
+      // result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
     }catch(Exception e) {
       result.put("success", "false");
       result.put("message", e.toString());

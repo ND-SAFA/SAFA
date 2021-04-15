@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.nd.crc.safa.warnings.Rule;
+import edu.nd.crc.safa.dao.Links;
 
 import java.util.List;
 import java.util.Map;
@@ -1002,29 +1003,39 @@ public class MySQL {
         return result;
     }
 
-    public boolean updateLink(String project, String source, String target, Integer value) throws Exception {
-        if(value < 0 || value > 2){
-            throw new Exception(String.format("Invalid link approval value"));
-        }
-
+    // public boolean updateLink(String project, String source, String target, Integer value) throws Exception {
+    public boolean updateLink(String project, Links links) throws Exception {
         boolean succeeded = false;
-        try(Connection conn = getConnection()){
+
+        try(Connection conn = getConnection()) {
             List<String> tables = new ArrayList<String>();
-            try(Statement s = conn.createStatement()){
+
+            try(Statement s = conn.createStatement()) {
                 ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
                 while (rs.next()) {
                     tables.add(rs.getString(1));
                 }
             }
 
-            for( String table : tables ){
-                PreparedStatement s = conn.prepareStatement(String.format("UPDATE %s SET approval = ? WHERE source = ? AND target = ?", table));
-                s.setInt(1, value);
-                s.setString(2, source);
-                s.setString(3, target);
-                succeeded |= (s.executeUpdate() > 0);
+
+            for (int i = 0; i < links.links.size(); i++) {
+                Links.Link link = links.links.get(i);
+                System.out.println(link.source);
+                if(link.approval < 0 || link.approval > 2) {
+                    throw new Exception(String.format("Invalid link approval value"));
+                }
+                
+                for( String table : tables ) {
+                    System.out.println(table);
+                    PreparedStatement s = conn.prepareStatement(String.format("UPDATE %s SET approval = ? WHERE source = ? AND target = ?", table));
+                    s.setInt(1, link.approval);
+                    s.setString(2, link.source);
+                    s.setString(3, link.target);
+                    succeeded |= (s.executeUpdate() > 0);
+                }
             }
         }
+
         return succeeded;
     }
 
@@ -1052,9 +1063,13 @@ public class MySQL {
                 throw new Exception(String.format("generated links table not found between %s and %s", source, target));
             }
             String linkTable = rsSource.getString(1);
+            String sqlString = "SELECT source, target, score, approval, %s.summary AS source_summary, %s.summary AS target_summary FROM %s LEFT JOIN %s ON %s.id=source LEFT JOIN %s ON %s.id=target WHERE score >= ? ORDER BY score DESC";
+            source = source.toLowerCase();
+            target = target.toLowerCase();
+            sqlString = String.format(sqlString, source, target, linkTable, source, source, target, target);
 
             try(Statement sLink = conn.createStatement()){
-                PreparedStatement sLinks = conn.prepareStatement(String.format("SELECT source, target, score, approval FROM %s WHERE SCORE >= ? ORDER BY score DESC", linkTable));
+                PreparedStatement sLinks = conn.prepareStatement(sqlString);
                 sLinks.setDouble(1, minScore);
 
                 ResultSet rs = sLinks.executeQuery();
@@ -1064,6 +1079,8 @@ public class MySQL {
                     link.put("target", rs.getString(2));
                     link.put("score", rs.getDouble(3));
                     link.put("approval", rs.getString(4));
+                    link.put("source_summary", rs.getString(5));
+                    link.put("target_summary", rs.getString(6));
                     result.add(link);
                 }
             }

@@ -929,7 +929,8 @@ public class MySQL {
                 String sqlCreateErrorTable = "CREATE TABLE project_warning_rules (\n" +
                     "db_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "projectId VARCHAR(1024),\n" + 
-                    "name VARCHAR(1024) NOT NULL,\n" + 
+                    "nShort VARCHAR(1024) NOT NULL,\n" + 
+                    "nLong VARCHAR(1024) NOT NULL,\n" + 
                     "rule VARCHAR(1024) NOT NULL);";
                 stmt.executeUpdate(sqlCreateErrorTable);
             }
@@ -942,29 +943,31 @@ public class MySQL {
         createWarningsTable();
         Connection conn = getConnection();
 
-        PreparedStatement preparedStmt = conn.prepareStatement("SELECT name, rule FROM project_warning_rules WHERE projectId = ?");
+        PreparedStatement preparedStmt = conn.prepareStatement("SELECT nShort, nLong, rule FROM project_warning_rules WHERE projectId = ?");
         preparedStmt.setString (1, project);
 
         ResultSet rs = preparedStmt.executeQuery();
         while (rs.next()) {
             System.out.println(rs.toString());
-            String name = rs.getString(1);
-            String rule = rs.getString(2);
-            result.add(new Rule(name, rule));
+            String nShort = rs.getString(1);
+            String nLong = rs.getString(2);
+            String rule = rs.getString(3);
+            result.add(new Rule(nShort, nLong, rule));
         }
         conn.close();
 
         return result;
     }
 
-    public void newWarning(String project, String name, String rule) throws Exception {
+    public void newWarning(String project, String nShort, String nLong, String rule) throws Exception {
         createWarningsTable();
         
         Connection conn = getConnection();
-        PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, name, rule) VALUES (?, ?, ?);");
+        PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, nShort, nLong, rule) VALUES (?, ?, ?, ?);");
         preparedStmt.setString (1, project);
-        preparedStmt.setString (2, name);
-        preparedStmt.setString (3, rule);
+        preparedStmt.setString (2, nShort);
+        preparedStmt.setString (3, nLong);
+        preparedStmt.setString (4, rule);
         System.out.println(preparedStmt.execute());
         conn.close();
     }

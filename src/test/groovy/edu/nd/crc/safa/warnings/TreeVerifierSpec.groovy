@@ -11,7 +11,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule, rule)
+    verifier.addRule(rule, rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Package")
     edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))
@@ -23,7 +23,7 @@ class TreeVerifierSpec extends Specification {
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals(rule)
+    warnings.get("UAV-0001").get(0).Short.equals(rule)
   }
 
   def "a graph with a hazard that has no requirements should fail a rule that states it must have at least one sibling node with one"(){
@@ -34,7 +34,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule, rule)
+    verifier.addRule(rule, rule, rule)
     nodes.put("UAV-0001", "Package")
     nodes.put("UAV-0002", "Hazard")
     nodes.put("UAV-0003", "Package")
@@ -48,7 +48,7 @@ class TreeVerifierSpec extends Specification {
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0002").size() == 1
-    warnings.get("UAV-0002").get(0).equals(rule)
+    warnings.get("UAV-0002").get(0).Short.equals(rule)
   }
 
   def "a graph with a hazard that has multiple requirements should fail a rule that states it must have exactly one"(){
@@ -59,7 +59,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule, rule)
+    verifier.addRule(rule, rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Requirement")
     nodes.put("UAV-0003", "Requirement")
@@ -73,7 +73,7 @@ class TreeVerifierSpec extends Specification {
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals(rule)
+    warnings.get("UAV-0001").get(0).Short.equals(rule)
   }
 
   def "a graph with a hazard that has multiple requirements should fail a rule that states it must have less than two"(){
@@ -84,7 +84,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule, rule)
+    verifier.addRule(rule, rule, rule)
     nodes.put("UAV-0001", "Hazard")
     nodes.put("UAV-0002", "Requirement")
     nodes.put("UAV-0003", "Requirement")
@@ -98,7 +98,7 @@ class TreeVerifierSpec extends Specification {
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals(rule)
+    warnings.get("UAV-0001").get(0).Short.equals(rule)
   }
 
   // Compount Rules
@@ -110,7 +110,7 @@ class TreeVerifierSpec extends Specification {
     def edges = new ArrayList<TreeVerifier.Edge>()
 
     when:
-    verifier.addRule(rule, rule)
+    verifier.addRule(rule, rule, rule)
     nodes.put("UAV-0001", "Requirement")
     nodes.put("UAV-0002", "Hazard")
     edges.add(new TreeVerifier.Edge(verifier, "UAV-0001", "UAV-0002", "REQUIRES"))
@@ -122,6 +122,6 @@ class TreeVerifierSpec extends Specification {
     def warnings = verifier.verify(nodes, edges);
     warnings.size() == 1
     warnings.get("UAV-0001").size() == 1
-    warnings.get("UAV-0001").get(0).equals(rule)
+    warnings.get("UAV-0001").get(0).Short.equals(rule)
   }
 }

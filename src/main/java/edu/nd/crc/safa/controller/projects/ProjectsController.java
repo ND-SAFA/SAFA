@@ -148,8 +148,8 @@ public class ProjectsController {
   }
 
   @PostMapping("/projects/{projId}/warnings/")
-  public void newWarning(@PathVariable String projId, @RequestParam("name") String name, @RequestParam("rule") String rule) {
-    projectService.newWarning(projId, name, rule);
+  public void newWarning(@PathVariable String projId, @RequestParam("short") String nShort, @RequestParam("long") String nLong, @RequestParam("rule") String rule) {
+    projectService.newWarning(projId, nShort, nLong, rule);
   }
 
   // Links

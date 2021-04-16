@@ -6,6 +6,21 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class Rule {
+    public class Name {
+        public String Short;
+        public String Long;
+
+        public Name(){
+            Short = "";
+            Long = "";
+        }
+
+        public Name(String s, String l){
+            Short = s;
+            Long = l;
+        }
+    }
+
     public enum Requirement {
         ATLEAST, EXACTLY, LESSTHAN,
     }
@@ -30,12 +45,12 @@ public class Rule {
         "less-than-n"
     );
 
-    String mName;
+    private Name mName;
     String mText;
     public List<Tokenizer.Token> mTokens;
 
     public Rule(){
-        mName = "";
+        mName = new Name();
         mText = "";
         mTokens = new ArrayList<>();
     }
@@ -46,13 +61,13 @@ public class Rule {
         mTokens = new ArrayList<>(that.mTokens);
     }
 
-    public Rule(final String name, final String rule){
-        mName = name;
+    public Rule(final String name, final String longname, final String rule){
+        mName = new Name(name, longname);
         mText = rule;
         mTokens = Tokenizer.lex(mText);
     }
 
-    public String toString() {
+    public Name GetName() {
         return mName;
     }
 

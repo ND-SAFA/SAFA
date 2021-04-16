@@ -22,8 +22,8 @@ public class TreeVerifier {
     
     List<Rule> mRules = new ArrayList<>();
 
-    public boolean addRule(final String name, final String rule) throws Exception{
-        mRules.add(new Rule(name, rule));
+    public boolean addRule(final String name, final String longname, final String rule) throws Exception{
+        mRules.add(new Rule(name, longname, rule));
         return true;
     }
 
@@ -54,7 +54,7 @@ public class TreeVerifier {
         }
     }
 
-    public final Map<String, List<String>> verify(final List<org.neo4j.driver.v1.types.Node> nodes, final Map<Long, String> ids, final List<Map<String, Object>> values){
+    public final Map<String, List<Rule.Name>> verify(final List<org.neo4j.driver.v1.types.Node> nodes, final Map<Long, String> ids, final List<Map<String, Object>> values){
         Map<String,String> nodeList = new HashMap<>();
         for(int i = 0; i < nodes.size(); i++) {
             final org.neo4j.driver.v1.types.Node node = nodes.get(i);
@@ -87,11 +87,11 @@ public class TreeVerifier {
         return verify(nodeList, edgeList);
     }
 
-    public final Map<String, List<String>> verify(final Map<String,String> nodes, final List<Edge> edges){
-        Map<String, List<String>> results = new HashMap<>();
+    public final Map<String, List<Rule.Name>> verify(final Map<String,String> nodes, final List<Edge> edges){
+        Map<String, List<Rule.Name>> results = new HashMap<>();
 
         nodes.forEach((id, type) -> {
-            List<String> nodeWarnings = new ArrayList<String>();
+            List<Rule.Name> nodeWarnings = new ArrayList<Rule.Name>();
             for( int i = 0; i < mRules.size(); i++ ){
                 Rule r = new Rule(mRules.get(i));
                 while(true){   
@@ -110,7 +110,7 @@ public class TreeVerifier {
 
                 r.Reduce();
                 if( !r.Result() ){
-                    nodeWarnings.add(r.toString());
+                    nodeWarnings.add(r.GetName());
                 }
             }
             if( !nodeWarnings.isEmpty() ) {

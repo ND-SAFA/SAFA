@@ -16,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.output.JsonStream;
 
+import org.javatuples.Pair;
+import org.javatuples.Tuple;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
@@ -492,12 +494,12 @@ public class ProjectService {
 
     TreeVerifier verifier = new TreeVerifier();
     try{
-      verifier.addRule("At least one requirement child for hazards", "at-least-one(Hazard, child, Requirement)");
+      verifier.addRule("Missing child", "At least one requirement child for hazards", "at-least-one(Hazard, child, Requirement)");
       
-      verifier.addRule("At least one requirement, design or process child for requirements", "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
-      verifier.addRule("Requirements must not have package children", "exactly-n(0, Requirement, child, Package)");
+      verifier.addRule("Missing child", "At least one requirement, design or process child for requirements", "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
+      verifier.addRule("Missing child", "Requirements must not have package children", "exactly-n(0, Requirement, child, Package)");
 
-      verifier.addRule("At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
+      verifier.addRule("Missing child", "At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
 
       for( Rule r : sql.getWarnings(projectId)){
         verifier.addRule(r);
@@ -505,14 +507,14 @@ public class ProjectService {
     }catch( Exception e ){
       System.out.println(e.toString());
     }
-    Map<String, List<String>> results = verifier.verify(nodes, ids, values);
+    Map<String, List<Rule.Name>> results = verifier.verify(nodes, ids, values);
 
     // Warnings
     for(int i = 0; i < nodes.size(); i++) {
       final Node node = nodes.get(i);
       final String id = ids.get(node.id());
 
-      List<String> warnings = results.get(id);
+      List<Rule.Name> warnings = results.get(id);
 
       if( warnings != null && !warnings.isEmpty() ) {
         for( Map<String,Object> value : values ){
@@ -581,9 +583,9 @@ public class ProjectService {
     return result;
   }
 
-  public void newWarning(String projectId, String name, String rule) {
+  public void newWarning(String projectId, String nShort, String nLong, String rule) {
     try {
-      sql.newWarning(projectId, name, rule);
+      sql.newWarning(projectId, nShort, nLong, rule);
     }catch(Exception e) {
       System.out.println(e.toString());
     }

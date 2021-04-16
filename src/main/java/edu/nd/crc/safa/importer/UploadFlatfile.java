@@ -43,8 +43,6 @@ public class UploadFlatfile {
       }
     }
 
-    deleteDirectory(path);
-
     sql.traceArtifactCheck();
     MySQL.FileInfo fileInfo = sql.getFileInfo();
 

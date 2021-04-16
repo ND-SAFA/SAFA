@@ -66,6 +66,11 @@ public class ProjectsController {
     return projectService.clearUploadedFlatfiles(projId);
   }
 
+  @GetMapping("/projects/{projId}/upload/")
+  public Map<String, Object> getUploadedFile(@PathVariable String projId, @RequestParam String filename){
+    return projectService.getUploadedFile(projId, filename);
+  }
+
   @PostMapping("/projects/{projId}/upload/")
   public String uploadFile(@PathVariable String projId, @RequestBody String encodedStr) {
     System.out.println("/projects/{projId}/upload/");

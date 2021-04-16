@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.services;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,11 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
+
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.output.JsonStream;
 
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
@@ -128,6 +135,41 @@ public class ProjectService {
         return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
       }
     }
+  }
+
+  public static class RawJson {
+    private String payload;
+    
+    public RawJson(String payload) {
+      this.payload = payload;
+    }
+    
+    public static RawJson from(String payload) {
+      return new RawJson(payload);
+    }
+    
+    @JsonValue
+    @JsonRawValue
+    public String getPayload() {
+      return this.payload;
+    }
+  }
+
+  public Map<String, Object> getUploadedFile(String pID, String file){
+    Map<String, Object> result = new HashMap<>();
+    try{ 
+      String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
+      if(file.contains(".json")){
+        result.put("data", RawJson.from(data));
+      }else{
+        result.put("data", data);
+      }
+      result.put("success", true);
+    }catch(Exception e){
+      result.put("success", false);
+      result.put("message", e.toString());
+    }
+    return result;
   }
 
   public String getUploadFilesErrorLog(String projId) {

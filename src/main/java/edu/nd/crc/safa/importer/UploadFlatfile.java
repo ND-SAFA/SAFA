@@ -97,11 +97,11 @@ public class UploadFlatfile {
         for (String header : headers) {
           if (header.toLowerCase().equals("source")) {
             source = true;
-            cols.add("source_id");
+            cols.add("source");
           }
           else if (header.toLowerCase().equals("target")) {
             target = true;
-            cols.add("target_id");
+            cols.add("target");
           }
         }
 

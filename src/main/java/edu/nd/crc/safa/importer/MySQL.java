@@ -389,9 +389,11 @@ public class MySQL {
             System.out.println("CREATING INTERMEDIATE TRACE MATRIX TABLE");
             String sqlCreateTable = String.format("CREATE TABLE %s (\n", intTableName) +
                 "db_id INT AUTO_INCREMENT PRIMARY KEY,\n" + 
-                "source_id VARCHAR(255),\n" +
-                "target_id VARCHAR(255)" +
-            ");";
+                "source VARCHAR(255),\n" +
+                "target VARCHAR(255),\n" +
+                "score FLOAT NOT NULL DEFAULT 1,\n" + 
+                "approval INT NOT NULL DEFAULT 2\n" + 
+                ");";
             stmt.executeUpdate(sqlCreateTable);
             System.out.println("CREATED INTERMEDIATE TRACE MATRIX TABLE");
         }
@@ -407,8 +409,8 @@ public class MySQL {
         System.out.println(String.format("LOADED FILE: %s INTO INTERMEDIATE TRACE MATRIX TABLE.", filePath));
 
         String sqlTrim = String.format("UPDATE %s SET\n", intTableName) +
-            "source_id = TRIM(TRIM(BOTH '\r' from source_id)),\n" +
-            "target_id = TRIM(TRIM(BOTH '\r' from target_id));";
+            "source = TRIM(TRIM(BOTH '\r' from source)),\n" +
+            "target = TRIM(TRIM(BOTH '\r' from target));";
 
         stmt.executeUpdate(sqlTrim);
         System.out.println("TRIMMED columns for INTERMEDIATE TABLE");
@@ -418,10 +420,10 @@ public class MySQL {
         
         stmt.executeUpdate(sqlDeleteErrors);
 
-        String sqlInsertDups = "INSERT INTO trace_matrix_error (tablename, source_id, target_id, line, descr)\n" +
-            String.format("SELECT '%s', t1.source_id, t1.target_id, t1.db_id, 'DUPLICATE LINK: LINE SKIPPED.' FROM %s t1\n", tableName, intTableName) +
+        String sqlInsertDups = "INSERT INTO trace_matrix_error (tablename, source, target, line, descr)\n" +
+            String.format("SELECT '%s', t1.source, t1.target, t1.db_id, 'DUPLICATE LINK: LINE SKIPPED.' FROM %s t1\n", tableName, intTableName) +
             String.format("INNER JOIN %s t2\n", intTableName) +
-            "WHERE t1.db_id > t2.db_id AND t1.source_id = t2.source_id AND t1.target_id = t2.target_id;";
+            "WHERE t1.db_id > t2.db_id AND t1.source = t2.source AND t1.target = t2.target;";
         
         stmt.executeUpdate(sqlInsertDups);
         System.out.println("INSERTED Duplicates into TABLE trace_matrix_error\n");
@@ -442,8 +444,8 @@ public class MySQL {
                 String sqlCreateErrorTable = "CREATE TABLE trace_matrix_error (\n" +
                     "db_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "tablename VARCHAR(255),\n" + 
-                    "source_id VARCHAR(255),\n" + 
-                    "target_id VARCHAR(255),\n" +
+                    "source VARCHAR(255),\n" + 
+                    "target VARCHAR(255),\n" +
                     "line INT,\n" +
                     "descr VARCHAR(255) NOT NULL" +
                 ");";
@@ -459,18 +461,20 @@ public class MySQL {
             } else {
                 System.out.println(String.format("CREATING NEW TRACE MATRIX TABLE: %s...", tableName));
                 String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName) + 
-                    "source_id VARCHAR(255),\n" +
-                    "target_id VARCHAR(255),\n" +
-                    "PRIMARY KEY (source_id, target_id)" +
+                    "source VARCHAR(255),\n" +
+                    "target VARCHAR(255),\n" +
+                    "score FLOAT NOT NULL DEFAULT 1,\n" + 
+                    "approval INT NOT NULL DEFAULT 2,\n" + 
+                    "PRIMARY KEY (source, target)" +
                 ");";
 
                 stmt.executeUpdate(sqlCreateTable);
                 System.out.println("CREATED NEW TRACE MATRIX TABLE");
             }
 
-            String sqlUpdateTable = String.format("INSERT INTO %s (source_id, target_id)\n", tableName) +
-            String.format("SELECT source_id, target_id FROM %s\n", intTableName) +
-            String.format("ON DUPLICATE KEY UPDATE source_id = %s.source_id, target_id = %s.target_id;", tableName, tableName);
+            String sqlUpdateTable = String.format("INSERT INTO %s (source, target, score, approval)\n", tableName) +
+            String.format("SELECT source, target, score, approval FROM %s\n", intTableName) +
+            String.format("ON DUPLICATE KEY UPDATE source = %s.source, target = %s.target;", tableName, tableName);
 
             stmt.executeUpdate(sqlUpdateTable);
             System.out.println("INSERTED DATA from %s into TRACE MATRIX TABLE: %s.");
@@ -580,24 +584,24 @@ public class MySQL {
             String tracematrix = trace_row.get(0);
 
             String source_artifact = trace_row.get(1);
-            Set<String> source_ids = artifact_map.get(source_artifact);
+            Set<String> sources = artifact_map.get(source_artifact);
 
             String target_artifact = trace_row.get(2);
-            Set<String> target_ids = artifact_map.get(target_artifact);
+            Set<String> targets = artifact_map.get(target_artifact);
 
             String trace_tablename = trace_row.get(4);
 
-            if (source_ids == null && target_ids == null){
+            if (sources == null && targets == null){
                 errorText += String.format("ERROR: TRACE MATRIX: %s DESC: source artifact: %s and target artifact: %s does not exist in the database. Make sure these artifacts are part of your tim file.\n", tracematrix, source_artifact, target_artifact);
                 continue;
             }
 
-            if (source_ids == null){
+            if (sources == null){
                 errorText += String.format("ERROR: TRACE MATRIX: %s DESC: source artifact %s does not exist in the database. Make sure this artifact is part of your tim file.\n", tracematrix, source_artifact);
                 continue;
             } 
 
-            if (target_ids == null){
+            if (targets == null){
                 errorText += String.format("ERROR: TRACE MATRIX: %s DESC: target artifact %s does not exist in the database. Make sure this artifact is part of your tim file.\n", tracematrix, target_artifact);
                 continue;
             } 
@@ -610,12 +614,12 @@ public class MySQL {
                 String tid = row.get(1);
                 line_num++;
 
-                if (!source_ids.contains(sid)) {
+                if (!sources.contains(sid)) {
                     errorText += String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s does not contain ID: %s\n", tracematrix, line_num, source_artifact, sid);
 
                 }
 
-                if (!target_ids.contains(tid)) {
+                if (!targets.contains(tid)) {
                     errorText += String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s does not contain ID: %s\n", tracematrix, line_num, target_artifact, tid);
                 }                
             }
@@ -662,7 +666,7 @@ public class MySQL {
             traceHeader.add("\"DESC\"");
             result.add(traceHeader);
 
-            String sqlTraceError = "SELECT tablename, source_id, target_id, line, descr FROM trace_matrix_error";
+            String sqlTraceError = "SELECT tablename, source, target, line, descr FROM trace_matrix_error";
             ResultSet rsTraceError = stmt.executeQuery(sqlTraceError);
 
             while (rsTraceError.next()) {
@@ -812,7 +816,7 @@ public class MySQL {
         try (Statement stmt = getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
     
-            String sqlGetData = String.format("SELECT source_id, target_id FROM %s;", tablename);
+            String sqlGetData = String.format("SELECT source, target FROM %s;", tablename);
              
             ResultSet rs = stmt.executeQuery(sqlGetData);
             
@@ -978,7 +982,8 @@ public class MySQL {
         try(Connection conn = getConnection()){
             List<String> tables = new ArrayList<String>();
             try(Statement s = conn.createStatement()){
-                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
+                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables");
+                // ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
                 while (rs.next()) {
                     tables.add(rs.getString(1));
                 }
@@ -1014,7 +1019,8 @@ public class MySQL {
             List<String> tables = new ArrayList<String>();
 
             try(Statement s = conn.createStatement()) {
-                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
+                ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables");
+                // ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables WHERE is_generated=1");
                 while (rs.next()) {
                     tables.add(rs.getString(1));
                 }
@@ -1057,7 +1063,8 @@ public class MySQL {
     public List<Map<String, Object>> getArtifactLinks(String project, String source, String target, Double minScore) throws Exception{
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         try(Connection conn = getConnection()){
-            PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE source_artifact = ? AND target_artifact = ? AND is_generated = 1");
+            // PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE source_artifact = ? AND target_artifact = ? AND is_generated = 1");
+            PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE source_artifact = ? AND target_artifact = ?");
             s.setString(1, source);
             s.setString(2, target);
 

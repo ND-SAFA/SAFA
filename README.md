@@ -105,15 +105,19 @@ Backend change should appear on electron. If not click on Project->Synchronize F
 ## Neo4j Username and Password for Logging into Neo4j Browser Interface
 Username: neo4j \
 Password: secret \
-Helpful command to delete all Neo4j data: (ONLY USE ON LOCAL NEO4J INSTANCE) \
+Helpful command to delete all Neo4j data: (ONLY USE ON LOCAL NEO4J INSTANCE)
 ```MATCH (n)
 DETACH DELETE n
 ```
 
 ## MySQL Command Line Login:
-```docker exec -it mysql-db mysql -uroot -p``` \
-Password: secret2 \
-```use safa-db```
+```
+docker exec -it mysql-db mysql -uroot -p
+```
+Enter password: secret2 \
+```
+use safa-db
+```
 
 ## Backend Flatfile Workflow
 https://docs.google.com/document/d/1z2j8eH8UfnCP5d9z2G-0B6a83mtnvlAS_0aclvhZBLs/edit?usp=sharing

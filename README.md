@@ -114,7 +114,7 @@ DETACH DELETE n
 ```
 docker exec -it mysql-db mysql -uroot -p
 ```
-Enter password: secret2 \
+Enter password: secret2
 ```
 use safa-db
 ```

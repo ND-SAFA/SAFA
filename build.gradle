@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.6.RELEASE")
+        classpath('com.netflix.nebula:gradle-lint-plugin:latest.release')
     }
 }
 
@@ -13,41 +14,80 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'nebula.lint'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
 
 bootJar {
     baseName = 'edu.nd.crc.safa'
-    version =  '0.1.0'
+    version = '0.1.0'
 }
 
 repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 dependencies {
     // mandatory dependencies for using Spock
     compile "org.codehaus.groovy:groovy-all:2.5.7"
     testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
 
-    compile("io.github.lukehutch:fast-classpath-scanner:3.1.13")
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-data-rest")
     compile("org.neo4j.driver:neo4j-java-driver:1.7.5")
-    compile("mysql:mysql-connector-java:6.0.6")
 
-    compile('commons-cli:commons-cli:1.4')
     compile('com.jsoniter:jsoniter:0.9.23')
     compile('org.javatuples:javatuples:1.2')
     compile('org.eclipse.jgit:org.eclipse.jgit:5.5.1.201910021850-r')
 
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.1.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot:2.1.6.RELEASE'
+    implementation 'org.springframework:spring-beans:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-context:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-tx:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-web:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-webmvc:5.1.8.RELEASE'
+    testImplementation 'org.codehaus.groovy:groovy:2.5.7'
 }
 
 test {
     testLogging {
-        outputs.upToDateWhen {false}
+        outputs.upToDateWhen { false }
         showStandardStreams = true
     }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+
+/*
+ * CI/CD
+ */
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0
+            }
+        }
+    }
+}
+
+checkstyle {
+    toolVersion = '8.11'
+    configFile = file("${project.rootDir}/checkstyle.xml")
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
+checkstyleTest {
+    source = 'src/test/java'
+}
+
+gradleLint {
+    reportFormat = 'text'
+    rules = ['all-dependency']
+    criticalRules = ['all-dependency'] // <-- this will fail the build in the event of a violation
 }

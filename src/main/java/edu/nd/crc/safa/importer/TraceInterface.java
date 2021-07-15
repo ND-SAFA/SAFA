@@ -1,4 +1,5 @@
 package edu.nd.crc.safa.importer;
+
 import java.util.Collection;
 
 public interface TraceInterface {

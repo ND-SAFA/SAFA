@@ -9,15 +9,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import javax.annotation.PostConstruct;
+
+import edu.nd.crc.safa.dao.Links;
+import edu.nd.crc.safa.importer.GenerateFlatfile;
+import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.importer.UploadFlatfile;
+import edu.nd.crc.safa.warnings.Rule;
+import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.jsoniter.JsonIterator;
-import com.jsoniter.output.JsonStream;
-
-import org.javatuples.Pair;
-import org.javatuples.Tuple;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
@@ -30,614 +34,601 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.UploadFlatfile;
-import edu.nd.crc.safa.warnings.Rule;
-import edu.nd.crc.safa.warnings.TreeVerifier;
-import edu.nd.crc.safa.importer.GenerateFlatfile;
-import edu.nd.crc.safa.dao.Links;
 
 @Service
 public class ProjectService {
 
-  @Autowired
-  Driver driver;
+    @Autowired
+    Driver driver;
 
-  @Autowired
-  Puller mPuller;
+    @Autowired
+    Puller mPuller;
 
-  @Autowired
-  UploadFlatfile uploadFlatfile;
+    @Autowired
+    UploadFlatfile uploadFlatfile;
 
-  @Autowired
-  GenerateFlatfile generateFlatfile;
+    @Autowired
+    GenerateFlatfile generateFlatfile;
 
-  @Autowired private MySQL sql = new MySQL();
-  private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
+    @Autowired
+    private MySQL sql = new MySQL();
+    private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
-  public ProjectService() {
-  }
-  
-  public ProjectService(Driver driver) {
-    this.driver = driver;
-  }
+    public ProjectService() {
+    }
 
-  public SseEmitter projectPull(String projId) {
-    SseEmitter emitter = new SseEmitter(0L);
-    ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-    sseMvcExecutor.execute(() -> {
+    public ProjectService(Driver driver) {
+        this.driver = driver;
+    }
+
+    public SseEmitter projectPull(String projId) {
+        SseEmitter emitter = new SseEmitter(0L);
+        ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
+        sseMvcExecutor.execute(() -> {
+            try {
+                emitter.send(SseEmitter.event()
+                    .data("{\"complete\": false}")
+                    .id(String.valueOf(0))
+                    .name("update"));
+
+                // mPuller.ParseJIRAIssues();
+                // emitter.send(SseEmitter.event()
+                //   .data("{\"complete\": false}")
+                //   .id(String.valueOf(1))
+                //   .name("update"));
+
+                // mPuller.ParseSourceLinks();
+                // emitter.send(SseEmitter.event()
+                //   .data("{\"complete\": false}")
+                //   .id(String.valueOf(2))
+                //   .name("update"));
+
+                String Mysql2NeoData = mPuller.mySQLNeo();
+                emitter.send(SseEmitter.event()
+                    .data(Mysql2NeoData)
+                    .id(String.valueOf(3))
+                    .name("update"));
+
+                mPuller.execute();
+                emitter.send(SseEmitter.event()
+                    .data("{\"complete\": true}")
+                    .id(String.valueOf(4))
+                    .name("update"));
+
+                emitter.complete();
+            } catch (Exception ex) {
+                emitter.completeWithError(ex);
+            }
+        });
+        return emitter;
+    }
+
+    public String generateLinks(String projId) {
         try {
-          emitter.send(SseEmitter.event()
-            .data("{\"complete\": false}")
-            .id(String.valueOf(0))
-            .name("update"));
-
-          // mPuller.ParseJIRAIssues();
-          // emitter.send(SseEmitter.event()
-          //   .data("{\"complete\": false}")
-          //   .id(String.valueOf(1))
-          //   .name("update"));
-
-          // mPuller.ParseSourceLinks();
-          // emitter.send(SseEmitter.event()
-          //   .data("{\"complete\": false}")
-          //   .id(String.valueOf(2))
-          //   .name("update"));
-          
-          String Mysql2NeoData = mPuller.Mysql2Neo();
-          emitter.send(SseEmitter.event()
-              .data(Mysql2NeoData)
-              .id(String.valueOf(3))
-              .name("update"));
-
-          mPuller.Execute();
-          emitter.send(SseEmitter.event()
-            .data("{\"complete\": true}")
-            .id(String.valueOf(4))
-            .name("update"));
-
-          emitter.complete();
-        } catch (Exception ex) {
-            emitter.completeWithError(ex);
+            return generateFlatfile.generateFiles();
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
         }
-    });
-    return emitter;
-  }
-
-  public String generateLinks(String projId){
-    try {
-      return generateFlatfile.generateFiles();
-    } 
-    catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
     }
-  }
 
-  public String getLinkTypes(String projId) {
-    try {
-      return generateFlatfile.getLinkTypes();
-    } catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  public String uploadFile(String projId, String encodedStr) {
-    try {
-      return uploadFlatfile.uploadFiles(projId, encodedStr);
-    }
-    catch(Exception e) {
-      System.out.println("Catch exception for uploadFlatfile");
-
-      if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-        return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON body.\"}";
-      } else {
-        System.out.println("Error uploading Flatfiles: OTHER");
-        System.out.println(e.getMessage());
-        return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}", e.getMessage());
-      }
-    }
-  }
-
-  public static class RawJson {
-    private String payload;
-    
-    public RawJson(String payload) {
-      this.payload = payload;
-    }
-    
-    public static RawJson from(String payload) {
-      return new RawJson(payload);
-    }
-    
-    @JsonValue
-    @JsonRawValue
-    public String getPayload() {
-      return this.payload;
-    }
-  }
-
-  public Map<String, Object> getUploadedFile(String pID, String file){
-    Map<String, Object> result = new HashMap<>();
-    try{ 
-      String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
-      if(file.contains(".json")){
-        result.put("data", RawJson.from(data));
-      }else{
-        result.put("data", data);
-      }
-      result.put("success", true);
-    }catch(Exception e){
-      result.put("success", false);
-      result.put("message", e.toString());
-    }
-    return result;
-  }
-
-  public String getUploadFilesErrorLog(String projId) {
-    try {
-      String errorStr = sql.getUploadErrorLog();
-
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
-    } catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  public String getLinkErrorLog(String projId) {
-    try {
-      String errorStr = sql.getLinkErrors();
-
-      return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
-    } catch (Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  // public String getGenerateLinksErrorLog(String projId) {
-  //   try {
-  //     File myObj = new File("/generatedFilesDir/ErrorText.csv"); 
-  //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
-  //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
-  //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
-  //   } catch (Exception e) {
-  //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-  //   }
-  // }
-
-  public String clearUploadedFlatfiles(String projid) {
-    try {
-      String message = sql.clearUploadedFlatfiles();
-      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
-    }
-    catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  public String clearGeneratedFlatfiles(String projid) {
-    try {
-      String message = sql.clearGeneratedFlatfiles();
-      return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
-    }
-    catch(Exception e) {
-      return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    }
-  }
-
-  @PostConstruct
-  private void init() {
-    final List<Map<String, Object>> nodes = nodes("test", "Hazard");
-    for( Map<String, Object> node : nodes ){
-      final String id = (String)node.get("id");
-      final int version = (Integer)versions("test").get("latest"); 
-      final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
-      mWarnings.put(id, false);
-      for( Map<String, Object> v: data) {
-        if( v.containsKey("warnings") ){
-          mWarnings.put(id, true);
+    public String getLinkTypes(String projId) {
+        try {
+            return generateFlatfile.getLinkTypes();
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
         }
-      }
     }
-    System.out.println(mWarnings);
-  }
 
-  @Transactional(readOnly = true)
-  public List<String> parents(String projectId, String node, String rootType) {
-    try ( Session session = driver.session() ) {
-      String query = "MATCH (a)\n" +
-        "WHERE a.id =~ $node\n" +
-        "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/"+ rootType + "', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
-        "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten(collect(last(nodes(path))))) END AS nodes";
-      StatementResult result = session.run(query, Values.parameters("node", "(?i)"+node.replace(".", "\\\\.")));
+    public String uploadFile(String projId, String encodedStr) {
+        try {
+            return uploadFlatfile.uploadFiles(projId, encodedStr);
+        } catch (Exception e) {
+            System.out.println("Catch exception for uploadFlatfile");
 
-      List<String> ret = new ArrayList<String>();
-      while( result.hasNext() ){
-        List<Node> nodes = result.next().get("nodes").asList(Values.ofNode());
-        for( Node n : nodes ){
-          ret.add(n.get("id").asString());
+            if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
+                return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON "
+                    + "body.\"}";
+            } else {
+                System.out.println("Error uploading Flatfiles: OTHER");
+                System.out.println(e.getMessage());
+                return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}",
+                    e.getMessage());
+            }
         }
-      }
-      return ret;
-    }
-  }
-
-  @Transactional(readOnly = true)
-  public List<Map<String, Object>> nodes(String projectId, String nodeType) {
-    List<Map<String, Object>> set = new ArrayList<>();
-    try ( Session session = driver.session() ) {
-      String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
-      StatementResult result = session.run(query);
-      List<Record> records = result.list();
-      for(int i = 0; i < records.size(); i++) {
-        Node node = records.get(i).get("n").asNode();
-        addNode(node, set);
-      }
-      return set;
-    }
-  }
-
-  @Transactional(readOnly = true)
-  public Map<String, Boolean> nodeWarnings(String projectId) {
-    return mWarnings;
-  }
-  
-  @Transactional(readOnly = true)
-  public List<Map<String, Object>> trees(String projectId, String rootType) {
-    try ( Session session = driver.session() ) {
-      String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n" +
-                     "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
-      StatementResult result = session.run(query);
-      return parseArtifactTree(result, projectId);
-    }
-  }
-
-  @Transactional(readOnly = true)
-  public List<Map<String, Object>> tree(String projectId, String root, String rootType) {
-    int version = (Integer)versions(projectId).get("latest");
-    return versions(projectId, root, version, rootType);
-  }
-
-  @Transactional(readOnly = true)
-  public Map<String, Object> versions(String projectId) {
-    int version = -1;
-    try ( Session session = driver.session() ) {
-      StatementResult result = session.run("MATCH (v:VERSION) RETURN v.number");
-      if (result.hasNext()) {
-          Record record = result.next();
-          version = record.get("v.number").asInt();
-      }
     }
 
-    // If we have no version and but we have nodes then our current version is 0
-    if( version == -1 ){
-        int count = 0;
+    public static class RawJson {
+        private String payload;
+
+        public RawJson(String payload) {
+            this.payload = payload;
+        }
+
+        public static RawJson from(String payload) {
+            return new RawJson(payload);
+        }
+
+        @JsonValue
+        @JsonRawValue
+        public String getPayload() {
+            return this.payload;
+        }
+    }
+
+    public Map<String, Object> getUploadedFile(String pID, String file) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
+            if (file.contains(".json")) {
+                result.put("data", RawJson.from(data));
+            } else {
+                result.put("data", data);
+            }
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.toString());
+        }
+        return result;
+    }
+
+    public String getUploadFilesErrorLog(String projId) {
+        try {
+            String errorStr = sql.getUploadErrorLog();
+
+            return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
+    }
+
+    public String getLinkErrorLog(String projId) {
+        try {
+            String errorStr = sql.getLinkErrors();
+
+            return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
+    }
+
+    // public String getGenerateLinksErrorLog(String projId) {
+    //   try {
+    //     File myObj = new File("/generatedFilesDir/ErrorText.csv");
+    //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
+    //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
+    //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
+    //   } catch (Exception e) {
+    //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+    //   }
+    // }
+
+    public String clearUploadedFlatfiles(String projid) {
+        try {
+            String message = sql.clearUploadedFlatfiles();
+            return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
+    }
+
+    public String clearGeneratedFlatfiles(String projid) {
+        try {
+            String message = sql.clearGeneratedFlatfiles();
+            return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
+        } catch (Exception e) {
+            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+        }
+    }
+
+    @PostConstruct
+    private void init() {
+        final List<Map<String, Object>> nodes = nodes("test", "Hazard");
+        for (Map<String, Object> node : nodes) {
+            final String id = (String) node.get("id");
+            final int version = (Integer) versions("test").get("latest");
+            final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
+            mWarnings.put(id, false);
+            for (Map<String, Object> v : data) {
+                if (v.containsKey("warnings")) {
+                    mWarnings.put(id, true);
+                }
+            }
+        }
+        System.out.println(mWarnings);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> parents(String projectId, String node, String rootType) {
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (n) RETURN count(*)");
+            String query = "MATCH (a)\n"
+                + "WHERE a.id =~ $node\n"
+                + "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/" + rootType + "', uniqueness"
+                + ": 'RELATIONSHIP_GLOBAL'}) yield path \n"
+                + "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten"
+                + "(collect(last(nodes(path))))) END AS nodes";
+            StatementResult result = session.run(query, Values.parameters("node", "(?i)"
+                + node.replace(".", "\\\\.")));
+
+            List<String> ret = new ArrayList<String>();
+            while (result.hasNext()) {
+                List<Node> nodes = result.next().get("nodes").asList(Values.ofNode());
+                for (Node n : nodes) {
+                    ret.add(n.get("id").asString());
+                }
+            }
+            return ret;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> nodes(String projectId, String nodeType) {
+        List<Map<String, Object>> set = new ArrayList<>();
+        try (Session session = driver.session()) {
+            String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
+            StatementResult result = session.run(query);
+            List<Record> records = result.list();
+            for (int i = 0; i < records.size(); i++) {
+                Node node = records.get(i).get("n").asNode();
+                addNode(node, set);
+            }
+            return set;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Boolean> nodeWarnings(String projectId) {
+        return mWarnings;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> trees(String projectId, String rootType) {
+        try (Session session = driver.session()) {
+            String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
+                + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
+                + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
+            StatementResult result = session.run(query);
+            return parseArtifactTree(result, projectId);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> tree(String projectId, String root, String rootType) {
+        int version = (Integer) versions(projectId).get("latest");
+        return versions(projectId, root, version, rootType);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> versions(String projectId) {
+        int version = -1;
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (v:VERSION) RETURN v.number");
             if (result.hasNext()) {
                 Record record = result.next();
-                count = record.get("count(*)").asInt();
+                version = record.get("v.number").asInt();
             }
         }
-        if( count > 0 ) {
-            version = 0;
-        }
-    }
-        
-    Map<String, Object> ret = new HashMap<String, Object>();
-    ret.put("latest", version);
-    return ret;
-  }
 
-  public Map<String, Object> versionsTag(String projectId) {
-      Map<String, Object> ret = new HashMap<String, Object>(); 
-      try {
-        ret.put("version", mPuller.mDatabase.Tag());
-      } catch (Exception e) {
-        //
-      }
-      return ret;
-  }
-
-  @Transactional(readOnly = true)
-  public String getTreeLayout(String projId, String hash) throws Exception {
-    // TODO(Adam): Do something with the projId?
-    String b64EncodedLayout = sql.FetchLayout(hash);
-    return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
-  }
-
-  public String postTreeLayout(String projId, String hash, String b64EncodedLayout) throws Exception {
-    // TODO(Adam): Do something with the projId?
-    sql.SaveLayout(hash, b64EncodedLayout);
-    return "{\"success\": true, \"message\": \"Layout saved\"}";
-  }
-
-  // MARKED AS DEPRECATED
-  //
-  // @Transactional(readOnly = true)
-  // public Map<String, Object> versions(String projectId, String root) {
-  //   try ( Session session = driver.session() ) {
-  //     String query = "MATCH (a {id: $root})" +
-  //     "CALL apoc.path.expandConfig(a, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path \n" + 
-  //     "WITH apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path) WHERE TYPE(r)='UPDATES' | r.version]))) AS rel\n" + 
-  //     "UNWIND rel as ru\n" + 
-  //     "WITH ru AS res ORDER BY res\n" + 
-  //     "RETURN collect(distinct res) as last";
-        
-  //     StatementResult result = session.run(query, Values.parameters("root", root));
-  //     List<Integer> last = result.single().get("last").asList(Values.ofInteger());
-
-  //     Map<String, Object> ret = new HashMap<String, Object>();
-  //     if( last.size() == 0 ) return ret;
-
-  //     ret.put("latest", last.get(last.size()-1));
-  //     ret.put("available", last);
-  //     return ret;
-  //   }
-  // }
-  //
-  // END MARKED AS DEPRECATED
-
-  @Transactional(readOnly = true)
-  public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType) {
-    try ( Session session = driver.session() ) {
-      String query ="MATCH (p)-[r:UPDATES]->(c)\n" +
-        "WHERE r.version <= $version\n" +
-        "WITH p, c, r AS rs ORDER BY r.version DESC\n" +
-        "WITH p, c, head(collect([p, rs, c])) AS removed\n" +
-        "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n" +
-        "WITH [e in excluded | e[0]] AS eHead, [e in excluded | e[1]] AS eTail, apoc.coll.toSet(apoc.coll.flatten([e in excluded WHERE e[0].id=e[1].id| e[0]])) AS eNo\n" +
-        // Find all removed relationships
-        "OPTIONAL MATCH (a)-[eR]-(b)\n" +
-        "WHERE a IN eHead AND b IN eTail\n" +
-        "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n" +
-        // Remove modification relations newer than requested version
-        "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n" +
-        "WHERE eR.version > $version AND eR.type='MODIFIED'\n" +
-        "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n" +
-        // Find any nodes added after wanted version
-        "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n" +
-        "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n" +
-        "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n" +
-        "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1].version > $version | c[2]]) as added\n" +
-        "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n" +
-        // Get Paths
-        "MATCH (h:" + rootType + " {id: $root})\n" +
-        "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield path\n" +
-        // Prune unwanted nodes and relationships
-        "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e IN nodes(path))\n" +
-        // Return a unique set of nodes and relationships
-        "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc.coll.flatten(collect([r in relationships(path)]))) AS rel\n";
-
-      StatementResult result = session.run(query, Values.parameters("version", version, "root", root));
-
-      final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
-
-      // Update warnings map
-      mWarnings.put(root, false);
-      for( Map<String, Object> v: retVal) {
-        if( v.containsKey("warnings") ){
-          mWarnings.put(root, true);
-        }
-      }
-      
-      return retVal;
-    }
-  }
-
-  private List<Map<String, Object>> parseArtifactTree(StatementResult result, String projectId) {
-    List<Map<String, Object>> values = new ArrayList<>();
-    Map<Long, String> ids = new HashMap<>();
-    Map<Long, Boolean> edges = new HashMap<>();
-
-    Record record = result.next();
-
-    List<Node> nodes = record.get("artifact").asList(Values.ofNode());
-    List<Relationship> rels = record.get("rel").asList(Values.ofRelationship());
-
-    for(int i = 0; i < nodes.size(); i++) {
-      addNode(nodes.get(i), values, ids);
-    }
-
-    // Find the highest version of the modification
-    Map<String, Integer> maxModification = new HashMap<String, Integer>();
-    for( int i = 0; i < rels.size(); i++ ){
-      final Relationship r = rels.get(i);
-      if( r.type().equals("UPDATES") && r.get("type").asString().equals("MODIFIED") ){
-        final String root = ids.get(r.startNodeId());
-        final int version = r.get("version").asInt();
-
-        if( maxModification.getOrDefault(root, -1) < version ){
-          maxModification.put(root, version);
-        }
-      }
-    }
-
-    for(int i = 0; i < rels.size(); i++) {
-      final Relationship r = rels.get(i);
-      if( !r.type().equals("UPDATES") ){
-        addEdge(r, values, edges, ids);
-      }else{
-        // Handle modifications
-        if( r.get("type").asString().equals("MODIFIED") ) {
-          final String root = ids.get(r.startNodeId());
-
-          // Make sure we only apply the latest version
-          final int version = r.get("version").asInt();
-          if( maxModification.get(root) != version ){
-            continue;
-          }
-
-          // Handle updating nodes
-          for( Map<String,Object> value : values ){
-            if( value.get("id").equals(root) ){
-              if( !value.get("label").equals("Code") && !value.get("label").equals("Package") ){
-                if( !value.containsKey("original") ){
-                  value.put("original", value.get("DATA").toString());
+        // If we have no version and but we have nodes then our current version is 0
+        if (version == -1) {
+            int count = 0;
+            try (Session session = driver.session()) {
+                StatementResult result = session.run("MATCH (n) RETURN count(*)");
+                if (result.hasNext()) {
+                    Record record = result.next();
+                    count = record.get("count(*)").asInt();
                 }
-                value.put("DATA", r.get("data").asString());
-              }
-
-              if( value.get("label").equals("Code") ){
-                if( !value.containsKey("original") ){
-                  value.put("original", value.get("commit").toString());
-                }
-                value.put("commit", r.get("data").asString());
-              }
-
-              value.put("modified", true);
             }
-          }
+            if (count > 0) {
+                version = 0;
+            }
         }
-      }
+
+        Map<String, Object> ret = new HashMap<String, Object>();
+        ret.put("latest", version);
+        return ret;
     }
 
-    TreeVerifier verifier = new TreeVerifier();
-    try{
-      verifier.addRule("Missing child", "At least one requirement child for hazards", "at-least-one(Hazard, child, Requirement)");
-      
-      verifier.addRule("Missing child", "At least one requirement, design or process child for requirements", "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || at-least-one(Requirement, child, Process)");
-      verifier.addRule("Missing child", "Requirements must not have package children", "exactly-n(0, Requirement, child, Package)");
 
-      verifier.addRule("Missing child", "At least one package child for design definitions", "at-least-one(DesignDefinition, child, Package)");
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType) {
+        try (Session session = driver.session()) {
+            String query = "MATCH (p)-[r:UPDATES]->(c)\n"
+                + "WHERE r.version <= $version\n"
+                + "WITH p, c, r AS rs ORDER BY r.version DESC\n"
+                + "WITH p, c, head(collect([p, rs, c])) AS removed\n"
+                + "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n"
+                // Find all removed relationships
+                + "WITH [e in excluded | e[0]] AS eHead, [e in excluded | e[1]] AS eTail, apoc.coll.toSet(apoc.coll"
+                + ".flatten([e in excluded WHERE e[0].id=e[1].id| e[0]])) AS eNo\n"
+                + "OPTIONAL MATCH (a)-[eR]-(b)\n"
+                + "WHERE a IN eHead AND b IN eTail\n"
+                + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n"
+                // Remove modification relations newer than requested version
+                + "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n"
+                + "WHERE eR.version > $version AND eR.type='MODIFIED'\n"
+                + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n"
+                // Find any nodes added after wanted version
+                + "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n"
+                + "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n"
+                + "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n"
+                + "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1]"
+                + ".version > $version | c[2]]) as added\n"
+                + "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n"
+                // Get Paths
+                + "MATCH (h:" + rootType + " {id: $root})\n"
+                + "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield"
+                + " path\n"
+                // Prune unwanted nodes and relationships
+                + "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e "
+                + "IN nodes(path))\n"
+                // Return a unique set of nodes and relationships
+                + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
+                + ".coll.flatten(collect([r in relationships(path)]))) AS rel\n";
 
-      for( Rule r : sql.getWarnings(projectId)){
-        verifier.addRule(r);
-      }
-    }catch( Exception e ){
-      System.out.println(e.toString());
-    }
-    Map<String, List<Rule.Name>> results = verifier.verify(nodes, ids, values);
+            StatementResult result = session.run(query, Values.parameters("version",
+                version, "root", root));
 
-    // Warnings
-    for(int i = 0; i < nodes.size(); i++) {
-      final Node node = nodes.get(i);
-      final String id = ids.get(node.id());
+            final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
 
-      List<Rule.Name> warnings = results.get(id);
+            // Update warnings map
+            mWarnings.put(root, false);
+            for (Map<String, Object> v : retVal) {
+                if (v.containsKey("warnings")) {
+                    mWarnings.put(root, true);
+                }
+            }
 
-      if( warnings != null && !warnings.isEmpty() ) {
-        for( Map<String,Object> value : values ){
-          if( value.getOrDefault("id", "").equals(id) ){
-            value.put("warnings", warnings.toArray());
-          }
+            return retVal;
         }
-      }
     }
 
-    return values;
-  } 
-
-  private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
-    if (!ids.containsKey(node.id())) {
-      String label = ((List<String>)node.labels()).get(0).toString();
-      Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-      // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
-      if (node.get("id") == null || node.get("id").toString() == "NULL") {
-        String nodeId = UUID.randomUUID().toString();
-        mapping.put("id", nodeId);
-        ids.put(node.id(), nodeId);
-      } else {
-        if( label.equals("Package") || label.equals("Code") ){
-          ids.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
-          mapping.put("id", node.get("issue").asString() + "." + node.get("id").asString());
-        }else{
-          ids.put(node.id(), node.get("id").asString());
+    public Map<String, Object> versionsTag(String projectId) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            ret.put("version", mPuller.mDatabase.tag());
+        } catch (Exception e) {
+            //
         }
-      }
-      mapping.put("classes", "node");
-      mapping.put("label", label);
-      values.add(mapping);
+        return ret;
     }
-  }
 
-  private void addNode(Node node, List<Map<String, Object>> values) {
-    addNode(node, values, new HashMap<Long, String>());
-  }
-
-  private void addEdge(Relationship rel, List<Map<String, Object>> values,  Map<Long, Boolean> edges, Map<Long, String> ids) {
-    Long relId = rel.id();
-    if (!edges.containsKey(relId)) {
-      edges.put(relId, true);
-      // System.out.println("[EDGE " + relId + ": " + rel.type() + "] from: " + ids.get(rel.startNodeId()) + ", to: " + ids.get(rel.endNodeId()));
-      Map<String, Object> mapping = new HashMap<String, Object>(); 
-      mapping.put("classes", "edge");
-      mapping.put("id", relId);
-      mapping.put("type", rel.type());
-      mapping.put("source", ids.get(rel.startNodeId()));
-      mapping.put("target", ids.get(rel.endNodeId()));
-      values.add(mapping);
+    @Transactional(readOnly = true)
+    public String getTreeLayout(String projId, String hash) throws Exception {
+        // TODO(Adam): Do something with the projId?
+        String b64EncodedLayout = sql.fetchLayout(hash);
+        return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
     }
-  }
 
-  @Transactional(readOnly = true)
-  public Map<String, String> getWarnings(String projectId) {
-    Map<String, String> result = new HashMap<String, String>();
-    try {
-      for( Rule r : sql.getWarnings(projectId)){
-        result.put(r.toString(), r.UnprocessedRule());
-      }
-    }catch(Exception e) {
-      System.out.println(e.toString());
+    public String postTreeLayout(String projId, String hash, String b64EncodedLayout) throws Exception {
+        // TODO(Adam): Do something with the projId?
+        sql.saveLayout(hash, b64EncodedLayout);
+        return "{\"success\": true, \"message\": \"Layout saved\"}";
     }
-    return result;
-  }
 
-  public void newWarning(String projectId, String nShort, String nLong, String rule) {
-    try {
-      sql.newWarning(projectId, nShort, nLong, rule);
-    }catch(Exception e) {
-      System.out.println(e.toString());
-    }
-  }
+    private List<Map<String, Object>> parseArtifactTree(StatementResult result, String projectId) {
+        List<Map<String, Object>> values = new ArrayList<>();
+        Map<Long, String> ids = new HashMap<>();
+        Map<Long, Boolean> edges = new HashMap<>();
 
-  // Links
-  @Transactional(readOnly = true)
-  public Map<String, String> getLink(String projectId, String source, String target) {
-    Map<String, String> result = new HashMap<String, String>();
-    try {
-      result.put("approval", sql.getLinkApproval(projectId, source, target).toString());
-    }catch(Exception e) {
-      System.out.println(e.toString());
-    }
-    return result;
-  }
+        Record record = result.next();
 
-  // public Map<String, String> updateLink(String projectId, String source, String target, Integer approval) {
-  public Map<String, String> updateLink(String projectId, Links links) {
-    Map<String, String> result = new HashMap<String, String>();
-    try {
-      result.put("success", String.format("%b", sql.updateLink(projectId, links)));
-      // result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
-    }catch(Exception e) {
-      result.put("success", "false");
-      result.put("message", e.toString());
-    }
-    return result;
-  }
+        List<Node> nodes = record.get("artifact").asList(Values.ofNode());
+        List<Relationship> rels = record.get("rel").asList(Values.ofRelationship());
 
-  // Artifacts
-  @Transactional(readOnly = true)
-  public Map<String, Object> getArtifacts(String projectId) {
-    Map<String, Object> result = new HashMap<String, Object>();
-    try {
-      result.put("artifacts", sql.getArtifacts(projectId));
-    }catch(Exception e) {
-      result.put("success", "false");
-      result.put("message", e.toString());
-    }
-    return result;
-  }
+        for (int i = 0; i < nodes.size(); i++) {
+            addNode(nodes.get(i), values, ids);
+        }
 
-  @Transactional(readOnly = true)
-  public Map<String, Object> getArtifactLinks(String projectId, String source, String target, Double minScore) {
-    Map<String, Object> result = new HashMap<String, Object>();
-    try {
-      result.put("links", sql.getArtifactLinks(projectId, source, target, minScore));
-    }catch(Exception e) {
-      result.put("success", "false");
-      result.put("message", e.toString());
+        // Find the highest version of the modification
+        Map<String, Integer> maxModification = new HashMap<String, Integer>();
+        for (int i = 0; i < rels.size(); i++) {
+            final Relationship r = rels.get(i);
+            if (r.type().equals("UPDATES") && r.get("type").asString().equals("MODIFIED")) {
+                final String root = ids.get(r.startNodeId());
+                final int version = r.get("version").asInt();
+
+                if (maxModification.getOrDefault(root, -1) < version) {
+                    maxModification.put(root, version);
+                }
+            }
+        }
+
+        for (int i = 0; i < rels.size(); i++) {
+            final Relationship r = rels.get(i);
+            if (!r.type().equals("UPDATES")) {
+                addEdge(r, values, edges, ids);
+            } else {
+                // Handle modifications
+                if (r.get("type").asString().equals("MODIFIED")) {
+                    final String root = ids.get(r.startNodeId());
+
+                    // Make sure we only apply the latest version
+                    final int version = r.get("version").asInt();
+                    if (maxModification.get(root) != version) {
+                        continue;
+                    }
+
+                    // Handle updating nodes
+                    for (Map<String, Object> value : values) {
+                        if (value.get("id").equals(root)) {
+                            if (!value.get("label").equals("Code") && !value.get("label").equals("Package")) {
+                                if (!value.containsKey("original")) {
+                                    value.put("original", value.get("DATA").toString());
+                                }
+                                value.put("DATA", r.get("data").asString());
+                            }
+
+                            if (value.get("label").equals("Code")) {
+                                if (!value.containsKey("original")) {
+                                    value.put("original", value.get("commit").toString());
+                                }
+                                value.put("commit", r.get("data").asString());
+                            }
+
+                            value.put("modified", true);
+                        }
+                    }
+                }
+            }
+        }
+
+        TreeVerifier verifier = new TreeVerifier();
+        try {
+            verifier.addRule("Missing child",
+                "At least one requirement child for hazards",
+                "at-least-one(Hazard, child, Requirement)");
+
+            verifier.addRule("Missing child",
+                "At least one requirement, design or process child for requirements",
+                "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || "
+                    + "at-least-one(Requirement, child, Process)");
+            verifier.addRule("Missing child",
+                "Requirements must not have package children",
+                "exactly-n(0, Requirement, child, Package)");
+
+            verifier.addRule("Missing child", "At least one package child for design definitions",
+                "at-least-one(DesignDefinition, child, Package)");
+
+            for (Rule r : sql.getWarnings(projectId)) {
+                verifier.addRule(r);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        Map<String, List<Rule.Name>> results = verifier.verify(nodes, ids, values);
+
+        // Warnings
+        for (int i = 0; i < nodes.size(); i++) {
+            final Node node = nodes.get(i);
+            final String id = ids.get(node.id());
+
+            List<Rule.Name> warnings = results.get(id);
+
+            if (warnings != null && !warnings.isEmpty()) {
+                for (Map<String, Object> value : values) {
+                    if (value.getOrDefault("id", "").equals(id)) {
+                        value.put("warnings", warnings.toArray());
+                    }
+                }
+            }
+        }
+
+        return values;
     }
-    return result;
-  }
+
+    private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
+        if (!ids.containsKey(node.id())) {
+            String label = ((List<String>) node.labels()).get(0).toString();
+            Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
+            // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
+            if (node.get("id") == null || node.get("id").toString() == "NULL") {
+                String nodeId = UUID.randomUUID().toString();
+                mapping.put("id", nodeId);
+                ids.put(node.id(), nodeId);
+            } else {
+                if (label.equals("Package") || label.equals("Code")) {
+                    ids.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
+                    mapping.put("id", node.get("issue").asString() + "." + node.get("id").asString());
+                } else {
+                    ids.put(node.id(), node.get("id").asString());
+                }
+            }
+            mapping.put("classes", "node");
+            mapping.put("label", label);
+            values.add(mapping);
+        }
+    }
+
+    private void addNode(Node node, List<Map<String, Object>> values) {
+        addNode(node, values, new HashMap<Long, String>());
+    }
+
+    private void addEdge(Relationship rel,
+                         List<Map<String, Object>> values,
+                         Map<Long, Boolean> edges,
+                         Map<Long, String> ids) {
+        Long relId = rel.id();
+        if (!edges.containsKey(relId)) {
+            edges.put(relId, true);
+            Map<String, Object> mapping = new HashMap<String, Object>();
+            mapping.put("classes", "edge");
+            mapping.put("id", relId);
+            mapping.put("type", rel.type());
+            mapping.put("source", ids.get(rel.startNodeId()));
+            mapping.put("target", ids.get(rel.endNodeId()));
+            values.add(mapping);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, String> getWarnings(String projectId) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            for (Rule r : sql.getWarnings(projectId)) {
+                result.put(r.toString(), r.unprocessedRule());
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        return result;
+    }
+
+    public void newWarning(String projectId, String nShort, String nLong, String rule) {
+        try {
+            sql.newWarning(projectId, nShort, nLong, rule);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    // Links
+    @Transactional(readOnly = true)
+    public Map<String, String> getLink(String projectId, String source, String target) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            result.put("approval", sql.getLinkApproval(projectId, source, target).toString());
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        return result;
+    }
+
+    // public Map<String, String> updateLink(String projectId, String source, String target, Integer approval) {
+    public Map<String, String> updateLink(String projectId, Links links) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            result.put("success", String.format("%b", sql.updateLink(projectId, links)));
+            // result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
+        } catch (Exception e) {
+            result.put("success", "false");
+            result.put("message", e.toString());
+        }
+        return result;
+    }
+
+    // Artifacts
+    @Transactional(readOnly = true)
+    public Map<String, Object> getArtifacts(String projectId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            result.put("artifacts", sql.getArtifacts(projectId));
+        } catch (Exception e) {
+            result.put("success", "false");
+            result.put("message", e.toString());
+        }
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getArtifactLinks(String projectId, String source, String target, Double minScore) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            result.put("links", sql.getArtifactLinks(projectId, source, target, minScore));
+        } catch (Exception e) {
+            result.put("success", "false");
+            result.put("message", e.toString());
+        }
+        return result;
+    }
 }

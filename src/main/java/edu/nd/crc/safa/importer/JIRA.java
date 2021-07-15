@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -43,14 +42,18 @@ public class JIRA {
     }
 
     private String uri;
-    @Autowired @Value("${jira.username:}") String mUsername;
-    @Autowired @Value("${jira.password:}") String mPassword;
+    @Autowired
+    @Value("${jira.username:}")
+    String mUsername;
+    @Autowired
+    @Value("${jira.password:}")
+    String mPassword;
 
 
     public JIRA() {
         uri = "http://spwd.cse.nd.edu:8080/";
     }
-    
+
     private String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
@@ -62,18 +65,23 @@ public class JIRA {
     public List<Issue> getIssues(String[] types) throws Exception {
         List<Issue> retVal = new ArrayList<Issue>();
 
-        int remaining = 0, downloaded = 0;
+        int remaining = 0;
+        int downloaded = 0;
         do {
             // Generate URL
             Map<String, String> requestParams = new HashMap<String, String>();
             requestParams.put("maxResults", "1000");
             requestParams.put("fields", "summary,issuelinks,customfield_10100,description,status,assignee,issuetype");
             requestParams.put("jql",
-                    "type in ('Requirement','Hazard','Sub-task','Design Definition','Context','Acceptance Test','Environmental Assumption','Simulation')");
+                "type in ('Requirement','Hazard','Sub-task',"
+                    + "'Design Definition','Context','Acceptance Test',"
+                    + "'Environmental Assumption','Simulation')");
 
             String encodedURL = requestParams.keySet().stream()
-                    .map(key -> key + "=" + encodeValue(requestParams.get(key)))
-                    .collect(Collectors.joining("&", "http://spwd.cse.nd.edu:8080/rest/api/2/search?", ""));
+                .map(key -> key + "=" + encodeValue(requestParams.get(key)))
+                .collect(Collectors.joining("&",
+                    "http://spwd.cse.nd.edu:8080/rest/api/2/search?",
+                    ""));
 
             URL url = new URL(encodedURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -122,7 +130,7 @@ public class JIRA {
                 if (fields.get("customfield_10100").valueType() != ValueType.INVALID) {
                     if (fields.get("customfield_10100").get("value").valueType() != ValueType.INVALID) {
                         char[] charArray = fields.get("customfield_10100").get("value").toString().toLowerCase()
-                                .toCharArray();
+                            .toCharArray();
                         charArray[0] = Character.toUpperCase(charArray[0]);
                         issue.type = new String(charArray);
                     }

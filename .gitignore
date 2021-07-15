@@ -32,4 +32,8 @@ out/
 .vscode/
 bin
 
+
+### Macs ###
+/**/.DS_Store
+
 src/main/resources/*local.properties

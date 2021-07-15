@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.jsoniter.output.JsonStream;
+import edu.nd.crc.safa.importer.JIRA.Issue;
 
+import com.jsoniter.output.JsonStream;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -25,34 +26,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import edu.nd.crc.safa.importer.JIRA.Issue;
-
 @Component
 public class Puller {
-    @Autowired @Value("${git.username:}") String gitUsername;
-    @Autowired @Value("${git.password:}") String gitPassword;
-    @Autowired @Value("${git.url:}") String gitURL;
-    @Autowired @Value("${git.branch:master}") String gitBranch;
+    @Autowired
+    @Value("${git.username:}")
+    String gitUsername;
+    @Autowired
+    @Value("${git.password:}")
+    String gitPassword;
+    @Autowired
+    @Value("${git.url:}")
+    String gitURL;
+    @Autowired
+    @Value("${git.branch:master}")
+    String gitBranch;
 
-    @Autowired @Value("${tim.requiredTraceScore:}") Double traceRequiredScore;
+    @Autowired
+    @Value("${tim.requiredTraceScore:}")
+    Double traceRequiredScore;
 
-    @Autowired JIRA mJira;
-    @Autowired public Database mDatabase;
-    @Autowired private MySQL sql = new MySQL();
+    @Autowired
+    JIRA mJira;
+    @Autowired
+    public Database mDatabase;
+    @Autowired
+    private MySQL sql = new MySQL();
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
 
     private Set<String> foundNodes = new HashSet<String>();
 
-    public void Execute(){
-        mDatabase.Execute();
+    public void execute() {
+        mDatabase.execute();
     }
 
-    public void ParseJIRAIssues() {
+    public void parseJIRAIssues() {
         try {
-            String[] types = new String[] { "Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
-                    "Acceptance Test", "Environmental Assumption", "Simulation" };
+            String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
+                "Acceptance Test", "Environmental Assumption", "Simulation"
+            };
 
             // Loop over issues returned from JIRA and add the found nodes and links
             for (Issue issue : mJira.getIssues(types)) {
@@ -66,7 +79,7 @@ public class Puller {
                 data.put("type", issue.type);
 
                 foundNodes.add(issue.key);
-                mDatabase.AddNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
+                mDatabase.addNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
@@ -75,7 +88,7 @@ public class Puller {
                             return link.InwardType.equals(type);
                         });
                     }).forEach((link) -> {
-                        mDatabase.AddLink(issue.key, link.Type, link.InwardKey);
+                        mDatabase.addLink(issue.key, link.Type, link.InwardKey);
                     });
                 }
             }
@@ -86,11 +99,11 @@ public class Puller {
 
     /**
      * ParseSourceLinks clones the specified git repository, or pulls the changes of it, before
-     * looping through the commits, from the latest to the oldest, and parses the issue id and 
+     * looping through the commits, from the latest to the oldest, and parses the issue id and
      * files modified out of the commit log and adds them, if they are not ignored, to the sources
      * to be applied to the databse.
      */
-    public void ParseSourceLinks() {
+    public void parseSourceLinks() {
         try (DiffFormatter diffFormatter = new DiffFormatter(NullOutputStream.INSTANCE)) {
 
             File tmpDir = new File("./safa-git/");
@@ -98,12 +111,12 @@ public class Puller {
             Git git;
             if (!tmpDir.exists()) {
                 git = Git.cloneRepository().setURI(gitURL).setDirectory(tmpDir)
-                        .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUsername, gitPassword))
-                        .setBranch("refs/heads/" + gitBranch).call();
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUsername, gitPassword))
+                    .setBranch("refs/heads/" + gitBranch).call();
             } else {
                 git = Git.open(tmpDir);
                 git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(
-                        gitUsername, gitPassword)).call();
+                    gitUsername, gitPassword)).call();
             }
 
             diffFormatter.setRepository(git.getRepository());
@@ -125,12 +138,12 @@ public class Puller {
             Iterable<RevCommit> logs = git.log().call();
             for (RevCommit rev : logs) {
                 // Check that we have an issue id inside the commit message
-                if( rev.getShortMessage().contains("UAV-")) {
+                if (rev.getShortMessage().contains("UAV-")) {
                     Set<String> commitFiles = new HashSet<String>();
 
                     // Loop over sections of the commit message seperated by a space
                     String[] parts = rev.getShortMessage().split(" ");
-                    for( String part: parts ){
+                    for (String part : parts) {
 
                         // Use a regex query to check if the part of the message contains an issue id
                         Matcher commitMatcher = mCommitApplies.matcher(part);
@@ -147,9 +160,9 @@ public class Puller {
                                     final String pkg = m.group(1).replace("main/java/", "").replace("/", ".");
 
                                     // Check if the file and id have been specified to be ignored in the properties file
-                                    if( prop.containsKey(id) ){
-                                        for( String possible: prop.getProperty(id).split(",") ){
-                                            if (entry.getNewPath().contains(possible) ){
+                                    if (prop.containsKey(id)) {
+                                        for (String possible : prop.getProperty(id).split(",")) {
+                                            if (entry.getNewPath().contains(possible)) {
                                                 System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
                                                 return;
                                             }
@@ -159,7 +172,7 @@ public class Puller {
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
                                         if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
-                                            mDatabase.AddSource(m.group(2), rev.name(), pkg, id);
+                                            mDatabase.addSource(m.group(2), rev.name(), pkg, id);
                                         }
                                         commitFiles.add(entry.getNewPath());
                                     }
@@ -197,7 +210,7 @@ public class Puller {
                 data.put("type", type);
 
                 foundNodes.add(id);
-                mDatabase.AddNode(id, type, JsonStream.serialize(data).toString());
+                mDatabase.addNode(id, type, JsonStream.serialize(data).toString());
             }
         }
     }
@@ -213,10 +226,9 @@ public class Puller {
                 for (List<String> row : rows) {
                     String source = row.get(0);
                     String target = row.get(1);
-                    mDatabase.AddLink(target, sourcetype, source);
+                    mDatabase.addLink(target, sourcetype, source);
                 }
-            }
-            else {
+            } else {
                 List<List<String>> rows = sql.getGeneratedTraceData(trace.get(4));
 
                 for (List<String> row : rows) {
@@ -226,21 +238,20 @@ public class Puller {
                     int approval = Integer.parseInt(row.get(3));
 
                     if ((approval == 1) || ((approval == 2) && score > traceRequiredScore)) {
-                        mDatabase.AddLink(target, sourcetype, source);
+                        mDatabase.addLink(target, sourcetype, source);
                     }
                 }
             }
         }
     }
 
-    public String Mysql2Neo() {
+    public String mySQLNeo() {
         try {
             insertArtifacts();
             insertConnections();
             System.out.println("Completed MysqlToNeo4j without exceptions");
-            return "{\"complete\": false}";  
-        } 
-        catch (Exception e) {
+            return "{\"complete\": false}";
+        } catch (Exception e) {
             System.out.println(String.format("Completed MysqlToNeo4j with exceptions: %s", e.getMessage()));
             return String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
         }

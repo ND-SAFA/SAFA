@@ -14,7 +14,6 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'nebula.lint'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 
@@ -86,8 +85,3 @@ checkstyleTest {
     source = 'src/test/java'
 }
 
-gradleLint {
-    reportFormat = 'text'
-    rules = ['all-dependency']
-    criticalRules = ['all-dependency'] // <-- this will fail the build in the event of a violation
-}

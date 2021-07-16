@@ -1,6 +1,9 @@
 FROM gradle:5.6.2-jdk8 AS builder
 COPY checkstyle.xml /app/checkstyle.xml
+
+RUN touch .env
 COPY .env /app/.env
+RUN touch safa-google-key.json
 COPY safa-google-key.json /app/safa-google-key.json
 
 WORKDIR /app

@@ -25,5 +25,4 @@ steps:
       - '_NEO4J_URI=${_NEO4J_URI}'
       - '_NEO4J_USERNAME=${_NEO4J_USERNAME}'
       - '_NEO4J_PASSWORD=${_NEO4J_PASSWORD}'
-    args: ['build', '.',
-    ]
+    args: ['build', '.']

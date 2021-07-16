@@ -16,7 +16,6 @@ import java.util.Set;
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.warnings.Rule;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,16 +27,11 @@ public class MySQL {
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
 
-    @Value("${mysql.host}")
-    String mysqlHost;
-    @Value("${mysql.port}")
-    String mysqlPort;
-    @Value("${mysql.username}")
-    String mysqlUser;
-    @Value("${mysql.password}")
-    String mysqlPassword;
-    @Value("${mysql.database}")
-    String mysqlDatabase;
+    String mysqlHost = System.getenv("_MY_SQL_HOST");
+    String mysqlPort = System.getenv("_MY_SQL_PORT");
+    String mysqlUser = System.getenv("_MY_SQL_USERNAME");
+    String mysqlPassword = System.getenv("_MY_SQL_PORT");
+    String mysqlDatabase = System.getenv("_MY_SQL_DATABASE");
 
     public MySQL() {
     }

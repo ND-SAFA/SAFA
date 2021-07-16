@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.importer;
 
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.parameters;
 
 import java.util.Base64;
 import java.util.HashSet;
@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Transaction;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,7 @@ public class Database implements AutoCloseable {
     public Database() {
     }
 
-    public StatementResult query(final String query) {
+    public Result query(final String query) {
         try (Session session = driver.session()) {
             return session.run(query);
         }
@@ -63,7 +63,7 @@ public class Database implements AutoCloseable {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=$version RETURN v;",
                     parameters("version", nextVersion));
-                tx.success();
+                tx.commit();
             }
         }
         return nextVersion;
@@ -78,7 +78,7 @@ public class Database implements AutoCloseable {
 
         // Check if we have a version node which stores the current version
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (v:VERSION) RETURN v.number");
+            Result result = session.run("MATCH (v:VERSION) RETURN v.number");
             if (result.hasNext()) {
                 Record record = result.next();
                 version = record.get("v.number").asInt();
@@ -89,7 +89,7 @@ public class Database implements AutoCloseable {
         if (version == -1) {
             int count = 0;
             try (Session session = driver.session()) {
-                StatementResult result = session.run("MATCH (n) RETURN count(*)");
+                Result result = session.run("MATCH (n) RETURN count(*)");
                 if (result.hasNext()) {
                     Record record = result.next();
                     count = record.get("count(*)").asInt();
@@ -113,7 +113,7 @@ public class Database implements AutoCloseable {
                     System.out.println("MATCH (n) DETACH DELETE n;");
                 }
                 tx.run("MATCH (n) DETACH DELETE n");
-                tx.success();
+                tx.commit();
             }
         }
 
@@ -159,7 +159,7 @@ public class Database implements AutoCloseable {
                 + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
                 + "eNodes"
                 + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-            StatementResult result = session.run(command);
+            Result result = session.run(command);
             while (result.hasNext()) {
                 Record record = result.next();
 
@@ -171,7 +171,7 @@ public class Database implements AutoCloseable {
                 String mCommand = String.format("MATCH (c) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", id)
                     + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
                     + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
-                StatementResult mResult = session.run(mCommand);
+                Result mResult = session.run(mCommand);
                 while (mResult.hasNext()) {
                     data = new String(Base64.getDecoder().decode(mResult.next().get("data").asString()));
                 }
@@ -185,7 +185,7 @@ public class Database implements AutoCloseable {
                 + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in eRelationships WHERE e"
                 + " IN relationships(path)) AND NOT any(e in eNodes WHERE e IN nodes(path))"
                 + " RETURN p.id AS parent, c.id AS child, TYPE(r) AS type";
-            StatementResult result = session.run(command);
+            Result result = session.run(command);
             while (result.hasNext()) {
                 Record record = result.next();
                 mNodeLinkMap.add(Triplet.with(record.get("parent").asString(), record.get("type").asString(),
@@ -199,7 +199,7 @@ public class Database implements AutoCloseable {
                 + " WHERE NOT any(e in eRelationships WHERE e IN relationships(p)) AND NOT any(e in eNodes WHERE e IN"
                 + " nodes(p))"
                 + " RETURN i.id AS issue, parent.id AS pkg, node.id AS file, node.commit AS commit";
-            StatementResult result = session.run(command);
+            Result result = session.run(command);
             while (result.hasNext()) {
                 Record record = result.next();
 
@@ -213,7 +213,7 @@ public class Database implements AutoCloseable {
                 String mCommand = String.format("MATCH (c:Code) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", file)
                     + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
                     + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
-                StatementResult mResult = session.run(mCommand);
+                Result mResult = session.run(mCommand);
                 while (mResult.hasNext()) {
                     commit = mResult.next().get("data").asString();
                 }
@@ -227,7 +227,7 @@ public class Database implements AutoCloseable {
     public int getLatestVersion() {
         int version = 0;
         try (Session session = driver.session()) {
-            StatementResult result = session.run(
+            Result result = session.run(
                 "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r"
                     + ".version DESC LIMIT 1");
             if (result.hasNext()) {
@@ -241,7 +241,7 @@ public class Database implements AutoCloseable {
     public int getNodeCount(final String type) {
         int count = 0;
         try (Session session = driver.session()) {
-            StatementResult result = session.run(String.format("MATCH (:%s) RETURN count(*)", type));
+            Result result = session.run(String.format("MATCH (:%s) RETURN count(*)", type));
             count = result.next().get("count(*)").asInt();
         }
         return count;
@@ -249,7 +249,7 @@ public class Database implements AutoCloseable {
 
     public void printNodes(final String type) {
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (n) WHERE [$type IN LABELS(n)] RETURN n",
+            Result result = session.run("MATCH (n) WHERE [$type IN LABELS(n)] RETURN n",
                 parameters("type", type));
             if (result.hasNext()) {
                 Record record = result.next();
@@ -260,7 +260,7 @@ public class Database implements AutoCloseable {
 
     public void printRelationships(final String id) {
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH ({id: $id})-[r]-() RETURN r",
+            Result result = session.run("MATCH ({id: $id})-[r]-() RETURN r",
                 parameters("id", id));
             if (result.hasNext()) {
                 Record record = result.next();
@@ -303,7 +303,7 @@ public class Database implements AutoCloseable {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("MATCH ()-[r:UPDATES]-() WHERE r.version = $version DELETE r",
                     parameters("version", mLatestVersion));
-                tx.success();
+                tx.commit();
             }
         }
 
@@ -399,7 +399,7 @@ public class Database implements AutoCloseable {
                         parameters("id", node.getValue0(), "version", mLatestVersion));
                 });
 
-                tx.success();
+                tx.commit();
             }
         }
 
@@ -408,7 +408,7 @@ public class Database implements AutoCloseable {
                 seenTypes.stream().forEach((type) -> {
                     tx.run(String.format("CREATE INDEX ON :%s(id)", sanitizeType(type)));
                 });
-                tx.success();
+                tx.commit();
             }
         }
     }
@@ -428,7 +428,7 @@ public class Database implements AutoCloseable {
                 + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
                 + "eNodes"
                 + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-            StatementResult cResult = session.run(cCommand);
+            Result cResult = session.run(cCommand);
             while (cResult.hasNext()) {
                 Record record = cResult.next();
                 final String id = record.get("id").asString();
@@ -450,7 +450,7 @@ public class Database implements AutoCloseable {
                     + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n"
                     + " IN eNodes "
                     + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-                StatementResult pResult = session.run(pCommand);
+                Result pResult = session.run(pCommand);
                 while (pResult.hasNext()) {
                     Record record = pResult.next();
                     final String id = record.get("id").asString();
@@ -477,7 +477,7 @@ public class Database implements AutoCloseable {
                     tx.run("MATCH (n {id:$id}) DETACH DELETE n",
                         parameters("id", node.getValue0()));
                 });
-                tx.success();
+                tx.commit();
             }
         }
     }
@@ -533,7 +533,7 @@ public class Database implements AutoCloseable {
                             link.getValue2(), "version", mLatestVersion));
                 });
 
-                tx.success();
+                tx.commit();
             }
         }
     }
@@ -554,7 +554,7 @@ public class Database implements AutoCloseable {
                 + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in "
                 + "eRelationships WHERE e IN relationships(path)) AND NOT any(e in eNodes WHERE e IN nodes(path))"
                 + " RETURN p.id AS parent, c.id AS child, TYPE(r) AS type";
-            StatementResult cResult = session.run(cCommand);
+            Result cResult = session.run(cCommand);
             while (cResult.hasNext()) {
                 Record record = cResult.next();
                 cLinks.add(Triplet.with(record.get("parent").asString(),
@@ -574,7 +574,7 @@ public class Database implements AutoCloseable {
                     + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in eNodes WHERE e IN"
                     + " nodes(path))"
                     + " RETURN p.id AS parent, c.id AS child, TYPE(r) AS type";
-                StatementResult pResult = session.run(pCommand);
+                Result pResult = session.run(pCommand);
                 while (pResult.hasNext()) {
                     Record record = pResult.next();
                     pLinks.add(Triplet.with(record.get("parent").asString(),
@@ -600,7 +600,7 @@ public class Database implements AutoCloseable {
                     tx.run(String.format("MATCH (p {id:$pid})-[r:%s]->(c {id:$cid}) DETACH DELETE r",
                         link.getValue1()), parameters("pid", link.getValue0(), "cid", link.getValue2()));
                 });
-                tx.success();
+                tx.commit();
             }
         }
     }
@@ -714,7 +714,7 @@ public class Database implements AutoCloseable {
                             file.getValue3()));
                 });
 
-                tx.success();
+                tx.commit();
             }
         }
     }
@@ -738,7 +738,7 @@ public class Database implements AutoCloseable {
                 + " WHERE NOT any(e in eRelationships WHERE e IN relationships(p)) AND NOT any(e in eNodes WHERE e "
                 + "IN nodes(p))"
                 + " RETURN i.id AS issue, parent.id AS pkg, node.id AS file, node.commit AS commit";
-            StatementResult cResult = session.run(cCommand);
+            Result cResult = session.run(cCommand);
             while (cResult.hasNext()) {
                 Record record = cResult.next();
 
@@ -765,7 +765,7 @@ public class Database implements AutoCloseable {
                     + " MATCH p=((i)-[:IMPLEMENTS]->(parent:Package)-[:CONTAINED_BY]->(node:Code))"
                     + " WHERE NOT any(e in eNodes WHERE e IN nodes(p))"
                     + " RETURN i.id AS issue, parent.id AS pkg, node.id AS file, node.commit AS commit";
-                StatementResult pResult = session.run(pCommand);
+                Result pResult = session.run(pCommand);
                 while (pResult.hasNext()) {
                     Record record = pResult.next();
 
@@ -809,7 +809,7 @@ public class Database implements AutoCloseable {
                     tx.run("MATCH (c:Code {id:$cid, commit:$commit}) DETACH DELETE c;",
                         parameters("cid", file.getValue1(), "commit", file.getValue2()));
                 });
-                tx.success();
+                tx.commit();
             }
         }
     }

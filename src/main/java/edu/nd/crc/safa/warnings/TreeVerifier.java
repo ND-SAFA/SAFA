@@ -54,12 +54,12 @@ public class TreeVerifier {
         }
     }
 
-    public final Map<String, List<Rule.Name>> verify(final List<org.neo4j.driver.v1.types.Node> nodes,
+    public final Map<String, List<Rule.Name>> verify(final List<org.neo4j.driver.types.Node> nodes,
                                                      final Map<Long, String> ids,
                                                      final List<Map<String, Object>> values) {
         Map<String, String> nodeList = new HashMap<>();
         for (int i = 0; i < nodes.size(); i++) {
-            final org.neo4j.driver.v1.types.Node node = nodes.get(i);
+            final org.neo4j.driver.types.Node node = nodes.get(i);
             if (node.get("id") == null || node.get("id").toString() == "NULL") {
                 continue;
             }

@@ -36,6 +36,10 @@ public class MySQL {
     String mySQLConnectionName = System.getenv("_MY_SQL_CONNECTION_NAME");
 
     public MySQL() {
+        Map<String, String> env = System.getenv();
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        }
     }
 
     public Connection getConnection() throws Exception {

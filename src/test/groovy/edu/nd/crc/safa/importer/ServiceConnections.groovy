@@ -8,8 +8,7 @@ import spock.lang.Specification
 class ServiceConnections extends Specification {
     def "MySQL Connection"() {
         System.out.println("HELLO")
-        ap<String, String> env = System.getenv();
-        env.forEach({ k, v -> System.out.println(k + ":" + v) });
+
         def sql = new MySQL();
 
         expect:

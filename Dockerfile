@@ -1,5 +1,8 @@
 FROM gradle:5.6.2-jdk8 AS builder
 COPY checkstyle.xml /app/checkstyle.xml
+COPY .env /app/.env
+COPY safa-google-key.json /app/safa-google-key.json
+
 WORKDIR /app
 ADD build.gradle /app/
 ADD src/ /app/src/

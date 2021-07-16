@@ -74,6 +74,7 @@ public class Database implements AutoCloseable {
      * doesn't exist the it checks to see if there are any nodes and if so then we are on the first version.
      */
     public int currentVersion() {
+        System.out.println("Getting current version...");
         int version = -1;
 
         // Check if we have a version node which stores the current version
@@ -83,6 +84,8 @@ public class Database implements AutoCloseable {
                 Record record = result.next();
                 version = record.get("v.number").asInt();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // If we have no version and but we have nodes then our current version is 0

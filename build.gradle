@@ -61,11 +61,11 @@ task myTask(type: Exec) {
 
 test {
     if (file('.env').exists()) {
-        print("ENV file exists!")
         file('.env').readLines().each() {
             def (key, value) = it.tokenize('=')
             if (value != "") {
                 environment key, value
+                print("adding {" + key + "} to env\n")
             }
         }
     }

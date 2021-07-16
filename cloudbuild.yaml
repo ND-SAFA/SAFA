@@ -3,6 +3,9 @@ steps:
     args: ['touch', '.env']
   - name: 'bash'
     args: ['touch', 'safa-google-key.json']
+  - name: 'bash'
+    args:
+      - 'env'
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'

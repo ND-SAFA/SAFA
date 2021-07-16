@@ -60,7 +60,7 @@ task myTask(type: Exec) {
 }
 
 test {
-    if (file('.env').exists()) {
+    if (file('.env').exists()) { //for local development
         file('.env').readLines().each() {
             def (key, value) = it.tokenize('=')
             if (value != "") {

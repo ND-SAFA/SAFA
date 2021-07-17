@@ -25,4 +25,14 @@ steps:
       - '_NEO4J_URI=${_NEO4J_URI}'
       - '_NEO4J_USERNAME=${_NEO4J_USERNAME}'
       - '_NEO4J_PASSWORD=${_NEO4J_PASSWORD}'
-    args: ['build', '.']
+    args: ['build',
+           '--build-arg', '_MY_SQL_HOST',
+           '--build-arg','_MY_SQL_USERNAME',
+           '--build-arg','_MY_SQL_PASSWORD',
+           '--build-arg','_MY_SQL_CONNECTION_NAME',
+           '--build-arg','_MY_SQL_DATABASE',
+           '--build-arg','_NEO4J_URI',
+           '--build-arg','_NEO4J_USERNAME',
+           '--build-arg','_NEO4J_PASSWORD',
+           '.'
+    ]

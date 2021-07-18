@@ -22,13 +22,13 @@ import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Values;
-import org.neo4j.driver.v1.types.Node;
-import org.neo4j.driver.v1.types.Relationship;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Values;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -247,7 +247,7 @@ public class ProjectService {
                 + ": 'RELATIONSHIP_GLOBAL'}) yield path \n"
                 + "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten"
                 + "(collect(last(nodes(path))))) END AS nodes";
-            StatementResult result = session.run(query, Values.parameters("node", "(?i)"
+            Result result = session.run(query, Values.parameters("node", "(?i)"
                 + node.replace(".", "\\\\.")));
 
             List<String> ret = new ArrayList<String>();
@@ -266,7 +266,7 @@ public class ProjectService {
         List<Map<String, Object>> set = new ArrayList<>();
         try (Session session = driver.session()) {
             String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
-            StatementResult result = session.run(query);
+            Result result = session.run(query);
             List<Record> records = result.list();
             for (int i = 0; i < records.size(); i++) {
                 Node node = records.get(i).get("n").asNode();
@@ -287,7 +287,7 @@ public class ProjectService {
             String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
                 + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
                 + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
-            StatementResult result = session.run(query);
+            Result result = session.run(query);
             return parseArtifactTree(result, projectId);
         }
     }
@@ -302,7 +302,7 @@ public class ProjectService {
     public Map<String, Object> versions(String projectId) {
         int version = -1;
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (v:VERSION) RETURN v.number");
+            Result result = session.run("MATCH (v:VERSION) RETURN v.number");
             if (result.hasNext()) {
                 Record record = result.next();
                 version = record.get("v.number").asInt();
@@ -313,7 +313,7 @@ public class ProjectService {
         if (version == -1) {
             int count = 0;
             try (Session session = driver.session()) {
-                StatementResult result = session.run("MATCH (n) RETURN count(*)");
+                Result result = session.run("MATCH (n) RETURN count(*)");
                 if (result.hasNext()) {
                     Record record = result.next();
                     count = record.get("count(*)").asInt();
@@ -366,7 +366,7 @@ public class ProjectService {
                 + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
                 + ".coll.flatten(collect([r in relationships(path)]))) AS rel\n";
 
-            StatementResult result = session.run(query, Values.parameters("version",
+            Result result = session.run(query, Values.parameters("version",
                 version, "root", root));
 
             final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
@@ -406,7 +406,7 @@ public class ProjectService {
         return "{\"success\": true, \"message\": \"Layout saved\"}";
     }
 
-    private List<Map<String, Object>> parseArtifactTree(StatementResult result, String projectId) {
+    private List<Map<String, Object>> parseArtifactTree(Result result, String projectId) {
         List<Map<String, Object>> values = new ArrayList<>();
         Map<Long, String> ids = new HashMap<>();
         Map<Long, Boolean> edges = new HashMap<>();

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.importer;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -13,10 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.warnings.Rule;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,26 +30,47 @@ public class MySQL {
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
 
-    @Value("${mysql.host}")
-    String mysqlHost;
-    @Value("${mysql.port}")
-    String mysqlPort;
-    @Value("${mysql.username}")
-    String mysqlUser;
-    @Value("${mysql.password}")
-    String mysqlPassword;
-    @Value("${mysql.database}")
-    String mysqlDatabase;
+    String mysqlUser = System.getenv("_MY_SQL_USERNAME");
+    String mysqlPassword = System.getenv("_MY_SQL_PASSWORD");
+    String mysqlDatabase = System.getenv("_MY_SQL_DATABASE");
+    String mySQLConnectionName = System.getenv("_MY_SQL_CONNECTION_NAME");
 
     public MySQL() {
     }
 
     public Connection getConnection() throws Exception {
-        String databaseURL = String.format("jdbc:mysql://%s:%s/%s?useSSL=false", mysqlHost, mysqlPort, mysqlDatabase);
-        return DriverManager.getConnection(databaseURL, mysqlUser, mysqlPassword);
+        return createConnectionPool().getConnection();
     }
 
-    ;
+    private DataSource createConnectionPool() {
+        if (mysqlUser == null || mysqlPassword == null || mysqlDatabase == null || mySQLConnectionName == null) {
+            throw new RuntimeException("Could not find at least one environment variable");
+        }
+
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(String.format("jdbc:mysql:///%s", mysqlDatabase));
+        config.setUsername(mysqlUser);
+        config.setPassword(mysqlPassword);
+        config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+        config.addDataSourceProperty("cloudSqlInstance", mySQLConnectionName);
+        config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
+        config.setMaximumPoolSize(5);
+        config.setMinimumIdle(5);
+        config.setConnectionTimeout(10000); // 10 seconds
+        config.setIdleTimeout(600000); // 10 minutes
+        config.setMaxLifetime(1800000); // 30 minutes
+        return new HikariDataSource(config);
+    }
+
+    public void verifyConnection() throws Exception {
+        Statement stmt = getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery("SHOW TABLES");
+        ArrayList<String> tables = new ArrayList<String>();
+        while (rs.next()) {
+            tables.add(rs.getString(1));
+        }
+        assert tables.size() > 0;
+    }
 
     public Boolean tableExists(String tableName) throws Exception {
         try (Statement stmt = getConnection().createStatement()) {
@@ -101,7 +124,8 @@ public class MySQL {
     public void newGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws Exception {
         System.out.println(String.format("CREATING NEW GENERATED TABLE: %s...", tableName));
 
-        String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName)
+        String sqlCreateTable = String.format(
+            "CREATE TABLE %s (\n", tableName)
             + "id INT AUTO_INCREMENT PRIMARY KEY,\n"
             + "source VARCHAR(255) NOT NULL,\n"
             + "target VARCHAR(255) NOT NULL,\n"

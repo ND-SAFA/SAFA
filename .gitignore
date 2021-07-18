@@ -5,7 +5,7 @@ build/
 !**/src/main/**
 !**/src/test/**
 .env
-*key.json
+safa-google-key.json
 
 ### STS ###
 .apt_generated

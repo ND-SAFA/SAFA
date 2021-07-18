@@ -57,15 +57,6 @@ dependencies {
 }
 
 test {
-    if (file('.env').exists()) { //for local development
-        file('.env').readLines().each() {
-            def (key, value) = it.tokenize('=')
-            if (value != "") {
-                environment key, value
-            }
-        }
-    }
-
     testLogging {
         outputs.upToDateWhen { false }
         showStandardStreams = true

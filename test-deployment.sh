@@ -1,6 +1,8 @@
-source .env &&
+(set -a &&
+  source .env &&
   cloud-build-local \
     --config=cloudbuild.yaml \
     --dryrun=false \
     --substitutions _MY_SQL_HOST=$_MY_SQL_HOST,_MY_SQL_USERNAME=$_MY_SQL_USERNAME,_MY_SQL_PASSWORD=$_MY_SQL_PASSWORD,_MY_SQL_CONNECTION_NAME=$_MY_SQL_CONNECTION_NAME,_NEO4J_URI=$_NEO4J_URI,_NEO4J_USERNAME=$_NEO4J_USERNAME,_NEO4J_PASSWORD=$_NEO4J_PASSWORD,_MY_SQL_DATABASE=$_MY_SQL_DATABASE \
     .
+)

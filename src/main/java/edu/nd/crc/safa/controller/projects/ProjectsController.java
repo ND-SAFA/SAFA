@@ -3,9 +3,14 @@ package edu.nd.crc.safa.controller.projects;
 import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.AppConfig;
 import edu.nd.crc.safa.dao.Links;
+import edu.nd.crc.safa.importer.Database;
+import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.services.ProjectService;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +29,16 @@ public class ProjectsController {
 
     public ProjectsController(ProjectService projectService) {
         this.projectService = projectService;
+    }
+
+    @GetMapping("/connections")
+    public void test() throws Exception {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Database db = context.getBean(Database.class);
+        db.verifyConnection();
+
+        MySQL sql = new MySQL();
+        sql.verifyConnection();
     }
 
     @GetMapping("/projects/{projId}/parents/{node}")

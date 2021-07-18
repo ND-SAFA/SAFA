@@ -36,10 +36,6 @@ public class MySQL {
     String mySQLConnectionName = System.getenv("_MY_SQL_CONNECTION_NAME");
 
     public MySQL() {
-        Map<String, String> env = System.getenv();
-        for (Map.Entry<String, String> entry : env.entrySet()) {
-            System.out.println(entry.getKey() + ":" + entry.getValue());
-        }
     }
 
     public Connection getConnection() throws Exception {
@@ -47,7 +43,9 @@ public class MySQL {
     }
 
     private DataSource createConnectionPool() {
-        System.out.println("SQL Connection Name" + mySQLConnectionName); //todo: remove this
+        if (mysqlUser == null || mysqlPassword == null || mysqlDatabase == null || mySQLConnectionName == null) {
+            throw new RuntimeException("Could not find at least one environment variable");
+        }
 
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(String.format("jdbc:mysql:///%s", mysqlDatabase));
@@ -64,18 +62,14 @@ public class MySQL {
         return new HikariDataSource(config);
     }
 
-    public ArrayList<String> getTableNames() throws Exception {
-        try (Statement stmt = getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery("SHOW TABLES");
-            ArrayList<String> tables = new ArrayList<String>();
-            while (rs.next()) {
-                tables.add(rs.getString(1));
-            }
-            return tables;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+    public void verifyConnection() throws Exception {
+        Statement stmt = getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery("SHOW TABLES");
+        ArrayList<String> tables = new ArrayList<String>();
+        while (rs.next()) {
+            tables.add(rs.getString(1));
         }
+        assert tables.size() > 0;
     }
 
     public Boolean tableExists(String tableName) throws Exception {

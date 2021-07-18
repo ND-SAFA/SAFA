@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class MainApplication {
 
+    // Neo4J Credentials
     String neo4jURI = System.getenv("_NEO4J_URI");
     String neo4jUser = System.getenv("_NEO4J_USERNAME");
     String neo4jPassword = System.getenv("_NEO4J_PASSWORD");

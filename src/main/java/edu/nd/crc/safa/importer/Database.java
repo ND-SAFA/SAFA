@@ -36,7 +36,6 @@ public class Database implements AutoCloseable {
     private Set<Quartet<String, String, String, String>> mSourceMap =
         new HashSet<Quartet<String, String, String, String>>();
 
-
     Driver driver;
     private static int mLatestVersion = 0;
 
@@ -46,9 +45,6 @@ public class Database implements AutoCloseable {
     }
 
     public void verifyConnection() {
-        if (driver == null) {
-            throw new RuntimeException("Neo4J driver is null");
-        }
         driver.verifyConnectivity();
     }
 

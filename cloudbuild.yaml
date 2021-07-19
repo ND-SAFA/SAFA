@@ -1,22 +1,6 @@
 steps:
-  - name: 'bash'
-    args: ['touch', '.env']
-  - name: 'bash'
-    args: ['touch', 'safa-google-key.json']
-  - name: 'bash'
-    id: 'print env variables'
-    env:
-      - '_MY_SQL_HOST=${_MY_SQL_HOST}'
-      - '_MY_SQL_USERNAME=${_MY_SQL_USERNAME}'
-      - '_MY_SQL_PASSWORD=${_MY_SQL_PASSWORD}'
-      - '_MY_SQL_CONNECTION_NAME=${_MY_SQL_CONNECTION_NAME}'
-      - '_MY_SQL_DATABASE=${_MY_SQL_DATABASE}'
-      - '_NEO4J_URI=${_NEO4J_URI}'
-      - '_NEO4J_USERNAME=${_NEO4J_USERNAME}'
-      - '_NEO4J_PASSWORD=${_NEO4J_PASSWORD}'
-    args:
-      - 'env'
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build the container image'
     env:
       - '_MY_SQL_HOST=${_MY_SQL_HOST}'
       - '_MY_SQL_USERNAME=${_MY_SQL_USERNAME}'
@@ -36,5 +20,20 @@ steps:
       '--build-arg','_NEO4J_URI',
       '--build-arg','_NEO4J_USERNAME',
       '--build-arg','_NEO4J_PASSWORD',
+      '-t', 'gcr.io/$PROJECT_ID/$_IMAGE',
       '.'
     ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push the container image to Container Registry'
+    args: ['push', 'gcr.io/$PROJECT_ID/$_IMAGE']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy container image to Cloud Run'
+    entrypoint: gcloud
+    args: ['run', 'deploy', '$_SERVICE_NAME',
+           '--image', 'gcr.io/$PROJECT_ID/$_IMAGE',
+           '--region', '$_REGION',
+           '--platform', 'managed']
+images:
+  - 'gcr.io/$PROJECT_ID/$_IMAGE'

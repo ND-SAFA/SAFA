@@ -3,10 +3,13 @@ steps:
     id: 'Build the container image'
     args: [
       'build',
-      '--push',
       '-t', 'gcr.io/$PROJECT_ID/$BRANCH_NAME/$COMMIT_SHA',
       '.'
     ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push the container image to Container Registry'
+    args: ['push', 'gcr.io/$PROJECT_ID/$BRANCH_NAME/$COMMIT_SHA']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy container image to Cloud Run'

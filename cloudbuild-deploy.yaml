@@ -15,6 +15,7 @@ steps:
     id: 'Deploy container image to Cloud Run'
     entrypoint: gcloud
     args: ['run', 'deploy', '$_SERVICE_NAME',
+           '--service-account', '$_SERVICE_ACCOUNT',
            '--image', 'gcr.io/$PROJECT_ID/$BRANCH_NAME/$COMMIT_SHA',
            '--region', '$_REGION',
            '--platform', 'managed']

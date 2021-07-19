@@ -37,13 +37,14 @@ public class ProjectsController {
     }
 
     @GetMapping("/connections")
-    public void test() throws Exception {
+    public String test() throws Exception {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         Database db = context.getBean(Database.class);
         db.verifyConnection();
 
         MySQL sql = new MySQL();
         sql.verifyConnection();
+        return "Connected Neo4J and MySQL!";
     }
 
     @GetMapping("/projects/{projId}/parents/{node}")

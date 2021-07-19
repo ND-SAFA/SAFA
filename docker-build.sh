@@ -1,1 +1,1 @@
-(set -a && source .env && docker build -t safa-api .)
+docker build -t safa-api .

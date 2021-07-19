@@ -31,6 +31,11 @@ public class ProjectsController {
         this.projectService = projectService;
     }
 
+    @GetMapping("/")
+    public String root() {
+        return "Hello World";
+    }
+
     @GetMapping("/connections")
     public void test() throws Exception {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);

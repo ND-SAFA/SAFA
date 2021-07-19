@@ -1,30 +1,9 @@
 FROM gradle:5.6.2-jdk8 AS builder
-COPY checkstyle.xml /app/checkstyle.xml
-
-ARG _MY_SQL_HOST
-ARG _MY_SQL_USERNAME
-ARG _MY_SQL_PASSWORD
-ARG _MY_SQL_CONNECTION_NAME
-ARG _MY_SQL_DATABASE
-ARG _NEO4J_URI
-ARG _NEO4J_USERNAME
-ARG _NEO4J_PASSWORD
-
-ENV _MY_SQL_HOST=${_MY_SQL_HOST}
-ENV _MY_SQL_USERNAME=${_MY_SQL_USERNAME}
-ENV _MY_SQL_PASSWORD=${_MY_SQL_PASSWORD}
-ENV _MY_SQL_CONNECTION_NAME=${_MY_SQL_CONNECTION_NAME}
-ENV _MY_SQL_DATABASE=${_MY_SQL_DATABASE}
-ENV _NEO4J_URI=${_NEO4J_URI}
-ENV _NEO4J_USERNAME=${_NEO4J_USERNAME}
-ENV _NEO4J_PASSWORD=${_NEO4J_PASSWORD}
-
-COPY .env /app/.env
-COPY safa-google-key.json /app/safa-google-key.json
 
 WORKDIR /app
 ADD build.gradle /app/
 ADD src/ /app/src/
+ADD checkstyle.xml /app/checkstyle.xml
 RUN gradle build --stacktrace
 
 FROM openjdk:8-jdk-alpine

@@ -16,7 +16,9 @@ steps:
     entrypoint: gcloud
     args: ['run', 'deploy', '$_SERVICE_NAME',
            '--image', 'gcr.io/$PROJECT_ID/$BRANCH_NAME/$COMMIT_SHA',
-           '--region', 'us-central1',
+           '--region', '$_REGION',
            '--platform', 'managed']
 images:
   - 'gcr.io/$PROJECT_ID/$BRANCH_NAME/$COMMIT_SHA'
+substitutions:
+  _REGION: us-central1

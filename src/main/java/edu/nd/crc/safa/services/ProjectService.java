@@ -51,7 +51,7 @@ public class ProjectService {
     GenerateFlatfile generateFlatfile;
 
     @Autowired
-    private MySQL sql = new MySQL();
+    private MySQL sql;
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
     public ProjectService() {

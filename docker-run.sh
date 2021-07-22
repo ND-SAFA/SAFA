@@ -1,1 +1,1 @@
-set -a && source .env && docker run -p 8080:8080 safa-api
+docker run --env-file .env -p 8080:8080 safa-api

@@ -1,1 +1,1 @@
-docker build -t safa-api .
+docker build -t safa_api .

@@ -44,11 +44,20 @@ public class MySQL {
     }
 
     private DataSource createConnectionPool() {
-        if (mysqlUser == null
-            || mysqlPassword == null
-            || mysqlDatabase == null
-            || mysqlHost == null) {
-            throw new RuntimeException("Could not find at least one environment variable");
+        if (mysqlUser == null) {
+            throw new RuntimeException("MySQL user is null");
+        }
+
+        if (mysqlPassword == null) {
+            throw new RuntimeException("MySQL Password is null");
+        }
+
+        if (mysqlDatabase == null) {
+            throw new RuntimeException("MySQL database name is null");
+        }
+
+        if (mysqlHost == null) {
+            throw new RuntimeException("MySQL server host is null");
         }
 
         HikariConfig config = new HikariConfig();

@@ -1,11 +1,13 @@
 FROM gradle:5.6.2-jdk8 AS builder
 
-WORKDIR /app
 ADD build.gradle /app/
 ADD src/ /app/src/
 ADD checkstyle.xml /app/
 ADD .env /app/
-RUN gradle build --stacktrace
+
+WORKDIR /app
+RUN sed -i s/localhost/host.docker.internal/ .env \ # hello
+    && gradle build --stacktrace
 
 FROM openjdk:8-jdk-alpine
 COPY --from=0 /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar

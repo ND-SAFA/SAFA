@@ -30,12 +30,12 @@ public class SmokeTest {
 
     @Test
     public void testHelloWorld() throws Exception {
-        this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get("/")).andExpect(status().isOk())
             .andExpect(content().string(containsString("Hello World")));
     }
 
     @Test
     public void testConnections() throws Exception {
-        this.mockMvc.perform(get("/connections")).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get("/connections")).andExpect(status().isOk());
     }
 }

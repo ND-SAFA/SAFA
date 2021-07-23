@@ -23,8 +23,15 @@ public class MainApplication {
 
     @Bean
     public Driver neo4jDriver() {
-        if (neo4jURI == null || neo4jUser == null || neo4jPassword == null) {
-            return null;
+        if (neo4jURI == null) {
+            throw new RuntimeException("Neo4J Uri is null");
+        }
+        if (neo4jUser == null) {
+            throw new RuntimeException("Neo4J neo4jUser is null");
+        }
+
+        if (neo4jPassword == null) {
+            throw new RuntimeException("Neo4J Password is null");
         }
         AuthToken token = AuthTokens.basic(neo4jUser, neo4jPassword);
         return GraphDatabase.driver(neo4jURI, AuthTokens.basic(neo4jUser, neo4jPassword), Config.defaultConfig());

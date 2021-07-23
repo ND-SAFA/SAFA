@@ -60,6 +60,13 @@ dependencies {
 }
 
 test {
+    print("ENVIRONMENT")
+    file('.env').readLines().each() {
+        def (key, value) = it.tokenize('=')
+        environment key, value
+        print(key + ":" + value + "\n")
+    }
+
     testLogging {
         outputs.upToDateWhen { false }
         showStandardStreams = true

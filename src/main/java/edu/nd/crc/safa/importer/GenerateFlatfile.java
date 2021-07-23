@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.importer.temp.VSM;
+import edu.nd.crc.safa.importer.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,7 +75,7 @@ public class GenerateFlatfile {
             tTokens.put(doc.get(0), Arrays.asList(doc.get(2).split(" ")));
         }
 
-        VSM vsm = new VSM();
+        Controller vsm = new Controller();
         vsm.buildIndex(tTokens.values());
         List<String> lines = new ArrayList<>();
         lines.add("Source,Target,Score");

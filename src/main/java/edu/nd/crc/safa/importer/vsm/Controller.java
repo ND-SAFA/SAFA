@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.temp;
+package edu.nd.crc.safa.importer.vsm;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,7 +9,7 @@ import edu.nd.crc.safa.importer.TraceInterface;
  * Vector Space Model using TF-IDF scores for evaluating document relevance
  */
 
-public class VSM implements TraceInterface {
+public class Controller implements TraceInterface {
     private Map<String, Double> idf;
 
     public void buildIndex(Collection<Collection<String>> docTokens) {

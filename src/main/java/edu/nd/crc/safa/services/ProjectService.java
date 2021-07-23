@@ -54,13 +54,6 @@ public class ProjectService {
     private MySQL sql;
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
-    public ProjectService() {
-    }
-
-    public ProjectService(Driver driver) {
-        this.driver = driver;
-    }
-
     public SseEmitter projectPull(String projId) {
         SseEmitter emitter = new SseEmitter(0L);
         ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();

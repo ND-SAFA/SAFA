@@ -29,12 +29,15 @@ repositories {
 dependencies {
     // mandatory dependencies for using Spock
     compile 'org.codehaus.groovy:groovy-all:2.5.7'
-    compile 'org.neo4j.driver:neo4j-java-driver:4.3.3'
     compile 'mysql:mysql-connector-java:8.0.15'
     compile 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.3.1'
     compile 'com.jsoniter:jsoniter:0.9.23'
     compile 'org.javatuples:javatuples:1.2'
     compile 'org.eclipse.jgit:org.eclipse.jgit:5.5.1.201910021850-r'
+
+    //Neo4J
+    compile 'org.neo4j.driver:neo4j-java-driver:4.3.3'
+    compile 'org.neo4j.driver:neo4j-java-driver-spring-boot-starter:4.2.7.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-autoconfigure:2.1.6.RELEASE'

@@ -30,6 +30,7 @@ public class MySQL {
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
 
+    String mysqlHost = System.getenv("_MY_SQL_HOST");
     String mysqlUser = System.getenv("_MY_SQL_USERNAME");
     String mysqlPassword = System.getenv("_MY_SQL_PASSWORD");
     String mysqlDatabase = System.getenv("_MY_SQL_DATABASE");
@@ -43,16 +44,25 @@ public class MySQL {
     }
 
     private DataSource createConnectionPool() {
-        if (mysqlUser == null || mysqlPassword == null || mysqlDatabase == null || mySQLConnectionName == null) {
+        if (mysqlUser == null
+            || mysqlPassword == null
+            || mysqlDatabase == null
+            || mysqlHost == null) {
             throw new RuntimeException("Could not find at least one environment variable");
         }
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(String.format("jdbc:mysql:///%s", mysqlDatabase));
+        String URL = String.format("jdbc:mysql://%s/%s", mysqlHost, mysqlDatabase);
+        System.out.println("URL: " + URL);
+        config.setJdbcUrl(URL);
         config.setUsername(mysqlUser);
         config.setPassword(mysqlPassword);
-        config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
-        config.addDataSourceProperty("cloudSqlInstance", mySQLConnectionName);
+
+        if (mySQLConnectionName != null) {
+            config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+            config.addDataSourceProperty("cloudSqlInstance", mySQLConnectionName);
+        }
+
         config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(5);

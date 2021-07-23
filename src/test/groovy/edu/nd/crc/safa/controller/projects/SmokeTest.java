@@ -33,4 +33,9 @@ public class SmokeTest {
         this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
             .andExpect(content().string(containsString("Hello World")));
     }
+
+    @Test
+    public void testConnections() throws Exception {
+        this.mockMvc.perform(get("/connections")).andDo(print()).andExpect(status().isOk());
+    }
 }

@@ -9,6 +9,7 @@ import edu.nd.crc.safa.importer.Database;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.services.ProjectService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -25,11 +26,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 public class ProjectsController {
 
-    private final ProjectService projectService;
-
-    public ProjectsController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
+    @Autowired
+    private ProjectService projectService;
 
     @GetMapping("/")
     public String root() {

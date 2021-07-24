@@ -10,9 +10,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.annotation.PostConstruct;
-
 import edu.nd.crc.safa.dao.Links;
+import edu.nd.crc.safa.database.Neo4J;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
@@ -22,7 +21,6 @@ import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.neo4j.driver.Driver;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -39,7 +37,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ProjectService {
 
     @Autowired
-    Driver driver;
+    Neo4J neo4j;
 
     @Autowired
     Puller mPuller;
@@ -52,7 +50,24 @@ public class ProjectService {
 
     @Autowired
     private MySQL sql;
+
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
+
+    private void init() {
+        final List<Map<String, Object>> nodes = nodes("test", "Hazard");
+        for (Map<String, Object> node : nodes) {
+            final String id = (String) node.get("id");
+            final int version = (Integer) versions("test").get("latest");
+            final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
+            mWarnings.put(id, false);
+            for (Map<String, Object> v : data) {
+                if (v.containsKey("warnings")) {
+                    mWarnings.put(id, true);
+                }
+            }
+        }
+        System.out.println(mWarnings);
+    }
 
     public SseEmitter projectPull(String projId) {
         SseEmitter emitter = new SseEmitter(0L);
@@ -214,26 +229,10 @@ public class ProjectService {
         }
     }
 
-    @PostConstruct
-    private void init() {
-        final List<Map<String, Object>> nodes = nodes("test", "Hazard");
-        for (Map<String, Object> node : nodes) {
-            final String id = (String) node.get("id");
-            final int version = (Integer) versions("test").get("latest");
-            final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
-            mWarnings.put(id, false);
-            for (Map<String, Object> v : data) {
-                if (v.containsKey("warnings")) {
-                    mWarnings.put(id, true);
-                }
-            }
-        }
-        System.out.println(mWarnings);
-    }
 
     @Transactional(readOnly = true)
     public List<String> parents(String projectId, String node, String rootType) {
-        try (Session session = driver.session()) {
+        try (Session session = neo4j.createSession()) {
             String query = "MATCH (a)\n"
                 + "WHERE a.id =~ $node\n"
                 + "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/" + rootType + "', uniqueness"
@@ -257,7 +256,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public List<Map<String, Object>> nodes(String projectId, String nodeType) {
         List<Map<String, Object>> set = new ArrayList<>();
-        try (Session session = driver.session()) {
+        try (Session session = neo4j.createSession()) {
             String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
             Result result = session.run(query);
             List<Record> records = result.list();
@@ -276,7 +275,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> trees(String projectId, String rootType) {
-        try (Session session = driver.session()) {
+        try (Session session = neo4j.createSession()) {
             String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
                 + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
                 + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
@@ -294,7 +293,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public Map<String, Object> versions(String projectId) {
         int version = -1;
-        try (Session session = driver.session()) {
+        try (Session session = neo4j.createSession()) {
             Result result = session.run("MATCH (v:VERSION) RETURN v.number");
             if (result.hasNext()) {
                 Record record = result.next();
@@ -305,7 +304,7 @@ public class ProjectService {
         // If we have no version and but we have nodes then our current version is 0
         if (version == -1) {
             int count = 0;
-            try (Session session = driver.session()) {
+            try (Session session = neo4j.createSession()) {
                 Result result = session.run("MATCH (n) RETURN count(*)");
                 if (result.hasNext()) {
                     Record record = result.next();
@@ -325,7 +324,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType) {
-        try (Session session = driver.session()) {
+        try (Session session = neo4j.createSession()) {
             String query = "MATCH (p)-[r:UPDATES]->(c)\n"
                 + "WHERE r.version <= $version\n"
                 + "WITH p, c, r AS rs ORDER BY r.version DESC\n"

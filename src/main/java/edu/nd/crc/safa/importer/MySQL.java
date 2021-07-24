@@ -17,8 +17,7 @@ import javax.sql.DataSource;
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.warnings.Rule;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,17 +29,11 @@ public class MySQL {
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
 
-    public final int MAX_POOL_SIZE = 1;
-    public final int MIN_IDLE = 1;
-    public final int CONNECTION_TIMEOUT = 10000;    // 10 seconds
-    public final int IDLE_TIMEOUT = 600000;         // 10 minutes
-    public final int MAX_LIFETIME = 1800000;        // 30 minutes
-
-    String mysqlHost = System.getenv("_MY_SQL_HOST");
+    String mysqlURL = System.getenv("_MY_SQL_URL");
     String mysqlUser = System.getenv("_MY_SQL_USERNAME");
     String mysqlPassword = System.getenv("_MY_SQL_PASSWORD");
-    String mysqlDatabase = System.getenv("_MY_SQL_DATABASE");
-    String mySQLConnectionName = System.getenv("_MY_SQL_CONNECTION_NAME");
+
+    public final int CONNECTION_TIMEOUT = 10000;
 
     public MySQL() {
     }
@@ -52,25 +45,12 @@ public class MySQL {
     private DataSource createConnectionPool() { //TODO: Create bean from this so it can be reused!
         hasValidCredentials();
 
-        HikariConfig config = new HikariConfig();
-        String URL = String.format("jdbc:mysql://%s/%s", mysqlHost, mysqlDatabase);
-
-        config.setJdbcUrl(URL);
-        config.setUsername(mysqlUser);
-        config.setPassword(mysqlPassword);
-
-        if (mySQLConnectionName != null) {
-            config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
-            config.addDataSourceProperty("cloudSqlInstance", mySQLConnectionName);
-        }
-
-        config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
-        config.setMaximumPoolSize(MAX_POOL_SIZE);
-        config.setMinimumIdle(MIN_IDLE);
-        config.setConnectionTimeout(CONNECTION_TIMEOUT);
-        config.setIdleTimeout(IDLE_TIMEOUT);
-        config.setMaxLifetime(MAX_LIFETIME);
-        return new HikariDataSource(config);
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl(mysqlURL);
+        dataSource.setUsername(mysqlUser);
+        dataSource.setPassword(mysqlPassword);
+        return dataSource;
     }
 
     private void hasValidCredentials() {
@@ -78,21 +58,15 @@ public class MySQL {
             throw new RuntimeException("MySQL user is null");
         } else if (mysqlPassword == null) {
             throw new RuntimeException("MySQL Password is null");
-        } else if (mysqlDatabase == null) {
-            throw new RuntimeException("MySQL database name is null");
-        } else if (mysqlHost == null) {
-            throw new RuntimeException("MySQL server host is null");
+        } else if (mysqlURL == null) {
+            throw new RuntimeException("MySQL url is null");
         }
     }
 
     public void verifyConnection() throws Exception {
-        Statement stmt = getConnection().createStatement();
-        ResultSet rs = stmt.executeQuery("SHOW TABLES");
-        ArrayList<String> tables = new ArrayList<String>();
-        while (rs.next()) {
-            tables.add(rs.getString(1));
+        if (!getConnection().isValid(CONNECTION_TIMEOUT)) {
+            throw new RuntimeException("SQL Connection is not valid");
         }
-        assert tables.size() > 0;
     }
 
     public Boolean tableExists(String tableName) throws Exception {

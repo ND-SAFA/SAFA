@@ -34,6 +34,7 @@ public class Puller {
     @Autowired
     @Value("${git.password:}")
     String gitPassword;
+
     @Autowired
     @Value("${git.url:}")
     String gitURL;
@@ -48,8 +49,10 @@ public class Puller {
 
     @Autowired
     JIRA mJira;
+
     @Autowired
     public Database mDatabase;
+
     @Autowired
     private MySQL sql = new MySQL();
 

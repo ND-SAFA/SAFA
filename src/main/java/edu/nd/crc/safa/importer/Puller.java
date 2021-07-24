@@ -37,6 +37,7 @@ public class Puller {
     @Autowired
     @Value("${git.url:}")
     String gitURL;
+
     @Autowired
     @Value("${git.branch:master}")
     String gitBranch;

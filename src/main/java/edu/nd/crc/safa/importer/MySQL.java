@@ -30,6 +30,12 @@ public class MySQL {
         public List<String> expectedGeneratedFiles = new ArrayList<String>();
     }
 
+    public final int MAX_POOL_SIZE = 1;
+    public final int MIN_IDLE = 1;
+    public final int CONNECTION_TIMEOUT = 10000;    // 10 seconds
+    public final int IDLE_TIMEOUT = 600000;         // 10 minutes
+    public final int MAX_LIFETIME = 1800000;        // 30 minutes
+
     String mysqlHost = System.getenv("_MY_SQL_HOST");
     String mysqlUser = System.getenv("_MY_SQL_USERNAME");
     String mysqlPassword = System.getenv("_MY_SQL_PASSWORD");
@@ -43,26 +49,12 @@ public class MySQL {
         return createConnectionPool().getConnection();
     }
 
-    private DataSource createConnectionPool() {
-        if (mysqlUser == null) {
-            throw new RuntimeException("MySQL user is null");
-        }
-
-        if (mysqlPassword == null) {
-            throw new RuntimeException("MySQL Password is null");
-        }
-
-        if (mysqlDatabase == null) {
-            throw new RuntimeException("MySQL database name is null");
-        }
-
-        if (mysqlHost == null) {
-            throw new RuntimeException("MySQL server host is null");
-        }
+    private DataSource createConnectionPool() { //TODO: Create bean from this so it can be reused!
+        hasValidCredentials();
 
         HikariConfig config = new HikariConfig();
         String URL = String.format("jdbc:mysql://%s/%s", mysqlHost, mysqlDatabase);
-        System.out.println("URL: " + URL);
+
         config.setJdbcUrl(URL);
         config.setUsername(mysqlUser);
         config.setPassword(mysqlPassword);
@@ -73,12 +65,24 @@ public class MySQL {
         }
 
         config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
-        config.setMaximumPoolSize(5);
-        config.setMinimumIdle(5);
-        config.setConnectionTimeout(10000); // 10 seconds
-        config.setIdleTimeout(600000); // 10 minutes
-        config.setMaxLifetime(1800000); // 30 minutes
+        config.setMaximumPoolSize(MAX_POOL_SIZE);
+        config.setMinimumIdle(MIN_IDLE);
+        config.setConnectionTimeout(CONNECTION_TIMEOUT);
+        config.setIdleTimeout(IDLE_TIMEOUT);
+        config.setMaxLifetime(MAX_LIFETIME);
         return new HikariDataSource(config);
+    }
+
+    private void hasValidCredentials() {
+        if (mysqlUser == null) {
+            throw new RuntimeException("MySQL user is null");
+        } else if (mysqlPassword == null) {
+            throw new RuntimeException("MySQL Password is null");
+        } else if (mysqlDatabase == null) {
+            throw new RuntimeException("MySQL database name is null");
+        } else if (mysqlHost == null) {
+            throw new RuntimeException("MySQL server host is null");
+        }
     }
 
     public void verifyConnection() throws Exception {

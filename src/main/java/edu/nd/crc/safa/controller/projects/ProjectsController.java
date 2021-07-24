@@ -3,15 +3,12 @@ package edu.nd.crc.safa.controller.projects;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.AppConfig;
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.importer.Database;
+import edu.nd.crc.safa.database.Neo4J;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,9 +33,7 @@ public class ProjectsController {
 
     @GetMapping("/connections")
     public String test() throws Exception {
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        Database db = context.getBean(Database.class);
-        db.verifyConnection();
+        (new Neo4J()).verifyConnectivity();
 
         MySQL sql = new MySQL();
         sql.verifyConnection();

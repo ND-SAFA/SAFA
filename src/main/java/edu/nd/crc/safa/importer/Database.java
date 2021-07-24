@@ -7,9 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.database.Neo4J;
+
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;
-import org.neo4j.driver.Driver;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -36,20 +37,12 @@ public class Database implements AutoCloseable {
     private Set<Quartet<String, String, String, String>> mSourceMap =
         new HashSet<Quartet<String, String, String, String>>();
 
-    Driver driver;
+    @Autowired
+    Neo4J driver;
     private static int mLatestVersion = 0;
 
-    @Autowired
-    public Database(Driver driver) {
-        this.driver = driver;
-    }
-
-    public void verifyConnection() {
-        driver.verifyConnectivity();
-    }
-
     public Result query(final String query) {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             return session.run(query);
         }
     }
@@ -64,7 +57,7 @@ public class Database implements AutoCloseable {
             throw new EmptyException();
         }
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=$version RETURN v;",
                     parameters("version", nextVersion));
@@ -83,7 +76,7 @@ public class Database implements AutoCloseable {
         int version = -1;
 
         // Check if we have a version node which stores the current version
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             Result result = session.run("MATCH (v:VERSION) RETURN v.number");
             if (result.hasNext()) {
                 Record record = result.next();
@@ -96,7 +89,7 @@ public class Database implements AutoCloseable {
         // If we have no version and but we have nodes then our current version is 0
         if (version == -1) {
             int count = 0;
-            try (Session session = driver.session()) {
+            try (Session session = driver.createSession()) {
                 Result result = session.run("MATCH (n) RETURN count(*)");
                 if (result.hasNext()) {
                     Record record = result.next();
@@ -115,7 +108,7 @@ public class Database implements AutoCloseable {
      * This function clears the entire database of nodes and links
      */
     public void clear() {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 if (VERBOSE) {
                     System.out.println("MATCH (n) DETACH DELETE n;");
@@ -162,7 +155,7 @@ public class Database implements AutoCloseable {
         // Find next version
         mLatestVersion = currentVersion();
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             String command = removedDataQuery(mLatestVersion) + " MATCH (n)\n"
                 + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
                 + "eNodes"
@@ -188,7 +181,7 @@ public class Database implements AutoCloseable {
             }
         }
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             String command = removedDataQuery(mLatestVersion) + " MATCH path=((c)<-[r]-(p))"
                 + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in eRelationships WHERE e"
                 + " IN relationships(path)) AND NOT any(e in eNodes WHERE e IN nodes(path))"
@@ -201,7 +194,7 @@ public class Database implements AutoCloseable {
             }
         }
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             String command = removedDataQuery(mLatestVersion) + " MATCH p=((i)-[:IMPLEMENTS]->(parent:Package)"
                 + "-[:CONTAINED_BY]->(node:Code))"
                 + " WHERE NOT any(e in eRelationships WHERE e IN relationships(p)) AND NOT any(e in eNodes WHERE e IN"
@@ -234,7 +227,7 @@ public class Database implements AutoCloseable {
 
     public int getLatestVersion() {
         int version = 0;
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             Result result = session.run(
                 "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r"
                     + ".version DESC LIMIT 1");
@@ -248,7 +241,7 @@ public class Database implements AutoCloseable {
 
     public int getNodeCount(final String type) {
         int count = 0;
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             Result result = session.run(String.format("MATCH (:%s) RETURN count(*)", type));
             count = result.next().get("count(*)").asInt();
         }
@@ -256,7 +249,7 @@ public class Database implements AutoCloseable {
     }
 
     public void printNodes(final String type) {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             Result result = session.run("MATCH (n) WHERE [$type IN LABELS(n)] RETURN n",
                 parameters("type", type));
             if (result.hasNext()) {
@@ -267,7 +260,7 @@ public class Database implements AutoCloseable {
     }
 
     public void printRelationships(final String id) {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             Result result = session.run("MATCH ({id: $id})-[r]-() RETURN r",
                 parameters("id", id));
             if (result.hasNext()) {
@@ -279,7 +272,7 @@ public class Database implements AutoCloseable {
 
     public int getLinkCount(final String type) {
         int count = 0;
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             count = session.run("MATCH ()<-[r]-() WHERE TYPE(r)=$type RETURN count(*)",
                 parameters("type", type)).single().get("count(*)").asInt();
         }
@@ -307,7 +300,7 @@ public class Database implements AutoCloseable {
         processOldIssues();
 
         // Delete old updates
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("MATCH ()-[r:UPDATES]-() WHERE r.version = $version DELETE r",
                     parameters("version", mLatestVersion));
@@ -362,7 +355,7 @@ public class Database implements AutoCloseable {
 
         // Apply changes to the database
         Set<String> seenTypes = new HashSet<String>();
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 added.forEach((node) -> {
                     if (VERBOSE) {
@@ -411,7 +404,7 @@ public class Database implements AutoCloseable {
             }
         }
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 seenTypes.stream().forEach((type) -> {
                     tx.run(String.format("CREATE INDEX ON :%s(id)", sanitizeType(type)));
@@ -428,7 +421,7 @@ public class Database implements AutoCloseable {
      * version but not the tagged version and then removes them.
      */
     private void processOldIssues() {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             // Get data for current version
             Set<Triplet<String, String, String>> cNodes = new HashSet<Triplet<String, String, String>>();
 
@@ -509,7 +502,7 @@ public class Database implements AutoCloseable {
         }).collect(Collectors.toSet());
 
         // Apply changes to the database
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 added.forEach((link) -> {
                     if (VERBOSE) {
@@ -554,7 +547,7 @@ public class Database implements AutoCloseable {
      * but not thetagged version and then removes them.
      */
     private void processOldLinks() {
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             // Get data for current version
             Set<Triplet<String, String, String>> cLinks = new HashSet<Triplet<String, String, String>>();
 
@@ -643,7 +636,7 @@ public class Database implements AutoCloseable {
         }).collect(Collectors.toSet());
 
         // Apply changes to the database
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             try (Transaction tx = session.beginTransaction()) {
                 added.forEach((file) -> {
                     if (VERBOSE) {
@@ -736,7 +729,7 @@ public class Database implements AutoCloseable {
      */
     private void processOldSources() {
         // Handles Sources
-        try (Session session = driver.session()) {
+        try (Session session = driver.createSession()) {
             // Get data for current version
             Set<Quartet<String, String, String, String>> cSources =
                 new HashSet<Quartet<String, String, String, String>>();

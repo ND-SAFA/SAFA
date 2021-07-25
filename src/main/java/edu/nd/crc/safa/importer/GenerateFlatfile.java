@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.importer;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GenerateFlatfile {
-    @Autowired
+
     private MySQL sql = new MySQL();
 
-    public String generateFiles() throws Exception {
+    @Autowired
+    public GenerateFlatfile(MySQL sql) {
+        this.sql = sql;
+    }
+
+    public String generateFiles() throws ServerError {
         String generatedDir = "/generatedFiles";
         UploadFlatfile.createDirectory(generatedDir);
 
@@ -27,7 +34,7 @@ public class GenerateFlatfile {
         System.out.println("Generate Info Works");
 
         if (data.size() == 0) {
-            return "{ \"success\": true, \"message\": \"No links needed to be generated.\"}";
+            return "No links needed to be generated.";
         }
 
         for (List<String> row : data) {
@@ -41,10 +48,10 @@ public class GenerateFlatfile {
 
         UploadFlatfile.deleteDirectory(generatedDir);
 
-        return "{ \"success\": true, \"message\": \"Successfully generated links\"}";
+        return "Successfully generated link";
     }
 
-    public String getLinkTypes() throws Exception {
+    public String getLinkTypes() throws ServerError {
         List<List<String>> traces = sql.getTimTraceData();
         Map<String, ArrayList<String>> sourceTargetMap = new HashMap<String, ArrayList<String>>();
         for (List<String> trace : traces) {
@@ -61,7 +68,7 @@ public class GenerateFlatfile {
     public void generateTraceMatrixFile(String sourceTable,
                                         String targetTable,
                                         String destFilePath,
-                                        String destTable) throws Exception {
+                                        String destTable) throws ServerError {
         List<List<String>> sourceData = sql.getArtifactData(sourceTable);
         List<List<String>> targetData = sql.getArtifactData(targetTable);
 
@@ -86,7 +93,11 @@ public class GenerateFlatfile {
             }
         }
 
-        Files.write(Paths.get(destFilePath), lines);
+        try {
+            Files.write(Paths.get(destFilePath), lines);
+        } catch (IOException e) {
+            throw new ServerError("error generating trace matrix file", e);
+        }
         sql.createGeneratedTraceMatrixTable(destTable, destFilePath);
     }
 }

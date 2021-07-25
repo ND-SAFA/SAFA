@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.database;
 
+import edu.nd.crc.safa.error.ServerError;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Config;
 import org.neo4j.driver.Driver;
@@ -16,17 +18,17 @@ public class Neo4J {
 
     private Driver driver;
 
-    protected Driver getDriver() {
+    protected Driver getDriver() throws ServerError {
         System.out.println("getting neo4j driver");
 
         if (driver != null) {
             return driver;
         } else if (neo4jURI == null) {
-            throw new RuntimeException("Neo4J Uri is null");
+            throw new ServerError("Neo4J URI is null");
         } else if (neo4jUser == null) {
-            throw new RuntimeException("Neo4J neo4jUser is null");
+            throw new ServerError("Neo4J username is null");
         } else if (neo4jPassword == null) {
-            throw new RuntimeException("Neo4J Password is null");
+            throw new ServerError("Neo4J password is null");
         }
         //TODO: Enable earlier auth tokens
         driver = GraphDatabase.driver(neo4jURI,
@@ -35,16 +37,15 @@ public class Neo4J {
         return driver;
     }
 
-    public Session createSession() {
-        System.out.println("Creating session");
+    public Session createSession() throws ServerError {
         return getDriver().session();
     }
 
-    public void verifyConnectivity() {
+    public void verifyConnectivity() throws ServerError {
         getDriver().verifyConnectivity();
     }
 
-    public void close() {
+    public void close() throws ServerError {
         getDriver().close();
     }
 }

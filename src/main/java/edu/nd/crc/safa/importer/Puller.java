@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.JIRA.Issue;
 
 import com.jsoniter.output.JsonStream;
@@ -28,32 +29,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Puller {
-    @Autowired
     @Value("${git.username:}")
     String gitUsername;
-    @Autowired
+
     @Value("${git.password:}")
     String gitPassword;
 
-    @Autowired
     @Value("${git.url:}")
     String gitURL;
 
-    @Autowired
     @Value("${git.branch:master}")
     String gitBranch;
 
-    @Autowired
     @Value("${tim.requiredTraceScore:}")
     Double traceRequiredScore;
 
-    @Autowired
     JIRA mJira;
-
-    @Autowired
     public Database mDatabase;
-
-    @Autowired
     private MySQL sql = new MySQL();
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
@@ -61,7 +53,16 @@ public class Puller {
 
     private Set<String> foundNodes = new HashSet<String>();
 
-    public void execute() {
+    @Autowired
+    public Puller(Database database,
+                  MySQL sql,
+                  JIRA jira) {
+        this.mDatabase = database;
+        this.sql = sql;
+        this.mJira = jira;
+    }
+
+    public void execute() throws ServerError {
         mDatabase.execute();
     }
 

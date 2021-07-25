@@ -3,11 +3,14 @@ package edu.nd.crc.safa.importer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+
+import edu.nd.crc.safa.error.ServerError;
 
 import com.jsoniter.JsonIterator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,23 +26,27 @@ public class UploadFlatfile {
         public List<List<String>> traces = new ArrayList<List<String>>();
     }
 
-    public String uploadFiles(String projId, String jsonfiles) throws Exception {
+    public String uploadFiles(String projId, String jsonfiles) throws ServerError {
         String path = "/uploadedFlatfiles";
         createDirectory(path);
 
         JsonIterator iterator = JsonIterator.parse(jsonfiles);
-        for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
-            String encodedData = iterator.readString();
-            byte[] bytes = Base64.getDecoder().decode(encodedData);
-            String fullPath = path + "/" + filename;
-            Files.write(Paths.get(fullPath), bytes);
+        try {
+            for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
+                String encodedData = iterator.readString();
+                byte[] bytes = Base64.getDecoder().decode(encodedData);
+                String fullPath = path + "/" + filename;
+                Files.write(Paths.get(fullPath), bytes);
 
-            if (filename.equals("tim.json")) {
-                sql.clearTimTables();
-                parseTimFile(fullPath);
-            } else {
-                parseRegFile(filename, fullPath);
+                if (filename.equals("tim.json")) {
+                    sql.clearTimTables();
+                    parseTimFile(fullPath);
+                } else {
+                    parseRegularFile(filename, fullPath);
+                }
             }
+        } catch (IOException e) {
+            throw new ServerError("uploading files", e);
         }
 
         sql.traceArtifactCheck();
@@ -58,41 +65,45 @@ public class UploadFlatfile {
             + " }", data);
     }
 
-    public void parseTimFile(String fullPath) throws Exception {
-        String data = new String(Files.readAllBytes(Paths.get(fullPath)));
-        JsonIterator iterator = JsonIterator.parse(data);
+    public void parseTimFile(String fullPath) throws ServerError {
+        try {
+            String data = new String(Files.readAllBytes(Paths.get(fullPath)));
+            JsonIterator iterator = JsonIterator.parse(data);
 
-        for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
-            if (field.toLowerCase().equals("datafiles")) {
-                for (String artifactName = iterator.readObject();
-                     artifactName != null;
-                     artifactName = iterator.readObject()) {
-                    String fileName = "";
+            for (String field = iterator.readObject(); field != null; field = iterator.readObject()) {
+                if (field.toLowerCase().equals("datafiles")) {
+                    for (String artifactName = iterator.readObject();
+                         artifactName != null;
+                         artifactName = iterator.readObject()) {
+                        String fileName = "";
 
-                    for (String field2 = iterator.readObject(); field2 != null; field2 = iterator.readObject()) {
-                        if (!field2.toLowerCase().equals("file")) {
-                            throw new Exception(String.format("Artifact: %s. Expected File attribute. The File "
-                                + "attribute should appear as 'File': 'FileName'", artifactName));
+                        for (String field2 = iterator.readObject(); field2 != null; field2 = iterator.readObject()) {
+                            if (!field2.toLowerCase().equals("file")) {
+                                throw new ServerError(String.format("Artifact: %s. Expected File attribute. The File "
+                                    + "attribute should appear as 'File': 'FileName'", artifactName));
+                            }
+
+                            fileName = iterator.readString();
                         }
 
-                        fileName = iterator.readString();
-                    }
+                        if (fileName.isEmpty()) {
+                            throw new ServerError(String.format("Did not provide a File for Artifact: %s. The File "
+                                + "attribute should appear as 'File': 'FileName.csv'", artifactName));
+                        }
 
-                    if (fileName.isEmpty()) {
-                        throw new Exception(String.format("Did not provide a File for Artifact: %s. The File "
-                            + "attribute should appear as 'File': 'FileName.csv'", artifactName));
+                        String artifactTableName = fileName.replaceAll("(?i)\\.csv", "").toLowerCase();
+                        sql.createTimArtifactsTable(artifactName, artifactTableName, fileName);
                     }
-
-                    String artifactTableName = fileName.replaceAll("(?i)\\.csv", "").toLowerCase();
-                    sql.createTimArtifactsTable(artifactName, artifactTableName, fileName);
+                } else {
+                    parseTraceMatrix(field, iterator);
                 }
-            } else {
-                parseTraceMatrix(field, iterator);
             }
+        } catch (IOException e) {
+            throw new ServerError("parsing TIM file", e);
         }
     }
 
-    public void parseRegFile(String filename, String fullPath) throws Exception {
+    public void parseRegularFile(String filename, String fullPath) throws ServerError {
         try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))) {
             String[] headers = uploadedFileReader.readLine().split(",");
 
@@ -149,89 +160,95 @@ public class UploadFlatfile {
             } else {
                 System.out.println(String.format("Do not recognize file: %s", filename));
             }
+        } catch (IOException e) {
+            throw new ServerError("parse regular file", e);
         }
     }
 
-    public void parseTraceMatrix(String tracename, JsonIterator iterator) throws Exception {
+    public void parseTraceMatrix(String tracename, JsonIterator iterator) throws ServerError {
         String filename = "";
         String source = "";
         String target = "";
         Boolean generated = false;
 
-        for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
-            if (!attr.toLowerCase().matches("file|source|target|generatelinks")) {
-                throw new Exception(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', "
-                    + "'Source', 'Target', or 'generateLinks'", tracename, attr));
-            }
+        try {
+            for (String attr = iterator.readObject(); attr != null; attr = iterator.readObject()) {
+                if (!attr.toLowerCase().matches("file|source|target|generatelinks")) {
+                    throw new ServerError(String.format("LinkFile: %s Attribute: %s does not match expected: 'File', "
+                        + "'Source', 'Target', or 'generateLinks'", tracename, attr));
+                }
 
-            if (attr.toLowerCase().equals("file")) {
-                filename = iterator.readString();
-            }
+                if (attr.toLowerCase().equals("file")) {
+                    filename = iterator.readString();
+                }
 
-            if (attr.toLowerCase().equals("source")) {
-                source = iterator.readString();
-            }
+                if (attr.toLowerCase().equals("source")) {
+                    source = iterator.readString();
+                }
 
-            if (attr.toLowerCase().equals("target")) {
-                target = iterator.readString();
-            }
+                if (attr.toLowerCase().equals("target")) {
+                    target = iterator.readString();
+                }
 
-            if (attr.toLowerCase().equals("generatelinks")) {
-                generated = iterator.readString().toLowerCase().equals("true") ? true : false;
+                if (attr.toLowerCase().equals("generatelinks")) {
+                    generated = iterator.readString().toLowerCase().equals("true") ? true : false;
+                }
             }
+        } catch (IOException e) {
+            throw new ServerError("parsing trace matrix", e);
         }
 
         if (source.isEmpty()) {
-            throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes "
+            throw new ServerError(String.format("Missing attribute for: '%s'. Missing: 'Source' Required attributes "
                 + "are 'File', 'Source', 'Target'", tracename));
         }
 
         if (target.isEmpty()) {
-            throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes "
+            throw new ServerError(String.format("Missing attribute for: '%s'. Missing: 'Target' Required attributes "
                 + "are 'File', 'Source', 'Target'", tracename));
         }
 
         if (!generated && filename.isEmpty()) {
-            throw new Exception(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are "
+            throw new ServerError(String.format("Missing attribute for: '%s'. Missing: 'File' Required attributes are "
                 + "'File', 'Source', 'Target'", tracename));
         }
 
         if (generated && !filename.isEmpty()) {
-            throw new Exception(String.format("Link: %s is a generated file and does not have a File attribute. "
+            throw new ServerError(String.format("Link: %s is a generated file and does not have a File attribute. "
                 + "Please delete the link attribute 'File: %s' or remove 'generateLinks: True'.", tracename, filename));
         }
 
         if (generated) {
             String traceMatrixTableName = tracename.toLowerCase();
-            sql.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
+            sql.createUpdateTIMTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, tracename);
         } else {
             String traceMatrixTableName = filename.replaceAll("(?i)\\.csv", "").toLowerCase();
-            sql.createTimTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
+            sql.createUpdateTIMTraceMatrixTable(tracename, traceMatrixTableName, source, target, generated, filename);
         }
     }
 
-    public static File createDirectory(String dir) throws Exception {
-        File myDir = new File(dir);
+    public static File createDirectory(String pathToDir) throws ServerError {
+        File myDir = new File(pathToDir);
 
         if (!myDir.exists()) {
             if (!myDir.mkdirs()) {
-                throw new Exception(String.format("Error creating folder: Path: %s", dir));
+                throw new ServerError(String.format("Error creating folder: Path: %s", pathToDir));
             }
         }
 
         if (!myDir.isDirectory()) {
             if (!myDir.delete()) {
-                throw new Exception(String.format("Error deleting file: Path: %s", dir));
+                throw new ServerError(String.format("Error deleting file: Path: %s", pathToDir));
             }
             if (!myDir.mkdirs()) {
-                throw new Exception(String.format("Error creating folder: Path: %s", dir));
+                throw new ServerError(String.format("Error creating folder: Path: %s", pathToDir));
             }
         }
 
         return myDir;
     }
 
-    public static void deleteDirectory(String dir) throws Exception {
+    public static void deleteDirectory(String dir) throws ServerError {
         File myDir = new File(dir);
 
         if (myDir.isDirectory()) {
@@ -239,7 +256,7 @@ public class UploadFlatfile {
         }
     }
 
-    public static boolean deleteDirectoryHelper(File dir) throws Exception {
+    public static boolean deleteDirectoryHelper(File dir) throws ServerError {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -249,7 +266,7 @@ public class UploadFlatfile {
         return dir.delete();
     }
 
-    public TimBackend getTimFile() throws Exception {
+    public TimBackend getTimFile() throws ServerError {
         TimBackend timBackend = new TimBackend();
 
         List<List<String>> artifact_rows = sql.getTimArtifactData();

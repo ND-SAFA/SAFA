@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.database.Neo4J;
+import edu.nd.crc.safa.error.ServerError;
 
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;
@@ -41,29 +42,24 @@ public class Database implements AutoCloseable {
     Neo4J driver;
     private static int mLatestVersion = 0;
 
-    public Result query(final String query) {
-        try (Session session = driver.createSession()) {
-            return session.run(query);
-        }
-    }
 
     /**
      * This function creates a new tag within the database which stores
      * the next version to be used by sucessive commands
      */
-    public int tag() throws EmptyException {
+    public int tag() throws ServerError {
         final int nextVersion = this.currentVersion() + 1;
         if (nextVersion == 0) {
-            throw new EmptyException();
+            throw new ServerError("current version is -1");
         }
 
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=$version RETURN v;",
-                    parameters("version", nextVersion));
-                tx.commit();
-            }
-        }
+        Session session = driver.createSession();
+        Transaction tx = session.beginTransaction();
+        tx.run("MERGE (v:VERSION {id: 'VERSION'}) SET v.number=$version RETURN v;",
+            parameters("version", nextVersion));
+        tx.commit();
+
+
         return nextVersion;
     }
 
@@ -71,7 +67,7 @@ public class Database implements AutoCloseable {
      * This function calculates the currenty version of the database by searching for the latest tagged version. If one
      * doesn't exist the it checks to see if there are any nodes and if so then we are on the first version.
      */
-    public int currentVersion() {
+    public int currentVersion() throws ServerError {
         System.out.println("Getting current version...");
         int version = -1;
 
@@ -89,13 +85,13 @@ public class Database implements AutoCloseable {
         // If we have no version and but we have nodes then our current version is 0
         if (version == -1) {
             int count = 0;
-            try (Session session = driver.createSession()) {
-                Result result = session.run("MATCH (n) RETURN count(*)");
-                if (result.hasNext()) {
-                    Record record = result.next();
-                    count = record.get("count(*)").asInt();
-                }
+            Session session = driver.createSession();
+            Result result = session.run("MATCH (n) RETURN count(*)");
+            if (result.hasNext()) {
+                Record record = result.next();
+                count = record.get("count(*)").asInt();
             }
+
             if (count > 0) {
                 version = 0;
             }
@@ -107,16 +103,15 @@ public class Database implements AutoCloseable {
     /**
      * This function clears the entire database of nodes and links
      */
-    public void clear() {
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                if (VERBOSE) {
-                    System.out.println("MATCH (n) DETACH DELETE n;");
-                }
-                tx.run("MATCH (n) DETACH DELETE n");
-                tx.commit();
-            }
+    public void clear() throws ServerError {
+        Session session = driver.createSession();
+        Transaction tx = session.beginTransaction();
+        if (VERBOSE) {
+            System.out.println("MATCH (n) DETACH DELETE n;");
         }
+        tx.run("MATCH (n) DETACH DELETE n");
+        tx.commit();
+
 
         mNodeLinkMap = new HashSet<Triplet<String, String, String>>();
         mNodeMap = new HashSet<Triplet<String, String, String>>();
@@ -147,7 +142,7 @@ public class Database implements AutoCloseable {
     /**
      * Retrieves nodes, sources and links from the database and stores them in hashsets for comparisons later
      */
-    public void updateDatabaseEntries() {
+    public void updateDatabaseEntries() throws ServerError {
         mNodeLinkMap = new HashSet<Triplet<String, String, String>>();
         mNodeMap = new HashSet<Triplet<String, String, String>>();
         mSourceMap = new HashSet<Quartet<String, String, String, String>>();
@@ -155,91 +150,88 @@ public class Database implements AutoCloseable {
         // Find next version
         mLatestVersion = currentVersion();
 
-        try (Session session = driver.createSession()) {
-            String command = removedDataQuery(mLatestVersion) + " MATCH (n)\n"
-                + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
-                + "eNodes"
-                + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-            Result result = session.run(command);
-            while (result.hasNext()) {
-                Record record = result.next();
+        Session session = driver.createSession();
+        String command = removedDataQuery(mLatestVersion) + " MATCH (n)\n"
+            + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
+            + "eNodes"
+            + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
+        Result result = session.run(command);
+        while (result.hasNext()) {
+            Record record = result.next();
 
-                final String id = record.get("id").asString();
-                final String type = record.get("type").asString();
-                String data = record.get("data").asString();
+            final String id = record.get("id").asString();
+            final String type = record.get("type").asString();
+            String data = record.get("data").asString();
 
-                // Get modifications to update data
-                String mCommand = String.format("MATCH (c) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", id)
-                    + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
-                    + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
-                Result mResult = session.run(mCommand);
-                while (mResult.hasNext()) {
-                    data = new String(Base64.getDecoder().decode(mResult.next().get("data").asString()));
-                }
-
-                mNodeMap.add(Triplet.with(id, type, data));
+            // Get modifications to update data
+            String mCommand = String.format("MATCH (c) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", id)
+                + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
+                + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
+            Result mResult = session.run(mCommand);
+            while (mResult.hasNext()) {
+                data = new String(Base64.getDecoder().decode(mResult.next().get("data").asString()));
             }
+
+            mNodeMap.add(Triplet.with(id, type, data));
         }
 
-        try (Session session = driver.createSession()) {
-            String command = removedDataQuery(mLatestVersion) + " MATCH path=((c)<-[r]-(p))"
-                + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in eRelationships WHERE e"
-                + " IN relationships(path)) AND NOT any(e in eNodes WHERE e IN nodes(path))"
-                + " RETURN p.id AS parent, c.id AS child, TYPE(r) AS type";
-            Result result = session.run(command);
-            while (result.hasNext()) {
-                Record record = result.next();
-                mNodeLinkMap.add(Triplet.with(record.get("parent").asString(), record.get("type").asString(),
-                    record.get("child").asString()));
-            }
+
+        command = removedDataQuery(mLatestVersion) + " MATCH path=((c)<-[r]-(p))"
+            + " WHERE NOT c:Code AND NOT c:Package AND TYPE(r)<>'UPDATES' AND NOT any(e in eRelationships WHERE e"
+            + " IN relationships(path)) AND NOT any(e in eNodes WHERE e IN nodes(path))"
+            + " RETURN p.id AS parent, c.id AS child, TYPE(r) AS type";
+        result = session.run(command);
+        while (result.hasNext()) {
+            Record record = result.next();
+            mNodeLinkMap.add(Triplet.with(record.get("parent").asString(), record.get("type").asString(),
+                record.get("child").asString()));
         }
 
-        try (Session session = driver.createSession()) {
-            String command = removedDataQuery(mLatestVersion) + " MATCH p=((i)-[:IMPLEMENTS]->(parent:Package)"
-                + "-[:CONTAINED_BY]->(node:Code))"
-                + " WHERE NOT any(e in eRelationships WHERE e IN relationships(p)) AND NOT any(e in eNodes WHERE e IN"
-                + " nodes(p))"
-                + " RETURN i.id AS issue, parent.id AS pkg, node.id AS file, node.commit AS commit";
-            Result result = session.run(command);
-            while (result.hasNext()) {
-                Record record = result.next();
 
-                // Get current node paramters
-                final String issue = record.get("issue").asString();
-                final String file = record.get("file").asString();
-                final String pkg = record.get("pkg").asString();
-                String commit = record.get("commit").asString();
+        command = removedDataQuery(mLatestVersion) + " MATCH p=((i)-[:IMPLEMENTS]->(parent:Package)"
+            + "-[:CONTAINED_BY]->(node:Code))"
+            + " WHERE NOT any(e in eRelationships WHERE e IN relationships(p)) AND NOT any(e in eNodes WHERE e IN"
+            + " nodes(p))"
+            + " RETURN i.id AS issue, parent.id AS pkg, node.id AS file, node.commit AS commit";
+        result = session.run(command);
+        while (result.hasNext()) {
+            Record record = result.next();
 
-                // Get modifications to update data
-                String mCommand = String.format("MATCH (c:Code) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", file)
-                    + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
-                    + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
-                Result mResult = session.run(mCommand);
-                while (mResult.hasNext()) {
-                    commit = mResult.next().get("data").asString();
-                }
+            // Get current node paramters
+            final String issue = record.get("issue").asString();
+            final String file = record.get("file").asString();
+            final String pkg = record.get("pkg").asString();
+            String commit = record.get("commit").asString();
 
-                // Add node
-                mSourceMap.add(Quartet.with(pkg, file, commit, issue));
+            // Get modifications to update data
+            String mCommand = String.format("MATCH (c:Code) WHERE c.id='%s' MATCH (c)-[r:UPDATES]->(c)\n", file)
+                + String.format("WHERE r.type='MODIFIED' AND r.version <= %d\n", mLatestVersion)
+                + "RETURN r.data AS data ORDER BY r.version DESC LIMIT 1\n";
+            Result mResult = session.run(mCommand);
+            while (mResult.hasNext()) {
+                commit = mResult.next().get("data").asString();
             }
+
+            // Add node
+            mSourceMap.add(Quartet.with(pkg, file, commit, issue));
         }
+
     }
 
-    public int getLatestVersion() {
+    public int getLatestVersion() throws ServerError {
         int version = 0;
-        try (Session session = driver.createSession()) {
-            Result result = session.run(
-                "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r"
-                    + ".version DESC LIMIT 1");
-            if (result.hasNext()) {
-                Record record = result.next();
-                version = record.get("version").asInt();
-            }
+        Session session = driver.createSession();
+        Result result = session.run(
+            "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r"
+                + ".version DESC LIMIT 1");
+        if (result.hasNext()) {
+            Record record = result.next();
+            version = record.get("version").asInt();
         }
         return version;
     }
 
-    public int getNodeCount(final String type) {
+    public int getNodeCount(final String type) throws ServerError {
         int count = 0;
         try (Session session = driver.createSession()) {
             Result result = session.run(String.format("MATCH (:%s) RETURN count(*)", type));
@@ -248,7 +240,7 @@ public class Database implements AutoCloseable {
         return count;
     }
 
-    public void printNodes(final String type) {
+    public void printNodes(final String type) throws ServerError {
         try (Session session = driver.createSession()) {
             Result result = session.run("MATCH (n) WHERE [$type IN LABELS(n)] RETURN n",
                 parameters("type", type));
@@ -259,7 +251,7 @@ public class Database implements AutoCloseable {
         }
     }
 
-    public void printRelationships(final String id) {
+    public void printRelationships(final String id) throws ServerError {
         try (Session session = driver.createSession()) {
             Result result = session.run("MATCH ({id: $id})-[r]-() RETURN r",
                 parameters("id", id));
@@ -270,12 +262,12 @@ public class Database implements AutoCloseable {
         }
     }
 
-    public int getLinkCount(final String type) {
+    public int getLinkCount(final String type) throws ServerError {
         int count = 0;
-        try (Session session = driver.createSession()) {
-            count = session.run("MATCH ()<-[r]-() WHERE TYPE(r)=$type RETURN count(*)",
-                parameters("type", type)).single().get("count(*)").asInt();
-        }
+        Session session = driver.createSession();
+        count = session.run("MATCH ()<-[r]-() WHERE TYPE(r)=$type RETURN count(*)",
+            parameters("type", type)).single().get("count(*)").asInt();
+
         return count;
     }
 
@@ -291,7 +283,7 @@ public class Database implements AutoCloseable {
         mExternalSourceMap.add(Quartet.with(parent, name, commit, issue));
     }
 
-    public void execute() {
+    public void execute() throws ServerError {
         // Delete old updates
         mLatestVersion = currentVersion();
 
@@ -330,7 +322,7 @@ public class Database implements AutoCloseable {
      * This function processes the added, removed and modified links
      * and updates the database to represent the new state.
      */
-    private void processIssues() {
+    private void processIssues() throws ServerError {
         // Find all added issues
         Set<Triplet<String, String, String>> added = mExternalNodeMap.stream().filter((n) -> {
             return !mNodeMap.stream().anyMatch((o) -> {
@@ -355,63 +347,56 @@ public class Database implements AutoCloseable {
 
         // Apply changes to the database
         Set<String> seenTypes = new HashSet<String>();
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                added.forEach((node) -> {
-                    if (VERBOSE) {
-                        System.out.println("Adding " + node.getValue0() + " " + node.getValue1());
-                        System.out.println(String.format("MERGE (:%s {id:'%s', DATA:'%s'});",
-                            sanitizeType(
-                                node.getValue1()),
-                            node.getValue0(),
-                            Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
-                        System.out.println(String.format("MATCH (c {id:'%s'}) CREATE (c)-[:UPDATES {type:'ADD', "
-                            + "version: %d}]->(c);", node.getValue0(), mLatestVersion));
-                    }
-                    seenTypes.add(node.getValue1());
-                    tx.run(String.format("MERGE (:%s {id:$id, DATA:$data})", sanitizeType(node.getValue1())),
-                        parameters("id", node.getValue0(), "data",
-                            Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
-                    tx.run(
-                        "MATCH (c {id:$id}) CREATE (c)-[:UPDATES {type:'ADD', version: $version}]->(c)",
-                        parameters("id", node.getValue0(), "version", mLatestVersion));
-                });
+        Session session = driver.createSession();
+        Transaction tx = session.beginTransaction();
 
-                modified.forEach((node) -> {
-                    if (VERBOSE) {
-                        System.out.println("Modifying " + node.getValue0() + " " + node.getValue1());
-                        System.out.println(String.format("MATCH (c) WHERE c.id='%s' CREATE (c)<-[:UPDATES "
-                                + "{type:'MODIFIED', version: %d, data:'%s'}]-(c);", node.getValue0(), mLatestVersion,
-                            Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
-                    }
-                    tx.run("MATCH (c) WHERE c.id=$cid CREATE (c)<-[:UPDATES {type:'MODIFIED', version: $version, "
-                            + "data:$data}]-(c)",
-                        parameters("cid", node.getValue0(), "version", mLatestVersion, "data",
-                            Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
-                });
-
-                removed.forEach((node) -> {
-                    if (VERBOSE) {
-                        System.out.println("Removing " + node.getValue0() + " " + node.getValue1());
-                        System.out.println(String.format("MATCH (c {id:'%s'}) CREATE (c)-[:UPDATES {type:'REMOVE', "
-                            + "version: %d}]->(c);", node.getValue0(), mLatestVersion));
-                    }
-                    tx.run("MATCH (c {id:$id}) CREATE (c)-[:UPDATES {type:'REMOVE', version: $version}]->(c)",
-                        parameters("id", node.getValue0(), "version", mLatestVersion));
-                });
-
-                tx.commit();
+        added.forEach((node) -> {
+            if (VERBOSE) {
+                System.out.println("Adding " + node.getValue0() + " " + node.getValue1());
+                System.out.println(String.format("MERGE (:%s {id:'%s', DATA:'%s'});",
+                    sanitizeType(
+                        node.getValue1()),
+                    node.getValue0(),
+                    Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
+                System.out.println(String.format("MATCH (c {id:'%s'}) CREATE (c)-[:UPDATES {type:'ADD', "
+                    + "version: %d}]->(c);", node.getValue0(), mLatestVersion));
             }
-        }
-
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                seenTypes.stream().forEach((type) -> {
-                    tx.run(String.format("CREATE INDEX ON :%s(id)", sanitizeType(type)));
-                });
-                tx.commit();
+            seenTypes.add(node.getValue1());
+            tx.run(String.format("MERGE (:%s {id:$id, DATA:$data})", sanitizeType(node.getValue1())),
+                parameters("id", node.getValue0(), "data",
+                    Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
+            tx.run(
+                "MATCH (c {id:$id}) CREATE (c)-[:UPDATES {type:'ADD', version: $version}]->(c)",
+                parameters("id", node.getValue0(), "version", mLatestVersion));
+        });
+        modified.forEach((node) -> {
+            if (VERBOSE) {
+                System.out.println("Modifying " + node.getValue0() + " " + node.getValue1());
+                System.out.println(String.format("MATCH (c) WHERE c.id='%s' CREATE (c)<-[:UPDATES "
+                        + "{type:'MODIFIED', version: %d, data:'%s'}]-(c);", node.getValue0(), mLatestVersion,
+                    Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
             }
-        }
+            tx.run("MATCH (c) WHERE c.id=$cid CREATE (c)<-[:UPDATES {type:'MODIFIED', version: $version, "
+                    + "data:$data}]-(c)",
+                parameters("cid", node.getValue0(), "version", mLatestVersion, "data",
+                    Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
+        });
+        removed.forEach((node) -> {
+            if (VERBOSE) {
+                System.out.println("Removing " + node.getValue0() + " " + node.getValue1());
+                System.out.println(String.format("MATCH (c {id:'%s'}) CREATE (c)-[:UPDATES {type:'REMOVE', "
+                    + "version: %d}]->(c);", node.getValue0(), mLatestVersion));
+            }
+            tx.run("MATCH (c {id:$id}) CREATE (c)-[:UPDATES {type:'REMOVE', version: $version}]->(c)",
+                parameters("id", node.getValue0(), "version", mLatestVersion));
+        });
+        tx.commit();
+
+        Transaction tx2 = session.beginTransaction();
+        seenTypes.forEach((type) -> {
+            tx2.run(String.format("CREATE INDEX ON :%s(id)", sanitizeType(type)));
+        });
+        tx2.commit();
     }
 
     /**
@@ -420,73 +405,72 @@ public class Database implements AutoCloseable {
      * version. It then creates a set of nodes that are in the current
      * version but not the tagged version and then removes them.
      */
-    private void processOldIssues() {
-        try (Session session = driver.createSession()) {
-            // Get data for current version
-            Set<Triplet<String, String, String>> cNodes = new HashSet<Triplet<String, String, String>>();
+    private void processOldIssues() throws ServerError {
+        Session session = driver.createSession();
+        // Get data for current version
+        Set<Triplet<String, String, String>> cNodes = new HashSet<Triplet<String, String, String>>();
 
-            String cCommand = removedDataQuery(mLatestVersion) + " MATCH (n)\n"
-                + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
-                + "eNodes"
+        String cCommand = removedDataQuery(mLatestVersion) + " MATCH (n)\n"
+            + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n IN "
+            + "eNodes"
+            + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
+        Result cResult = session.run(cCommand);
+        while (cResult.hasNext()) {
+            Record record = cResult.next();
+            final String id = record.get("id").asString();
+            final String type = record.get("type").asString();
+            final String data = record.get("data").asString();
+            cNodes.add(Triplet.with(id, type, data));
+        }
+
+        Set<Triplet<String, String, String>> pNodes = new HashSet<Triplet<String, String, String>>();
+
+        // Get data for previous version
+        if (mLatestVersion > 0) {
+            String pCommand = "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n"
+                + "WITH p, c, r AS rs ORDER BY r.version\n"
+                + "WITH p, c, head(collect([p, rs, c])) AS removed\n"
+                + String.format("WITH apoc.coll.toSet([c in collect(removed) WHERE c[1].type='ADD' AND c[1]"
+                + ".version > %s | c[2]]) as eNodes\n", mLatestVersion - 1)
+                + " MATCH (n)\n"
+                + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n"
+                + " IN eNodes "
                 + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-            Result cResult = session.run(cCommand);
-            while (cResult.hasNext()) {
-                Record record = cResult.next();
+            Result pResult = session.run(pCommand);
+            while (pResult.hasNext()) {
+                Record record = pResult.next();
                 final String id = record.get("id").asString();
                 final String type = record.get("type").asString();
                 final String data = record.get("data").asString();
-                cNodes.add(Triplet.with(id, type, data));
+                pNodes.add(Triplet.with(id, type, data));
             }
+        }
 
-            Set<Triplet<String, String, String>> pNodes = new HashSet<Triplet<String, String, String>>();
+        // Calculate differences
+        Set<Triplet<String, String, String>> added = cNodes.stream().filter((n) -> {
+            return !pNodes.stream().anyMatch((o) -> {
+                return o.getValue0().equals(n.getValue0());
+            });
+        }).collect(Collectors.toSet());
 
-            // Get data for previous version
-            if (mLatestVersion > 0) {
-                String pCommand = "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n"
-                    + "WITH p, c, r AS rs ORDER BY r.version\n"
-                    + "WITH p, c, head(collect([p, rs, c])) AS removed\n"
-                    + String.format("WITH apoc.coll.toSet([c in collect(removed) WHERE c[1].type='ADD' AND c[1]"
-                    + ".version > %s | c[2]]) as eNodes\n", mLatestVersion - 1)
-                    + " MATCH (n)\n"
-                    + " WHERE labels(n)[0]<>'Package' AND labels(n)[0]<>'Code' AND labels(n)[0]<>'VERSION' AND NOT n"
-                    + " IN eNodes "
-                    + " RETURN n.id AS id, n.DATA as data, labels(n)[0] AS type ORDER BY n.id";
-                Result pResult = session.run(pCommand);
-                while (pResult.hasNext()) {
-                    Record record = pResult.next();
-                    final String id = record.get("id").asString();
-                    final String type = record.get("type").asString();
-                    final String data = record.get("data").asString();
-                    pNodes.add(Triplet.with(id, type, data));
+        // Remove added issues
+        try (Transaction tx = session.beginTransaction()) {
+            added.forEach((node) -> {
+                if (VERBOSE) {
+                    System.out.println("Removing " + node.getValue0() + " " + node.getValue1());
+                    System.out.println(String.format("MATCH (n {id:'%s'}) DETACH DELETE n;", node.getValue0()));
                 }
-            }
-
-            // Calculate differences
-            Set<Triplet<String, String, String>> added = cNodes.stream().filter((n) -> {
-                return !pNodes.stream().anyMatch((o) -> {
-                    return o.getValue0().equals(n.getValue0());
-                });
-            }).collect(Collectors.toSet());
-
-            // Remove added issues
-            try (Transaction tx = session.beginTransaction()) {
-                added.forEach((node) -> {
-                    if (VERBOSE) {
-                        System.out.println("Removing " + node.getValue0() + " " + node.getValue1());
-                        System.out.println(String.format("MATCH (n {id:'%s'}) DETACH DELETE n;", node.getValue0()));
-                    }
-                    tx.run("MATCH (n {id:$id}) DETACH DELETE n",
-                        parameters("id", node.getValue0()));
-                });
-                tx.commit();
-            }
+                tx.run("MATCH (n {id:$id}) DETACH DELETE n",
+                    parameters("id", node.getValue0()));
+            });
+            tx.commit();
         }
     }
 
     /**
      * This function processes the added and removed links and updates the database to represent the new state.
      */
-    public void processLinks() {
+    public void processLinks() throws ServerError {
         // Find added links
         Set<Triplet<String, String, String>> added = mExternalNodeLinkMap.stream().filter((n) -> {
             return !mNodeLinkMap.stream().anyMatch((o) -> {
@@ -502,41 +486,39 @@ public class Database implements AutoCloseable {
         }).collect(Collectors.toSet());
 
         // Apply changes to the database
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                added.forEach((link) -> {
-                    if (VERBOSE) {
-                        System.out.println("Adding link between " + link.getValue0() + " " + link.getValue2());
-                        System.out.println(String.format("MATCH (p {id:'%s'}) MATCH (c {id:'%s'}) MERGE (c)<-[:%s]-"
-                            + "(p);", link.getValue0(), link.getValue2(), link.getValue1()));
-                        System.out.println(String.format("MATCH (c {id:'%s'})<-[r]-(p {id:'%s'}) WHERE NOT exists(r"
-                                + ".type) CREATE (c)<-[:UPDATES {type:'ADD', version: %d}]-(p);",
-                            link.getValue2(), link.getValue0(), mLatestVersion));
-                    }
-                    tx.run(String.format("MATCH (p {id:$pid}) MATCH (c {id:$cid}) MERGE (c)<-[:%s]-(p)",
-                        link.getValue1()), parameters("pid", link.getValue0(), "cid", link.getValue2()));
-                    tx.run("MATCH (c {id:$cid})<-[r]-(p {id:$pid}) WHERE NOT exists(r.type) CREATE (c)<-[:UPDATES "
-                            + "{type:'ADD', version: $version}]-(p)",
-                        parameters("pid", link.getValue0(), "cid", link.getValue2(), "version",
-                            mLatestVersion));
-                });
-
-                removed.forEach((link) -> {
-                    if (VERBOSE) {
-                        System.out.println("Removing link between " + link.getValue0() + " " + link.getValue2());
-                        System.out.println(String.format("MATCH (c {id:'%s'})<-[r]-(p {id:'%s'}) HERE NOT exists(r"
-                                + ".type) CREATE (c)<-[:UPDATES {type:'REMOVE', version: %d}]-(p)",
-                            link.getValue2(), link.getValue0(), mLatestVersion));
-                    }
-                    tx.run("MATCH (c {id:$cid})<-[r]-(p {id:$pid}) WHERE NOT exists(r.type) CREATE (c)<-[:UPDATES "
-                            + "{type:'REMOVE', version: $version}]-(p)",
-                        parameters("pid", link.getValue0(), "cid",
-                            link.getValue2(), "version", mLatestVersion));
-                });
-
-                tx.commit();
+        Session session = driver.createSession();
+        Transaction tx = session.beginTransaction();
+        added.forEach((link) -> {
+            if (VERBOSE) {
+                System.out.println("Adding link between " + link.getValue0() + " " + link.getValue2());
+                System.out.println(String.format("MATCH (p {id:'%s'}) MATCH (c {id:'%s'}) MERGE (c)<-[:%s]-"
+                    + "(p);", link.getValue0(), link.getValue2(), link.getValue1()));
+                System.out.println(String.format("MATCH (c {id:'%s'})<-[r]-(p {id:'%s'}) WHERE NOT exists(r"
+                        + ".type) CREATE (c)<-[:UPDATES {type:'ADD', version: %d}]-(p);",
+                    link.getValue2(), link.getValue0(), mLatestVersion));
             }
-        }
+            tx.run(String.format("MATCH (p {id:$pid}) MATCH (c {id:$cid}) MERGE (c)<-[:%s]-(p)",
+                link.getValue1()), parameters("pid", link.getValue0(), "cid", link.getValue2()));
+            tx.run("MATCH (c {id:$cid})<-[r]-(p {id:$pid}) WHERE NOT exists(r.type) CREATE (c)<-[:UPDATES "
+                    + "{type:'ADD', version: $version}]-(p)",
+                parameters("pid", link.getValue0(), "cid", link.getValue2(), "version",
+                    mLatestVersion));
+        });
+
+        removed.forEach((link) -> {
+            if (VERBOSE) {
+                System.out.println("Removing link between " + link.getValue0() + " " + link.getValue2());
+                System.out.println(String.format("MATCH (c {id:'%s'})<-[r]-(p {id:'%s'}) HERE NOT exists(r"
+                        + ".type) CREATE (c)<-[:UPDATES {type:'REMOVE', version: %d}]-(p)",
+                    link.getValue2(), link.getValue0(), mLatestVersion));
+            }
+            tx.run("MATCH (c {id:$cid})<-[r]-(p {id:$pid}) WHERE NOT exists(r.type) CREATE (c)<-[:UPDATES "
+                    + "{type:'REMOVE', version: $version}]-(p)",
+                parameters("pid", link.getValue0(), "cid",
+                    link.getValue2(), "version", mLatestVersion));
+        });
+
+        tx.commit();
     }
 
     /**
@@ -546,7 +528,7 @@ public class Database implements AutoCloseable {
      * a set of links that are in the current version
      * but not thetagged version and then removes them.
      */
-    private void processOldLinks() {
+    private void processOldLinks() throws ServerError {
         try (Session session = driver.createSession()) {
             // Get data for current version
             Set<Triplet<String, String, String>> cLinks = new HashSet<Triplet<String, String, String>>();
@@ -610,7 +592,7 @@ public class Database implements AutoCloseable {
      * This function processes the added, removed and modified source nodes
      * and updates the database to represent the new state.
      */
-    private void processSources() {
+    private void processSources() throws ServerError {
         // Find all source added nodes since tagged version
         Set<Quartet<String, String, String, String>> added = mExternalSourceMap.stream().filter((n) -> {
             return !mSourceMap.stream().anyMatch((o) -> {
@@ -636,88 +618,88 @@ public class Database implements AutoCloseable {
         }).collect(Collectors.toSet());
 
         // Apply changes to the database
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                added.forEach((file) -> {
-                    if (VERBOSE) {
-                        System.out.println("Adding: " + file.getValue0() + " " + file.getValue1()
-                            + " " + mLatestVersion);
-                        System.out.println(String.format("MERGE (:Package {id:'%s', issue:'%s'});",
-                            file.getValue0(), file.getValue3()));
-                        System.out.println(String.format("MATCH (p {id:'%s' }) MATCH (c:Package {id:'%s', "
-                                + "issue:'%s'}) MERGE (c)<-[:IMPLEMENTS]-(p);", file.getValue3(),
-                            file.getValue3(), file.getValue0()));
-                        System.out.println(String.format("MERGE (:Code {id:'%s', commit:'%s', issue:'%s'});",
-                            file.getValue1(), file.getValue2(), file.getValue3()));
-                        System.out.println(String.format("MATCH (p:Package {id:'%s', issue:'%s'}) MATCH (c:Code "
-                                + "{id:'%s', commit:'%s', issue:'%s'}) MERGE (c)<-[:CONTAINED_BY]-(p);",
-                            file.getValue3(), file.getValue0(), file.getValue1(), file.getValue2(), file.getValue3()));
-                        System.out.println(String.format("MATCH (c:Code {id:'%s', commit:'%s', issue:'%s'})"
-                                + "<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES "
-                                + "{type:'ADD',"
-                                + " version: %d}]-(p);",
-                            file.getValue1(), file.getValue2(), file.getValue3(),
-                            file.getValue3(), file.getValue0(), mLatestVersion));
-                    }
-
-                    // Create package
-                    tx.run("MERGE (:Package {id:$package, issue:$issue})",
-                        parameters("package", file.getValue0(),
-                            "issue", file.getValue3()));
-                    tx.run("MATCH (p {id:$pid}) MATCH (c:Package {id:$package, issue:$issue}) MERGE (c)"
-                            + "<-[:IMPLEMENTS]-(p)",
-                        parameters("pid", file.getValue3(), "package",
-                            file.getValue0(), "issue", file.getValue3()));
-
-                    // Create file
-                    tx.run("MERGE (:Code {id:$file, commit:$commit, issue:$issue})",
-                        parameters("file", file.getValue1(), "commit",
-                            file.getValue2(), "issue", file.getValue3()));
-                    tx.run("MATCH (p:Package {id:$pkg, issue:$issue}) MATCH (c:Code {id:$file, commit:$commit, "
-                            + "issue:$issue}) MERGE (c)<-[:CONTAINED_BY]-(p)",
-                        parameters("pkg", file.getValue0(),
-                            "file", file.getValue1(), "issue", file.getValue3(), "commit", file.getValue2()));
-                    tx.run("MATCH (c:Code {id:$cid, commit:$commit, issue:$issue})<-[:CONTAINED_BY]-(p:Package "
-                            + "{id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'ADD', version: $version}]-(p)",
-                        parameters("pid", file.getValue0(),
-                            "cid", file.getValue1(), "version", mLatestVersion, "issue", file.getValue3(),
-                            "commit", file.getValue2()));
-                });
-
-                modified.forEach((file) -> {
-                    if (VERBOSE) {
-                        System.out.println("Modifying: " + file.getValue0()
-                            + " " + file.getValue1() + " " + mLatestVersion);
-                        System.out.println(String.format("MATCH (c:Code) WHERE c.id='%s' CREATE (c)<-[:UPDATES "
-                                + "{type:'MODIFIED', version: %d, data:'%s'}]-(c);",
-                            file.getValue1(), mLatestVersion + 1, file.getValue2()));
-                    }
-                    tx.run("MATCH (c:Code) WHERE c.id=$cid CREATE (c)<-[:UPDATES {type:'MODIFIED', version: "
-                            + "$version, data:$data}]-(c)",
-                        parameters("cid",
-                            file.getValue1(), "version", mLatestVersion, "data", file.getValue2()));
-                });
-
-                removed.forEach((file) -> {
-                    if (VERBOSE) {
-                        System.out.println("Removing: " + file.getValue0()
-                            + " " + file.getValue1() + " " + mLatestVersion);
-                        System.out.println(String.format("MATCH (c:Code {id:'%s', issue:'%s'})<-[:CONTAINED_BY]-"
-                                + "(p:Package {id:'%s', issue:'%s'}) +CREATE (c)<-[:UPDATES {type:'REMOVE', version: "
-                                + "%d}]-(p);",
-                            file.getValue1(), file.getValue3(),
-                            file.getValue3(), file.getValue0(), mLatestVersion + 1));
-                    }
-                    tx.run("MATCH (c:Code {id:$cid, issue:$issue})<-[:CONTAINED_BY]-(p:Package {id:$pid, "
-                            + "issue:$issue}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: $version}]-(p)",
-                        parameters("pid",
-                            file.getValue0(), "cid", file.getValue1(), "version", mLatestVersion, "issue",
-                            file.getValue3()));
-                });
-
-                tx.commit();
+        Session session = driver.createSession();
+        Transaction tx = session.beginTransaction();
+        added.forEach((file) -> {
+            if (VERBOSE) {
+                System.out.println("Adding: " + file.getValue0() + " " + file.getValue1()
+                    + " " + mLatestVersion);
+                System.out.println(String.format("MERGE (:Package {id:'%s', issue:'%s'});",
+                    file.getValue0(), file.getValue3()));
+                System.out.println(String.format("MATCH (p {id:'%s' }) MATCH (c:Package {id:'%s', "
+                        + "issue:'%s'}) MERGE (c)<-[:IMPLEMENTS]-(p);", file.getValue3(),
+                    file.getValue3(), file.getValue0()));
+                System.out.println(String.format("MERGE (:Code {id:'%s', commit:'%s', issue:'%s'});",
+                    file.getValue1(), file.getValue2(), file.getValue3()));
+                System.out.println(String.format("MATCH (p:Package {id:'%s', issue:'%s'}) MATCH (c:Code "
+                        + "{id:'%s', commit:'%s', issue:'%s'}) MERGE (c)<-[:CONTAINED_BY]-(p);",
+                    file.getValue3(), file.getValue0(), file.getValue1(), file.getValue2(), file.getValue3()));
+                System.out.println(String.format("MATCH (c:Code {id:'%s', commit:'%s', issue:'%s'})"
+                        + "<-[:CONTAINED_BY]-(p:Package {id:'%s', issue:'%s'}) CREATE (c)<-[:UPDATES "
+                        + "{type:'ADD',"
+                        + " version: %d}]-(p);",
+                    file.getValue1(), file.getValue2(), file.getValue3(),
+                    file.getValue3(), file.getValue0(), mLatestVersion));
             }
-        }
+
+            // Create package
+            tx.run("MERGE (:Package {id:$package, issue:$issue})",
+                parameters("package", file.getValue0(),
+                    "issue", file.getValue3()));
+            tx.run("MATCH (p {id:$pid}) MATCH (c:Package {id:$package, issue:$issue}) MERGE (c)"
+                    + "<-[:IMPLEMENTS]-(p)",
+                parameters("pid", file.getValue3(), "package",
+                    file.getValue0(), "issue", file.getValue3()));
+
+            // Create file
+            tx.run("MERGE (:Code {id:$file, commit:$commit, issue:$issue})",
+                parameters("file", file.getValue1(), "commit",
+                    file.getValue2(), "issue", file.getValue3()));
+            tx.run("MATCH (p:Package {id:$pkg, issue:$issue}) MATCH (c:Code {id:$file, commit:$commit, "
+                    + "issue:$issue}) MERGE (c)<-[:CONTAINED_BY]-(p)",
+                parameters("pkg", file.getValue0(),
+                    "file", file.getValue1(), "issue", file.getValue3(), "commit", file.getValue2()));
+            tx.run("MATCH (c:Code {id:$cid, commit:$commit, issue:$issue})<-[:CONTAINED_BY]-(p:Package "
+                    + "{id:$pid, issue:$issue}) CREATE (c)<-[:UPDATES {type:'ADD', version: $version}]-(p)",
+                parameters("pid", file.getValue0(),
+                    "cid", file.getValue1(), "version", mLatestVersion, "issue", file.getValue3(),
+                    "commit", file.getValue2()));
+        });
+
+        modified.forEach((file) -> {
+            if (VERBOSE) {
+                System.out.println("Modifying: " + file.getValue0()
+                    + " " + file.getValue1() + " " + mLatestVersion);
+                System.out.println(String.format("MATCH (c:Code) WHERE c.id='%s' CREATE (c)<-[:UPDATES "
+                        + "{type:'MODIFIED', version: %d, data:'%s'}]-(c);",
+                    file.getValue1(), mLatestVersion + 1, file.getValue2()));
+            }
+            tx.run("MATCH (c:Code) WHERE c.id=$cid CREATE (c)<-[:UPDATES {type:'MODIFIED', version: "
+                    + "$version, data:$data}]-(c)",
+                parameters("cid",
+                    file.getValue1(), "version", mLatestVersion, "data", file.getValue2()));
+        });
+
+        removed.forEach((file) -> {
+            if (VERBOSE) {
+                System.out.println("Removing: " + file.getValue0()
+                    + " " + file.getValue1() + " " + mLatestVersion);
+                System.out.println(String.format("MATCH (c:Code {id:'%s', issue:'%s'})<-[:CONTAINED_BY]-"
+                        + "(p:Package {id:'%s', issue:'%s'}) +CREATE (c)<-[:UPDATES {type:'REMOVE', version: "
+                        + "%d}]-(p);",
+                    file.getValue1(), file.getValue3(),
+                    file.getValue3(), file.getValue0(), mLatestVersion + 1));
+            }
+            tx.run("MATCH (c:Code {id:$cid, issue:$issue})<-[:CONTAINED_BY]-(p:Package {id:$pid, "
+                    + "issue:$issue}) CREATE (c)<-[:UPDATES {type:'REMOVE', version: $version}]-(p)",
+                parameters("pid",
+                    file.getValue0(), "cid", file.getValue1(), "version", mLatestVersion, "issue",
+                    file.getValue3()));
+        });
+
+        tx.commit();
+
+
     }
 
     /**
@@ -727,7 +709,7 @@ public class Database implements AutoCloseable {
      * nodes that are in the current version but not the tagged
      * version and then removes them.
      */
-    private void processOldSources() {
+    private void processOldSources() throws ServerError {
         // Handles Sources
         try (Session session = driver.createSession()) {
             // Get data for current version

@@ -6,8 +6,7 @@ ADD checkstyle.xml /app/
 ADD .env /app/
 
 WORKDIR /app
-# host.docker.internal proxy for docker runner (used for local services)
-RUN sed -i s/localhost/host.docker.internal/ .env && gradle build --stacktrace
+RUN gradle build --stacktrace
 
 FROM openjdk:8-jdk-alpine
 COPY --from=0 /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar

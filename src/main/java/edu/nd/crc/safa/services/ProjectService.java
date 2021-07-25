@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.services;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.concurrent.Executors;
 
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.database.Neo4J;
+import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.GenerateFlatfile;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
@@ -21,6 +23,7 @@ import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.jsoniter.spi.JsonException;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -34,26 +37,33 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @Service
+/* Responsible for all providing an API for peforming the
+ * business logic involved in ProjectsController.
+ * TODO: Unused ProjectID variables should be used to authenticate access to resources.
+ */
 public class ProjectService {
 
-    @Autowired
     Neo4J neo4j;
-
-    @Autowired
     Puller mPuller;
-
-    @Autowired
     UploadFlatfile uploadFlatfile;
-
-    @Autowired
     GenerateFlatfile generateFlatfile;
+    MySQL sql;
 
     @Autowired
-    private MySQL sql;
+    public ProjectService(Neo4J neo4j, Puller puller, UploadFlatfile uploadFlatFile,
+                          GenerateFlatfile generateFlatfile, MySQL mysql) {
+        this.neo4j = neo4j;
+        this.mPuller = puller;
+        this.uploadFlatfile = uploadFlatFile;
+        this.generateFlatfile = generateFlatfile;
+        this.sql = mysql;
+    }
 
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
-    private void init() {
+
+    private void init() throws ServerError { //TODO: Run after Dependency injection once test connection has been
+        // installed
         final List<Map<String, Object>> nodes = nodes("test", "Hazard");
         for (Map<String, Object> node : nodes) {
             final String id = (String) node.get("id");
@@ -79,18 +89,6 @@ public class ProjectService {
                     .id(String.valueOf(0))
                     .name("update"));
 
-                // mPuller.ParseJIRAIssues();
-                // emitter.send(SseEmitter.event()
-                //   .data("{\"complete\": false}")
-                //   .id(String.valueOf(1))
-                //   .name("update"));
-
-                // mPuller.ParseSourceLinks();
-                // emitter.send(SseEmitter.event()
-                //   .data("{\"complete\": false}")
-                //   .id(String.valueOf(2))
-                //   .name("update"));
-
                 String Mysql2NeoData = mPuller.mySQLNeo();
                 emitter.send(SseEmitter.event()
                     .data(Mysql2NeoData)
@@ -111,37 +109,19 @@ public class ProjectService {
         return emitter;
     }
 
-    public String generateLinks(String projId) {
-        try {
-            return generateFlatfile.generateFiles();
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.toString());
-        }
+    public String generateLinks(String projId) throws ServerError {
+        return generateFlatfile.generateFiles();
     }
 
-    public String getLinkTypes(String projId) {
-        try {
-            return generateFlatfile.getLinkTypes();
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
+    public String getLinkTypes(String projId) throws ServerError {
+        return generateFlatfile.getLinkTypes();
     }
 
-    public String uploadFile(String projId, String encodedStr) {
+    public String uploadFile(String projId, String encodedStr) throws ServerError {
         try {
             return uploadFlatfile.uploadFiles(projId, encodedStr);
-        } catch (Exception e) {
-            System.out.println("Catch exception for uploadFlatfile");
-
-            if (e.getClass().getName().equals("com.jsoniter.spi.JsonException")) {
-                return "{ \"success\": false, \"message\": \"Error uploading Flatfiles: Could not parse API JSON "
-                    + "body.\"}";
-            } else {
-                System.out.println("Error uploading Flatfiles: OTHER");
-                System.out.println(e.getMessage());
-                return String.format("{ \"success\": false, \"message\": \"Error uploading Flatfiles: %s\"}",
-                    e.getMessage());
-            }
+        } catch (JsonException e) {
+            throw new ServerError("uploading file", e);
         }
     }
 
@@ -163,9 +143,9 @@ public class ProjectService {
         }
     }
 
-    public Map<String, Object> getUploadedFile(String pID, String file) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
         try {
+            Map<String, Object> result = new HashMap<>();
             String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
             if (file.contains(".json")) {
                 result.put("data", RawJson.from(data));
@@ -173,99 +153,64 @@ public class ProjectService {
                 result.put("data", data);
             }
             result.put("success", true);
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", e.toString());
-        }
-        return result;
-    }
-
-    public String getUploadFilesErrorLog(String projId) {
-        try {
-            String errorStr = sql.getUploadErrorLog();
-
-            return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
+            return result;
+        } catch (IOException e) {
+            throw new ServerError("retrieve uploaded file", e);
         }
     }
 
-    public String getLinkErrorLog(String projId) {
-        try {
-            String errorStr = sql.getLinkErrors();
-
-            return String.format("{ \"success\": true, \"data\": \"%s\"}", errorStr);
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
+    public String getUploadFilesErrorLog(String projId) throws ServerError {
+        String errorStr = sql.getUploadErrorLog();
+        return errorStr;
     }
 
-    // public String getGenerateLinksErrorLog(String projId) {
-    //   try {
-    //     File myObj = new File("/generatedFilesDir/ErrorText.csv");
-    //     byte[] fileContent = Files.readAllBytes(myObj.toPath());
-    //     String returnStr = Base64.getEncoder().encodeToString(fileContent);
-    //     return String.format("{ \"success\": true, \"data\": \"%s\"}", returnStr);
-    //   } catch (Exception e) {
-    //     return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-    //   }
-    // }
-
-    public String clearUploadedFlatfiles(String projid) {
-        try {
-            String message = sql.clearUploadedFlatfiles();
-            return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
+    public String getLinkErrorLog(String projId) throws ServerError {
+        return sql.getLinkErrors();
     }
 
-    public String clearGeneratedFlatfiles(String projid) {
-        try {
-            String message = sql.clearGeneratedFlatfiles();
-            return String.format("{ \"success\": true, \"message\": \"%s\"}", message);
-        } catch (Exception e) {
-            return String.format("{ \"success\": false, \"message\": \"%s\"}", e.getMessage());
-        }
+    public String clearUploadedFlatfiles(String projectID) throws ServerError {
+        return sql.clearUploadedFlatfiles();
+    }
+
+    public String clearGeneratedFlatfiles(String projid) throws ServerError {
+        return sql.clearGeneratedFlatfiles();
     }
 
 
     @Transactional(readOnly = true)
-    public List<String> parents(String projectId, String node, String rootType) {
-        try (Session session = neo4j.createSession()) {
-            String query = "MATCH (a)\n"
-                + "WHERE a.id =~ $node\n"
-                + "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/" + rootType + "', uniqueness"
-                + ": 'RELATIONSHIP_GLOBAL'}) yield path \n"
-                + "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten"
-                + "(collect(last(nodes(path))))) END AS nodes";
-            Result result = session.run(query, Values.parameters("node", "(?i)"
-                + node.replace(".", "\\\\.")));
+    public List<String> parents(String projectId, String node, String rootType) throws ServerError {
+        Session session = neo4j.createSession();
+        String query = "MATCH (a)\n"
+            + "WHERE a.id =~ $node\n"
+            + "CALL apoc.path.expandConfig(a, {relationshipFilter:'<', labelFilter:'/" + rootType + "', uniqueness"
+            + ": 'RELATIONSHIP_GLOBAL'}) yield path \n"
+            + "RETURN CASE WHEN LABELS(a)[0]='" + rootType + "' THEN [a] ELSE apoc.coll.toSet(apoc.coll.flatten"
+            + "(collect(last(nodes(path))))) END AS nodes";
+        Result result = session.run(query, Values.parameters("node", "(?i)"
+            + node.replace(".", "\\\\.")));
 
-            List<String> ret = new ArrayList<String>();
-            while (result.hasNext()) {
-                List<Node> nodes = result.next().get("nodes").asList(Values.ofNode());
-                for (Node n : nodes) {
-                    ret.add(n.get("id").asString());
-                }
+        List<String> ret = new ArrayList<String>();
+        while (result.hasNext()) {
+            List<Node> nodes = result.next().get("nodes").asList(Values.ofNode());
+            for (Node n : nodes) {
+                ret.add(n.get("id").asString());
             }
-            return ret;
         }
+        return ret;
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> nodes(String projectId, String nodeType) {
+    public List<Map<String, Object>> nodes(String projectId, String nodeType) throws ServerError {
         List<Map<String, Object>> set = new ArrayList<>();
-        try (Session session = neo4j.createSession()) {
-            String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
-            Result result = session.run(query);
-            List<Record> records = result.list();
-            for (int i = 0; i < records.size(); i++) {
-                Node node = records.get(i).get("n").asNode();
-                addNode(node, set);
-            }
-            return set;
+        Session session = neo4j.createSession();
+        String query = "MATCH (n:" + nodeType + ") WITH n ORDER BY n.id ASC RETURN n";
+        Result result = session.run(query);
+        List<Record> records = result.list();
+        for (Record record : records) {
+            Node node = record.get("n").asNode();
+            addNode(node, set);
         }
+        return set;
     }
 
     @Transactional(readOnly = true)
@@ -274,43 +219,41 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> trees(String projectId, String rootType) {
-        try (Session session = neo4j.createSession()) {
-            String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
-                + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
-                + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
-            Result result = session.run(query);
-            return parseArtifactTree(result, projectId);
-        }
+    public List<Map<String, Object>> trees(String projectId, String rootType) throws ServerError {
+        Session session = neo4j.createSession();
+        String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
+            + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
+            + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
+        Result result = session.run(query);
+        return parseArtifactTree(result, projectId);
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> tree(String projectId, String root, String rootType) {
+    public List<Map<String, Object>> tree(String projectId, String root, String rootType) throws ServerError {
         int version = (Integer) versions(projectId).get("latest");
         return versions(projectId, root, version, rootType);
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> versions(String projectId) {
+    public Map<String, Object> versions(String projectId) throws ServerError {
         int version = -1;
-        try (Session session = neo4j.createSession()) {
-            Result result = session.run("MATCH (v:VERSION) RETURN v.number");
-            if (result.hasNext()) {
-                Record record = result.next();
-                version = record.get("v.number").asInt();
-            }
+        Session session = neo4j.createSession();
+        Result result = session.run("MATCH (v:VERSION) RETURN v.number");
+        if (result.hasNext()) {
+            Record record = result.next();
+            version = record.get("v.number").asInt();
         }
 
         // If we have no version and but we have nodes then our current version is 0
         if (version == -1) {
             int count = 0;
-            try (Session session = neo4j.createSession()) {
-                Result result = session.run("MATCH (n) RETURN count(*)");
-                if (result.hasNext()) {
-                    Record record = result.next();
-                    count = record.get("count(*)").asInt();
-                }
+            session = neo4j.createSession();
+            result = session.run("MATCH (n) RETURN count(*)");
+            if (result.hasNext()) {
+                Record record = result.next();
+                count = record.get("count(*)").asInt();
             }
+
             if (count > 0) {
                 version = 0;
             }
@@ -323,56 +266,56 @@ public class ProjectService {
 
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType) {
-        try (Session session = neo4j.createSession()) {
-            String query = "MATCH (p)-[r:UPDATES]->(c)\n"
-                + "WHERE r.version <= $version\n"
-                + "WITH p, c, r AS rs ORDER BY r.version DESC\n"
-                + "WITH p, c, head(collect([p, rs, c])) AS removed\n"
-                + "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n"
-                // Find all removed relationships
-                + "WITH [e in excluded | e[0]] AS eHead, [e in excluded | e[1]] AS eTail, apoc.coll.toSet(apoc.coll"
-                + ".flatten([e in excluded WHERE e[0].id=e[1].id| e[0]])) AS eNo\n"
-                + "OPTIONAL MATCH (a)-[eR]-(b)\n"
-                + "WHERE a IN eHead AND b IN eTail\n"
-                + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n"
-                // Remove modification relations newer than requested version
-                + "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n"
-                + "WHERE eR.version > $version AND eR.type='MODIFIED'\n"
-                + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n"
-                // Find any nodes added after wanted version
-                + "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n"
-                + "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n"
-                + "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n"
-                + "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1]"
-                + ".version > $version | c[2]]) as added\n"
-                + "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n"
-                // Get Paths
-                + "MATCH (h:" + rootType + " {id: $root})\n"
-                + "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield"
-                + " path\n"
-                // Prune unwanted nodes and relationships
-                + "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e "
-                + "IN nodes(path))\n"
-                // Return a unique set of nodes and relationships
-                + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
-                + ".coll.flatten(collect([r in relationships(path)]))) AS rel\n";
+    public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType)
+        throws ServerError {
+        Session session = neo4j.createSession();
+        String query = "MATCH (p)-[r:UPDATES]->(c)\n"
+            + "WHERE r.version <= $version\n"
+            + "WITH p, c, r AS rs ORDER BY r.version DESC\n"
+            + "WITH p, c, head(collect([p, rs, c])) AS removed\n"
+            + "WITH [c in collect(removed) WHERE c[1].type='REMOVE' | [c[0],c[2]]] as excluded\n"
+            // Find all removed relationships
+            + "WITH [e in excluded | e[0]] AS eHead, [e in excluded | e[1]] AS eTail, apoc.coll.toSet(apoc.coll"
+            + ".flatten([e in excluded WHERE e[0].id=e[1].id| e[0]])) AS eNo\n"
+            + "OPTIONAL MATCH (a)-[eR]-(b)\n"
+            + "WHERE a IN eHead AND b IN eTail\n"
+            + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten(collect(eR))) AS eRel\n"
+            // Remove modification relations newer than requested version
+            + "OPTIONAL MATCH (a)-[eR:UPDATES]-(b)\n"
+            + "WHERE eR.version > $version AND eR.type='MODIFIED'\n"
+            + "WITH eNo, apoc.coll.toSet(apoc.coll.flatten([eRel,collect(eR)])) AS eRelationships\n"
+            // Find any nodes added after wanted version
+            + "OPTIONAL MATCH (p)-[r:UPDATES]->(c)\n"
+            + "WITH eRelationships, eNo, p, c, r AS rs ORDER BY r.version\n"
+            + "WITH eRelationships, eNo, p, c, head(collect([p, rs, c])) AS removed\n"
+            + "WITH eRelationships, eNo, apoc.coll.toSet([c in collect(removed) WHERE c[1].type<>'REMOVE' AND c[1]"
+            + ".version > $version | c[2]]) as added\n"
+            + "WITH eRelationships, apoc.coll.toSet(apoc.coll.flatten([eNo, added])) AS eNodes\n"
+            // Get Paths
+            + "MATCH (h:" + rootType + " {id: $root})\n"
+            + "CALL apoc.path.expandConfig(h, {relationshipFilter:'>', uniqueness: 'RELATIONSHIP_GLOBAL'}) yield"
+            + " path\n"
+            // Prune unwanted nodes and relationships
+            + "WHERE NOT ANY(e IN eRelationships WHERE e IN relationships(path)) AND NOT ANY(e IN eNodes WHERE e "
+            + "IN nodes(path))\n"
+            // Return a unique set of nodes and relationships
+            + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
+            + ".coll.flatten(collect([r in relationships(path)]))) AS rel\n";
 
-            Result result = session.run(query, Values.parameters("version",
-                version, "root", root));
+        Result result = session.run(query, Values.parameters("version",
+            version, "root", root));
 
-            final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
+        final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
 
-            // Update warnings map
-            mWarnings.put(root, false);
-            for (Map<String, Object> v : retVal) {
-                if (v.containsKey("warnings")) {
-                    mWarnings.put(root, true);
-                }
+        // Update warnings map
+        mWarnings.put(root, false);
+        for (Map<String, Object> v : retVal) {
+            if (v.containsKey("warnings")) {
+                mWarnings.put(root, true);
             }
-
-            return retVal;
         }
+
+        return retVal;
     }
 
     public Map<String, Object> versionsTag(String projectId) {
@@ -386,16 +329,14 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public String getTreeLayout(String projId, String hash) throws Exception {
+    public String getTreeLayout(String projId, String hash) throws ServerError {
         // TODO(Adam): Do something with the projId?
         String b64EncodedLayout = sql.fetchLayout(hash);
         return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
     }
 
-    public String postTreeLayout(String projId, String hash, String b64EncodedLayout) throws Exception {
-        // TODO(Adam): Do something with the projId?
+    public void postTreeLayout(String projId, String hash, String b64EncodedLayout) throws ServerError {
         sql.saveLayout(hash, b64EncodedLayout);
-        return "{\"success\": true, \"message\": \"Layout saved\"}";
     }
 
     private List<Map<String, Object>> parseArtifactTree(Result result, String projectId) {

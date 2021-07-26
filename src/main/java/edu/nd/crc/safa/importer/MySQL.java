@@ -53,7 +53,7 @@ public class MySQL {
         hasValidCredentials();
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.h2.Driver");
+        //dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setUrl(mysqlURL);
         dataSource.setUsername(mysqlUser);
         dataSource.setPassword(mysqlPassword);
@@ -1125,7 +1125,8 @@ public class MySQL {
             createWarningsTable();
 
             Connection conn = getConnection();
-            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, nShort,"
+            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, "
+                + "nShort,"
                 + " nLong, rule) VALUES (?, ?, ?, ?);");
             preparedStmt.setString(1, project);
             preparedStmt.setString(2, nShort);

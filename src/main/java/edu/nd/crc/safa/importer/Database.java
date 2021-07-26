@@ -72,21 +72,18 @@ public class Database implements AutoCloseable {
         int version = -1;
 
         // Check if we have a version node which stores the current version
-        try (Session session = driver.createSession()) {
-            Result result = session.run("MATCH (v:VERSION) RETURN v.number");
-            if (result.hasNext()) {
-                Record record = result.next();
-                version = record.get("v.number").asInt();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        Session session = driver.createSession();
+        Result result = session.run("MATCH (v:VERSION) RETURN v.number");
+        if (result.hasNext()) {
+            Record record = result.next();
+            version = record.get("v.number").asInt();
         }
+
 
         // If we have no version and but we have nodes then our current version is 0
         if (version == -1) {
             int count = 0;
-            Session session = driver.createSession();
-            Result result = session.run("MATCH (n) RETURN count(*)");
+            result = session.run("MATCH (n) RETURN count(*)");
             if (result.hasNext()) {
                 Record record = result.next();
                 count = record.get("count(*)").asInt();

@@ -8,26 +8,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
 public class ServerError extends Exception {
-    String error;
-    String type;
+    Exception error;
     String message;
 
-    public ServerError(String error) {
-        this.error = error;
-        this.type = "Internal";
+    public ServerError(String message) {
+        this.message = message;
     }
 
     public ServerError(String activityName, Exception e) {
-        this.message = e.getMessage();
-        this.type = e.getClass().toString();
-        this.error = String.format("Could not perform %s due to a %s", activityName, this.message);
+        this.message = String.format("Could not perform %s due to an error", activityName);
+        this.error = e;
     }
 
-    public String getError() {
+    public Exception getError() {
         return this.error = error;
     }
 
-    public void setError(String error) {
+    public void setError(Exception error) {
         this.error = error;
     }
 
@@ -37,13 +34,5 @@ public class ServerError extends Exception {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

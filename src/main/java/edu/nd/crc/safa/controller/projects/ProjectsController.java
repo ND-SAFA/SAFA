@@ -12,12 +12,14 @@ import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -36,7 +38,7 @@ public class ProjectsController {
     public String root() {
         return "Hello World";
     }
-    
+
     @GetMapping("/connections")
     public ServerResponse test_service_connections() throws Exception {
         (new Neo4J()).verifyConnectivity();
@@ -91,6 +93,7 @@ public class ProjectsController {
     }
 
     @PostMapping("/projects/{projId}/versions/")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse versionsTag(@PathVariable String projId) {
         return new ServerResponse(projectService.versionsTag(projId));
     }
@@ -107,9 +110,9 @@ public class ProjectsController {
     }
 
     @PostMapping("/projects/{projId}/upload/")
+    @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse uploadFile(@PathVariable String projId,
                                      @RequestBody String encodedStr) throws ServerError {
-        System.out.println("/projects/{projId}/upload/");
         return new ServerResponse(projectService.uploadFile(projId, encodedStr));
     }
 
@@ -146,6 +149,7 @@ public class ProjectsController {
     }
 
     @PostMapping("/projects/{projId}/trees/{treeId}/layout/")
+    @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse postTreeLayout(@PathVariable String projId,
                                          @PathVariable String treeId,
                                          @RequestBody String b64EncodedLayout) throws Exception {
@@ -165,6 +169,7 @@ public class ProjectsController {
     }
 
     @PostMapping("/projects/{projId}/warnings/")
+    @ResponseStatus(HttpStatus.CREATED)
     public void newWarning(@PathVariable String projId,
                            @RequestParam("short") String nShort,
                            @RequestParam("long") String nLong,
@@ -181,6 +186,7 @@ public class ProjectsController {
     }
 
     @PostMapping("/projects/{projId}/link/")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse updateLink(@PathVariable String projId, @RequestBody Links links) {
         return new ServerResponse(projectService.updateLink(projId, links));
     }
@@ -201,12 +207,14 @@ public class ProjectsController {
     }
 
     @ExceptionHandler(ServerError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleServerError(HttpServletRequest req,
                                             ServerError exception) {
         return new ServerResponse(exception, ResponseCodes.FAILURE);
     }
 
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(HttpServletRequest req,
                                              Exception ex) {
         ServerError wrapper = new ServerError("unknown activity", ex);

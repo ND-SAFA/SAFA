@@ -14,16 +14,16 @@ import java.util.concurrent.Executors;
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.database.Neo4J;
 import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.GenerateFlatfile;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.UploadFlatfile;
+import edu.nd.crc.safa.importer.flatfile.GenerateFlatFile;
+import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
+import edu.nd.crc.safa.importer.flatfile.UploadFlatFileResponse;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.jsoniter.spi.JsonException;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -45,13 +45,13 @@ public class ProjectService {
 
     Neo4J neo4j;
     Puller mPuller;
-    UploadFlatfile uploadFlatfile;
-    GenerateFlatfile generateFlatfile;
+    UploadFlatFile uploadFlatfile;
+    GenerateFlatFile generateFlatfile;
     MySQL sql;
 
     @Autowired
-    public ProjectService(Neo4J neo4j, Puller puller, UploadFlatfile uploadFlatFile,
-                          GenerateFlatfile generateFlatfile, MySQL mysql) {
+    public ProjectService(Neo4J neo4j, Puller puller, UploadFlatFile uploadFlatFile,
+                          GenerateFlatFile generateFlatfile, MySQL mysql) {
         this.neo4j = neo4j;
         this.mPuller = puller;
         this.uploadFlatfile = uploadFlatFile;
@@ -117,12 +117,8 @@ public class ProjectService {
         return generateFlatfile.getLinkTypes();
     }
 
-    public String uploadFile(String projId, String encodedStr) throws ServerError {
-        try {
-            return uploadFlatfile.uploadFiles(projId, encodedStr);
-        } catch (JsonException e) {
-            throw new ServerError("uploading file", e);
-        }
+    public UploadFlatFileResponse uploadFile(String projectId, String encodedStr) throws ServerError {
+        return uploadFlatfile.uploadFiles(projectId, encodedStr);
     }
 
     public static class RawJson {

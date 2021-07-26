@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.controller.projects;
+package edu.nd.crc.safa.routes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -9,20 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.nd.crc.safa.importer.MySQL;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class SmokeTest {
-
-    @Autowired
-    private ProjectsController controller;
-
-    @Autowired
-    private MockMvc mockMvc;
+public class SmokeTest extends MvcBaseTest {
 
     @Test
     public void contextLoads() throws Exception {

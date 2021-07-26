@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer;
+package edu.nd.crc.safa.importer.flatfile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,31 +11,40 @@ import java.util.Base64;
 import java.util.List;
 
 import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.importer.MySQL;
 
 import com.jsoniter.JsonIterator;
+import com.jsoniter.spi.JsonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 @Component
-public class UploadFlatfile {
+public class UploadFlatFile {
+
+    String pathToFlatFiles = System.getProperty("user.dir") + "/build/uploadedFlatFiles";
+
+    private MySQL sql;
+
     @Autowired
-    private MySQL sql = new MySQL();
+    public UploadFlatFile(MySQL sql) {
+        this.sql = sql;
+    }
 
     public static class TimBackend {
         public List<List<String>> artifacts = new ArrayList<List<String>>();
         public List<List<String>> traces = new ArrayList<List<String>>();
     }
 
-    public String uploadFiles(String projId, String jsonfiles) throws ServerError {
-        String path = "/uploadedFlatfiles";
-        createDirectory(path);
+    public UploadFlatFileResponse uploadFiles(String projId, String jsonfiles) throws ServerError {
+        createDirectory(pathToFlatFiles);
 
         JsonIterator iterator = JsonIterator.parse(jsonfiles);
         try {
             for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
                 String encodedData = iterator.readString();
                 byte[] bytes = Base64.getDecoder().decode(encodedData);
-                String fullPath = path + "/" + filename;
+                String fullPath = pathToFlatFiles + "/" + filename;
                 Files.write(Paths.get(fullPath), bytes);
 
                 if (filename.equals("tim.json")) {
@@ -47,22 +56,18 @@ public class UploadFlatfile {
             }
         } catch (IOException e) {
             throw new ServerError("uploading files", e);
+        } catch (JsonException e) {
+            throw new ServerError("parsing json file", e);
         }
 
         sql.traceArtifactCheck();
         MySQL.FileInfo fileInfo = sql.getFileInfo();
 
-        String data = "{\"uploadedFiles\":"
-            + fileInfo.uploadedFiles.toString()
-            + ",\"expectedFiles\":"
-            + fileInfo.expectedFiles.toString() + ",\"generatedFiles\":" + fileInfo.generatedFiles.toString()
-            + ",\"expectedGeneratedFiles\":"
-            + fileInfo.expectedGeneratedFiles.toString()
-            + "}";
-
-        System.out.println(data);
-        return String.format("{ \"success\": true, \"message\": \"Checking missing files successful.\", \"data\": %s"
-            + " }", data);
+        return new UploadFlatFileResponse(fileInfo.uploadedFiles,
+            fileInfo.expectedFiles,
+            fileInfo.generatedFiles,
+            fileInfo.expectedGeneratedFiles
+        );
     }
 
     public void parseTimFile(String fullPath) throws ServerError {
@@ -103,7 +108,7 @@ public class UploadFlatfile {
         }
     }
 
-    public void parseRegularFile(String filename, String fullPath) throws ServerError {
+    public void parseRegularFile(String fileName, String fullPath) throws ServerError {
         try (BufferedReader uploadedFileReader = new BufferedReader(new FileReader(fullPath))) {
             String[] headers = uploadedFileReader.readLine().split(",");
 
@@ -123,7 +128,7 @@ public class UploadFlatfile {
                 }
 
                 if (source && target) {
-                    String tableName = filename.replaceAll("(?i)\\.csv", "").toLowerCase();
+                    String tableName = fileName.replaceAll("(?i)\\.csv", "").toLowerCase();
                     String colHeader = cols
                         .toString()
                         .replace("[", "(")
@@ -150,7 +155,7 @@ public class UploadFlatfile {
                 }
 
                 if (id && summary && content) {
-                    String tableName = filename.replaceAll("(?i)\\.csv", "").toLowerCase();
+                    String tableName = fileName.replaceAll("(?i)\\.csv", "").toLowerCase();
                     String colHeader = cols
                         .toString()
                         .replace("[", "(")
@@ -158,7 +163,7 @@ public class UploadFlatfile {
                     sql.createArtifactTable(tableName, fullPath, colHeader);
                 }
             } else {
-                System.out.println(String.format("Do not recognize file: %s", filename));
+                throw new ServerError("unrecognized file type: " + fileName);
             }
         } catch (IOException e) {
             throw new ServerError("parse regular file", e);
@@ -229,6 +234,13 @@ public class UploadFlatfile {
 
     public static File createDirectory(String pathToDir) throws ServerError {
         File myDir = new File(pathToDir);
+
+        try {
+            System.out.println("PATH: " + myDir.getCanonicalPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         if (!myDir.exists()) {
             if (!myDir.mkdirs()) {

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer;
+package edu.nd.crc.safa.importer.flatfile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,24 +11,26 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GenerateFlatfile {
+public class GenerateFlatFile {
 
-    private MySQL sql = new MySQL();
+    private MySQL sql;
+    public final String PATH_TO_GENERATED_DIR = System.getProperty("user.dir") + "/build/generatedFiles";
 
     @Autowired
-    public GenerateFlatfile(MySQL sql) {
+    public GenerateFlatFile(MySQL sql) {
         this.sql = sql;
     }
 
     public String generateFiles() throws ServerError {
-        String generatedDir = "/generatedFiles";
-        UploadFlatfile.createDirectory(generatedDir);
+
+        UploadFlatFile.createDirectory(PATH_TO_GENERATED_DIR);
 
         List<List<String>> data = sql.generateInfo();
         System.out.println("Generate Info Works");
@@ -41,12 +43,12 @@ public class GenerateFlatfile {
             String sourceTable = row.get(0);
             String targetTable = row.get(1);
             String destTable = row.get(2);
-            String destFilePath = String.format("%s/%s.csv", generatedDir, destTable);
+            String destFilePath = String.format("%s/%s.csv", PATH_TO_GENERATED_DIR, destTable);
 
             generateTraceMatrixFile(sourceTable, targetTable, destFilePath, destTable);
         }
 
-        UploadFlatfile.deleteDirectory(generatedDir);
+        UploadFlatFile.deleteDirectory(PATH_TO_GENERATED_DIR);
 
         return "Successfully generated link";
     }

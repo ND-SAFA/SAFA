@@ -63,8 +63,7 @@ public class GenerateFlatFile {
         }
 
         String dataDict = sourceTargetMap.toString().replace("=", ":");
-        System.out.println(dataDict);
-        return String.format("{ \"success\": true, \"data\": %s}", dataDict);
+        return dataDict;
     }
 
     public void generateTraceMatrixFile(String sourceTable,

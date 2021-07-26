@@ -45,7 +45,14 @@ public class Neo4J {
         getDriver().verifyConnectivity();
     }
 
-    public void close() throws ServerError {
-        getDriver().close();
+    public void close() {
+        try {
+            Driver driver = getDriver();
+            if (driver != null) {
+                driver.close();
+            }
+        } catch (ServerError ignored) {
+            //close is still successful even if driver is null
+        }
     }
 }

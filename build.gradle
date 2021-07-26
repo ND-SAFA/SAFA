@@ -67,6 +67,17 @@ dependencies {
 }
 
 test {
+    def envFileName = ""
+    if (file("test.env").exists()) {
+        envFileName = "test.env"
+    } else if (file(".env").exists()) {
+        envFileName = ".env"
+    }
+
+    file(envFileName).readLines().each() {
+        def (key, value) = it.tokenize('=')
+        environment key, value
+    }
     testLogging {
         outputs.upToDateWhen { false }
         showStandardStreams = true

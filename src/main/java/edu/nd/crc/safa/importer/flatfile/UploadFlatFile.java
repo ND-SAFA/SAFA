@@ -235,25 +235,19 @@ public class UploadFlatFile {
     public static File createDirectory(String pathToDir) throws ServerError {
         File myDir = new File(pathToDir);
 
-        try {
-            System.out.println("PATH: " + myDir.getCanonicalPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         if (!myDir.exists()) {
             if (!myDir.mkdirs()) {
-                throw new ServerError(String.format("Error creating folder: Path: %s", pathToDir));
+                throw new ServerError(String.format("creating folder at path: %s", pathToDir));
             }
         }
 
         if (!myDir.isDirectory()) {
             if (!myDir.delete()) {
-                throw new ServerError(String.format("Error deleting file: Path: %s", pathToDir));
+                throw new ServerError(String.format("deleting file at path: %s", pathToDir));
             }
             if (!myDir.mkdirs()) {
-                throw new ServerError(String.format("Error creating folder: Path: %s", pathToDir));
+                throw new ServerError(String.format("creating file at path: %s", pathToDir));
             }
         }
 

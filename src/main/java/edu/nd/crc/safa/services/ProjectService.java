@@ -328,7 +328,7 @@ public class ProjectService {
     public String getTreeLayout(String projId, String hash) throws ServerError {
         // TODO(Adam): Do something with the projId?
         String b64EncodedLayout = sql.fetchLayout(hash);
-        return String.format("{\"success\": true, \"data\": \"%s\"}", b64EncodedLayout);
+        return b64EncodedLayout;
     }
 
     public void postTreeLayout(String projId, String hash, String b64EncodedLayout) throws ServerError {

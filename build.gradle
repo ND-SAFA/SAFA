@@ -37,6 +37,7 @@ dependencies {
 
     //database
     testImplementation 'com.h2database:h2:1.4.200'
+    implementation 'org.hibernate:hibernate-core:5.5.4.Final'
 
     //Neo4J
     compile 'org.neo4j.driver:neo4j-java-driver:4.3.3'

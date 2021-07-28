@@ -1,8 +1,5 @@
 package edu.nd.crc.safa.services;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +13,11 @@ import edu.nd.crc.safa.database.Neo4J;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.flatfile.GenerateFlatFile;
+import edu.nd.crc.safa.importer.flatfile.Generator;
 import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
-import edu.nd.crc.safa.importer.flatfile.UploadFlatFileResponse;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -45,17 +39,13 @@ public class ProjectService {
 
     Neo4J neo4j;
     Puller mPuller;
-    UploadFlatFile uploadFlatfile;
-    GenerateFlatFile generateFlatfile;
     MySQL sql;
 
     @Autowired
     public ProjectService(Neo4J neo4j, Puller puller, UploadFlatFile uploadFlatFile,
-                          GenerateFlatFile generateFlatfile, MySQL mysql) {
+                          Generator generateFlatfile, MySQL mysql) {
         this.neo4j = neo4j;
         this.mPuller = puller;
-        this.uploadFlatfile = uploadFlatFile;
-        this.generateFlatfile = generateFlatfile;
         this.sql = mysql;
     }
 
@@ -107,69 +97,6 @@ public class ProjectService {
             }
         });
         return emitter;
-    }
-
-    public String generateLinks(String projId) throws ServerError {
-        return generateFlatfile.generateFiles();
-    }
-
-    public String getLinkTypes(String projId) throws ServerError {
-        return generateFlatfile.getLinkTypes();
-    }
-
-    public UploadFlatFileResponse uploadFile(String projectId, String encodedStr) throws ServerError {
-        return uploadFlatfile.uploadFiles(projectId, encodedStr);
-    }
-
-    public static class RawJson {
-        private String payload;
-
-        public RawJson(String payload) {
-            this.payload = payload;
-        }
-
-        public static RawJson from(String payload) {
-            return new RawJson(payload);
-        }
-
-        @JsonValue
-        @JsonRawValue
-        public String getPayload() {
-            return this.payload;
-        }
-    }
-
-    public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
-        try {
-            Map<String, Object> result = new HashMap<>();
-            String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
-            if (file.contains(".json")) {
-                result.put("data", RawJson.from(data));
-            } else {
-                result.put("data", data);
-            }
-            result.put("success", true);
-            return result;
-        } catch (IOException e) {
-            throw new ServerError("retrieve uploaded file", e);
-        }
-    }
-
-    public String getUploadFilesErrorLog(String projId) throws ServerError {
-        String errorStr = sql.getUploadErrorLog();
-        return errorStr;
-    }
-
-    public String getLinkErrorLog(String projId) throws ServerError {
-        return sql.getLinkErrors();
-    }
-
-    public String clearUploadedFlatfiles(String projectID) throws ServerError {
-        return sql.clearUploadedFlatfiles();
-    }
-
-    public String clearGeneratedFlatfiles(String projid) throws ServerError {
-        return sql.clearGeneratedFlatfiles();
     }
 
 

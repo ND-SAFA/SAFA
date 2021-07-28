@@ -21,11 +21,12 @@ import org.hibernate.boot.MetadataSources;
  * to the SQL database.
  */
 public class SQLConnection {
-    final String DIALECT_PROPERTY_NAME = "hibernate.dialect";
+    final String DIALECT_PROP = "hibernate.dialect";
     final String MYSQL_DIALECT = "org.hibernate.dialect.MySQL5Dialect";
     final String h2_DIALECT = "org.hibernate.dialect.H2Dialect";
     final String MYSQL_ID = "mysql";
     final String H2_ID = "h2";
+    final String TABLE_CREATION_PROP = "hibernate.hbm2ddl.auto";
 
     public DataSource dataSource() throws ServerError {
         assertValidCredentials();
@@ -45,12 +46,13 @@ public class SQLConnection {
         Properties hibernateProperties = new Properties();
 
         if (queryURL.contains(MYSQL_ID)) {
-            hibernateProperties.setProperty(DIALECT_PROPERTY_NAME, MYSQL_DIALECT);
+            hibernateProperties.setProperty(DIALECT_PROP, MYSQL_DIALECT);
         } else if (queryURL.contains(H2_ID)) {
-            hibernateProperties.setProperty(DIALECT_PROPERTY_NAME, h2_DIALECT);
+            hibernateProperties.setProperty(DIALECT_PROP, h2_DIALECT);
         } else {
             throw new RuntimeException("Hibernate dialect not supported for connection string:" + SQL_URL);
         }
+        hibernateProperties.setProperty(TABLE_CREATION_PROP, "create");
 
         return hibernateProperties;
     }

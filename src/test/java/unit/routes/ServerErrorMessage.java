@@ -1,17 +1,24 @@
-package edu.nd.crc.safa.routes;
+package unit.routes;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import unit.SpringBootBaseTest;
+import unit.TestUtil;
 
-public class ErrorTest extends MvcBaseTest {
+/**
+ * Tests that server errors include a
+ * - status (0 if success otherwise some error code > 0)
+ * - body (contains error message and other information)
+ */
+public class ServerErrorMessage extends SpringBootBaseTest {
 
     @Test
     public void testUploadError() throws Exception {
@@ -19,7 +26,7 @@ public class ErrorTest extends MvcBaseTest {
         String URL = String.format("/projects/%s/upload/", projectID);
         MockHttpServletRequestBuilder request = post(URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString("hello world"));
+            .content(TestUtil.asJsonString("hello world"));
         MvcResult result = mockMvc
             .perform(request)
             .andExpect(status().isBadRequest())
@@ -27,15 +34,18 @@ public class ErrorTest extends MvcBaseTest {
 
         String content = result.getResponse().getContentAsString();
         JSONObject obj = new JSONObject(content);
-        Assert.assertEquals(obj.get("status"), 1);
-        Assert.assertTrue(obj.getJSONObject("body").get("message").toString().contains("parsing json file"));
-    }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        //Verification Points
+        Integer responseStatus = (Integer) obj.get("status");
+
+        assertThat(responseStatus).isNotNull();
+        assertThat(responseStatus).isEqualTo(1);
+
+        JSONObject body = obj.getJSONObject("body");
+        assertThat(body).isNotNull();
+
+        Object error = body.get("message");
+        assertThat(error).isNotNull();
+        assertTrue(error.toString().contains("parsing json file"));
     }
 }

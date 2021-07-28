@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.routes;
+package unit.routes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -9,8 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.nd.crc.safa.importer.MySQL;
 
 import org.junit.jupiter.api.Test;
+import unit.SpringBootBaseTest;
 
-public class SmokeTest extends MvcBaseTest {
+/**
+ * Tests that SpringBoot application is loaded and dependency injection
+ * can be performed.
+ */
+public class ApplicationLoader extends SpringBootBaseTest {
 
     @Test
     public void contextLoads() throws Exception {

@@ -1,5 +1,10 @@
 package unit.entities;
 
+import java.io.Serializable;
+
+import edu.nd.crc.safa.entities.ArtifactType;
+import edu.nd.crc.safa.entities.Project;
+
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,5 +23,18 @@ public class EntityBaseTest extends SpringBootBaseTest {
         if (session != null) {
             session.close();
         }
+    }
+
+    public Serializable createProject(String projectName) {
+        Project project = new Project();
+        project.setName(projectName);
+        return session.save(project);
+    }
+
+    public Serializable createArtifactType(Project project, String artifactTypeName) {
+        ArtifactType artifactType = new ArtifactType();
+        artifactType.setProject(project);
+        artifactType.setName(artifactTypeName);
+        return session.save(artifactType);
     }
 }

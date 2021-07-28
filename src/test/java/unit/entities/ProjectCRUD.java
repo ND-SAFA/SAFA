@@ -17,7 +17,7 @@ public class ProjectCRUD extends EntityBaseTest {
     String ALT_PROJECT_NAME = "some_other_project";
 
     @Test
-    public void createAndRetrieveProject() {
+    public void CRUDProject() {
         //VP 1: Create Project
         Project project = new Project();
         project.setName(TEST_PROJECT_NAME);

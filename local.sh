@@ -1,20 +1,21 @@
 build() {
   (
-    sed 's,jdbc:mysql://localhost/safa-db,jdbc:h2:mem:safa-db/,g' ".env" >test.env &&
+    set -a &&
+      source .env &&
       ./gradlew build --stacktrace # automatically reads env files
   )
-  echo "DONE"
-  rm test.env
 }
 
 run() {
   JAR_PATH="$PWD/build/libs/edu.nd.crc.safa-0.1.0.jar"
 
   (
-    set -a &&
-      source .env &&
+    sed 's,h2:mem:,mysql://localhost/,g' ".env" >test.env &&
+      set -a &&
+      source test.env &&
       java -jar "$JAR_PATH"
   )
+  rm test.env
 }
 
 if [ $1 == "build" ]; then
@@ -26,6 +27,5 @@ if [ $1 == "run" ]; then
 fi
 
 if [ $1 == "buildrun" ]; then
-  build
-  run
+  build && run
 fi

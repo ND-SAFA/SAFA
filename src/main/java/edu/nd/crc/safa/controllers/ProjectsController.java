@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.controller.projects;
+package edu.nd.crc.safa.controllers;
 
 import java.util.Map;
 

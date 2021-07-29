@@ -17,12 +17,10 @@ public class ProjectCRUD extends EntityBaseTest {
     String ALT_PROJECT_NAME = "some_other_project";
 
     @Test
-    public void CRUDProject() {
+    public void createRetrieveUpdateDeleteProject() {
         //VP 1: Create Project
-        Project project = new Project();
-        project.setName(TEST_PROJECT_NAME);
+        Project project = new Project(TEST_PROJECT_NAME);
         Serializable id = session.save(project);
-
 
         //VP 2: Retrieve Project
         Project queryProject = session.find(Project.class, project.getProjectId());

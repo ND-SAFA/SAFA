@@ -21,7 +21,7 @@ public class ArtifactType implements Serializable {
     @JoinColumn(
         name = "project_id"
     )
-    Project projectId;
+    Project project;
 
     @Id
     @Column(name = "type_id")
@@ -30,6 +30,14 @@ public class ArtifactType implements Serializable {
 
     @Column(name = "name")
     String name;
+
+    public ArtifactType() {
+    }
+
+    public ArtifactType(Project project, String name) {
+        this.project = project;
+        this.name = name.toLowerCase();
+    }
 
     public UUID getTypeId() {
         return this.typeId;
@@ -44,6 +52,6 @@ public class ArtifactType implements Serializable {
     }
 
     public void setProject(Project project) {
-        this.projectId = project;
+        this.project = project;
     }
 }

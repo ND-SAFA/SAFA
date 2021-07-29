@@ -30,7 +30,7 @@ public class Artifact implements Serializable {
         foreignKey = @ForeignKey(name = "project_id", value = ConstraintMode.PROVIDER_DEFAULT),
         nullable = false
     )
-    Project projectId;
+    Project project;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumns({
@@ -49,4 +49,34 @@ public class Artifact implements Serializable {
 
     @Column(name = "name")
     String name;
+
+    public Artifact() {
+
+    }
+
+    public Artifact(Project project, ArtifactType type, String name) {
+        setProject(project);
+        setType(type);
+        setName(name);
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public void setType(ArtifactType artifactType) {
+        this.type = artifactType;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ArtifactType getType() {
+        return this.type;
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }

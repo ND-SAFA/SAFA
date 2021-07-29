@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ArtifactTypeCRUD extends EntityBaseTest {
     @Test
-    public void createArtifactType() {
+    public void createRetrieveUpdateDeleteArtifactType() {
         String projectName = "test_project";
         String artifactTypeName = "Design Definitions";
         String altArtifactTypeName = "Requirements";
@@ -23,9 +23,7 @@ public class ArtifactTypeCRUD extends EntityBaseTest {
         Project project = session.find(Project.class, projectId);
 
         //VP 1 - Create Artifact Type
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setProject(project);
-        artifactType.setName(artifactTypeName);
+        ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
         Serializable artifactTypeId = session.save(artifactType);
         assertThat(artifactTypeId).isNotNull();
 

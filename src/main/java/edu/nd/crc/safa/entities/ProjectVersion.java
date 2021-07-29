@@ -25,10 +25,18 @@ public class ProjectVersion implements Serializable {
         foreignKey = @ForeignKey(value = ConstraintMode.PROVIDER_DEFAULT),
         nullable = false
     )
-    Project projectId;
+    Project project;
 
     @Id
     @Column(name = "version_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     String versionId; //todo: generate in sequence relative to project id using GenericGenerator
+
+    public ProjectVersion() {
+    }
+
+    public ProjectVersion(Project project, String versionId) {
+        this.project = project;
+        this.versionId = versionId;
+    }
 }

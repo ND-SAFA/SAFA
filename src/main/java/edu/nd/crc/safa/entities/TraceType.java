@@ -25,4 +25,10 @@ public class TraceType implements Serializable {
         this.traceTypeName = name.toLowerCase();
     }
 
+    public TraceType() {
+    }
+
+    public TraceType(String traceTypeName) {
+        this.traceTypeName = traceTypeName;
+    }
 }

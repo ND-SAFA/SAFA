@@ -25,4 +25,15 @@ public class ParserError implements Serializable {
 
     @Column(name = "description")
     String description;
+
+    public ParserError() {
+    }
+
+    public ParserError(String fileName,
+                       String line,
+                       String description) {
+        this.fileName = fileName;
+        this.line = line;
+        this.description = description;
+    }
 }

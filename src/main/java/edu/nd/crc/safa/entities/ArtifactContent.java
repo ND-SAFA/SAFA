@@ -23,7 +23,7 @@ public class ArtifactContent implements Serializable {
         foreignKey = @ForeignKey(name = "artifact_id", value = ConstraintMode.PROVIDER_DEFAULT),
         nullable = false
     )
-    Artifact artifactId;
+    Artifact artifact;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumns({
@@ -36,11 +36,24 @@ public class ArtifactContent implements Serializable {
             nullable = false
         )
     })
-    ProjectVersion version;
+    ProjectVersion projectVersion;
 
     @Column(name = "summary")
     String summary;
 
     @Column(name = "content")
     String content;
+
+    public ArtifactContent() {
+    }
+
+    public ArtifactContent(Artifact artifact,
+                           ProjectVersion projectVersion,
+                           String summary,
+                           String content) {
+        this.artifact = artifact;
+        this.projectVersion = projectVersion;
+        this.summary = summary;
+        this.content = content;
+    }
 }

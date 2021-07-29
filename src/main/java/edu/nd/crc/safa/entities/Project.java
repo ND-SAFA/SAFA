@@ -21,6 +21,13 @@ public class Project implements Serializable {
     @Column(name = "name")
     String name;
 
+    public Project() {
+    }
+
+    public Project(String name) {
+        this.setName(name);
+    }
+
     public void setName(String name) {
         this.name = name;
     }

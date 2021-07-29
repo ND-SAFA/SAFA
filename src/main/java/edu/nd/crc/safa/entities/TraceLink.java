@@ -19,7 +19,7 @@ public class TraceLink implements Serializable {
         name = "artifact_id",
         nullable = false
     )
-    Artifact sourceId;
+    Artifact sourceArtifact;
 
     @Id
     @ManyToOne(cascade = CascadeType.REMOVE)
@@ -27,14 +27,14 @@ public class TraceLink implements Serializable {
         name = "artifact_id",
         nullable = false
     )
-    Artifact targetId;
+    Artifact targetArtifact;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "trace_type_id",
         nullable = false
     )
-    TraceType type;
+    TraceType traceType;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumns({
@@ -48,4 +48,15 @@ public class TraceLink implements Serializable {
         )
     })
     ProjectVersion projectVersion;
+
+    public TraceLink() {
+    }
+
+    public TraceLink(Artifact sourceArtifact,
+                     Artifact targetArtifact,
+                     TraceType traceType) {
+        this.sourceArtifact = sourceArtifact;
+        this.targetArtifact = targetArtifact;
+        this.traceType = traceType;
+    }
 }

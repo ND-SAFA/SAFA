@@ -2,6 +2,7 @@ package unit.entities;
 
 import java.io.Serializable;
 
+import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 
@@ -26,15 +27,17 @@ public class EntityBaseTest extends SpringBootBaseTest {
     }
 
     public Serializable createProject(String projectName) {
-        Project project = new Project();
-        project.setName(projectName);
+        Project project = new Project(projectName);
         return session.save(project);
     }
 
     public Serializable createArtifactType(Project project, String artifactTypeName) {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setProject(project);
-        artifactType.setName(artifactTypeName);
+        ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
         return session.save(artifactType);
+    }
+
+    public Serializable createArtifact(Project project, ArtifactType type, String name) {
+        Artifact artifact = new Artifact(project, type, name);
+        return session.save(artifact);
     }
 }

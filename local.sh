@@ -13,6 +13,7 @@ run() {
     sed 's,h2:mem:,mysql://localhost/,g' ".env" >test.env &&
       set -a &&
       source test.env &&
+      env &&
       java -jar "$JAR_PATH"
   )
   rm test.env

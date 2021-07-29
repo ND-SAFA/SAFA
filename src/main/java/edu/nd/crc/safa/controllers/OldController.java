@@ -1,14 +1,13 @@
-package edu.nd.crc.safa.controller.projects;
+package edu.nd.crc.safa.controllers;
 
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.database.Neo4J;
 import edu.nd.crc.safa.error.ResponseCodes;
 import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.services.FlatFileService;
 import edu.nd.crc.safa.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,67 +23,106 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-public class ProjectsController {
+public class OldController {
 
 
     private ProjectService projectService;
+    private FlatFileService flatFileService;
 
     @Autowired
-    public ProjectsController(ProjectService projectService) {
+    public OldController(ProjectService projectService, FlatFileService flatFileService) {
         this.projectService = projectService;
+        this.flatFileService = flatFileService;
     }
 
-    @GetMapping("/")
-    public String root() {
-        return "Hello World";
+    /* Flat File Routes
+     * Includes the ability to upload, download, and remove flat files
+     */
+    @PostMapping("old/projects/{projId}/upload/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ServerResponse uploadFile(@PathVariable String projId,
+                                     @RequestBody String encodedStr) throws ServerError {
+        return new ServerResponse(flatFileService.uploadFile(projId, encodedStr));
     }
 
-    @GetMapping("/connections")
-    public ServerResponse test_service_connections() throws Exception {
-        (new Neo4J()).verifyConnectivity();
-
-        MySQL sql = new MySQL();
-        sql.verifyConnection();
-        return new ServerResponse("Connected Neo4J and MySQL!");
+    @GetMapping("old/projects/{projId}/upload/")
+    public ServerResponse getUploadedFile(@PathVariable String projId,
+                                          @RequestParam String filename) throws ServerError {
+        return new ServerResponse(flatFileService.getUploadedFile(projId, filename));
     }
 
-    @GetMapping("/projects/{projId}/parents/{node}")
+    @GetMapping("old/projects/{projId}/clear/")
+    public ServerResponse clearUploadedFlatfiles(@PathVariable String projId) throws ServerError {
+        return new ServerResponse(flatFileService.clearUploadedFlatFiles(projId));
+    }
+
+    @GetMapping("old/projects/{projId}/uploaderrorlog/")
+    public ServerResponse getUploadFilesErrorLog(@PathVariable String projId) throws ServerError {
+        System.out.println("/projects/{projId}/uploaderrorlog/");
+        return new ServerResponse(flatFileService.getUploadFilesErrorLog(projId));
+    }
+
+    @GetMapping("old/projects/{projId}/linkerrorlog/")
+    public ServerResponse getLinkErrorLog(@PathVariable String projId) throws ServerError {
+        System.out.println("/projects/{projId}/errorlog/");
+        return new ServerResponse(flatFileService.getLinkErrorLog(projId));
+    }
+
+    @GetMapping("old/projects/{projId}/generate/")
+    public ServerResponse generateLinks(@PathVariable String projId) throws ServerError {
+        return new ServerResponse(flatFileService.generateLinks(projId));
+    }
+
+    @GetMapping("old/projects/{projId}/linktypes/")
+    public ServerResponse getLinkTypes(@PathVariable String projId) throws ServerError {
+        return new ServerResponse(flatFileService.getLinkTypes(projId));
+    }
+
+    @GetMapping("old/projects/{projId}/remove/")
+    public ServerResponse removeGeneratedFlatFiles(@PathVariable String projId) throws ServerError {
+        return new ServerResponse(flatFileService.clearGeneratedFlatFiles(projId));
+    }
+
+    /* Versioning, deltas, nodes
+     *
+     */
+    @GetMapping("old/projects/{projId}/parents/{node}")
     public ServerResponse parents(@PathVariable String projId,
                                   @PathVariable String node,
                                   @RequestParam String rootType) throws ServerError {
         return new ServerResponse(projectService.parents(projId, node, rootType));
     }
 
-    @GetMapping("/projects/{projId}/nodes/")
+    @GetMapping("old/projects/{projId}/nodes/")
     public ServerResponse nodes(@PathVariable String projId,
                                 @RequestParam String nodeType) throws ServerError {
         return new ServerResponse(projectService.nodes(projId, nodeType));
     }
 
-    @GetMapping("/projects/{projId}/nodes/warnings")
+    @GetMapping("old/projects/{projId}/nodes/warnings")
     public ServerResponse nodeWarnings(@PathVariable String projId) {
         return new ServerResponse(projectService.nodeWarnings(projId));
     }
 
-    @GetMapping("/projects/{projId}/trees/")
+    @GetMapping("old/projects/{projId}/trees/")
     public ServerResponse trees(@PathVariable String projId,
                                 @RequestParam String rootType) throws ServerError {
         return new ServerResponse(projectService.trees(projId, rootType));
     }
 
-    @GetMapping("/projects/{projId}/trees/{treeId}/")
+    @GetMapping("old/projects/{projId}/trees/{treeId}/")
     public ServerResponse tree(@PathVariable String projId,
                                @PathVariable String treeId,
                                @RequestParam String rootType) throws ServerError {
         return new ServerResponse(projectService.tree(projId, treeId, rootType));
     }
 
-    @GetMapping("/projects/{projId}/versions/")
+    @GetMapping("old/projects/{projId}/versions/")
     public ServerResponse versions(@PathVariable String projId) throws ServerError {
         return new ServerResponse(projectService.versions(projId));
     }
 
-    @GetMapping("/projects/{projId}/trees/{treeId}/versions/{version}")
+    @GetMapping("old/projects/{projId}/trees/{treeId}/versions/{version}")
     public ServerResponse versions(@PathVariable String projId,
                                    @PathVariable String treeId,
                                    @PathVariable int version,
@@ -92,63 +130,18 @@ public class ProjectsController {
         return new ServerResponse(projectService.versions(projId, treeId, version, rootType));
     }
 
-    @PostMapping("/projects/{projId}/versions/")
+    @PostMapping("old/projects/{projId}/versions/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse versionsTag(@PathVariable String projId) {
         return new ServerResponse(projectService.versionsTag(projId));
     }
 
-    @GetMapping("/projects/{projId}/clear/")
-    public ServerResponse clearUploadedFlatfiles(@PathVariable String projId) throws ServerError {
-        return new ServerResponse(projectService.clearUploadedFlatfiles(projId));
-    }
-
-    @GetMapping("/projects/{projId}/upload/")
-    public ServerResponse getUploadedFile(@PathVariable String projId,
-                                          @RequestParam String filename) throws ServerError {
-        return new ServerResponse(projectService.getUploadedFile(projId, filename));
-    }
-
-    @PostMapping("/projects/{projId}/upload/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse uploadFile(@PathVariable String projId,
-                                     @RequestBody String encodedStr) throws ServerError {
-        return new ServerResponse(projectService.uploadFile(projId, encodedStr));
-    }
-
-    @GetMapping("/projects/{projId}/uploaderrorlog/")
-    public ServerResponse getUploadFilesErrorLog(@PathVariable String projId) throws ServerError {
-        System.out.println("/projects/{projId}/uploaderrorlog/");
-        return new ServerResponse(projectService.getUploadFilesErrorLog(projId));
-    }
-
-    @GetMapping("/projects/{projId}/linkerrorlog/")
-    public ServerResponse getLinkErrorLog(@PathVariable String projId) throws ServerError {
-        System.out.println("/projects/{projId}/errorlog/");
-        return new ServerResponse(projectService.getLinkErrorLog(projId));
-    }
-
-    @GetMapping("/projects/{projId}/generate/")
-    public ServerResponse generateLinks(@PathVariable String projId) throws ServerError {
-        return new ServerResponse(projectService.generateLinks(projId));
-    }
-
-    @GetMapping("/projects/{projId}/linktypes/")
-    public ServerResponse getLinkTypes(@PathVariable String projId) throws ServerError {
-        return new ServerResponse(projectService.getLinkTypes(projId));
-    }
-
-    @GetMapping("/projects/{projId}/remove/")
-    public ServerResponse clearGeneratedFlatfiles(@PathVariable String projId) throws ServerError {
-        return new ServerResponse(projectService.clearGeneratedFlatfiles(projId));
-    }
-
-    @GetMapping("/projects/{projId}/pull/")
+    @GetMapping("old/projects/{projId}/pull/")
     public ServerResponse projectPull(@PathVariable String projId) {
         return new ServerResponse(projectService.projectPull(projId));
     }
 
-    @PostMapping("/projects/{projId}/trees/{treeId}/layout/")
+    @PostMapping("old/projects/{projId}/trees/{treeId}/layout/")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse postTreeLayout(@PathVariable String projId,
                                          @PathVariable String treeId,
@@ -157,18 +150,18 @@ public class ProjectsController {
         return new ServerResponse("Layout");
     }
 
-    @GetMapping(value = "/projects/{projId}/trees/{treeId}/layout/")
+    @GetMapping(value = "old/projects/{projId}/trees/{treeId}/layout/")
     public String getTreeLayout(@PathVariable String projId, @PathVariable String treeId) throws ServerError {
         return projectService.getTreeLayout(projId, treeId);
     }
 
     // Warnings
-    @GetMapping("/projects/{projId}/warnings/")
+    @GetMapping("old/projects/{projId}/warnings/")
     public Map<String, String> getWarnings(@PathVariable String projId) {
         return projectService.getWarnings(projId);
     }
 
-    @PostMapping("/projects/{projId}/warnings/")
+    @PostMapping("old/projects/{projId}/warnings/")
     @ResponseStatus(HttpStatus.CREATED)
     public void newWarning(@PathVariable String projId,
                            @RequestParam("short") String nShort,
@@ -178,26 +171,26 @@ public class ProjectsController {
     }
 
     // Links
-    @GetMapping("/projects/{projId}/link/")
+    @GetMapping("old/projects/{projId}/link/")
     public ServerResponse getLink(@PathVariable String projId,
                                   @RequestParam("source") String source,
                                   @RequestParam("target") String target) {
         return new ServerResponse(projectService.getLink(projId, source, target));
     }
 
-    @PostMapping("/projects/{projId}/link/")
+    @PostMapping("old/projects/{projId}/link/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse updateLink(@PathVariable String projId, @RequestBody Links links) {
         return new ServerResponse(projectService.updateLink(projId, links));
     }
 
     // Artifacts
-    @GetMapping("/projects/{projId}/artifact/")
+    @GetMapping("old/projects/{projId}/artifact/")
     public ServerResponse getArtifacts(@PathVariable String projId) {
         return new ServerResponse(projectService.getArtifacts(projId));
     }
 
-    @GetMapping("/projects/{projId}/artifact/{source}/links")
+    @GetMapping("old/projects/{projId}/artifact/{source}/links")
     public ServerResponse getArtifactLinks(@PathVariable String projId,
                                            @PathVariable String source,
                                            @RequestParam("target") String target,

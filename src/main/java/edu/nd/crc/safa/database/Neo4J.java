@@ -19,8 +19,6 @@ public class Neo4J {
     private Driver driver;
 
     protected Driver getDriver() throws ServerError {
-        System.out.println("getting neo4j driver");
-
         if (driver != null) {
             return driver;
         } else if (neo4jURI == null) {

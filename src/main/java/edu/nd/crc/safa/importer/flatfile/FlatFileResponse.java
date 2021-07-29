@@ -2,16 +2,20 @@ package edu.nd.crc.safa.importer.flatfile;
 
 import java.util.List;
 
-public class UploadFlatFileResponse {
+/**
+ * Represents the 1-1 JSON object mapping as the response
+ * to a Client after a file manipulation operation.
+ */
+public class FlatFileResponse {
     List<String> uploadedFiles;
     List<String> expectedFiles;
     List<String> generatedFiles;
     List<String> expectedGeneratedFiles;
 
-    public UploadFlatFileResponse(List<String> uFiles,
-                                  List<String> eFiles,
-                                  List<String> gFiles,
-                                  List<String> egFiles) {
+    public FlatFileResponse(List<String> uFiles,
+                            List<String> eFiles,
+                            List<String> gFiles,
+                            List<String> egFiles) {
         this.uploadedFiles = uFiles;
         this.expectedFiles = eFiles;
         this.generatedFiles = gFiles;

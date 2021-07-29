@@ -444,7 +444,9 @@ public class MySQL {
         }
     }
 
-    public void createArtifactTable(String tableName, String filePath, String colHeader) throws ServerError {
+    public void createArtifactTable(String tableName,
+                                    String filePath,
+                                    String colHeader) throws ServerError {
         try (Statement stmt = getConnection().createStatement()) {
             String intTableName = "intermediate_" + tableName;
             if (!tableExists("artifact_error")) {
@@ -491,6 +493,63 @@ public class MySQL {
             createTableList(tableName, false);
         } catch (SQLException e) {
             throw new ServerError("creating artifact table", e);
+        }
+    }
+
+
+    public void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws ServerError {
+        try {
+            Statement stmt = getConnection().createStatement();
+            String intTableName = "intermediate_" + tableName;
+
+            if (!tableExists("trace_matrix_error")) {
+                System.out.println("CREATING NEW Trace Matrix ERROR TABLE: trace_matrix_error...");
+                String sqlCreateErrorTable = "CREATE TABLE trace_matrix_error (\n"
+                    + "db_id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "tablename VARCHAR(255),\n"
+                    + "source VARCHAR(255),\n"
+                    + "target VARCHAR(255),\n"
+                    + "line INT,\n"
+                    + "descr VARCHAR(255) NOT NULL"
+                    + ");";
+                stmt.executeUpdate(sqlCreateErrorTable);
+                System.out.println("CREATED NEW ARTIFACT ERROR TABLE: trace_matrix_error...");
+            }
+
+            createTraceMatrixHelper(stmt, intTableName, tableName, filePath, colHeader);
+
+            if (tableExists(tableName)) {
+                String sqlTruncateArtifactTable = String.format("TRUNCATE TABLE %s", tableName);
+                stmt.executeUpdate(sqlTruncateArtifactTable);
+            } else {
+                System.out.println(String.format("CREATING NEW TRACE MATRIX TABLE: %s...", tableName));
+                String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName)
+                    + "source VARCHAR(255),\n"
+                    + "target VARCHAR(255),\n"
+                    + "score FLOAT NOT NULL DEFAULT 1,\n"
+                    + "approval INT NOT NULL DEFAULT 2,\n"
+                    + "PRIMARY KEY (source, target)"
+                    + ");";
+
+                stmt.executeUpdate(sqlCreateTable);
+                System.out.println("CREATED NEW TRACE MATRIX TABLE");
+            }
+
+            String sqlUpdateTable = String.format("INSERT INTO %s (source, target, score, approval)\n", tableName)
+                + String.format("SELECT source, target, score, approval FROM %s\n", intTableName)
+                + String.format("ON DUPLICATE KEY UPDATE source = %s.source, target = %s.target;",
+                tableName, tableName);
+
+            stmt.executeUpdate(sqlUpdateTable);
+            System.out.println("INSERTED DATA from %s into TRACE MATRIX TABLE: %s.");
+
+
+            stmt.executeUpdate(String.format("DROP TABLE %s", intTableName));
+            System.out.println("DELETED INTERMEDIATE TRACE MATRIX TABLE");
+
+            createTableList(tableName, false);
+        } catch (SQLException e) {
+            throw new ServerError("create trace matrix table", e);
         }
     }
 
@@ -554,61 +613,6 @@ public class MySQL {
             System.out.println("Updated Line numbers.\n");
         } catch (SQLException e) {
             throw new ServerError("creating trace matrix helper", e);
-        }
-    }
-
-    public void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
-            String intTableName = "intermediate_" + tableName;
-
-            if (!tableExists("trace_matrix_error")) {
-                System.out.println("CREATING NEW Trace Matrix ERROR TABLE: trace_matrix_error...");
-                String sqlCreateErrorTable = "CREATE TABLE trace_matrix_error (\n"
-                    + "db_id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "tablename VARCHAR(255),\n"
-                    + "source VARCHAR(255),\n"
-                    + "target VARCHAR(255),\n"
-                    + "line INT,\n"
-                    + "descr VARCHAR(255) NOT NULL"
-                    + ");";
-                stmt.executeUpdate(sqlCreateErrorTable);
-                System.out.println("CREATED NEW ARTIFACT ERROR TABLE: trace_matrix_error...");
-            }
-
-            createTraceMatrixHelper(stmt, intTableName, tableName, filePath, colHeader);
-
-            if (tableExists(tableName)) {
-                String sqlTruncateArtifactTable = String.format("TRUNCATE TABLE %s", tableName);
-                stmt.executeUpdate(sqlTruncateArtifactTable);
-            } else {
-                System.out.println(String.format("CREATING NEW TRACE MATRIX TABLE: %s...", tableName));
-                String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName)
-                    + "source VARCHAR(255),\n"
-                    + "target VARCHAR(255),\n"
-                    + "score FLOAT NOT NULL DEFAULT 1,\n"
-                    + "approval INT NOT NULL DEFAULT 2,\n"
-                    + "PRIMARY KEY (source, target)"
-                    + ");";
-
-                stmt.executeUpdate(sqlCreateTable);
-                System.out.println("CREATED NEW TRACE MATRIX TABLE");
-            }
-
-            String sqlUpdateTable = String.format("INSERT INTO %s (source, target, score, approval)\n", tableName)
-                + String.format("SELECT source, target, score, approval FROM %s\n", intTableName)
-                + String.format("ON DUPLICATE KEY UPDATE source = %s.source, target = %s.target;",
-                tableName, tableName);
-
-            stmt.executeUpdate(sqlUpdateTable);
-            System.out.println("INSERTED DATA from %s into TRACE MATRIX TABLE: %s.");
-
-
-            stmt.executeUpdate(String.format("DROP TABLE %s", intTableName));
-            System.out.println("DELETED INTERMEDIATE TRACE MATRIX TABLE");
-
-            createTableList(tableName, false);
-        } catch (SQLException e) {
-            throw new ServerError("create trace matrix table", e);
         }
     }
 

@@ -68,7 +68,6 @@ public class Database implements AutoCloseable {
      * doesn't exist the it checks to see if there are any nodes and if so then we are on the first version.
      */
     public int currentVersion() throws ServerError {
-        System.out.println("Getting current version...");
         int version = -1;
 
         // Check if we have a version node which stores the current version

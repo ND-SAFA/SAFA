@@ -1,0 +1,12 @@
+{
+  "DataFiles": {
+    "Design": {
+      "File": "Design.csv"
+    }
+  },
+  "DesignToDesign": {
+    "Source": "Design",
+    "Target": "Design",
+    "File": "Design2Design.csv"
+  }
+}

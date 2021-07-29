@@ -15,13 +15,9 @@ public class ProjectController {
     @PostMapping(value = "/projects/flat-files")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse uploadProjectFiles(@RequestParam("files") MultipartFile[] files) {
-        String[] filesReceived = new String[files.length];
-
-        for (int i = 0; i < files.length; i++) {
-            filesReceived[i] = files[i].getOriginalFilename();
-        }
-
-        return new ServerResponse(new ProjectCreationResponse(filesReceived));
+        ProjectCreationResponse response = new ProjectCreationResponse();
+        response.setFilesReceived(files);
+        return new ServerResponse(response);
     }
 }
 

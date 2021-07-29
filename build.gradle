@@ -69,7 +69,6 @@ dependencies {
     }
 }
 
-
 test {
     def envFileName = ''
     if (file('test.env').exists()) {
@@ -116,4 +115,5 @@ checkstyleMain {
 checkstyleTest {
     source = 'src/test/'
 }
+
 

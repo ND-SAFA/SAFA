@@ -21,9 +21,9 @@ import unit.TestUtil;
 public class ServerErrorMessage extends SpringBootBaseTest {
 
     @Test
-    public void testUploadError() throws Exception {
+    public void testServerError() throws Exception {
         String projectID = "abc123";
-        String URL = String.format("/projects/%s/upload/", projectID);
+        String URL = String.format("/old/projects/%s/upload/", projectID);
         MockHttpServletRequestBuilder request = post(URL)
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.asJsonString("hello world"));
@@ -32,8 +32,7 @@ public class ServerErrorMessage extends SpringBootBaseTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 
-        String content = result.getResponse().getContentAsString();
-        JSONObject obj = new JSONObject(content);
+        JSONObject obj = TestUtil.asJson(result);
 
         //Verification Points
         Integer responseStatus = (Integer) obj.get("status");

@@ -9,6 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Responsible for uniquely identifying which
+ * projects exist.
+ */
 @Entity
 @Table(name = "projects")
 public class Project implements Serializable {

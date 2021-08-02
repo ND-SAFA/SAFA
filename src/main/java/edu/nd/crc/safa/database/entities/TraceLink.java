@@ -10,6 +10,9 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Responsible for marking each trace link in each project.
+ */
 @Entity
 @Table(name = "trace_links")
 public class TraceLink implements Serializable {

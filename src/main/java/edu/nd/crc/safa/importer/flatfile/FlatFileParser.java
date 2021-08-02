@@ -11,9 +11,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.crc.safa.database.entities.ArtifactFile;
 import edu.nd.crc.safa.database.entities.ArtifactType;
 import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.TIMFile;
 import edu.nd.crc.safa.error.ServerError;
 
 import com.jsoniter.JsonIterator;
@@ -69,7 +69,7 @@ public class FlatFileParser {
                 Session session = sessionFactory.openSession();
                 ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
                 Serializable artifactId = session.save(artifactType);
-                TIMFile newFile = new TIMFile(project, artifactType, artifactFileName);
+                ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
                 session.save(newFile);
             }
         } catch (IOException e) {

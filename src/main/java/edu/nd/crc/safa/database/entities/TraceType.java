@@ -9,6 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Responsible for enumerating the different ways traces
+ * can be established. The reason this is an entire table
+ * is too leave the naming flexible in case we ever want to
+ * distinguish between algorithms or variants.
+ */
 @Entity
 @Table(name = "trace_type")
 public class TraceType implements Serializable {

@@ -9,7 +9,6 @@ import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -23,8 +22,9 @@ import javax.persistence.Table;
 public class ProjectVersion implements Serializable {
 
     @Id
+    @Column(name = "version_id")
     @GeneratedValue
-    UUID VersionId;
+    UUID versionId; //todo: generate in sequence relative to project id using GenericGenerator
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
@@ -34,15 +34,11 @@ public class ProjectVersion implements Serializable {
     )
     Project project;
 
-    @Column(name = "version_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    String versionId; //todo: generate in sequence relative to project id using GenericGenerator
 
     public ProjectVersion() {
     }
 
-    public ProjectVersion(Project project, String versionId) {
+    public ProjectVersion(Project project) {
         this.project = project;
-        this.versionId = versionId;
     }
 }

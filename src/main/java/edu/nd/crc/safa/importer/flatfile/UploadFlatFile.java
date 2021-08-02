@@ -8,6 +8,7 @@ import java.util.Base64;
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.importer.flatfile.parser.ArtifactFileParser;
 import edu.nd.crc.safa.responses.FlatFileResponse;
 
 import com.jsoniter.JsonIterator;
@@ -25,12 +26,12 @@ public class UploadFlatFile {
 
 
     private MySQL sql;
-    private FlatFileParser flatFileParser;
+    private ArtifactFileParser artifactFileParser;
 
     @Autowired
-    public UploadFlatFile(MySQL sql, FlatFileParser flatFileParser) {
+    public UploadFlatFile(MySQL sql, ArtifactFileParser artifactFileParser) {
         this.sql = sql;
-        this.flatFileParser = flatFileParser;
+        this.artifactFileParser = artifactFileParser;
     }
 
     public FlatFileResponse uploadFiles(String projectId, String jsonfiles) throws ServerError {
@@ -46,9 +47,9 @@ public class UploadFlatFile {
 
                 if (filename.equals("tim.json")) {
                     sql.clearTimTables();
-                    flatFileParser.parseTimFile(fullPath);
+                    artifactFileParser.parseTimFile(fullPath);
                 } else {
-                    flatFileParser.parseRegularFile(filename, fullPath);
+                    artifactFileParser.parseRegularFile(filename, fullPath);
                 }
             }
         } catch (IOException e) {

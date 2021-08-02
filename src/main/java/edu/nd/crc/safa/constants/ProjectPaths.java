@@ -10,7 +10,11 @@ public class ProjectPaths {
     public static final String PATH_TO_GENERATED_DIR = PATH_TO_BUILD + "/generatedFiles";
     public static final String PATH_TO_TEST_RESOURCES = PATH_TO_ROOT + "/resources";
 
-    public static String getPathToProjectFlatFile(String projectId) {
+    public static String getPathToProjectFlatFiles(String projectId) {
         return ProjectPaths.PATH_TO_FLAT_FILES + "/" + projectId + "/";
+    }
+
+    public static String getPathToProjectFlatFile(String projectId, String fileName) {
+        return getPathToProjectFlatFiles(projectId) + "/" + fileName;
     }
 }

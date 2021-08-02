@@ -40,6 +40,9 @@ public class ArtifactFile {
     @Column(name = "fileName", nullable = false)
     String fileName;
 
+    public ArtifactFile() {
+    }
+
     public ArtifactFile(Project project,
                         ArtifactType artifactType,
                         String fileName) {

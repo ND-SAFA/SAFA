@@ -31,8 +31,8 @@ public class ParserError implements Serializable {
     @Column(name = "file_name")
     String fileName;
 
-    @Column(name = "line")
-    String line;
+    @Column(name = "line_number")
+    Long lineNumber;
 
     @Column(name = "description")
     String description;
@@ -40,11 +40,13 @@ public class ParserError implements Serializable {
     public ParserError() {
     }
 
-    public ParserError(String fileName,
-                       String line,
+    public ParserError(Project project,
+                       String fileName,
+                       Long lineNumber,
                        String description) {
+        this.project = project;
         this.fileName = fileName;
-        this.line = line;
+        this.lineNumber = lineNumber;
         this.description = description;
     }
 }

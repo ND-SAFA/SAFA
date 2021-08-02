@@ -16,9 +16,9 @@ import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.constants.ProjectVariables;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.importer.flatfile.FlatFileParser;
 import edu.nd.crc.safa.importer.flatfile.Generator;
 import edu.nd.crc.safa.importer.flatfile.OSHelper;
+import edu.nd.crc.safa.importer.flatfile.parser.ArtifactFileParser;
 import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.RawJson;
 
@@ -33,24 +33,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class FlatFileService {
 
-    FlatFileParser flatFileParser;
+    ArtifactFileParser artifactFileParser;
     TraceMatrixService traceMatrixService;
     Generator generateFlatFile;
     TimArtifactService timArtifactService;
 
     @Autowired
-    public FlatFileService(FlatFileParser flatFileParser,
+    public FlatFileService(ArtifactFileParser artifactFileParser,
                            TraceMatrixService traceMatrixService,
                            Generator generateFlatFile,
                            TimArtifactService timArtifactService) {
         this.generateFlatFile = generateFlatFile;
         this.traceMatrixService = traceMatrixService;
-        this.flatFileParser = flatFileParser;
+        this.artifactFileParser = artifactFileParser;
         this.timArtifactService = timArtifactService;
     }
 
     public FlatFileResponse uploadAndParseFile(String projectId, String encodedStr) throws ServerError {
-        String pathToStorage = ProjectPaths.getPathToProjectFlatFile(projectId);
+        String pathToStorage = ProjectPaths.getPathToProjectFlatFiles(projectId);
         OSHelper.clearOrCreateDirectory(pathToStorage);
 
         try {
@@ -63,9 +63,9 @@ public class FlatFileService {
 
                 if (fileName.equals(ProjectVariables.TIM_FILENAME)) {
                     sql.clearTimTables();
-                    flatFileParser.parseTimFile(pathToFile);
+                    artifactFileParser.parseTimFile(pathToFile);
                 } else {
-                    flatFileParser.parseRegularFile(fileName, pathToFile);
+                    artifactFileParser.parseRegularFile(fileName, pathToFile);
                 }
             }
         } catch (IOException e) {

@@ -16,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "artifact_contents")
-public class ArtifactContent implements Serializable {
+public class ArtifactBody implements Serializable {
     @Id
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "artifact_id")
@@ -35,13 +35,13 @@ public class ArtifactContent implements Serializable {
     @Column(name = "content")
     String content;
 
-    public ArtifactContent() {
+    public ArtifactBody() {
     }
 
-    public ArtifactContent(Artifact artifact,
-                           ProjectVersion projectVersion,
-                           String summary,
-                           String content) {
+    public ArtifactBody(Artifact artifact,
+                        ProjectVersion projectVersion,
+                        String summary,
+                        String content) {
         this.artifact = artifact;
         this.projectVersion = projectVersion;
         this.summary = summary;

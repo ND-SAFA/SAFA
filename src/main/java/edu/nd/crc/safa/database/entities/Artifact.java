@@ -36,7 +36,7 @@ public class Artifact implements Serializable {
     @JoinColumn(
         name = "type_id",
         nullable = false,
-        referencedColumnName = "type_id" //TODO: Figure out if this can ever mismatch with project_id above
+        referencedColumnName = "type_id"
     )
     ArtifactType type;
 

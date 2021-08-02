@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.responses;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,6 +12,13 @@ public class FlatFileResponse {
     List<String> expectedFiles;
     List<String> generatedFiles;
     List<String> expectedGeneratedFiles;
+
+    public FlatFileResponse() {
+        this.uploadedFiles = new ArrayList<>();
+        this.expectedFiles = new ArrayList<>();
+        this.generatedFiles = new ArrayList<>();
+        this.expectedGeneratedFiles = new ArrayList<>();
+    }
 
     public FlatFileResponse(List<String> uFiles,
                             List<String> eFiles,

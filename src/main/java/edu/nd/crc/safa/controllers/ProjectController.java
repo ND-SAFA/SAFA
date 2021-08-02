@@ -2,18 +2,23 @@ package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.database.entities.Artifact;
+import edu.nd.crc.safa.database.entities.Project;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
+import edu.nd.crc.safa.database.repositories.ProjectRepository;
 import edu.nd.crc.safa.error.ResponseCodes;
 import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.responses.ServerResponse;
 import edu.nd.crc.safa.services.FlatFileService;
 import edu.nd.crc.safa.services.ProjectService;
+import edu.nd.crc.safa.services.TraceLinkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,14 +39,21 @@ public class ProjectController {
     private ProjectService projectService;
     private FlatFileService flatFileService;
     private ArtifactRepository artifactRepository;
+    private TraceLinkService traceLinkService;
+    private ProjectRepository projectRepository;
 
     @Autowired
+
     public ProjectController(ProjectService projectService,
                              FlatFileService flatFileService,
-                             ArtifactRepository artifactRepository) {
+                             ArtifactRepository artifactRepository,
+                             TraceLinkService traceLinkService,
+                             ProjectRepository projectRepository) {
         this.projectService = projectService;
         this.flatFileService = flatFileService;
         this.artifactRepository = artifactRepository;
+        this.traceLinkService = traceLinkService;
+        this.projectRepository = projectRepository;
     }
 
     /* Flat File Routes
@@ -50,6 +62,7 @@ public class ProjectController {
     @PostMapping(value = "/projects/flat-files")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ServerResponse uploadProjectFiles(@RequestParam("files") MultipartFile[] files) {
+        // TODO: delete this
         ProjectCreationResponse response = new ProjectCreationResponse();
         response.setFilesReceived(files);
         return new ServerResponse(response);
@@ -57,9 +70,12 @@ public class ProjectController {
 
     @PostMapping("projects/{projId}/upload/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse uploadFile(@PathVariable String projId,
-                                     @RequestBody String encodedStr) throws ServerError {
-        return new ServerResponse(flatFileService.uploadAndParseFile(projId, encodedStr));
+    public ServerResponse uploadFile(@PathVariable String projectId,
+                                     @RequestParam("files") MultipartFile[] files) throws ServerError {
+        // TODO: Find way to automatically validate and find project.
+        Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
+        FlatFileResponse response = this.flatFileService.createProjectFromFiles(project, files);
+        return new ServerResponse(response);
     }
 
     @GetMapping("projects/{projId}/upload/")
@@ -91,8 +107,10 @@ public class ProjectController {
     }
 
     @GetMapping("projects/{projId}/linktypes/")
-    public ServerResponse getLinkTypes(@PathVariable String projId) throws ServerError {
-        return new ServerResponse(flatFileService.getLinkTypes(projId));
+    public ServerResponse getLinkTypes(@PathVariable String projectId) throws ServerError {
+        // TODO: Find way to automatically validate and find project.
+        Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
+        return new ServerResponse(traceLinkService.getLinkTypes(project));
     }
 
     @GetMapping("projects/{projId}/remove/")

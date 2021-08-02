@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.importer.MySQL;
-
+import org.hibernate.Session;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,7 +32,7 @@ public class ApplicationLoads extends SpringBootBaseTest {
 
     @Test
     public void testSQLConnection() throws Exception {
-        MySQL sql = new MySQL();
-        sql.verifyConnection();
+        Session session = sessionFactory.openSession();
+        assertThat(session.isConnected()).isTrue();
     }
 }

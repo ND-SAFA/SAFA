@@ -1,10 +1,13 @@
 package edu.nd.crc.safa.database.entities;
 
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -14,8 +17,13 @@ import javax.persistence.Table;
  * are traced in a project
  */
 @Entity
-@Table(name = "tim_trace_matrix")
-public class TIMTraceMatrix {
+@Table(name = "trace_matrix")
+public class TraceMatrix {
+
+    @Id
+    @Column(name = "trace_matrix_id")
+    UUID traceMatrixId;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "project_id",
@@ -34,4 +42,17 @@ public class TIMTraceMatrix {
 
     @Column(name = "is_generated", nullable = false)
     boolean isGenerated;
+
+    public TraceMatrix() {
+    }
+
+    public TraceMatrix(Project project,
+                       ArtifactType sourceType,
+                       ArtifactType targetType,
+                       boolean isGenerated) {
+        this.project = project;
+        this.sourceType = sourceType;
+        this.targetType = targetType;
+        this.isGenerated = isGenerated;
+    }
 }

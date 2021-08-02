@@ -47,4 +47,12 @@ public class ArtifactBody implements Serializable {
         this.summary = summary;
         this.content = content;
     }
+
+    public String getName() {
+        return this.artifact.getName();
+    }
+
+    public String getContent() {
+        return this.content;
+    }
 }

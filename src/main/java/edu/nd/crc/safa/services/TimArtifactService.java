@@ -6,12 +6,31 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
+import edu.nd.crc.safa.database.repositories.TIMFileRepository;
 import edu.nd.crc.safa.error.ServerError;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TimArtifactService {
+
+    SessionFactory sessionFactory;
+    ArtifactRepository artifactRepository;
+    TIMFileRepository timFileRepository;
+
+    @Autowired
+    public TimArtifactService(SessionFactory sessionFactory,
+                              ArtifactRepository artifactRepository,
+                              TIMFileRepository timFileRepository) {
+        this.sessionFactory = sessionFactory;
+        this.artifactRepository = artifactRepository;
+        this.timFileRepository = timFileRepository;
+    }
+
     public void createTimArtifactsTable(String artifact, String tablename, String filename)
         throws ServerError {
         try {
@@ -30,7 +49,8 @@ public class TimArtifactService {
     }
 
     public void clearTimTables() throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
+
+        try (Session session = sessionFactory.openSession()) {
             Boolean artifactsExists = tableExists("tim_artifact");
             Boolean traceExists = tableExists("tim_trace_matrix");
 
@@ -110,47 +130,6 @@ public class TimArtifactService {
             }
         } catch (SQLException e) {
             throw new ServerError("trace artifact check", e);
-        }
-    }
-
-    public List<List<String>> getTimArtifactData() throws ServerError {
-        try {
-            List<List<String>> data = new ArrayList<List<String>>();
-            if (!tableExists("tim_artifact")) {
-                return data;
-            }
-            Statement stmt = getConnection().createStatement();
-            String sqlGetData = String.format("SELECT artifact, tablename, filename FROM %s;", "tim_artifact");
-
-            ResultSet rs = stmt.executeQuery(sqlGetData);
-
-            while (rs.next()) {
-                List<String> row = new ArrayList<String>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
-                row.add(rs.getString(3));
-                data.add(row);
-            }
-
-            return data;
-        } catch (SQLException e) {
-            throw new ServerError("retrieving TIM artifact data", e);
-        }
-    }
-
-    // Artifacts
-    public List<String> getArtifacts(String project) throws ServerError {
-        try {
-            List<String> result = new ArrayList<String>();
-            Statement s = getConnection().createStatement();
-            ResultSet rs = s.executeQuery("SELECT artifact FROM tim_artifact");
-            while (rs.next()) {
-                result.add(rs.getString(1));
-            }
-
-            return result;
-        } catch (SQLException e) {
-            throw new ServerError("retrieve artifacts in project", e);
         }
     }
 }

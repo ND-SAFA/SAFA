@@ -1,10 +1,13 @@
 package edu.nd.crc.safa.controllers;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.dao.Links;
+import edu.nd.crc.safa.database.entities.Artifact;
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.error.ResponseCodes;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.responses.ProjectCreationResponse;
@@ -30,11 +33,15 @@ public class ProjectController {
 
     private ProjectService projectService;
     private FlatFileService flatFileService;
+    private ArtifactRepository artifactRepository;
 
     @Autowired
-    public ProjectController(ProjectService projectService, FlatFileService flatFileService) {
+    public ProjectController(ProjectService projectService,
+                             FlatFileService flatFileService,
+                             ArtifactRepository artifactRepository) {
         this.projectService = projectService;
         this.flatFileService = flatFileService;
+        this.artifactRepository = artifactRepository;
     }
 
     /* Flat File Routes
@@ -196,8 +203,9 @@ public class ProjectController {
 
     // Artifacts
     @GetMapping("projects/{projId}/artifact/")
-    public ServerResponse getArtifacts(@PathVariable String projId) {
-        return new ServerResponse(projectService.getArtifacts(projId));
+    public ServerResponse getArtifacts(@PathVariable String projectId) {
+        List<Artifact> artifact = artifactRepository.findByProjectId(projectId);
+        return new ServerResponse(artifact);
     }
 
     @GetMapping("projects/{projId}/artifact/{source}/links")

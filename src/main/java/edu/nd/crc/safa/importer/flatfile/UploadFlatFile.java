@@ -25,12 +25,12 @@ public class UploadFlatFile {
 
 
     private MySQL sql;
-    private Parser parser;
+    private FlatFileParser flatFileParser;
 
     @Autowired
-    public UploadFlatFile(MySQL sql, Parser parser) {
+    public UploadFlatFile(MySQL sql, FlatFileParser flatFileParser) {
         this.sql = sql;
-        this.parser = parser;
+        this.flatFileParser = flatFileParser;
     }
 
     public FlatFileResponse uploadFiles(String projectId, String jsonfiles) throws ServerError {
@@ -46,9 +46,9 @@ public class UploadFlatFile {
 
                 if (filename.equals("tim.json")) {
                     sql.clearTimTables();
-                    parser.parseTimFile(fullPath);
+                    flatFileParser.parseTimFile(fullPath);
                 } else {
-                    parser.parseRegularFile(filename, fullPath);
+                    flatFileParser.parseRegularFile(filename, fullPath);
                 }
             }
         } catch (IOException e) {

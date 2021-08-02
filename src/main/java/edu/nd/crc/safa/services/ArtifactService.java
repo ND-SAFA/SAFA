@@ -74,57 +74,6 @@ public class ArtifactService {
         }
     }
 
-    public void createArtifactTable(String tableName,
-                                    String filePath,
-                                    String colHeader) throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
-            String intTableName = "intermediate_" + tableName;
-            if (!tableExists("artifact_error")) {
-                System.out.println("CREATING NEW ARTIFACT ERROR TABLE: artifact_error...");
-                String sqlCreateErrorTable = "CREATE TABLE artifact_error (\n"
-                    + "db_id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "tablename VARCHAR(255),\n"
-                    + "id VARCHAR(255),\n"
-                    + "line INT,\n"
-                    + "descr VARCHAR(255) NOT NULL"
-                    + ");";
-                stmt.executeUpdate(sqlCreateErrorTable);
-                System.out.println("CREATED NEW ARTIFACT ERROR TABLE: artifact_error...");
-            }
-
-            createArtifactTableHelper(stmt, intTableName, tableName, filePath, colHeader);
-
-            if (tableExists(tableName)) {
-                String sqlTruncateArtifactTable = String.format("TRUNCATE TABLE %s", tableName);
-                stmt.executeUpdate(sqlTruncateArtifactTable);
-            } else {
-                System.out.println("CREATING NEW ARTIFACT TABLE");
-                String sqlCreateTable = String.format("CREATE TABLE %s (\n", tableName)
-                    + "id VARCHAR(255) PRIMARY KEY,\n"
-                    + "summary TEXT NOT NULL,\n"
-                    + "content TEXT NOT NULL"
-                    + ");";
-
-                stmt.executeUpdate(sqlCreateTable);
-                System.out.println("CREATED NEW ARTIFACT TABLE");
-            }
-
-            String sqlUpdateTable = String.format("INSERT INTO %s (id, summary, content)\n", tableName)
-                + String.format("SELECT id, summary, content FROM %s\n", intTableName)
-                + String.format("ON DUPLICATE KEY UPDATE id = %s.id;", tableName);
-
-            stmt.executeUpdate(sqlUpdateTable);
-            System.out.println("INSERTED DATA into ARTIFACT TABLE");
-
-
-            stmt.executeUpdate(String.format("DROP TABLE %s", intTableName));
-            System.out.println("DELETED INTERMEDIATE ARTIFACT TABLE");
-
-            createTableList(tableName, false);
-        } catch (SQLException e) {
-            throw new ServerError("creating artifact table", e);
-        }
-    }
 
     public List<List<String>> getArtifactData(String tableName) throws ServerError {
         try (Statement stmt = getConnection().createStatement()) {

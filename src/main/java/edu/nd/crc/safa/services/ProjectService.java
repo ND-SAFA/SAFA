@@ -462,19 +462,6 @@ public class ProjectService {
         return result;
     }
 
-    // Artifacts
-    @Transactional(readOnly = true)
-    public Map<String, Object> getArtifacts(String projectId) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        try {
-            result.put("artifacts", sql.getArtifacts(projectId));
-        } catch (Exception e) {
-            result.put("success", "false");
-            result.put("message", e.toString());
-        }
-        return result;
-    }
-
     @Transactional(readOnly = true)
     public Map<String, Object> getArtifactLinks(String projectId, String source, String target, Double minScore) {
         Map<String, Object> result = new HashMap<String, Object>();

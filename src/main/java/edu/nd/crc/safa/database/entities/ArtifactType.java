@@ -17,16 +17,15 @@ import javax.persistence.Table;
 public class ArtifactType implements Serializable {
 
     @Id
+    @Column(name = "type_id")
+    @GeneratedValue
+    UUID typeId;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "project_id"
     )
     Project project;
-
-    @Id
-    @Column(name = "type_id")
-    @GeneratedValue
-    UUID typeId;
 
     @Column(name = "name")
     String name;

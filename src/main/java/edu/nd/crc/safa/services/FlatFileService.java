@@ -13,11 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.constants.ProjectVariables;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.importer.flatfile.FlatFileParser;
 import edu.nd.crc.safa.importer.flatfile.Generator;
 import edu.nd.crc.safa.importer.flatfile.OSHelper;
-import edu.nd.crc.safa.importer.flatfile.Parser;
 import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.RawJson;
 
@@ -26,39 +27,45 @@ import com.jsoniter.spi.JsonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for creating projects through Flat Files.
+ */
 @Service
 public class FlatFileService {
 
-    Generator generateFlatFile;
+    FlatFileParser flatFileParser;
     TraceMatrixService traceMatrixService;
-    Parser parser;
+    Generator generateFlatFile;
+    TimArtifactService timArtifactService;
 
     @Autowired
-    public FlatFileService(Generator generateFlatFile,
+    public FlatFileService(FlatFileParser flatFileParser,
                            TraceMatrixService traceMatrixService,
-                           Parser parser) {
+                           Generator generateFlatFile,
+                           TimArtifactService timArtifactService) {
         this.generateFlatFile = generateFlatFile;
         this.traceMatrixService = traceMatrixService;
-        this.parser = parser;
+        this.flatFileParser = flatFileParser;
+        this.timArtifactService = timArtifactService;
     }
 
     public FlatFileResponse uploadAndParseFile(String projectId, String encodedStr) throws ServerError {
-        String pathToStorage = ProjectPaths.PATH_TO_FLAT_FILES + "/" + projectId + "/";
+        String pathToStorage = ProjectPaths.getPathToProjectFlatFile(projectId);
         OSHelper.clearOrCreateDirectory(pathToStorage);
 
         try {
             JsonIterator iterator = JsonIterator.parse(encodedStr);
-            for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
-                String encodedData = iterator.readString();
-                byte[] bytes = Base64.getDecoder().decode(encodedData);
-                String fullPath = ProjectPaths.PATH_TO_FLAT_FILES + "/" + filename;
-                Files.write(Paths.get(fullPath), bytes);
+            for (String fileName = iterator.readObject(); fileName != null; fileName = iterator.readObject()) {
+                String encodedContent = iterator.readString();
+                byte[] fileContent = Base64.getDecoder().decode(encodedContent);
+                String pathToFile = ProjectPaths.PATH_TO_FLAT_FILES + "/" + fileName;
+                Files.write(Paths.get(pathToFile), fileContent);
 
-                if (filename.equals("tim.json")) {
+                if (fileName.equals(ProjectVariables.TIM_FILENAME)) {
                     sql.clearTimTables();
-                    parser.parseTimFile(fullPath);
+                    flatFileParser.parseTimFile(pathToFile);
                 } else {
-                    parser.parseRegularFile(filename, fullPath);
+                    flatFileParser.parseRegularFile(fileName, pathToFile);
                 }
             }
         } catch (IOException e) {

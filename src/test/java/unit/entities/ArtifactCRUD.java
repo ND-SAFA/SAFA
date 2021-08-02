@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.database.entities.Artifact;
+import edu.nd.crc.safa.database.entities.ArtifactType;
+import edu.nd.crc.safa.database.entities.Project;
 
 import org.junit.jupiter.api.Test;
 

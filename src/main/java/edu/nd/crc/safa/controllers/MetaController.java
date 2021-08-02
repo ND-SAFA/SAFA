@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.database.Neo4J;
+import edu.nd.crc.safa.database.connection.Neo4J;
 import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.responses.ServerResponse;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

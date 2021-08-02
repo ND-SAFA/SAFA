@@ -30,7 +30,7 @@ public class Generator {
 
     public String generateFiles() throws ServerError {
 
-        OSHelper.createOrClearDirectory(ProjectPaths.PATH_TO_GENERATED_DIR);
+        OSHelper.clearOrCreateDirectory(ProjectPaths.PATH_TO_GENERATED_DIR);
 
         List<List<String>> data = sql.generateInfo();
         System.out.println("Generate Info Works");

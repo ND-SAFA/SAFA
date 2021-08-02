@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.SQLConnection;
+import edu.nd.crc.safa.database.connection.SQLConnection;
 import edu.nd.crc.safa.error.ServerError;
 
 import org.apache.commons.dbcp2.BasicDataSource;

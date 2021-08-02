@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.MySQL;
 
 import com.jsoniter.JsonIterator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Parser {
-    MySQL sql;
 
     @Autowired
-    public Parser(MySQL sql) {
-        this.sql = sql;
+    public Parser() {
     }
 
     public void parseTimFile(String fullPath) throws ServerError {

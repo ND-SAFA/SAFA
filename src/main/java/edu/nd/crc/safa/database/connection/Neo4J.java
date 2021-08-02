@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database;
+package edu.nd.crc.safa.database.connection;
 
 import edu.nd.crc.safa.error.ServerError;
 

@@ -21,7 +21,7 @@ public class OSHelperTest {
         String pathToDummyFolder = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
-        OSHelper.createOrClearDirectory(pathToDummyFolder);
+        OSHelper.clearOrCreateDirectory(pathToDummyFolder);
         assertTrue(folder.exists());
 
         OSHelper.deletePath(pathToDummyFolder);
@@ -41,7 +41,7 @@ public class OSHelperTest {
         assertFalse(childFolder.exists());
 
         //VP 2: Verify able to create subdirectories
-        OSHelper.createOrClearDirectory(pathToChild);
+        OSHelper.clearOrCreateDirectory(pathToChild);
         assertTrue(parentFolder.exists());
         assertTrue(childFolder.exists());
 

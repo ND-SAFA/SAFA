@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database;
+package edu.nd.crc.safa.database.connection;
 
 import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_URL;
 import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_USERNAME;

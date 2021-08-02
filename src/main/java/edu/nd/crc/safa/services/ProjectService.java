@@ -9,12 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.database.Neo4J;
+import edu.nd.crc.safa.database.connection.Neo4J;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.flatfile.Generator;
-import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
@@ -42,8 +40,9 @@ public class ProjectService {
     MySQL sql;
 
     @Autowired
-    public ProjectService(Neo4J neo4j, Puller puller, UploadFlatFile uploadFlatFile,
-                          Generator generateFlatfile, MySQL mysql) {
+    public ProjectService(Neo4J neo4j,
+                          Puller puller,
+                          MySQL mysql) {
         this.neo4j = neo4j;
         this.mPuller = puller;
         this.sql = mysql;

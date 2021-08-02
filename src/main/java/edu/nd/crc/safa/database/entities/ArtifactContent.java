@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.database.entities;
 
 import java.io.Serializable;
 

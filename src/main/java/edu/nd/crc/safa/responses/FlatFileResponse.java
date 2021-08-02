@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfile;
+package edu.nd.crc.safa.responses;
 
 import java.util.List;
 

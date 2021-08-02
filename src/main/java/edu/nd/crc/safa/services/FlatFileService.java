@@ -3,55 +3,80 @@ package edu.nd.crc.safa.services;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.importer.flatfile.FlatFileResponse;
 import edu.nd.crc.safa.importer.flatfile.Generator;
-import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
+import edu.nd.crc.safa.importer.flatfile.OSHelper;
+import edu.nd.crc.safa.importer.flatfile.Parser;
+import edu.nd.crc.safa.responses.FlatFileResponse;
+import edu.nd.crc.safa.responses.RawJson;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.spi.JsonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FlatFileService {
 
-    MySQL sql;
-    UploadFlatFile uploadFlatfile;
-    Generator generateFlatfile;
+    Generator generateFlatFile;
+    TraceMatrixService traceMatrixService;
+    Parser parser;
 
     @Autowired
-    public FlatFileService(MySQL sql, UploadFlatFile uploadFlatfile, Generator generateFlatfile) {
-        this.sql = sql;
-        this.uploadFlatfile = uploadFlatfile;
-        this.generateFlatfile = generateFlatfile;
+    public FlatFileService(Generator generateFlatFile,
+                           TraceMatrixService traceMatrixService,
+                           Parser parser) {
+        this.generateFlatFile = generateFlatFile;
+        this.traceMatrixService = traceMatrixService;
+        this.parser = parser;
     }
 
-    public FlatFileResponse uploadFile(String projectId, String encodedStr) throws ServerError {
-        return uploadFlatfile.uploadFiles(projectId, encodedStr);
+    public FlatFileResponse uploadAndParseFile(String projectId, String encodedStr) throws ServerError {
+        String pathToStorage = ProjectPaths.PATH_TO_FLAT_FILES + "/" + projectId + "/";
+        OSHelper.clearOrCreateDirectory(pathToStorage);
+
+        try {
+            JsonIterator iterator = JsonIterator.parse(encodedStr);
+            for (String filename = iterator.readObject(); filename != null; filename = iterator.readObject()) {
+                String encodedData = iterator.readString();
+                byte[] bytes = Base64.getDecoder().decode(encodedData);
+                String fullPath = ProjectPaths.PATH_TO_FLAT_FILES + "/" + filename;
+                Files.write(Paths.get(fullPath), bytes);
+
+                if (filename.equals("tim.json")) {
+                    sql.clearTimTables();
+                    parser.parseTimFile(fullPath);
+                } else {
+                    parser.parseRegularFile(filename, fullPath);
+                }
+            }
+        } catch (IOException e) {
+            throw new ServerError("uploading files", e);
+        } catch (JsonException e) {
+            throw new ServerError("parsing json file", e);
+        }
+
+        sql.traceArtifactCheck();
+        MySQL.FileInfo fileInfo = sql.getFileInfo();
+
+        return new FlatFileResponse(fileInfo.uploadedFiles,
+            fileInfo.expectedFiles,
+            fileInfo.generatedFiles,
+            fileInfo.expectedGeneratedFiles
+        );
     }
 
-    public static class RawJson {
-        private String payload;
-
-        public RawJson(String payload) {
-            this.payload = payload;
-        }
-
-        public static RawJson from(String payload) {
-            return new RawJson(payload);
-        }
-
-        @JsonValue
-        @JsonRawValue
-        public String getPayload() {
-            return this.payload;
-        }
-    }
 
     public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
         try {
@@ -83,14 +108,197 @@ public class FlatFileService {
     }
 
     public String generateLinks(String projectId) throws ServerError {
-        return generateFlatfile.generateFiles();
+        return generateFlatFile.generateFiles();
     }
 
     public String getLinkTypes(String projectId) throws ServerError {
-        return generateFlatfile.getLinkTypes();
+        return generateFlatFile.getLinkTypes();
     }
 
     public String getLinkErrorLog(String projectId) throws ServerError {
         return sql.getLinkErrors();
+    }
+
+    public String getUploadErrorLog() throws ServerError {
+        try {
+            Statement stmt = getConnection().createStatement();
+            System.out.println("Upload Flatfile Error Log...");
+
+            if (!(tableExists("artifact_error") && tableExists("trace_matrix_error"))) {
+                System.out.println("Upload Flatfile Error Log: Empty...");
+                return "";
+            }
+
+            ArrayList<Object> artifactHeader = new ArrayList<Object>();
+            artifactHeader.add("\"FILE NAME\"");
+            artifactHeader.add("\"ID\"");
+            artifactHeader.add("\"LINE\"");
+            artifactHeader.add("\"DESC\"");
+
+            List<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+            result.add(artifactHeader);
+
+            String sqlArtifactError = "SELECT tablename, id, line, descr FROM artifact_error";
+            ResultSet rsArtifactError = stmt.executeQuery(sqlArtifactError);
+
+            while (rsArtifactError.next()) {
+                ArrayList<Object> row = new ArrayList<Object>();
+                row.add(String.format("\"%s\"", rsArtifactError.getString(2)));
+                row.add(String.format("\"%s\"", rsArtifactError.getString(3)));
+                row.add(rsArtifactError.getInt(4));
+                row.add(rsArtifactError.getString(5));
+                result.add(row);
+            }
+
+            ArrayList<Object> traceHeader = new ArrayList<Object>();
+            traceHeader.add("\"FILE NAME\"");
+            traceHeader.add("\"SOURCE ID\"");
+            traceHeader.add("\"TARGET ID\"");
+            traceHeader.add("\"LINE\"");
+            traceHeader.add("\"DESC\"");
+            result.add(traceHeader);
+
+            String sqlTraceError = "SELECT tablename, source, target, line, descr FROM trace_matrix_error";
+            ResultSet rsTraceError = stmt.executeQuery(sqlTraceError);
+
+            while (rsTraceError.next()) {
+                ArrayList<Object> row = new ArrayList<Object>();
+                row.add(String.format("\"%s\"", rsTraceError.getString(2)));
+                row.add(String.format("\"%s\"", rsTraceError.getString(3)));
+                row.add(String.format("\"%s\"", rsTraceError.getString(4)));
+                row.add(rsTraceError.getInt(5));
+                row.add(String.format("\"%s\"", rsTraceError.getString(6)));
+                result.add(row);
+            }
+
+            byte[] content = result.toString().getBytes();
+            String returnStr = Base64.getEncoder().encodeToString(content);
+
+            return returnStr;
+        } catch (SQLException e) {
+            throw new ServerError("retrieving upload error log", e);
+        }
+    }
+
+    public String clearUploadedFlatfiles() throws ServerError {
+        try (Statement stmt = getConnection().createStatement()) {
+            if (tableExists("uploaded_and_generated_tables")) {
+                String sqlUploadedFiles = "SELECT tablename\n"
+                    + "FROM uploaded_and_generated_tables\n"
+                    + "WHERE is_generated = 0;";
+
+                ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
+                ArrayList<String> tables = new ArrayList<String>();
+
+                while (rs.next()) {
+                    tables.add(rs.getString(1));
+                }
+
+                if (tableExists("artifact_error")) {
+                    stmt.executeUpdate("DROP TABLE artifact_error");
+                }
+
+                if (tableExists("trace_matrix_error")) {
+                    stmt.executeUpdate("DROP TABLE trace_matrix_error");
+                }
+
+                if (tables.size() == 0) {
+                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
+                    return "No generated files";
+                }
+
+                String deleteTables = tables.toString().replace("[", "").replace("]", "");
+                String sqlDropTables = String.format("DROP TABLES %s;", deleteTables);
+                stmt.executeUpdate(sqlDropTables);
+
+                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables WHERE is_generated = 0;";
+                stmt.executeUpdate(sqlDeleteTables);
+
+                return "Uploaded files have successfully been cleared";
+            } else {
+                return "No uploaded files";
+            }
+        } catch (SQLException e) {
+            throw new ServerError("clear uploaded flat files", e);
+        }
+    }
+
+    public String clearGeneratedFlatfiles() throws ServerError {
+        try (Statement stmt = getConnection().createStatement()) {
+            if (tableExists("uploaded_and_generated_tables")) {
+                String sqlUploadedFiles = "SELECT tablename\n"
+                    + "FROM uploaded_and_generated_tables\n"
+                    + "WHERE is_generated = 1;";
+
+                ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
+                ArrayList<String> tables = new ArrayList<String>();
+
+                while (rs.next()) {
+                    tables.add(rs.getString(1));
+                }
+
+                if (tables.size() == 0) {
+                    stmt.executeUpdate("DROP TABLE uploaded_and_generated_tables");
+                    return "No generated files";
+                }
+
+                String deleteTables = tables
+                    .toString()
+                    .replace("[", "")
+                    .replace("]", "");
+                String sqlDropTables = String.format("DROP TABLES %s;", deleteTables);
+                stmt.executeUpdate(sqlDropTables);
+
+                String sqlDeleteTables = "DELETE FROM uploaded_and_generated_tables WHERE is_generated = 1;";
+                stmt.executeUpdate(sqlDeleteTables);
+
+                return "Generated files have successfully been cleared";
+            } else {
+                return "No generated files";
+            }
+        } catch (SQLException e) {
+            throw new ServerError("clearing generated flat files", e);
+        }
+    }
+
+    public MySQL.FileInfo getFileInfo() throws ServerError {
+        MySQL.FileInfo fileInfo = new MySQL.FileInfo();
+
+        List<List<String>> artifact_rows = getTimArtifactData();
+
+        for (List<String> artifact_row : artifact_rows) {
+            String tablename = artifact_row.get(1);
+            String filename = String.format("\"%s\"", artifact_row.get(2));
+
+            fileInfo.expectedFiles.add(filename);
+
+            if (tableExists(tablename)) {
+                fileInfo.uploadedFiles.add(filename);
+            }
+        }
+
+        List<List<String>> trace_rows = getTimTraceData();
+
+        for (List<String> trace_row : trace_rows) {
+            boolean generated = trace_row.get(3).equals("1");
+            String tableName = trace_row.get(4);
+            String filename = String.format("\"%s\"", trace_row.get(5));
+
+            if (generated) {
+                fileInfo.expectedGeneratedFiles.add(filename);
+
+                if (tableExists(tableName)) {
+                    fileInfo.generatedFiles.add(filename);
+                }
+            } else {
+                fileInfo.expectedFiles.add(filename);
+
+                if (tableExists(tableName)) {
+                    fileInfo.uploadedFiles.add(filename);
+                }
+            }
+        }
+
+        return fileInfo;
     }
 }

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.controllers;
+package edu.nd.crc.safa.responses;
 
 import edu.nd.crc.safa.error.ResponseCodes;
 

@@ -8,6 +8,7 @@ import java.util.Base64;
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.responses.FlatFileResponse;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.spi.JsonException;
@@ -33,7 +34,7 @@ public class UploadFlatFile {
     }
 
     public FlatFileResponse uploadFiles(String projectId, String jsonfiles) throws ServerError {
-        OSHelper.createOrClearDirectory(ProjectPaths.PATH_TO_FLAT_FILES);
+        OSHelper.clearOrCreateDirectory(ProjectPaths.PATH_TO_FLAT_FILES);
 
         try {
             JsonIterator iterator = JsonIterator.parse(jsonfiles);

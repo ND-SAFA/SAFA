@@ -1,7 +1,7 @@
 package unit;
 
 import edu.nd.crc.safa.MainApplication;
-import edu.nd.crc.safa.controllers.OldController;
+import edu.nd.crc.safa.controllers.ProjectController;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public abstract class SpringBootBaseTest {
     protected MockMvc mockMvc;
 
     @Autowired
-    protected OldController controller;
+    protected ProjectController controller;
 
     @Autowired
     public SessionFactory sessionFactory;

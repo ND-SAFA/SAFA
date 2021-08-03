@@ -1,8 +1,8 @@
-package edu.nd.crc.safa.flatfile;
+package edu.nd.crc.safa.utilities;
 
 import java.io.File;
 
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 
 
 /**

@@ -15,7 +15,8 @@ import edu.nd.crc.safa.database.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -43,7 +44,6 @@ public class ArtifactFileParser {
     ProjectVersionRepository projectVersionRepository;
 
     @Autowired
-
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
                               ArtifactRepository artifactRepository,
                               ArtifactBodyRepository artifactBodyRepository,

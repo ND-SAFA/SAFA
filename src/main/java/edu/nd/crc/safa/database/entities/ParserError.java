@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,6 +30,10 @@ public class ParserError implements Serializable {
     @JoinColumn(name = "project_id", nullable = false)
     Project project;
 
+    @Column(name = "activity")
+    @Enumerated(EnumType.ORDINAL)
+    ApplicationActivity activity;
+
     @Column(name = "file_name")
     String fileName;
 
@@ -38,15 +44,32 @@ public class ParserError implements Serializable {
     String description;
 
     public ParserError() {
+        this.activity = ApplicationActivity.UNKNOWN;
     }
 
     public ParserError(Project project,
                        String fileName,
                        Long lineNumber,
-                       String description) {
+                       String description,
+                       ApplicationActivity activity) {
+        this();
         this.project = project;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
         this.description = description;
+        this.activity = activity;
+    }
+
+    public String toLogFormat() {
+        String entry = "";
+
+        entry += "File: " + this.fileName + "\n";
+        entry += "Line: " + (this.lineNumber != null ? this.lineNumber : "unknown") + "\n";
+        entry += "Description: " + this.description + "\n";
+        return entry;
+    }
+
+    public ApplicationActivity getActivity() {
+        return this.activity;
     }
 }

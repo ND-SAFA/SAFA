@@ -1,10 +1,11 @@
-package edu.nd.crc.safa.responses;
+package edu.nd.crc.safa.server.responses;
 
-import edu.nd.crc.safa.error.ResponseCodes;
+import edu.nd.crc.safa.server.error.ResponseCodes;
 
 public class ServerResponse {
     private Object body;
     private int status;
+
 
     public ServerResponse(Object body) {
         this.body = body;

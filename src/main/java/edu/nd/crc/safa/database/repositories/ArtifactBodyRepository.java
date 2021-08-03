@@ -17,4 +17,7 @@ public interface ArtifactBodyRepository extends CrudRepository<ArtifactBody, UUI
     List<ArtifactBody> findByProjectAndProjectVersionAndArtifactType(Project project,
                                                                      ProjectVersion projectVersion,
                                                                      ArtifactType artifactType);
+
+    List<ArtifactBody> findByProjectAndProjectVersion(Project project,
+                                                      ProjectVersion projectVersion);
 }

@@ -2,14 +2,14 @@ package edu.nd.crc.safa.database.repositories;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.database.entities.Layout;
 import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjectVersionRepository extends CrudRepository<ProjectVersion, UUID> {
+public interface LayoutRepository extends CrudRepository<Layout, UUID> {
 
-    ProjectVersion findTopByProjectOrderByVersionIdDesc(Project project);
+    Layout findByProjectAndHash(Project project, String hash);
 }

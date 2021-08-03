@@ -1,79 +1,39 @@
 package edu.nd.crc.safa.services;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.database.entities.Project;
+import edu.nd.crc.safa.database.entities.Warning;
+import edu.nd.crc.safa.database.repositories.WarningRepository;
+import edu.nd.crc.safa.server.error.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WarningService {
-    public List<Rule> getWarnings(String project) throws ServerError {
-        try {
-            List<Rule> result = new ArrayList<Rule>();
 
-            createWarningsTable();
-            Connection conn = getConnection();
+    WarningRepository warningRepository;
 
-            PreparedStatement preparedStmt = conn.prepareStatement("SELECT nShort, nLong, rule FROM "
-                + "project_warning_rules WHERE projectId = ?");
-            preparedStmt.setString(1, project);
-
-            ResultSet rs = preparedStmt.executeQuery();
-            while (rs.next()) {
-                System.out.println(rs.toString());
-                String nShort = rs.getString(1);
-                String nLong = rs.getString(2);
-                String rule = rs.getString(3);
-                result.add(new Rule(nShort, nLong, rule));
-            }
-            conn.close();
-
-            return result;
-        } catch (SQLException e) {
-            throw new ServerError("retrieve warnings", e);
-        }
+    @Autowired
+    public WarningService(WarningRepository warningRepository) {
+        this.warningRepository = warningRepository;
     }
 
-    public void newWarning(String project, String nShort, String nLong, String rule) throws ServerError {
-        try {
-            createWarningsTable();
+    public List<Rule> getWarnings(Project project) throws ServerError {
+        List<Warning> projectWarnings = this.warningRepository.findAllByProject(project);
+        List<Rule> projectRules = new ArrayList<Rule>();
 
-            Connection conn = getConnection();
-            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO project_warning_rules(projectId, "
-                + "nShort,"
-                + " nLong, rule) VALUES (?, ?, ?, ?);");
-            preparedStmt.setString(1, project);
-            preparedStmt.setString(2, nShort);
-            preparedStmt.setString(3, nLong);
-            preparedStmt.setString(4, rule);
-            System.out.println(preparedStmt.execute());
-            conn.close();
-        } catch (SQLException e) {
-            throw new ServerError("create a new warning", e);
+        for (Warning warning : projectWarnings) {
+            projectRules.add(new Rule(warning));
         }
+        return projectRules;
     }
 
-    public void createWarningsTable() throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
-            if (!tableExists("project_warning_rules")) {
-                String sqlCreateErrorTable = "CREATE TABLE project_warning_rules (\n"
-                    + "db_id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "projectId VARCHAR(1024),\n"
-                    + "nShort VARCHAR(1024) NOT NULL,\n"
-                    + "nLong VARCHAR(1024) NOT NULL,\n"
-                    + "rule VARCHAR(1024) NOT NULL);";
-                stmt.executeUpdate(sqlCreateErrorTable);
-            }
-        } catch (SQLException e) {
-            throw new ServerError("create warnings table", e);
-        }
+    public void newWarning(Project project, String nShort, String nLong, String rule) {
+        Warning warning = new Warning(project, nShort, nLong, rule);
+        this.warningRepository.save(warning);
     }
 }

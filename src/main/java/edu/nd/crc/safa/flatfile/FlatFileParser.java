@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
+import edu.nd.crc.safa.constants.ProjectVariables;
 import edu.nd.crc.safa.database.entities.Project;
 import edu.nd.crc.safa.database.entities.ProjectVersion;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
@@ -26,7 +28,6 @@ public class FlatFileParser {
     ArtifactFileParser artifactFileParser;
     TraceFileParser traceFileParser;
 
-    private final String DATAFILES_PARAM = "datafiles";
 
     @Autowired
     public FlatFileParser(SessionFactory sessionFactory,
@@ -50,17 +51,17 @@ public class FlatFileParser {
                              ProjectVersion projectVersion,
                              String pathToTIMFile) throws ServerError {
         try {
-            String fileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
-            JSONObject fileJson = FileUtilities.toLowerCase(new JSONObject(fileContent));
+            String TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
+            JSONObject TIMFileJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
 
-            artifactFileParser.parseArtifactFiles(project, fileJson.getJSONObject(DATAFILES_PARAM));
+            artifactFileParser.parseArtifactFiles(project, TIMFileJson.getJSONObject(ProjectVariables.DATAFILES_PARAM));
 
-            for (Iterator keyIterator = fileJson.keys(); keyIterator.hasNext(); ) {
-                String nextKey = keyIterator.next().toString();
-                if (!nextKey.toLowerCase().equals(DATAFILES_PARAM)) {
+            for (Iterator keyIterator = TIMFileJson.keys(); keyIterator.hasNext(); ) {
+                String traceMatrixKey = keyIterator.next().toString();
+                if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
                     traceFileParser.parseTraceMatrixJson(project,
                         projectVersion,
-                        fileJson.getJSONObject(nextKey));
+                        TIMFileJson.getJSONObject(traceMatrixKey));
                 }
             }
         } catch (IOException | JSONException e) {

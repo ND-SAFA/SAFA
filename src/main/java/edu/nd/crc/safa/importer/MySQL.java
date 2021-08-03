@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.database.connection.SQLConnection;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

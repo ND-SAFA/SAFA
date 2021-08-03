@@ -1,14 +1,23 @@
-package edu.nd.crc.safa.controllers;
+package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.database.connection.Neo4J;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.responses.ServerResponse;
+import edu.nd.crc.safa.server.responses.ServerResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MetaController {
+
+    MySQL sql;
+
+    @Autowired
+    public MetaController(MySQL sql) {
+        this.sql = sql;
+    }
+
     @GetMapping("/")
     public ServerResponse root() {
         return new ServerResponse("Hello World");
@@ -18,7 +27,6 @@ public class MetaController {
     public ServerResponse test_service_connections() throws Exception {
         (new Neo4J()).verifyConnectivity();
 
-        MySQL sql = new MySQL();
         sql.verifyConnection();
         return new ServerResponse("Connected Neo4J and MySQL!");
     }

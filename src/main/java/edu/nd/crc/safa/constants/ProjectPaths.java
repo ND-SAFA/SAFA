@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.constants;
 
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 import edu.nd.crc.safa.database.entities.Project;
 
 /**
@@ -12,11 +15,28 @@ public class ProjectPaths {
     public static final String PATH_TO_GENERATED_DIR = PATH_TO_BUILD + "/generatedFiles";
     public static final String PATH_TO_TEST_RESOURCES = PATH_TO_ROOT + "/resources";
 
-    public static String getPathToProjectFlatFiles(Project project) {
-        return ProjectPaths.PATH_TO_FLAT_FILES + "/" + project.getProjectId().toString() + "/";
+
+    private static String pathHelper(String... paths) {
+        return Paths.get(Arrays.toString(paths)).toString();
     }
 
-    public static String getPathToProjectFlatFile(Project project, String fileName) {
-        return getPathToProjectFlatFiles(project) + "/" + fileName;
+    public static String getPathToStorage(Project project) {
+        return pathHelper(ProjectPaths.PATH_TO_FLAT_FILES, project.getProjectId().toString());
+    }
+
+    public static String getPathToUploadedFiles(Project project) {
+        return pathHelper(getPathToStorage(project), "uploaded");
+    }
+
+    public static String getPathToFlatFile(Project project, String fileName) {
+        return pathHelper(getPathToUploadedFiles(project), fileName);
+    }
+
+    public static String getPathToGeneratedFiles(Project project) {
+        return pathHelper(getPathToStorage(project), "generated");
+    }
+
+    public static String getPathToGeneratedFile(Project project, String fileName) {
+        return pathHelper(getPathToGeneratedFiles(project), fileName);
     }
 }

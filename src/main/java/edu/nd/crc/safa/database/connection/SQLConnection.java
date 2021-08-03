@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 
 import com.github.fluent.hibernate.cfg.scanner.EntityScanner;
 import org.hibernate.boot.MetadataSources;

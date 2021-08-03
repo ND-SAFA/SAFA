@@ -13,9 +13,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ArtifactRepository extends CrudRepository<Artifact, UUID> {
 
-    Artifact findByArtifactId(String artifactId);
-
     Artifact findByProjectAndArtifactTypeAndName(Project project, ArtifactType artifactType, String name);
 
-    List<Artifact> findByProjectId(String projectId);
+    List<Artifact> findByProject(Project project);
+
+    void deleteAllByProject(Project project);
 }

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.database.connection;
 
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Config;

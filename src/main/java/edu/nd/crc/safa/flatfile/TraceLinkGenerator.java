@@ -1,11 +1,16 @@
 package edu.nd.crc.safa.flatfile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.entities.Artifact;
 import edu.nd.crc.safa.database.entities.ArtifactBody;
 import edu.nd.crc.safa.database.entities.ArtifactType;
@@ -15,7 +20,7 @@ import edu.nd.crc.safa.database.entities.TraceLink;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +60,9 @@ public class TraceLinkGenerator {
 
         Controller vsm = new Controller();
         vsm.buildIndex(tTokens.values());
+        List<String> lines = new ArrayList<>();
+        String GENERATED_FILES_HEADER = "Source,Target,Score";
+        lines.add(GENERATED_FILES_HEADER);
         for (String sid : sTokens.keySet()) {
             for (String tid : tTokens.keySet()) {
                 Artifact sourceArtifact = this.artifactRepository.findByProjectAndArtifactTypeAndName(project,
@@ -64,8 +72,16 @@ public class TraceLinkGenerator {
                 double score = vsm.getRelevance(sTokens.get(sid), tTokens.get(tid));
                 TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);
                 generatedLink.setIsGenerated(score);
-                this.traceLinkRepository.save(generatedLink);
+                this.traceLinkRepository.save(generatedLink); // TODO : add check for save error
+                lines.add(String.format("%s,%s,%s", sid, tid, score));
             }
+        }
+
+        try {
+            String pathToOutputFile = ProjectPaths.getPathToGeneratedFile(project, outputFileName);
+            Files.write(Paths.get(pathToOutputFile), lines);
+        } catch (IOException e) {
+            throw new ServerError("error writing trace matrix file", e);
         }
     }
 
@@ -73,9 +89,13 @@ public class TraceLinkGenerator {
         Map<String, Collection<String>> artifactTokens = new HashMap<>();
         for (ArtifactBody artifact : artifacts) {
             String artifactName = artifact.getName();
-            String[] artifactWords = artifact.getContent().split(" ");
-            artifactTokens.put(artifactName, Arrays.asList(artifactWords));
+            artifactTokens.put(artifactName, getArtifactWords(artifact));
         }
         return artifactTokens;
+    }
+
+    private List<String> getArtifactWords(ArtifactBody artifactBody) {
+        String[] artifactWords = artifactBody.getContent().split(" ");
+        return Arrays.asList(artifactWords);
     }
 }

@@ -1,7 +1,7 @@
 package unit;
 
 import edu.nd.crc.safa.MainApplication;
-import edu.nd.crc.safa.controllers.ProjectController;
+import edu.nd.crc.safa.server.controllers.ProjectController;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

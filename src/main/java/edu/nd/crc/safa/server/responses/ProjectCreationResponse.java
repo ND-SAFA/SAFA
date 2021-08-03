@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.responses;
+package edu.nd.crc.safa.server.responses;
 
 import org.springframework.web.multipart.MultipartFile;
 

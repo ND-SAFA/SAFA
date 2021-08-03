@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.database.entities.Project;
 import edu.nd.crc.safa.database.entities.TraceLink;
+import edu.nd.crc.safa.database.entities.TraceType;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,6 @@ import org.springframework.stereotype.Repository;
 public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
 
     List<TraceLink> findByProject(Project project);
+
+    void deleteAllByProjectAndTraceType(Project project, TraceType traceType);
 }

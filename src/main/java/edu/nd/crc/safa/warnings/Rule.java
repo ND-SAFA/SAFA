@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.database.entities.Warning;
+
 public class Rule {
     public static class Name {
         public String Short;
@@ -65,6 +67,10 @@ public class Rule {
         mName = new Name(name, longname);
         mText = rule;
         mTokens = Tokenizer.lex(mText);
+    }
+
+    public Rule(Warning warning) {
+        this(warning.getNShort(), warning.getNLong(), warning.getRule());
     }
 
     public Name getName() {

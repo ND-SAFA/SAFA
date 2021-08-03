@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.error;
+package edu.nd.crc.safa.server.error;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

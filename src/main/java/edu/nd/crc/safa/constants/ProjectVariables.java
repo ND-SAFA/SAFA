@@ -7,7 +7,7 @@ package edu.nd.crc.safa.constants;
 public class ProjectVariables {
     public static final String MAIN_PACKAGE = "edu.nd.crc.safa";
     public static final String TIM_FILENAME = "tim.json";
-
+    public static final String DATAFILES_PARAM = "datafiles";
 }
 
 

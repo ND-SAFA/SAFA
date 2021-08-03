@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.error;
+package edu.nd.crc.safa.server.error;
 
 public class ResponseCodes {
     public static final int SUCCESS = 0;

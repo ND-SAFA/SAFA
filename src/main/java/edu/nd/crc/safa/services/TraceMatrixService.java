@@ -6,26 +6,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.error.ServerError;
 import edu.nd.crc.safa.importer.MySQL;
+import edu.nd.crc.safa.server.error.ServerError;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TraceMatrixService extends MySQL {
+public class TraceMatrixService {
+    MySQL sql;
+
+    @Autowired
+    public TraceMatrixService(MySQL sql) {
+        this.sql = sql;
+    }
+
     public void createGeneratedTraceMatrixTable(String tableName,
                                                 String filePath) throws ServerError {
         try {
-            Statement stmt = getConnection().createStatement();
-            Boolean exists = tableExists(tableName);
+            Statement stmt = sql.getConnection().createStatement();
+            Boolean exists = sql.tableExists(tableName);
 
             if (exists) {
                 updateGeneratedTraceMatrixTable(stmt, tableName, filePath);
@@ -44,9 +49,9 @@ public class TraceMatrixService extends MySQL {
                                                 Boolean generated,
                                                 String filename) throws ServerError {
         try {
-            Statement stmt = getConnection().createStatement();
+            Statement stmt = sql.getConnection().createStatement();
 
-            if (tableExists("tim_trace_matrix")) {
+            if (sql.tableExists("tim_trace_matrix")) {
                 updateTimTraceMatrixTable(stmt, traceMatrixName, traceMatrixTableName,
                     sourceArtifact, targetArtifact, generated, filename);
             } else {
@@ -103,10 +108,10 @@ public class TraceMatrixService extends MySQL {
 
     public void createTraceMatrixTable(String tableName, String filePath, String colHeader) throws ServerError {
         try {
-            Statement stmt = getConnection().createStatement();
+            Statement stmt = sql.getConnection().createStatement();
             String intTableName = "intermediate_" + tableName;
 
-            if (!tableExists("trace_matrix_error")) {
+            if (!sql.tableExists("trace_matrix_error")) {
                 System.out.println("CREATING NEW Trace Matrix ERROR TABLE: trace_matrix_error...");
                 String sqlCreateErrorTable = "CREATE TABLE trace_matrix_error (\n"
                     + "db_id INT AUTO_INCREMENT PRIMARY KEY,"
@@ -122,7 +127,7 @@ public class TraceMatrixService extends MySQL {
 
             createTraceMatrixHelper(stmt, intTableName, tableName, filePath, colHeader);
 
-            if (tableExists(tableName)) {
+            if (sql.tableExists(tableName)) {
                 String sqlTruncateArtifactTable = String.format("TRUNCATE TABLE %s", tableName);
                 stmt.executeUpdate(sqlTruncateArtifactTable);
             } else {
@@ -151,7 +156,7 @@ public class TraceMatrixService extends MySQL {
             stmt.executeUpdate(String.format("DROP TABLE %s", intTableName));
             System.out.println("DELETED INTERMEDIATE TRACE MATRIX TABLE");
 
-            createTableList(tableName, false);
+            sql.createTableList(tableName, false);
         } catch (SQLException e) {
             throw new ServerError("create trace matrix table", e);
         }
@@ -163,7 +168,7 @@ public class TraceMatrixService extends MySQL {
                                         String filePath,
                                         String colHeader) throws ServerError {
         try {
-            if (tableExists(intTableName)) {
+            if (sql.tableExists(intTableName)) {
                 String sqlTruncate = String.format("TRUNCATE TABLE %s", intTableName);
                 stmt.executeUpdate(sqlTruncate);
             } else {
@@ -220,89 +225,6 @@ public class TraceMatrixService extends MySQL {
         }
     }
 
-    public String getLinkErrors() throws ServerError {
-        HashMap<String, Set<String>> artifact_map = new HashMap<String, Set<String>>();
-        StringBuilder errorText = new StringBuilder();
-
-        List<List<String>> artifactRows = getTimArtifactData();
-
-        for (List<String> artifactRow : artifactRows) {
-            String artifactName = artifactRow.get(0);
-            String artifactTableName = artifactRow.get(1);
-            Set<String> ids = new HashSet<String>();
-
-            List<List<String>> artifact_data_rows = getArtifactData(artifactTableName);
-            for (List<String> row : artifact_data_rows) {
-                ids.add(row.get(0));
-            }
-
-            artifact_map.put(artifactName, ids);
-        }
-
-        List<List<String>> traceRows = getTimTraceData();
-
-        for (List<String> traceRow : traceRows) {
-            if (traceRow.get(3).equals("1")) {
-                continue;
-            }
-
-            String traceMatrix = traceRow.get(0);
-
-            String source_artifact = traceRow.get(1);
-            Set<String> sources = artifact_map.get(source_artifact);
-
-            String target_artifact = traceRow.get(2);
-            Set<String> targets = artifact_map.get(target_artifact);
-
-
-            if (sources == null && targets == null) {
-                errorText.append(String.format("ERROR: TRACE MATRIX: %s DESC: source artifact: %s and target "
-                    + "artifact: %s does not exist in the database. Make sure these artifacts are part of your "
-                    + "tim file.\n", traceMatrix, source_artifact, target_artifact));
-                continue;
-            }
-
-            if (sources == null) {
-                errorText.append(String.format("ERROR: TRACE MATRIX: %s DESC: source artifact %s does not exist in "
-                        + "the database. Make sure this artifact is part of your tim file.\n",
-                    traceMatrix,
-                    source_artifact));
-                continue;
-            }
-
-            if (targets == null) {
-                errorText.append(String.format("ERROR: TRACE MATRIX: %s DESC: target artifact %s does not exist in "
-                        + "the database. Make sure this artifact is part of your tim file.\n",
-                    traceMatrix, target_artifact));
-                continue;
-            }
-
-            int line_num = 0;
-            String traceTableName = traceRow.get(4);
-
-            List<List<String>> traceDataRows = getNonGeneratedTraceData(traceTableName);
-
-            for (List<String> row : traceDataRows) {
-                String sid = row.get(0);
-                String tid = row.get(1);
-                line_num++;
-
-                if (!sources.contains(sid)) {
-                    errorText.append(String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s"
-                        + " does not contain ID: %s\n", traceMatrix, line_num, source_artifact, sid));
-
-                }
-
-                if (!targets.contains(tid)) {
-                    errorText.append(String.format("ERROR: TRACE MATRIX: %s Line Number: %s DESC: source artifact %s"
-                        + " does not contain ID: %s\n", traceMatrix, line_num, target_artifact, tid));
-                }
-            }
-        }
-
-        return Base64.getEncoder().encodeToString(errorText.toString().getBytes());
-    }
-
     public void updateGeneratedTraceMatrixTable(Statement stmt, String tableName, String filePath) throws ServerError {
         try {
             System.out.println(String.format("UPDATING GENERATED TABLE: %s...", tableName));
@@ -334,7 +256,7 @@ public class TraceMatrixService extends MySQL {
             System.out.println("TRIMMED WHITESPACE STORED IN COLUMNS");
 
             String newTable = String.format("new_%s", tableName);
-            if (tableExists(newTable)) {
+            if (sql.tableExists(newTable)) {
                 String sqlDelete = String.format("DROP TABLE %s", newTable);
                 stmt.executeUpdate(sqlDelete);
                 System.out.println("DELETED ABANDONED GENERATED TABLE");
@@ -407,7 +329,7 @@ public class TraceMatrixService extends MySQL {
             stmt.executeUpdate(sqlTrim);
             System.out.println("TRIMMED WHITESPACE STORED IN COLUMNS");
 
-            createTableList(tableName, true);
+            sql.createTableList(tableName, true);
         } catch (SQLException e) {
             throw new ServerError("creating new generated trace matrix table", e);
         }
@@ -418,7 +340,7 @@ public class TraceMatrixService extends MySQL {
                                                       String target,
                                                       Double minScore) throws ServerError {
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-        try (Connection conn = getConnection()) {
+        try (Connection conn = sql.getConnection()) {
             PreparedStatement s = conn.prepareStatement("SELECT tablename FROM tim_trace_matrix WHERE "
                 + "source_artifact = ? AND target_artifact = ?");
             s.setString(1, source);
@@ -463,7 +385,7 @@ public class TraceMatrixService extends MySQL {
     public boolean updateLink(String project, Links links) throws ServerError {
         boolean succeeded = false;
 
-        try (Connection conn = getConnection()) {
+        try (Connection conn = sql.getConnection()) {
             List<String> tables = new ArrayList<String>();
 
             try (Statement s = conn.createStatement()) {
@@ -501,7 +423,7 @@ public class TraceMatrixService extends MySQL {
     // Links
     public Integer getLinkApproval(String project, String source, String target) throws ServerError {
         Integer result = -1;
-        try (Connection conn = getConnection()) {
+        try (Connection conn = sql.getConnection()) {
             List<String> tables = new ArrayList<String>();
             try (Statement s = conn.createStatement()) {
                 ResultSet rs = s.executeQuery("SELECT tablename FROM uploaded_and_generated_tables");
@@ -537,7 +459,7 @@ public class TraceMatrixService extends MySQL {
     }
 
     public List<List<String>> getGeneratedTraceData(String tablename) throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
+        try (Statement stmt = sql.getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
 
             String sqlGetData = String.format("SELECT source, target, score, approval FROM %s;", tablename);
@@ -560,7 +482,7 @@ public class TraceMatrixService extends MySQL {
     }
 
     public List<List<String>> getNonGeneratedTraceData(String tablename) throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
+        try (Statement stmt = sql.getConnection().createStatement()) {
             List<List<String>> data = new ArrayList<List<String>>();
 
             String sqlGetData = String.format("SELECT source, target FROM %s;", tablename);
@@ -583,10 +505,10 @@ public class TraceMatrixService extends MySQL {
     public List<List<String>> getTimTraceData() throws ServerError {
         try {
             List<List<String>> data = new ArrayList<List<String>>();
-            if (!tableExists("tim_trace_matrix")) {
+            if (!sql.tableExists("tim_trace_matrix")) {
                 return data;
             }
-            Statement stmt = getConnection().createStatement();
+            Statement stmt = sql.getConnection().createStatement();
             String sqlGetData = String.format("SELECT trace_matrix, source_artifact, target_artifact, is_generated, "
                 + "tablename, filename FROM %s;", "tim_trace_matrix");
             ResultSet rs = stmt.executeQuery(sqlGetData);
@@ -608,35 +530,5 @@ public class TraceMatrixService extends MySQL {
         }
     }
 
-    public List<List<String>> generateInfo() throws ServerError {
-        try (Statement stmt = getConnection().createStatement()) {
-            List<List<String>> data = new ArrayList<List<String>>();
 
-            String sqlUploadedFiles = "SELECT tim_source.tablename as source_tablename,\n"
-                + "tim_target.tablename as target_tablename,\n"
-                + "tim_trace_matrix.tablename as dest_tablename\n"
-                + "FROM tim_trace_matrix\n"
-                + "LEFT JOIN tim_artifact as tim_source\n"
-                + "ON tim_source.artifact = tim_trace_matrix.source_artifact\n"
-                + "AND is_generated = 1\n"
-                + "LEFT JOIN tim_artifact as tim_target\n"
-                + "ON tim_target.artifact = tim_trace_matrix.target_artifact\n"
-                + "AND is_generated = 1\n"
-                + "where tim_source.tablename IS NOT NULL AND tim_target.tablename IS NOT NULL;";
-
-            ResultSet rs = stmt.executeQuery(sqlUploadedFiles);
-
-            while (rs.next()) {
-                List<String> row = new ArrayList<String>();
-                row.add(rs.getString(1));
-                row.add(rs.getString(2));
-                row.add(rs.getString(3));
-                data.add(row);
-            }
-
-            return data;
-        } catch (SQLException e) {
-            throw new ServerError("generate information", e);
-        }
-    }
 }

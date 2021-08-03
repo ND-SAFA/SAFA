@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatfile;
+package edu.nd.crc.safa.utilities;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.server.error.ServerError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -24,7 +24,7 @@ public class FileUtilities {
 
     public static CSVParser readCSVFile(Project project, String fileName) throws ServerError {
         try {
-            String pathToFile = ProjectPaths.getPathToProjectFlatFile(project, fileName);
+            String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
             Reader in = new FileReader(pathToFile);
             CSVFormat fileFormat = CSVFormat.DEFAULT.builder().setIgnoreHeaderCase(true).build();
             in.close();

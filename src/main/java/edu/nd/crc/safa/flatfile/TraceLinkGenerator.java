@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfile;
+package edu.nd.crc.safa.flatfile;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.vsm.Controller;
+import edu.nd.crc.safa.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,16 +25,16 @@ import org.springframework.stereotype.Component;
  * Responsible for generating trace links for given projects.
  */
 @Component
-public class Generator {
+public class TraceLinkGenerator {
 
     private TraceLinkRepository traceLinkRepository;
     private ArtifactBodyRepository artifactBodyRepository;
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    public Generator(TraceLinkRepository traceLinkRepository,
-                     ArtifactBodyRepository artifactBodyRepository,
-                     ArtifactRepository artifactRepository) {
+    public TraceLinkGenerator(TraceLinkRepository traceLinkRepository,
+                              ArtifactBodyRepository artifactBodyRepository,
+                              ArtifactRepository artifactRepository) {
         this.traceLinkRepository = traceLinkRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.artifactRepository = artifactRepository;

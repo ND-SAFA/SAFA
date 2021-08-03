@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfile;
+package edu.nd.crc.safa.flatfile;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +39,7 @@ public class TraceFileParser {
     TraceMatrixRepository traceMatrixRepository;
     ParserErrorRepository parserErrorRepository;
     TraceLinkRepository traceLinkRepository;
-    Generator traceLinkGenerator;
+    TraceLinkGenerator traceLinkGenerator;
 
     @Autowired
     public TraceFileParser(ArtifactRepository artifactRepository,
@@ -47,7 +47,7 @@ public class TraceFileParser {
                            TraceMatrixRepository traceMatrixRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
-                           Generator traceLinkGenerator) {
+                           TraceLinkGenerator traceLinkGenerator) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.traceMatrixRepository = traceMatrixRepository;

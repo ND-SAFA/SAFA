@@ -7,7 +7,7 @@ import java.io.File;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.flatfile.OSHelper;
+import edu.nd.crc.safa.flatfile.OSHelper;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.vsm;
+package edu.nd.crc.safa.vsm;
 
 import java.util.ArrayList;
 import java.util.Collection;

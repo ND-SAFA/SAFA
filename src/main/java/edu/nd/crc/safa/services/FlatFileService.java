@@ -18,10 +18,10 @@ import edu.nd.crc.safa.database.entities.Project;
 import edu.nd.crc.safa.database.entities.ProjectVersion;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.flatfile.FlatFileParser;
+import edu.nd.crc.safa.flatfile.OSHelper;
+import edu.nd.crc.safa.flatfile.TraceLinkGenerator;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.importer.flatfile.FlatFileParser;
-import edu.nd.crc.safa.importer.flatfile.Generator;
-import edu.nd.crc.safa.importer.flatfile.OSHelper;
 import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.RawJson;
 
@@ -30,21 +30,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Responsible for creating projects through Flat Files.
+ * Responsible for exposing an API for uploading,
+ * parsing, and deleting flat files.
  */
 @Service
 public class FlatFileService {
 
     FlatFileParser flatFileParser;
     TraceMatrixService traceMatrixService;
-    Generator generateFlatFile;
+    TraceLinkGenerator generateFlatFile;
     TimArtifactService timArtifactService;
     ProjectVersionRepository projectVersionRepository;
 
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
                            TraceMatrixService traceMatrixService,
-                           Generator generateFlatFile,
+                           TraceLinkGenerator generateFlatFile,
                            TimArtifactService timArtifactService,
                            ProjectVersionRepository projectVersionRepository) {
         this.generateFlatFile = generateFlatFile;
@@ -73,6 +74,22 @@ public class FlatFileService {
         return response;
     }
 
+    public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
+            if (file.contains(".json")) {
+                result.put("data", RawJson.from(data));
+            } else {
+                result.put("data", data);
+            }
+            result.put("success", true);
+            return result;
+        } catch (IOException e) {
+            throw new ServerError("retrieve uploaded file", e);
+        }
+    }
+
     private List<String> uploadFlatFiles(Project project, MultipartFile[] files) throws ServerError {
         String pathToStorage = ProjectPaths.getPathToProjectFlatFiles(project);
         OSHelper.clearOrCreateDirectory(pathToStorage);
@@ -97,21 +114,6 @@ public class FlatFileService {
         // TODO: return generated files
     }
 
-    public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
-        try {
-            Map<String, Object> result = new HashMap<>();
-            String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
-            if (file.contains(".json")) {
-                result.put("data", RawJson.from(data));
-            } else {
-                result.put("data", data);
-            }
-            result.put("success", true);
-            return result;
-        } catch (IOException e) {
-            throw new ServerError("retrieve uploaded file", e);
-        }
-    }
 
     public String getUploadFilesErrorLog(String projectId) throws ServerError {
         String errorStr = sql.getUploadErrorLog();

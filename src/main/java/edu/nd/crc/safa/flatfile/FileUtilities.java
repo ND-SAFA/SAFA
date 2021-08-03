@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfile;
+package edu.nd.crc.safa.flatfile;
 
 import java.io.FileReader;
 import java.io.IOException;

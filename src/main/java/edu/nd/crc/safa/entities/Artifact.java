@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Responsible for storing the unique identifiers for artifacts
  * in a project.
@@ -25,7 +28,8 @@ public class Artifact implements Serializable {
     @GeneratedValue
     UUID artifactId;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         nullable = false

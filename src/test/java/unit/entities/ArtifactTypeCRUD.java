@@ -9,6 +9,7 @@ import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 
 import org.junit.jupiter.api.Test;
+import unit.EntityBaseTest;
 
 /* Tests that ArtifactTypes can be created
  *

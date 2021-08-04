@@ -11,8 +11,12 @@ import java.util.concurrent.Executors;
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.database.configuration.Neo4J;
+import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.LayoutRepository;
 import edu.nd.crc.safa.database.repositories.ProjectRepository;
+import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.database.repositories.WarningRepository;
 import edu.nd.crc.safa.entities.Layout;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
@@ -58,7 +62,11 @@ public class ProjectService {
                           LayoutRepository layoutRepository,
                           WarningService warningService,
                           TraceMatrixService traceMatrixService,
-                          ProjectRepository projectRepository) {
+                          ProjectRepository projectRepository,
+                          ProjectVersionRepository projectVersionRepository,
+                          ArtifactRepository artifactRepository,
+                          ArtifactBodyRepository artifactBodyRepository,
+                          WarningRepository warningRepository) {
         this.neo4j = neo4j;
         this.mPuller = puller;
         this.sql = mysql;

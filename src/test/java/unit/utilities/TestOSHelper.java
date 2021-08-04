@@ -11,7 +11,7 @@ import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
-import unit.entities.EntityBaseTest;
+import unit.EntityBaseTest;
 
 public class TestOSHelper extends EntityBaseTest {
 

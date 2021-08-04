@@ -253,7 +253,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleServerError(HttpServletRequest req,
                                             ServerError exception) {
-        exception.getError().printStackTrace();
+        exception.printError();
         return new ServerResponse(exception, ResponseCodes.FAILURE);
     }
 

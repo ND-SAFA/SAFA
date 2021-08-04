@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface ProjectVersionRepository extends CrudRepository<ProjectVersion, UUID> {
 
     ProjectVersion findTopByProjectOrderByVersionIdDesc(Project project);
+
+    void deleteAllByProject(Project project);
 }

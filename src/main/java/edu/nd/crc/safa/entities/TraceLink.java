@@ -16,6 +16,9 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.output.error.ServerError;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Responsible for marking each trace link in each project.
  */
@@ -28,7 +31,8 @@ public class TraceLink implements Serializable {
     @GeneratedValue
     UUID traceLinkId;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         nullable = false

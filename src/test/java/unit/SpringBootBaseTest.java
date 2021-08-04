@@ -26,4 +26,7 @@ public abstract class SpringBootBaseTest {
 
     @Autowired
     protected EntityManager entityManager;
+
+
+    public final int N_TEST_RESOURCES = 3;
 }

@@ -20,11 +20,11 @@ public class ServerError extends Exception {
         this.error = e;
     }
 
-    public Exception getError() {
-        if (this.error == null) {
-            return this;
+    public void printError() {
+        if (this.error != null) {
+            this.error.printStackTrace();
         } else {
-            return this.error;
+            this.printStackTrace();
         }
     }
 

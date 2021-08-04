@@ -78,15 +78,14 @@ public class ArtifactFileParser {
             ProjectVersion firstProjectVersion = new ProjectVersion(project);
             this.projectVersionRepository.save(firstProjectVersion);
 
-            parseArtifactFile(project, firstProjectVersion, artifactType, artifactFileName);
+            parseArtifactFile(firstProjectVersion, artifactType, artifactFileName);
         }
     }
 
-    private void parseArtifactFile(Project project,
-                                   ProjectVersion projectVersion,
+    private void parseArtifactFile(ProjectVersion projectVersion,
                                    ArtifactType artifactType,
                                    String fileName) throws ServerError {
-
+        Project project = projectVersion.getProject();
         CSVParser fileParser = FileUtilities.readCSVFile(project, fileName);
         FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 

@@ -40,7 +40,7 @@ public class FileUtilities {
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                throw new ServerError("Expected file to column: " + n + " but only saw " + file.getHeaderNames());
+                throw new ServerError("Expected file to have column: " + n + " but only saw " + file.getHeaderNames());
             }
         }
     }

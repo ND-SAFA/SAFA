@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.database.Neo4J;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.database.configuration.Neo4J;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;

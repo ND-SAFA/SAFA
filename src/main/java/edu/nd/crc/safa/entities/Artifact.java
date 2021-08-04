@@ -5,16 +5,17 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Responsible for storing the unique identifiers for artifacts
+ * in a project.
+ */
 @Entity
 @Table(name = "artifacts")
 public class Artifact implements Serializable {
@@ -27,31 +28,20 @@ public class Artifact implements Serializable {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "project_id",
-        foreignKey = @ForeignKey(name = "project_id", value = ConstraintMode.PROVIDER_DEFAULT),
         nullable = false
     )
     Project project;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumns({
-        @JoinColumn(
-            name = "type_project_id",
-            nullable = false,
-            referencedColumnName = "project_id" //TODO: Figure out if this can ever mismatch with project_id above
-        ),
-        @JoinColumn(
-            name = "type_id",
-            nullable = false,
-            referencedColumnName = "type_id"
-        )
-    })
+    @JoinColumn(
+        name = "type_id",
+        nullable = false)
     ArtifactType type;
 
     @Column(name = "name")
     String name;
 
     public Artifact() {
-
     }
 
     public Artifact(Project project, ArtifactType type, String name) {
@@ -78,5 +68,9 @@ public class Artifact implements Serializable {
 
     public String getName() {
         return this.name;
+    }
+
+    public UUID getArtifactId() {
+        return this.artifactId;
     }
 }

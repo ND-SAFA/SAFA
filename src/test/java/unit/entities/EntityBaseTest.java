@@ -1,43 +1,43 @@
 package unit.entities;
 
-import java.io.Serializable;
+import java.util.UUID;
 
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
+import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.database.repositories.ProjectRepository;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 
-import org.hibernate.Session;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import unit.SpringBootBaseTest;
 
 public class EntityBaseTest extends SpringBootBaseTest {
-    Session session;
 
-    @BeforeEach
-    public void loadSession() {
-        session = this.sessionFactory.openSession();
-    }
+    @Autowired
+    ProjectRepository projectRepository;
 
-    @AfterEach
-    public void closeSession() {
-        if (session != null) {
-            session.close();
-        }
-    }
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
-    public Serializable createProject(String projectName) {
+    @Autowired
+    ArtifactRepository artifactRepository;
+
+    public UUID createProject(String projectName) {
         Project project = new Project(projectName);
-        return session.save(project);
+        projectRepository.save(project);
+        return project.getProjectId();
     }
 
-    public Serializable createArtifactType(Project project, String artifactTypeName) {
+    public UUID createArtifactType(Project project, String artifactTypeName) {
         ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
-        return session.save(artifactType);
+        artifactTypeRepository.save(artifactType);
+        return artifactType.getTypeId();
     }
 
-    public Serializable createArtifact(Project project, ArtifactType type, String name) {
+    public UUID createArtifact(Project project, ArtifactType type, String name) {
         Artifact artifact = new Artifact(project, type, name);
-        return session.save(artifact);
+        artifactRepository.save(artifact);
+        return artifact.getArtifactId();
     }
 }

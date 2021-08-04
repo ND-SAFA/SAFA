@@ -12,21 +12,25 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Responsible for defining which types are available
+ * to which projects.
+ */
 @Entity
 @Table(name = "artifact_type")
 public class ArtifactType implements Serializable {
 
     @Id
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(
-        name = "project_id"
-    )
-    Project project;
-
-    @Id
     @Column(name = "type_id")
     @GeneratedValue
     UUID typeId;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(
+        name = "project_id",
+        nullable = false
+    )
+    Project project;
 
     @Column(name = "name")
     String name;

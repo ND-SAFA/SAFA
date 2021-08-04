@@ -1,35 +1,72 @@
 package edu.nd.crc.safa;
 
-import java.io.IOException;
+import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_URL;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
+import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.SQLConnection;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.database.configuration.SQLConnection;
+import edu.nd.crc.safa.output.error.ServerError;
 
-import org.hibernate.SessionFactory;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Responsible for setting up AppContext through annotations
  * and holding all the beans.
  */
 @Configuration
+@EnableAutoConfiguration
+@EntityScan(ProjectVariables.MAIN_PACKAGE)
 @ComponentScan(ProjectVariables.MAIN_PACKAGE)
+@EnableJpaRepositories(ProjectVariables.MAIN_PACKAGE)
+@EnableTransactionManagement
 public class AppConfig {
 
+//    @Bean
+//    public SessionFactory createSessionFactory() throws ServerError, IOException {
+//        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+//
+//        sessionFactory.setMetadataSources(SQLConnection.getEntitiesMetaData());
+//        sessionFactory.setHibernateProperties(SQLConnection.getConnectionProperties());
+//        sessionFactory.setDataSource(getDataSource());
+//        sessionFactory.afterPropertiesSet();
+//
+//        return sessionFactory.getObject();
+//    }
+
     @Bean
-    public SessionFactory createSessionFactory() throws ServerError, IOException {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+    public DataSource getDataSource() throws ServerError {
+        SQLConnection.assertValidCredentials();
+        BasicDataSource dataSource = new BasicDataSource();
 
-        SQLConnection sqlConnection = new SQLConnection();
-        sessionFactory.setMetadataSources(sqlConnection.getEntitiesMetaData());
-        sessionFactory.setDataSource(sqlConnection.dataSource());
-        sessionFactory.setHibernateProperties(sqlConnection.getConnectionProperties());
-        sessionFactory.afterPropertiesSet();
+        dataSource.setUrl(SQL_URL);
+        dataSource.setUsername(DatabaseVariables.SQL_USERNAME);
+        dataSource.setPassword(DatabaseVariables.SQL_PASSWORD);
+        dataSource.setDriverClassName(SQLConnection.getDriverClassName());
 
-        return sessionFactory.getObject();
+        return dataSource;
+    }
+
+    @Bean
+    public EntityManagerFactory entityManagerFactory() throws ServerError {
+        LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+        HibernatePersistenceProvider provider = new HibernatePersistenceProvider();
+        emf.setDataSource(this.getDataSource());
+        emf.setJpaProperties(SQLConnection.getConnectionProperties());
+        emf.setPersistenceProvider(provider);
+        emf.setPackagesToScan(ProjectVariables.ENTITIES_PACKAGE);
+        emf.afterPropertiesSet();
+        return emf.getNativeEntityManagerFactory();
     }
 }

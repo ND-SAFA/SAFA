@@ -1,4 +1,4 @@
-package unit.flatfile;
+package unit.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.error.ServerError;
-import edu.nd.crc.safa.importer.flatfile.OSHelper;
+import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class OSHelperTest {
         String pathToDummyFolder = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
-        OSHelper.createOrClearDirectory(pathToDummyFolder);
+        OSHelper.clearOrCreateDirectory(pathToDummyFolder);
         assertTrue(folder.exists());
 
         OSHelper.deletePath(pathToDummyFolder);
@@ -41,7 +41,7 @@ public class OSHelperTest {
         assertFalse(childFolder.exists());
 
         //VP 2: Verify able to create subdirectories
-        OSHelper.createOrClearDirectory(pathToChild);
+        OSHelper.clearOrCreateDirectory(pathToChild);
         assertTrue(parentFolder.exists());
         assertTrue(childFolder.exists());
 

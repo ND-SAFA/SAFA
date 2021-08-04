@@ -1,62 +1,101 @@
 package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.output.error.ServerError;
+
+/**
+ * Responsible for marking each trace link in each project.
+ */
 @Entity
 @Table(name = "trace_links")
 public class TraceLink implements Serializable {
+
     @Id
+    @Column(name = "trace_link_id")
+    @GeneratedValue
+    UUID traceLinkId;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
-        name = "artifact_id",
+        name = "project_id",
+        nullable = false
+    )
+    Project project;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(
+        name = "source_artifact_id",
+        referencedColumnName = "artifact_id",
         nullable = false
     )
     Artifact sourceArtifact;
 
-    @Id
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
-        name = "artifact_id",
+        name = "target_artifact_id",
+        referencedColumnName = "artifact_id",
         nullable = false
     )
     Artifact targetArtifact;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(
-        name = "trace_type_id",
-        nullable = false
-    )
+    @Column(name = "trace_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     TraceType traceType;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumns({
-        @JoinColumn(
-            name = "project_id",
-            nullable = false
-        ),
-        @JoinColumn(
-            name = "version_id",
-            nullable = false
-        )
-    })
-    ProjectVersion projectVersion;
+    @Column(name = "approved")
+    boolean approved;
+
+    @Column(name = "score")
+    double score;
 
     public TraceLink() {
+        this.approved = false;
+        this.score = 0;
     }
 
     public TraceLink(Artifact sourceArtifact,
-                     Artifact targetArtifact,
-                     TraceType traceType) {
+                     Artifact targetArtifact) throws ServerError {
+        this();
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
-        this.traceType = traceType;
+        if (!sourceArtifact.project.equals(targetArtifact.project)) {
+            throw new ServerError("Source and target artifacts exist in different projects");
+        }
+        this.project = sourceArtifact.project;
+    }
+
+    public TraceType getTraceType() {
+        return this.traceType;
+    }
+
+    public UUID getTraceLinkId() {
+        return this.traceLinkId;
+    }
+
+
+    public void setIsManual() {
+        this.approved = true;
+        this.traceType = TraceType.MANUAL;
+        this.score = 1;
+    }
+
+    public void setIsGenerated(double score) {
+        this.approved = false;
+        this.traceType = TraceType.GENERATED;
+        this.score = score;
     }
 }

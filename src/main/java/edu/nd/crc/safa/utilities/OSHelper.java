@@ -1,9 +1,8 @@
-package edu.nd.crc.safa.importer.flatfile;
+package edu.nd.crc.safa.utilities;
 
 import java.io.File;
 
-import edu.nd.crc.safa.error.ServerError;
-
+import edu.nd.crc.safa.output.error.ServerError;
 
 /**
  * Responsible for encapsulating common operating system
@@ -21,7 +20,7 @@ public class OSHelper {
      * @throws ServerError failure to delete any files or folders with
      *                     directory will be thrown.
      */
-    public static void createOrClearDirectory(String pathToDir) throws ServerError {
+    public static void clearOrCreateDirectory(String pathToDir) throws ServerError {
         File myDir = new File(pathToDir);
 
         if (!myDir.exists()) {

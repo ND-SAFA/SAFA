@@ -1,96 +1,195 @@
 package edu.nd.crc.safa.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import edu.nd.crc.safa.error.ServerError;
+import javax.naming.OperationNotSupportedException;
+
+import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.constants.ProjectVariables;
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
+import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.entities.ApplicationActivity;
+import edu.nd.crc.safa.entities.ParserError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.TraceType;
+import edu.nd.crc.safa.flatfile.FlatFileParser;
+import edu.nd.crc.safa.flatfile.TraceFileParser;
+import edu.nd.crc.safa.flatfile.TraceLinkGenerator;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.importer.flatfile.FlatFileResponse;
-import edu.nd.crc.safa.importer.flatfile.Generator;
-import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
+import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.output.responses.FlatFileResponse;
+import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.OSHelper;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Responsible for exposing an API for uploading,
+ * parsing, and deleting flat files.
+ */
 @Service
 public class FlatFileService {
 
-    MySQL sql;
-    UploadFlatFile uploadFlatfile;
-    Generator generateFlatfile;
+    FlatFileParser flatFileParser;
+    TraceLinkGenerator traceLinkGenerator;
+    TraceFileParser traceFileParser;
+
+    TraceMatrixService traceMatrixService;
+    TimArtifactService timArtifactService;
+
+    ProjectVersionRepository projectVersionRepository;
+    ParserErrorRepository parserErrorRepository;
+    ArtifactRepository artifactRepository;
+    TraceLinkRepository traceLinkRepository;
+
+    private final String SEPARATOR = "-------------------------------";
+
 
     @Autowired
-    public FlatFileService(MySQL sql, UploadFlatFile uploadFlatfile, Generator generateFlatfile) {
-        this.sql = sql;
-        this.uploadFlatfile = uploadFlatfile;
-        this.generateFlatfile = generateFlatfile;
+    public FlatFileService(FlatFileParser flatFileParser,
+                           TraceMatrixService traceMatrixService,
+                           TraceLinkGenerator traceLinkGenerator,
+                           TimArtifactService timArtifactService,
+                           ProjectVersionRepository projectVersionRepository,
+                           ParserErrorRepository parserErrorRepository,
+                           ArtifactRepository artifactRepository,
+                           TraceLinkRepository traceLinkRepository) {
+        this.traceLinkGenerator = traceLinkGenerator;
+        this.traceMatrixService = traceMatrixService;
+        this.flatFileParser = flatFileParser;
+        this.timArtifactService = timArtifactService;
+        this.projectVersionRepository = projectVersionRepository;
+        this.parserErrorRepository = parserErrorRepository;
+        this.artifactRepository = artifactRepository;
+        this.traceLinkRepository = traceLinkRepository;
     }
 
-    public FlatFileResponse uploadFile(String projectId, String encodedStr) throws ServerError {
-        return uploadFlatfile.uploadFiles(projectId, encodedStr);
+    /**
+     * Responsible for creating a project from given flat files. This includes
+     * parsing tim.json, creating artifacts, and their trace links.
+     *
+     * @param project the project whose artifacts and trace links should be associated with
+     * @param files   the flat files defining the project
+     * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
+     */
+    public FlatFileResponse parseFlatFiles(Project project, MultipartFile[] files) throws ServerError {
+        List<String> uploadedFiles = this.uploadFlatFiles(project, files);
+        ProjectVersion newProjectVersion = new ProjectVersion();
+        this.projectVersionRepository.save(newProjectVersion);
+        this.createProjectFromTIMFile(project, newProjectVersion);
+
+        FlatFileResponse response = new FlatFileResponse();
+        response.setUploadedFiles(uploadedFiles);
+        return response;
     }
 
-    public static class RawJson {
-        private String payload;
 
-        public RawJson(String payload) {
-            this.payload = payload;
-        }
-
-        public static RawJson from(String payload) {
-            return new RawJson(payload);
-        }
-
-        @JsonValue
-        @JsonRawValue
-        public String getPayload() {
-            return this.payload;
-        }
-    }
-
-    public Map<String, Object> getUploadedFile(String pID, String file) throws ServerError {
+    public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {
+        String pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        String TIMFileContent;
         try {
-            Map<String, Object> result = new HashMap<>();
-            String data = new String(Files.readAllBytes(Paths.get("/uploadedFlatfiles/" + file)));
-            if (file.contains(".json")) {
-                result.put("data", RawJson.from(data));
-            } else {
-                result.put("data", data);
-            }
-            result.put("success", true);
-            return result;
+            TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
         } catch (IOException e) {
-            throw new ServerError("retrieve uploaded file", e);
+            throw new ServerError("Could not read TIM.json file.", e);
+        }
+        //TODO: Generalize with FlatFileParser.parseProject
+        JSONObject timJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
+        for (Iterator keyIterator = timJson.keys(); keyIterator.hasNext(); ) {
+            String traceMatrixKey = keyIterator.next().toString();
+            if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
+                boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
+                if (isGenerated) {
+                    this.traceFileParser.parseTraceMatrixJson(project, projectVersion,
+                        timJson.getJSONObject(traceMatrixKey));
+                }
+            }
         }
     }
 
-    public String getUploadFilesErrorLog(String projectId) throws ServerError {
-        String errorStr = sql.getUploadErrorLog();
-        return errorStr;
+    public String getLinkErrorLog(Project project) throws ServerError {
+        return "Trace Link Error Log" + SEPARATOR + "\n" + getErrorLog(project,
+            ApplicationActivity.PARSING_TRACE_MATRIX);
     }
 
-    public String clearUploadedFlatFiles(String projectId) throws ServerError {
-        return sql.clearUploadedFlatfiles();
+    /**
+     * Returns list of parsing error for given project if it was created
+     * through flat files.
+     *
+     * @param project the project whose upload errors are associated
+     * @return formatted string containing all parsing errors
+     */
+    public String getUploadErrorLog(Project project) {
+        return "TIM.json error log " + SEPARATOR + "\n"
+            + getErrorLog(project, ApplicationActivity.PARSING_TIM)
+            + "Artifact parsing error log" + SEPARATOR + "\n"
+            + getErrorLog(project, ApplicationActivity.PARSING_TRACE_MATRIX);
     }
 
-    public String clearGeneratedFlatFiles(String projectId) throws ServerError {
-        return sql.clearGeneratedFlatfiles();
+    public FileSystemResource getUploadedFile(Project project, String file) {
+        return new FileSystemResource(new File(ProjectPaths.getPathToFlatFile(project, file)));
     }
 
-    public String generateLinks(String projectId) throws ServerError {
-        return generateFlatfile.generateFiles();
+    public void clearUploadedFiles(Project project) throws ServerError {
+        OSHelper.clearOrCreateDirectory(ProjectPaths.getPathToUploadedFiles(project));
+        this.artifactRepository.deleteAllByProject(project);
     }
 
-    public String getLinkTypes(String projectId) throws ServerError {
-        return generateFlatfile.getLinkTypes();
+    public void clearGeneratedFiles(Project project) throws ServerError {
+        OSHelper.clearOrCreateDirectory(ProjectPaths.getPathToGeneratedFiles(project));
+        this.traceLinkRepository.deleteAllByProjectAndTraceType(project, TraceType.GENERATED);
     }
 
-    public String getLinkErrorLog(String projectId) throws ServerError {
-        return sql.getLinkErrors();
+    public MySQL.FileInfo getFileInfo() throws OperationNotSupportedException {
+        //TODO: what kind of information is needed?
+        throw new OperationNotSupportedException("getting file information is under construction");
+    }
+
+    private List<String> uploadFlatFiles(Project project, MultipartFile[] files) throws ServerError {
+        String pathToStorage = ProjectPaths.getPathToStorage(project);
+        OSHelper.clearOrCreateDirectory(pathToStorage);
+
+        List<String> uploadedFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                String pathToFile = ProjectPaths.getPathToFlatFile(project, file.getOriginalFilename());
+                byte[] fileContent = file.getBytes();
+                Files.write(Paths.get(pathToFile), fileContent);
+                uploadedFiles.add(file.getOriginalFilename());
+            } catch (IOException e) {
+                throw new ServerError("Could not upload file: " + file.getOriginalFilename());
+            }
+        }
+        return uploadedFiles;
+    }
+
+    private void createProjectFromTIMFile(Project project, ProjectVersion projectVersion) throws ServerError {
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        this.flatFileParser.parseProject(project, projectVersion, pathToFile);
+        // TODO: return generated files
+    }
+
+    private String getErrorLog(Project project, ApplicationActivity activity) {
+        List<ParserError> parserErrors = this.parserErrorRepository.findByProject(project);
+
+        StringBuilder result = new StringBuilder();
+        for (ParserError error : parserErrors) {
+            if (error.getActivity() == activity) {
+                result.append(error.toLogFormat());
+            }
+        }
+        return result.toString();
     }
 }

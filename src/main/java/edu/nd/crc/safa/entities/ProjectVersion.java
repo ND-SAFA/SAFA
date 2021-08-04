@@ -14,11 +14,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Responsible for identifying each project's version.
+ */
 @Entity
 @Table(name = "project_versions")
 public class ProjectVersion implements Serializable {
 
     @Id
+    @Column(name = "version_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    long versionId; //todo: generate in sequence relative to project id using GenericGenerator
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "project_id",
@@ -27,16 +34,11 @@ public class ProjectVersion implements Serializable {
     )
     Project project;
 
-    @Id
-    @Column(name = "version_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    String versionId; //todo: generate in sequence relative to project id using GenericGenerator
 
     public ProjectVersion() {
     }
 
-    public ProjectVersion(Project project, String versionId) {
+    public ProjectVersion(Project project) {
         this.project = project;
-        this.versionId = versionId;
     }
 }

@@ -9,12 +9,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.database.Neo4J;
-import edu.nd.crc.safa.error.ServerError;
+import edu.nd.crc.safa.database.configuration.Neo4J;
+import edu.nd.crc.safa.database.repositories.LayoutRepository;
+import edu.nd.crc.safa.entities.Layout;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.importer.flatfile.Generator;
-import edu.nd.crc.safa.importer.flatfile.UploadFlatFile;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
@@ -26,7 +28,6 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
@@ -41,35 +42,30 @@ public class ProjectService {
     Puller mPuller;
     MySQL sql;
 
+    LayoutRepository layoutRepository;
+
+    WarningService warningService;
+    TraceMatrixService traceMatrixService;
+
     @Autowired
-    public ProjectService(Neo4J neo4j, Puller puller, UploadFlatFile uploadFlatFile,
-                          Generator generateFlatfile, MySQL mysql) {
+    public ProjectService(Neo4J neo4j,
+                          Puller puller,
+                          MySQL mysql,
+                          LayoutRepository layoutRepository,
+                          WarningService warningService,
+                          TraceMatrixService traceMatrixService) {
         this.neo4j = neo4j;
         this.mPuller = puller;
         this.sql = mysql;
+        this.layoutRepository = layoutRepository;
+        this.warningService = warningService;
+        this.traceMatrixService = traceMatrixService;
     }
 
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
 
-    private void init() throws ServerError { //TODO: Run after Dependency injection once test connection has been
-        // installed
-        final List<Map<String, Object>> nodes = nodes("test", "Hazard");
-        for (Map<String, Object> node : nodes) {
-            final String id = (String) node.get("id");
-            final int version = (Integer) versions("test").get("latest");
-            final List<Map<String, Object>> data = versions("test", id, version, "Hazard");
-            mWarnings.put(id, false);
-            for (Map<String, Object> v : data) {
-                if (v.containsKey("warnings")) {
-                    mWarnings.put(id, true);
-                }
-            }
-        }
-        System.out.println(mWarnings);
-    }
-
-    public SseEmitter projectPull(String projId) {
+    public SseEmitter projectPull(Project project, ProjectVersion projectVersion) {
         SseEmitter emitter = new SseEmitter(0L);
         ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
         sseMvcExecutor.execute(() -> {
@@ -79,7 +75,7 @@ public class ProjectService {
                     .id(String.valueOf(0))
                     .name("update"));
 
-                String Mysql2NeoData = mPuller.mySQLNeo();
+                String Mysql2NeoData = mPuller.mySQLNeo(project, projectVersion);
                 emitter.send(SseEmitter.event()
                     .data(Mysql2NeoData)
                     .id(String.valueOf(3))
@@ -100,7 +96,7 @@ public class ProjectService {
     }
 
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public List<String> parents(String projectId, String node, String rootType) throws ServerError {
         Session session = neo4j.createSession();
         String query = "MATCH (a)\n"
@@ -122,7 +118,7 @@ public class ProjectService {
         return ret;
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public List<Map<String, Object>> nodes(String projectId, String nodeType) throws ServerError {
         List<Map<String, Object>> set = new ArrayList<>();
         Session session = neo4j.createSession();
@@ -136,29 +132,29 @@ public class ProjectService {
         return set;
     }
 
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public Map<String, Boolean> nodeWarnings(String projectId) {
         return mWarnings;
     }
 
-    @Transactional(readOnly = true)
-    public List<Map<String, Object>> trees(String projectId, String rootType) throws ServerError {
+    //@Transactional(readOnly = true)
+    public List<Map<String, Object>> trees(Project project, String rootType) throws ServerError {
         Session session = neo4j.createSession();
         String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
             + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
             + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
         Result result = session.run(query);
-        return parseArtifactTree(result, projectId);
+        return parseArtifactTree(project, result);
     }
 
-    @Transactional(readOnly = true)
-    public List<Map<String, Object>> tree(String projectId, String root, String rootType) throws ServerError {
-        int version = (Integer) versions(projectId).get("latest");
-        return versions(projectId, root, version, rootType);
+    //@Transactional(readOnly = true)
+    public List<Map<String, Object>> tree(Project project, String root, String rootType) throws ServerError {
+        int version = (Integer) versions(project).get("latest");
+        return versions(project, root, version, rootType);
     }
 
-    @Transactional(readOnly = true)
-    public Map<String, Object> versions(String projectId) throws ServerError {
+    //@Transactional(readOnly = true)
+    public Map<String, Object> versions(Project project) throws ServerError {
         int version = -1;
         Session session = neo4j.createSession();
         Result result = session.run("MATCH (v:VERSION) RETURN v.number");
@@ -188,8 +184,8 @@ public class ProjectService {
     }
 
 
-    @Transactional(readOnly = true)
-    public List<Map<String, Object>> versions(String projectId, String root, int version, String rootType)
+    //@Transactional(readOnly = true)
+    public List<Map<String, Object>> versions(Project project, String root, int version, String rootType)
         throws ServerError {
         Session session = neo4j.createSession();
         String query = "MATCH (p)-[r:UPDATES]->(c)\n"
@@ -228,7 +224,7 @@ public class ProjectService {
         Result result = session.run(query, Values.parameters("version",
             version, "root", root));
 
-        final List<Map<String, Object>> retVal = parseArtifactTree(result, projectId);
+        final List<Map<String, Object>> retVal = parseArtifactTree(project, result);
 
         // Update warnings map
         mWarnings.put(root, false);
@@ -251,18 +247,18 @@ public class ProjectService {
         return ret;
     }
 
-    @Transactional(readOnly = true)
-    public String getTreeLayout(String projId, String hash) throws ServerError {
-        // TODO(Adam): Do something with the projId?
-        String b64EncodedLayout = sql.fetchLayout(hash);
-        return b64EncodedLayout;
+    //@Transactional(readOnly = true)
+    public String getTreeLayout(Project project, String hash) throws ServerError {
+        Layout layout = this.layoutRepository.findByProjectAndHash(project, hash);
+        return layout.getData();
     }
 
-    public void postTreeLayout(String projId, String hash, String b64EncodedLayout) throws ServerError {
-        sql.saveLayout(hash, b64EncodedLayout);
+    public void postTreeLayout(Project project, String hash, String b64EncodedLayout) throws ServerError {
+        Layout newLayout = new Layout(project, hash, b64EncodedLayout);
+        this.layoutRepository.save(newLayout);
     }
 
-    private List<Map<String, Object>> parseArtifactTree(Result result, String projectId) {
+    private List<Map<String, Object>> parseArtifactTree(Project project, Result result) {
         List<Map<String, Object>> values = new ArrayList<>();
         Map<Long, String> ids = new HashMap<>();
         Map<Long, Boolean> edges = new HashMap<>();
@@ -346,7 +342,7 @@ public class ProjectService {
             verifier.addRule("Missing child", "At least one package child for design definitions",
                 "at-least-one(DesignDefinition, child, Package)");
 
-            for (Rule r : sql.getWarnings(projectId)) {
+            for (Rule r : warningService.getWarnings(project)) {
                 verifier.addRule(r);
             }
         } catch (Exception e) {
@@ -417,11 +413,11 @@ public class ProjectService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Map<String, String> getWarnings(String projectId) {
+    //@Transactional(readOnly = true)
+    public Map<String, String> getWarnings(Project project) {
         Map<String, String> result = new HashMap<String, String>();
         try {
-            for (Rule r : sql.getWarnings(projectId)) {
+            for (Rule r : warningService.getWarnings(project)) {
                 result.put(r.toString(), r.unprocessedRule());
             }
         } catch (Exception e) {
@@ -430,20 +426,20 @@ public class ProjectService {
         return result;
     }
 
-    public void newWarning(String projectId, String nShort, String nLong, String rule) {
+    public void newWarning(Project project, String nShort, String nLong, String rule) {
         try {
-            sql.newWarning(projectId, nShort, nLong, rule);
+            warningService.newWarning(project, nShort, nLong, rule);
         } catch (Exception e) {
             System.out.println(e.toString());
         }
     }
 
     // Links
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public Map<String, String> getLink(String projectId, String source, String target) {
         Map<String, String> result = new HashMap<String, String>();
         try {
-            result.put("approval", sql.getLinkApproval(projectId, source, target).toString());
+            result.put("approval", traceMatrixService.getLinkApproval(projectId, source, target).toString());
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -454,7 +450,7 @@ public class ProjectService {
     public Map<String, String> updateLink(String projectId, Links links) {
         Map<String, String> result = new HashMap<String, String>();
         try {
-            result.put("success", String.format("%b", sql.updateLink(projectId, links)));
+            result.put("success", String.format("%b", traceMatrixService.updateLink(projectId, links)));
             // result.put("success", String.format("%b", sql.updateLink(projectId, source, target, approval)));
         } catch (Exception e) {
             result.put("success", "false");
@@ -463,24 +459,11 @@ public class ProjectService {
         return result;
     }
 
-    // Artifacts
-    @Transactional(readOnly = true)
-    public Map<String, Object> getArtifacts(String projectId) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        try {
-            result.put("artifacts", sql.getArtifacts(projectId));
-        } catch (Exception e) {
-            result.put("success", "false");
-            result.put("message", e.toString());
-        }
-        return result;
-    }
-
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public Map<String, Object> getArtifactLinks(String projectId, String source, String target, Double minScore) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            result.put("links", sql.getArtifactLinks(projectId, source, target, minScore));
+            result.put("links", traceMatrixService.getArtifactLinks(projectId, source, target, minScore));
         } catch (Exception e) {
             result.put("success", "false");
             result.put("message", e.toString());

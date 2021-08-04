@@ -20,8 +20,7 @@ public class ArtifactTypeCRUD extends EntityBaseTest {
         String artifactTypeName = "Design Definitions";
         String altArtifactTypeName = "Requirements";
 
-        UUID projectId = createProject(projectName);
-        Project project = projectRepository.findByProjectId(projectId);
+        Project project = createProject(projectName);
 
         //VP 1 - Create Artifact Type
         ArtifactType artifactType = new ArtifactType(project, artifactTypeName);

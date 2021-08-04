@@ -106,10 +106,7 @@ public class TraceFileParser {
                                ArtifactType targetType,
                                String fileName) throws ServerError {
         CSVParser traceFileParser = FileUtilities.readCSVFile(project, fileName);
-        if (!FileUtilities.hasColumns(traceFileParser, REQUIRED_COLUMNS)) {
-            String error = "Trace file (%s) is missing at least one required columns (%s)";
-            throw new ServerError(String.format(error, fileName, FileUtilities.toString(REQUIRED_COLUMNS)));
-        }
+        FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {
             records = traceFileParser.getRecords();
@@ -137,6 +134,7 @@ public class TraceFileParser {
                 TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
                 traceLink.setIsManual();
                 this.traceLinkRepository.save(traceLink);
+                //TODO: construct list and save all in batch
             } catch (ServerError e) {
                 ParserError parserError = new ParserError(project,
                     fileName,

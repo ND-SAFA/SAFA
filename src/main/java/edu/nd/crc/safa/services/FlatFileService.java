@@ -3,8 +3,10 @@ package edu.nd.crc.safa.services;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -86,8 +88,8 @@ public class FlatFileService {
      * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
      */
     public FlatFileResponse parseFlatFiles(Project project, MultipartFile[] files) throws ServerError {
-        List<String> uploadedFiles = this.uploadFlatFiles(project, files);
-        ProjectVersion newProjectVersion = new ProjectVersion();
+        List<String> uploadedFiles = this.uploadFlatFiles(project, Arrays.asList(files));
+        ProjectVersion newProjectVersion = new ProjectVersion(project);
         this.projectVersionRepository.save(newProjectVersion);
         this.createProjectFromTIMFile(project, newProjectVersion);
 
@@ -152,24 +154,39 @@ public class FlatFileService {
         this.traceLinkRepository.deleteAllByProjectAndTraceType(project, TraceType.GENERATED);
     }
 
+    public File[] getUploadedFiles(Project project) {
+        File directory = new File(ProjectPaths.getPathToUploadedFiles(project));
+        File[] filesInDirectory = directory.listFiles();
+        if (filesInDirectory == null) {
+            return new File[]{};
+        }
+        return filesInDirectory;
+    }
+
     public MySQL.FileInfo getFileInfo() throws OperationNotSupportedException {
         //TODO: what kind of information is needed?
         throw new OperationNotSupportedException("getting file information is under construction");
     }
 
-    private List<String> uploadFlatFiles(Project project, MultipartFile[] files) throws ServerError {
+    public List<String> uploadFlatFiles(Project project, List<MultipartFile> requestFiles) throws ServerError {
         String pathToStorage = ProjectPaths.getPathToStorage(project);
         OSHelper.clearOrCreateDirectory(pathToStorage);
 
         List<String> uploadedFiles = new ArrayList<>();
-        for (MultipartFile file : files) {
+        for (MultipartFile requestFile : requestFiles) {
             try {
-                String pathToFile = ProjectPaths.getPathToFlatFile(project, file.getOriginalFilename());
-                byte[] fileContent = file.getBytes();
-                Files.write(Paths.get(pathToFile), fileContent);
-                uploadedFiles.add(file.getOriginalFilename());
+                System.out.println("ORIGINALNAME:" + requestFile.getOriginalFilename());
+                String pathToFile = ProjectPaths.getPathToFlatFile(project, requestFile.getOriginalFilename());
+                Path pathToUploadedFile = Paths.get(pathToFile);
+                File newFile = new File(pathToUploadedFile.toString());
+                newFile.getParentFile().mkdirs();
+                newFile.createNewFile();
+                System.out.println("FILEPATH:" + newFile.getAbsolutePath());
+                requestFile.transferTo(newFile);
+                uploadedFiles.add(requestFile.getOriginalFilename());
+
             } catch (IOException e) {
-                throw new ServerError("Could not upload file: " + file.getOriginalFilename());
+                throw new ServerError("Could not upload file: " + requestFile.getOriginalFilename(), e);
             }
         }
         return uploadedFiles;

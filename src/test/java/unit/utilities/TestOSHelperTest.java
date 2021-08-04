@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Responsible for testing OSHelper IO capabilities.
  */
-public class OSHelperTest {
+public class TestOSHelperTest {
 
     @Test
     public void canCreateAndDeleteFolder() throws ServerError {

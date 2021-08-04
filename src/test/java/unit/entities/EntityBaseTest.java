@@ -23,16 +23,16 @@ public class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     ArtifactRepository artifactRepository;
 
-    public UUID createProject(String projectName) {
+    public Project createProject(String projectName) {
         Project project = new Project(projectName);
         projectRepository.save(project);
-        return project.getProjectId();
+        return project;
     }
 
-    public UUID createArtifactType(Project project, String artifactTypeName) {
+    public ArtifactType createArtifactType(Project project, String artifactTypeName) {
         ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
         artifactTypeRepository.save(artifactType);
-        return artifactType.getTypeId();
+        return artifactType;
     }
 
     public UUID createArtifact(Project project, ArtifactType type, String name) {

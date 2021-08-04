@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.utilities;
 
 import java.io.File;
+import java.io.IOException;
 
 import edu.nd.crc.safa.output.error.ServerError;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * Responsible for encapsulating common operating system
@@ -29,13 +32,10 @@ public class OSHelper {
             }
         }
 
-        if (!myDir.isDirectory()) {
-            if (!myDir.delete()) {
-                throw new ServerError(String.format("deleting file at path: %s", pathToDir));
-            }
-            if (!myDir.mkdirs()) {
-                throw new ServerError(String.format("creating file at path: %s", pathToDir));
-            }
+        try {
+            FileUtils.cleanDirectory(myDir);
+        } catch (IOException e) {
+            throw new ServerError("Could not clear directory", e);
         }
     }
 
@@ -47,13 +47,18 @@ public class OSHelper {
      *                     or children of directory
      */
     public static void deletePath(String path) throws ServerError {
-        File object = new File(path);
+        File objectAtPath = new File(path);
 
-        if (object.exists()) {
-            if (object.isDirectory()) {
-                recursivelyDeleteDirectory(object);
+        if (objectAtPath.exists()) {
+            if (objectAtPath.isDirectory()) {
+                try {
+                    FileUtils.deleteDirectory(objectAtPath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new ServerError("Could not delete directory: " + path);
+                }
             } else {
-                if (!object.delete()) {
+                if (!objectAtPath.delete()) {
                     throw new ServerError("Could not delete file at: " + path);
                 }
             }

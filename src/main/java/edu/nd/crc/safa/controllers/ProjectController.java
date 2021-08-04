@@ -2,6 +2,7 @@ package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,25 +61,22 @@ public class ProjectController {
         this.projectVersionRepository = projectVersionRepository;
     }
 
-    @PostMapping(value = "/projects/flat-files")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ServerResponse uploadProjectFiles(@RequestParam("files") MultipartFile[] files) {
-        // TODO: delete this route
-        ProjectCreationResponse response = new ProjectCreationResponse();
-        response.setFilesReceived(files);
-        return new ServerResponse(response);
-    }
 
-    @PostMapping("projects/{projectId}/upload/")
+    @PostMapping("projects/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse uploadFile(@PathVariable String projectId,
-                                     @RequestParam("files") MultipartFile[] files) throws ServerError {
-        Project project = getProject(projectId);
-        FlatFileResponse response = this.flatFileService.parseFlatFiles(project, files);
-        return new ServerResponse(response);
+    public ServerResponse uploadFile(@RequestParam MultipartFile[] files) throws ServerError {
+        if (files.length == 0) {
+            throw new ServerError("Could not create project because no files were received.");
+        }
+        Project project = new Project(); // TODO: extract name from TIM file
+        this.projectRepository.save(project);
+        FlatFileResponse flatFileResponse = this.flatFileService.parseFlatFiles(project, files);
+        ProjectCreationResponse response = new ProjectCreationResponse(project, flatFileResponse);
+        response.setFlatFileResponse(flatFileResponse);
+        return new ServerResponse(project);
     }
 
-    @GetMapping("projects/{projectId}/upload/")
+    @GetMapping("projects/{projectId}/flat-files/")
     public ServerResponse getUploadedFile(@PathVariable String projectId,
                                           @RequestParam String filename) throws ServerError {
         Project project = getProject(projectId);
@@ -181,7 +179,7 @@ public class ProjectController {
     }
 
     @GetMapping("projects/{projectId}/pull/")
-    public ServerResponse projectPull(@PathVariable String projectId) {
+    public ServerResponse projectPull(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         ProjectVersion projectVersion = getCurrentVersion(project);
         return new ServerResponse(projectService.projectPull(project, projectVersion));
@@ -205,7 +203,7 @@ public class ProjectController {
 
     // Warnings
     @GetMapping("projects/{projectId}/warnings/")
-    public Map<String, String> getWarnings(@PathVariable String projectId) {
+    public Map<String, String> getWarnings(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return projectService.getWarnings(project);
     }
@@ -215,7 +213,7 @@ public class ProjectController {
     public void newWarning(@PathVariable String projectId,
                            @RequestParam("short") String nShort,
                            @RequestParam("long") String nLong,
-                           @RequestParam("rule") String rule) {
+                           @RequestParam("rule") String rule) throws ServerError {
         Project project = getProject(projectId);
         projectService.newWarning(project, nShort, nLong, rule);
     }
@@ -236,7 +234,7 @@ public class ProjectController {
 
     // Artifacts
     @GetMapping("projects/{projectId}/artifact/")
-    public ServerResponse getArtifacts(@PathVariable String projectId) {
+    public ServerResponse getArtifacts(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         List<Artifact> artifact = artifactRepository.findByProject(project);
         return new ServerResponse(artifact);
@@ -255,6 +253,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleServerError(HttpServletRequest req,
                                             ServerError exception) {
+        exception.getError().printStackTrace();
         return new ServerResponse(exception, ResponseCodes.FAILURE);
     }
 
@@ -267,9 +266,12 @@ public class ProjectController {
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
     }
 
-    private Project getProject(String projectId) {
-        // TODO: validate that user has access to project
-        return this.projectRepository.findByProjectId(UUID.fromString(projectId));
+    private Project getProject(String projectId) throws ServerError {
+        Optional<Project> queriedProject = this.projectRepository.findById(UUID.fromString(projectId));
+        if (!queriedProject.isPresent()) {
+            throw new ServerError("Could not find project with id:" + projectId);
+        }
+        return queriedProject.get();
     }
 
     private ProjectVersion getCurrentVersion(Project project) {

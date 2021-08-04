@@ -34,16 +34,15 @@ public class FileUtilities {
         }
     }
 
-    public static boolean hasColumns(CSVParser file, String[] names) {
+    public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {
         List<String> headerNames = file.getHeaderNames();
         List<String> headerNamesLower = toLowerCase(headerNames);
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                return false;
+                throw new ServerError("Expected file to column: " + n + " but only saw " + file.getHeaderNames());
             }
         }
-        return true;
     }
 
     public static String toString(Object[] a) {
@@ -81,7 +80,13 @@ public class FileUtilities {
 
         while (keys.hasNext()) {
             String key = keys.next().toString();
-            result.put(key.toLowerCase(), jsonObject.get(key));
+            Object value = jsonObject.get(key);
+            if (value instanceof JSONObject) {
+                result.put(key.toLowerCase(), toLowerCase((JSONObject) value));
+            } else {
+                result.put(key.toLowerCase(), value);
+            }
+
         }
         return result;
     }

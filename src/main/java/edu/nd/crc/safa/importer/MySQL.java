@@ -10,12 +10,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
-import edu.nd.crc.safa.database.connection.SQLConnection;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.database.configuration.SQLConnection;
+import edu.nd.crc.safa.output.error.ServerError;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
@@ -30,21 +27,6 @@ public class MySQL {
 
     public final int CONNECTION_TIMEOUT = 10000;
 
-    SessionFactory sessionFactory;
-
-    @Autowired
-    public MySQL(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
-
-    public void verifyConnection() throws ServerError {
-        try (Session newSession = sessionFactory.openSession()) {
-            if (!newSession.isConnected()) {
-                throw new ServerError("SQL Connection is not valid");
-            }
-        }
-    }
 
     public Connection getConnection() throws ServerError {
         try {
@@ -55,10 +37,8 @@ public class MySQL {
     }
 
     private DataSource createConnectionPool() throws ServerError {
-        //TODO: Create bean from this so it can be reused!
+        //TODO: delete this
         SQLConnection.assertValidCredentials();
-        SessionFactory sessionFactory;
-
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         //dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setUrl(DatabaseVariables.SQL_URL);

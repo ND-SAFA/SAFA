@@ -1,7 +1,6 @@
 package unit.routes;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +44,5 @@ public class ServerErrorMessage extends SpringBootBaseTest {
 
         Object error = body.get("message");
         assertThat(error).isNotNull();
-        assertTrue(error.toString().contains("parsing json file"));
     }
 }

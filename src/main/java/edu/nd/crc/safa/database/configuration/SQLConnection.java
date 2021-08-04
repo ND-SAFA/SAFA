@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database.connection;
+package edu.nd.crc.safa.database.configuration;
 
 import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_URL;
 import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_USERNAME;
@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import com.github.fluent.hibernate.cfg.scanner.EntityScanner;
 import org.hibernate.boot.MetadataSources;

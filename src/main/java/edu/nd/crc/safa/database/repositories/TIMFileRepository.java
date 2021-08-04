@@ -2,7 +2,7 @@ package edu.nd.crc.safa.database.repositories;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.database.entities.ArtifactFile;
+import edu.nd.crc.safa.entities.ArtifactFile;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database.entities;
+package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.output.error.ServerError;
+
 /**
  * Responsible for marking each trace link in each project.
  */
@@ -28,7 +30,15 @@ public class TraceLink implements Serializable {
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
-        name = "artifact_id",
+        name = "project_id",
+        nullable = false
+    )
+    Project project;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(
+        name = "source_artifact_id",
+        referencedColumnName = "artifact_id",
         nullable = false
     )
     Artifact sourceArtifact;
@@ -36,7 +46,8 @@ public class TraceLink implements Serializable {
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
-        name = "artifact_id",
+        name = "target_artifact_id",
+        referencedColumnName = "artifact_id",
         nullable = false
     )
     Artifact targetArtifact;
@@ -57,10 +68,14 @@ public class TraceLink implements Serializable {
     }
 
     public TraceLink(Artifact sourceArtifact,
-                     Artifact targetArtifact) {
+                     Artifact targetArtifact) throws ServerError {
         this();
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
+        if (!sourceArtifact.project.equals(targetArtifact.project)) {
+            throw new ServerError("Source and target artifacts exist in different projects");
+        }
+        this.project = sourceArtifact.project;
     }
 
     public TraceType getTraceType() {

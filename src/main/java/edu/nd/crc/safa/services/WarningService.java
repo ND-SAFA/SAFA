@@ -3,10 +3,10 @@ package edu.nd.crc.safa.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.Warning;
 import edu.nd.crc.safa.database.repositories.WarningRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.Warning;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 
 import org.springframework.beans.factory.annotation.Autowired;

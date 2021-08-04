@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.responses;
+package edu.nd.crc.safa.output.responses;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.constants;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import edu.nd.crc.safa.database.entities.Project;
+import edu.nd.crc.safa.entities.Project;
 
 /**
  * Contains common full paths used through app.

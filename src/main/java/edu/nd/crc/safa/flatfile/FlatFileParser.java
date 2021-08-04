@@ -6,12 +6,11 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import org.hibernate.SessionFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +23,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlatFileParser {
 
-    SessionFactory sessionFactory;
     ArtifactFileParser artifactFileParser;
     TraceFileParser traceFileParser;
 
 
     @Autowired
-    public FlatFileParser(SessionFactory sessionFactory,
-                          ArtifactFileParser artifactFileParser,
+    public FlatFileParser(ArtifactFileParser artifactFileParser,
                           TraceFileParser traceFileParser) {
-        this.sessionFactory = sessionFactory;
         this.artifactFileParser = artifactFileParser;
         this.traceFileParser = traceFileParser;
     }

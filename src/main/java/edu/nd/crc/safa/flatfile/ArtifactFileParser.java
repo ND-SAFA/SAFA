@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.nd.crc.safa.database.entities.Artifact;
-import edu.nd.crc.safa.database.entities.ArtifactBody;
-import edu.nd.crc.safa.database.entities.ArtifactFile;
-import edu.nd.crc.safa.database.entities.ArtifactType;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Artifact;
+import edu.nd.crc.safa.entities.ArtifactBody;
+import edu.nd.crc.safa.entities.ArtifactFile;
+import edu.nd.crc.safa.entities.ArtifactType;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;

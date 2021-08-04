@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.hibernate.Session;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,9 +29,4 @@ public class ApplicationLoads extends SpringBootBaseTest {
         assertThat(content.get("body")).isEqualTo("Hello World");
     }
 
-    @Test
-    public void testSQLConnection() throws Exception {
-        Session session = sessionFactory.openSession();
-        assertThat(session.isConnected()).isTrue();
-    }
 }

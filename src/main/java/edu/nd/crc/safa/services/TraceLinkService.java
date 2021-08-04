@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.TraceLink;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

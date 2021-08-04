@@ -11,16 +11,16 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.database.entities.Artifact;
-import edu.nd.crc.safa.database.entities.ArtifactBody;
-import edu.nd.crc.safa.database.entities.ArtifactType;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
-import edu.nd.crc.safa.database.entities.TraceLink;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Artifact;
+import edu.nd.crc.safa.entities.ArtifactBody;
+import edu.nd.crc.safa.entities.ArtifactType;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +51,9 @@ public class TraceLinkGenerator {
                                   ArtifactType targetType,
                                   String outputFileName) throws ServerError {
         List<ArtifactBody> sourceArtifacts = this.artifactBodyRepository
-            .findByProjectAndProjectVersionAndArtifactType(project, projectVersion, sourceType);
+            .findByProjectVersionAndArtifactType(projectVersion, sourceType);
         List<ArtifactBody> targetArtifacts = this.artifactBodyRepository
-            .findByProjectAndProjectVersionAndArtifactType(project, projectVersion, targetType);
+            .findByProjectVersionAndArtifactType(projectVersion, targetType);
 
         Map<String, Collection<String>> sTokens = splitArtifactsIntoWords(sourceArtifacts);
         Map<String, Collection<String>> tTokens = splitArtifactsIntoWords(targetArtifacts);
@@ -65,9 +65,9 @@ public class TraceLinkGenerator {
         lines.add(GENERATED_FILES_HEADER);
         for (String sid : sTokens.keySet()) {
             for (String tid : tTokens.keySet()) {
-                Artifact sourceArtifact = this.artifactRepository.findByProjectAndArtifactTypeAndName(project,
+                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
                     sourceType, sid);
-                Artifact targetArtifact = this.artifactRepository.findByProjectAndArtifactTypeAndName(project,
+                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
                     sourceType, tid);
                 double score = vsm.getRelevance(sTokens.get(sid), tTokens.get(tid));
                 TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);

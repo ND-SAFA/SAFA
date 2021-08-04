@@ -12,21 +12,21 @@ import javax.naming.OperationNotSupportedException;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.entities.ApplicationActivity;
-import edu.nd.crc.safa.database.entities.ParserError;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
-import edu.nd.crc.safa.database.entities.TraceType;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.entities.ApplicationActivity;
+import edu.nd.crc.safa.entities.ParserError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.TraceType;
 import edu.nd.crc.safa.flatfile.FlatFileParser;
 import edu.nd.crc.safa.flatfile.TraceFileParser;
 import edu.nd.crc.safa.flatfile.TraceLinkGenerator;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.server.error.ServerError;
-import edu.nd.crc.safa.server.responses.FlatFileResponse;
+import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.output.responses.FlatFileResponse;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.OSHelper;
 

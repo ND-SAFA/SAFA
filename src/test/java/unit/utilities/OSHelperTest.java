@@ -1,4 +1,4 @@
-package unit.flatfile;
+package unit.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
-import edu.nd.crc.safa.server.error.ServerError;
 
 import org.junit.jupiter.api.Test;
 

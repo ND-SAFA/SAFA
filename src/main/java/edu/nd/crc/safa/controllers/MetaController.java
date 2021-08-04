@@ -1,8 +1,7 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.database.connection.Neo4J;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.output.responses.ServerResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +23,7 @@ public class MetaController {
     }
 
     @GetMapping("/connections")
-    public ServerResponse test_service_connections() throws Exception {
-        (new Neo4J()).verifyConnectivity();
-
-        sql.verifyConnection();
-        return new ServerResponse("Connected Neo4J and MySQL!");
+    public ServerResponse test_service_connections() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("connections route is under construction");
     }
 }

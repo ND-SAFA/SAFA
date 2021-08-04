@@ -1,6 +1,6 @@
-package edu.nd.crc.safa.server.responses;
+package edu.nd.crc.safa.output.responses;
 
-import edu.nd.crc.safa.server.error.ResponseCodes;
+import edu.nd.crc.safa.output.error.ResponseCodes;
 
 public class ServerResponse {
     private Object body;

@@ -13,12 +13,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.nd.crc.safa.database.entities.ArtifactBody;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.entities.ArtifactBody;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.services.TraceMatrixService;
 
 import com.jsoniter.output.JsonStream;
@@ -216,8 +216,7 @@ public class Puller {
     }
 
     public void insertArtifacts(Project project, ProjectVersion projectVersion) throws Exception {
-        List<ArtifactBody> artifacts = this.artifactBodyRepository.findByProjectAndProjectVersion(project,
-            projectVersion);
+        List<ArtifactBody> artifacts = this.artifactBodyRepository.findByProjectVersion(projectVersion);
         for (ArtifactBody artifact : artifacts) {
             String type = artifact.getTypeName();
             String id = artifact.getName();

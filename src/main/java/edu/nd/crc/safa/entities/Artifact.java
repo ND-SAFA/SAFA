@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database.entities;
+package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -35,9 +35,7 @@ public class Artifact implements Serializable {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(
         name = "type_id",
-        nullable = false,
-        referencedColumnName = "type_id"
-    )
+        nullable = false)
     ArtifactType type;
 
     @Column(name = "name")
@@ -70,5 +68,9 @@ public class Artifact implements Serializable {
 
     public String getName() {
         return this.name;
+    }
+
+    public UUID getArtifactId() {
+        return this.artifactId;
     }
 }

@@ -7,7 +7,7 @@ import javax.naming.OperationNotSupportedException;
 
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.TIMFileRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,8 @@ public class TimArtifactService {
     TIMFileRepository timFileRepository;
 
     @Autowired
-    public TimArtifactService(SessionFactory sessionFactory,
-                              ArtifactRepository artifactRepository,
+    public TimArtifactService(ArtifactRepository artifactRepository,
                               TIMFileRepository timFileRepository) {
-        this.sessionFactory = sessionFactory;
         this.artifactRepository = artifactRepository;
         this.timFileRepository = timFileRepository;
     }

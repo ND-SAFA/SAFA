@@ -2,24 +2,23 @@ package edu.nd.crc.safa;
 
 import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_URL;
 
-import java.io.IOException;
-
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import edu.nd.crc.safa.constants.DatabaseVariables;
 import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.connection.SQLConnection;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.database.configuration.SQLConnection;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.hibernate.SessionFactory;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -34,17 +33,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class AppConfig {
 
-    @Bean
-    public SessionFactory createSessionFactory() throws ServerError, IOException {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-
-        sessionFactory.setMetadataSources(SQLConnection.getEntitiesMetaData());
-        sessionFactory.setHibernateProperties(SQLConnection.getConnectionProperties());
-        sessionFactory.setDataSource(getDataSource());
-        sessionFactory.afterPropertiesSet();
-
-        return sessionFactory.getObject();
-    }
+//    @Bean
+//    public SessionFactory createSessionFactory() throws ServerError, IOException {
+//        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+//
+//        sessionFactory.setMetadataSources(SQLConnection.getEntitiesMetaData());
+//        sessionFactory.setHibernateProperties(SQLConnection.getConnectionProperties());
+//        sessionFactory.setDataSource(getDataSource());
+//        sessionFactory.afterPropertiesSet();
+//
+//        return sessionFactory.getObject();
+//    }
 
     @Bean
     public DataSource getDataSource() throws ServerError {
@@ -57,5 +56,17 @@ public class AppConfig {
         dataSource.setDriverClassName(SQLConnection.getDriverClassName());
 
         return dataSource;
+    }
+
+    @Bean
+    public EntityManagerFactory entityManagerFactory() throws ServerError {
+        LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+        HibernatePersistenceProvider provider = new HibernatePersistenceProvider();
+        emf.setDataSource(this.getDataSource());
+        emf.setJpaProperties(SQLConnection.getConnectionProperties());
+        emf.setPersistenceProvider(provider);
+        emf.setPackagesToScan(ProjectVariables.ENTITIES_PACKAGE);
+        emf.afterPropertiesSet();
+        return emf.getNativeEntityManagerFactory();
     }
 }

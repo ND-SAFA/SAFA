@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.database.entities.Warning;
+import edu.nd.crc.safa.entities.Warning;
 
 public class Rule {
     public static class Name {

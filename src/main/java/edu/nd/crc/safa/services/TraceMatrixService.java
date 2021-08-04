@@ -12,7 +12,7 @@ import java.util.Map;
 
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,22 +24,6 @@ public class TraceMatrixService {
     @Autowired
     public TraceMatrixService(MySQL sql) {
         this.sql = sql;
-    }
-
-    public void createGeneratedTraceMatrixTable(String tableName,
-                                                String filePath) throws ServerError {
-        try {
-            Statement stmt = sql.getConnection().createStatement();
-            Boolean exists = sql.tableExists(tableName);
-
-            if (exists) {
-                updateGeneratedTraceMatrixTable(stmt, tableName, filePath);
-            } else {
-                createGeneratedTraceMatrixTable(stmt, tableName, filePath);
-            }
-        } catch (SQLException e) {
-            throw new ServerError("creating generated trace matrix table", e);
-        }
     }
 
     public void createUpdateTIMTraceMatrixTable(String traceMatrixName,

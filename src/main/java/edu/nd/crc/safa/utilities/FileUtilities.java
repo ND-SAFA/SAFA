@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.output.error.ServerError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

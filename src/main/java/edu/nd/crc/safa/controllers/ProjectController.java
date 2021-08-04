@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 import java.util.Map;
@@ -7,17 +7,17 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.database.entities.Artifact;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ProjectRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.error.ResponseCodes;
-import edu.nd.crc.safa.server.error.ServerError;
-import edu.nd.crc.safa.server.responses.FlatFileResponse;
-import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
-import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.entities.Artifact;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.output.error.ResponseCodes;
+import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.output.responses.FlatFileResponse;
+import edu.nd.crc.safa.output.responses.ProjectCreationResponse;
+import edu.nd.crc.safa.output.responses.ServerResponse;
 import edu.nd.crc.safa.services.FlatFileService;
 import edu.nd.crc.safa.services.ProjectService;
 import edu.nd.crc.safa.services.TraceLinkService;
@@ -69,7 +69,7 @@ public class ProjectController {
         return new ServerResponse(response);
     }
 
-    @PostMapping("projects/{projId}/upload/")
+    @PostMapping("projects/{projectId}/upload/")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse uploadFile(@PathVariable String projectId,
                                      @RequestParam("files") MultipartFile[] files) throws ServerError {
@@ -78,46 +78,46 @@ public class ProjectController {
         return new ServerResponse(response);
     }
 
-    @GetMapping("projects/{projId}/upload/")
+    @GetMapping("projects/{projectId}/upload/")
     public ServerResponse getUploadedFile(@PathVariable String projectId,
                                           @RequestParam String filename) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(flatFileService.getUploadedFile(project, filename));
     }
 
-    @GetMapping("projects/{projId}/clear/")
+    @GetMapping("projects/{projectId}/clear/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearUploadedFlatFiles(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         flatFileService.clearUploadedFiles(project);
     }
 
-    @GetMapping("projects/{projId}/uploaderrorlog/")
+    @GetMapping("projects/{projectId}/uploaderrorlog/")
     public ServerResponse getUploadFilesErrorLog(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(flatFileService.getUploadErrorLog(project));
     }
 
-    @GetMapping("projects/{projId}/linkerrorlog/")
+    @GetMapping("projects/{projectId}/linkerrorlog/")
     public ServerResponse getLinkErrorLog(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(flatFileService.getLinkErrorLog(project));
     }
 
-    @GetMapping("projects/{projId}/generate/")
+    @GetMapping("projects/{projectId}/generate/")
     public void generateLinks(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         ProjectVersion projectVersion = getCurrentVersion(project);
         flatFileService.generateLinks(project, projectVersion); //TODO: return any error logs
     }
 
-    @GetMapping("projects/{projId}/linktypes/")
+    @GetMapping("projects/{projectId}/linktypes/")
     public ServerResponse getLinkTypes(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(traceLinkService.getLinkTypes(project));
     }
 
-    @GetMapping("projects/{projId}/remove/")
+    @GetMapping("projects/{projectId}/remove/")
     public void removeGeneratedFlatFiles(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         flatFileService.clearGeneratedFiles(project);
@@ -126,32 +126,32 @@ public class ProjectController {
     /**
      * Versioning, deltas, nodes
      */
-    @GetMapping("projects/{projId}/parents/{node}")
-    public ServerResponse parents(@PathVariable String projId,
+    @GetMapping("projects/{projectId}/parents/{node}")
+    public ServerResponse parents(@PathVariable String projectId,
                                   @PathVariable String node,
                                   @RequestParam String rootType) throws ServerError {
-        return new ServerResponse(projectService.parents(projId, node, rootType));
+        return new ServerResponse(projectService.parents(projectId, node, rootType));
     }
 
-    @GetMapping("projects/{projId}/nodes/")
-    public ServerResponse nodes(@PathVariable String projId,
+    @GetMapping("projects/{projectId}/nodes/")
+    public ServerResponse nodes(@PathVariable String projectId,
                                 @RequestParam String nodeType) throws ServerError {
-        return new ServerResponse(projectService.nodes(projId, nodeType));
+        return new ServerResponse(projectService.nodes(projectId, nodeType));
     }
 
-    @GetMapping("projects/{projId}/nodes/warnings")
-    public ServerResponse nodeWarnings(@PathVariable String projId) {
-        return new ServerResponse(projectService.nodeWarnings(projId));
+    @GetMapping("projects/{projectId}/nodes/warnings")
+    public ServerResponse nodeWarnings(@PathVariable String projectId) {
+        return new ServerResponse(projectService.nodeWarnings(projectId));
     }
 
-    @GetMapping("projects/{projId}/trees/")
+    @GetMapping("projects/{projectId}/trees/")
     public ServerResponse trees(@PathVariable String projectId,
                                 @RequestParam String rootType) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(projectService.trees(project, rootType));
     }
 
-    @GetMapping("projects/{projId}/trees/{treeId}/")
+    @GetMapping("projects/{projectId}/trees/{treeId}/")
     public ServerResponse tree(@PathVariable String projectId,
                                @PathVariable String treeId,
                                @RequestParam String rootType) throws ServerError {
@@ -159,13 +159,13 @@ public class ProjectController {
         return new ServerResponse(projectService.tree(project, treeId, rootType));
     }
 
-    @GetMapping("projects/{projId}/versions/")
+    @GetMapping("projects/{projectId}/versions/")
     public ServerResponse versions(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(projectService.versions(project));
     }
 
-    @GetMapping("projects/{projId}/trees/{treeId}/versions/{version}")
+    @GetMapping("projects/{projectId}/trees/{treeId}/versions/{version}")
     public ServerResponse versions(@PathVariable String projectId,
                                    @PathVariable String treeId,
                                    @PathVariable int version,
@@ -174,20 +174,20 @@ public class ProjectController {
         return new ServerResponse(projectService.versions(project, treeId, version, rootType));
     }
 
-    @PostMapping("projects/{projId}/versions/")
+    @PostMapping("projects/{projectId}/versions/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ServerResponse versionsTag(@PathVariable String projId) {
-        return new ServerResponse(projectService.versionsTag(projId));
+    public ServerResponse versionsTag(@PathVariable String projectId) {
+        return new ServerResponse(projectService.versionsTag(projectId));
     }
 
-    @GetMapping("projects/{projId}/pull/")
+    @GetMapping("projects/{projectId}/pull/")
     public ServerResponse projectPull(@PathVariable String projectId) {
         Project project = getProject(projectId);
         ProjectVersion projectVersion = getCurrentVersion(project);
         return new ServerResponse(projectService.projectPull(project, projectVersion));
     }
 
-    @PostMapping("projects/{projId}/trees/{treeId}/layout/")
+    @PostMapping("projects/{projectId}/trees/{treeId}/layout/")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse postTreeLayout(@PathVariable String projectId,
                                          @PathVariable String treeId,
@@ -197,20 +197,20 @@ public class ProjectController {
         return new ServerResponse("Layout");
     }
 
-    @GetMapping(value = "projects/{projId}/trees/{treeId}/layout/")
+    @GetMapping(value = "projects/{projectId}/trees/{treeId}/layout/")
     public String getTreeLayout(@PathVariable String projectId, @PathVariable String treeId) throws ServerError {
         Project project = getProject(projectId);
         return projectService.getTreeLayout(project, treeId);
     }
 
     // Warnings
-    @GetMapping("projects/{projId}/warnings/")
+    @GetMapping("projects/{projectId}/warnings/")
     public Map<String, String> getWarnings(@PathVariable String projectId) {
         Project project = getProject(projectId);
         return projectService.getWarnings(project);
     }
 
-    @PostMapping("projects/{projId}/warnings/")
+    @PostMapping("projects/{projectId}/warnings/")
     @ResponseStatus(HttpStatus.CREATED)
     public void newWarning(@PathVariable String projectId,
                            @RequestParam("short") String nShort,
@@ -221,34 +221,34 @@ public class ProjectController {
     }
 
     // Links
-    @GetMapping("projects/{projId}/link/")
-    public ServerResponse getLink(@PathVariable String projId,
+    @GetMapping("projects/{projectId}/link/")
+    public ServerResponse getLink(@PathVariable String projectId,
                                   @RequestParam("source") String source,
                                   @RequestParam("target") String target) {
-        return new ServerResponse(projectService.getLink(projId, source, target));
+        return new ServerResponse(projectService.getLink(projectId, source, target));
     }
 
-    @PostMapping("projects/{projId}/link/")
+    @PostMapping("projects/{projectId}/link/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ServerResponse updateLink(@PathVariable String projId, @RequestBody Links links) {
-        return new ServerResponse(projectService.updateLink(projId, links));
+    public ServerResponse updateLink(@PathVariable String projectId, @RequestBody Links links) {
+        return new ServerResponse(projectService.updateLink(projectId, links));
     }
 
     // Artifacts
-    @GetMapping("projects/{projId}/artifact/")
+    @GetMapping("projects/{projectId}/artifact/")
     public ServerResponse getArtifacts(@PathVariable String projectId) {
         Project project = getProject(projectId);
         List<Artifact> artifact = artifactRepository.findByProject(project);
         return new ServerResponse(artifact);
     }
 
-    @GetMapping("projects/{projId}/artifact/{source}/links")
-    public ServerResponse getArtifactLinks(@PathVariable String projId,
+    @GetMapping("projects/{projectId}/artifact/{source}/links")
+    public ServerResponse getArtifactLinks(@PathVariable String projectId,
                                            @PathVariable String source,
                                            @RequestParam("target") String target,
                                            @RequestParam(name = "minScore", defaultValue = "0.0")
                                                Double minScore) {
-        return new ServerResponse(projectService.getArtifactLinks(projId, source, target, minScore));
+        return new ServerResponse(projectService.getArtifactLinks(projectId, source, target, minScore));
     }
 
     @ExceptionHandler(ServerError.class)
@@ -262,6 +262,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(HttpServletRequest req,
                                              Exception ex) {
+        ex.printStackTrace();
         ServerError wrapper = new ServerError("unknown activity", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
     }

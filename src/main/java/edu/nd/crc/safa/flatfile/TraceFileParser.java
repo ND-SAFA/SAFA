@@ -3,20 +3,20 @@ package edu.nd.crc.safa.flatfile;
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.database.entities.ApplicationActivity;
-import edu.nd.crc.safa.database.entities.Artifact;
-import edu.nd.crc.safa.database.entities.ArtifactType;
-import edu.nd.crc.safa.database.entities.ParserError;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
-import edu.nd.crc.safa.database.entities.TraceLink;
-import edu.nd.crc.safa.database.entities.TraceMatrix;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.database.repositories.TraceMatrixRepository;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.entities.ApplicationActivity;
+import edu.nd.crc.safa.entities.Artifact;
+import edu.nd.crc.safa.entities.ArtifactType;
+import edu.nd.crc.safa.entities.ParserError;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.TraceMatrix;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -122,10 +122,10 @@ public class TraceFileParser {
                 String sourceId = record.get(SOURCE_PARAM).trim();
                 String targetId = record.get(TARGET_PARAM).trim();
 
-                Artifact sourceArtifact = this.artifactRepository.findByProjectAndArtifactTypeAndName(project,
+                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
                     sourceType,
                     sourceId);
-                Artifact targetArtifact = this.artifactRepository.findByProjectAndArtifactTypeAndName(project,
+                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
                     targetType,
                     targetId);
                 if (sourceArtifact == null) {

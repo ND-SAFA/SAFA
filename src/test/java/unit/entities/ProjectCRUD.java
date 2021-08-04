@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
-import edu.nd.crc.safa.database.entities.Project;
+import edu.nd.crc.safa.entities.Project;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,22 +20,22 @@ public class ProjectCRUD extends EntityBaseTest {
     public void createRetrieveUpdateDeleteProject() {
         //VP 1: Create Project
         Project project = new Project(TEST_PROJECT_NAME);
-        Serializable id = session.save(project);
+        Serializable id = projectRepository.save(project);
 
         //VP 2: Retrieve Project
-        Project queryProject = session.find(Project.class, project.getProjectId());
+        Project queryProject = projectRepository.findByProjectId(project.getProjectId());
         assertThat(queryProject).isNotNull();
         assertThat(queryProject.getName()).isEqualTo(TEST_PROJECT_NAME);
 
         //VP 3: Update Project
         project.setName(ALT_PROJECT_NAME);
-        session.update(project);
-        queryProject = session.find(Project.class, project.getProjectId());
+        projectRepository.save(project);
+        queryProject = projectRepository.findByProjectId(project.getProjectId());
         assertThat(queryProject.getName()).isEqualTo(ALT_PROJECT_NAME);
 
         //VP 4: Delete Project
-        session.delete(project);
-        queryProject = session.find(Project.class, project.getProjectId());
+        projectRepository.delete(project);
+        queryProject = projectRepository.findByProjectId(project.getProjectId());
         assertThat(queryProject).isNull();
     }
 }

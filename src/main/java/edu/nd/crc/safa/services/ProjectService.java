@@ -9,14 +9,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.nd.crc.safa.dao.Links;
-import edu.nd.crc.safa.database.connection.Neo4J;
-import edu.nd.crc.safa.database.entities.Layout;
-import edu.nd.crc.safa.database.entities.Project;
-import edu.nd.crc.safa.database.entities.ProjectVersion;
+import edu.nd.crc.safa.database.configuration.Neo4J;
 import edu.nd.crc.safa.database.repositories.LayoutRepository;
+import edu.nd.crc.safa.entities.Layout;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.server.error.ServerError;
+import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 

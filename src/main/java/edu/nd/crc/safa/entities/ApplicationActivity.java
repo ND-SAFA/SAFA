@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database.entities;
+package edu.nd.crc.safa.entities;
 
 public enum ApplicationActivity {
     PARSING_TIM,

@@ -2,8 +2,7 @@ package edu.nd.crc.safa.utilities;
 
 import java.io.File;
 
-import edu.nd.crc.safa.server.error.ServerError;
-
+import edu.nd.crc.safa.output.error.ServerError;
 
 /**
  * Responsible for encapsulating common operating system

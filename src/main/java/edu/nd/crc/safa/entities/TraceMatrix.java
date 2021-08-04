@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.database.entities;
+package edu.nd.crc.safa.entities;
 
 import java.util.UUID;
 
@@ -33,11 +33,11 @@ public class TraceMatrix {
     Project project;
 
     @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
+    @JoinColumn(name = "source_type_id", nullable = false, referencedColumnName = "type_id")
     ArtifactType sourceType;
 
     @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
+    @JoinColumn(name = "target_type_id", nullable = false, referencedColumnName = "type_id")
     ArtifactType targetType;
 
     @Column(name = "is_generated", nullable = false)

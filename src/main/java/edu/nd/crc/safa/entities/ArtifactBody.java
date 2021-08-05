@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.constants.ProjectVariables;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -42,7 +44,7 @@ public class ArtifactBody implements Serializable {
     @Column(name = "summary")
     String summary;
 
-    @Column(name = "content")
+    @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH)
     String content;
 
     public ArtifactBody() {

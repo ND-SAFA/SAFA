@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ProjectRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
@@ -32,6 +34,12 @@ public class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected ArtifactRepository artifactRepository;
+
+    @Autowired
+    protected ArtifactBodyRepository artifactBodyRepository;
+
+    @Autowired
+    protected TraceLinkRepository traceLinkRepository;
 
     @Autowired
     protected FlatFileService flatFileService;

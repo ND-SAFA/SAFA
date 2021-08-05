@@ -175,13 +175,11 @@ public class FlatFileService {
         List<String> uploadedFiles = new ArrayList<>();
         for (MultipartFile requestFile : requestFiles) {
             try {
-                System.out.println("ORIGINALNAME:" + requestFile.getOriginalFilename());
                 String pathToFile = ProjectPaths.getPathToFlatFile(project, requestFile.getOriginalFilename());
                 Path pathToUploadedFile = Paths.get(pathToFile);
                 File newFile = new File(pathToUploadedFile.toString());
                 newFile.getParentFile().mkdirs();
                 newFile.createNewFile();
-                System.out.println("FILEPATH:" + newFile.getAbsolutePath());
                 requestFile.transferTo(newFile);
                 uploadedFiles.add(requestFile.getOriginalFilename());
 

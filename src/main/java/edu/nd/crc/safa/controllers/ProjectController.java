@@ -73,7 +73,7 @@ public class ProjectController {
         FlatFileResponse flatFileResponse = this.flatFileService.parseFlatFiles(project, files);
         ProjectCreationResponse response = new ProjectCreationResponse(project, flatFileResponse);
         response.setFlatFileResponse(flatFileResponse);
-        return new ServerResponse(project);
+        return new ServerResponse(response);
     }
 
     @GetMapping("projects/{projectId}/flat-files/")

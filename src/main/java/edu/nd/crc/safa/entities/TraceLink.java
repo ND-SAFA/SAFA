@@ -3,7 +3,6 @@ package edu.nd.crc.safa.entities;
 import java.io.Serializable;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -39,7 +38,8 @@ public class TraceLink implements Serializable {
     )
     Project project;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "source_artifact_id",
         referencedColumnName = "artifact_id",
@@ -48,7 +48,8 @@ public class TraceLink implements Serializable {
     Artifact sourceArtifact;
 
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "target_artifact_id",
         referencedColumnName = "artifact_id",

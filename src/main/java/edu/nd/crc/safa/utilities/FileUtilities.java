@@ -45,12 +45,12 @@ public class FileUtilities {
 
     public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {
         List<String> headerNames = file.getHeaderNames();
-
         List<String> headerNamesLower = toLowerCase(headerNames);
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                throw new ServerError("Expected file to have column: " + n + " but only saw " + file.getHeaderNames());
+                String error = "Expected file to have column [%s] but only saw %s";
+                throw new ServerError(String.format(error, n, file.getHeaderNames()));
             }
         }
     }

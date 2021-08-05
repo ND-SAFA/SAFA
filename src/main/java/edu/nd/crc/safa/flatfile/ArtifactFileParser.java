@@ -88,7 +88,6 @@ public class ArtifactFileParser {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
-        System.out.println("ARTIFACT FILE:" + fileParser.getRecordNumber());
         FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);

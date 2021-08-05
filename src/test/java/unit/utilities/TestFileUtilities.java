@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
+import unit.TestConstants;
 
 public class TestFileUtilities extends EntityBaseTest {
     @Test
@@ -25,7 +26,7 @@ public class TestFileUtilities extends EntityBaseTest {
         String testArtifactId = "D1";
         String testSummaryQuery = "warning";
         String testContentQuery = "RPIC";
-        int nTotalRecords = 12;
+        int nTotalRecords = TestConstants.N_DESIGN_ARTIFACTS;
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();

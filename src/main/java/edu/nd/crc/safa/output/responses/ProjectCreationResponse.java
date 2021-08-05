@@ -23,4 +23,8 @@ public class ProjectCreationResponse {
     public void setFlatFileResponse(FlatFileResponse flatFileResponse) {
         this.flatFileResponse = flatFileResponse;
     }
+
+    public FlatFileResponse getFlatFileResponse() {
+        return this.flatFileResponse;
+    }
 }

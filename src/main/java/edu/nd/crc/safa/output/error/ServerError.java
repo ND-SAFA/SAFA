@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
 public class ServerError extends Exception {
-    String error;
+    Exception error;
     String message;
 
     public ServerError(String message) {
@@ -17,14 +17,18 @@ public class ServerError extends Exception {
 
     public ServerError(String activityName, Exception e) {
         this.message = String.format("An error occurred while %s.", activityName);
-        this.error = e.getMessage();
+        this.error = e;
     }
 
-    public String getError() {
-        return this.error = error;
+    public void printError() {
+        if (this.error != null) {
+            this.error.printStackTrace();
+        } else {
+            this.printStackTrace();
+        }
     }
 
-    public void setError(String error) {
+    public void setError(Exception error) {
         this.error = error;
     }
 

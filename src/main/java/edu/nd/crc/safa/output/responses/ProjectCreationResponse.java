@@ -1,31 +1,30 @@
 package edu.nd.crc.safa.output.responses;
 
-import org.springframework.web.multipart.MultipartFile;
+import edu.nd.crc.safa.entities.Project;
 
 public class ProjectCreationResponse {
-    String[] filesReceived;
 
+    Project project;
+    FlatFileResponse flatFileResponse;
 
-    public ProjectCreationResponse() {
+    public ProjectCreationResponse(Project project, FlatFileResponse flatFileResponse) {
+        this.project = project;
+        this.flatFileResponse = flatFileResponse;
     }
 
-    public ProjectCreationResponse(String[] filesReceived) {
-        setFilesReceived(filesReceived);
+    public Project getProject() {
+        return this.project;
     }
 
-    public void setFilesReceived(String[] filesReceived) {
-        this.filesReceived = filesReceived;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
-    public void setFilesReceived(MultipartFile[] requestFiles) {
-        this.filesReceived = new String[requestFiles.length];
-
-        for (int i = 0; i < requestFiles.length; i++) {
-            this.filesReceived[i] = requestFiles[i].getOriginalFilename();
-        }
+    public void setFlatFileResponse(FlatFileResponse flatFileResponse) {
+        this.flatFileResponse = flatFileResponse;
     }
 
-    public String[] getFilesReceived() {
-        return this.filesReceived;
+    public FlatFileResponse getFlatFileResponse() {
+        return this.flatFileResponse;
     }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
@@ -57,12 +58,16 @@ public class ArtifactFileParser {
     }
 
     public void parseArtifactFiles(Project project,
-                                   JSONObject dataFilesIterator) throws JSONException, ServerError {
-        for (Iterator keyIterator = dataFilesIterator.keys(); keyIterator.hasNext(); ) {
+                                   JSONObject dataFilesJson) throws JSONException, ServerError {
+        for (Iterator keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
             String artifactTypeName = keyIterator.next().toString();
-            String artifactFileName = dataFilesIterator
-                .getJSONObject(artifactTypeName)
-                .getString("file");
+
+            JSONObject artifactDefinitionJson = dataFilesJson.getJSONObject(artifactTypeName);
+            if (!artifactDefinitionJson.has("file")) {
+                throw new ServerError("Could not find key [file] in json: " + artifactDefinitionJson);
+            }
+
+            String artifactFileName = artifactDefinitionJson.getString("file");
 
             ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
             this.artifactTypeRepository.save(artifactType);
@@ -73,20 +78,17 @@ public class ArtifactFileParser {
             ProjectVersion firstProjectVersion = new ProjectVersion(project);
             this.projectVersionRepository.save(firstProjectVersion);
 
-            parseArtifactFile(project, firstProjectVersion, artifactType, artifactFileName);
+            parseArtifactFile(firstProjectVersion, artifactType, artifactFileName);
         }
     }
 
-    private void parseArtifactFile(Project project,
-                                   ProjectVersion projectVersion,
+    private void parseArtifactFile(ProjectVersion projectVersion,
                                    ArtifactType artifactType,
                                    String fileName) throws ServerError {
-
-        CSVParser fileParser = FileUtilities.readCSVFile(project, fileName);
-        if (!FileUtilities.hasColumns(fileParser, REQUIRED_COLUMNS)) {
-            String error = "Artifact file %s missing at least one required column: id, summary, content";
-            throw new ServerError(String.format(error, fileName));
-        }
+        Project project = projectVersion.getProject();
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
+        CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
+        FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);

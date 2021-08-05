@@ -1,3 +1,11 @@
+buildNoTests() {
+  (
+    set -a &&
+      source .env &&
+      ./gradlew build --stacktrace -x Test # automatically reads env files
+  )
+}
+
 build() {
   (
     set -a &&
@@ -20,6 +28,10 @@ run() {
 
 if [ $1 == "build" ]; then
   build
+fi
+
+if [ $1 == "buildrun-no-tests" ]; then
+  buildNoTests && run
 fi
 
 if [ $1 == "run" ]; then

@@ -3,6 +3,7 @@ package edu.nd.crc.safa.flatfile;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
@@ -33,8 +34,7 @@ public class TraceFileParser {
 
     private final String SOURCE_PARAM = "source";
     private final String TARGET_PARAM = "target";
-    private final String FILE_PARAM = "file";
-    private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM, FILE_PARAM};
+    private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
 
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
@@ -77,13 +77,22 @@ public class TraceFileParser {
         String fileName = timJson.getString("file");
         boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
 
-        ArtifactType sourceType = this.artifactTypeRepository.findByProjectAndName(project, sourceTypeName);
-        ArtifactType targetType = this.artifactTypeRepository.findByProjectAndName(project, targetTypeName);
+        List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
+        Artifact testArtifact = projectArtifacts.get(0);
 
-        if (sourceType == null || targetType == null) {
+        ArtifactType sourceType = this.artifactTypeRepository.findByProjectAndNameIgnoreCase(project, sourceTypeName);
+
+        if (sourceType == null) {
             String errorMessage = "Could not find source artifacts [%s] for %s";
-            String failingType = sourceType == null ? sourceTypeName : targetTypeName;
-            String error = String.format(errorMessage, failingType, fileName);
+            String error = String.format(errorMessage, sourceTypeName, fileName);
+            throw new ServerError(error);
+        }
+
+        ArtifactType targetType = this.artifactTypeRepository.findByProjectAndNameIgnoreCase(project, targetTypeName);
+
+        if (targetType == null) {
+            String errorMessage = "Could not find target artifacts [%s] for %s";
+            String error = String.format(errorMessage, targetTypeName, fileName);
             throw new ServerError(error);
         }
 
@@ -105,11 +114,9 @@ public class TraceFileParser {
                                ArtifactType sourceType,
                                ArtifactType targetType,
                                String fileName) throws ServerError {
-        CSVParser traceFileParser = FileUtilities.readCSVFile(project, fileName);
-        if (!FileUtilities.hasColumns(traceFileParser, REQUIRED_COLUMNS)) {
-            String error = "Trace file (%s) is missing at least one required columns (%s)";
-            throw new ServerError(String.format(error, fileName, FileUtilities.toString(REQUIRED_COLUMNS)));
-        }
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
+        CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
+        FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {
             records = traceFileParser.getRecords();
@@ -137,6 +144,7 @@ public class TraceFileParser {
                 TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
                 traceLink.setIsManual();
                 this.traceLinkRepository.save(traceLink);
+                //TODO: construct list and save all in batch
             } catch (ServerError e) {
                 ParserError parserError = new ParserError(project,
                     fileName,

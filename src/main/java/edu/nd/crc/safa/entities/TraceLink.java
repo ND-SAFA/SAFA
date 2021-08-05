@@ -3,7 +3,6 @@ package edu.nd.crc.safa.entities;
 import java.io.Serializable;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.output.error.ServerError;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -28,14 +30,16 @@ public class TraceLink implements Serializable {
     @GeneratedValue
     UUID traceLinkId;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         nullable = false
     )
     Project project;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "source_artifact_id",
         referencedColumnName = "artifact_id",
@@ -44,7 +48,8 @@ public class TraceLink implements Serializable {
     Artifact sourceArtifact;
 
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "target_artifact_id",
         referencedColumnName = "artifact_id",

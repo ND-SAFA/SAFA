@@ -8,15 +8,22 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.dao.Links;
 import edu.nd.crc.safa.database.configuration.Neo4J;
+import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.LayoutRepository;
+import edu.nd.crc.safa.database.repositories.ProjectRepository;
+import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.database.repositories.WarningRepository;
 import edu.nd.crc.safa.entities.Layout;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.importer.MySQL;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.utilities.OSHelper;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
@@ -43,6 +50,7 @@ public class ProjectService {
     MySQL sql;
 
     LayoutRepository layoutRepository;
+    ProjectRepository projectRepository;
 
     WarningService warningService;
     TraceMatrixService traceMatrixService;
@@ -53,17 +61,27 @@ public class ProjectService {
                           MySQL mysql,
                           LayoutRepository layoutRepository,
                           WarningService warningService,
-                          TraceMatrixService traceMatrixService) {
+                          TraceMatrixService traceMatrixService,
+                          ProjectRepository projectRepository,
+                          ProjectVersionRepository projectVersionRepository,
+                          ArtifactRepository artifactRepository,
+                          ArtifactBodyRepository artifactBodyRepository,
+                          WarningRepository warningRepository) {
         this.neo4j = neo4j;
         this.mPuller = puller;
         this.sql = mysql;
         this.layoutRepository = layoutRepository;
         this.warningService = warningService;
         this.traceMatrixService = traceMatrixService;
+        this.projectRepository = projectRepository;
     }
 
     private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
+    public void deleteProject(Project project) throws ServerError {
+        this.projectRepository.delete(project);
+        OSHelper.deletePath(ProjectPaths.getPathToStorage(project));
+    }
 
     public SseEmitter projectPull(Project project, ProjectVersion projectVersion) {
         SseEmitter emitter = new SseEmitter(0L);

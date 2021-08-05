@@ -14,7 +14,7 @@ import unit.TestUtil;
  * Tests that SpringBoot application is loaded and dependency injection
  * can be performed.
  */
-public class ApplicationLoads extends SpringBootBaseTest {
+public class TestApplicationLoads extends SpringBootBaseTest {
 
     @Test
     public void contextLoads() throws Exception {

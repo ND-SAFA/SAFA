@@ -7,6 +7,7 @@ import java.io.Serializable;
 import edu.nd.crc.safa.entities.Project;
 
 import org.junit.jupiter.api.Test;
+import unit.EntityBaseTest;
 
 /**
  * Responsible for testing CRUD operation on the Project entity

@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -13,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Responsible for identifying each project's version.
@@ -26,7 +28,8 @@ public class ProjectVersion implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     long versionId; //todo: generate in sequence relative to project id using GenericGenerator
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         foreignKey = @ForeignKey(value = ConstraintMode.PROVIDER_DEFAULT),
@@ -40,5 +43,9 @@ public class ProjectVersion implements Serializable {
 
     public ProjectVersion(Project project) {
         this.project = project;
+    }
+
+    public Project getProject() {
+        return this.project;
     }
 }

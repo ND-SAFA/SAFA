@@ -2,15 +2,18 @@ package edu.nd.crc.safa.entities;
 
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Responsible for storing which artifacts types
@@ -21,10 +24,12 @@ import javax.persistence.Table;
 public class TraceMatrix {
 
     @Id
+    @GeneratedValue
     @Column(name = "trace_matrix_id")
     UUID traceMatrixId;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         foreignKey = @ForeignKey(name = "project_id", value = ConstraintMode.PROVIDER_DEFAULT),
@@ -33,10 +38,12 @@ public class TraceMatrix {
     Project project;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "source_type_id", nullable = false, referencedColumnName = "type_id")
     ArtifactType sourceType;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "target_type_id", nullable = false, referencedColumnName = "type_id")
     ArtifactType targetType;
 

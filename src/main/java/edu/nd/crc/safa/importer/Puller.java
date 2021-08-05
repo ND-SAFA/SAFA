@@ -177,7 +177,6 @@ public class Puller {
                                     if (prop.containsKey(id)) {
                                         for (String possible : prop.getProperty(id).split(",")) {
                                             if (entry.getNewPath().contains(possible)) {
-                                                System.out.println("Ignoring " + entry.getNewPath() + " for " + id);
                                                 return;
                                             }
                                         }

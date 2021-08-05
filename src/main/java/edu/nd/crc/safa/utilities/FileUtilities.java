@@ -1,14 +1,12 @@
 package edu.nd.crc.safa.utilities;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.output.error.ServerError;
 
 import org.apache.commons.csv.CSVFormat;
@@ -22,28 +20,39 @@ import org.json.JSONObject;
  */
 public class FileUtilities {
 
-    public static CSVParser readCSVFile(Project project, String fileName) throws ServerError {
+    public static CSVParser readCSVFile(String pathToFile) throws ServerError {
         try {
-            String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
-            Reader in = new FileReader(pathToFile);
-            CSVFormat fileFormat = CSVFormat.DEFAULT.builder().setIgnoreHeaderCase(true).build();
-            in.close();
-            return new CSVParser(in, fileFormat);
+            File csvData = new File(pathToFile);
+            if (!csvData.exists()) {
+                throw new ServerError("CSV file does not exist: " + pathToFile);
+            }
+
+            CSVFormat fileFormat = CSVFormat.DEFAULT
+                .withHeader() // only way to read headers without defining them.
+                .builder()
+                .setSkipHeaderRecord(false)
+                .setIgnoreEmptyLines(true)
+                .setAllowMissingColumnNames(true)
+                .setIgnoreHeaderCase(true)
+                .build();
+
+            return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
-            throw new ServerError("Could not read CSV file: " + fileName);
+            e.printStackTrace();
+            throw new ServerError("Could not read CSV file at path: " + pathToFile, e);
         }
     }
 
-    public static boolean hasColumns(CSVParser file, String[] names) {
+    public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {
         List<String> headerNames = file.getHeaderNames();
         List<String> headerNamesLower = toLowerCase(headerNames);
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                return false;
+                String error = "Expected file to have column [%s] but only saw %s";
+                throw new ServerError(String.format(error, n, file.getHeaderNames()));
             }
         }
-        return true;
     }
 
     public static String toString(Object[] a) {
@@ -81,7 +90,13 @@ public class FileUtilities {
 
         while (keys.hasNext()) {
             String key = keys.next().toString();
-            result.put(key.toLowerCase(), jsonObject.get(key));
+            Object value = jsonObject.get(key);
+            if (value instanceof JSONObject) {
+                result.put(key.toLowerCase(), toLowerCase((JSONObject) value));
+            } else {
+                result.put(key.toLowerCase(), value);
+            }
+
         }
         return result;
     }

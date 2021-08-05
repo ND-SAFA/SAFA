@@ -48,16 +48,16 @@ public class FlatFileParser {
                              String pathToTIMFile) throws ServerError {
         try {
             String TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
-            JSONObject TIMFileJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
+            JSONObject timFileJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
+            JSONObject dataFilesJson = timFileJson.getJSONObject(ProjectVariables.DATAFILES_PARAM);
+            artifactFileParser.parseArtifactFiles(project, dataFilesJson);
 
-            artifactFileParser.parseArtifactFiles(project, TIMFileJson.getJSONObject(ProjectVariables.DATAFILES_PARAM));
-
-            for (Iterator keyIterator = TIMFileJson.keys(); keyIterator.hasNext(); ) {
+            for (Iterator keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
                 String traceMatrixKey = keyIterator.next().toString();
                 if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
                     traceFileParser.parseTraceMatrixJson(project,
                         projectVersion,
-                        TIMFileJson.getJSONObject(traceMatrixKey));
+                        timFileJson.getJSONObject(traceMatrixKey));
                 }
             }
         } catch (IOException | JSONException e) {

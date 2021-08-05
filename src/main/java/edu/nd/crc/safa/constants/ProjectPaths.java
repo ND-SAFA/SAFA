@@ -18,8 +18,13 @@ public class ProjectPaths {
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();
-        for (String p : paths) {
-            finalPath.append(p).append(File.separator);
+        for (int i = 0; i < paths.length; i++) {
+            String p = paths[i];
+            if (i < paths.length - 1) {
+                finalPath.append(p).append(File.separator);
+            } else {
+                finalPath.append(p);
+            }
         }
         return finalPath.toString();
     }
@@ -55,5 +60,9 @@ public class ProjectPaths {
 
     public static String getPathToGeneratedFile(Project project, String fileName) {
         return pathHelper(getPathToGeneratedFiles(project), fileName);
+    }
+
+    public static String getPathToTestResources(String fileName) {
+        return pathHelper(PATH_TO_TEST_RESOURCES, fileName);
     }
 }

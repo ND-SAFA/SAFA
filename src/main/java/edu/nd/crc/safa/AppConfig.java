@@ -33,18 +33,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class AppConfig {
 
-//    @Bean
-//    public SessionFactory createSessionFactory() throws ServerError, IOException {
-//        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-//
-//        sessionFactory.setMetadataSources(SQLConnection.getEntitiesMetaData());
-//        sessionFactory.setHibernateProperties(SQLConnection.getConnectionProperties());
-//        sessionFactory.setDataSource(getDataSource());
-//        sessionFactory.afterPropertiesSet();
-//
-//        return sessionFactory.getObject();
-//    }
-
     @Bean
     public DataSource getDataSource() throws ServerError {
         SQLConnection.assertValidCredentials();

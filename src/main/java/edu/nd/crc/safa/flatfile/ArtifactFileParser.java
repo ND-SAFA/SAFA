@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
@@ -62,7 +63,6 @@ public class ArtifactFileParser {
             String artifactTypeName = keyIterator.next().toString();
 
             JSONObject artifactDefinitionJson = dataFilesJson.getJSONObject(artifactTypeName);
-
             if (!artifactDefinitionJson.has("file")) {
                 throw new ServerError("Could not find key [file] in json: " + artifactDefinitionJson);
             }
@@ -86,7 +86,9 @@ public class ArtifactFileParser {
                                    ArtifactType artifactType,
                                    String fileName) throws ServerError {
         Project project = projectVersion.getProject();
-        CSVParser fileParser = FileUtilities.readCSVFile(project, fileName);
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
+        CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
+        System.out.println("ARTIFACT FILE:" + fileParser.getRecordNumber());
         FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);

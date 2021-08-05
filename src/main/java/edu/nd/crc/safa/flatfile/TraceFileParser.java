@@ -3,6 +3,7 @@ package edu.nd.crc.safa.flatfile;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
@@ -105,7 +106,8 @@ public class TraceFileParser {
                                ArtifactType sourceType,
                                ArtifactType targetType,
                                String fileName) throws ServerError {
-        CSVParser traceFileParser = FileUtilities.readCSVFile(project, fileName);
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
+        CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {

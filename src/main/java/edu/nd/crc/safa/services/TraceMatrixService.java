@@ -125,7 +125,6 @@ public class TraceMatrixService {
                     + ");";
 
                 stmt.executeUpdate(sqlCreateTable);
-                System.out.println("CREATED NEW TRACE MATRIX TABLE");
             }
 
             String sqlUpdateTable = String.format("INSERT INTO %s (source, target, score, approval)\n", tableName)

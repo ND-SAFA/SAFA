@@ -1,6 +1,5 @@
 package unit.parser;
 
-import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.flatfile.ArtifactFileParser;
@@ -22,7 +21,6 @@ public class TestArtifactFileParser extends EntityBaseTest {
         ProjectVersion projectVersion = createProjectWithTestResources("testProject");
         Project project = projectVersion.getProject();
 
-        ArtifactType artifactType = createArtifactType(project, "Design");
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {\n"
             + "      \"file\": \"Design.csv\"\n"

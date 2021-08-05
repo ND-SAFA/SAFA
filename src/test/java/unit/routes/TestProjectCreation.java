@@ -15,9 +15,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import unit.MultipartHelper;
 import unit.SpringBootBaseTest;
 import unit.TestUtil;
-import unit.utilities.TestFileUtility;
 
 public class TestProjectCreation extends SpringBootBaseTest {
 
@@ -30,7 +30,7 @@ public class TestProjectCreation extends SpringBootBaseTest {
         String routeName = "/projects/flat-files";
 
         List<MockMultipartFile> files =
-            TestFileUtility.createMockMultipartFilesFromDirectory(ProjectPaths.PATH_TO_TEST_RESOURCES,
+            MultipartHelper.createMockMultipartFilesFromDirectory(ProjectPaths.PATH_TO_TEST_RESOURCES,
                 attributeName);
         MockMultipartHttpServletRequestBuilder request = multipart(routeName);
 
@@ -46,7 +46,6 @@ public class TestProjectCreation extends SpringBootBaseTest {
 
         //Verification Points
         assertThat(response).isNotNull();
-        System.out.println("response:" + response);
         JSONObject responseContent = TestUtil.asJson(response);
         assertThat(responseContent.get("status")).isEqualTo(0);
         JSONObject responseBody = responseContent.getJSONObject("body");

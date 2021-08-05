@@ -18,7 +18,6 @@ import edu.nd.crc.safa.services.FlatFileService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-import unit.utilities.TestFileUtility;
 
 public class EntityBaseTest extends SpringBootBaseTest {
 
@@ -59,7 +58,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
     public ProjectVersion createProjectWithTestResources(String projectName) throws ServerError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
-        List<MultipartFile> files = TestFileUtility.createMultipartFilesFromDirectory(
+        List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
             ProjectPaths.PATH_TO_TEST_RESOURCES,
             "files");
         List<String> uploadedFileNames = flatFileService.uploadFlatFiles(project, files);

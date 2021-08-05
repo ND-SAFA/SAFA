@@ -77,9 +77,6 @@ public class TraceFileParser {
         String fileName = timJson.getString("file");
         boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
 
-        List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
-        Artifact testArtifact = projectArtifacts.get(0);
-
         ArtifactType sourceType = this.artifactTypeRepository.findByProjectAndNameIgnoreCase(project, sourceTypeName);
 
         if (sourceType == null) {
@@ -129,10 +126,10 @@ public class TraceFileParser {
                 String sourceId = record.get(SOURCE_PARAM).trim();
                 String targetId = record.get(TARGET_PARAM).trim();
 
-                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
+                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
                     sourceType,
                     sourceId);
-                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
+                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
                     targetType,
                     targetId);
                 if (sourceArtifact == null) {

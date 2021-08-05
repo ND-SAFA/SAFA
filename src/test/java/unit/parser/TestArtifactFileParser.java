@@ -32,24 +32,23 @@ public class TestArtifactFileParser extends EntityBaseTest {
             + "      \"file\": \"Design.csv\"\n"
             + "    }\n"
             + "  }");
-        artifactFileParser.parseArtifactFiles(project, jsonSpec);
+        artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
 
         List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
         assertThat(projectArtifacts.size())
             .as("artifacts created")
-            .isEqualTo(TestConstants.N_DESIGN_ARTIFACTS);
+            .isEqualTo(TestConstants.N_DESIGNS);
     }
 
     @Test
     public void missingFileKey() throws Exception {
         ProjectVersion projectVersion = createProjectWithTestResources("testProject");
-        Project project = projectVersion.getProject();
 
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {}\n"
             + "  }");
         Exception exception = assertThrows(ServerError.class, () -> {
-            artifactFileParser.parseArtifactFiles(project, jsonSpec);
+            artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
         });
         assertThat(exception.getMessage()).contains("file");
     }

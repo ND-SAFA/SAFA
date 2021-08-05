@@ -26,7 +26,7 @@ public class TestFileUtilities extends EntityBaseTest {
         String testArtifactId = "D1";
         String testSummaryQuery = "warning";
         String testContentQuery = "RPIC";
-        int nTotalRecords = TestConstants.N_DESIGN_ARTIFACTS;
+        int nTotalRecords = TestConstants.N_DESIGNS;
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();

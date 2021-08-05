@@ -65,9 +65,9 @@ public class TraceLinkGenerator {
         lines.add(GENERATED_FILES_HEADER);
         for (String sid : sTokens.keySet()) {
             for (String tid : tTokens.keySet()) {
-                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
+                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
                     sourceType, sid);
-                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndName(project,
+                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
                     sourceType, tid);
                 double score = vsm.getRelevance(sTokens.get(sid), tTokens.get(tid));
                 TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);

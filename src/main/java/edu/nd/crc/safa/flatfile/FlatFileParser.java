@@ -50,7 +50,7 @@ public class FlatFileParser {
             String TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
             JSONObject timFileJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
             JSONObject dataFilesJson = timFileJson.getJSONObject(ProjectVariables.DATAFILES_PARAM);
-            artifactFileParser.parseArtifactFiles(project, dataFilesJson);
+            artifactFileParser.parseArtifactFiles(projectVersion, dataFilesJson);
 
             for (Iterator keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
                 String traceMatrixKey = keyIterator.next().toString();

@@ -57,8 +57,10 @@ public class ArtifactFileParser {
         this.projectVersionRepository = projectVersionRepository;
     }
 
-    public void parseArtifactFiles(Project project,
+    public void parseArtifactFiles(ProjectVersion projectVersion,
                                    JSONObject dataFilesJson) throws JSONException, ServerError {
+        Project project = projectVersion.getProject();
+
         for (Iterator keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
             String artifactTypeName = keyIterator.next().toString();
 
@@ -75,10 +77,7 @@ public class ArtifactFileParser {
             ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
             this.artifactFileRepository.save(newFile);
 
-            ProjectVersion firstProjectVersion = new ProjectVersion(project);
-            this.projectVersionRepository.save(firstProjectVersion);
-
-            parseArtifactFile(firstProjectVersion, artifactType, artifactFileName);
+            parseArtifactFile(projectVersion, artifactType, artifactFileName);
         }
     }
 

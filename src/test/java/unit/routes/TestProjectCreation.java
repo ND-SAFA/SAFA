@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactBody;
 import edu.nd.crc.safa.entities.ArtifactType;
+import edu.nd.crc.safa.entities.ParserError;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.entities.TraceLink;
@@ -67,7 +69,7 @@ public class TestProjectCreation extends EntityBaseTest {
 
         JSONArray filesReceived = flatFileResponse.getJSONArray("uploadedFiles");
         assertThat(filesReceived).as("uploadedFiles non-null").isNotNull();
-        assertThat(filesReceived.length()).as("all files uploaded").isEqualTo(3);
+        assertThat(filesReceived.length()).as("all files uploaded").isEqualTo(TestConstants.N_FILES);
 
         // VP 3 - Resources were created
         JSONObject projectJson = responseBody.getJSONObject("project");
@@ -75,19 +77,56 @@ public class TestProjectCreation extends EntityBaseTest {
         Project project = projectRepository.findByProjectId(UUID.fromString(projectId));
         assertThat(project).as("project was created").isNotNull();
 
-        ProjectVersion projectVersion = projectVersionRepository.findTopByProjectOrderByVersionIdDesc(project);
+        List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);
+        assertThat(projectVersions.size()).as("# versions").isEqualTo(1);
+        ProjectVersion projectVersion = projectVersions.get(0);
         assertThat(projectVersion).as("project version created").isNotNull();
 
+        // VP X - Project types
         List<ArtifactType> projectTypes = artifactTypeRepository.findByProject(project);
         assertThat(projectTypes.size()).as("all types created").isEqualTo(TestConstants.N_TYPES);
 
-        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
-        assertThat(projectArtifacts.size()).isEqualTo(TestConstants.N_DESIGN_ARTIFACTS);
+        // VP X - requirements artifacts created
+        ArtifactType requirementType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, "requirement");
+        List<Artifact> requirements = artifactRepository.findByProjectAndType(project, requirementType);
+        assertThat(requirements.size()).as("requirements created").isEqualTo(TestConstants.N_REQUIREMENTS);
 
+        // VP X - design artifacts created
+        ArtifactType designType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, "design");
+        List<Artifact> designs = artifactRepository.findByProjectAndType(project, designType);
+        assertThat(designs.size())
+            .as("designs created)")
+            .isEqualTo(TestConstants.N_DESIGNS);
+
+        // VP X - hazards artifacts created
+        ArtifactType hazardType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, "hazard");
+        List<Artifact> hazards = artifactRepository.findByProjectAndType(project, hazardType);
+        assertThat(hazards.size())
+            .as("hazards created")
+            .isEqualTo(TestConstants.N_HAZARDS);
+
+        // VP X - environment assumption artifacts created
+        ArtifactType envAssumptionType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project,
+            "EnvironmentalAssumption");
+        List<Artifact> envAssumptions = artifactRepository.findByProjectAndType(project, envAssumptionType);
+        assertThat(envAssumptions.size())
+            .as("env assumptions created")
+            .isEqualTo(TestConstants.N_ENV_ASSUMPTIONS);
+
+        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
+        assertThat(projectArtifacts.size()).isEqualTo(TestConstants.N_ARTIFACTS);
+
+        // VP X - Artifact bodies
         List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProjectVersion(projectVersion);
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
-            .isEqualTo(TestConstants.N_DESIGN_ARTIFACTS);
+            .isEqualTo(TestConstants.N_ARTIFACTS);
+
+        List<ParserError> parserErrors = parserErrorRepository.findByProject(project);
+        assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
+        ParserError error = parserErrors.get(0);
+        assertThat(error.getActivity()).isEqualTo(ApplicationActivity.PARSING_TRACE_MATRIX);
+        assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
         List<TraceLink> traceLinks = traceLinkRepository.findByProject(project);
         assertThat(traceLinks.size()).isEqualTo(TestConstants.N_LINKS);

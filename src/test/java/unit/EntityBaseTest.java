@@ -9,6 +9,7 @@ import edu.nd.crc.safa.constants.ProjectPaths;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.database.repositories.ProjectRepository;
 import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
@@ -44,6 +45,9 @@ public class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected FlatFileService flatFileService;
 
+    @Autowired
+    protected ParserErrorRepository parserErrorRepository;
+
     public Project createProject(String projectName) {
         Project project = new Project(projectName);
         projectRepository.save(project);
@@ -70,7 +74,9 @@ public class EntityBaseTest extends SpringBootBaseTest {
             ProjectPaths.PATH_TO_TEST_RESOURCES,
             "files");
         List<String> uploadedFileNames = flatFileService.uploadFlatFiles(project, files);
-        assertThat(uploadedFileNames.size()).as("test resources uploaded").isEqualTo(N_TEST_RESOURCES);
+        assertThat(uploadedFileNames.size())
+            .as("test resources uploaded")
+            .isEqualTo(TestConstants.N_FILES);
         return projectVersion;
     }
 }

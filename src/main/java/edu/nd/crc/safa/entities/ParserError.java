@@ -75,4 +75,8 @@ public class ParserError implements Serializable {
     public ApplicationActivity getActivity() {
         return this.activity;
     }
+
+    public String getFileName() {
+        return this.fileName;
+    }
 }

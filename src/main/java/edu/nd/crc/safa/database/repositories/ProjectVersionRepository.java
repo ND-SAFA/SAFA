@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.database.repositories;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.entities.Project;
@@ -13,5 +14,5 @@ public interface ProjectVersionRepository extends CrudRepository<ProjectVersion,
 
     ProjectVersion findTopByProjectOrderByVersionIdDesc(Project project);
 
-    void deleteAllByProject(Project project);
+    List<ProjectVersion> findByProject(Project project);
 }

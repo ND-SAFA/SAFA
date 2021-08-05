@@ -103,4 +103,12 @@ public class TraceLink implements Serializable {
         this.traceType = TraceType.GENERATED;
         this.score = score;
     }
+
+    public String getSourceName() {
+        return this.sourceArtifact.getName();
+    }
+
+    public String getTargetName() {
+        return this.targetArtifact.getName();
+    }
 }

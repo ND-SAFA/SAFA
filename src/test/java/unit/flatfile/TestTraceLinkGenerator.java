@@ -62,6 +62,9 @@ public class TestTraceLinkGenerator extends EntityBaseTest {
 
         TraceLink linkTwo = getLinkWithSourceName(newLinks, sourceTwoName);
         assertThat(linkTwo.getTargetName()).as("link source name").isEqualTo(targetTwoName);
+
+        //cleanup
+        projectService.deleteProject(project);
     }
 
     private TraceLink getLinkWithSourceName(List<TraceLink> links, String sourceName) {

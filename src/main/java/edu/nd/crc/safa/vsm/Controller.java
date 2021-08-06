@@ -3,8 +3,6 @@ package edu.nd.crc.safa.vsm;
 import java.util.Collection;
 import java.util.Map;
 
-import edu.nd.crc.safa.importer.TraceInterface;
-
 /**
  * Vector Space Model using TF-IDF scores for evaluating document relevance
  */

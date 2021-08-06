@@ -19,7 +19,6 @@ public class TreeVerifier {
         }
     }
 
-
     List<Rule> mRules = new ArrayList<>();
 
     public boolean addRule(final String name, final String longname, final String rule) throws Exception {

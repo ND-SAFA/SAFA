@@ -1,14 +1,14 @@
 package edu.nd.crc.safa;
 
-import static edu.nd.crc.safa.constants.DatabaseVariables.SQL_URL;
+import static edu.nd.crc.safa.configuration.DatabaseVariables.SQL_URL;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import edu.nd.crc.safa.constants.DatabaseVariables;
-import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.configuration.SQLConnection;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.configuration.DatabaseVariables;
+import edu.nd.crc.safa.configuration.ProjectVariables;
+import edu.nd.crc.safa.configuration.SQLConnection;
+import edu.nd.crc.safa.responses.ServerError;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.jpa.HibernatePersistenceProvider;

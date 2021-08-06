@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.responses.ServerError;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -46,7 +45,6 @@ public class TraceLink implements Serializable {
         nullable = false
     )
     Artifact sourceArtifact;
-
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -91,7 +89,6 @@ public class TraceLink implements Serializable {
         return this.traceLinkId;
     }
 
-
     public void setIsManual() {
         this.approved = true;
         this.traceType = TraceType.MANUAL;
@@ -112,7 +109,19 @@ public class TraceLink implements Serializable {
         return this.targetArtifact.getName();
     }
 
+    public ArtifactType getSourceType() {
+        return this.sourceArtifact.getType();
+    }
+
+    public ArtifactType getTargetType() {
+        return this.targetArtifact.getType();
+    }
+
     public double getScore() {
         return this.score;
+    }
+
+    public boolean isApproved() {
+        return this.approved;
     }
 }

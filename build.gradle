@@ -107,12 +107,14 @@ jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    toolVersion = '8.11'
+    toolVersion = '8.45'
     configFile = file('checkstyle.xml')
 }
 
 checkstyleMain {
     source = 'src/main/java'
+    ignoreFailures = false
+    maxWarnings = 0
 }
 
 checkstyleTest {

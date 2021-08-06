@@ -8,8 +8,8 @@ import java.util.List;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.flatfile.ArtifactFileParser;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.flatfiles.ArtifactFileParser;
+import edu.nd.crc.safa.responses.ServerError;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

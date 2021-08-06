@@ -5,9 +5,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.configuration.ProjectPaths;
 import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.utilities;
 import java.io.File;
 import java.io.IOException;
 
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.responses.ServerError;
 
 import org.apache.commons.io.FileUtils;
 
@@ -12,8 +12,7 @@ import org.apache.commons.io.FileUtils;
  * primarily surrounding file manipulation.
  */
 public class OSHelper {
-
-
+    
     /**
      * Removes any children of given directory includes
      * all sub-folders and files. If directory has not

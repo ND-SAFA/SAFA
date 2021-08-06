@@ -49,7 +49,6 @@ public class JIRA {
     @Value("${jira.password:}")
     String mPassword;
 
-
     public JIRA() {
         uri = "http://spwd.cse.nd.edu:8080/";
     }

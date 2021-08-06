@@ -5,18 +5,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.database.repositories.ArtifactRepository;
-import edu.nd.crc.safa.database.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.database.repositories.ProjectRepository;
-import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.configuration.ProjectPaths;
 import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.ArtifactRepository;
+import edu.nd.crc.safa.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.repositories.ProjectRepository;
+import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.services.FlatFileService;
 import edu.nd.crc.safa.services.ProjectService;
 

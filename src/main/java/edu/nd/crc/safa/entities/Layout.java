@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.entities;
 
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +21,6 @@ public class Layout {
     @GeneratedValue
     UUID layoutId;
 
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -32,14 +30,14 @@ public class Layout {
     Project project;
 
     @Column
-    String hash;
+    String treeId;
 
     @Column
     private String data;
 
-    public Layout(Project project, String hash, String data) {
+    public Layout(Project project, String treeId, String data) {
         this.project = project;
-        this.hash = hash;
+        this.treeId = treeId;
         this.data = data;
     }
 

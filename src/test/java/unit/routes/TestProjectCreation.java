@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.configuration.ProjectPaths;
 import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactBody;
@@ -16,12 +16,10 @@ import edu.nd.crc.safa.entities.ParserError;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.entities.TraceLink;
-import edu.nd.crc.safa.services.ProjectService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -32,9 +30,6 @@ import unit.TestConstants;
 import unit.TestUtil;
 
 public class TestProjectCreation extends EntityBaseTest {
-
-    @Autowired
-    ProjectService projectService;
 
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {

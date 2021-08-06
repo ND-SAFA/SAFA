@@ -3,10 +3,9 @@ package edu.nd.crc.safa.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.database.repositories.WarningRepository;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.Warning;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.Rule;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class WarningService {
         this.warningRepository = warningRepository;
     }
 
-    public List<Rule> getWarnings(Project project) throws ServerError {
+    public List<Rule> getProjectRules(Project project) {
         List<Warning> projectWarnings = this.warningRepository.findAllByProject(project);
         List<Rule> projectRules = new ArrayList<Rule>();
 
@@ -30,10 +29,5 @@ public class WarningService {
             projectRules.add(new Rule(warning));
         }
         return projectRules;
-    }
-
-    public void newWarning(Project project, String nShort, String nLong, String rule) {
-        Warning warning = new Warning(project, nShort, nLong, rule);
-        this.warningRepository.save(warning);
     }
 }

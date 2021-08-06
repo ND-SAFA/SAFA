@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.entities;
 
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -61,5 +60,13 @@ public class TraceMatrix {
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.isGenerated = isGenerated;
+    }
+
+    public ArtifactType getSourceType() {
+        return this.sourceType;
+    }
+
+    public ArtifactType getTargetType() {
+        return this.targetType;
     }
 }

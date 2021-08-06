@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -58,20 +57,20 @@ public class Artifact implements Serializable {
         this.project = project;
     }
 
-    public void setType(ArtifactType artifactType) {
-        this.type = artifactType;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public ArtifactType getType() {
         return this.type;
     }
 
+    public void setType(ArtifactType artifactType) {
+        this.type = artifactType;
+    }
+
     public String getName() {
         return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public UUID getArtifactId() {

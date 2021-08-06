@@ -7,44 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Term frequency-Inverse document frequency.
  * Find source at https://github.com/wpm/tfidf
  */
 class TfIdf {
-
-    /**
-     * Word count method used for term frequencies
-     */
-    public enum TfType {
-        /**
-         * Term frequency
-         */
-        NATURAL,
-        /**
-         * Log term frequency plus 1
-         */
-        LOGARITHM,
-        /**
-         * 1 if term is present, 0 if it is not
-         */
-        BOOLEAN
-    }
-
-    /**
-     * Normalization of the tf-idf vector
-     */
-    public enum Normalization {
-        /**
-         * Do not normalize the vector
-         */
-        NONE,
-        /**
-         * Normalize by the vector elements added in quadrature
-         */
-        COSINE
-    }
 
     /**
      * Term frequency for a single document
@@ -221,6 +188,38 @@ class TfIdf {
      */
     public static <TERM> Map<TERM, Double> idfFromTfs(Iterable<Map<TERM, Double>> tfs) {
         return idfFromTfs(tfs, true, true);
+    }
+
+    /**
+     * Word count method used for term frequencies
+     */
+    public enum TfType {
+        /**
+         * Term frequency
+         */
+        NATURAL,
+        /**
+         * Log term frequency plus 1
+         */
+        LOGARITHM,
+        /**
+         * 1 if term is present, 0 if it is not
+         */
+        BOOLEAN
+    }
+
+    /**
+     * Normalization of the tf-idf vector
+     */
+    public enum Normalization {
+        /**
+         * Do not normalize the vector
+         */
+        NONE,
+        /**
+         * Normalize by the vector elements added in quadrature
+         */
+        COSINE
     }
 
     /**

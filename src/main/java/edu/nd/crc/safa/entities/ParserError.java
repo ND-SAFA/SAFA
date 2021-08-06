@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -74,5 +73,9 @@ public class ParserError implements Serializable {
 
     public ApplicationActivity getActivity() {
         return this.activity;
+    }
+
+    public String getFileName() {
+        return this.fileName;
     }
 }

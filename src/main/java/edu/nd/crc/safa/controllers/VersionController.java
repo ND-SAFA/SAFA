@@ -1,0 +1,60 @@
+package edu.nd.crc.safa.controllers;
+
+import edu.nd.crc.safa.configuration.Neo4J;
+import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.repositories.ProjectRepository;
+import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.responses.ServerError;
+import edu.nd.crc.safa.responses.ServerResponse;
+import edu.nd.crc.safa.services.VersionService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class VersionController extends BaseController {
+
+    Neo4J neo4J;
+    Puller mPuller;
+    VersionService versionService;
+
+    @Autowired
+    public VersionController(ProjectRepository projectRepository,
+                             ProjectVersionRepository projectVersionRepository,
+                             Neo4J neo4J,
+                             Puller mPuller,
+                             VersionService versionService) {
+        super(projectRepository, projectVersionRepository);
+        this.neo4J = neo4J;
+        this.mPuller = mPuller;
+        this.versionService = versionService;
+    }
+
+    @GetMapping("projects/{projectId}/versions/")
+    public ServerResponse versions(@PathVariable String projectId) throws ServerError {
+        Project project = getProject(projectId);
+        return new ServerResponse(versionService.versions(project));
+    }
+
+    @GetMapping("projects/{projectId}/trees/{treeId}/versions/{version}")
+    public ServerResponse versions(@PathVariable String projectId,
+                                   @PathVariable String treeId,
+                                   @PathVariable int version,
+                                   @RequestParam String rootType) throws ServerError {
+        Project project = getProject(projectId);
+        return new ServerResponse(versionService.versions(project, treeId, version, rootType));
+    }
+
+    @PostMapping("projects/{projectId}/versions/")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ServerResponse createNewVersionTag(@PathVariable String projectId) {
+        return new ServerResponse(versionService.versionsTag(projectId));
+    }
+}

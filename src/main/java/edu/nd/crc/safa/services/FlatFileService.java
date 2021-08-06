@@ -9,26 +9,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.OperationNotSupportedException;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.constants.ProjectVariables;
-import edu.nd.crc.safa.database.repositories.ArtifactRepository;
-import edu.nd.crc.safa.database.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.database.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.configuration.ProjectVariables;
 import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.ParserError;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.entities.TraceType;
-import edu.nd.crc.safa.flatfile.FlatFileParser;
-import edu.nd.crc.safa.flatfile.TraceFileParser;
-import edu.nd.crc.safa.flatfile.TraceLinkGenerator;
-import edu.nd.crc.safa.importer.MySQL;
-import edu.nd.crc.safa.output.error.ServerError;
-import edu.nd.crc.safa.output.responses.FlatFileResponse;
+import edu.nd.crc.safa.flatfiles.FlatFileParser;
+import edu.nd.crc.safa.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.flatfiles.TraceLinkGenerator;
+import edu.nd.crc.safa.repositories.ArtifactRepository;
+import edu.nd.crc.safa.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.responses.FlatFileResponse;
+import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.OSHelper;
 
@@ -45,34 +43,24 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FlatFileService {
 
+    private final String SEPARATOR = "-------------------------------";
     FlatFileParser flatFileParser;
     TraceLinkGenerator traceLinkGenerator;
     TraceFileParser traceFileParser;
-
-    TraceMatrixService traceMatrixService;
-    TimArtifactService timArtifactService;
-
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
     ArtifactRepository artifactRepository;
     TraceLinkRepository traceLinkRepository;
 
-    private final String SEPARATOR = "-------------------------------";
-
-
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
-                           TraceMatrixService traceMatrixService,
                            TraceLinkGenerator traceLinkGenerator,
-                           TimArtifactService timArtifactService,
                            ProjectVersionRepository projectVersionRepository,
                            ParserErrorRepository parserErrorRepository,
                            ArtifactRepository artifactRepository,
                            TraceLinkRepository traceLinkRepository) {
         this.traceLinkGenerator = traceLinkGenerator;
-        this.traceMatrixService = traceMatrixService;
         this.flatFileParser = flatFileParser;
-        this.timArtifactService = timArtifactService;
         this.projectVersionRepository = projectVersionRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.artifactRepository = artifactRepository;
@@ -85,6 +73,7 @@ public class FlatFileService {
      *
      * @param project the project whose artifacts and trace links should be associated with
      * @param files   the flat files defining the project
+     * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
      */
     public FlatFileResponse parseFlatFiles(Project project, MultipartFile[] files) throws ServerError {
@@ -95,9 +84,9 @@ public class FlatFileService {
 
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);
+        //TODO: set generated files
         return response;
     }
-
 
     public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {
         String pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
@@ -111,10 +100,10 @@ public class FlatFileService {
         JSONObject timJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
         for (Iterator keyIterator = timJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next().toString();
-            if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
+            if (!traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
                 boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
                 if (isGenerated) {
-                    this.traceFileParser.parseTraceMatrixJson(project, projectVersion,
+                    this.traceFileParser.parseTraceMatrixDefinition(projectVersion,
                         timJson.getJSONObject(traceMatrixKey));
                 }
             }
@@ -163,7 +152,7 @@ public class FlatFileService {
         return filesInDirectory;
     }
 
-    public MySQL.FileInfo getFileInfo() throws OperationNotSupportedException {
+    public void getFileInfo() throws OperationNotSupportedException {
         //TODO: what kind of information is needed?
         throw new OperationNotSupportedException("getting file information is under construction");
     }
@@ -192,7 +181,7 @@ public class FlatFileService {
 
     private void createProjectFromTIMFile(Project project, ProjectVersion projectVersion) throws ServerError {
         String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
-        this.flatFileParser.parseProject(project, projectVersion, pathToFile);
+        this.flatFileParser.parseProject(projectVersion, pathToFile);
         // TODO: return generated files
     }
 

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
-import edu.nd.crc.safa.constants.ProjectPaths;
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -26,7 +26,7 @@ public class TestFileUtilities extends EntityBaseTest {
         String testArtifactId = "D1";
         String testSummaryQuery = "warning";
         String testContentQuery = "RPIC";
-        int nTotalRecords = TestConstants.N_DESIGN_ARTIFACTS;
+        int nTotalRecords = TestConstants.N_DESIGNS;
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();

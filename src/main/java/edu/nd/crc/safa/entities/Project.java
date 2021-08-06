@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,15 +31,15 @@ public class Project implements Serializable {
         this.setName(name);
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public UUID getProjectId() {
         return this.projectId;
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

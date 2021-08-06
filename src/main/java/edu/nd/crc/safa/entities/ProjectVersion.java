@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -36,7 +35,6 @@ public class ProjectVersion implements Serializable {
         nullable = false
     )
     Project project;
-
 
     public ProjectVersion() {
     }

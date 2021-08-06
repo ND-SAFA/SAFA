@@ -2,7 +2,6 @@ package edu.nd.crc.safa.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.output.error.ServerError;
+import edu.nd.crc.safa.responses.ServerError;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -47,7 +46,6 @@ public class TraceLink implements Serializable {
     )
     Artifact sourceArtifact;
 
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -77,7 +75,7 @@ public class TraceLink implements Serializable {
         this();
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
-        if (!sourceArtifact.project.equals(targetArtifact.project)) {
+        if (!sourceArtifact.project.getProjectId().equals(targetArtifact.project.getProjectId())) {
             throw new ServerError("Source and target artifacts exist in different projects");
         }
         this.project = sourceArtifact.project;
@@ -91,7 +89,6 @@ public class TraceLink implements Serializable {
         return this.traceLinkId;
     }
 
-
     public void setIsManual() {
         this.approved = true;
         this.traceType = TraceType.MANUAL;
@@ -102,5 +99,29 @@ public class TraceLink implements Serializable {
         this.approved = false;
         this.traceType = TraceType.GENERATED;
         this.score = score;
+    }
+
+    public String getSourceName() {
+        return this.sourceArtifact.getName();
+    }
+
+    public String getTargetName() {
+        return this.targetArtifact.getName();
+    }
+
+    public ArtifactType getSourceType() {
+        return this.sourceArtifact.getType();
+    }
+
+    public ArtifactType getTargetType() {
+        return this.targetArtifact.getType();
+    }
+
+    public double getScore() {
+        return this.score;
+    }
+
+    public boolean isApproved() {
+        return this.approved;
     }
 }

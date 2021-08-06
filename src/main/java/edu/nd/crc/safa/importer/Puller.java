@@ -13,13 +13,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.entities.ArtifactBody;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.TraceLink;
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.output.error.ServerError;
-import edu.nd.crc.safa.services.TraceMatrixService;
+import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.responses.ServerError;
+import edu.nd.crc.safa.services.Neo4JService;
 
 import com.jsoniter.output.JsonStream;
 import org.eclipse.jgit.api.Git;
@@ -50,10 +53,10 @@ public class Puller {
     Double traceRequiredScore;
 
     JIRA mJira;
-    public Database mDatabase;
-    private MySQL sql;
-    private TraceMatrixService traceMatrixService;
+    public Neo4JService mNeo4JService;
     private ArtifactBodyRepository artifactBodyRepository;
+    private TraceMatrixRepository traceMatrixRepository;
+    private TraceLinkRepository traceLinkRepository;
 
     private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
@@ -61,18 +64,20 @@ public class Puller {
     private Set<String> foundNodes = new HashSet<String>();
 
     @Autowired
-    public Puller(Database database,
-                  MySQL sql,
+    public Puller(Neo4JService neo4JService,
                   JIRA jira,
-                  ArtifactBodyRepository artifactBodyRepository) {
-        this.mDatabase = database;
-        this.sql = sql;
+                  ArtifactBodyRepository artifactBodyRepository,
+                  TraceMatrixRepository traceMatrixRepository,
+                  TraceLinkRepository traceLinkRepository) {
+        this.mNeo4JService = neo4JService;
         this.mJira = jira;
         this.artifactBodyRepository = artifactBodyRepository;
+        this.traceMatrixRepository = traceMatrixRepository;
+        this.traceLinkRepository = traceLinkRepository;
     }
 
     public void execute() throws ServerError {
-        mDatabase.execute();
+        mNeo4JService.execute();
     }
 
     public void parseJIRAIssues() {
@@ -93,7 +98,7 @@ public class Puller {
                 data.put("type", issue.type);
 
                 foundNodes.add(issue.key);
-                mDatabase.addNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
+                mNeo4JService.addNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
@@ -102,7 +107,7 @@ public class Puller {
                             return link.InwardType.equals(type);
                         });
                     }).forEach((link) -> {
-                        mDatabase.addLink(issue.key, link.Type, link.InwardKey);
+                        mNeo4JService.addLink(issue.key, link.Type, link.InwardKey);
                     });
                 }
             }
@@ -185,7 +190,7 @@ public class Puller {
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
                                         if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
-                                            mDatabase.addSource(m.group(2), rev.name(), pkg, id);
+                                            mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
                                         }
                                         commitFiles.add(entry.getNewPath());
                                     }
@@ -204,9 +209,8 @@ public class Puller {
 
     public String mySQLNeo(Project project, ProjectVersion projectVersion) {
         try {
-            insertArtifacts(project, projectVersion);
-            insertConnections();
-            System.out.println("Completed MysqlToNeo4j without exceptions");
+            insertArtifacts(projectVersion);
+            insertConnections(project);
             return "{\"complete\": false}";
         } catch (Exception e) {
             System.out.println(String.format("Completed MysqlToNeo4j with exceptions: %s", e.getMessage()));
@@ -214,7 +218,7 @@ public class Puller {
         }
     }
 
-    public void insertArtifacts(Project project, ProjectVersion projectVersion) throws Exception {
+    public void insertArtifacts(ProjectVersion projectVersion) throws Exception {
         List<ArtifactBody> artifacts = this.artifactBodyRepository.findByProjectVersion(projectVersion);
         for (ArtifactBody artifact : artifacts) {
             String type = artifact.getTypeName();
@@ -232,39 +236,16 @@ public class Puller {
             data.put("type", type);
 
             foundNodes.add(id);
-            mDatabase.addNode(id, type, JsonStream.serialize(data).toString());
+            mNeo4JService.addNode(id, type, JsonStream.serialize(data).toString());
         }
     }
 
-    public void insertConnections() throws Exception {
-        List<List<String>> traces = traceMatrixService.getTimTraceData();
-        for (List<String> trace : traces) {
-            String sourcetype = trace.get(0);
-
-            if (Integer.parseInt(trace.get(3)) == 0) {
-                List<List<String>> rows = traceMatrixService.getNonGeneratedTraceData(trace.get(4));
-
-                for (List<String> row : rows) {
-                    String source = row.get(0);
-                    String target = row.get(1);
-                    mDatabase.addLink(target, sourcetype, source);
-                }
-            } else {
-                List<List<String>> rows = traceMatrixService.getGeneratedTraceData(trace.get(4));
-
-                for (List<String> row : rows) {
-                    String source = row.get(0).toString();
-                    String target = row.get(1).toString();
-                    Float score = Float.parseFloat(row.get(2));
-                    int approval = Integer.parseInt(row.get(3));
-
-                    if ((approval == 1) || ((approval == 2) && score > traceRequiredScore)) {
-                        mDatabase.addLink(target, sourcetype, source);
-                    }
-                }
+    public void insertConnections(Project project) {
+        List<TraceLink> projectLinks = traceLinkRepository.findByProject(project);
+        for (TraceLink link : projectLinks) {
+            if (link.isApproved()) {
+                mNeo4JService.addLink(link.getSourceName(), link.getSourceType().getName(), link.getTargetName());
             }
         }
     }
-
-
 }

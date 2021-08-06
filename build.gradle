@@ -13,6 +13,7 @@ plugins {
     id 'idea'
     id 'checkstyle'
     id 'jacoco'
+    id 'org.barfuin.gradle.jacocolog' version '1.0.1'
 }
 
 bootJar {
@@ -37,7 +38,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'org.json:json:20210307'
     implementation 'org.apache.commons:commons-csv:1.9.0'
-
+    implementation 'org.javatuples:javatuples:1.2'
 
     //database
     implementation 'mysql:mysql-connector-java:8.0.15'
@@ -99,19 +100,21 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0
+                minimum = 0.0 // TODO: no ratio is being caught
             }
         }
     }
 }
 
 checkstyle {
-    toolVersion = '8.11'
+    toolVersion = '8.45'
     configFile = file('checkstyle.xml')
 }
 
 checkstyleMain {
     source = 'src/main/java'
+    ignoreFailures = false
+    maxWarnings = 0
 }
 
 checkstyleTest {

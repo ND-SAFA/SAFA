@@ -77,7 +77,7 @@ public class TraceLink implements Serializable {
         this();
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
-        if (!sourceArtifact.project.equals(targetArtifact.project)) {
+        if (!sourceArtifact.project.getProjectId().equals(targetArtifact.project.getProjectId())) {
             throw new ServerError("Source and target artifacts exist in different projects");
         }
         this.project = sourceArtifact.project;
@@ -110,5 +110,9 @@ public class TraceLink implements Serializable {
 
     public String getTargetName() {
         return this.targetArtifact.getName();
+    }
+
+    public double getScore() {
+        return this.score;
     }
 }

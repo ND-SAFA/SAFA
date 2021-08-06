@@ -27,7 +27,7 @@ public class TestUploadFlatFiles extends EntityBaseTest {
     @Test
     public void uploadTestResources() throws IOException, ServerError {
         String testProjectName = "testProject";
-        ProjectVersion projectVersion = createProjectWithTestResources(testProjectName);
+        ProjectVersion projectVersion = createProjectUploadedResources(testProjectName);
         Project project = projectVersion.getProject();
 
         //Cleanup

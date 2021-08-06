@@ -114,7 +114,7 @@ public class FlatFileService {
             if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
                 boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
                 if (isGenerated) {
-                    this.traceFileParser.parseTraceMatrixJson(project, projectVersion,
+                    this.traceFileParser.parseTraceMatrixDefinition(projectVersion,
                         timJson.getJSONObject(traceMatrixKey));
                 }
             }

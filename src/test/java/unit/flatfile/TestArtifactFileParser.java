@@ -1,4 +1,4 @@
-package unit.parser;
+package unit.flatfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +24,7 @@ public class TestArtifactFileParser extends EntityBaseTest {
 
     @Test
     public void parseDesignArtifacts() throws Exception {
-        ProjectVersion projectVersion = createProjectWithTestResources("testProject");
+        ProjectVersion projectVersion = createProjectUploadedResources("testProject");
         Project project = projectVersion.getProject();
 
         JSONObject jsonSpec = new JSONObject("{\n"
@@ -38,11 +38,12 @@ public class TestArtifactFileParser extends EntityBaseTest {
         assertThat(projectArtifacts.size())
             .as("artifacts created")
             .isEqualTo(TestConstants.N_DESIGNS);
+        projectService.deleteProject(project);
     }
 
     @Test
     public void missingFileKey() throws Exception {
-        ProjectVersion projectVersion = createProjectWithTestResources("testProject");
+        ProjectVersion projectVersion = createProjectUploadedResources("testProject");
 
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {}\n"
@@ -51,5 +52,6 @@ public class TestArtifactFileParser extends EntityBaseTest {
             artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
         });
         assertThat(exception.getMessage()).contains("file");
+        projectService.deleteProject(projectVersion.getProject());
     }
 }

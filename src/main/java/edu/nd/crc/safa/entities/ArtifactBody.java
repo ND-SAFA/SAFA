@@ -50,8 +50,8 @@ public class ArtifactBody implements Serializable {
     public ArtifactBody() {
     }
 
-    public ArtifactBody(Artifact artifact,
-                        ProjectVersion projectVersion,
+    public ArtifactBody(ProjectVersion projectVersion,
+                        Artifact artifact,
                         String summary,
                         String content) {
         this.artifact = artifact;
@@ -74,5 +74,9 @@ public class ArtifactBody implements Serializable {
 
     public String getSummary() {
         return this.summary;
+    }
+
+    public Artifact getArtifact() {
+        return this.artifact;
     }
 }

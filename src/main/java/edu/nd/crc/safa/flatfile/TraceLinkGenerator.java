@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.constants.ProjectPaths;
+import edu.nd.crc.safa.constants.ProjectVariables;
 import edu.nd.crc.safa.database.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.database.repositories.ArtifactRepository;
 import edu.nd.crc.safa.database.repositories.TraceLinkRepository;
@@ -23,6 +24,7 @@ import edu.nd.crc.safa.entities.TraceLink;
 import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,51 +47,64 @@ public class TraceLinkGenerator {
         this.artifactRepository = artifactRepository;
     }
 
-    public void generateTraceLink(Project project,
-                                  ProjectVersion projectVersion,
-                                  ArtifactType sourceType,
-                                  ArtifactType targetType,
-                                  String outputFileName) throws ServerError {
-        List<ArtifactBody> sourceArtifacts = this.artifactBodyRepository
-            .findByProjectVersionAndArtifactType(projectVersion, sourceType);
-        List<ArtifactBody> targetArtifacts = this.artifactBodyRepository
-            .findByProjectVersionAndArtifactType(projectVersion, targetType);
 
-        Map<String, Collection<String>> sTokens = splitArtifactsIntoWords(sourceArtifacts);
-        Map<String, Collection<String>> tTokens = splitArtifactsIntoWords(targetArtifacts);
-
-        Controller vsm = new Controller();
-        vsm.buildIndex(tTokens.values());
-        List<String> lines = new ArrayList<>();
-        String GENERATED_FILES_HEADER = "Source,Target,Score";
-        lines.add(GENERATED_FILES_HEADER);
-        for (String sid : sTokens.keySet()) {
-            for (String tid : tTokens.keySet()) {
-                Artifact sourceArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
-                    sourceType, sid);
-                Artifact targetArtifact = this.artifactRepository.findByProjectAndTypeAndNameIgnoreCase(project,
-                    sourceType, tid);
-                double score = vsm.getRelevance(sTokens.get(sid), tTokens.get(tid));
-                TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);
-                generatedLink.setIsGenerated(score);
-                this.traceLinkRepository.save(generatedLink); // TODO : add check for save error
-                lines.add(String.format("%s,%s,%s", sid, tid, score));
-            }
-        }
+    public void generateTraceLinksToFile(ProjectVersion projectVersion,
+                                         Pair<ArtifactType, ArtifactType> artifactTypes,
+                                         String outputFileName) throws ServerError {
+        Project project = projectVersion.getProject();
+        List<TraceLink> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
+        this.traceLinkRepository.saveAll(generatedLinks);
 
         try {
             String pathToOutputFile = ProjectPaths.getPathToGeneratedFile(project, outputFileName);
-            Files.write(Paths.get(pathToOutputFile), lines);
+            writeLinksToFile(generatedLinks, pathToOutputFile);
         } catch (IOException e) {
             throw new ServerError("error writing trace matrix file", e);
         }
     }
 
-    private Map<String, Collection<String>> splitArtifactsIntoWords(List<ArtifactBody> artifacts) {
-        Map<String, Collection<String>> artifactTokens = new HashMap<>();
-        for (ArtifactBody artifact : artifacts) {
-            String artifactName = artifact.getName();
-            artifactTokens.put(artifactName, getArtifactWords(artifact));
+    public List<TraceLink> generateLinksBetweenTypes(ProjectVersion projectVersion,
+                                                     Pair<ArtifactType, ArtifactType> artifactTypes)
+        throws ServerError {
+
+        Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(projectVersion,
+            artifactTypes.getValue0());
+        Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(projectVersion,
+            artifactTypes.getValue1());
+
+        return generateLinksFromTokens(sTokens, tTokens);
+    }
+
+    private List<TraceLink> generateLinksFromTokens(Map<Artifact, Collection<String>> sTokens, Map<Artifact, Collection<String>> tTokens) throws ServerError {
+        Controller vsm = new Controller();
+        vsm.buildIndex(tTokens.values());
+
+        List<TraceLink> generatedLinks = new ArrayList<>();
+        for (Artifact sourceArtifact : sTokens.keySet()) {
+            for (Artifact targetArtifact : tTokens.keySet()) {
+                double score = vsm.getRelevance(sTokens.get(sourceArtifact), tTokens.get(targetArtifact));
+                if (score > ProjectVariables.TRACE_THRESHOLD) {
+                    TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);
+                    generatedLink.setIsGenerated(score);
+                    generatedLinks.add(generatedLink);
+                }
+            }
+        }
+        return generatedLinks;
+    }
+
+    private Map<Artifact, Collection<String>> tokenizeArtifactOfType(ProjectVersion projectVersion,
+                                                                     ArtifactType artifactType) {
+        List<ArtifactBody> sourceArtifactBodies = this.artifactBodyRepository
+            .findByProjectVersionAndArtifactType(projectVersion, artifactType);
+        return splitArtifactsIntoWords(sourceArtifactBodies);
+    }
+
+    private Map<Artifact, Collection<String>> splitArtifactsIntoWords(List<ArtifactBody> artifacts) {
+        Map<Artifact, Collection<String>> artifactTokens = new HashMap<>();
+        for (ArtifactBody artifactBody : artifacts) {
+            Artifact artifact = artifactBody.getArtifact();
+            artifactTokens.put(artifact, getArtifactWords(artifactBody));
         }
         return artifactTokens;
     }
@@ -97,5 +112,19 @@ public class TraceLinkGenerator {
     private List<String> getArtifactWords(ArtifactBody artifactBody) {
         String[] artifactWords = artifactBody.getContent().split(" ");
         return Arrays.asList(artifactWords);
+    }
+
+    private void writeLinksToFile(List<TraceLink> generatedLinks,
+                                  String pathToOutputFile) throws IOException {
+        List<String> lines = new ArrayList<>();
+        String GENERATED_FILES_HEADER = "Source,Target,Score";
+        lines.add(GENERATED_FILES_HEADER);
+        for (TraceLink generatedLink : generatedLinks) {
+            lines.add(String.format("%s,%s,%s",
+                generatedLink.getSourceName(),
+                generatedLink.getTargetName(),
+                generatedLink.getScore()));
+        }
+        Files.write(Paths.get(pathToOutputFile), lines);
     }
 }

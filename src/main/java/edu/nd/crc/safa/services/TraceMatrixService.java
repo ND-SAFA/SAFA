@@ -73,7 +73,6 @@ public class TraceMatrixService {
                                           Boolean generated,
                                           String filename) throws ServerError {
         try {
-            System.out.println(String.format("Updating TIM ARTIFACTS TABLE: %s...", "tim_trace_matrix"));
             String sqlUpdateTable = String.format("INSERT INTO %s (trace_matrix, source_artifact, target_artifact,"
                 + "is_generated, tablename, filename)\n", "tim_trace_matrix")
                 + String.format("VALUES ('%s', '%s', '%s', %s, '%s', '%s')\n",
@@ -84,7 +83,6 @@ public class TraceMatrixService {
 
 
             stmt.executeUpdate(sqlUpdateTable);
-            System.out.println(String.format("UPDATED TIM TRACE MATRIX TABLE: %s.", "tim_trace_matrix"));
         } catch (SQLException e) {
             throw new ServerError("Failed to update TIM trace matrix table");
         }

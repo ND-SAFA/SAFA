@@ -113,8 +113,8 @@ public class ArtifactFileParser {
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
 
             Artifact artifact = new Artifact(project, artifactType, artifactId);
-            ArtifactBody artifactBody = new ArtifactBody(artifact,
-                projectVersion, artifactSummary, artifactContent);
+            ArtifactBody artifactBody = new ArtifactBody(
+                projectVersion, artifact, artifactSummary, artifactContent);
 
             this.artifactRepository.save(artifact);
             this.artifactBodyRepository.save(artifactBody);

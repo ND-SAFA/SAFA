@@ -18,6 +18,7 @@ import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.output.error.ServerError;
 import edu.nd.crc.safa.services.FlatFileService;
+import edu.nd.crc.safa.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +49,9 @@ public class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected ParserErrorRepository parserErrorRepository;
 
+    @Autowired
+    protected ProjectService projectService;
+
     public Project createProject(String projectName) {
         Project project = new Project(projectName);
         projectRepository.save(project);
@@ -67,7 +71,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
         return artifactType;
     }
 
-    public ProjectVersion createProjectWithTestResources(String projectName) throws ServerError, IOException {
+    public ProjectVersion createProjectUploadedResources(String projectName) throws ServerError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(

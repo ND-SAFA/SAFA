@@ -72,10 +72,8 @@ public class MySQL {
                     + ");";
 
                 stmt.executeUpdate(sqlCreateTable);
-                System.out.println(String.format("CREATED TABLE: %s.", "uploaded_and_generated_tables"));
             }
 
-            System.out.println(String.format("Updating TABLE: %s...", "uploaded_and_generated_tables"));
             String sqlUpdateTable = String.format(
                 "INSERT INTO %s (tablename, is_generated)\n",
                 "uploaded_and_generated_tables")
@@ -84,7 +82,6 @@ public class MySQL {
                 generated);
 
             stmt.executeUpdate(sqlUpdateTable);
-            System.out.println(String.format("UPDATED TABLE: %s.", "uploaded_and_generated_tables"));
         } catch (SQLException e) {
             throw new ServerError("creating table list", e);
         }

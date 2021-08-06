@@ -55,8 +55,7 @@ public class FlatFileParser {
             for (Iterator keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
                 String traceMatrixKey = keyIterator.next().toString();
                 if (!traceMatrixKey.toLowerCase().equals(ProjectVariables.DATAFILES_PARAM)) {
-                    traceFileParser.parseTraceMatrixJson(project,
-                        projectVersion,
+                    traceFileParser.parseTraceMatrixDefinition(projectVersion,
                         timFileJson.getJSONObject(traceMatrixKey));
                 }
             }

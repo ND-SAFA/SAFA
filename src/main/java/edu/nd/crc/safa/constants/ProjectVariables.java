@@ -10,6 +10,7 @@ public class ProjectVariables {
     public static final String TIM_FILENAME = "tim.json";
     public static final String DATAFILES_PARAM = "datafiles";
     public static final int ARTIFACT_CONTENT_LENGTH = 1028;
+    public static final double TRACE_THRESHOLD = 0.5;
 }
 
 

@@ -52,7 +52,6 @@ dependencies {
     implementation 'com.github.v-ladynev:fluent-hibernate-core:0.3.1'
     testImplementation 'com.h2database:h2:1.4.200'
 
-
     //Spring
     implementation 'org.springframework:spring-jdbc:5.3.9'
     implementation 'org.springframework:spring-beans:5.3.9'
@@ -64,26 +63,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.3'
     implementation 'org.springframework.data:spring-data-commons:2.5.3'
     implementation 'org.springframework.data:spring-data-jpa:2.5.3'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+    testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.3') {
         exclude module: 'logback-classic'
     }
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.5.3'
 
     // testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1' //TODO: might not need this
 }
 
 test {
-    def envFileName = ''
-    if (file('test.env').exists()) {
-        envFileName = 'test.env'
-    } else if (file('.env').exists()) {
-        envFileName = '.env'
-    }
-
-    file(envFileName).readLines().each() {
-        def (key, value) = it.tokenize('=')
-        environment key, value
-    }
     testLogging {
         outputs.upToDateWhen { false }
         showStandardStreams = true

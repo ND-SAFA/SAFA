@@ -11,8 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.naming.OperationNotSupportedException;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
-import edu.nd.crc.safa.configuration.ProjectVariables;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.ParserError;
 import edu.nd.crc.safa.entities.Project;

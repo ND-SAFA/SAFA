@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.configuration.Neo4J;
+import edu.nd.crc.safa.config.Neo4J;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.repositories.ProjectRepository;

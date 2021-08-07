@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.configuration;
+package edu.nd.crc.safa.config;
 
 /**
  * Enumerates the different types of servers our application

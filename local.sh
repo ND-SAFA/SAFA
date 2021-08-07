@@ -1,16 +1,12 @@
 buildNoTests() {
   (
-    set -a &&
-      source .env &&
-      ./gradlew build --stacktrace -x Test # automatically reads env files
+    ./gradlew build --stacktrace -x Test
   )
 }
 
 build() {
   (
-    set -a &&
-      source .env &&
-      ./gradlew build --stacktrace # automatically reads env files
+    ./gradlew build --stacktrace
   )
 }
 
@@ -20,7 +16,7 @@ run() {
   (
     sed 's,h2:mem:,mysql://localhost/,g' ".env" >test.env &&
       set -a &&
-      source test.env &&
+      source .env &&
       java -jar "$JAR_PATH"
   )
   rm test.env

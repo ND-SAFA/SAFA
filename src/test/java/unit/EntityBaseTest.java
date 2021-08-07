@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.ArtifactType;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;

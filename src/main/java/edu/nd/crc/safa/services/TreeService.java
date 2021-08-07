@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.configuration.Neo4J;
+import edu.nd.crc.safa.config.Neo4J;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
@@ -25,15 +25,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TreeService {
 
+    private final Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
     Neo4J neo4j;
     WarningService warningService;
-
-    private Map<String, Boolean> mWarnings = new HashMap<String, Boolean>();
 
     @Autowired
     public TreeService(Neo4J neo4J, WarningService warningService) {
         this.neo4j = neo4J;
         this.warningService = warningService;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> trees(Project project, String rootType) throws ServerError {
+        Session session = neo4j.createSession();
+        String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
+            + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
+            + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
+        Result result = session.run(query);
+        return parseArtifactTree(project, result);
     }
 
     public List<Map<String, Object>> parseArtifactTree(Project project, Result result) {
@@ -46,14 +55,13 @@ public class TreeService {
         List<Node> nodes = record.get("artifact").asList(Values.ofNode());
         List<Relationship> rels = record.get("rel").asList(Values.ofRelationship());
 
-        for (int i = 0; i < nodes.size(); i++) {
-            addNode(nodes.get(i), values, ids);
+        for (Node item : nodes) {
+            addNode(item, values, ids);
         }
 
         // Find the highest version of the modification
         Map<String, Integer> maxModification = new HashMap<String, Integer>();
-        for (int i = 0; i < rels.size(); i++) {
-            final Relationship r = rels.get(i);
+        for (final Relationship r : rels) {
             if (r.type().equals("UPDATES") && r.get("type").asString().equals("MODIFIED")) {
                 final String root = ids.get(r.startNodeId());
                 final int version = r.get("version").asInt();
@@ -64,8 +72,7 @@ public class TreeService {
             }
         }
 
-        for (int i = 0; i < rels.size(); i++) {
-            final Relationship r = rels.get(i);
+        for (final Relationship r : rels) {
             if (!r.type().equals("UPDATES")) {
                 addEdge(r, values, edges, ids);
             } else {
@@ -124,13 +131,12 @@ public class TreeService {
                 verifier.addRule(r);
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
         Map<String, List<Rule.Name>> results = verifier.verify(nodes, ids, values);
 
         // Warnings
-        for (int i = 0; i < nodes.size(); i++) {
-            final Node node = nodes.get(i);
+        for (final Node node : nodes) {
             final String id = ids.get(node.id());
 
             List<Rule.Name> warnings = results.get(id);
@@ -147,19 +153,9 @@ public class TreeService {
         return values;
     }
 
-    @Transactional(readOnly = true)
-    public List<Map<String, Object>> trees(Project project, String rootType) throws ServerError {
-        Session session = neo4j.createSession();
-        String query = "MATCH path=(root:" + rootType + ")-[rel*]->(artifact:" + rootType + ")\n"
-            + "RETURN apoc.coll.toSet(apoc.coll.flatten(collect(nodes(path)))) AS artifact, apoc.coll.toSet(apoc"
-            + ".coll.flatten(collect([r in relationships(path) WHERE TYPE(r)<>'UPDATES']))) AS rel";
-        Result result = session.run(query);
-        return parseArtifactTree(project, result);
-    }
-
     private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
         if (!ids.containsKey(node.id())) {
-            String label = ((List<String>) node.labels()).get(0).toString();
+            String label = ((List<String>) node.labels()).get(0);
             Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
             // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
             if (node.get("id") == null || node.get("id").toString() == "NULL") {

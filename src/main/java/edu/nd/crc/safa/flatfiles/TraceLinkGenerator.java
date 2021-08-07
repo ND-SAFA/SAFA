@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
-import edu.nd.crc.safa.configuration.ProjectVariables;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactBody;
 import edu.nd.crc.safa.entities.ArtifactType;

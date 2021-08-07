@@ -113,10 +113,7 @@ public class TraceFileParser {
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, sourceTypeName);
-
-        for (ArtifactType at : this.artifactTypeRepository.findByProject(project)) {
-            System.out.println("Project created: " + at.getName());
-        }
+        
         if (!sourceTypeQuery.isPresent()) {
             String errorMessage = "Source artifact type does not exist: %s";
             String error = String.format(errorMessage, sourceTypeName);

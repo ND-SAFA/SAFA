@@ -78,7 +78,6 @@ public class ArtifactFileParser {
             this.artifactFileRepository.save(newFile);
 
             parseArtifactFile(projectVersion, artifactType, artifactFileName);
-            System.out.println(artifactType.getName() + " was created.");
         }
     }
 

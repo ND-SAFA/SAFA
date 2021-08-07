@@ -131,7 +131,7 @@ public class TreeService {
                 verifier.addRule(r);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(e);
         }
         Map<String, List<Rule.Name>> results = verifier.verify(nodes, ids, values);
 
@@ -157,7 +157,6 @@ public class TreeService {
         if (!ids.containsKey(node.id())) {
             String label = ((List<String>) node.labels()).get(0);
             Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
-            // System.out.println("[NODE " + node.id() + ":" + label + "] " + mapping);
             if (node.get("id") == null || node.get("id").toString() == "NULL") {
                 String nodeId = UUID.randomUUID().toString();
                 mapping.put("id", nodeId);

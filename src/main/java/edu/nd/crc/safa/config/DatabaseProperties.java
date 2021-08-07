@@ -6,10 +6,10 @@ import edu.nd.crc.safa.responses.ServerError;
 
 public class DatabaseProperties {
 
+    private final SQLServers sqlType;
     public String url;
     public String username;
     public String password;
-    private final SQLServers sqlType;
 
     public DatabaseProperties(String url, String username, String password) {
         this.url = url;
@@ -26,7 +26,6 @@ public class DatabaseProperties {
         if (prodSqlUrl != null
             && prodSqlUsername != null
             && prodSqlPassword != null) {
-            System.out.println("Setting production values");
             this.url = prodSqlUrl;
             this.username = prodSqlUsername;
             this.password = prodSqlPassword;

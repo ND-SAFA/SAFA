@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 /**
  * Responsible for uniquely identifying which
  * projects exist.
@@ -18,6 +20,7 @@ public class Project implements Serializable {
 
     @Id
     @GeneratedValue
+    @Type(type = "uuid-char")
     @Column(name = "project_id")
     UUID projectId;
 

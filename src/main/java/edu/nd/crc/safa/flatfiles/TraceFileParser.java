@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactType;
@@ -85,8 +85,6 @@ public class TraceFileParser {
             && traceMatrixDefinition.getBoolean("generateLinks");
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-        ArtifactType sourceType = matrixArtifactTypes.getValue0();
-        ArtifactType targetType = matrixArtifactTypes.getValue1();
 
         TraceMatrix traceMatrix = new TraceMatrix(project,
             matrixArtifactTypes.getValue0(),
@@ -115,6 +113,7 @@ public class TraceFileParser {
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, sourceTypeName);
+        
         if (!sourceTypeQuery.isPresent()) {
             String errorMessage = "Source artifact type does not exist: %s";
             String error = String.format(errorMessage, sourceTypeName);

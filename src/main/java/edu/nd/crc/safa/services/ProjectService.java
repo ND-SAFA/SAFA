@@ -3,7 +3,7 @@ package edu.nd.crc.safa.services;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.Project;
 import edu.nd.crc.safa.entities.ProjectVersion;
 import edu.nd.crc.safa.importer.Puller;

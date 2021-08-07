@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.ApplicationActivity;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactBody;
@@ -100,7 +100,7 @@ public class TestProjectCreation extends EntityBaseTest {
 
         // VP X - hazards artifacts created
         Optional<ArtifactType> hazardType = artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, "hazard");
+            .findByProjectAndNameIgnoreCase(project, "HAZARD");
         assertThat(hazardType.isPresent()).as("hazard type created").isTrue();
         List<Artifact> hazards = artifactRepository.findByProjectAndType(project, hazardType.get());
         assertThat(hazards.size())

@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for storing the unique identifiers for artifacts
@@ -22,8 +23,9 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Artifact implements Serializable {
 
     @Id
-    @Column(name = "artifact_id")
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "artifact_id")
     UUID artifactId;
 
     @ManyToOne

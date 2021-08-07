@@ -65,7 +65,6 @@ public class TestTraceFileParser extends EntityBaseTest {
         projectService.deleteProject(project);
     }
 
-
     @Test
     public void testCreateTestLinkMissingIds() throws IOException, ServerError {
         String sourceName = "RE-8";

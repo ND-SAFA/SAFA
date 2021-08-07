@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.nd.crc.safa.configuration.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.Artifact;
 import edu.nd.crc.safa.entities.ArtifactBody;
 import edu.nd.crc.safa.entities.ArtifactFile;

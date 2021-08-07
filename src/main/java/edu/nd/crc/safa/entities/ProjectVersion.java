@@ -23,8 +23,8 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ProjectVersion implements Serializable {
 
     @Id
-    @Column(name = "version_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "version_id")
     long versionId; //todo: generate in sequence relative to project id using GenericGenerator
 
     @ManyToOne

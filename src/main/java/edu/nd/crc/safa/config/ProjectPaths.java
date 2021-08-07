@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.configuration;
+package edu.nd.crc.safa.config;
 
 import java.io.File;
 import java.io.IOException;

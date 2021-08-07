@@ -16,6 +16,7 @@ import edu.nd.crc.safa.responses.ServerError;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -25,8 +26,9 @@ import org.hibernate.annotations.OnDeleteAction;
 public class TraceLink implements Serializable {
 
     @Id
-    @Column(name = "trace_link_id")
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "trace_link_id")
     UUID traceLinkId;
 
     @ManyToOne

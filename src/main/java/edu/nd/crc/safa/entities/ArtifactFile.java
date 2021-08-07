@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for mapping which TIM files
@@ -20,8 +21,9 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ArtifactFile {
 
     @Id
-    @Column(name = "file_id")
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "file_id")
     UUID FileId;
 
     @ManyToOne

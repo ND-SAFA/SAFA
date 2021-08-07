@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for storing parsing errors when
@@ -24,6 +25,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ParserError implements Serializable {
     @Id
     @GeneratedValue
+    @Type(type = "uuid-char")
     @Column(name = "id")
     UUID id;
 

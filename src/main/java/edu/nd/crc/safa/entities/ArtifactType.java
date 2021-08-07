@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for defining which types are available
@@ -22,8 +23,9 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ArtifactType implements Serializable {
 
     @Id
-    @Column(name = "type_id")
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "type_id")
     UUID typeId;
 
     @ManyToOne

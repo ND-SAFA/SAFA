@@ -11,14 +11,16 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "saved_layouts")
 public class Layout {
 
     @Id
-    @Column(name = "layout_id")
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "layout_id")
     UUID layoutId;
 
     @ManyToOne

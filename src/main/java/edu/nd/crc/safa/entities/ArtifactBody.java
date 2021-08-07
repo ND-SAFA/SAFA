@@ -14,6 +14,7 @@ import edu.nd.crc.safa.config.ProjectVariables;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 /**
  * Responsible for storing an artifact's different contents
@@ -24,6 +25,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ArtifactBody implements Serializable {
     @Id
     @GeneratedValue
+    @Type(type = "uuid-char")
     @Column
     UUID artifactBodyId;
 

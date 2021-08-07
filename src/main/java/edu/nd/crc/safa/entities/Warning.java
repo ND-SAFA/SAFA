@@ -11,14 +11,16 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "warnings")
 public class Warning {
 
     @Id
-    @Column
     @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "warning_id")
     UUID warningId;
 
     @ManyToOne

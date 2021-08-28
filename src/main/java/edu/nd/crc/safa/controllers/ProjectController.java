@@ -17,6 +17,7 @@ import edu.nd.crc.safa.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class ProjectController extends BaseController {
 
-    private ProjectService projectService;
-    private FlatFileService flatFileService;
-    private ArtifactRepository artifactRepository;
+    private final ProjectService projectService;
+    private final FlatFileService flatFileService;
+    private final ArtifactRepository artifactRepository;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
@@ -44,6 +45,7 @@ public class ProjectController extends BaseController {
         this.artifactRepository = artifactRepository;
     }
 
+    @CrossOrigin
     @PostMapping("projects/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse uploadFile(@RequestParam MultipartFile[] files) throws ServerError {

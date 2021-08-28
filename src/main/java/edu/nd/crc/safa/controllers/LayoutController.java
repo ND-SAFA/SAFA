@@ -38,7 +38,7 @@ public class LayoutController extends BaseController {
         Project project = getProject(projectId);
         Layout newLayout = new Layout(project, treeId, b64EncodedLayout);
         this.layoutRepository.save(newLayout);
-        return new ServerResponse("Layout");
+        return new ServerResponse(newLayout);
     }
 
     @GetMapping(value = "projects/{projectId}/trees/{treeId}/layout/")

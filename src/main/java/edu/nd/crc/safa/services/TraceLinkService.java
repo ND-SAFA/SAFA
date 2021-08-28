@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TraceLinkService {
 
-    private TraceLinkRepository traceLinkRepository;
+    private final TraceLinkRepository traceLinkRepository;
     private ArtifactRepository artifactRepository;
 
     @Autowired
@@ -39,8 +39,7 @@ public class TraceLinkService {
             sourceTargetMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
         }
 
-        String dataDict = sourceTargetMap.toString().replace("=", ":");
-        return dataDict;
+        return sourceTargetMap.toString().replace("=", ":");
     }
 
     @Transactional(readOnly = true)

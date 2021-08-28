@@ -181,6 +181,9 @@ public class FlatFileService {
 
     private void createProjectFromTIMFile(Project project, ProjectVersion projectVersion) throws ServerError {
         String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        if (!Files.exists(Paths.get(pathToFile))) {
+            throw new ServerError("TIM.json file was not uploaded for this project");
+        }
         this.flatFileParser.parseProject(projectVersion, pathToFile);
         // TODO: return generated files
     }

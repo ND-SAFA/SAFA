@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.entities.database;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -15,18 +15,18 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /**
- * Responsible for storing the unique identifiers for artifacts
- * in a project.
+ * Responsible for defining which types are available
+ * to which projects.
  */
 @Entity
-@Table(name = "artifacts")
-public class Artifact implements Serializable {
+@Table(name = "artifact_type")
+public class ArtifactType implements Serializable {
 
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
-    @Column(name = "artifact_id")
-    UUID artifactId;
+    @Column(name = "type_id")
+    UUID typeId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -36,35 +36,19 @@ public class Artifact implements Serializable {
     )
     Project project;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(
-        name = "type_id",
-        nullable = false)
-    ArtifactType type;
-
     @Column(name = "name")
     String name;
 
-    public Artifact() {
+    public ArtifactType() {
     }
 
-    public Artifact(Project project, ArtifactType type, String name) {
-        setProject(project);
-        setType(type);
-        setName(name);
-    }
-
-    public void setProject(Project project) {
+    public ArtifactType(Project project, String name) {
         this.project = project;
+        this.name = name.toLowerCase();
     }
 
-    public ArtifactType getType() {
-        return this.type;
-    }
-
-    public void setType(ArtifactType artifactType) {
-        this.type = artifactType;
+    public UUID getTypeId() {
+        return this.typeId;
     }
 
     public String getName() {
@@ -72,10 +56,10 @@ public class Artifact implements Serializable {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.toLowerCase();
     }
 
-    public UUID getArtifactId() {
-        return this.artifactId;
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

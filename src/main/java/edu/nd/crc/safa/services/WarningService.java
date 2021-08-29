@@ -3,8 +3,8 @@ package edu.nd.crc.safa.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.Warning;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.Warning;
 import edu.nd.crc.safa.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.Rule;
 

@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.entities.Layout;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Layout;
+import edu.nd.crc.safa.entities.database.Project;
 import edu.nd.crc.safa.repositories.LayoutRepository;
 import edu.nd.crc.safa.repositories.ProjectRepository;
 import edu.nd.crc.safa.repositories.ProjectVersionRepository;
@@ -38,7 +38,7 @@ public class LayoutController extends BaseController {
         Project project = getProject(projectId);
         Layout newLayout = new Layout(project, treeId, b64EncodedLayout);
         this.layoutRepository.save(newLayout);
-        return new ServerResponse("Layout");
+        return new ServerResponse(newLayout);
     }
 
     @GetMapping(value = "projects/{projectId}/trees/{treeId}/layout/")

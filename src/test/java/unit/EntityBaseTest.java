@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
 import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.repositories.ArtifactRepository;
 import edu.nd.crc.safa.repositories.ArtifactTypeRepository;

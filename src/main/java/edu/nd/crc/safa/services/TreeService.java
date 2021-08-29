@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.Neo4J;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Project;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;
@@ -56,7 +56,7 @@ public class TreeService {
         List<Relationship> rels = record.get("rel").asList(Values.ofRelationship());
 
         for (Node item : nodes) {
-            addNode(item, values, ids);
+            addNodeToTreeMapping(values, ids, item);
         }
 
         // Find the highest version of the modification
@@ -153,30 +153,32 @@ public class TreeService {
         return values;
     }
 
-    private void addNode(Node node, List<Map<String, Object>> values, Map<Long, String> ids) {
-        if (!ids.containsKey(node.id())) {
+    private void addNodeToTreeMapping(List<Map<String, Object>> listOfNodeMaps,
+                                      Map<Long, String> validIds,
+                                      Node node) {
+        if (!validIds.containsKey(node.id())) {
             String label = ((List<String>) node.labels()).get(0);
             Map<String, Object> mapping = new HashMap<String, Object>(node.asMap());
             if (node.get("id") == null || node.get("id").toString() == "NULL") {
                 String nodeId = UUID.randomUUID().toString();
                 mapping.put("id", nodeId);
-                ids.put(node.id(), nodeId);
+                validIds.put(node.id(), nodeId);
             } else {
                 if (label.equals("Package") || label.equals("Code")) {
-                    ids.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
+                    validIds.put(node.id(), node.get("issue").asString() + "." + node.get("id").asString());
                     mapping.put("id", node.get("issue").asString() + "." + node.get("id").asString());
                 } else {
-                    ids.put(node.id(), node.get("id").asString());
+                    validIds.put(node.id(), node.get("id").asString());
                 }
             }
             mapping.put("classes", "node");
             mapping.put("label", label);
-            values.add(mapping);
+            listOfNodeMaps.add(mapping);
         }
     }
 
-    private void addNode(Node node, List<Map<String, Object>> values) {
-        addNode(node, values, new HashMap<Long, String>());
+    private void addNodeToTreeMapping(Node node, List<Map<String, Object>> values) {
+        addNodeToTreeMapping(values, new HashMap<>(), node);
     }
 
     @Transactional(readOnly = true)
@@ -210,7 +212,7 @@ public class TreeService {
         List<Record> records = result.list();
         for (Record record : records) {
             Node node = record.get("n").asNode();
-            addNode(node, set);
+            addNodeToTreeMapping(node, set);
         }
         return set;
     }

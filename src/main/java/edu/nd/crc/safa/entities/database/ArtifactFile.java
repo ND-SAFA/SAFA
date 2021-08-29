@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.entities.database;
 
 import java.util.UUID;
 import javax.persistence.Column;

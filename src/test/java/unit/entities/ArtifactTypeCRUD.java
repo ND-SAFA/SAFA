@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.Project;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;

@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.nd.crc.safa.entities.ArtifactBody;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.database.ArtifactBody;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceLink;
 import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.repositories.TraceLinkRepository;
@@ -37,23 +37,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Puller {
+    public Neo4JService mNeo4JService;
     @Value("${git.username:}")
     String gitUsername;
-
     @Value("${git.password:}")
     String gitPassword;
-
     @Value("${git.url:}")
     String gitURL;
-
     @Value("${git.branch:master}")
     String gitBranch;
-
     @Value("${tim.requiredTraceScore:}")
     Double traceRequiredScore;
-
     JIRA mJira;
-    public Neo4JService mNeo4JService;
     private ArtifactBodyRepository artifactBodyRepository;
     private TraceMatrixRepository traceMatrixRepository;
     private TraceLinkRepository traceLinkRepository;

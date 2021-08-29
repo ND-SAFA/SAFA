@@ -2,9 +2,9 @@ package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceLink;
 import edu.nd.crc.safa.repositories.ProjectRepository;
 import edu.nd.crc.safa.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.repositories.TraceLinkRepository;
@@ -80,11 +80,5 @@ public class LinkController extends BaseController {
         Project project = getProject(projectId);
         ProjectVersion projectVersion = getCurrentVersion(project);
         flatFileService.generateLinks(project, projectVersion); //TODO: return any error logs
-    }
-
-    @GetMapping("projects/{projectId}/linkerrorlog/")
-    public ServerResponse getLinkErrorLog(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        return new ServerResponse(flatFileService.getLinkErrorLog(project));
     }
 }

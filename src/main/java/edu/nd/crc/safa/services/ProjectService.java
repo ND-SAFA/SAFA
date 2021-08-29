@@ -1,19 +1,36 @@
 package edu.nd.crc.safa.services;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.entities.application.ArtifactApplicationEntity;
+import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
+import edu.nd.crc.safa.entities.application.TraceApplicationEntity;
+import edu.nd.crc.safa.entities.database.ApplicationActivity;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.ArtifactBody;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.ParserError;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceLink;
+import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.ArtifactRepository;
+import edu.nd.crc.safa.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.repositories.ProjectRepository;
+import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.responses.ProjectCreationResponse;
+import edu.nd.crc.safa.responses.ProjectErrors;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 
@@ -23,13 +40,31 @@ public class ProjectService {
      * business logic involved in ProjectsController.
      */
     ProjectRepository projectRepository;
-    Puller mPuller;
+    ProjectVersionRepository projectVersionRepository;
+    ArtifactRepository artifactRepository;
+    ArtifactTypeRepository artifactTypeRepository;
+    ArtifactBodyRepository artifactBodyRepository;
+    TraceLinkRepository traceLinkRepository;
+    ParserErrorRepository parserErrorRepository;
+    ParserErrorService parserErrorService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
-                          Puller puller) {
+                          ProjectVersionRepository projectVersionRepository,
+                          ArtifactRepository artifactRepository,
+                          ArtifactTypeRepository artifactTypeRepository,
+                          ArtifactBodyRepository artifactBodyRepository,
+                          TraceLinkRepository traceLinkRepository,
+                          ParserErrorRepository parserErrorRepository,
+                          ParserErrorService parserErrorService) {
         this.projectRepository = projectRepository;
-        this.mPuller = puller;
+        this.projectVersionRepository = projectVersionRepository;
+        this.artifactRepository = artifactRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactBodyRepository = artifactBodyRepository;
+        this.traceLinkRepository = traceLinkRepository;
+        this.parserErrorRepository = parserErrorRepository;
+        this.parserErrorService = parserErrorService;
     }
 
     public void deleteProject(Project project) throws ServerError {
@@ -37,33 +72,95 @@ public class ProjectService {
         OSHelper.deletePath(ProjectPaths.getPathToStorage(project));
     }
 
-    public SseEmitter projectPull(Project project, ProjectVersion projectVersion) {
-        SseEmitter emitter = new SseEmitter(0L);
-        ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-        sseMvcExecutor.execute(() -> {
-            try {
-                emitter.send(SseEmitter.event()
-                    .data("{\"complete\": false}")
-                    .id(String.valueOf(0))
-                    .name("update"));
+    public ProjectApplicationEntity createApplicationEntity(ProjectVersion newProjectVersion) {
+        Project project = newProjectVersion.getProject();
+        List<ArtifactApplicationEntity> artifacts = this.artifactBodyRepository
+            .findByProjectVersion(newProjectVersion)
+            .stream()
+            .map(ArtifactApplicationEntity::new)
+            .collect(Collectors.toList());
+        List<TraceApplicationEntity> traces = this.traceLinkRepository
+            .findByProject(project)
+            .stream()
+            .map(TraceApplicationEntity::new)
+            .collect(Collectors.toList());
+        return new ProjectApplicationEntity(project, artifacts, traces);
+    }
 
-                String Mysql2NeoData = mPuller.mySQLNeo(project, projectVersion);
-                emitter.send(SseEmitter.event()
-                    .data(Mysql2NeoData)
-                    .id(String.valueOf(3))
-                    .name("update"));
+    @Transactional
+    public ProjectCreationResponse createOrUpdateProject(ProjectApplicationEntity appEntity) {
+        Project project = new Project(appEntity);
+        this.projectRepository.save(project);
+        ProjectVersion projectVersion = new ProjectVersion(project);
+        this.projectVersionRepository.save(projectVersion);
 
-                mPuller.execute();
-                emitter.send(SseEmitter.event()
-                    .data("{\"complete\": true}")
-                    .id(String.valueOf(4))
-                    .name("update"));
+        if (appEntity.artifacts != null) {
+            appEntity
+                .getArtifacts()
+                .forEach(a -> createArtifact(projectVersion, a));
+        }
 
-                emitter.complete();
-            } catch (Exception ex) {
-                emitter.completeWithError(ex);
-            }
-        });
-        return emitter;
+        if (appEntity.traces != null) {
+            appEntity
+                .getTraces()
+                .forEach(t -> createTrace(projectVersion, t));
+        }
+
+        ProjectApplicationEntity projectApplicationEntity = createApplicationEntity(projectVersion);
+        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        return new ProjectCreationResponse(projectApplicationEntity, projectErrors);
+    }
+
+    private void createArtifact(ProjectVersion projectVersion,
+                                ArtifactApplicationEntity a) {
+        Project project = projectVersion.getProject();
+        Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
+            .findByProjectAndNameIgnoreCase(project, a.getType());
+        ArtifactType artifactType;
+        if (!artifactTypeQuery.isPresent()) {
+            artifactType = new ArtifactType(project, a.getType());
+            this.artifactTypeRepository.save(artifactType);
+        } else {
+            artifactType = artifactTypeQuery.get();
+        }
+
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, a.getName());
+        Artifact artifact;
+        artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, a.getName()));
+        this.artifactRepository.save(artifact);
+
+        ArtifactBody body = new ArtifactBody(projectVersion, artifact, a.getSummary(), a.getBody());
+        this.artifactBodyRepository.save(body);
+    }
+
+    private void createTrace(ProjectVersion projectVersion,
+                             TraceApplicationEntity t) {
+        Project project = projectVersion.getProject();
+        Optional<Artifact> source = this.artifactRepository.findByProjectAndName(project, t.source);
+        if (!source.isPresent()) {
+            ParserError sourceError = new ParserError(projectVersion,
+                "Could not find source artifact: " + t.source,
+                ApplicationActivity.PARSING_TRACES);
+            this.parserErrorRepository.save(sourceError);
+            return;
+        }
+        Optional<Artifact> target = this.artifactRepository.findByProjectAndName(project, t.target);
+        if (!target.isPresent()) {
+            ParserError targetError = new ParserError(projectVersion,
+                "Could not find target artifact: " + t.target,
+                ApplicationActivity.PARSING_TRACES);
+            this.parserErrorRepository.save(targetError);
+            return;
+        }
+        try {
+            TraceLink traceLink = new TraceLink(source.get(), target.get());
+            traceLink.setIsManual();
+            this.traceLinkRepository.save(traceLink);
+        } catch (ServerError e) {
+            ParserError linkError = new ParserError(projectVersion,
+                e.getMessage(),
+                ApplicationActivity.PARSING_TRACES);
+            this.parserErrorRepository.save(linkError);
+        }
     }
 }

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.TraceLink;
 import edu.nd.crc.safa.repositories.ArtifactRepository;
 import edu.nd.crc.safa.repositories.TraceLinkRepository;
 
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TraceLinkService {
 
-    private TraceLinkRepository traceLinkRepository;
+    private final TraceLinkRepository traceLinkRepository;
     private ArtifactRepository artifactRepository;
 
     @Autowired
@@ -39,8 +39,7 @@ public class TraceLinkService {
             sourceTargetMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
         }
 
-        String dataDict = sourceTargetMap.toString().replace("=", ":");
-        return dataDict;
+        return sourceTargetMap.toString().replace("=", ":");
     }
 
     @Transactional(readOnly = true)

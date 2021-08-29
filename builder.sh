@@ -14,7 +14,6 @@ run() {
   JAR_PATH="$PWD/build/libs/edu.nd.crc.safa-0.1.0.jar"
 
   (
-    sed 's,h2:mem:,mysql://localhost/,g' ".env" >test.env &&
       set -a &&
       source .env &&
       java -jar "$JAR_PATH"

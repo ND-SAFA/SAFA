@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.entities.database;
 
 import java.util.UUID;
 import javax.persistence.Column;
@@ -14,14 +14,14 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "saved_layouts")
-public class Layout {
+@Table(name = "warnings")
+public class Warning {
 
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
-    @Column(name = "layout_id")
-    UUID layoutId;
+    @Column(name = "warning_id")
+    UUID warningId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -32,18 +32,30 @@ public class Layout {
     Project project;
 
     @Column
-    String treeId;
+    String nShort;
 
     @Column
-    private String data;
+    String nLong;
 
-    public Layout(Project project, String treeId, String data) {
+    @Column
+    String rule;
+
+    public Warning(Project project, String nShort, String nLong, String rule) {
         this.project = project;
-        this.treeId = treeId;
-        this.data = data;
+        this.nShort = nShort;
+        this.nLong = nLong;
+        this.rule = rule;
     }
 
-    public String getData() {
-        return this.data;
+    public String getNShort() {
+        return this.nShort;
+    }
+
+    public String getNLong() {
+        return this.nLong;
+    }
+
+    public String getRule() {
+        return this.rule;
     }
 }

@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.ApplicationActivity;
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.ParserError;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.entities.TraceLink;
-import edu.nd.crc.safa.entities.TraceMatrix;
+import edu.nd.crc.safa.entities.database.ApplicationActivity;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.ParserError;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceLink;
+import edu.nd.crc.safa.entities.database.TraceMatrix;
 import edu.nd.crc.safa.repositories.ArtifactRepository;
 import edu.nd.crc.safa.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.repositories.ParserErrorRepository;
@@ -95,7 +95,7 @@ public class TraceFileParser {
         if (isGenerated) {
             traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes, fileName);
         }
-        parseTraceFile(project, matrixArtifactTypes, fileName);
+        parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
     }
 
     /**
@@ -113,7 +113,7 @@ public class TraceFileParser {
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, sourceTypeName);
-        
+
         if (!sourceTypeQuery.isPresent()) {
             String errorMessage = "Source artifact type does not exist: %s";
             String error = String.format(errorMessage, sourceTypeName);
@@ -131,9 +131,10 @@ public class TraceFileParser {
         return Pair.with(sourceTypeQuery.get(), targetTypeQuery.get());
     }
 
-    public void parseTraceFile(Project project,
+    public void parseTraceFile(ProjectVersion projectVersion,
                                Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
                                String fileName) throws ServerError {
+        Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
@@ -156,11 +157,11 @@ public class TraceFileParser {
             }
             this.traceLinkRepository.saveAll(traceLinks);
         } catch (ServerError e) {
-            ParserError parserError = new ParserError(project,
-                fileName,
-                traceFileParser.getCurrentLineNumber(),
+            ParserError parserError = new ParserError(projectVersion,
                 e.getMessage(),
-                ApplicationActivity.PARSING_TRACE_MATRIX);
+                ApplicationActivity.PARSING_TRACES,
+                fileName,
+                traceFileParser.getCurrentLineNumber());
             this.parserErrorRepository.save(parserError);
         }
     }
@@ -178,7 +179,6 @@ public class TraceFileParser {
     public TraceLink createTraceLink(Project project,
                                      Pair<ArtifactType, ArtifactType> artifactTypes,
                                      Pair<String, String> artifactNames) throws ServerError {
-
         ArtifactType sourceType = artifactTypes.getValue0();
         String sourceId = artifactNames.getValue0();
         Optional<Artifact> sourceArtifactQuery = this.artifactRepository

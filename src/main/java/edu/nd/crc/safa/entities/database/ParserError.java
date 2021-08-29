@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.entities.database;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -20,6 +20,7 @@ import org.hibernate.annotations.Type;
  * Responsible for storing parsing errors when
  * uploading projects.
  */
+//TODO: Consider separating error details into an object (e.g. fileName, lineNumber);
 @Entity
 @Table(name = "parse_errors")
 public class ParserError implements Serializable {
@@ -31,12 +32,12 @@ public class ParserError implements Serializable {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id", nullable = false)
-    Project project;
+    @JoinColumn(name = "version_id", nullable = false)
+    ProjectVersion projectVersion;
 
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
-    ApplicationActivity activity;
+    ApplicationActivity applicationActivity;
 
     @Column(name = "file_name")
     String fileName;
@@ -48,20 +49,26 @@ public class ParserError implements Serializable {
     String description;
 
     public ParserError() {
-        this.activity = ApplicationActivity.UNKNOWN;
+        this.applicationActivity = ApplicationActivity.UNKNOWN;
     }
 
-    public ParserError(Project project,
-                       String fileName,
-                       Long lineNumber,
+    public ParserError(ProjectVersion projectVersion,
                        String description,
-                       ApplicationActivity activity) {
+                       ApplicationActivity applicationActivity) {
         this();
-        this.project = project;
+        this.projectVersion = projectVersion;
+        this.description = description;
+        this.applicationActivity = applicationActivity;
+    }
+
+    public ParserError(ProjectVersion projectVersion,
+                       String description,
+                       ApplicationActivity applicationActivity,
+                       String fileName,
+                       Long lineNumber) {
+        this(projectVersion, description, applicationActivity);
         this.fileName = fileName;
         this.lineNumber = lineNumber;
-        this.description = description;
-        this.activity = activity;
     }
 
     public String toLogFormat() {
@@ -73,11 +80,19 @@ public class ParserError implements Serializable {
         return entry;
     }
 
-    public ApplicationActivity getActivity() {
-        return this.activity;
+    public String getErrorId() {
+        return this.id.toString();
+    }
+
+    public ApplicationActivity getApplicationActivity() {
+        return this.applicationActivity;
     }
 
     public String getFileName() {
         return this.fileName;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 }

@@ -36,7 +36,7 @@ public class ParserError implements Serializable {
 
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
-    ApplicationActivity activity;
+    ApplicationActivity applicationActivity;
 
     @Column(name = "file_name")
     String fileName;
@@ -48,20 +48,20 @@ public class ParserError implements Serializable {
     String description;
 
     public ParserError() {
-        this.activity = ApplicationActivity.UNKNOWN;
+        this.applicationActivity = ApplicationActivity.UNKNOWN;
     }
 
     public ParserError(Project project,
                        String fileName,
                        Long lineNumber,
                        String description,
-                       ApplicationActivity activity) {
+                       ApplicationActivity applicationActivity) {
         this();
         this.project = project;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
         this.description = description;
-        this.activity = activity;
+        this.applicationActivity = applicationActivity;
     }
 
     public String toLogFormat() {
@@ -73,8 +73,8 @@ public class ParserError implements Serializable {
         return entry;
     }
 
-    public ApplicationActivity getActivity() {
-        return this.activity;
+    public ApplicationActivity getApplicationActivity() {
+        return this.applicationActivity;
     }
 
     public String getFileName() {

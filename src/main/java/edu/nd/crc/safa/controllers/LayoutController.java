@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.entities.Layout;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Layout;
+import edu.nd.crc.safa.entities.database.Project;
 import edu.nd.crc.safa.repositories.LayoutRepository;
 import edu.nd.crc.safa.repositories.ProjectRepository;
 import edu.nd.crc.safa.repositories.ProjectVersionRepository;

@@ -5,40 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.entities.Warning;
+import edu.nd.crc.safa.entities.database.Warning;
 
 public class Rule {
-    public static class Name {
-        public String Short;
-        public String Long;
-
-        public Name() {
-            Short = "";
-            Long = "";
-        }
-
-        public Name(String s, String l) {
-            Short = s;
-            Long = l;
-        }
-    }
-
-    public enum Requirement {
-        ATLEAST, EXACTLY, LESSTHAN,
-    }
-
-    public enum Relationship {
-        CHILD, SIBLING,
-    }
-
-    public static class Function {
-        public int Count;
-        public Requirement Requirement;
-        public String Target;
-        public Relationship Relationship;
-        public String RequiredTarget;
-    }
-
+    public List<Tokenizer.Token> mTokens;
     List<String> ImplementedFunctions = Arrays.asList(
         "at-least-one",
         "at-least-n",
@@ -46,10 +16,8 @@ public class Rule {
         "exactly-n",
         "less-than-n"
     );
-
-    private Name mName;
     String mText;
-    public List<Tokenizer.Token> mTokens;
+    private final Name mName;
 
     public Rule() {
         mName = new Name();
@@ -297,5 +265,36 @@ public class Rule {
         }
 
         return false;
+    }
+
+    public enum Requirement {
+        ATLEAST, EXACTLY, LESSTHAN,
+    }
+
+    public enum Relationship {
+        CHILD, SIBLING,
+    }
+
+    public static class Name {
+        public String Short;
+        public String Long;
+
+        public Name() {
+            Short = "";
+            Long = "";
+        }
+
+        public Name(String s, String l) {
+            Short = s;
+            Long = l;
+        }
+    }
+
+    public static class Function {
+        public int Count;
+        public Requirement Requirement;
+        public String Target;
+        public Relationship Relationship;
+        public String RequiredTarget;
     }
 }

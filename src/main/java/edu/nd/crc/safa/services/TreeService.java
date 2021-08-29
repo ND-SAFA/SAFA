@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.Neo4J;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Project;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.TreeVerifier;

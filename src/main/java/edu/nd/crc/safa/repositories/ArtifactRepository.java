@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.Project;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

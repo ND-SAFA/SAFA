@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Project;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 

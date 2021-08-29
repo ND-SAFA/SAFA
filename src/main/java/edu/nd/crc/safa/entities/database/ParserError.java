@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.entities;
+package edu.nd.crc.safa.entities.database;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -31,8 +31,8 @@ public class ParserError implements Serializable {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id", nullable = false)
-    Project project;
+    @JoinColumn(name = "version_id", nullable = false)
+    ProjectVersion projectVersion;
 
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
@@ -51,13 +51,13 @@ public class ParserError implements Serializable {
         this.applicationActivity = ApplicationActivity.UNKNOWN;
     }
 
-    public ParserError(Project project,
+    public ParserError(ProjectVersion projectVersion,
                        String fileName,
                        Long lineNumber,
                        String description,
                        ApplicationActivity applicationActivity) {
         this();
-        this.project = project;
+        this.projectVersion = projectVersion;
         this.fileName = fileName;
         this.lineNumber = lineNumber;
         this.description = description;
@@ -73,11 +73,19 @@ public class ParserError implements Serializable {
         return entry;
     }
 
+    public String getErrorId() {
+        return this.id.toString();
+    }
+
     public ApplicationActivity getApplicationActivity() {
         return this.applicationActivity;
     }
 
     public String getFileName() {
         return this.fileName;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 }

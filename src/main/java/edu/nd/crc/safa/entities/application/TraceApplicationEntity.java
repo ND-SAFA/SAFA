@@ -1,6 +1,6 @@
-package edu.nd.crc.safa.responses;
+package edu.nd.crc.safa.entities.application;
 
-import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.database.TraceLink;
 
 public class TraceApplicationEntity {
     public String source;

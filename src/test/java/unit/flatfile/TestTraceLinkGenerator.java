@@ -4,12 +4,12 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.ArtifactBody;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.entities.TraceLink;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.ArtifactBody;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceLink;
 import edu.nd.crc.safa.flatfiles.TraceLinkGenerator;
 import edu.nd.crc.safa.responses.ServerError;
 

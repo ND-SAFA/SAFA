@@ -9,23 +9,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import javax.naming.OperationNotSupportedException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.entities.ApplicationActivity;
-import edu.nd.crc.safa.entities.ParserError;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
-import edu.nd.crc.safa.entities.TraceType;
+import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
+import edu.nd.crc.safa.entities.database.TraceType;
 import edu.nd.crc.safa.flatfiles.FlatFileParser;
 import edu.nd.crc.safa.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.flatfiles.TraceLinkGenerator;
+import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.repositories.ArtifactRepository;
 import edu.nd.crc.safa.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.responses.FlatFileResponse;
+import edu.nd.crc.safa.responses.ProjectCreationResponse;
+import edu.nd.crc.safa.responses.ProjectErrors;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.OSHelper;
@@ -50,7 +51,11 @@ public class FlatFileService {
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
     ArtifactRepository artifactRepository;
+    ArtifactBodyRepository artifactBodyRepository;
     TraceLinkRepository traceLinkRepository;
+
+    ProjectService projectService;
+    ParserErrorService parserErrorService;
 
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
@@ -58,13 +63,19 @@ public class FlatFileService {
                            ProjectVersionRepository projectVersionRepository,
                            ParserErrorRepository parserErrorRepository,
                            ArtifactRepository artifactRepository,
-                           TraceLinkRepository traceLinkRepository) {
+                           TraceLinkRepository traceLinkRepository,
+                           ArtifactBodyRepository artifactBodyRepository,
+                           ProjectService projectService,
+                           ParserErrorService parserErrorService) {
         this.traceLinkGenerator = traceLinkGenerator;
         this.flatFileParser = flatFileParser;
         this.projectVersionRepository = projectVersionRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.artifactRepository = artifactRepository;
         this.traceLinkRepository = traceLinkRepository;
+        this.artifactBodyRepository = artifactBodyRepository;
+        this.projectService = projectService;
+        this.parserErrorService = parserErrorService;
     }
 
     /**
@@ -76,16 +87,22 @@ public class FlatFileService {
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
      */
-    public FlatFileResponse parseFlatFiles(Project project, MultipartFile[] files) throws ServerError {
+    public ProjectCreationResponse createProjectFromFlatFiles(Project project, MultipartFile[] files)
+        throws ServerError {
+        // TODO: Move uploading into creation method
         List<String> uploadedFiles = this.uploadFlatFiles(project, Arrays.asList(files));
+
         ProjectVersion newProjectVersion = new ProjectVersion(project);
         this.projectVersionRepository.save(newProjectVersion);
         this.createProjectFromTIMFile(project, newProjectVersion);
 
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);
-        //TODO: set generated files
-        return response;
+
+        ProjectApplicationEntity projectApplicationEntity =
+            this.projectService.createApplicationEntity(newProjectVersion);
+        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(newProjectVersion);
+        return new ProjectCreationResponse(projectApplicationEntity, projectErrors);
     }
 
     public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {
@@ -110,25 +127,6 @@ public class FlatFileService {
         }
     }
 
-    public String getLinkErrorLog(Project project) throws ServerError {
-        return "Trace Link Error Log" + SEPARATOR + "\n" + getErrorLog(project,
-            ApplicationActivity.PARSING_TRACE_MATRIX);
-    }
-
-    /**
-     * Returns list of parsing error for given project if it was created
-     * through flat files.
-     *
-     * @param project the project whose upload errors are associated
-     * @return formatted string containing all parsing errors
-     */
-    public String getUploadErrorLog(Project project) {
-        return "TIM.json error log " + SEPARATOR + "\n"
-            + getErrorLog(project, ApplicationActivity.PARSING_TIM)
-            + "Artifact parsing error log" + SEPARATOR + "\n"
-            + getErrorLog(project, ApplicationActivity.PARSING_TRACE_MATRIX);
-    }
-
     public FileSystemResource getUploadedFile(Project project, String file) {
         return new FileSystemResource(new File(ProjectPaths.getPathToFlatFile(project, file)));
     }
@@ -141,20 +139,6 @@ public class FlatFileService {
     public void clearGeneratedFiles(Project project) throws ServerError {
         OSHelper.clearOrCreateDirectory(ProjectPaths.getPathToGeneratedFiles(project));
         this.traceLinkRepository.deleteAllByProjectAndTraceType(project, TraceType.GENERATED);
-    }
-
-    public File[] getUploadedFiles(Project project) {
-        File directory = new File(ProjectPaths.getPathToUploadedFiles(project));
-        File[] filesInDirectory = directory.listFiles();
-        if (filesInDirectory == null) {
-            return new File[]{};
-        }
-        return filesInDirectory;
-    }
-
-    public void getFileInfo() throws OperationNotSupportedException {
-        //TODO: what kind of information is needed?
-        throw new OperationNotSupportedException("getting file information is under construction");
     }
 
     public List<String> uploadFlatFiles(Project project, List<MultipartFile> requestFiles) throws ServerError {
@@ -186,17 +170,5 @@ public class FlatFileService {
         }
         this.flatFileParser.parseProject(projectVersion, pathToFile);
         // TODO: return generated files
-    }
-
-    private String getErrorLog(Project project, ApplicationActivity activity) {
-        List<ParserError> parserErrors = this.parserErrorRepository.findByProject(project);
-
-        StringBuilder result = new StringBuilder();
-        for (ParserError error : parserErrors) {
-            if (error.getActivity() == activity) {
-                result.append(error.toLogFormat());
-            }
-        }
-        return result.toString();
     }
 }

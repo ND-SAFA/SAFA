@@ -5,12 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.ArtifactBody;
-import edu.nd.crc.safa.entities.ArtifactFile;
-import edu.nd.crc.safa.entities.ArtifactType;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.ArtifactBody;
+import edu.nd.crc.safa.entities.database.ArtifactFile;
+import edu.nd.crc.safa.entities.database.ArtifactType;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
 import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.repositories.ArtifactRepository;

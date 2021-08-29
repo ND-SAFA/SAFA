@@ -1,30 +1,29 @@
 package edu.nd.crc.safa.responses;
 
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
 
 public class ProjectCreationResponse {
+    ProjectApplicationEntity project;
+    ProjectErrors errors;
 
-    Project project;
-    FlatFileResponse flatFileResponse;
-
-    public ProjectCreationResponse(Project project, FlatFileResponse flatFileResponse) {
+    public ProjectCreationResponse(ProjectApplicationEntity project, ProjectErrors errors) {
         this.project = project;
-        this.flatFileResponse = flatFileResponse;
+        this.errors = errors;
     }
 
-    public Project getProject() {
+    public ProjectApplicationEntity getProject() {
         return this.project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(ProjectApplicationEntity project) {
         this.project = project;
     }
 
-    public void setFlatFileResponse(FlatFileResponse flatFileResponse) {
-        this.flatFileResponse = flatFileResponse;
+    public ProjectErrors getErrors() {
+        return this.errors;
     }
 
-    public FlatFileResponse getFlatFileResponse() {
-        return this.flatFileResponse;
+    public void setErrors(ProjectErrors errors) {
+        this.errors = errors;
     }
 }

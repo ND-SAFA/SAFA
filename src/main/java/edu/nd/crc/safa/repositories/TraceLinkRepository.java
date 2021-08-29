@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.TraceLink;
-import edu.nd.crc.safa.entities.TraceType;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.TraceLink;
+import edu.nd.crc.safa.entities.database.TraceType;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

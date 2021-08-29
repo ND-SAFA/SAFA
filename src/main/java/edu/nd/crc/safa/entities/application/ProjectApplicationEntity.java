@@ -1,8 +1,8 @@
-package edu.nd.crc.safa.responses;
+package edu.nd.crc.safa.entities.application;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.Project;
+import edu.nd.crc.safa.entities.database.Project;
 
 public class ProjectApplicationEntity {
     String projectId;

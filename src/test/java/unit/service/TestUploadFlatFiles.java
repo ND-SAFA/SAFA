@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.services.FlatFileService;
 

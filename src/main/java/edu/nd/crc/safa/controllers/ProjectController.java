@@ -2,13 +2,12 @@ package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.Artifact;
-import edu.nd.crc.safa.entities.Project;
-import edu.nd.crc.safa.entities.ProjectVersion;
+import edu.nd.crc.safa.entities.database.Artifact;
+import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.database.ProjectVersion;
 import edu.nd.crc.safa.repositories.ArtifactRepository;
 import edu.nd.crc.safa.repositories.ProjectRepository;
 import edu.nd.crc.safa.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.responses.ServerResponse;
@@ -54,9 +53,7 @@ public class ProjectController extends BaseController {
         }
         Project project = new Project(); // TODO: extract name from TIM file
         this.projectRepository.save(project);
-        FlatFileResponse flatFileResponse = this.flatFileService.parseFlatFiles(project, files);
-        ProjectCreationResponse response = new ProjectCreationResponse(project, flatFileResponse);
-        response.setFlatFileResponse(flatFileResponse);
+        ProjectCreationResponse response = this.flatFileService.createProjectFromFlatFiles(project, files);
         return new ServerResponse(response);
     }
 
@@ -72,12 +69,6 @@ public class ProjectController extends BaseController {
     public void clearUploadedFlatFiles(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         flatFileService.clearUploadedFiles(project);
-    }
-
-    @GetMapping("projects/{projectId}/uploaderrorlog/")
-    public ServerResponse getUploadFilesErrorLog(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        return new ServerResponse(flatFileService.getUploadErrorLog(project));
     }
 
     @GetMapping("projects/{projectId}/remove/")

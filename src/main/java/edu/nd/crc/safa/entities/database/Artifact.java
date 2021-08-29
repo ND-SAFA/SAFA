@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -19,7 +20,9 @@ import org.hibernate.annotations.Type;
  * in a project.
  */
 @Entity
-@Table(name = "artifacts")
+@Table(name = "artifacts", uniqueConstraints = {@UniqueConstraint(name = "UniqueNameInProject", columnNames = {
+    "project_id",
+    "name"})})
 public class Artifact implements Serializable {
 
     @Id

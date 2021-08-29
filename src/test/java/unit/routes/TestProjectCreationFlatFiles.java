@@ -28,7 +28,7 @@ import unit.MultipartHelper;
 import unit.TestConstants;
 import unit.TestUtil;
 
-public class TestProjectCreation extends EntityBaseTest {
+public class TestProjectCreationFlatFiles extends EntityBaseTest {
 
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
@@ -143,7 +143,7 @@ public class TestProjectCreation extends EntityBaseTest {
         List<ParserError> parserErrors = parserErrorRepository.findByProjectVersion(projectVersion);
         assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
         ParserError error = parserErrors.get(0);
-        assertThat(error.getApplicationActivity()).isEqualTo(ApplicationActivity.PARSING_TRACE_MATRIX);
+        assertThat(error.getApplicationActivity()).isEqualTo(ApplicationActivity.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
         List<TraceLink> traceLinks = traceLinkRepository.findByProject(project);

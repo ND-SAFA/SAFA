@@ -158,10 +158,10 @@ public class TraceFileParser {
             this.traceLinkRepository.saveAll(traceLinks);
         } catch (ServerError e) {
             ParserError parserError = new ParserError(projectVersion,
-                fileName,
-                traceFileParser.getCurrentLineNumber(),
                 e.getMessage(),
-                ApplicationActivity.PARSING_TRACE_MATRIX);
+                ApplicationActivity.PARSING_TRACES,
+                fileName,
+                traceFileParser.getCurrentLineNumber());
             this.parserErrorRepository.save(parserError);
         }
     }

@@ -5,10 +5,14 @@ import java.util.List;
 import edu.nd.crc.safa.entities.database.Project;
 
 public class ProjectApplicationEntity {
-    String projectId;
-    String name;
-    List<ArtifactApplicationEntity> artifacts;
-    List<TraceApplicationEntity> traces;
+
+    public String projectId;
+    public String name;
+    public List<ArtifactApplicationEntity> artifacts;
+    public List<TraceApplicationEntity> traces;
+
+    public ProjectApplicationEntity() {
+    }
 
     public ProjectApplicationEntity(Project project,
                                     List<ArtifactApplicationEntity> artifacts,
@@ -25,6 +29,14 @@ public class ProjectApplicationEntity {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<ArtifactApplicationEntity> getArtifacts() {

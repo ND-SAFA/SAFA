@@ -34,7 +34,7 @@ public class ParserErrorService {
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
         List<ErrorApplicationEntity> traceErrors = this.parserErrorRepository
-            .findByProjectVersionAndApplicationActivity(projectVersion, ApplicationActivity.PARSING_TRACE_MATRIX)
+            .findByProjectVersionAndApplicationActivity(projectVersion, ApplicationActivity.PARSING_TRACES)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());

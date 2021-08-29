@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
+
 import org.hibernate.annotations.Type;
 
 /**
@@ -28,6 +30,13 @@ public class Project implements Serializable {
     String name;
 
     public Project() {
+    }
+
+    public Project(ProjectApplicationEntity appEntity) {
+        if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
+            this.projectId = UUID.fromString(appEntity.getProjectId());
+        }
+        this.name = appEntity.getName();
     }
 
     public Project(String name) {

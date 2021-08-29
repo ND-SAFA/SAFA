@@ -4,11 +4,16 @@ import edu.nd.crc.safa.entities.database.ArtifactBody;
 
 public class ArtifactApplicationEntity {
     public String name;
+    public String summary;
     public String body;
     public String type;
 
+    public ArtifactApplicationEntity() {
+    }
+
     public ArtifactApplicationEntity(ArtifactBody body) {
         this.name = body.getName();
+        this.summary = body.getSummary();
         this.body = body.getContent();
         this.type = body.getTypeName();
     }
@@ -19,6 +24,14 @@ public class ArtifactApplicationEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSummary() {
+        return this.summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public String getBody() {

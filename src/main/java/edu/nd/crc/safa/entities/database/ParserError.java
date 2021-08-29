@@ -20,6 +20,7 @@ import org.hibernate.annotations.Type;
  * Responsible for storing parsing errors when
  * uploading projects.
  */
+//TODO: Consider separating error details into an object (e.g. fileName, lineNumber);
 @Entity
 @Table(name = "parse_errors")
 public class ParserError implements Serializable {
@@ -52,16 +53,22 @@ public class ParserError implements Serializable {
     }
 
     public ParserError(ProjectVersion projectVersion,
-                       String fileName,
-                       Long lineNumber,
                        String description,
                        ApplicationActivity applicationActivity) {
         this();
         this.projectVersion = projectVersion;
-        this.fileName = fileName;
-        this.lineNumber = lineNumber;
         this.description = description;
         this.applicationActivity = applicationActivity;
+    }
+
+    public ParserError(ProjectVersion projectVersion,
+                       String description,
+                       ApplicationActivity applicationActivity,
+                       String fileName,
+                       Long lineNumber) {
+        this(projectVersion, description, applicationActivity);
+        this.fileName = fileName;
+        this.lineNumber = lineNumber;
     }
 
     public String toLogFormat() {

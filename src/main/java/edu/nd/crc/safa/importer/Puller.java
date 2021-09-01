@@ -13,15 +13,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.nd.crc.safa.entities.database.ArtifactBody;
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.entities.database.TraceLink;
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.repositories.TraceMatrixRepository;
-import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.services.Neo4JService;
 
 import com.jsoniter.output.JsonStream;
@@ -37,6 +29,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Puller {
+    private final Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
+    private final Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
+    private final Set<String> foundNodes = new HashSet<String>();
     public Neo4JService mNeo4JService;
     @Value("${git.username:}")
     String gitUsername;
@@ -49,30 +44,12 @@ public class Puller {
     @Value("${tim.requiredTraceScore:}")
     Double traceRequiredScore;
     JIRA mJira;
-    private ArtifactBodyRepository artifactBodyRepository;
-    private TraceMatrixRepository traceMatrixRepository;
-    private TraceLinkRepository traceLinkRepository;
-
-    private Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
-    private Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
-
-    private Set<String> foundNodes = new HashSet<String>();
 
     @Autowired
     public Puller(Neo4JService neo4JService,
-                  JIRA jira,
-                  ArtifactBodyRepository artifactBodyRepository,
-                  TraceMatrixRepository traceMatrixRepository,
-                  TraceLinkRepository traceLinkRepository) {
+                  JIRA jira) {
         this.mNeo4JService = neo4JService;
         this.mJira = jira;
-        this.artifactBodyRepository = artifactBodyRepository;
-        this.traceMatrixRepository = traceMatrixRepository;
-        this.traceLinkRepository = traceLinkRepository;
-    }
-
-    public void execute() throws ServerError {
-        mNeo4JService.execute();
     }
 
     public void parseJIRAIssues() {
@@ -93,7 +70,7 @@ public class Puller {
                 data.put("type", issue.type);
 
                 foundNodes.add(issue.key);
-                mNeo4JService.addNode(issue.key, issue.issuetype, JsonStream.serialize(data).toString());
+                mNeo4JService.addNode(issue.key, issue.issuetype, JsonStream.serialize(data));
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
@@ -198,49 +175,7 @@ public class Puller {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.toString());
-        }
-    }
-
-    public String mySQLNeo(Project project, ProjectVersion projectVersion) {
-        try {
-            insertArtifacts(projectVersion);
-            insertConnections(project);
-            return "{\"complete\": false}";
-        } catch (Exception e) {
-            System.out.println(String.format("Completed MysqlToNeo4j with exceptions: %s", e.getMessage()));
-            return String.format("{\"complete\": true, \"message\": \"%s\"}", e.getMessage());
-        }
-    }
-
-    public void insertArtifacts(ProjectVersion projectVersion) throws Exception {
-        List<ArtifactBody> artifacts = this.artifactBodyRepository.findByProjectVersion(projectVersion);
-        for (ArtifactBody artifact : artifacts) {
-            String type = artifact.getTypeName();
-            String id = artifact.getName();
-            String summary = artifact.getSummary();
-            String content = artifact.getContent();
-
-            Map<String, Object> data = new HashMap<String, Object>();
-            data.put("source", "Flatfile");
-            data.put("isDelegated", "N/A");
-            data.put("status", "N/A");
-            data.put("name", summary);
-            data.put("href", "N/A");
-            data.put("description", content);
-            data.put("type", type);
-
-            foundNodes.add(id);
-            mNeo4JService.addNode(id, type, JsonStream.serialize(data).toString());
-        }
-    }
-
-    public void insertConnections(Project project) {
-        List<TraceLink> projectLinks = traceLinkRepository.findByProject(project);
-        for (TraceLink link : projectLinks) {
-            if (link.isApproved()) {
-                mNeo4JService.addLink(link.getSourceName(), link.getSourceType().getName(), link.getTargetName());
-            }
+            System.err.println(e);
         }
     }
 }

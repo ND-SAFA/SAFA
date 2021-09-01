@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.config.Neo4J;
-import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.sql.Project;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.responses.ServerError;
 
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class VersionService {
-
     Neo4J neo4J;
     TreeService treeService;
     Puller mPuller;

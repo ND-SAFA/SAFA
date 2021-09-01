@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,7 +21,7 @@ public class TestServerErrorMessage extends SpringBootBaseTest {
 
     @Test
     public void testServerError() throws Exception {
-        String projectId = "abc"; // not exist
+        String projectId = UUID.randomUUID().toString(); // not exist
         String routeName = String.format("/projects/%s/versions/", projectId);
 
         MvcResult result = mockMvc

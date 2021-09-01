@@ -15,7 +15,6 @@ public class MultipartHelper {
 
     public static MockMultipartFile createFile(String pathToFile, String attrName) throws IOException {
         File file = new File(pathToFile);
-
         byte[] fileContent = FileUtils.readFileToByteArray(file);
         return new MockMultipartFile(
             attrName,

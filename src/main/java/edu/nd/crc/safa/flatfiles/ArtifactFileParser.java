@@ -5,17 +5,17 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.database.Artifact;
-import edu.nd.crc.safa.entities.database.ArtifactBody;
-import edu.nd.crc.safa.entities.database.ArtifactFile;
-import edu.nd.crc.safa.entities.database.ArtifactType;
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.repositories.ArtifactFileRepository;
-import edu.nd.crc.safa.repositories.ArtifactRepository;
-import edu.nd.crc.safa.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.entities.sql.Artifact;
+import edu.nd.crc.safa.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.entities.sql.ArtifactFile;
+import edu.nd.crc.safa.entities.sql.ArtifactType;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.repositories.sql.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactFileRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactTypeRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.entities.application;
 
-import edu.nd.crc.safa.entities.database.ArtifactBody;
+import edu.nd.crc.safa.entities.sql.ArtifactBody;
 
 public class ArtifactApplicationEntity {
     public String name;

@@ -13,17 +13,17 @@ import java.util.List;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.entities.database.TraceType;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.entities.sql.TraceType;
 import edu.nd.crc.safa.flatfiles.FlatFileParser;
 import edu.nd.crc.safa.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.flatfiles.TraceLinkGenerator;
-import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.repositories.ArtifactRepository;
-import edu.nd.crc.safa.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactRepository;
+import edu.nd.crc.safa.repositories.sql.ParserErrorRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.sql.TraceLinkRepository;
 import edu.nd.crc.safa.responses.FlatFileResponse;
 import edu.nd.crc.safa.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.responses.ProjectErrors;
@@ -56,6 +56,7 @@ public class FlatFileService {
 
     ProjectService projectService;
     ParserErrorService parserErrorService;
+    SynchronizeService synchronizeService;
 
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
@@ -66,7 +67,8 @@ public class FlatFileService {
                            TraceLinkRepository traceLinkRepository,
                            ArtifactBodyRepository artifactBodyRepository,
                            ProjectService projectService,
-                           ParserErrorService parserErrorService) {
+                           ParserErrorService parserErrorService,
+                           SynchronizeService synchronizeService) {
         this.traceLinkGenerator = traceLinkGenerator;
         this.flatFileParser = flatFileParser;
         this.projectVersionRepository = projectVersionRepository;
@@ -76,6 +78,7 @@ public class FlatFileService {
         this.artifactBodyRepository = artifactBodyRepository;
         this.projectService = projectService;
         this.parserErrorService = parserErrorService;
+        this.synchronizeService = synchronizeService;
     }
 
     /**
@@ -95,6 +98,7 @@ public class FlatFileService {
         ProjectVersion newProjectVersion = new ProjectVersion(project);
         this.projectVersionRepository.save(newProjectVersion);
         this.createProjectFromTIMFile(project, newProjectVersion);
+        // TODO: Uncomment when in-memory works synchronizeService.projectPull(newProjectVersion);
 
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);

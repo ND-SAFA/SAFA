@@ -2,22 +2,26 @@ package edu.nd.crc.safa.entities.application;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
 
 public class ProjectApplicationEntity {
 
     public String projectId;
     public String name;
+    public String projectVersion;
     public List<ArtifactApplicationEntity> artifacts;
     public List<TraceApplicationEntity> traces;
 
     public ProjectApplicationEntity() {
     }
 
-    public ProjectApplicationEntity(Project project,
+    public ProjectApplicationEntity(ProjectVersion projectVersion,
                                     List<ArtifactApplicationEntity> artifacts,
                                     List<TraceApplicationEntity> traces) {
+        Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
+        this.projectVersion = String.valueOf(projectVersion.getVersionId());
         this.name = project.getName();
         this.artifacts = artifacts;
         this.traces = traces;

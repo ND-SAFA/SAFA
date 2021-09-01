@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.entities.application.ErrorApplicationEntity;
-import edu.nd.crc.safa.entities.database.ApplicationActivity;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.repositories.sql.ParserErrorRepository;
 import edu.nd.crc.safa.responses.ProjectErrors;
 
 import org.springframework.beans.factory.annotation.Autowired;

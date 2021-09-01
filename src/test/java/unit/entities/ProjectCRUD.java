@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
-import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.sql.Project;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.TraceLink;
-import edu.nd.crc.safa.repositories.ArtifactRepository;
-import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.TraceLink;
+import edu.nd.crc.safa.repositories.sql.ArtifactRepository;
+import edu.nd.crc.safa.repositories.sql.TraceLinkRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

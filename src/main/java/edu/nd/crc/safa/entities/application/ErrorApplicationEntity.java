@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.entities.application;
 
-import edu.nd.crc.safa.entities.database.ParserError;
+import edu.nd.crc.safa.entities.sql.ParserError;
 
 public class ErrorApplicationEntity {
     String errorId;

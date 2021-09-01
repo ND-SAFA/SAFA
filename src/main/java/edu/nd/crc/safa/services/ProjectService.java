@@ -9,21 +9,21 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.entities.application.ArtifactApplicationEntity;
 import edu.nd.crc.safa.entities.application.ProjectApplicationEntity;
 import edu.nd.crc.safa.entities.application.TraceApplicationEntity;
-import edu.nd.crc.safa.entities.database.ApplicationActivity;
-import edu.nd.crc.safa.entities.database.Artifact;
-import edu.nd.crc.safa.entities.database.ArtifactBody;
-import edu.nd.crc.safa.entities.database.ArtifactType;
-import edu.nd.crc.safa.entities.database.ParserError;
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.entities.database.TraceLink;
-import edu.nd.crc.safa.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.repositories.ArtifactRepository;
-import edu.nd.crc.safa.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.repositories.ProjectRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.entities.sql.Artifact;
+import edu.nd.crc.safa.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.entities.sql.ArtifactType;
+import edu.nd.crc.safa.entities.sql.ParserError;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.entities.sql.TraceLink;
+import edu.nd.crc.safa.repositories.sql.ArtifactBodyRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactRepository;
+import edu.nd.crc.safa.repositories.sql.ArtifactTypeRepository;
+import edu.nd.crc.safa.repositories.sql.ParserErrorRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.sql.TraceLinkRepository;
 import edu.nd.crc.safa.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.responses.ProjectErrors;
 import edu.nd.crc.safa.responses.ServerError;
@@ -47,6 +47,7 @@ public class ProjectService {
     TraceLinkRepository traceLinkRepository;
     ParserErrorRepository parserErrorRepository;
     ParserErrorService parserErrorService;
+    SynchronizeService synchronizeService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
@@ -56,7 +57,8 @@ public class ProjectService {
                           ArtifactBodyRepository artifactBodyRepository,
                           TraceLinkRepository traceLinkRepository,
                           ParserErrorRepository parserErrorRepository,
-                          ParserErrorService parserErrorService) {
+                          ParserErrorService parserErrorService,
+                          SynchronizeService synchronizeService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactRepository = artifactRepository;
@@ -65,26 +67,12 @@ public class ProjectService {
         this.traceLinkRepository = traceLinkRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.parserErrorService = parserErrorService;
+        this.synchronizeService = synchronizeService;
     }
 
     public void deleteProject(Project project) throws ServerError {
         this.projectRepository.delete(project);
         OSHelper.deletePath(ProjectPaths.getPathToStorage(project));
-    }
-
-    public ProjectApplicationEntity createApplicationEntity(ProjectVersion newProjectVersion) {
-        Project project = newProjectVersion.getProject();
-        List<ArtifactApplicationEntity> artifacts = this.artifactBodyRepository
-            .findByProjectVersion(newProjectVersion)
-            .stream()
-            .map(ArtifactApplicationEntity::new)
-            .collect(Collectors.toList());
-        List<TraceApplicationEntity> traces = this.traceLinkRepository
-            .findByProject(project)
-            .stream()
-            .map(TraceApplicationEntity::new)
-            .collect(Collectors.toList());
-        return new ProjectApplicationEntity(project, artifacts, traces);
     }
 
     @Transactional
@@ -109,6 +97,21 @@ public class ProjectService {
         ProjectApplicationEntity projectApplicationEntity = createApplicationEntity(projectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
         return new ProjectCreationResponse(projectApplicationEntity, projectErrors);
+    }
+
+    public ProjectApplicationEntity createApplicationEntity(ProjectVersion newProjectVersion) {
+        Project project = newProjectVersion.getProject();
+        List<ArtifactApplicationEntity> artifacts = this.artifactBodyRepository
+            .findByProjectVersion(newProjectVersion)
+            .stream()
+            .map(ArtifactApplicationEntity::new)
+            .collect(Collectors.toList());
+        List<TraceApplicationEntity> traces = this.traceLinkRepository
+            .findByProject(project)
+            .stream()
+            .map(TraceApplicationEntity::new)
+            .collect(Collectors.toList());
+        return new ProjectApplicationEntity(newProjectVersion, artifacts, traces);
     }
 
     private void createArtifact(ProjectVersion projectVersion,

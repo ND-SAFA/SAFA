@@ -1,19 +1,25 @@
 package edu.nd.crc.safa.controllers;
 
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.config.Neo4J;
-import edu.nd.crc.safa.entities.database.Project;
+import edu.nd.crc.safa.entities.application.TestQuery;
+import edu.nd.crc.safa.entities.sql.Project;
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.repositories.ProjectRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.responses.ServerResponse;
 import edu.nd.crc.safa.services.VersionService;
 
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +41,14 @@ public class VersionController extends BaseController {
         this.neo4J = neo4J;
         this.mPuller = mPuller;
         this.versionService = versionService;
+    }
+
+    @PostMapping("/project/{projectId}/test-query/")
+    public ServerResponse testQuery(@PathVariable String projectId,
+                                    @RequestBody TestQuery query) throws Exception {
+        Session session = neo4J.createSession();
+        Result result = session.run(query.getQuery());
+        return new ServerResponse(result.stream().collect(Collectors.toList()));
     }
 
     @GetMapping("projects/{projectId}/versions/")

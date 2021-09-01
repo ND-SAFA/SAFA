@@ -2,12 +2,12 @@ package edu.nd.crc.safa.controllers;
 
 import java.util.List;
 
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.entities.database.TraceLink;
-import edu.nd.crc.safa.repositories.ProjectRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.entities.sql.TraceLink;
+import edu.nd.crc.safa.repositories.sql.ProjectRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.repositories.sql.TraceLinkRepository;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.responses.ServerResponse;
 import edu.nd.crc.safa.services.FlatFileService;

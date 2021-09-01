@@ -23,18 +23,58 @@ import org.springframework.stereotype.Service;
 public class Neo4JService implements AutoCloseable {
     private static int mLatestVersion = 0;
     public boolean VERBOSE = false;
-    @Autowired
     Neo4J driver;
+
     // Incoming Data
-    private Set<Triplet<String, String, String>> mExternalNodeLinkMap = new HashSet<Triplet<String, String, String>>();
-    private Set<Triplet<String, String, String>> mExternalNodeMap = new HashSet<Triplet<String, String, String>>();
-    private Set<Quartet<String, String, String, String>> mExternalSourceMap =
-        new HashSet<Quartet<String, String, String, String>>();
+    private Set<Triplet<String, String, String>> mExternalNodeLinkMap = new HashSet<>();
+    private Set<Triplet<String, String, String>> mExternalNodeMap = new HashSet<>();
+    private Set<Quartet<String, String, String, String>> mExternalSourceMap;
+
     // Current Data
-    private Set<Triplet<String, String, String>> mNodeLinkMap = new HashSet<Triplet<String, String, String>>();
-    private Set<Triplet<String, String, String>> mNodeMap = new HashSet<Triplet<String, String, String>>();
-    private Set<Quartet<String, String, String, String>> mSourceMap =
-        new HashSet<Quartet<String, String, String, String>>();
+    private Set<Triplet<String, String, String>> mNodeLinkMap = new HashSet<>();
+    private Set<Triplet<String, String, String>> mNodeMap = new HashSet<>();
+    private Set<Quartet<String, String, String, String>> mSourceMap;
+
+    @Autowired
+    public Neo4JService(Neo4J driver) {
+        this.driver = driver;
+        this.mExternalSourceMap = new HashSet<>();
+        this.mSourceMap = new HashSet<>();
+    }
+
+    public void execute() throws ServerError {
+        // Delete old updates
+        mLatestVersion = currentVersion();
+
+        processOldSources();
+        processOldLinks();
+        processOldIssues();
+
+        // Delete old updates
+        try (Session session = driver.createSession()) {
+            try (Transaction tx = session.beginTransaction()) {
+                tx.run("MATCH ()-[r:UPDATES]-() WHERE r.version = $version DELETE r",
+                    parameters("version", mLatestVersion));
+                tx.commit();
+            }
+        }
+
+        // Update current contents
+        updateDatabaseEntries();
+
+        if (mLatestVersion == -1) {
+            mLatestVersion = 0;
+        }
+
+        processIssues();
+        processLinks();
+        processSources();
+
+        // Clear inputted entries
+        mExternalNodeLinkMap = new HashSet<>();
+        mExternalNodeMap = new HashSet<>();
+        mExternalSourceMap = new HashSet<>();
+    }
 
     /**
      * This function creates a new tag within the database which stores the next version to be used by sucessive
@@ -91,23 +131,6 @@ public class Neo4JService implements AutoCloseable {
         }
 
         return version;
-    }
-
-    /**
-     * This function clears the entire database of nodes and links
-     */
-    public void clear() throws ServerError {
-        Session session = driver.createSession();
-        Transaction tx = session.beginTransaction();
-        if (VERBOSE) {
-            System.out.println("MATCH (n) DETACH DELETE n;");
-        }
-        tx.run("MATCH (n) DETACH DELETE n");
-        tx.commit();
-
-        mNodeLinkMap = new HashSet<Triplet<String, String, String>>();
-        mNodeMap = new HashSet<Triplet<String, String, String>>();
-        mSourceMap = new HashSet<Quartet<String, String, String, String>>();
     }
 
     private String removedDataQuery(int version) {
@@ -208,103 +231,16 @@ public class Neo4JService implements AutoCloseable {
 
     }
 
-    public int getLatestVersion() throws ServerError {
-        int version = 0;
-        Session session = driver.createSession();
-        Result result = session.run(
-            "MATCH ()-[r:UPDATES]-() RETURN r.version AS version ORDER BY r"
-                + ".version DESC LIMIT 1");
-        if (result.hasNext()) {
-            Record record = result.next();
-            version = record.get("version").asInt();
-        }
-        return version;
-    }
-
-    public int getNodeCount(final String type) throws ServerError {
-        int count = 0;
-        try (Session session = driver.createSession()) {
-            Result result = session.run(String.format("MATCH (:%s) RETURN count(*)", type));
-            count = result.next().get("count(*)").asInt();
-        }
-        return count;
-    }
-
-    public void printNodes(final String type) throws ServerError {
-        try (Session session = driver.createSession()) {
-            Result result = session.run("MATCH (n) WHERE [$type IN LABELS(n)] RETURN n",
-                parameters("type", type));
-            if (result.hasNext()) {
-                Record record = result.next();
-                System.out.println(record.get("n").asMap());
-            }
-        }
-    }
-
-    public void printRelationships(final String id) throws ServerError {
-        try (Session session = driver.createSession()) {
-            Result result = session.run("MATCH ({id: $id})-[r]-() RETURN r",
-                parameters("id", id));
-            if (result.hasNext()) {
-                Record record = result.next();
-                System.out.println(record.get("r").asMap());
-            }
-        }
-    }
-
-    public int getLinkCount(final String type) throws ServerError {
-        int count = 0;
-        Session session = driver.createSession();
-        count = session.run("MATCH ()<-[r]-() WHERE TYPE(r)=$type RETURN count(*)",
-            parameters("type", type)).single().get("count(*)").asInt();
-
-        return count;
-    }
-
     public void addNode(final String id, final String type, final String data) {
         mExternalNodeMap.add(Triplet.with(id, type, data));
     }
 
-    public void addLink(final String parent, final String type, final String child) {
-        mExternalNodeLinkMap.add(Triplet.with(parent, type, child));
+    public void addLink(final String sourceName, final String linkType, final String targetName) {
+        mExternalNodeLinkMap.add(Triplet.with(sourceName, linkType, targetName));
     }
 
     public void addSource(final String name, final String commit, final String parent, final String issue) {
         mExternalSourceMap.add(Quartet.with(parent, name, commit, issue));
-    }
-
-    public void execute() throws ServerError {
-        // Delete old updates
-        mLatestVersion = currentVersion();
-
-        processOldSources();
-        processOldLinks();
-        processOldIssues();
-
-        // Delete old updates
-        try (Session session = driver.createSession()) {
-            try (Transaction tx = session.beginTransaction()) {
-                tx.run("MATCH ()-[r:UPDATES]-() WHERE r.version = $version DELETE r",
-                    parameters("version", mLatestVersion));
-                tx.commit();
-            }
-        }
-
-        // Update current contents
-        updateDatabaseEntries();
-
-        if (mLatestVersion == -1) {
-            mLatestVersion = 0;
-        }
-
-        processIssues();
-        processLinks();
-        processSources();
-
-        // Clear inputted entries
-        mExternalNodeLinkMap = new HashSet<Triplet<String, String, String>>();
-        mExternalNodeMap = new HashSet<Triplet<String, String, String>>();
-        mExternalSourceMap = new HashSet<Quartet<String, String, String, String>>();
     }
 
     /**
@@ -791,9 +727,5 @@ public class Neo4JService implements AutoCloseable {
 
     private String sanitizeType(final String type) {
         return type.replace(" ", "").replace("-", "");
-    }
-
-    public static class EmptyException extends Exception {
-        private static final long serialVersionUID = 7123803818445430594L;
     }
 }

@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.controllers;
 
-import edu.nd.crc.safa.entities.database.Layout;
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.repositories.LayoutRepository;
-import edu.nd.crc.safa.repositories.ProjectRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.entities.sql.Layout;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.repositories.sql.LayoutRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.responses.ServerResponse;
 

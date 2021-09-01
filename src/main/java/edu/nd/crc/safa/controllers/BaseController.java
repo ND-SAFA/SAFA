@@ -4,10 +4,10 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import edu.nd.crc.safa.entities.database.Project;
-import edu.nd.crc.safa.entities.database.ProjectVersion;
-import edu.nd.crc.safa.repositories.ProjectRepository;
-import edu.nd.crc.safa.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.entities.sql.Project;
+import edu.nd.crc.safa.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.repositories.sql.ProjectRepository;
+import edu.nd.crc.safa.repositories.sql.ProjectVersionRepository;
 import edu.nd.crc.safa.responses.ResponseCodes;
 import edu.nd.crc.safa.responses.ServerError;
 import edu.nd.crc.safa.responses.ServerResponse;

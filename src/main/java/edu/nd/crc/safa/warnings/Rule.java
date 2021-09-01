@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.entities.database.Warning;
+import edu.nd.crc.safa.entities.sql.Warning;
 
 public class Rule {
+    private final Name mName;
     public List<Tokenizer.Token> mTokens;
     List<String> ImplementedFunctions = Arrays.asList(
         "at-least-one",
@@ -17,7 +18,6 @@ public class Rule {
         "less-than-n"
     );
     String mText;
-    private final Name mName;
 
     public Rule() {
         mName = new Name();

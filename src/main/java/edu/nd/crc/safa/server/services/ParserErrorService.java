@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.db.entities.application.ErrorApplicationEntity;
+import edu.nd.crc.safa.db.entities.app.ErrorApplicationEntity;
 import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;

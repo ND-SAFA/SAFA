@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
-import edu.nd.crc.safa.db.entities.application.ProjectApplicationEntity;
+import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
 import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
@@ -56,7 +56,7 @@ public class ProjectController extends BaseController {
 
     @PostMapping("projects/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody ProjectApplicationEntity project) {
+    public ServerResponse createOrUpdateProject(@RequestBody ProjectAppEntity project) throws ServerError {
         ProjectCreationResponse response = this.projectService.createOrUpdateProject(project);
         return new ServerResponse(response);
     }

@@ -107,14 +107,12 @@ public class ArtifactFileParser {
         }
 
         for (CSVRecord artifactRecord : artifactRecords) {
-
             String artifactId = artifactRecord.get(ID_PARAM);
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
 
             Artifact artifact = new Artifact(project, artifactType, artifactId);
-            ArtifactBody artifactBody = new ArtifactBody(
-                projectVersion, artifact, artifactSummary, artifactContent);
+            ArtifactBody artifactBody = new ArtifactBody(projectVersion, artifact, artifactSummary, artifactContent);
 
             this.artifactRepository.save(artifact);
             this.artifactBodyRepository.save(artifactBody);

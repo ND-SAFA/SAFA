@@ -4,11 +4,14 @@ import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 
@@ -21,13 +24,18 @@ import org.hibernate.annotations.Type;
  * depending on the project version.
  */
 @Entity
-@Table(name = "artifact_contents")
+@Table(name = "artifact_contents",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"artifact_id", "version_id"})})
 public class ArtifactBody implements Serializable {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
     UUID artifactBodyId;
+
+    @Column(name = "modification_type")
+    @Enumerated(EnumType.ORDINAL)
+    ModificationType modificationType;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,14 +59,24 @@ public class ArtifactBody implements Serializable {
     public ArtifactBody() {
     }
 
+
     public ArtifactBody(ProjectVersion projectVersion,
+                        ModificationType modificationType,
                         Artifact artifact,
                         String summary,
                         String content) {
         this.artifact = artifact;
+        this.modificationType = modificationType;
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
+    }
+
+    public ArtifactBody(ProjectVersion projectVersion,
+                        Artifact artifact,
+                        String summary,
+                        String content) {
+        this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
     public String getName() {
@@ -79,5 +97,13 @@ public class ArtifactBody implements Serializable {
 
     public Artifact getArtifact() {
         return this.artifact;
+    }
+
+    public ModificationType getModificationType() {
+        return this.modificationType;
+    }
+
+    public long getProjectVersionId() {
+        return this.projectVersion.getVersionId();
     }
 }

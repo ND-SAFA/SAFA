@@ -18,7 +18,7 @@ public class TestOSHelper extends EntityBaseTest {
     @Test
     public void smokeTest() throws ServerError {
         String testName = "hellWorld";
-        Project project = createProject(testName);
+        Project project = entityBuilder.newProject(testName).getProject(testName);
         String pathToTestProject = ProjectPaths.getPathToStorage(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();

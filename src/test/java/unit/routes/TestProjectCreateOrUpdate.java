@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,7 +69,7 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
      */
     @Test
     public void updateEntities() throws Exception {
-        // Create Basic Project (repeat of createEntitiesFromJson)
+        // Step - Create Basic Project (repeat of createEntitiesFromJson)
         JSONObject projectJson = createProjectJson();
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
@@ -79,18 +78,18 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
             .getString("projectId");
         Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
         testProjectArtifactsCreated(project, 1);
+        List<ArtifactBody> artifactBodiesQuery =
+            this.artifactBodyRepository.getBodiesWithName(project, a1Name);
+        assertThat(artifactBodiesQuery.size()).as("# of bodies on init").isEqualTo(1);
 
-        // Create Updated Request
+        // Step - Create Updated Request and Send
         String newProjectName = "new-project-name";
         String newArtifactBody = "new-artifact-body";
-        JSONObject updateRequest = new JSONObject();
-        updateRequest.put("projectId", projectId);
-        updateRequest.put("name", newProjectName);
-        List<JSONObject> artifacts = new ArrayList<>();
-        artifacts.add(createArtifact(a1Name, a1Type, newArtifactBody));
-        updateRequest.put("artifacts", artifacts);
-
-        postProjectJson(updateRequest);
+        JSONObject updateRequestJson = jsonBuilder
+            .withProject(projectId, newProjectName)
+            .withArtifact(newProjectName, a1Name, a1Type, newArtifactBody)
+            .getProjectAndReturn(newProjectName);
+        postProjectJson(updateRequestJson);
 
         // VP - Verify that project name has changed
         Project updatedProject = this.projectRepository.findByProjectId(UUID.fromString(projectId));
@@ -98,19 +97,20 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
         // VP - Verify all entities still exist
         testProjectArtifactsCreated(project, 2);
         // VP - Verify that artifact has two versions and the latest has updated body.
-        List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifactName(a1Name);
-        assertThat(artifactBodies.size()).isEqualTo(2);
-        assertThat(artifactBodies.get(1).getContent()).isEqualTo(newArtifactBody);
+        artifactBodiesQuery =
+            this.artifactBodyRepository.getBodiesWithName(project, a1Name);
+        assertThat(artifactBodiesQuery.size()).as("# of bodies on update").isEqualTo(2);
+        assertThat(artifactBodiesQuery.get(1).getContent()).isEqualTo(newArtifactBody);
     }
 
     private void testProjectArtifactsCreated(Project project, int expectedVersions) {
-        // VP 3 - Resources were created
+        // VP - Resources were created
         List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);
         assertThat(projectVersions.size()).as("# versions").isEqualTo(expectedVersions);
         ProjectVersion projectVersion = projectVersions.get(0);
         assertThat(projectVersion).as("project version created").isNotNull();
 
-        // VP - Project types
+        // VP - Project types are created
         List<ArtifactType> projectTypes = artifactTypeRepository.findByProject(project);
         assertThat(projectTypes.size()).as("all types created").isEqualTo(N_TYPES);
 
@@ -153,35 +153,11 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
     }
 
     private JSONObject createProjectJson() {
-        List<JSONObject> artifacts = new ArrayList<JSONObject>();
-        artifacts.add(createArtifact(a1Name, a1Type, "this is a requirement"));
-        artifacts.add(createArtifact(a2Name, a2Type, "this is a design"));
-
-        List<JSONObject> traces = new ArrayList<>();
-        traces.add(createTrace(a1Name, a2Name));
-
-        JSONObject projectJson = new JSONObject();
-        projectJson.put("projectId", "");
-        projectJson.put("name", projectName);
-        projectJson.put("artifacts", artifacts);
-        projectJson.put("traces", traces);
-        return projectJson;
-    }
-
-    private JSONObject createArtifact(String name,
-                                      String type,
-                                      String body) {
-        JSONObject artifact = new JSONObject();
-        artifact.put("name", name);
-        artifact.put("type", type);
-        artifact.put("body", body);
-        return artifact;
-    }
-
-    private JSONObject createTrace(String source, String target) {
-        JSONObject trace = new JSONObject();
-        trace.put("source", source);
-        trace.put("target", target);
-        return trace;
+        return jsonBuilder
+            .withProject("", projectName)
+            .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
+            .withArtifact(projectName, a2Name, a2Type, "this is a design")
+            .withTrace(projectName, a1Name, a2Name)
+            .getProjectAndReturn(projectName);
     }
 }

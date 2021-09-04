@@ -12,18 +12,18 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.db.entities.application.ProjectApplicationEntity;
+import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceType;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
-import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
-import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
 import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
 import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
 import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;
 import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
 import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
+import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
+import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
 import edu.nd.crc.safa.server.responses.FlatFileResponse;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ProjectErrors;
@@ -103,10 +103,10 @@ public class FlatFileService {
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);
 
-        ProjectApplicationEntity projectApplicationEntity =
+        ProjectAppEntity projectAppEntity =
             this.projectService.createApplicationEntity(newProjectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(newProjectVersion);
-        return new ProjectCreationResponse(projectApplicationEntity, projectErrors);
+        return new ProjectCreationResponse(projectAppEntity, projectErrors);
     }
 
     public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {

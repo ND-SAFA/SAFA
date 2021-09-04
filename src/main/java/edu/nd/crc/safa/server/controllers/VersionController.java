@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.Neo4J;
-import edu.nd.crc.safa.db.entities.application.TestQuery;
+import edu.nd.crc.safa.db.entities.app.TestQuery;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;

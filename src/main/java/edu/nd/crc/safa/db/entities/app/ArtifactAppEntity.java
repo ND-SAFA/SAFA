@@ -1,17 +1,17 @@
-package edu.nd.crc.safa.db.entities.application;
+package edu.nd.crc.safa.db.entities.app;
 
 import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 
-public class ArtifactApplicationEntity {
+public class ArtifactAppEntity {
     public String name;
     public String summary;
     public String body;
     public String type;
 
-    public ArtifactApplicationEntity() {
+    public ArtifactAppEntity() {
     }
 
-    public ArtifactApplicationEntity(ArtifactBody body) {
+    public ArtifactAppEntity(ArtifactBody body) {
         this.name = body.getName();
         this.summary = body.getSummary();
         this.body = body.getContent();
@@ -48,5 +48,10 @@ public class ArtifactApplicationEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public ArtifactAppEntity withName(String name) {
+        this.name = name;
+        return this;
     }
 }

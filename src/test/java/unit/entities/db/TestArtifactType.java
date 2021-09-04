@@ -1,4 +1,4 @@
-package unit.entities;
+package unit.entities.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,45 +6,40 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.Project;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
 
-/* Tests that ArtifactTypes can be created
- *
+/**
+ * Tests that ArtifactTypes can be created, retrieved, updated, and deleted.
  */
-public class ArtifactNodeTypeCRUD extends EntityBaseTest {
+public class TestArtifactType extends EntityBaseTest {
     @Test
     public void createRetrieveUpdateDeleteArtifactType() {
         String projectName = "test_project";
         String artifactTypeName = "Design Definitions";
         String altArtifactTypeName = "Requirements";
 
-        Project project = createProject(projectName);
+        // Step - Create project with new artifact type
+        this.entityBuilder.newProject(projectName);
+        ArtifactType artifactType = entityBuilder.newTypeAndReturn(projectName, artifactTypeName);
 
-        //VP 1 - Create Artifact Type
-        ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
-        artifactTypeRepository.save(artifactType);
+        // VP - Artifact type created
         UUID artifactTypeId = artifactType.getTypeId();
-        assertThat(artifactTypeId).isNotNull();
-
-        //VP 2 - Retrieve Artifact Type
         ArtifactType queriedArtifactType = artifactTypeRepository.findByTypeId(artifactTypeId);
 
+        assertThat(artifactTypeId).isNotNull();
         assertThat(queriedArtifactType).isNotNull();
         assertThat(queriedArtifactType.getName()).isEqualTo(artifactTypeName.toLowerCase());
 
-        //VP 3 - Update Artifact Type
-        queriedArtifactType.setName(altArtifactTypeName);
-        artifactTypeRepository.save(queriedArtifactType);
+        // VP 3 - Update type name
+        entityBuilder.updateTypeName(projectName, artifactTypeName, altArtifactTypeName);
         queriedArtifactType = artifactTypeRepository.findByTypeId(artifactTypeId);
         assertThat(queriedArtifactType.getName()).isEqualTo(altArtifactTypeName.toLowerCase());
 
-        //VP 4 - Delete Artifact Type
+        // VP - Delete Artifact Type
         artifactTypeRepository.delete(queriedArtifactType);
         Optional<ArtifactType> artifactTypeQuery = artifactTypeRepository.findById(artifactTypeId);
-
         assertThat(artifactTypeQuery.isPresent()).isFalse();
     }
 }

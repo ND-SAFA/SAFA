@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.db.entities.application.ProjectApplicationEntity;
+import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 
 import org.hibernate.annotations.Type;
 
@@ -32,7 +32,7 @@ public class Project implements Serializable {
     public Project() {
     }
 
-    public Project(ProjectApplicationEntity appEntity) {
+    public Project(ProjectAppEntity appEntity) {
         if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
             this.projectId = UUID.fromString(appEntity.getProjectId());
         }

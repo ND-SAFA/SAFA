@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.db.entities.application;
+package edu.nd.crc.safa.db.entities.app;
 
 public class TestQuery {
     String query;

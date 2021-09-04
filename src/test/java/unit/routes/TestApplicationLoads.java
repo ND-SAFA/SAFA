@@ -28,5 +28,4 @@ public class TestApplicationLoads extends SpringBootBaseTest {
         assertThat(content.get("status")).isEqualTo(0);
         assertThat(content.get("body")).isEqualTo("Hello World");
     }
-
 }

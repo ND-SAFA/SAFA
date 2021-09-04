@@ -4,13 +4,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
+import edu.nd.crc.safa.db.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.db.entities.sql.Artifact;
+import edu.nd.crc.safa.db.entities.sql.ParserError;
 import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
 import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
+import edu.nd.crc.safa.server.responses.ServerError;
 
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class TraceLinkService {
 
     private final TraceLinkRepository traceLinkRepository;
-    private ArtifactRepository artifactRepository;
+    private final ArtifactRepository artifactRepository;
 
     @Autowired
-    public TraceLinkService(TraceLinkRepository traceLinkRepository) {
+    public TraceLinkService(TraceLinkRepository traceLinkRepository, ArtifactRepository artifactRepository) {
         this.traceLinkRepository = traceLinkRepository;
+        this.artifactRepository = artifactRepository;
     }
 
     public String getLinkTypes(Project project) {
@@ -80,5 +89,34 @@ public class TraceLinkService {
             }
         }
         return queriedLinks;
+    }
+
+    public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,
+                                                    TraceApplicationEntity t) {
+        Project project = projectVersion.getProject();
+        Optional<Artifact> source = this.artifactRepository.findByProjectAndName(project, t.source);
+        if (!source.isPresent()) {
+            ParserError sourceError = new ParserError(projectVersion,
+                "Could not find source artifact: " + t.source,
+                ApplicationActivity.PARSING_TRACES);
+            return new Pair<>(null, sourceError);
+        }
+        Optional<Artifact> target = this.artifactRepository.findByProjectAndName(project, t.target);
+        if (!target.isPresent()) {
+            ParserError targetError = new ParserError(projectVersion,
+                "Could not find target artifact: " + t.target,
+                ApplicationActivity.PARSING_TRACES);
+            return new Pair<>(null, targetError);
+        }
+        try {
+            TraceLink traceLink = new TraceLink(source.get(), target.get());
+            traceLink.setIsManual();
+            return new Pair<>(traceLink, null);
+        } catch (ServerError e) {
+            ParserError linkError = new ParserError(projectVersion,
+                e.getMessage(),
+                ApplicationActivity.PARSING_TRACES);
+            return new Pair<>(null, linkError);
+        }
     }
 }

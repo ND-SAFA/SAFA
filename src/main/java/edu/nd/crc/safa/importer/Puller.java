@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.services.Neo4JService;
+import edu.nd.crc.safa.server.services.Neo4JService;
 
 import com.jsoniter.output.JsonStream;
 import org.eclipse.jgit.api.Git;

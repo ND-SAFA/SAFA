@@ -8,14 +8,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.entities.sql.Artifact;
-import edu.nd.crc.safa.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.entities.sql.ArtifactType;
-import edu.nd.crc.safa.entities.sql.ParserError;
-import edu.nd.crc.safa.entities.sql.Project;
-import edu.nd.crc.safa.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.entities.sql.TraceLink;
+import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.db.entities.sql.Artifact;
+import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.db.entities.sql.ParserError;
+import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.db.entities.sql.TraceLink;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

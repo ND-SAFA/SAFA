@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.responses.ServerError;
+import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;

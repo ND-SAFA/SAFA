@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.entities.neo4j.ArtifactNode;
+import edu.nd.crc.safa.db.entities.neo4j.ArtifactNode;
 
 import org.junit.jupiter.api.Test;
 

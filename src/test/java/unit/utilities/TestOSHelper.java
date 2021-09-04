@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.entities.sql.Project;
-import edu.nd.crc.safa.responses.ServerError;
+import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;

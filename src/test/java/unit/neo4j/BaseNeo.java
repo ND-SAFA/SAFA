@@ -1,6 +1,6 @@
 package unit.neo4j;
 
-import edu.nd.crc.safa.repositories.neo4j.ArtifactNodeRepository;
+import edu.nd.crc.safa.db.repositories.neo4j.ArtifactNodeRepository;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

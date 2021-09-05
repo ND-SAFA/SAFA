@@ -106,4 +106,8 @@ public class ArtifactBody implements Serializable {
     public long getProjectVersionId() {
         return this.projectVersion.getVersionId();
     }
+
+    public boolean hasSameId(ArtifactBody other) {
+        return this.artifactBodyId.equals(other.artifactBodyId);
+    }
 }

@@ -1,13 +1,18 @@
 package unit.service;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 import edu.nd.crc.safa.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.ArtifactService;
 
 import org.junit.jupiter.api.Test;
@@ -87,5 +92,78 @@ public class TestArtifactService extends EntityBaseTest {
             .findLastArtifactBody(entityBuilder.getProject(projectName),
                 entityBuilder.getArtifact(projectName, artifactName));
         assertThat(artifactBodyQuery.isPresent()).isFalse();
+    }
+
+    @Test
+    public void testNoChangeDetected() throws ServerError {
+        String projectName = "test-project";
+        String artifactTypeName = "requirement";
+        String artifactName = "RE-8";
+        String artifactContent = "this is a body";
+        String artifactSummary = "this is a summary";
+
+        // Step - Create project with: v1, type, artifact, body
+        entityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newType(projectName, artifactTypeName)
+            .newArtifact(projectName, artifactTypeName, artifactName)
+            .newArtifactBody(projectName, artifactName, artifactSummary, artifactContent);
+
+        // Step - Create new version + update artifact with same artifact (no change)
+        ArtifactBody artifactBody = entityBuilder.getArtifactBody(projectName, artifactName, 0);
+        ArtifactAppEntity artifactApp = new ArtifactAppEntity(artifactBody);
+
+        // VP - Verify that no new entry has been created
+        ProjectVersion newVersion = entityBuilder.newVersionWithReturn(projectName);
+        Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
+        ArtifactBody updatedBody = artifactService.updateArtifactBody(newVersion, artifact, artifactApp);
+        assertThat(updatedBody).isNull();
+        List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifact(artifact);
+        assertThat(artifactBodies.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void verifyErrorIfNoBodyExists() {
+        String projectName = "test-project";
+        String typeName = "requirements";
+        String artifactName = "RE-8";
+
+        // Step - Create project with: version, type, artifact -- no body
+        Artifact artifact = entityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newType(projectName, typeName)
+            .newArtifactWithReturn(projectName, typeName, artifactName);
+        ProjectVersion projectVersion = entityBuilder.getProjectVersion(projectName, 0);
+        ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", "");
+        assertThrows(ServerError.class, () ->
+            this.artifactService.updateArtifactBody(projectVersion, artifact, appEntity));
+    }
+
+    @Test
+    public void artifactModificationDetected() throws ServerError {
+        String projectName = "test-project";
+        String typeName = "requirements";
+        String artifactName = "RE-8";
+        String newContent = "this is a new content text";
+
+        // Step - Create project with: version, type, artifact, body
+        entityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newType(projectName, typeName)
+            .newArtifact(projectName, typeName, artifactName)
+            .newArtifactBody(projectName, artifactName, "", "");
+
+        // Step - Create new version and updated artifact
+        ProjectVersion projectVersion = entityBuilder.newVersionWithReturn(projectName);
+        Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
+        ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", newContent);
+
+        // VP - Verify that artifact body is detected to be modified
+        ArtifactBody updatedBody = this.artifactService.updateArtifactBody(projectVersion, artifact, appEntity);
+        assertThat(updatedBody.getModificationType()).isEqualTo(ModificationType.MODIFIED);
+        assertThat(updatedBody.getContent()).isEqualTo(newContent);
     }
 }

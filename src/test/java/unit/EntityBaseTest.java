@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.builders.AppBuilder;
+import edu.nd.crc.safa.builders.EntityBuilder;
+import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.builders.AppBuilder;
-import edu.nd.crc.safa.db.entities.builders.EntityBuilder;
-import edu.nd.crc.safa.db.entities.builders.JsonBuilder;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;

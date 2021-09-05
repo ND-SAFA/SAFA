@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.db.entities.builders;
+package edu.nd.crc.safa.builders;
 
 import java.util.Hashtable;
 
@@ -37,21 +37,21 @@ public abstract class BaseBuilder {
     protected void addArtifactBody(Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactBody>>> table,
                                    String projectName,
                                    String artifactName,
-                                   Long versionId,
+                                   int versionIndex,
                                    ArtifactBody body) {
         if (table.containsKey(projectName)) {
             Hashtable<String, Hashtable<Long, ArtifactBody>> projectTable = table.get(projectName);
             if (projectTable.contains(artifactName)) {
-                projectTable.get(projectName).put(versionId, body);
+                projectTable.get(projectName).put((long) versionIndex, body);
             } else {
                 Hashtable<Long, ArtifactBody> versionTable = new Hashtable<>();
-                versionTable.put(versionId, body);
+                versionTable.put((long) versionIndex, body);
                 projectTable.put(artifactName, versionTable);
             }
         } else {
             Hashtable<String, Hashtable<Long, ArtifactBody>> projectTable = new Hashtable<>();
             table.put(projectName, projectTable);
-            addArtifactBody(table, projectName, artifactName, versionId, body);
+            addArtifactBody(table, projectName, artifactName, versionIndex, body);
         }
     }
 }

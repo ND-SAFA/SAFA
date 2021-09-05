@@ -1,8 +1,8 @@
-package edu.nd.crc.safa.db.entities.builders;
+package edu.nd.crc.safa.builders;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
@@ -73,17 +73,21 @@ public class EntityBuilder extends BaseBuilder {
         Project project = new Project(name);
         this.projectRepository.save(project);
         this.projects.put(name, project);
+        this.projectVersions.put(name, new Hashtable<>());
+        this.artifactTypes.put(name, new Hashtable<>());
+        this.artifacts.put(name, new Hashtable<>());
+        this.bodies.put(name, new Hashtable<>());
         return this;
     }
 
     public ProjectVersion newVersionWithReturn(String projectName) {
         this.newVersion(projectName);
-        int versionIndex = this.projectVersions.get(projectName).size() - 1;
+        int versionIndex = getProjectVersions(projectName).size() - 1;
         return this.getProjectVersion(projectName, versionIndex);
     }
 
     public EntityBuilder newVersion(String projectName) {
-        Project project = this.projects.get(projectName);
+        Project project = getProject(projectName);
         ProjectVersion projectVersion = new ProjectVersion(project);
         this.projectVersionRepository.save(projectVersion);
         addEntry(this.projectVersions, projectName, projectVersion);
@@ -95,7 +99,7 @@ public class EntityBuilder extends BaseBuilder {
     }
 
     public EntityBuilder newType(String projectName, String typeName) {
-        Project project = this.projects.get(projectName);
+        Project project = getProject(projectName);
         ArtifactType artifactType = new ArtifactType(project, typeName);
         this.artifactTypeRepository.save(artifactType);
         addEntry(this.artifactTypes, projectName, typeName, artifactType);
@@ -107,8 +111,8 @@ public class EntityBuilder extends BaseBuilder {
     }
 
     public EntityBuilder newArtifact(String projectName, String typeName, String artifactName) {
-        Project project = this.projects.get(projectName);
-        ArtifactType artifactType = this.artifactTypes.get(projectName).get(typeName);
+        Project project = getProject(projectName);
+        ArtifactType artifactType = getType(projectName, typeName);
         Artifact artifact = new Artifact(project, artifactType, artifactName);
         this.artifactRepository.save(artifact);
         this.addEntry(this.artifacts, projectName, artifactName, artifact);
@@ -134,6 +138,14 @@ public class EntityBuilder extends BaseBuilder {
         return this.newArtifactBody(projectName, versionIndex, artifactName, summary, content);
     }
 
+    public ArtifactBody newArtifactBodyWithReturn(String projectName,
+                                                  String artifactName,
+                                                  String summary,
+                                                  String content) {
+        newArtifactBody(projectName, 0, artifactName, summary, content);
+        return getArtifactBody(projectName, artifactName, 0);
+    }
+
     public EntityBuilder newArtifactBody(String projectName,
                                          String artifactName,
                                          String summary,
@@ -156,7 +168,7 @@ public class EntityBuilder extends BaseBuilder {
                                                   String summary,
                                                   String content) {
         newArtifactBody(projectName, versionIndex, modificationType, artifactName, summary, content);
-        return getArtifactBody(projectName, artifactName, (long) versionIndex);
+        return getArtifactBody(projectName, artifactName, versionIndex);
     }
 
     public EntityBuilder newArtifactBody(String projectName,
@@ -173,52 +185,81 @@ public class EntityBuilder extends BaseBuilder {
             summary,
             content);
         this.artifactBodyRepository.save(artifactBody);
-        addArtifactBody(bodies, projectName, artifactName, projectVersion.getVersionId(), artifactBody);
+        addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactBody);
         return this;
     }
 
     public EntityBuilder updateProjectName(String currentName, String newName) {
-        Project project = this.projects.get(currentName);
+        Project project = getProject(currentName);
         project.setName(newName);
         this.projectRepository.save(project);
         return this;
     }
 
     public EntityBuilder updateTypeName(String projectName, String currentName, String newName) {
-        ArtifactType artifactType = this.artifactTypes.get(projectName).get(currentName);
+        ArtifactType artifactType = getType(projectName, currentName);
         artifactType.setName(newName);
         this.artifactTypeRepository.save(artifactType);
         return this;
     }
 
     public EntityBuilder updateArtifactName(String projectName, String artifactName, String newName) {
-        Artifact artifact = this.artifacts.get(projectName).get(artifactName);
+        Artifact artifact = getArtifact(projectName, artifactName);
         artifact.setName(newName);
         this.artifactRepository.save(artifact);
         return this;
     }
 
     public Project getProject(String projectName) {
+        assertProjectExists(this.projects, projectName);
         return this.projects.get(projectName);
     }
 
     public ProjectVersion getProjectVersion(String projectName, int index) {
+        assertProjectExists(this.projectVersions, projectName);
+        assertEntityExists(this.projectVersions.get(projectName), "Project index", index);
         return this.projectVersions.get(projectName).get(index);
     }
 
+    public List<ProjectVersion> getProjectVersions(String projectName) {
+        assertProjectExists(this.projectVersions, projectName);
+        return new ArrayList<>(this.projectVersions.get(projectName).values());
+    }
+
     public Artifact getArtifact(String projectName, String artifactName) {
+        assertProjectExists(this.artifacts, projectName);
+        if (!this.artifacts.get(projectName).containsKey(artifactName)) {
+            throw new RuntimeException(String.format("Artifact %s has not been created.", artifactName));
+        }
         return this.artifacts.get(projectName).get(artifactName);
     }
 
     public List<Artifact> getArtifacts(String projectName) {
-        return this.artifacts.get(projectName).values().stream().collect(Collectors.toList());
+        assertProjectExists(this.artifacts, projectName);
+        return new ArrayList<>(this.artifacts.get(projectName).values());
     }
 
-    public ArtifactBody getArtifactBody(String projectName, String artifactName, Long versionIndex) {
-        return this.bodies.get(projectName).get(artifactName).get(versionIndex);
+    public ArtifactBody getArtifactBody(String projectName, String artifactName, int versionIndex) {
+        assertProjectExists(this.bodies, projectName);
+        Hashtable<String, Hashtable<Long, ArtifactBody>> project = this.bodies.get(projectName);
+        assertEntityExists(project, "Artifact", artifactName);
+        assertEntityExists(project.get(artifactName), "Version Index", (long) versionIndex);
+        return this.bodies.get(projectName).get(artifactName).get((long) versionIndex);
     }
 
     public ArtifactType getType(String projectName, String typeName) {
+        assertProjectExists(this.artifactTypes, projectName);
+        assertEntityExists(this.artifactTypes.get(projectName), "ArtifactType", typeName);
         return this.artifactTypes.get(projectName).get(typeName);
+    }
+
+    private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {
+        assertEntityExists(table, "Project", projectName);
+    }
+
+    private <T, K> void assertEntityExists(Hashtable<K, T> table, String entityName, K keyName) {
+        if (!table.containsKey(keyName)) {
+            throw new RuntimeException(String.format("[%s: %s] has not been created.", keyName, entityName));
+        }
     }
 }

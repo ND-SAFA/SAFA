@@ -38,7 +38,7 @@ public class TestProjectAppEntity extends EntityBaseTest {
         // VP - ProjectAppEntity is able to detect the new artifacts
         List<Artifact> existingArtifacts = entityBuilder.getArtifacts(projectName);
         ProjectAppEntity appEntity = appBuilder.getProject(projectName);
-        List<ArtifactAppEntity> newArtifacts = appEntity.getNewArtifacts(existingArtifacts);
+        List<ArtifactAppEntity> newArtifacts = appEntity.findNewArtifacts(existingArtifacts);
 
         assertThat(newArtifacts.size()).as("# new artifacts").isEqualTo(1);
         assertThat(newArtifacts.get(0).getName()).as("new artifact names").isEqualTo(newArtifactName);

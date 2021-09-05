@@ -12,10 +12,17 @@ public class ArtifactAppEntity {
     }
 
     public ArtifactAppEntity(ArtifactBody body) {
-        this.name = body.getName();
-        this.summary = body.getSummary();
-        this.body = body.getContent();
-        this.type = body.getTypeName();
+        this(body.getTypeName(), body.getName(), body.getSummary(), body.getContent());
+    }
+
+    public ArtifactAppEntity(String type,
+                             String name,
+                             String summary,
+                             String body) {
+        this.type = type;
+        this.name = name;
+        this.summary = summary;
+        this.body = body;
     }
 
     public String getName() {

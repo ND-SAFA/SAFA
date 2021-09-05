@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.db.entities.builders;
+package edu.nd.crc.safa.builders;
 
 import java.util.Hashtable;
 

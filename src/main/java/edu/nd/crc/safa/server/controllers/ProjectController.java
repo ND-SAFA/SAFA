@@ -57,7 +57,12 @@ public class ProjectController extends BaseController {
     @PostMapping("projects/")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@RequestBody ProjectAppEntity project) throws ServerError {
-        ProjectCreationResponse response = this.projectService.createOrUpdateProject(project);
+        ProjectCreationResponse response;
+        if (project.projectId != null && !project.projectId.equals("")) {
+            response = this.projectService.updateProject(project);
+        } else {
+            response = this.projectService.createProject(project);
+        }
         return new ServerResponse(response);
     }
 

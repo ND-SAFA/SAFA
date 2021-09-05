@@ -277,16 +277,6 @@ public class Neo4JService implements AutoCloseable {
         Transaction tx = session.beginTransaction();
 
         added.forEach((node) -> {
-            if (VERBOSE) {
-                System.out.println("Adding " + node.getValue0() + " " + node.getValue1());
-                System.out.println(String.format("MERGE (:%s {id:'%s', DATA:'%s'});",
-                    sanitizeType(
-                        node.getValue1()),
-                    node.getValue0(),
-                    Base64.getEncoder().encodeToString(node.getValue2().getBytes())));
-                System.out.println(String.format("MATCH (c {id:'%s'}) CREATE (c)-[:UPDATES {type:'ADD', "
-                    + "version: %d}]->(c);", node.getValue0(), mLatestVersion));
-            }
             seenTypes.add(node.getValue1());
             tx.run(String.format("MERGE (:%s {id:$id, DATA:$data})", sanitizeType(node.getValue1())),
                 parameters("id", node.getValue0(), "data",

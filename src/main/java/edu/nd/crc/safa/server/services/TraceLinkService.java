@@ -15,6 +15,7 @@ import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;
 import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 
@@ -32,11 +33,15 @@ public class TraceLinkService {
 
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactRepository artifactRepository;
+    private final ParserErrorRepository parserErrorRepository;
 
     @Autowired
-    public TraceLinkService(TraceLinkRepository traceLinkRepository, ArtifactRepository artifactRepository) {
+    public TraceLinkService(TraceLinkRepository traceLinkRepository,
+                            ArtifactRepository artifactRepository,
+                            ParserErrorRepository parserErrorRepository) {
         this.traceLinkRepository = traceLinkRepository;
         this.artifactRepository = artifactRepository;
+        this.parserErrorRepository = parserErrorRepository;
     }
 
     public String getLinkTypes(Project project) {
@@ -89,6 +94,22 @@ public class TraceLinkService {
             }
         }
         return queriedLinks;
+    }
+
+    public void createTraceLinks(List<TraceApplicationEntity> traces, ProjectVersion projectVersion) {
+        List<TraceLink> newLinks = new ArrayList<>();
+        List<ParserError> newErrors = new ArrayList<>();
+        traces.forEach(t -> {
+            Pair<TraceLink, ParserError> result = createTrace(projectVersion, t);
+            if (result.getValue0() != null) {
+                newLinks.add(result.getValue0());
+            }
+            if (result.getValue1() != null) {
+                newErrors.add(result.getValue1());
+            }
+        });
+        this.traceLinkRepository.saveAll(newLinks);
+        this.parserErrorRepository.saveAll(newErrors);
     }
 
     public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,

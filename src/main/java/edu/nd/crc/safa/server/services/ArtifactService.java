@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.server.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 import edu.nd.crc.safa.db.entities.sql.ArtifactType;
@@ -34,13 +37,43 @@ public class ArtifactService {
         this.artifactBodyRepository = artifactBodyRepository;
     }
 
+    public void addNewArtifacts(List<ArtifactAppEntity> newArtifactApps,
+                                ProjectVersion newProjectVersion) {
+        List<ArtifactType> newArtifactTypes = new ArrayList<>(); // Note, these are potentially new
+        List<Artifact> newArtifacts = new ArrayList<>();
+        List<ArtifactBody> newArtifactBodies = new ArrayList<>();
+
+        for (ArtifactAppEntity artifactApp : newArtifactApps) {
+            Triplet<ArtifactType, Artifact, ArtifactBody> result = createArtifact(newProjectVersion,
+                artifactApp);
+            newArtifactTypes.add(result.getValue0());
+            newArtifacts.add(result.getValue1());
+            newArtifactBodies.add(result.getValue2());
+        }
+        this.artifactTypeRepository.saveAll(newArtifactTypes);
+        this.artifactRepository.saveAll(newArtifacts);
+        this.artifactBodyRepository.saveAll(newArtifactBodies);
+    }
+
+    public void updateExistingArtifacts(List<Artifact> existingArtifacts,
+                                        ProjectVersion newProjectVersion,
+                                        ProjectAppEntity appEntity) throws ServerError {
+        List<ArtifactBody> newBodies = new ArrayList<>();
+        for (Artifact currentArtifact : existingArtifacts) {
+            String artifactName = currentArtifact.getName();
+            ArtifactAppEntity updatedArtifact = appEntity.getArtifactWithName(artifactName);
+            ArtifactBody newBody = updateArtifactBody(newProjectVersion, currentArtifact, updatedArtifact);
+            if (newBody != null) {
+                newBodies.add(newBody);
+            }
+        }
+        this.artifactBodyRepository.saveAll(newBodies);
+    }
+
     public ArtifactBody updateArtifactBody(ProjectVersion projectVersion,
                                            Artifact artifact,
                                            ArtifactAppEntity appEntity) throws ServerError {
-        ArtifactBody body;
         Project project = projectVersion.getProject();
-        this.artifactBodyRepository.findLastArtifactBody(project, artifact);
-
         if (appEntity == null) {
             return new ArtifactBody(projectVersion,
                 ModificationType.REMOVED,
@@ -60,7 +93,8 @@ public class ArtifactService {
                     return null; // No change
                 }
             } else {
-                String errorMessage = String.format("%s was created but contains no body.");
+                String errorMessage = String.format("[%s: Artifact] was created but contains no initial body.",
+                    artifact.getName());
                 throw new ServerError(errorMessage);
             }
         }

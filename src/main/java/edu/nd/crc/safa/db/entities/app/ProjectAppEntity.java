@@ -74,17 +74,17 @@ public class ProjectAppEntity {
         this.traces = traces;
     }
 
-    public ArtifactAppEntity getArtifactWithId(String artifactId) {
+    public ArtifactAppEntity getArtifactWithName(String artifactName) {
         if (artifactTable == null) {
             loadArtifactTable();
         }
-        if (artifactTable.containsKey(artifactId)) {
-            return artifactTable.get(artifactId);
+        if (artifactTable.containsKey(artifactName)) {
+            return artifactTable.get(artifactName);
         }
         return null;
     }
 
-    public List<ArtifactAppEntity> getNewArtifacts(List<Artifact> existingArtifacts) {
+    public List<ArtifactAppEntity> findNewArtifacts(List<Artifact> existingArtifacts) {
         List<String> existingArtifactNames = existingArtifacts
             .stream()
             .map(Artifact::getName)

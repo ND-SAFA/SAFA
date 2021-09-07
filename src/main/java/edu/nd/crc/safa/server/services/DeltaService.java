@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,9 +14,9 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 import edu.nd.crc.safa.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,20 +45,23 @@ public class DeltaService {
 
         Project project = beforeVersion.getProject();
 
-        List<AddedArtifact> added = new ArrayList<>();
-        List<ModifiedArtifact> modified = new ArrayList<>();
-        List<RemovedArtifact> removed = new ArrayList<>();
+        Hashtable<String, AddedArtifact> added = new Hashtable<>();
+        Hashtable<String, ModifiedArtifact> modified = new Hashtable<>();
+        Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
 
         List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
         for (Artifact artifact : projectArtifacts) {
             DeltaArtifact deltaArtifact = getModificationOverDelta(artifact, beforeVersion, afterVersion);
-
+            if (deltaArtifact == null) {
+                continue;
+            }
+            String artifactName = deltaArtifact.getArtifactId();
             if (deltaArtifact instanceof ModifiedArtifact) {
-                modified.add((ModifiedArtifact) deltaArtifact);
+                modified.put(artifactName, (ModifiedArtifact) deltaArtifact);
             } else if (deltaArtifact instanceof RemovedArtifact) {
-                removed.add((RemovedArtifact) deltaArtifact);
+                removed.put(artifactName, (RemovedArtifact) deltaArtifact);
             } else if (deltaArtifact instanceof AddedArtifact) {
-                added.add((AddedArtifact) deltaArtifact);
+                added.put(artifactName, (AddedArtifact) deltaArtifact);
             }
         }
 

@@ -12,8 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.server.responses.ServerError;
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -30,14 +28,6 @@ public class TraceLink implements Serializable {
     @Type(type = "uuid-char")
     @Column(name = "trace_link_id")
     UUID traceLinkId;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(
-        name = "project_id",
-        nullable = false
-    )
-    Project project;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -73,14 +63,20 @@ public class TraceLink implements Serializable {
     }
 
     public TraceLink(Artifact sourceArtifact,
-                     Artifact targetArtifact) throws ServerError {
+                     Artifact targetArtifact) {
         this();
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
-        if (!sourceArtifact.project.getProjectId().equals(targetArtifact.project.getProjectId())) {
-            throw new ServerError("Source and target artifacts exist in different projects");
-        }
-        this.project = sourceArtifact.project;
+        setIsManual();
+    }
+
+    public TraceLink(Artifact sourceArtifact,
+                     Artifact targetArtifact,
+                     double score) {
+        this();
+        this.sourceArtifact = sourceArtifact;
+        this.targetArtifact = targetArtifact;
+        setIsGenerated(score);
     }
 
     public TraceType getTraceType() {
@@ -91,13 +87,13 @@ public class TraceLink implements Serializable {
         return this.traceLinkId;
     }
 
-    public void setIsManual() {
+    private void setIsManual() {
         this.approved = true;
         this.traceType = TraceType.MANUAL;
         this.score = 1;
     }
 
-    public void setIsGenerated(double score) {
+    private void setIsGenerated(double score) {
         this.approved = false;
         this.traceType = TraceType.GENERATED;
         this.score = score;
@@ -125,5 +121,17 @@ public class TraceLink implements Serializable {
 
     public boolean isApproved() {
         return this.approved;
+    }
+
+    public String toString() {
+        return String.format("%s -> %s", sourceArtifact, targetArtifact);
+    }
+
+    public boolean isSourceName(String sourceName) {
+        return this.sourceArtifact.getName().equals(sourceName);
+    }
+
+    public boolean isTargetName(String targetName) {
+        return this.targetArtifact.getName().equals(targetName);
     }
 }

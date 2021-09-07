@@ -11,13 +11,13 @@ import edu.nd.crc.safa.db.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ProjectErrors;
 import edu.nd.crc.safa.server.responses.ServerError;
@@ -40,7 +40,6 @@ public class ProjectService {
     TraceLinkRepository traceLinkRepository;
     ParserErrorRepository parserErrorRepository;
     ParserErrorService parserErrorService;
-    SynchronizeService synchronizeService;
     ArtifactService artifactService;
     TraceLinkService traceLinkService;
 
@@ -53,7 +52,6 @@ public class ProjectService {
                           TraceLinkRepository traceLinkRepository,
                           ParserErrorRepository parserErrorRepository,
                           ParserErrorService parserErrorService,
-                          SynchronizeService synchronizeService,
                           ArtifactService artifactService,
                           TraceLinkService traceLinkService) {
         this.projectRepository = projectRepository;
@@ -64,7 +62,6 @@ public class ProjectService {
         this.traceLinkRepository = traceLinkRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.parserErrorService = parserErrorService;
-        this.synchronizeService = synchronizeService;
         this.artifactService = artifactService;
         this.traceLinkService = traceLinkService;
     }
@@ -77,11 +74,11 @@ public class ProjectService {
         this.projectVersionRepository.save(projectVersion);
 
         if (appEntity.artifacts != null) {
-            artifactService.addNewArtifacts(appEntity.getArtifacts(), projectVersion);
+            artifactService.addNewArtifacts(projectVersion, appEntity.getArtifacts());
         }
 
         if (appEntity.traces != null) {
-            traceLinkService.createTraceLinks(appEntity.getTraces(), projectVersion);
+            traceLinkService.createTraceLinks(projectVersion, appEntity.getTraces());
         }
 
         ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
@@ -100,7 +97,7 @@ public class ProjectService {
         List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
         artifactService.updateExistingArtifacts(projectArtifacts, newProjectVersion, appEntity);
         List<ArtifactAppEntity> newArtifacts = appEntity.findNewArtifacts(projectArtifacts);
-        artifactService.addNewArtifacts(newArtifacts, newProjectVersion);
+        artifactService.addNewArtifacts(newProjectVersion, newArtifacts);
 
         //TODO: Update trace links
 

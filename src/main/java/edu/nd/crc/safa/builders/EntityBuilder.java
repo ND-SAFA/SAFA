@@ -10,11 +10,13 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,7 @@ public class EntityBuilder extends BaseBuilder {
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactRepository artifactRepository;
     ArtifactBodyRepository artifactBodyRepository;
+    TraceLinkRepository traceLinkRepository;
 
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
@@ -43,12 +46,14 @@ public class EntityBuilder extends BaseBuilder {
                          ProjectVersionRepository projectVersionRepository,
                          ArtifactTypeRepository artifactTypeRepository,
                          ArtifactRepository artifactRepository,
-                         ArtifactBodyRepository artifactBodyRepository) {
+                         ArtifactBodyRepository artifactBodyRepository,
+                         TraceLinkRepository traceLinkRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.artifactBodyRepository = artifactBodyRepository;
+        this.traceLinkRepository = traceLinkRepository;
         createEmptyData();
     }
 
@@ -139,11 +144,13 @@ public class EntityBuilder extends BaseBuilder {
     }
 
     public ArtifactBody newArtifactBodyWithReturn(String projectName,
+                                                  int versionIndex,
+                                                  ModificationType modificationType,
                                                   String artifactName,
                                                   String summary,
                                                   String content) {
-        newArtifactBody(projectName, 0, artifactName, summary, content);
-        return getArtifactBody(projectName, artifactName, 0);
+        newArtifactBody(projectName, versionIndex, modificationType, artifactName, summary, content);
+        return getArtifactBody(projectName, artifactName, versionIndex);
     }
 
     public EntityBuilder newArtifactBody(String projectName,
@@ -161,16 +168,6 @@ public class EntityBuilder extends BaseBuilder {
         return newArtifactBody(projectName, versionIndex, ModificationType.ADDED, artifactName, summary, content);
     }
 
-    public ArtifactBody newArtifactBodyWithReturn(String projectName,
-                                                  int versionIndex,
-                                                  ModificationType modificationType,
-                                                  String artifactName,
-                                                  String summary,
-                                                  String content) {
-        newArtifactBody(projectName, versionIndex, modificationType, artifactName, summary, content);
-        return getArtifactBody(projectName, artifactName, versionIndex);
-    }
-
     public EntityBuilder newArtifactBody(String projectName,
                                          int versionIndex,
                                          ModificationType modificationType,
@@ -186,6 +183,14 @@ public class EntityBuilder extends BaseBuilder {
             content);
         this.artifactBodyRepository.save(artifactBody);
         addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactBody);
+        return this;
+    }
+
+    public EntityBuilder newTraceLink(String projectName, String sourceName, String targetName) {
+        Artifact source = this.getArtifact(projectName, sourceName);
+        Artifact target = this.getArtifact(projectName, targetName);
+        TraceLink traceLink = new TraceLink(source, target);
+        this.traceLinkRepository.save(traceLink);
         return this;
     }
 
@@ -247,10 +252,24 @@ public class EntityBuilder extends BaseBuilder {
         return this.bodies.get(projectName).get(artifactName).get((long) versionIndex);
     }
 
+    public List<ArtifactBody> getArtifactBodies(String projectName) {
+        assertProjectExists(this.bodies, projectName);
+        List<ArtifactBody> projectBodies = new ArrayList<>();
+        this.bodies.get(projectName).values().forEach(artifactVersionTable -> {
+            projectBodies.addAll(artifactVersionTable.values());
+        });
+        return projectBodies;
+    }
+
     public ArtifactType getType(String projectName, String typeName) {
         assertProjectExists(this.artifactTypes, projectName);
         assertEntityExists(this.artifactTypes.get(projectName), "ArtifactType", typeName);
         return this.artifactTypes.get(projectName).get(typeName);
+    }
+
+    public List<TraceLink> getTraceLinks(String projectName) {
+        Project project = getProject(projectName);
+        return this.traceLinkRepository.findByProject(project);
     }
 
     private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {

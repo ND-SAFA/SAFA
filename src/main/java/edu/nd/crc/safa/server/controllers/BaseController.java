@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ResponseCodes;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.responses.ServerResponse;

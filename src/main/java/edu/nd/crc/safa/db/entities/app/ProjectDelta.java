@@ -1,44 +1,44 @@
 package edu.nd.crc.safa.db.entities.app;
 
-import java.util.List;
+import java.util.Hashtable;
 
 public class ProjectDelta {
-    List<AddedArtifact> added;
-    List<ModifiedArtifact> modified;
-    List<RemovedArtifact> removed;
+    Hashtable<String, AddedArtifact> added;
+    Hashtable<String, ModifiedArtifact> modified;
+    Hashtable<String, RemovedArtifact> removed;
 
     public ProjectDelta() {
     }
 
-    public ProjectDelta(List<AddedArtifact> added,
-                        List<ModifiedArtifact> modified,
-                        List<RemovedArtifact> removed) {
+    public ProjectDelta(Hashtable<String, AddedArtifact> added,
+                        Hashtable<String, ModifiedArtifact> modified,
+                        Hashtable<String, RemovedArtifact> removed) {
         this.added = added;
         this.modified = modified;
         this.removed = removed;
     }
 
-    public List<AddedArtifact> getAdded() {
+    public Hashtable<String, AddedArtifact> getAdded() {
         return this.added;
     }
 
-    public void setAdded(List<AddedArtifact> added) {
+    public void setAdded(Hashtable<String, AddedArtifact> added) {
         this.added = added;
     }
 
-    public List<ModifiedArtifact> getModified() {
+    public Hashtable<String, ModifiedArtifact> getModified() {
         return this.modified;
     }
 
-    public void setModified(List<ModifiedArtifact> modified) {
+    public void setModified(Hashtable<String, ModifiedArtifact> modified) {
         this.modified = modified;
     }
 
-    public List<RemovedArtifact> getRemoved() {
+    public Hashtable<String, RemovedArtifact> getRemoved() {
         return this.removed;
     }
 
-    public void setRemoved(List<RemovedArtifact> removed) {
+    public void setRemoved(Hashtable<String, RemovedArtifact> removed) {
         this.removed = removed;
     }
 }

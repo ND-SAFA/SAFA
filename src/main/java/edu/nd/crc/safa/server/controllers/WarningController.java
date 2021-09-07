@@ -5,9 +5,9 @@ import java.util.Map;
 
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.Warning;
-import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.sql.WarningRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.WarningRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.Rule;

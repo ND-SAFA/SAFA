@@ -6,7 +6,7 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 
 public abstract class BaseBuilder {
 
-    abstract public void createEmptyData();
+    public abstract void createEmptyData();
 
     protected <T, K> void addEntry(Hashtable<String, Hashtable<K, T>> table,
                                    String projectName,

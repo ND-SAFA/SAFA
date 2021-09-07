@@ -18,9 +18,9 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
@@ -75,7 +75,7 @@ public class TraceLinkGenerator {
     }
 
     private List<TraceLink> generateLinksFromTokens(Map<Artifact, Collection<String>> sTokens,
-                                                    Map<Artifact, Collection<String>> tTokens) throws ServerError {
+                                                    Map<Artifact, Collection<String>> tTokens) {
         Controller vsm = new Controller();
         vsm.buildIndex(tTokens.values());
 
@@ -84,8 +84,7 @@ public class TraceLinkGenerator {
             for (Artifact targetArtifact : tTokens.keySet()) {
                 double score = vsm.getRelevance(sTokens.get(sourceArtifact), tTokens.get(targetArtifact));
                 if (score > ProjectVariables.TRACE_THRESHOLD) {
-                    TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact);
-                    generatedLink.setIsGenerated(score);
+                    TraceLink generatedLink = new TraceLink(sourceArtifact, targetArtifact, score);
                     generatedLinks.add(generatedLink);
                 }
             }

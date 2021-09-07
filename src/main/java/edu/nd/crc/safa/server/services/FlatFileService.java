@@ -16,11 +16,11 @@ import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceType;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
@@ -56,7 +56,6 @@ public class FlatFileService {
 
     ProjectService projectService;
     ParserErrorService parserErrorService;
-    SynchronizeService synchronizeService;
 
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
@@ -67,8 +66,7 @@ public class FlatFileService {
                            TraceLinkRepository traceLinkRepository,
                            ArtifactBodyRepository artifactBodyRepository,
                            ProjectService projectService,
-                           ParserErrorService parserErrorService,
-                           SynchronizeService synchronizeService) {
+                           ParserErrorService parserErrorService) {
         this.traceLinkGenerator = traceLinkGenerator;
         this.flatFileParser = flatFileParser;
         this.projectVersionRepository = projectVersionRepository;
@@ -78,7 +76,6 @@ public class FlatFileService {
         this.artifactBodyRepository = artifactBodyRepository;
         this.projectService = projectService;
         this.parserErrorService = parserErrorService;
-        this.synchronizeService = synchronizeService;
     }
 
     /**

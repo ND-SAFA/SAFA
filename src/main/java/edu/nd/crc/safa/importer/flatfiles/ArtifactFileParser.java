@@ -11,11 +11,11 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactFile;
 import edu.nd.crc.safa.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactFileRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactFileRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

@@ -59,7 +59,6 @@ public class ArtifactBody implements Serializable {
     public ArtifactBody() {
     }
 
-
     public ArtifactBody(ProjectVersion projectVersion,
                         ModificationType modificationType,
                         Artifact artifact,
@@ -109,5 +108,9 @@ public class ArtifactBody implements Serializable {
 
     public boolean hasSameId(ArtifactBody other) {
         return this.artifactBodyId.equals(other.artifactBodyId);
+    }
+
+    public String toString() {
+        return this.artifact.toString();
     }
 }

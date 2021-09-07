@@ -81,4 +81,8 @@ public class Artifact implements Serializable {
     public UUID getArtifactId() {
         return this.artifactId;
     }
+
+    public String toString() {
+        return String.format("{%s:%s}", this.name, this.type.getName());
+    }
 }

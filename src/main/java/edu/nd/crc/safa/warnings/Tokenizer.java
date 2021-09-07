@@ -4,36 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tokenizer {
-    public static enum Type {
-        LPAREN, RPAREN, FUNCS, FUNCE, ARGUMENT, NOT, AND, OR, TRUE, FALSE;
-    }
-
-    public static class Token {
-        public final Type t;
-        public final String c;
-
-        public Token(Type t, String c) {
-            this.t = t;
-            this.c = c;
-        }
-
-        public String toString() {
-            if (t == Type.FUNCS) {
-                return "FUNCTION<" + c + ">";
-            }
-            if (t == Type.FUNCE) {
-                return "FUNCTION END";
-            }
-            if (t == Type.ARGUMENT) {
-                return "ARGUMENT<" + c + ">";
-            }
-            return t.toString();
-        }
-
-        public boolean isBoolean() {
-            return t == Type.TRUE || t == Type.FALSE;
-        }
-    }
 
     public static List<Token> lex(String input) {
         String buffer = "";
@@ -45,12 +15,12 @@ public class Tokenizer {
             switch (input.charAt(i)) {
                 case '(':
                     if (!buffer.isEmpty()) {
-                        result.add(new Token(Type.FUNCS, buffer));
+                        result.add(new Token(TokenType.FUNC_START, buffer));
                         depth = 1;
                         isFunc = true;
                         buffer = "";
                     } else {
-                        result.add(new Token(Type.LPAREN, "("));
+                        result.add(new Token(TokenType.LEFT_PAREN, "("));
                         depth++;
                     }
                     break;
@@ -60,23 +30,23 @@ public class Tokenizer {
                     if (depth == 0 && isFunc) {
                         isFunc = false;
                         if (!buffer.isEmpty()) {
-                            result.add(new Token(Type.ARGUMENT, buffer));
+                            result.add(new Token(TokenType.ARGUMENT, buffer));
                             buffer = "";
                         }
-                        result.add(new Token(Type.FUNCE, ")"));
+                        result.add(new Token(TokenType.FUNC_END, ")"));
                     } else {
-                        result.add(new Token(Type.RPAREN, ")"));
+                        result.add(new Token(TokenType.RIGHT_PAREN, ")"));
                     }
                     break;
                 case ',':
                     if (!buffer.isEmpty()) {
-                        result.add(new Token(Type.ARGUMENT, buffer));
+                        result.add(new Token(TokenType.ARGUMENT, buffer));
                         buffer = "";
                     }
                     break;
                 case '&':
                     if (input.charAt(i + 1) == '&') {
-                        result.add(new Token(Type.AND, "&&"));
+                        result.add(new Token(TokenType.AND, "&&"));
                         i++;
                     } else {
                         buffer += input.charAt(i);
@@ -84,14 +54,14 @@ public class Tokenizer {
                     break;
                 case '|':
                     if (input.charAt(i + 1) == '|') {
-                        result.add(new Token(Type.OR, "||"));
+                        result.add(new Token(TokenType.OR, "||"));
                         i++;
                     } else {
                         buffer += input.charAt(i);
                     }
                     break;
                 case '!':
-                    result.add(new Token(Type.NOT, "!"));
+                    result.add(new Token(TokenType.NOT, "!"));
                     break;
                 default:
                     if (!Character.isWhitespace(input.charAt(i))) {

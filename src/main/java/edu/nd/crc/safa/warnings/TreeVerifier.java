@@ -6,182 +6,153 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.nd.crc.safa.db.entities.sql.Artifact;
+import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.db.entities.sql.TraceLink;
+
 public class TreeVerifier {
-    public class MultipleRuleException extends Exception {
-        public MultipleRuleException(String errorMessage) {
-            super(errorMessage);
-        }
-    }
 
-    public class InvalidRuleException extends Exception {
-        public InvalidRuleException(String errorMessage) {
-            super(errorMessage);
-        }
-    }
+    /**
+     * Applies given list of rules to tree formed by given artifacts connected via trace links.
+     *
+     * @param artifactBodies - The nodes of the graph
+     * @param traceLinks     - The traceLinks (links) connecting the nodes (artifacts)
+     * @param rulesToApply   - The list of rules to apply to the artifact tree
+     * @return A mapping between artifact Ids and the list of rules it violated
+     */
+    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactBody> artifactBodies,
+                                                                List<TraceLink> traceLinks,
+                                                                List<Rule> rulesToApply) {
+        Map<String, List<RuleName>> results = new HashMap<>();
 
-    List<Rule> mRules = new ArrayList<>();
-
-    public boolean addRule(final String name, final String longname, final String rule) throws Exception {
-        mRules.add(new Rule(name, longname, rule));
-        return true;
-    }
-
-    public boolean addRule(final Rule rule) throws Exception {
-        mRules.add(rule);
-        return true;
-    }
-
-    public final List<Rule> getRules() {
-        return mRules;
-    }
-
-    public class Edge {
-        public String Source;
-        public String Target;
-        public String Type;
-
-        public Edge() {
-            Source = "";
-            Target = "";
-            Type = "";
-        }
-
-        public Edge(String source, String target, String relType) {
-            Source = source;
-            Target = target;
-            Type = relType;
-        }
-    }
-
-    public final Map<String, List<Rule.Name>> verify(final List<org.neo4j.driver.types.Node> nodes,
-                                                     final Map<Long, String> ids,
-                                                     final List<Map<String, Object>> values) {
-        Map<String, String> nodeList = new HashMap<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            final org.neo4j.driver.types.Node node = nodes.get(i);
-            if (node.get("id") == null || node.get("id").toString() == "NULL") {
-                continue;
-            }
-            nodeList.put(node.get("id").asString(), ((List<String>) node.labels()).get(0).toString());
-        }
-
-        List<Edge> edgeList = new ArrayList<>();
-        for (Map<String, Object> value : values) {
-            final String relType = (String) value.getOrDefault("type", "");
-            if (relType.equals("UPDATES")) {
-                continue;
-            }
-
-            final String source = (String) value.getOrDefault("source", "");
-            if (source.isEmpty()) {
-                continue;
-            }
-
-            final String target = (String) value.getOrDefault("target", "");
-            if (target.isEmpty()) {
-                continue;
-            }
-
-            edgeList.add(new Edge(source, target, relType));
-        }
-
-        return verify(nodeList, edgeList);
-    }
-
-    public final Map<String, List<Rule.Name>> verify(final Map<String, String> nodes, final List<Edge> edges) {
-        Map<String, List<Rule.Name>> results = new HashMap<>();
-
-        nodes.forEach((id, type) -> {
-            List<Rule.Name> nodeWarnings = new ArrayList<Rule.Name>();
-            for (int i = 0; i < mRules.size(); i++) {
-                Rule r = new Rule(mRules.get(i));
+        artifactBodies.forEach((artifactBody) -> {
+            String artifactName = artifactBody.getName();
+            List<RuleName> artifactWarnings = new ArrayList<>();
+            for (Rule rule : rulesToApply) {
+                rule = new Rule(rule);
                 while (true) {
-                    Optional<Rule.Function> of = r.nextFunction();
-                    if (of.isPresent()) {
-                        Rule.Function f = of.get();
-                        if (type.toLowerCase().equals(f.Target)) {
-                            r.setFunctionResult(handleFunction(f, id, nodes, edges));
+                    Optional<Function> ruleFunctionQuery = rule.parseFunction();
+                    if (ruleFunctionQuery.isPresent()) {
+                        Function ruleFunction = ruleFunctionQuery.get();
+                        if (artifactBody.getTypeName().equalsIgnoreCase(ruleFunction.targetArtifactType)) {
+                            boolean isSatisfied = isRuleSatisfied(ruleFunction, artifactBody.getArtifact(), traceLinks);
+                            rule.setFunctionResult(isSatisfied);
                         } else {
-                            r.setFunctionResult(true);
+                            rule.setFunctionResult(true);
                         }
                     } else {
                         break;
                     }
                 }
 
-                r.reduce();
-                if (!r.result()) {
-                    nodeWarnings.add(r.getName());
+                rule.reduce();
+
+                if (!rule.isRuleSatisfied()) {
+                    artifactWarnings.add(rule.getName());
                 }
             }
-            if (!nodeWarnings.isEmpty()) {
-                results.put(id, nodeWarnings);
+            if (!artifactWarnings.isEmpty()) {
+                results.put(artifactName, artifactWarnings);
             }
         });
 
         return results;
     }
 
-    private boolean handleFunction(final Rule.Function r,
-                                   final String index,
-                                   final Map<String, String> nodes,
-                                   final List<Edge> edges) {
-        switch (r.Relationship) {
+    private boolean isRuleSatisfied(final Function ruleToApply,
+                                    Artifact targetArtifact,
+                                    final List<TraceLink> traceLinks) {
+        switch (ruleToApply.relationship) {
+            case BIDIRECTIONAL_LINK:
+                return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
             case CHILD:
-                return handleChildFunction(r, index, nodes, edges);
+                return satisfiesChildCountRule(ruleToApply, targetArtifact.getName(), traceLinks);
             case SIBLING:
-                return handleSiblingFunction(r, index, nodes, edges);
+                return handleSiblingFunction(ruleToApply, targetArtifact.getName(), traceLinks);
             default:
+                return true;
         }
-        return true;
+
     }
 
-    public boolean handleChildFunction(final Rule.Function r,
-                                       final String index,
-                                       final Map<String,
-                                           String> nodes,
-                                       final List<Edge> edges) {
-        long childCount = edges.stream()
-            .filter(e -> e.Source.equals(index)) // Get all edges where we are the source
-            // Get all edges where the target matches the required target type
-            .filter(e -> nodes.get(e.Target).toLowerCase().equals(r.RequiredTarget))
+    public boolean satisfiesLinkCountRule(final Function rule,
+                                          final Artifact artifact,
+                                          final List<TraceLink> traceLinks) {
+        long childCount = traceLinks
+            .stream()
+            // Get all traceLinks where we are the source or target
+            .filter(t -> {
+                String typeName = artifact.getType().getName();
+                String artifactName = artifact.getName();
+                String otherType;
+                if (typeName.equalsIgnoreCase(rule.sourceArtifactType)) {
+                    otherType = rule.targetArtifactType;
+                } else if (typeName.equalsIgnoreCase(rule.targetArtifactType)) {
+                    otherType = rule.sourceArtifactType;
+                } else {
+                    return false;
+                }
+
+                if (t.isSourceName(artifactName)) {
+                    return t.getTargetType().getName().equalsIgnoreCase(otherType);
+                } else if (t.isTargetName(artifactName)) {
+                    return t.getSourceType().getName().equalsIgnoreCase(otherType);
+                } else {
+                    return false;
+                }
+            })
             .count();
-        switch (r.Requirement) {
-            case ATLEAST:
-                return childCount >= r.Count;
-            case EXACTLY:
-                return childCount == r.Count;
-            case LESSTHAN:
-                return childCount < r.Count;
-            default:
-        }
-        return true;
+        return matchesRuleCount(rule, childCount);
     }
 
-    public boolean handleSiblingFunction(final Rule.Function r,
-                                         final String index,
-                                         final Map<String, String> nodes,
-                                         final List<Edge> edges) {
-        Integer childCount = edges.stream()
-            .filter(e -> e.Target.equals(index)) // Get edges that finish with this node
-            .map(e -> e.Source) // Convert to parent id
-            .map(n ->
-                edges.stream()
-                    .filter(e -> e.Source.equals(n)) // Get all edges where we are the source
-                    // Get all edges where the target matches the required target type
-                    .filter(e -> nodes.get(e.Target).toLowerCase().equals(r.RequiredTarget))
+    public boolean satisfiesChildCountRule(final Function childCountRule,
+                                           final String targetArtifact,
+                                           final List<TraceLink> traceLinks) {
+
+        long childCount = traceLinks
+            .stream()
+            // Get all traceLinks where we are the source
+            .filter(link -> link
+                .isTargetName(targetArtifact))
+            // Get all traceLinks where the target matches the required target type
+            .filter(link -> link
+                .getSourceType()
+                .getName()
+                .equalsIgnoreCase(childCountRule.sourceArtifactType))
+            .count();
+        return matchesRuleCount(childCountRule, childCount);
+    }
+
+    public boolean handleSiblingFunction(final Function r,
+                                         final String artifactName,
+                                         final List<TraceLink> traceLinks) {
+        Integer childCount = traceLinks
+            .stream()
+            .filter(t -> t.getTargetName().equals(artifactName)) // Get traceLinks that finish with this node
+            .map(TraceLink::getSourceName) // Convert to parent id
+            .map(parentName ->
+                traceLinks
+                    .stream()
+                    // Get all traceLinks where we are the source
+                    .filter(link -> link.getSourceName().equals(parentName))
+                    // Get all traceLinks where the target matches the required target type
+                    .filter(link -> link.getTargetType().getName().equalsIgnoreCase(r.sourceArtifactType))
                     .count()
             )
-            .map(v -> v.intValue())
+            .map(Long::intValue)
             .reduce(0, Integer::sum);
 
-        switch (r.Requirement) {
-            case ATLEAST:
-                return childCount >= r.Count;
+        return matchesRuleCount(r, childCount);
+    }
+
+    private boolean matchesRuleCount(Function r, long childCount) {
+        switch (r.condition) {
+            case AT_LEAST:
+                return childCount >= r.count;
             case EXACTLY:
-                return childCount == r.Count;
-            case LESSTHAN:
-                return childCount < r.Count;
+                return childCount == r.count;
+            case LESS_THAN:
+                return childCount < r.count;
             default:
         }
         return true;

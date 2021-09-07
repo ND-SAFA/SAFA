@@ -14,11 +14,11 @@ import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.db.entities.sql.TraceMatrix;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.sql.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.sql.TraceLinkRepository;
-import edu.nd.crc.safa.db.repositories.sql.TraceMatrixRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.db.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -198,7 +198,6 @@ public class TraceFileParser {
         Artifact targetArtifact = targetArtifactQuery.get();
 
         TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
-        traceLink.setIsManual();
         return traceLink;
     }
 }

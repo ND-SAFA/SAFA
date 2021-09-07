@@ -13,8 +13,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.server.services.Neo4JService;
+import edu.nd.crc.safa.server.services.ArtifactService;
+import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import com.jsoniter.output.JsonStream;
 import org.eclipse.jgit.api.Git;
@@ -32,7 +39,6 @@ public class Puller {
     private final Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private final Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
     private final Set<String> foundNodes = new HashSet<String>();
-    public Neo4JService mNeo4JService;
     @Value("${git.username:}")
     String gitUsername;
     @Value("${git.password:}")
@@ -45,11 +51,29 @@ public class Puller {
     Double traceRequiredScore;
     JIRA mJira;
 
+    ProjectRepository projectRepository;
+    ArtifactTypeRepository artifactTypeRepository;
+    ArtifactRepository artifactRepository;
+    ArtifactBodyRepository artifactBodyRepository;
+
+    ArtifactService artifactService;
+    TraceLinkService traceLinkService;
+
     @Autowired
-    public Puller(Neo4JService neo4JService,
-                  JIRA jira) {
-        this.mNeo4JService = neo4JService;
+    public Puller(JIRA jira,
+                  ProjectRepository projectRepository,
+                  ArtifactTypeRepository artifactTypeRepository,
+                  ArtifactRepository artifactRepository,
+                  ArtifactBodyRepository artifactBodyRepository,
+                  ArtifactService artifactService,
+                  TraceLinkService traceLinkService) {
         this.mJira = jira;
+        this.projectRepository = projectRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactRepository = artifactRepository;
+        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactService = artifactService;
+        this.traceLinkService = traceLinkService;
     }
 
     public void parseJIRAIssues() {
@@ -57,6 +81,10 @@ public class Puller {
             String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
                 "Acceptance Test", "Environmental Assumption", "Simulation"
             };
+
+            Project project = new Project();
+            this.projectRepository.save(project);
+            ProjectVersion projectVersion = new ProjectVersion(project);
 
             // Loop over issues returned from JIRA and add the found nodes and links
             for (Issue issue : mJira.getIssues(types)) {
@@ -70,17 +98,28 @@ public class Puller {
                 data.put("type", issue.type);
 
                 foundNodes.add(issue.key);
-                mNeo4JService.addNode(issue.key, issue.issuetype, JsonStream.serialize(data));
+
+                String artifactName = issue.key;
+                String typeName = issue.key;
+                String artifactContent = JsonStream.serialize(data);
+
+                artifactService.createArtifact(projectVersion,
+                    artifactName,
+                    typeName,
+                    "",
+                    artifactContent);
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
-                    issue.links.stream().filter((link) -> {
-                        return Arrays.asList(types).stream().anyMatch((type) -> {
-                            return link.InwardType.equals(type);
-                        });
-                    }).forEach((link) -> {
-                        mNeo4JService.addLink(issue.key, link.Type, link.InwardKey);
-                    });
+                    issue.links.stream().filter((link) -> Arrays
+                            .stream(types)
+                            .anyMatch((type) -> link
+                                .InwardType
+                                .equals(type)))
+                        .forEach((link) -> traceLinkService.createTrace(projectVersion,
+                            issue.key,
+                            // TODO: Add link.Type
+                            link.InwardKey));
                 }
             }
         } catch (Exception e) {
@@ -115,8 +154,7 @@ public class Puller {
             Properties prop = new Properties();
             try (InputStream input = Puller.class.getClassLoader().getResourceAsStream("ignore.properties")) {
                 if (input == null) {
-                    System.out.println("Sorry, unable to find config.properties");
-                    return;
+                    throw new RuntimeException("Sorry, unable to find config.properties");
                 }
                 prop.load(input);
             } catch (IOException ex) {
@@ -161,8 +199,9 @@ public class Puller {
 
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
-                                        if (foundNodes.stream().anyMatch((node) -> id.equals(node))) {
-                                            mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
+                                        if (foundNodes.stream().anyMatch(id::equals)) {
+                                            //TODO: mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
+                                            throw new RuntimeException("Adding source in puller has not been restored");
                                         }
                                         commitFiles.add(entry.getNewPath());
                                     }

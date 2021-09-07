@@ -12,9 +12,9 @@ import edu.nd.crc.safa.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.sql.ArtifactTypeRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 
 import org.javatuples.Triplet;
@@ -37,8 +37,7 @@ public class ArtifactService {
         this.artifactBodyRepository = artifactBodyRepository;
     }
 
-    public void addNewArtifacts(List<ArtifactAppEntity> newArtifactApps,
-                                ProjectVersion newProjectVersion) {
+    public void addNewArtifacts(ProjectVersion newProjectVersion, List<ArtifactAppEntity> newArtifactApps) {
         List<ArtifactType> newArtifactTypes = new ArrayList<>(); // Note, these are potentially new
         List<Artifact> newArtifacts = new ArrayList<>();
         List<ArtifactBody> newArtifactBodies = new ArrayList<>();
@@ -102,23 +101,38 @@ public class ArtifactService {
 
     public Triplet<ArtifactType, Artifact, ArtifactBody> createArtifact(ProjectVersion projectVersion,
                                                                         ArtifactAppEntity a) {
-        //TODO: Return object and save in batch
+        return createArtifact(projectVersion,
+            a.name,
+            a.type,
+            a.summary,
+            a.body);
+    }
+
+    public Triplet<ArtifactType, Artifact, ArtifactBody> createArtifact(ProjectVersion projectVersion,
+                                                                        String artifactName,
+                                                                        String typeName,
+                                                                        String summary,
+                                                                        String content) {
         Project project = projectVersion.getProject();
         Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, a.getType());
+            .findByProjectAndNameIgnoreCase(project, typeName);
         ArtifactType artifactType;
         if (!artifactTypeQuery.isPresent()) {
-            artifactType = new ArtifactType(project, a.getType());
+            artifactType = new ArtifactType(project, typeName);
             this.artifactTypeRepository.save(artifactType);
         } else {
             artifactType = artifactTypeQuery.get();
         }
 
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, a.getName());
-        Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, a.getName()));
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+        Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
         this.artifactRepository.save(artifact);
-        ArtifactBody artifacyBody = new ArtifactBody(projectVersion, ModificationType.ADDED, artifact, a.summary, a.body);
-        this.artifactBodyRepository.save(artifacyBody);
-        return new Triplet<>(artifactType, artifact, artifacyBody);
+        ArtifactBody artifactBody = new ArtifactBody(projectVersion,
+            ModificationType.ADDED,
+            artifact,
+            summary,
+            content);
+        this.artifactBodyRepository.save(artifactBody);
+        return new Triplet<>(artifactType, artifact, artifactBody);
     }
 }

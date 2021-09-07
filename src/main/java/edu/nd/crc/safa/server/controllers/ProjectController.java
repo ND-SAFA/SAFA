@@ -2,14 +2,13 @@ package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.repositories.sql.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.sql.ProjectVersionRepository;
+import edu.nd.crc.safa.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.responses.ServerResponse;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.SynchronizeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,18 +27,15 @@ public class ProjectController extends BaseController {
 
     private final ProjectService projectService;
     private final FlatFileService flatFileService;
-    private final SynchronizeService synchronizeService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ProjectService projectService,
-                             FlatFileService flatFileService,
-                             SynchronizeService synchronizeService) {
+                             FlatFileService flatFileService) {
         super(projectRepository, projectVersionRepository);
         this.projectService = projectService;
         this.flatFileService = flatFileService;
-        this.synchronizeService = synchronizeService;
     }
 
     @PostMapping("projects/flat-files")

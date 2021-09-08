@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.warnings;
 
-
 public class Token {
+
     public final TokenType tokenType;
     public final String value;
 

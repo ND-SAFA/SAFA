@@ -30,9 +30,12 @@ public interface ArtifactBodyRepository extends CrudRepository<ArtifactBody, UUI
     List<ArtifactBody> findByProjectVersionProjectAndArtifactName(Project project, String name);
 
     default Optional<ArtifactBody> findLastArtifactBody(Project project, Artifact artifact) {
-        return this.findTopByProjectVersionProjectAndArtifactOrderByProjectVersionDesc(project, artifact);
+        return this.findTopByProjectVersionProjectAndArtifactOrderByProjectVersionMajorVersionDescProjectVersionMinorVersionDescProjectVersionRevisionDesc(
+            project,
+            artifact);
     }
 
-    Optional<ArtifactBody> findTopByProjectVersionProjectAndArtifactOrderByProjectVersionDesc(Project project,
-                                                                                              Artifact artifact);
+    Optional<ArtifactBody> findTopByProjectVersionProjectAndArtifactOrderByProjectVersionMajorVersionDescProjectVersionMinorVersionDescProjectVersionRevisionDesc(
+        Project project,
+        Artifact artifact);
 }

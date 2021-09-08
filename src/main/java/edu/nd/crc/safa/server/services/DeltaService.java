@@ -74,7 +74,9 @@ public class DeltaService {
         List<ArtifactBody> bodies = this.artifactBodyRepository.findByArtifact(artifact);
         bodies = bodies
             .stream()
-            .filter(b -> b.getProjectVersionId() <= afterVersion.getVersionId())
+            .filter(artifactBody -> artifactBody
+                .getProjectVersion()
+                .isLessThanOrEqualTo(afterVersion))
             .collect(Collectors.toList());
 
         ArtifactBody beforeBody = getBodyAtVersion(bodies, beforeVersion);
@@ -113,7 +115,9 @@ public class DeltaService {
     public ArtifactBody getBodyAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
         for (int i = bodies.size() - 1; i >= 0; i--) {
             ArtifactBody body = bodies.get(i);
-            if (body.getProjectVersionId() <= version.getVersionId()) {
+            if (body
+                .getProjectVersion()
+                .isLessThanOrEqualTo(version)) {
                 return body;
             }
         }

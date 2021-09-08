@@ -38,9 +38,9 @@ public class WarningController extends BaseController {
         this.warningRepository = warningRepository;
     }
 
-    @GetMapping("projects/{projectId}/warnings/")
+    @GetMapping("projects/warnings/{projectId}")
     @Transactional(readOnly = true)
-    public Map<String, String> getWarnings(@PathVariable String projectId) throws ServerError {
+    public Map<String, String> getProjectWarnings(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         Map<String, String> result = new HashMap<String, String>();
         for (Rule r : warningService.getProjectRules(project)) {
@@ -49,12 +49,12 @@ public class WarningController extends BaseController {
         return result;
     }
 
-    @PostMapping("projects/{projectId}/warnings/")
+    @PostMapping("projects/warnings/{projectId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void newWarning(@PathVariable String projectId,
-                           @RequestParam("short") String nShort,
-                           @RequestParam("long") String nLong,
-                           @RequestParam("rule") String rule) throws ServerError {
+    public void createNewWarning(@PathVariable String projectId,
+                                 @RequestParam("short") String nShort,
+                                 @RequestParam("long") String nLong,
+                                 @RequestParam("rule") String rule) throws ServerError {
         Project project = getProject(projectId);
         Warning warning = new Warning(project, nShort, nLong, rule);
         this.warningRepository.save(warning);

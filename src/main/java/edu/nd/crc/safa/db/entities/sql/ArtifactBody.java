@@ -24,8 +24,13 @@ import org.hibernate.annotations.Type;
  * depending on the project version.
  */
 @Entity
-@Table(name = "artifact_contents",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"artifact_id", "version_id"})})
+@Table(name = "artifact_content",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "artifact_id", "version_id"
+        })
+    }
+)
 public class ArtifactBody implements Serializable {
     @Id
     @GeneratedValue
@@ -102,8 +107,8 @@ public class ArtifactBody implements Serializable {
         return this.modificationType;
     }
 
-    public long getProjectVersionId() {
-        return this.projectVersion.getVersionId();
+    public ProjectVersion getProjectVersion() {
+        return this.projectVersion;
     }
 
     public boolean hasSameId(ArtifactBody other) {

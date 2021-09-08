@@ -82,28 +82,29 @@ public class FlatFileService {
      * Responsible for creating a project from given flat files. This includes
      * parsing tim.json, creating artifacts, and their trace links.
      *
-     * @param project the project whose artifacts and trace links should be associated with
-     * @param files   the flat files defining the project
+     * @param project        the project whose artifacts and trace links should be associated with
+     * @param projectVersion - the version that the artifacts and errors will be associated with.
+     * @param files          the flat files defining the project
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
      */
-    public ProjectCreationResponse createProjectFromFlatFiles(Project project, MultipartFile[] files)
+    public ProjectCreationResponse parseAndUploadFlatFiles(Project project,
+                                                           ProjectVersion projectVersion,
+                                                           MultipartFile[] files)
         throws ServerError {
         // TODO: Move uploading into creation method
         List<String> uploadedFiles = this.uploadFlatFiles(project, Arrays.asList(files));
 
-        ProjectVersion newProjectVersion = new ProjectVersion(project);
-        this.projectVersionRepository.save(newProjectVersion);
-        this.createProjectFromTIMFile(project, newProjectVersion);
+        this.createProjectFromTIMFile(project, projectVersion);
         // TODO: Uncomment when in-memory works synchronizeService.projectPull(newProjectVersion);
 
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);
 
         ProjectAppEntity projectAppEntity =
-            this.projectService.createApplicationEntity(newProjectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(newProjectVersion);
-        return new ProjectCreationResponse(projectAppEntity, projectErrors);
+            this.projectService.createApplicationEntity(projectVersion);
+        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        return new ProjectCreationResponse(projectAppEntity, projectVersion, projectErrors);
     }
 
     public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {

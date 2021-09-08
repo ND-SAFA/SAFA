@@ -20,7 +20,7 @@ import org.hibernate.annotations.Type;
  * Responsible for marking each trace link in each project.
  */
 @Entity
-@Table(name = "trace_links")
+@Table(name = "trace_link")
 public class TraceLink implements Serializable {
 
     @Id

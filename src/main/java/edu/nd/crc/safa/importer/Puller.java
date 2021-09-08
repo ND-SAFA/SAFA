@@ -84,7 +84,7 @@ public class Puller {
 
             Project project = new Project();
             this.projectRepository.save(project);
-            ProjectVersion projectVersion = new ProjectVersion(project);
+            ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
 
             // Loop over issues returned from JIRA and add the found nodes and links
             for (Issue issue : mJira.getIssues(types)) {
@@ -103,7 +103,7 @@ public class Puller {
                 String typeName = issue.key;
                 String artifactContent = JsonStream.serialize(data);
 
-                artifactService.createArtifact(projectVersion,
+                artifactService.createOrUpdateArtifact(projectVersion,
                     artifactName,
                     typeName,
                     "",

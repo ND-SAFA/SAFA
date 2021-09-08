@@ -17,7 +17,7 @@ import org.hibernate.annotations.Type;
  * projects exist.
  */
 @Entity
-@Table(name = "projects")
+@Table(name = "project")
 public class Project implements Serializable {
 
     @Id

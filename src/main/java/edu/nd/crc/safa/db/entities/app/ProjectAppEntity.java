@@ -1,12 +1,13 @@
 package edu.nd.crc.safa.db.entities.app;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.Project;
+
+import org.json.JSONObject;
 
 public class ProjectAppEntity {
 
@@ -14,7 +15,6 @@ public class ProjectAppEntity {
     public String name;
     public List<ArtifactAppEntity> artifacts;
     public List<TraceApplicationEntity> traces;
-    private Hashtable<String, ArtifactAppEntity> artifactTable;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -28,14 +28,6 @@ public class ProjectAppEntity {
         this.name = project.getName();
         this.artifacts = artifacts;
         this.traces = traces;
-        loadArtifactTable();
-    }
-
-    private void loadArtifactTable() {
-        this.artifactTable = new Hashtable<>();
-        for (ArtifactAppEntity artifact : artifacts) {
-            this.artifactTable.put(artifact.getName(), artifact);
-        }
     }
 
     public String getProjectId() {
@@ -74,16 +66,6 @@ public class ProjectAppEntity {
         this.traces = traces;
     }
 
-    public ArtifactAppEntity getArtifactWithName(String artifactName) {
-        if (artifactTable == null) {
-            loadArtifactTable();
-        }
-        if (artifactTable.containsKey(artifactName)) {
-            return artifactTable.get(artifactName);
-        }
-        return null;
-    }
-
     public List<ArtifactAppEntity> findNewArtifacts(List<Artifact> existingArtifacts) {
         List<String> existingArtifactNames = existingArtifacts
             .stream()
@@ -99,8 +81,16 @@ public class ProjectAppEntity {
         return newArtifacts;
     }
 
-    public ProjectAppEntity withArtifact(ArtifactAppEntity artifact) {
-        this.artifacts.add(artifact);
-        return this;
+    public boolean hasValidId() {
+        return this.projectId != null && !this.projectId.equals("");
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("projectId", this.projectId);
+        json.put("name", this.name);
+        json.put("artifacts", artifacts);
+        json.put("traces", traces);
+        return json.toString();
     }
 }

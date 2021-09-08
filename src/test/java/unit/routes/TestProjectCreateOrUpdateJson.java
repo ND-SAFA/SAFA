@@ -28,7 +28,7 @@ import unit.TestUtil;
  * Tests that /projects/ is able to create new projects from the front-end
  * JSON representation as well as updates the elements if they already exists
  */
-public class TestProjectCreateOrUpdate extends EntityBaseTest {
+public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
 
     final int N_TYPES = 2;
     final int N_ARTIFACTS = 2;
@@ -87,8 +87,9 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
         String newArtifactBody = "new-artifact-body";
         JSONObject updateRequestJson = jsonBuilder
             .withProject(projectId, newProjectName)
+            .withProjectVersion(newProjectName, 1, 1, 2)
             .withArtifact(newProjectName, a1Name, a1Type, newArtifactBody)
-            .getProjectAndReturn(newProjectName);
+            .getPayload(newProjectName);
         postProjectJson(updateRequestJson);
 
         // VP - Verify that project name has changed
@@ -158,6 +159,7 @@ public class TestProjectCreateOrUpdate extends EntityBaseTest {
             .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
             .withArtifact(projectName, a2Name, a2Type, "this is a design")
             .withTrace(projectName, a1Name, a2Name)
-            .getProjectAndReturn(projectName);
+            .withProjectVersion(projectName, 1, 1, 1)
+            .getPayload(projectName);
     }
 }

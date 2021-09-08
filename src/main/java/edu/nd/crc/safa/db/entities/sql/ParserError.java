@@ -22,7 +22,7 @@ import org.hibernate.annotations.Type;
  */
 //TODO: Consider separating error details into an object (e.g. fileName, lineNumber);
 @Entity
-@Table(name = "parse_errors")
+@Table(name = "parse_error")
 public class ParserError implements Serializable {
     @Id
     @GeneratedValue

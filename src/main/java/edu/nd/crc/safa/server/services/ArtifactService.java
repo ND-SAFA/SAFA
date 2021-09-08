@@ -1,11 +1,9 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
 import edu.nd.crc.safa.db.entities.sql.ArtifactType;
@@ -15,7 +13,6 @@ import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
 
 import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,41 +34,74 @@ public class ArtifactService {
         this.artifactBodyRepository = artifactBodyRepository;
     }
 
-    public void addNewArtifacts(ProjectVersion newProjectVersion, List<ArtifactAppEntity> newArtifactApps) {
-        List<ArtifactType> newArtifactTypes = new ArrayList<>(); // Note, these are potentially new
-        List<Artifact> newArtifacts = new ArrayList<>();
-        List<ArtifactBody> newArtifactBodies = new ArrayList<>();
-
-        for (ArtifactAppEntity artifactApp : newArtifactApps) {
-            Triplet<ArtifactType, Artifact, ArtifactBody> result = createArtifact(newProjectVersion,
-                artifactApp);
-            newArtifactTypes.add(result.getValue0());
-            newArtifacts.add(result.getValue1());
-            newArtifactBodies.add(result.getValue2());
+    public void createOrUpdateArtifacts(ProjectVersion projectVersion,
+                                        List<ArtifactAppEntity> artifactsToUpdate) {
+        for (ArtifactAppEntity a : artifactsToUpdate) {
+            createOrUpdateArtifact(projectVersion, a);
         }
-        this.artifactTypeRepository.saveAll(newArtifactTypes);
-        this.artifactRepository.saveAll(newArtifacts);
-        this.artifactBodyRepository.saveAll(newArtifactBodies);
     }
 
-    public void updateExistingArtifacts(List<Artifact> existingArtifacts,
-                                        ProjectVersion newProjectVersion,
-                                        ProjectAppEntity appEntity) throws ServerError {
-        List<ArtifactBody> newBodies = new ArrayList<>();
-        for (Artifact currentArtifact : existingArtifacts) {
-            String artifactName = currentArtifact.getName();
-            ArtifactAppEntity updatedArtifact = appEntity.getArtifactWithName(artifactName);
-            ArtifactBody newBody = updateArtifactBody(newProjectVersion, currentArtifact, updatedArtifact);
-            if (newBody != null) {
-                newBodies.add(newBody);
-            }
-        }
-        this.artifactBodyRepository.saveAll(newBodies);
+    public Triplet<ArtifactType, Artifact, ArtifactBody> createOrUpdateArtifact(ProjectVersion projectVersion,
+                                                                                ArtifactAppEntity a) {
+        return createOrUpdateArtifact(projectVersion,
+            a.name,
+            a.type,
+            a.summary,
+            a.body);
     }
 
-    public ArtifactBody updateArtifactBody(ProjectVersion projectVersion,
-                                           Artifact artifact,
-                                           ArtifactAppEntity appEntity) throws ServerError {
+    /**
+     * Returns the entities corresponding to artifact's type, body, and identifier within the project.
+     *
+     * @param projectVersion - The version that will be associated with the artifact's initial creation.
+     * @param artifactName   - The artifact's unique name with given project.
+     * @param typeName       - The name of the artifact's type (e.g. requirement).
+     * @param summary        - Summary of the artifact's content. Can be null or empty string.
+     * @param content        - The initial content of the artifact being saved.
+     * @return Triplet of unsaved entities consisting of artifact's type, identifier, and initial body.
+     */
+    public Triplet<ArtifactType, Artifact, ArtifactBody> createOrUpdateArtifact(
+        ProjectVersion projectVersion,
+        String artifactName,
+        String typeName,
+        String summary,
+        String content) {
+
+        Project project = projectVersion.getProject();
+        Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
+            .findByProjectAndNameIgnoreCase(project, typeName);
+        ArtifactType artifactType = artifactTypeQuery.orElseGet(() -> new ArtifactType(project, typeName));
+        this.artifactTypeRepository.save(artifactType);
+
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+        Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
+        this.artifactRepository.save(artifact);
+
+        ArtifactBody artifactBody = createOrUpdateArtifactBody(projectVersion,
+            artifact,
+            new ArtifactAppEntity(typeName,
+                artifactName,
+                summary,
+                content));
+        if (artifactBody != null) {
+            this.artifactBodyRepository.save(artifactBody);
+        }
+
+        return new Triplet<>(artifactType, artifact, artifactBody);
+    }
+
+    /**
+     * Creates an artifact's body such that its modification type is calculated relative to the
+     * last registered change. If not change is detected then the body is added as a new change.
+     *
+     * @param projectVersion - The version associated with the change created.
+     * @param artifact       - The registered artifact in the project associated with the project version.
+     * @param appEntity      - The artifact's new changes in the form of the domain model.
+     * @return ArtifactBody - unsaved database entity with given changes and modification type.
+     */
+    private ArtifactBody createOrUpdateArtifactBody(ProjectVersion projectVersion,
+                                                    Artifact artifact,
+                                                    ArtifactAppEntity appEntity) {
         Project project = projectVersion.getProject();
         if (appEntity == null) {
             return new ArtifactBody(projectVersion,
@@ -92,47 +122,12 @@ public class ArtifactService {
                     return null; // No change
                 }
             } else {
-                String errorMessage = String.format("[%s: Artifact] was created but contains no initial body.",
-                    artifact.getName());
-                throw new ServerError(errorMessage);
+                return new ArtifactBody(projectVersion,
+                    ModificationType.ADDED,
+                    artifact,
+                    appEntity.summary,
+                    appEntity.body);
             }
         }
-    }
-
-    public Triplet<ArtifactType, Artifact, ArtifactBody> createArtifact(ProjectVersion projectVersion,
-                                                                        ArtifactAppEntity a) {
-        return createArtifact(projectVersion,
-            a.name,
-            a.type,
-            a.summary,
-            a.body);
-    }
-
-    public Triplet<ArtifactType, Artifact, ArtifactBody> createArtifact(ProjectVersion projectVersion,
-                                                                        String artifactName,
-                                                                        String typeName,
-                                                                        String summary,
-                                                                        String content) {
-        Project project = projectVersion.getProject();
-        Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, typeName);
-        ArtifactType artifactType;
-        if (!artifactTypeQuery.isPresent()) {
-            artifactType = new ArtifactType(project, typeName);
-            this.artifactTypeRepository.save(artifactType);
-        } else {
-            artifactType = artifactTypeQuery.get();
-        }
-
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
-        Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
-        this.artifactRepository.save(artifact);
-        ArtifactBody artifactBody = new ArtifactBody(projectVersion,
-            ModificationType.ADDED,
-            artifact,
-            summary,
-            content);
-        this.artifactBodyRepository.save(artifactBody);
-        return new Triplet<>(artifactType, artifact, artifactBody);
     }
 }

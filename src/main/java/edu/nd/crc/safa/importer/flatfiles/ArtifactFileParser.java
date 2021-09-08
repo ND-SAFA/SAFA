@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.importer.flatfiles;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.db.entities.sql.ArtifactFile;
 import edu.nd.crc.safa.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.db.entities.sql.Project;
@@ -17,6 +17,7 @@ import edu.nd.crc.safa.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.services.ArtifactService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -44,17 +45,21 @@ public class ArtifactFileParser {
     ArtifactTypeRepository artifactTypeRepository;
     ProjectVersionRepository projectVersionRepository;
 
+    ArtifactService artifactService;
+
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
                               ArtifactRepository artifactRepository,
                               ArtifactBodyRepository artifactBodyRepository,
                               ArtifactTypeRepository artifactTypeRepository,
-                              ProjectVersionRepository projectVersionRepository) {
+                              ProjectVersionRepository projectVersionRepository,
+                              ArtifactService artifactService) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectVersionRepository = projectVersionRepository;
+        this.artifactService = artifactService;
     }
 
     public void parseArtifactFiles(ProjectVersion projectVersion,
@@ -71,7 +76,9 @@ public class ArtifactFileParser {
 
             String artifactFileName = artifactDefinitionJson.getString("file");
 
-            ArtifactType artifactType = new ArtifactType(project, artifactTypeName);
+            ArtifactType artifactType = this.artifactTypeRepository
+                .findByProjectAndNameIgnoreCase(project, artifactTypeName)
+                .orElseGet(() -> new ArtifactType(project, artifactTypeName));
             this.artifactTypeRepository.save(artifactType);
 
             ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
@@ -92,13 +99,13 @@ public class ArtifactFileParser {
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);
 
-        saveArtifactRecords(project, projectVersion, artifactType, fileParser);
+        saveOrUpdateArtifactRecords(project, projectVersion, artifactType, fileParser);
     }
 
-    private void saveArtifactRecords(Project project,
-                                     ProjectVersion projectVersion,
-                                     ArtifactType artifactType,
-                                     CSVParser parsedFile) throws ServerError {
+    private void saveOrUpdateArtifactRecords(Project project,
+                                             ProjectVersion projectVersion,
+                                             ArtifactType artifactType,
+                                             CSVParser parsedFile) throws ServerError {
         List<CSVRecord> artifactRecords;
         try {
             artifactRecords = parsedFile.getRecords();
@@ -106,16 +113,21 @@ public class ArtifactFileParser {
             throw new ServerError("parsing artifact file", e);
         }
 
+        List<ArtifactAppEntity> artifactAppEntities = new ArrayList<>();
         for (CSVRecord artifactRecord : artifactRecords) {
             String artifactId = artifactRecord.get(ID_PARAM);
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
 
-            Artifact artifact = new Artifact(project, artifactType, artifactId);
-            ArtifactBody artifactBody = new ArtifactBody(projectVersion, artifact, artifactSummary, artifactContent);
-
-            this.artifactRepository.save(artifact);
-            this.artifactBodyRepository.save(artifactBody);
+            ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
+                artifactType.getName(),
+                artifactId,
+                artifactSummary,
+                artifactContent
+            );
+            artifactAppEntities.add(artifactAppEntity);
         }
+
+        artifactService.createOrUpdateArtifacts(projectVersion, artifactAppEntities);
     }
 }

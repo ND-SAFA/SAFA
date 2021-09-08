@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -19,7 +20,13 @@ import org.hibernate.annotations.Type;
  * to which projects.
  */
 @Entity
-@Table(name = "artifact_type")
+@Table(name = "artifact_type",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "project_id", "name"
+        })
+    }
+)
 public class ArtifactType implements Serializable {
 
     @Id
@@ -36,7 +43,7 @@ public class ArtifactType implements Serializable {
     )
     Project project;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     String name;
 
     public ArtifactType() {

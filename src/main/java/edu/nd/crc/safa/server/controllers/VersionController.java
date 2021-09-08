@@ -29,7 +29,7 @@ public class VersionController extends BaseController {
         this.versionService = versionService;
     }
 
-    @GetMapping("projects/{projectId}/versions/")
+    @GetMapping("projects/versions/{projectId}")
     public ServerResponse versions(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getProjectVersions(project));

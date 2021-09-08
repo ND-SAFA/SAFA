@@ -8,7 +8,6 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
@@ -67,14 +66,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResponse createProject(ProjectAppEntity appEntity) {
-        Project project = new Project(appEntity);
-        this.projectRepository.save(project);
-        ProjectVersion projectVersion = new ProjectVersion(project);
-        this.projectVersionRepository.save(projectVersion);
+    public ProjectCreationResponse createProject(ProjectVersion projectVersion,
+                                                 ProjectAppEntity appEntity) {
 
         if (appEntity.artifacts != null) {
-            artifactService.addNewArtifacts(projectVersion, appEntity.getArtifacts());
+            artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
         }
 
         if (appEntity.traces != null) {
@@ -83,26 +79,19 @@ public class ProjectService {
 
         ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectCreationResponse(projectAppEntity, projectErrors);
+        return new ProjectCreationResponse(projectAppEntity, projectVersion, projectErrors);
     }
 
     @Transactional
-    public ProjectCreationResponse updateProject(ProjectAppEntity appEntity) throws ServerError {
-        Project project = new Project(appEntity);
-        this.projectRepository.save(project);
+    public ProjectCreationResponse updateProject(ProjectVersion projectVersion,
+                                                 ProjectAppEntity appEntity) {
 
-        ProjectVersion newProjectVersion = new ProjectVersion(project);
-        this.projectVersionRepository.save(newProjectVersion);
-
-        List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
-        artifactService.updateExistingArtifacts(projectArtifacts, newProjectVersion, appEntity);
-        List<ArtifactAppEntity> newArtifacts = appEntity.findNewArtifacts(projectArtifacts);
-        artifactService.addNewArtifacts(newProjectVersion, newArtifacts);
+        artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
 
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(newProjectVersion);
-        return new ProjectCreationResponse(appEntity, projectErrors); // TODO: Actually retrieve new object
+        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        return new ProjectCreationResponse(appEntity, projectVersion, projectErrors); // TODO: Actually retrieve new
     }
 
     public ProjectAppEntity createApplicationEntity(ProjectVersion newProjectVersion) {

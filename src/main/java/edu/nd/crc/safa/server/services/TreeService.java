@@ -12,6 +12,4 @@ public class TreeService {
     public TreeService(WarningService warningService) {
         this.warningService = warningService;
     }
-
-
 }

@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "warnings")
+@Table(name = "warning")
 public class Warning {
 
     @Id

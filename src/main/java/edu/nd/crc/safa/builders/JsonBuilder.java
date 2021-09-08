@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class JsonBuilder extends BaseBuilder {
 
     Hashtable<String, JSONObject> projects;
+    Hashtable<String, JSONObject> projectVersions;
 
     public JsonBuilder() {
         createEmptyData();
@@ -18,6 +19,11 @@ public class JsonBuilder extends BaseBuilder {
 
     public void createEmptyData() {
         projects = new Hashtable<>();
+        projectVersions = new Hashtable<>();
+    }
+
+    public JSONObject withProjectAndReturn(String id, String name) {
+        return withProject(id, name).getProjectAndReturn(id);
     }
 
     public JsonBuilder withProject(String id, String name) {
@@ -35,6 +41,27 @@ public class JsonBuilder extends BaseBuilder {
         project.put("traces", traces);
         projects.put(name, project);
         return this;
+    }
+
+    public JsonBuilder withProjectVersion(String projectName,
+                                          int majorVersion,
+                                          int minorVersion,
+                                          int revision) {
+        JSONObject project = this.projects.get(projectName);
+        JSONObject projectVersion = new JSONObject();
+        projectVersion.put("projectId", project.getString("projectId"));
+        projectVersion.put("majorVersion", majorVersion);
+        projectVersion.put("minorVersion", minorVersion);
+        projectVersion.put("revision", revision);
+        this.projectVersions.put(projectName, projectVersion);
+        return this;
+    }
+
+    public JSONObject getPayload(String projectName) {
+        JSONObject payload = new JSONObject();
+        payload.put("project", this.projects.get(projectName));
+        payload.put("projectVersion", this.projectVersions.get(projectName));
+        return payload;
     }
 
     public JsonBuilder withArtifact(String projectName,

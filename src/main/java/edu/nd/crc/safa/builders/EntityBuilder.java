@@ -28,18 +28,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class EntityBuilder extends BaseBuilder {
 
+    final int majorVersion = 1;
+    final int minorVersion = 1;
     ProjectRepository projectRepository;
     ProjectVersionRepository projectVersionRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactRepository artifactRepository;
     ArtifactBodyRepository artifactBodyRepository;
     TraceLinkRepository traceLinkRepository;
-
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
     Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
     Hashtable<String, Hashtable<String, Artifact>> artifacts;
     Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactBody>>> bodies;
+    int revisionNumber;
 
     @Autowired
     public EntityBuilder(ProjectRepository projectRepository,
@@ -68,6 +70,7 @@ public class EntityBuilder extends BaseBuilder {
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactBodyRepository.deleteAll();
+        this.revisionNumber = 1;
     }
 
     public Project newProjectWithReturn(String name) {
@@ -93,7 +96,10 @@ public class EntityBuilder extends BaseBuilder {
 
     public EntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
-        ProjectVersion projectVersion = new ProjectVersion(project);
+        ProjectVersion projectVersion = new ProjectVersion(project,
+            this.majorVersion,
+            this.minorVersion,
+            this.revisionNumber++);
         this.projectVersionRepository.save(projectVersion);
         addEntry(this.projectVersions, projectName, projectVersion);
         return this;

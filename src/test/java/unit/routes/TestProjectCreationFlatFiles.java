@@ -3,6 +3,7 @@ package unit.routes;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,17 +34,8 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
 
-        String attributeName = "files";
         String routeName = "/projects/flat-files";
-
-        List<MockMultipartFile> files =
-            MultipartHelper.createMockMultipartFilesFromDirectory(ProjectPaths.PATH_TO_TEST_RESOURCES,
-                attributeName);
-        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
-
-        for (MockMultipartFile file : files) {
-            request.file(file);
-        }
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
 
         MvcResult response = mockMvc
             .perform(request)
@@ -150,5 +142,73 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(traceLinks.size()).isEqualTo(TestConstants.N_LINKS);
 
         projectService.deleteProject(project);
+    }
+
+    @Test
+    public void testUpdateProjectViaFlatFiles() throws Exception {
+
+        String projectName = "test-project";
+
+        entityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newVersion(projectName)
+            .newVersion(projectName);
+
+        Project project = entityBuilder.getProject(projectName);
+        ProjectVersion emptyVersion = entityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion updateVersion = entityBuilder.getProjectVersion(projectName, 1);
+        ProjectVersion noChangeVersion = entityBuilder.getProjectVersion(projectName, 2);
+
+        String routeName = String.format("/projects/flat-files/%s/%s",
+            project.getProjectId().toString(),
+            updateVersion.getVersionId().toString());
+
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
+
+        mockMvc
+            .perform(request)
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andReturn();
+
+        List<ArtifactBody> initialBodies = this.artifactBodyRepository.findByProjectVersion(emptyVersion);
+        assertThat(initialBodies.size())
+            .as("no bodies at init")
+            .isEqualTo(0);
+
+        List<ArtifactBody> updateBodies = this.artifactBodyRepository.findByProjectVersion(updateVersion);
+        assertThat(updateBodies.size())
+            .as("bodies created in later version")
+            .isEqualTo(TestConstants.N_ARTIFACTS);
+
+        routeName = String.format("/projects/flat-files/%s/%s",
+            project.getProjectId().toString(),
+            noChangeVersion.getVersionId().toString());
+        request = createMultiPartRequest(routeName);
+
+        mockMvc
+            .perform(request)
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andReturn();
+
+        List<ArtifactBody> noChangeBodies = this.artifactBodyRepository.findByProjectVersion(noChangeVersion);
+        assertThat(noChangeBodies.size())
+            .as("no changes were detected in project versions")
+            .isEqualTo(0);
+    }
+
+    private MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName) throws IOException {
+        String attributeName = "files";
+
+        List<MockMultipartFile> files =
+            MultipartHelper.createMockMultipartFilesFromDirectory(ProjectPaths.PATH_TO_TEST_RESOURCES,
+                attributeName);
+        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
+
+        for (MockMultipartFile file : files) {
+            request.file(file);
+        }
+
+        return request;
     }
 }

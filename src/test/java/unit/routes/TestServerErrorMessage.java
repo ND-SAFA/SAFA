@@ -22,7 +22,7 @@ public class TestServerErrorMessage extends SpringBootBaseTest {
     @Test
     public void testServerError() throws Exception {
         String projectId = UUID.randomUUID().toString(); // not exist
-        String routeName = String.format("/projects/%s/versions/", projectId);
+        String routeName = String.format("/projects/versions/%s", projectId);
 
         MvcResult result = mockMvc
             .perform(get(routeName))

@@ -16,9 +16,9 @@ public class TestProjectVersion extends EntityBaseTest {
         entityBuilder.newProject(projectName);
         ProjectVersion sourceVersion1 = entityBuilder.newVersionWithReturn(projectName);
         ProjectVersion sourceVersion2 = entityBuilder.newVersionWithReturn(projectName);
-
+        
         // VP - Verify that versions are incremented
-        assertThat(sourceVersion1.getVersionId()).isLessThan(sourceVersion2.getVersionId());
+        assertThat(sourceVersion1.isLessThanOrEqualTo(sourceVersion2)).isTrue();
 
         // Step - Create another project
         String otherProjectName = "other-project";
@@ -27,6 +27,6 @@ public class TestProjectVersion extends EntityBaseTest {
         ProjectVersion targetVersion2 = entityBuilder.newVersionWithReturn(otherProjectName);
 
         // VP - Verify that versions are incremented in other project
-        assertThat(targetVersion1.getVersionId()).isLessThan(targetVersion2.getVersionId());
+        assertThat(targetVersion1.isLessThanOrEqualTo(targetVersion2)).isTrue();
     }
 }

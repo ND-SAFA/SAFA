@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.importer.Puller;
@@ -11,6 +12,7 @@ import edu.nd.crc.safa.server.services.VersionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,9 +31,16 @@ public class VersionController extends BaseController {
         this.versionService = versionService;
     }
 
-    @GetMapping("projects/versions/{projectId}")
+    @GetMapping("projects/version/{projectId}")
     public ServerResponse versions(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getProjectVersions(project));
+    }
+
+    @PostMapping("projects/version/revision/{projectId}")
+    public ServerResponse createNextVersionRevision(@PathVariable String projectId) throws ServerError {
+        Project project = getProject(projectId);
+        ProjectVersion nextVersion = versionService.createNextRevision(project);
+        return new ServerResponse(nextVersion);
     }
 }

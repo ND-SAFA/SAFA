@@ -5,7 +5,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ResponseCodes;
@@ -54,9 +53,5 @@ public abstract class BaseController {
             throw new ServerError("Could not find project with id:" + projectId);
         }
         return queriedProject.get();
-    }
-
-    protected ProjectVersion getCurrentVersion(Project project) {
-        return this.projectVersionRepository.findTopByProjectOrderByVersionIdDesc(project);
     }
 }

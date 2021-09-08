@@ -12,7 +12,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProjectVersionRepository extends CrudRepository<ProjectVersion, UUID> {
 
-    ProjectVersion findTopByProjectOrderByVersionIdDesc(Project project);
+    default ProjectVersion getCurrentVersion(Project project) {
+        return findTopByProjectOrderByMajorVersionDescMinorVersionDescRevisionDesc(project);
+    }
+
+    ProjectVersion findTopByProjectOrderByMajorVersionDescMinorVersionDescRevisionDesc(Project project);
 
     List<ProjectVersion> findByProject(Project project);
 }

@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
 
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 /**
  * Responsible for uniquely identifying which
@@ -32,15 +33,17 @@ public class Project implements Serializable {
     public Project() {
     }
 
-    public Project(ProjectAppEntity appEntity) {
-        if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
-            this.projectId = UUID.fromString(appEntity.getProjectId());
-        }
-        this.name = appEntity.getName();
-    }
-
     public Project(String name) {
         this.setName(name);
+    }
+
+    public static Project fromAppEntity(ProjectAppEntity appEntity) {
+        Project project = new Project();
+        if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
+            project.projectId = UUID.fromString(appEntity.getProjectId());
+        }
+        project.name = appEntity.getName();
+        return project;
     }
 
     public UUID getProjectId() {
@@ -53,5 +56,16 @@ public class Project implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean hasDefinedId() {
+        return this.projectId != null && !this.projectId.toString().equals("");
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("projectId", projectId);
+        json.put("name", name);
+        return json.toString();
     }
 }

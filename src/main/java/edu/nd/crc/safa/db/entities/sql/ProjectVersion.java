@@ -124,8 +124,17 @@ public class ProjectVersion implements Serializable {
         this.revision = revision;
     }
 
+    public boolean hasValidId() {
+        return this.versionId != null && !this.versionId.toString().equals("");
+    }
+
+    public boolean hasValidVersion() {
+        return this.majorVersion > 0 && this.minorVersion > 0 && this.revision > 0;
+    }
+
     public String toString() {
         JSONObject json = new JSONObject();
+        json.put("versionId", versionId);
         json.put("majorVersion", majorVersion);
         json.put("minorVersion", minorVersion);
         json.put("revision", revision);

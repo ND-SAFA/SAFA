@@ -1,6 +1,8 @@
 package unit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,8 +24,13 @@ import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 public class EntityBaseTest extends SpringBootBaseTest {
@@ -88,5 +95,25 @@ public class EntityBaseTest extends SpringBootBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
+    }
+
+    public JSONObject sendPost(String routeName, JSONObject body, ResultMatcher test) throws Exception {
+        return sendRequest(post(routeName)
+                .content(body.toString())
+                .contentType(MediaType.APPLICATION_JSON),
+            test);
+    }
+
+    public JSONObject sendGet(String routeName, ResultMatcher test) throws Exception {
+        return sendRequest(get(routeName), test);
+    }
+
+    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
+                                  ResultMatcher test) throws Exception {
+        MvcResult response = mockMvc
+            .perform(request)
+            .andExpect(test)
+            .andReturn();
+        return TestUtil.asJson(response);
     }
 }

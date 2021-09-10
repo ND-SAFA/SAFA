@@ -103,8 +103,9 @@ public class ArtifactService {
                                                     Artifact artifact,
                                                     ArtifactAppEntity appEntity) {
         Project project = projectVersion.getProject();
+        ArtifactBody artifactBody = null;
         if (appEntity == null) {
-            return new ArtifactBody(projectVersion,
+            artifactBody = new ArtifactBody(projectVersion,
                 ModificationType.REMOVED,
                 artifact,
                 null,
@@ -113,21 +114,29 @@ public class ArtifactService {
             Optional<ArtifactBody> previousBody = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
             if (previousBody.isPresent()) {
                 if (!previousBody.get().getContent().equals(appEntity.body)) {
-                    return new ArtifactBody(projectVersion,
+                    artifactBody = new ArtifactBody(projectVersion,
                         ModificationType.MODIFIED,
                         artifact,
                         appEntity.summary,
                         appEntity.body);
-                } else {
-                    return null; // No change
                 }
             } else {
-                return new ArtifactBody(projectVersion,
+                artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.ADDED,
                     artifact,
                     appEntity.summary,
                     appEntity.body);
             }
+        }
+        if (artifactBody == null) {
+            return null;
+        } else {
+            Optional<ArtifactBody> bodyQuery =
+                this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
+            if (bodyQuery.isPresent()) {
+                artifactBody.setArtifactBodyId(bodyQuery.get().getArtifactBodyId());
+            }
+            return artifactBody;
         }
     }
 }

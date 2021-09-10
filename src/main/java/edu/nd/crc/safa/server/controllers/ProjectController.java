@@ -45,7 +45,7 @@ public class ProjectController extends BaseController {
 
     @PostMapping(value = "projects/flat-files/{projectId}/{versionId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProjectFromFlatFiles(
+    public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable String projectId,
         @PathVariable String versionId,
         @RequestParam MultipartFile[] files) throws ServerError {
@@ -73,13 +73,13 @@ public class ProjectController extends BaseController {
 
     @PostMapping(value = "projects/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
+    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
 
         Project project = createProject(null);
-        ProjectVersion projectVersion = createProjectVersion(project, 1, 1, 1);
+        ProjectVersion projectVersion = createProjectVersion(project);
 
         ProjectCreationResponse response = this.flatFileService.parseAndUploadFlatFiles(project,
             projectVersion,
@@ -92,14 +92,29 @@ public class ProjectController extends BaseController {
     public ServerResponse createOrUpdateProject(@RequestBody ProjectAndVersion payload) throws ServerError {
         ProjectCreationResponse response;
 
-        Project project = new Project(payload.project);
-        project = saveOrCreateProject(project);
-        ProjectVersion projectVersion = saveOrCreateProjectVersion(project, payload.projectVersion);
+        Project project = Project.fromAppEntity(payload.project); // gets
+        ProjectVersion projectVersion = payload.projectVersion;
 
-        if (payload.project.hasValidId()) {
-            response = this.projectService.updateProject(projectVersion, payload.project);
-        } else {
+        if (!project.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
+            if (projectVersion != null
+                && projectVersion.hasValidVersion()
+                && projectVersion.hasValidId()) {
+                throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
+            }
+            project = createProject(project.getName());
+            projectVersion = createProjectVersion(project);
             response = this.projectService.createProject(projectVersion, payload.project);
+        } else {
+            if (!projectVersion.hasValidId()) {
+                throw new ServerError("Invalid Project version: must have a valid ID.");
+            } else if (!projectVersion.hasValidVersion()) {
+                throw new ServerError("Invalid Project version: must contain positive major, minor, and revision "
+                    + "numbers.");
+            }
+            this.projectRepository.save(project);
+            projectVersion.setProject(project);
+            this.projectVersionRepository.save(projectVersion);
+            response = this.projectService.updateProject(projectVersion, payload.project);
         }
 
         return new ServerResponse(response);
@@ -111,38 +126,14 @@ public class ProjectController extends BaseController {
         return new ServerResponse(this.projectRepository.findAll());
     }
 
-    private Project saveOrCreateProject(Project project) {
-        if (project.getProjectId() == null) {
-            project = createProject(project.getName());
-        } else {
-            this.projectRepository.save(project);
-        }
-        return project;
-    }
-
     private Project createProject(String name) {
         Project project = new Project(name); // TODO: extract name from TIM file
         this.projectRepository.save(project);
         return project;
     }
 
-    private ProjectVersion saveOrCreateProjectVersion(Project project, ProjectVersion projectVersion) {
-        if (projectVersion.getVersionId() == null) {
-            projectVersion = createProjectVersion(project,
-                projectVersion.getMajorVersion(),
-                projectVersion.getMinorVersion(),
-                projectVersion.getRevision());
-        } else {
-            this.projectVersionRepository.save(projectVersion);
-        }
-        return projectVersion;
-    }
-
-    private ProjectVersion createProjectVersion(Project project,
-                                                int majorVersion,
-                                                int minorVersion,
-                                                int revision) {
-        ProjectVersion projectVersion = new ProjectVersion(project, majorVersion, minorVersion, revision);
+    private ProjectVersion createProjectVersion(Project project) {
+        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
         this.projectVersionRepository.save(projectVersion);
         return projectVersion;
     }

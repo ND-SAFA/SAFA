@@ -1,4 +1,4 @@
-package unit.routes;
+package unit.controllers.project;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -21,13 +21,11 @@ import edu.nd.crc.safa.db.entities.sql.TraceLink;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.EntityBaseTest;
 import unit.MultipartHelper;
 import unit.TestConstants;
-import unit.TestUtil;
 
 public class TestProjectCreationFlatFiles extends EntityBaseTest {
 
@@ -35,16 +33,11 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
     public void testMultipleFilesUploadRestController() throws Exception {
 
         String routeName = "/projects/flat-files";
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
 
-        MvcResult response = mockMvc
-            .perform(request)
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andReturn();
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated());
 
         // VP 1 - Server response is 200 - okay
-        assertThat(response).as("server response non-null").isNotNull();
-        JSONObject responseContent = TestUtil.asJson(response);
         assertThat(responseContent.get("status")).as("status is set").isEqualTo(0);
         JSONObject responseBody = responseContent.getJSONObject("body");
         assertThat(responseBody).as("response body is non-null").isNotNull();
@@ -165,11 +158,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
             updateVersion.getVersionId().toString());
 
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
-
-        mockMvc
-            .perform(request)
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andReturn();
+        sendRequest(request, MockMvcResultMatchers.status().isCreated());
 
         List<ArtifactBody> initialBodies = this.artifactBodyRepository.findByProjectVersion(emptyVersion);
         assertThat(initialBodies.size())

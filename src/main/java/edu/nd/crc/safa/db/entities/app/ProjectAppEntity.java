@@ -81,7 +81,7 @@ public class ProjectAppEntity {
         return newArtifacts;
     }
 
-    public boolean hasValidId() {
+    public boolean hasDefinedId() {
         return this.projectId != null && !this.projectId.equals("");
     }
 

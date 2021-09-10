@@ -83,6 +83,14 @@ public class ArtifactBody implements Serializable {
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
+    public UUID getArtifactBodyId() {
+        return this.artifactBodyId;
+    }
+
+    public void setArtifactBodyId(UUID artifactBodyId) {
+        this.artifactBodyId = artifactBodyId;
+    }
+
     public String getName() {
         return this.artifact.getName();
     }

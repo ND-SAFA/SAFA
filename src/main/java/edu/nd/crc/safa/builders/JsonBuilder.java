@@ -44,12 +44,12 @@ public class JsonBuilder extends BaseBuilder {
     }
 
     public JsonBuilder withProjectVersion(String projectName,
+                                          String versionId,
                                           int majorVersion,
                                           int minorVersion,
                                           int revision) {
-        JSONObject project = this.projects.get(projectName);
         JSONObject projectVersion = new JSONObject();
-        projectVersion.put("projectId", project.getString("projectId"));
+        projectVersion.put("versionId", versionId);
         projectVersion.put("majorVersion", majorVersion);
         projectVersion.put("minorVersion", minorVersion);
         projectVersion.put("revision", revision);

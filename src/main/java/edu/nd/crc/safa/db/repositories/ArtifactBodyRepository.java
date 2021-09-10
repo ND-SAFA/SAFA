@@ -23,6 +23,8 @@ public interface ArtifactBodyRepository extends CrudRepository<ArtifactBody, UUI
 
     List<ArtifactBody> findByProjectVersion(ProjectVersion projectVersion);
 
+    Optional<ArtifactBody> findByProjectVersionAndArtifact(ProjectVersion projectVersion, Artifact artifact);
+
     default List<ArtifactBody> getBodiesWithName(Project project, String name) {
         return findByProjectVersionProjectAndArtifactName(project, name);
     }

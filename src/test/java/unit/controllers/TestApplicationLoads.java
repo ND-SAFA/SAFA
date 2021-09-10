@@ -1,4 +1,4 @@
-package unit.routes;
+package unit.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

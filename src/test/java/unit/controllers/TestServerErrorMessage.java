@@ -19,7 +19,7 @@ public class TestServerErrorMessage extends EntityBaseTest {
     @Test
     public void testServerError() throws Exception {
         String projectId = UUID.randomUUID().toString(); // not exist
-        String routeName = String.format("/projects/versions/%s", projectId);
+        String routeName = String.format("/projects/%s/versions", projectId);
 
         JSONObject obj = sendGet(routeName, status().isBadRequest());
 

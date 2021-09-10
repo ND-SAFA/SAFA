@@ -153,7 +153,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         ProjectVersion updateVersion = entityBuilder.getProjectVersion(projectName, 1);
         ProjectVersion noChangeVersion = entityBuilder.getProjectVersion(projectName, 2);
 
-        String routeName = String.format("/projects/flat-files/%s/%s",
+        String routeName = String.format("/projects/%s/%s/flat-files",
             project.getProjectId().toString(),
             updateVersion.getVersionId().toString());
 
@@ -170,7 +170,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
             .as("bodies created in later version")
             .isEqualTo(TestConstants.N_ARTIFACTS);
 
-        routeName = String.format("/projects/flat-files/%s/%s",
+        routeName = String.format("/projects/%s/%s/flat-files",
             project.getProjectId().toString(),
             noChangeVersion.getVersionId().toString());
         request = createMultiPartRequest(routeName);

@@ -43,7 +43,7 @@ public class ProjectController extends BaseController {
         this.flatFileService = flatFileService;
     }
 
-    @PostMapping(value = "projects/flat-files/{projectId}/{versionId}")
+    @PostMapping(value = "projects/{projectId}/{versionId}/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable String projectId,

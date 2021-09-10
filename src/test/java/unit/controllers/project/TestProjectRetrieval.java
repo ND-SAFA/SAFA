@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
 
-public class TestGetProjects extends EntityBaseTest {
+public class TestProjectRetrieval extends EntityBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {
         JSONObject response = sendGet("/projects/", status().isOk());

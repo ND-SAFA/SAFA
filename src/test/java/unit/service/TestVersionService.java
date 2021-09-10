@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.db.entities.sql.Project;
 import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ public class TestVersionService extends EntityBaseTest {
     VersionService versionService;
 
     @Test
-    public void createNextVersion() {
+    public void createNextVersion() throws ServerError {
         String projectName = "test-project";
         entityBuilder
             .newProject(projectName)

@@ -4,19 +4,19 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.db.entities.app.AddedArtifact;
-import edu.nd.crc.safa.db.entities.app.DeltaArtifact;
-import edu.nd.crc.safa.db.entities.app.ModifiedArtifact;
-import edu.nd.crc.safa.db.entities.app.ProjectDelta;
-import edu.nd.crc.safa.db.entities.app.RemovedArtifact;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.ModificationType;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.entities.app.AddedArtifact;
+import edu.nd.crc.safa.server.db.entities.app.DeltaArtifact;
+import edu.nd.crc.safa.server.db.entities.app.ModifiedArtifact;
+import edu.nd.crc.safa.server.db.entities.app.ProjectDelta;
+import edu.nd.crc.safa.server.db.entities.app.RemovedArtifact;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +50,7 @@ public class DeltaService {
         Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
 
         List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
+
         for (Artifact artifact : projectArtifacts) {
             DeltaArtifact deltaArtifact = getModificationOverDelta(artifact, beforeVersion, afterVersion);
             if (deltaArtifact == null) {

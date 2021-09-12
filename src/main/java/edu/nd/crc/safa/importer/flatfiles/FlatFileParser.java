@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

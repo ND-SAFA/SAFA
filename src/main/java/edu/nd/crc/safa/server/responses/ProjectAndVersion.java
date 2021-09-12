@@ -2,8 +2,8 @@ package edu.nd.crc.safa.server.responses;
 
 import javax.validation.constraints.NotBlank;
 
-import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 
 public class ProjectAndVersion {
     @NotBlank(message = "'project' field must be defined.")

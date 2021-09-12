@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.responses.ServerError;
 

@@ -3,11 +3,11 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.Warning;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.WarningRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.Warning;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.repositories.WarningRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.Rule;

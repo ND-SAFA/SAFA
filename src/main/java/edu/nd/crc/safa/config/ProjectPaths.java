@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
 
 /**
  * Contains common full paths used through app.
@@ -14,7 +14,8 @@ public class ProjectPaths {
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
     public static final String PATH_TO_BUILD = PATH_TO_ROOT + "/build";
     public static final String PATH_TO_STORAGE = PATH_TO_BUILD + "/storage";
-    public static final String PATH_TO_TEST_RESOURCES = PATH_TO_ROOT + "/resources";
+    public static final String PATH_TO_BEFORE_FILES = PATH_TO_ROOT + "/resources/before";
+    public static final String PATH_TO_AFTER_FILES = PATH_TO_ROOT + "/resources/after";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();
@@ -63,6 +64,6 @@ public class ProjectPaths {
     }
 
     public static String getPathToTestResources(String fileName) {
-        return pathHelper(PATH_TO_TEST_RESOURCES, fileName);
+        return pathHelper(PATH_TO_BEFORE_FILES, fileName);
     }
 }

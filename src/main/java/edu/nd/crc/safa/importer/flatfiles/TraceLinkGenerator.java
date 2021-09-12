@@ -12,15 +12,14 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
@@ -36,15 +35,12 @@ public class TraceLinkGenerator {
 
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactBodyRepository artifactBodyRepository;
-    private final ArtifactRepository artifactRepository;
 
     @Autowired
     public TraceLinkGenerator(TraceLinkRepository traceLinkRepository,
-                              ArtifactBodyRepository artifactBodyRepository,
-                              ArtifactRepository artifactRepository) {
+                              ArtifactBodyRepository artifactBodyRepository) {
         this.traceLinkRepository = traceLinkRepository;
         this.artifactBodyRepository = artifactBodyRepository;
-        this.artifactRepository = artifactRepository;
     }
 
     public void generateTraceLinksToFile(ProjectVersion projectVersion,

@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;

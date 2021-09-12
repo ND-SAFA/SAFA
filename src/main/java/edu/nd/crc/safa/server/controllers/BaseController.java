@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ResponseCodes;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.responses.ServerResponse;

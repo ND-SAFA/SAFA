@@ -13,13 +13,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.importer.JIRA.Issue;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.services.ArtifactService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 

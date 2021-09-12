@@ -12,18 +12,17 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceType;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.FlatFileResponse;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ProjectErrors;
@@ -33,7 +32,6 @@ import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FlatFileService {
 
-    private final String SEPARATOR = "-------------------------------";
     FlatFileParser flatFileParser;
     TraceLinkGenerator traceLinkGenerator;
     TraceFileParser traceFileParser;
@@ -127,20 +124,6 @@ public class FlatFileService {
                 }
             }
         }
-    }
-
-    public FileSystemResource getUploadedFile(Project project, String file) {
-        return new FileSystemResource(new File(ProjectPaths.getPathToFlatFile(project, file)));
-    }
-
-    public void clearUploadedFiles(Project project) throws ServerError {
-        OSHelper.clearOrCreateDirectory(ProjectPaths.getPathToUploadedFiles(project));
-        this.artifactRepository.deleteAllByProject(project);
-    }
-
-    public void clearGeneratedFiles(Project project) throws ServerError {
-        OSHelper.clearOrCreateDirectory(ProjectPaths.getPathToGeneratedFiles(project));
-        this.traceLinkRepository.deleteAllByProjectAndTraceType(project, TraceType.GENERATED);
     }
 
     public List<String> uploadFlatFiles(Project project, List<MultipartFile> requestFiles) throws ServerError {

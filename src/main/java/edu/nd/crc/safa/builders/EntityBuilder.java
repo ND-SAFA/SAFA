@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.ModificationType;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -78,7 +78,7 @@ public class EntityBuilder extends BaseBuilder {
     }
 
     public EntityBuilder newProject(String name) {
-        Project project = new Project(name);
+        Project project = new Project(name, "");
         this.projectRepository.save(project);
         this.projects.put(name, project);
         this.projectVersions.put(name, new Hashtable<>());

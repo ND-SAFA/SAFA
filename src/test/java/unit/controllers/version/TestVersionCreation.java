@@ -3,7 +3,7 @@ package unit.controllers.version;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ public class TestVersionCreation extends EntityBaseTest {
         String projectId = project
             .getProjectId()
             .toString();
-        String routeName = String.format("/projects/%s/versions/revisions", projectId);
+        String routeName = String.format("/projects/%s/versions/revision", projectId);
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
         assertThat(response.getJSONObject("body").getString("message")).contains("initial version");
     }
@@ -34,7 +34,7 @@ public class TestVersionCreation extends EntityBaseTest {
         String projectId = project
             .getProjectId()
             .toString();
-        String routeName = String.format("/projects/%s/versions/revisions", projectId);
+        String routeName = String.format("/projects/%s/versions/revision", projectId);
 
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");

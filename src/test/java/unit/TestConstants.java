@@ -8,5 +8,5 @@ public class TestConstants {
     public static final int N_ENV_ASSUMPTIONS = 1;
     public static final int N_ARTIFACTS = N_DESIGNS + N_REQUIREMENTS + N_HAZARDS + N_ENV_ASSUMPTIONS;
     public static final int N_LINKS = 22; //23 but there exist an invalid one
-    public static final int N_FILES = 12;
+    public static final int N_FILES = 11;
 }

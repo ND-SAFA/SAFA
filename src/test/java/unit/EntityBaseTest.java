@@ -2,6 +2,7 @@ package unit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.io.IOException;
@@ -11,15 +12,15 @@ import edu.nd.crc.safa.builders.AppBuilder;
 import edu.nd.crc.safa.builders.EntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -28,9 +29,11 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 public class EntityBaseTest extends SpringBootBaseTest {
@@ -81,9 +84,10 @@ public class EntityBaseTest extends SpringBootBaseTest {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
-            ProjectPaths.PATH_TO_TEST_RESOURCES,
+            ProjectPaths.PATH_TO_BEFORE_FILES,
             "files");
         List<String> uploadedFileNames = flatFileService.uploadFlatFiles(project, files);
+        System.out.println("Uploaded files:" + uploadedFileNames);
         assertThat(uploadedFileNames.size())
             .as("test resources uploaded")
             .isEqualTo(TestConstants.N_FILES);
@@ -115,5 +119,20 @@ public class EntityBaseTest extends SpringBootBaseTest {
             .andExpect(test)
             .andReturn();
         return TestUtil.asJson(response);
+    }
+
+    public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)
+        throws IOException {
+        String attributeName = "files";
+
+        List<MockMultipartFile> files =
+            MultipartHelper.createMockMultipartFilesFromDirectory(pathToFiles, attributeName);
+        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
+
+        for (MockMultipartFile file : files) {
+            request.file(file);
+        }
+
+        return request;
     }
 }

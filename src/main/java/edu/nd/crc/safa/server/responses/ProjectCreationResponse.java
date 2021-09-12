@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.responses;
 
-import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 
 public class ProjectCreationResponse {
     ProjectAppEntity project;

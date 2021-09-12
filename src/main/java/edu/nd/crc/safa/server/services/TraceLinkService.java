@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ParserError;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ParserError;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

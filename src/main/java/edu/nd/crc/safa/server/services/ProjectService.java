@@ -1,22 +1,26 @@
 package edu.nd.crc.safa.server.services;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ProjectErrors;
 import edu.nd.crc.safa.server.responses.ServerError;
@@ -94,19 +98,42 @@ public class ProjectService {
         return new ProjectCreationResponse(appEntity, projectVersion, projectErrors); // TODO: Actually retrieve new
     }
 
-    public ProjectAppEntity createApplicationEntity(ProjectVersion newProjectVersion) {
-        Project project = newProjectVersion.getProject();
-        List<ArtifactAppEntity> artifacts = this.artifactBodyRepository
-            .findByProjectVersion(newProjectVersion)
-            .stream()
-            .map(ArtifactAppEntity::new)
-            .collect(Collectors.toList());
+    public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
+        Project project = projectVersion.getProject();
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+
+        Hashtable<String, List<ArtifactBody>> artifactBodyTable = new Hashtable<>();
+        List<ArtifactBody> projectBodies = this.artifactBodyRepository.findByProject(projectVersion.getProject());
+        for (ArtifactBody body : projectBodies) {
+            String key = body.getArtifact().getArtifactId().toString();
+            if (artifactBodyTable.containsKey(key)) {
+                artifactBodyTable.get(key).add(body);
+            } else {
+                List<ArtifactBody> newList = new ArrayList<>();
+                newList.add(body);
+                artifactBodyTable.put(key, newList);
+            }
+        }
+
+        for (String key : artifactBodyTable.keySet()) {
+            List<ArtifactBody> bodyVersions = artifactBodyTable.get(key);
+            ArtifactBody latest = bodyVersions.get(0);
+            for (ArtifactBody body : bodyVersions) {
+                if (!body.getProjectVersion().isLessThanOrEqualTo(latest.getProjectVersion())) {
+                    latest = body;
+                }
+            }
+            if (latest.getModificationType() != ModificationType.REMOVED) {
+                artifacts.add(new ArtifactAppEntity(latest));
+            }
+        }
+
         List<TraceApplicationEntity> traces = this.traceLinkRepository
             .findByProject(project)
             .stream()
             .map(TraceApplicationEntity::new)
             .collect(Collectors.toList());
-        return new ProjectAppEntity(project, artifacts, traces);
+        return new ProjectAppEntity(projectVersion, artifacts, traces);
     }
 
     public void deleteProject(Project project) throws ServerError {

@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.ParserError;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.entities.sql.TraceMatrix;
-import edu.nd.crc.safa.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.db.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.ParserError;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.TraceMatrix;
+import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.db.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -86,10 +86,12 @@ public class TraceFileParser {
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
 
-        TraceMatrix traceMatrix = new TraceMatrix(project,
-            matrixArtifactTypes.getValue0(),
-            matrixArtifactTypes.getValue1(),
-            isGenerated);
+        TraceMatrix traceMatrix =
+            this.traceMatrixRepository.findBySourceTypeAndTargetType(matrixArtifactTypes.getValue0(),
+                matrixArtifactTypes.getValue1()).orElseGet(() -> new TraceMatrix(project,
+                matrixArtifactTypes.getValue0(),
+                matrixArtifactTypes.getValue1(),
+                isGenerated));
         this.traceMatrixRepository.save(traceMatrix);
 
         if (isGenerated) {
@@ -197,7 +199,8 @@ public class TraceFileParser {
         }
         Artifact targetArtifact = targetArtifactQuery.get();
 
-        TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
-        return traceLink;
+        return this.traceLinkRepository
+            .findBySourceArtifactAndTargetArtifact(sourceArtifact, targetArtifact)
+            .orElseGet(() -> new TraceLink(sourceArtifact, targetArtifact));
     }
 }

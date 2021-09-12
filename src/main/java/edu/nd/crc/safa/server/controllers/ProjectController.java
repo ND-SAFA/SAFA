@@ -3,10 +3,10 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.responses.ProjectAndVersion;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ServerError;
@@ -17,6 +17,7 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,19 +47,19 @@ public class ProjectController extends BaseController {
     @PostMapping(value = "projects/{projectId}/{versionId}/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
-        @PathVariable String projectId,
-        @PathVariable String versionId,
+        @PathVariable UUID projectId,
+        @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        Optional<Project> project = this.projectRepository.findById(UUID.fromString(projectId));
+        Optional<Project> project = this.projectRepository.findById(projectId);
         if (!project.isPresent()) {
             String message = String.format("Could not find project with id: %s", projectId);
             throw new ServerError(message);
         }
-        Optional<ProjectVersion> projectVersion = this.projectVersionRepository.findById(UUID.fromString(versionId));
+        Optional<ProjectVersion> projectVersion = this.projectVersionRepository.findById(versionId);
         if (!projectVersion.isPresent()) {
             String message = String.format("Could not find ProjectVersion with id: %s", versionId);
             throw new ServerError(message);
@@ -78,7 +79,7 @@ public class ProjectController extends BaseController {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        Project project = createProject(null);
+        Project project = createProject(null, null);
         ProjectVersion projectVersion = createProjectVersion(project);
 
         ProjectCreationResponse response = this.flatFileService.parseAndUploadFlatFiles(project,
@@ -101,33 +102,52 @@ public class ProjectController extends BaseController {
                 && projectVersion.hasValidId()) {
                 throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
             }
-            project = createProject(project.getName());
+            project = createProject(project.getName(), project.getDescription());
             projectVersion = createProjectVersion(project);
             response = this.projectService.createProject(projectVersion, payload.project);
         } else {
-            if (!projectVersion.hasValidId()) {
+            this.projectRepository.save(project);
+            //TODO: Update traces
+            if (projectVersion == null) {
+                if ((payload.project.artifacts != null
+                    && payload.project.artifacts.size() > 0)) {
+                    throw new ServerError("Cannot update artifacts because project version not defined");
+                }
+                response = new ProjectCreationResponse(payload.project, null, null);
+            } else if (!projectVersion.hasValidId()) {
                 throw new ServerError("Invalid Project version: must have a valid ID.");
             } else if (!projectVersion.hasValidVersion()) {
                 throw new ServerError("Invalid Project version: must contain positive major, minor, and revision "
                     + "numbers.");
+            } else {
+                projectVersion.setProject(project);
+                this.projectVersionRepository.save(projectVersion);
+                response = this.projectService.updateProject(projectVersion, payload.project);
             }
-            this.projectRepository.save(project);
-            projectVersion.setProject(project);
-            this.projectVersionRepository.save(projectVersion);
-            response = this.projectService.updateProject(projectVersion, payload.project);
         }
 
         return new ServerResponse(response);
     }
 
-    @CrossOrigin
     @GetMapping("projects/")
     public ServerResponse getProjects() {
         return new ServerResponse(this.projectRepository.findAll());
     }
 
-    private Project createProject(String name) {
-        Project project = new Project(name); // TODO: extract name from TIM file
+    @DeleteMapping("projects/{projectId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
+        Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
+        if (projectQuery.isPresent()) {
+            this.projectRepository.delete(projectQuery.get());
+            return new ServerResponse("Project deleted successfully");
+        } else {
+            throw new ServerError("Could not find project with id" + projectId);
+        }
+    }
+
+    private Project createProject(String name, String description) {
+        Project project = new Project(name, description); // TODO: extract name from TIM file
         this.projectRepository.save(project);
         return project;
     }

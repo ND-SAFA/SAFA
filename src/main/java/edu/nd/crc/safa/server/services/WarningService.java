@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.db.entities.sql.Warning;
-import edu.nd.crc.safa.db.repositories.WarningRepository;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.Warning;
+import edu.nd.crc.safa.server.db.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.RuleName;
 import edu.nd.crc.safa.warnings.TreeRules;

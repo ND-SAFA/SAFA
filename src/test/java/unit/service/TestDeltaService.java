@@ -3,9 +3,9 @@ package unit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.nd.crc.safa.db.entities.app.ProjectDelta;
-import edu.nd.crc.safa.db.entities.sql.ModificationType;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.app.ProjectDelta;
+import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.DeltaService;
 

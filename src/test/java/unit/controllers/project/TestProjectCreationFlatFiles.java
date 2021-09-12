@@ -1,30 +1,26 @@
 package unit.controllers.project;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.db.entities.sql.Artifact;
-import edu.nd.crc.safa.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.db.entities.sql.ParserError;
-import edu.nd.crc.safa.db.entities.sql.Project;
-import edu.nd.crc.safa.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
+import edu.nd.crc.safa.server.db.entities.sql.ParserError;
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.EntityBaseTest;
-import unit.MultipartHelper;
 import unit.TestConstants;
 
 public class TestProjectCreationFlatFiles extends EntityBaseTest {
@@ -34,7 +30,8 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
 
         String routeName = "/projects/flat-files";
 
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
+            ProjectPaths.PATH_TO_BEFORE_FILES);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated());
 
         // VP 1 - Server response is 200 - okay
@@ -139,7 +136,6 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
 
     @Test
     public void testUpdateProjectViaFlatFiles() throws Exception {
-
         String projectName = "test-project";
 
         entityBuilder
@@ -153,51 +149,45 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         ProjectVersion updateVersion = entityBuilder.getProjectVersion(projectName, 1);
         ProjectVersion noChangeVersion = entityBuilder.getProjectVersion(projectName, 2);
 
-        String routeName = String.format("/projects/%s/%s/flat-files",
+        // Step - Create request to update project via flat files
+        String updateRouteName = String.format("/projects/%s/%s/flat-files",
             project.getProjectId().toString(),
             updateVersion.getVersionId().toString());
 
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName);
-        sendRequest(request, MockMvcResultMatchers.status().isCreated());
+        MockMultipartHttpServletRequestBuilder updateRequest = createMultiPartRequest(updateRouteName,
+            ProjectPaths.PATH_TO_BEFORE_FILES);
+        sendRequest(updateRequest, MockMvcResultMatchers.status().isCreated());
 
+        // VP - Verify that no artifacts associated with empty version
         List<ArtifactBody> initialBodies = this.artifactBodyRepository.findByProjectVersion(emptyVersion);
         assertThat(initialBodies.size())
             .as("no bodies at init")
             .isEqualTo(0);
 
+        // VP - Verify that artifacts are constructed and associated with update version
         List<ArtifactBody> updateBodies = this.artifactBodyRepository.findByProjectVersion(updateVersion);
         assertThat(updateBodies.size())
             .as("bodies created in later version")
             .isEqualTo(TestConstants.N_ARTIFACTS);
+        List<TraceLink> updateTraces = this.traceLinkRepository.findByProject(project);
+        assertThat(updateTraces.size()).isEqualTo(TestConstants.N_LINKS);
 
-        routeName = String.format("/projects/%s/%s/flat-files",
+        // Step - Create request to parse same flat files at different version
+        String noChangeRouteName = String.format("/projects/%s/%s/flat-files",
             project.getProjectId().toString(),
             noChangeVersion.getVersionId().toString());
-        request = createMultiPartRequest(routeName);
+        MockMultipartHttpServletRequestBuilder noChangeRequest = createMultiPartRequest(noChangeRouteName,
+            ProjectPaths.PATH_TO_BEFORE_FILES);
+        sendRequest(noChangeRequest, MockMvcResultMatchers.status().isCreated());
 
-        mockMvc
-            .perform(request)
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andReturn();
-
+        // VP - No new artifacts were created
         List<ArtifactBody> noChangeBodies = this.artifactBodyRepository.findByProjectVersion(noChangeVersion);
         assertThat(noChangeBodies.size())
             .as("no changes were detected in project versions")
             .isEqualTo(0);
-    }
 
-    private MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName) throws IOException {
-        String attributeName = "files";
-
-        List<MockMultipartFile> files =
-            MultipartHelper.createMockMultipartFilesFromDirectory(ProjectPaths.PATH_TO_TEST_RESOURCES,
-                attributeName);
-        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
-
-        for (MockMultipartFile file : files) {
-            request.file(file);
-        }
-
-        return request;
+        // VP - No new trace links were created
+        List<TraceLink> noChangeTraces = this.traceLinkRepository.findByProject(project);
+        assertThat(noChangeTraces.size()).isEqualTo(TestConstants.N_LINKS);
     }
 }

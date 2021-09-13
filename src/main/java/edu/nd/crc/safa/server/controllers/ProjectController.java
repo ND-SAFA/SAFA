@@ -3,11 +3,11 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.responses.ProjectAndVersion;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.responses.ServerResponse;
@@ -90,12 +90,11 @@ public class ProjectController extends BaseController {
 
     @PostMapping("projects/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody ProjectAndVersion payload) throws ServerError {
-        ProjectCreationResponse response;
-
-        Project project = Project.fromAppEntity(payload.project); // gets
+    public ServerResponse createOrUpdateProject(@RequestBody ProjectAppEntity payload) throws ServerError {
+        Project project = Project.fromAppEntity(payload); // gets
         ProjectVersion projectVersion = payload.projectVersion;
 
+        ProjectCreationResponse response;
         if (!project.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
             if (projectVersion != null
                 && projectVersion.hasValidVersion()
@@ -104,16 +103,16 @@ public class ProjectController extends BaseController {
             }
             project = createProject(project.getName(), project.getDescription());
             projectVersion = createProjectVersion(project);
-            response = this.projectService.createProject(projectVersion, payload.project);
+            response = this.projectService.createProject(projectVersion, payload);
         } else {
             this.projectRepository.save(project);
             //TODO: Update traces
             if (projectVersion == null) {
-                if ((payload.project.artifacts != null
-                    && payload.project.artifacts.size() > 0)) {
+                if ((payload.artifacts != null
+                    && payload.artifacts.size() > 0)) {
                     throw new ServerError("Cannot update artifacts because project version not defined");
                 }
-                response = new ProjectCreationResponse(payload.project, null, null);
+                response = new ProjectCreationResponse(payload, null, null);
             } else if (!projectVersion.hasValidId()) {
                 throw new ServerError("Invalid Project version: must have a valid ID.");
             } else if (!projectVersion.hasValidVersion()) {
@@ -122,7 +121,7 @@ public class ProjectController extends BaseController {
             } else {
                 projectVersion.setProject(project);
                 this.projectVersionRepository.save(projectVersion);
-                response = this.projectService.updateProject(projectVersion, payload.project);
+                response = this.projectService.updateProject(projectVersion, payload);
             }
         }
 

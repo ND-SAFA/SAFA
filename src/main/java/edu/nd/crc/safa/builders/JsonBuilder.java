@@ -58,10 +58,9 @@ public class JsonBuilder extends BaseBuilder {
     }
 
     public JSONObject getPayload(String projectName) {
-        JSONObject payload = new JSONObject();
-        payload.put("project", this.projects.get(projectName));
-        payload.put("projectVersion", this.projectVersions.get(projectName));
-        return payload;
+        JSONObject project = this.projects.get(projectName);
+        project.put("projectVersion", this.projectVersions.get(projectName));
+        return project;
     }
 
     public JsonBuilder withArtifact(String projectName,

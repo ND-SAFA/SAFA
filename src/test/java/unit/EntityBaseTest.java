@@ -87,7 +87,6 @@ public class EntityBaseTest extends SpringBootBaseTest {
             ProjectPaths.PATH_TO_BEFORE_FILES,
             "files");
         List<String> uploadedFileNames = flatFileService.uploadFlatFiles(project, files);
-        System.out.println("Uploaded files:" + uploadedFileNames);
         assertThat(uploadedFileNames.size())
             .as("test resources uploaded")
             .isEqualTo(TestConstants.N_FILES);

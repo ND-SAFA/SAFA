@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,18 +37,23 @@ public class ArtifactService {
 
     public void createOrUpdateArtifacts(ProjectVersion projectVersion,
                                         List<ArtifactAppEntity> artifactsToUpdate) {
+        Hashtable<String, ArtifactAppEntity> entitiesSeen = new Hashtable<>();
         for (ArtifactAppEntity a : artifactsToUpdate) {
-            createOrUpdateArtifact(projectVersion, a);
+            createOrUpdateArtifact(projectVersion,
+                a.name,
+                a.type,
+                a.summary,
+                a.body);
+            entitiesSeen.put(a.getName(), a);
         }
-    }
 
-    public Triplet<ArtifactType, Artifact, ArtifactBody> createOrUpdateArtifact(ProjectVersion projectVersion,
-                                                                                ArtifactAppEntity a) {
-        return createOrUpdateArtifact(projectVersion,
-            a.name,
-            a.type,
-            a.summary,
-            a.body);
+        for (Artifact projectArtifact : this.artifactRepository.findByProject(projectVersion.getProject())) {
+            if (entitiesSeen.containsKey(projectArtifact.getName())) {
+                continue;
+            }
+            ArtifactBody removedBody = calculateArtifactChange(projectVersion, projectArtifact, null);
+            this.artifactBodyRepository.save(removedBody);
+        }
     }
 
     /**
@@ -60,7 +66,7 @@ public class ArtifactService {
      * @param content        - The initial content of the artifact being saved.
      * @return Triplet of unsaved entities consisting of artifact's type, identifier, and initial body.
      */
-    public Triplet<ArtifactType, Artifact, ArtifactBody> createOrUpdateArtifact(
+    private Triplet<ArtifactType, Artifact, ArtifactBody> createOrUpdateArtifact(
         ProjectVersion projectVersion,
         String artifactName,
         String typeName,
@@ -77,12 +83,13 @@ public class ArtifactService {
         Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
         this.artifactRepository.save(artifact);
 
-        ArtifactBody artifactBody = createOrUpdateArtifactBody(projectVersion,
+        ArtifactBody artifactBody = calculateArtifactChange(projectVersion,
             artifact,
             new ArtifactAppEntity(typeName,
                 artifactName,
                 summary,
                 content));
+
         if (artifactBody != null) {
             this.artifactBodyRepository.save(artifactBody);
         }
@@ -99,35 +106,41 @@ public class ArtifactService {
      * @param appEntity      - The artifact's new changes in the form of the domain model.
      * @return ArtifactBody - unsaved database entity with given changes and modification type.
      */
-    private ArtifactBody createOrUpdateArtifactBody(ProjectVersion projectVersion,
-                                                    Artifact artifact,
-                                                    ArtifactAppEntity appEntity) {
+    private ArtifactBody calculateArtifactChange(ProjectVersion projectVersion,
+                                                 Artifact artifact,
+                                                 ArtifactAppEntity appEntity) {
         Project project = projectVersion.getProject();
         ArtifactBody artifactBody = null;
-        if (appEntity == null) {
-            artifactBody = new ArtifactBody(projectVersion,
-                ModificationType.REMOVED,
-                artifact,
-                null,
-                null);
-        } else {
-            Optional<ArtifactBody> previousBody = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
-            if (previousBody.isPresent()) {
-                if (!previousBody.get().getContent().equals(appEntity.body)) {
-                    artifactBody = new ArtifactBody(projectVersion,
-                        ModificationType.MODIFIED,
-                        artifact,
-                        appEntity.summary,
-                        appEntity.body);
-                }
-            } else {
+        Optional<ArtifactBody> previousBodyQuery = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
+        if (previousBodyQuery.isPresent()) {
+            ArtifactBody previousBody = previousBodyQuery.get();
+            if (appEntity == null) {
+                artifactBody = new ArtifactBody(projectVersion,
+                    ModificationType.REMOVED,
+                    artifact,
+                    null,
+                    null);
+            } else if (previousBody.getModificationType() == ModificationType.REMOVED) {
                 artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.ADDED,
                     artifact,
                     appEntity.summary,
                     appEntity.body);
+            } else if (!previousBody.getContent().equals(appEntity.body)) {
+                artifactBody = new ArtifactBody(projectVersion,
+                    ModificationType.MODIFIED,
+                    artifact,
+                    appEntity.summary,
+                    appEntity.body);
             }
+        } else {
+            artifactBody = new ArtifactBody(projectVersion,
+                ModificationType.ADDED,
+                artifact,
+                appEntity.summary,
+                appEntity.body);
         }
+
         if (artifactBody == null) {
             return null;
         } else {

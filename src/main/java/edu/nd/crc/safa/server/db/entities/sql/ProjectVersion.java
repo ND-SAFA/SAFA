@@ -84,6 +84,10 @@ public class ProjectVersion implements Serializable {
         }
     }
 
+    public boolean isGreaterThan(ProjectVersion other) {
+        return !this.isLessThanOrEqualTo(other);
+    }
+
     public Project getProject() {
         return this.project;
     }

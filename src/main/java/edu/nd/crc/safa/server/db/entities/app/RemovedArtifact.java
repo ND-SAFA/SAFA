@@ -2,21 +2,31 @@ package edu.nd.crc.safa.server.db.entities.app;
 
 public class RemovedArtifact extends DeltaArtifact {
 
-    String previous;
+    String before;
+    String beforeSummary;
 
     public RemovedArtifact() {
     }
 
-    public RemovedArtifact(String artifactId, String previous) {
+    public RemovedArtifact(String artifactId, String before, String beforeSummary) {
         super(artifactId);
-        this.previous = previous;
+        this.before = before;
+        this.beforeSummary = beforeSummary;
     }
 
-    public String getPrevious() {
-        return this.previous;
+    public String getBefore() {
+        return this.before;
     }
 
-    public void setPrevious(String previous) {
-        this.previous = previous;
+    public void setBefore(String before) {
+        this.before = before;
+    }
+
+    public String getBeforeSummary() {
+        return this.beforeSummary;
+    }
+
+    public void setBeforeSummary(String beforeSummary) {
+        this.beforeSummary = beforeSummary;
     }
 }

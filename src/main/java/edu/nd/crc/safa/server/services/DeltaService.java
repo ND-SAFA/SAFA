@@ -1,10 +1,12 @@
 package edu.nd.crc.safa.server.services;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.app.AddedArtifact;
+import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.app.DeltaArtifact;
 import edu.nd.crc.safa.server.db.entities.app.ModifiedArtifact;
 import edu.nd.crc.safa.server.db.entities.app.ProjectDelta;
@@ -50,6 +52,7 @@ public class DeltaService {
         Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
 
         List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
+        List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : projectArtifacts) {
             DeltaArtifact deltaArtifact = getModificationOverDelta(artifact, beforeVersion, afterVersion);
@@ -63,10 +66,14 @@ public class DeltaService {
                 removed.put(artifactName, (RemovedArtifact) deltaArtifact);
             } else if (deltaArtifact instanceof AddedArtifact) {
                 added.put(artifactName, (AddedArtifact) deltaArtifact);
+                ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(artifact.getType().getName(),
+                    artifact.getName(), ((AddedArtifact) deltaArtifact).getAfterSummary(),
+                    ((AddedArtifact) deltaArtifact).getAfter());
+                missingArtifacts.add(addedArtifactBody);
             }
         }
 
-        return new ProjectDelta(added, modified, removed);
+        return new ProjectDelta(added, modified, removed, missingArtifacts);
     }
 
     public DeltaArtifact getModificationOverDelta(Artifact artifact,
@@ -80,12 +87,20 @@ public class DeltaService {
                 .isLessThanOrEqualTo(afterVersion))
             .collect(Collectors.toList());
 
+        String artifactName = artifact.getName();
+
         ArtifactBody beforeBody = getBodyAtVersion(bodies, beforeVersion);
         ArtifactBody afterBody = getBodyAtVersion(bodies, afterVersion);
 
-        String artifactName = artifact.getName();
+        if (beforeBody == null) {
+            return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+        }
+
         String beforeContent = beforeBody.getContent();
+        String beforeSummary = beforeBody.getSummary();
+
         String afterContent = afterBody.getContent();
+        String afterSummary = afterBody.getSummary();
 
         if (beforeBody.hasSameId(afterBody)) {
             return null; // no change
@@ -97,16 +112,16 @@ public class DeltaService {
             if (beforeContent.equals(afterContent)) { // no change - same body
                 return null;
             } else {
-                return new ModifiedArtifact(artifactName, beforeContent, afterContent);
+                return new ModifiedArtifact(artifactName, beforeContent, beforeSummary, afterContent, afterSummary);
             }
         } else {
             switch (afterBody.getModificationType()) {
                 case MODIFIED:
-                    return new ModifiedArtifact(artifactName, beforeContent, afterContent);
+                    return new ModifiedArtifact(artifactName, beforeContent, beforeSummary, afterContent, afterSummary);
                 case ADDED:
-                    return new AddedArtifact(artifactName, afterContent);
+                    return new AddedArtifact(artifactName, afterContent, afterSummary);
                 case REMOVED:
-                    return new RemovedArtifact(artifactName, beforeContent);
+                    return new RemovedArtifact(artifactName, beforeContent, beforeSummary);
                 default:
                     throw new RuntimeException("New modification type is not supported");
             }

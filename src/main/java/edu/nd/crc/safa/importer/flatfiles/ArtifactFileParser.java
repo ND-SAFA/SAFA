@@ -66,6 +66,7 @@ public class ArtifactFileParser {
                                    JSONObject dataFilesJson) throws JSONException, ServerError {
         Project project = projectVersion.getProject();
 
+        List<ArtifactAppEntity> projectArtifacts = new ArrayList<>();
         for (Iterator keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
             String artifactTypeName = keyIterator.next().toString();
 
@@ -84,13 +85,15 @@ public class ArtifactFileParser {
             ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
             this.artifactFileRepository.save(newFile);
 
-            parseArtifactFile(projectVersion, artifactType, artifactFileName);
+            List<ArtifactAppEntity> artifactsInFile = parseArtifactFile(projectVersion, artifactType, artifactFileName);
+            projectArtifacts.addAll(artifactsInFile);
         }
+        artifactService.createOrUpdateArtifacts(projectVersion, projectArtifacts);
     }
 
-    private void parseArtifactFile(ProjectVersion projectVersion,
-                                   ArtifactType artifactType,
-                                   String fileName) throws ServerError {
+    private List<ArtifactAppEntity> parseArtifactFile(ProjectVersion projectVersion,
+                                                      ArtifactType artifactType,
+                                                      String fileName) throws ServerError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
@@ -99,13 +102,13 @@ public class ArtifactFileParser {
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);
 
-        saveOrUpdateArtifactRecords(project, projectVersion, artifactType, fileParser);
+        return saveOrUpdateArtifactRecords(project, projectVersion, artifactType, fileParser);
     }
 
-    private void saveOrUpdateArtifactRecords(Project project,
-                                             ProjectVersion projectVersion,
-                                             ArtifactType artifactType,
-                                             CSVParser parsedFile) throws ServerError {
+    private List<ArtifactAppEntity> saveOrUpdateArtifactRecords(Project project,
+                                                                ProjectVersion projectVersion,
+                                                                ArtifactType artifactType,
+                                                                CSVParser parsedFile) throws ServerError {
         List<CSVRecord> artifactRecords;
         try {
             artifactRecords = parsedFile.getRecords();
@@ -128,6 +131,6 @@ public class ArtifactFileParser {
             artifactAppEntities.add(artifactAppEntity);
         }
 
-        artifactService.createOrUpdateArtifacts(projectVersion, artifactAppEntities);
+        return artifactAppEntities;
     }
 }

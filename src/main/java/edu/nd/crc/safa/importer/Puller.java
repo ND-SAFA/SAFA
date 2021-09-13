@@ -3,6 +3,7 @@ package edu.nd.crc.safa.importer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
+import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
@@ -76,17 +78,16 @@ public class Puller {
         this.traceLinkService = traceLinkService;
     }
 
-    public void parseJIRAIssues() {
+    public void parseJIRAIssues(ProjectVersion projectVersion) {
         try {
             String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
                 "Acceptance Test", "Environmental Assumption", "Simulation"
             };
 
-            Project project = new Project();
-            this.projectRepository.save(project);
-            ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
+            Project project = projectVersion.getProject();
 
             // Loop over issues returned from JIRA and add the found nodes and links
+            List<ArtifactAppEntity> artifactsToUpdate = new ArrayList<>();
             for (Issue issue : mJira.getIssues(types)) {
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("source", issue.source);
@@ -103,11 +104,7 @@ public class Puller {
                 String typeName = issue.key;
                 String artifactContent = JsonStream.serialize(data);
 
-                artifactService.createOrUpdateArtifact(projectVersion,
-                    artifactName,
-                    typeName,
-                    "",
-                    artifactContent);
+                artifactsToUpdate.add(new ArtifactAppEntity(typeName, artifactName, "", artifactContent));
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
@@ -122,6 +119,7 @@ public class Puller {
                             link.InwardKey));
                 }
             }
+            artifactService.createOrUpdateArtifacts(projectVersion, artifactsToUpdate);
         } catch (Exception e) {
             e.printStackTrace();
         }

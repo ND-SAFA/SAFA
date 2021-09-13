@@ -117,13 +117,16 @@ public class ProjectService {
 
         for (String key : artifactBodyTable.keySet()) {
             List<ArtifactBody> bodyVersions = artifactBodyTable.get(key);
-            ArtifactBody latest = bodyVersions.get(0);
+            ArtifactBody latest = null;
             for (ArtifactBody body : bodyVersions) {
-                if (!body.getProjectVersion().isLessThanOrEqualTo(latest.getProjectVersion())) {
-                    latest = body;
+                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
+                    if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
+                        latest = body;
+                    }
                 }
             }
-            if (latest.getModificationType() != ModificationType.REMOVED) {
+
+            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
                 artifacts.add(new ArtifactAppEntity(latest));
             }
         }

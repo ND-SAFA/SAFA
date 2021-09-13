@@ -2,20 +2,19 @@ package unit.service;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.services.ArtifactService;
 
-import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.EntityBaseTest;
@@ -118,10 +117,8 @@ public class TestArtifactService extends EntityBaseTest {
         // VP - Verify that no new entry has been created
         ProjectVersion newVersion = entityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
-        Triplet<ArtifactType, Artifact, ArtifactBody> artifactEntities =
-            artifactService.createOrUpdateArtifact(newVersion, artifactApp);
-        ArtifactBody updatedBody = artifactEntities.getValue2();
-        assertThat(updatedBody).isNull();
+
+        artifactService.createOrUpdateArtifacts(newVersion, Arrays.asList(artifactApp));
         List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -147,10 +144,13 @@ public class TestArtifactService extends EntityBaseTest {
         ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", newContent);
 
         // VP - Verify that artifact body is detected to be modified
-        Triplet<ArtifactType, Artifact, ArtifactBody> artifactEntities =
-            this.artifactService.createOrUpdateArtifact(projectVersion,
-                appEntity);
-        ArtifactBody updatedBody = artifactEntities.getValue2();
+        this.artifactService.createOrUpdateArtifacts(projectVersion,
+            Arrays.asList(appEntity));
+        Optional<ArtifactBody> updatedBodyQuery =
+            this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion,
+                artifact);
+        assertThat(updatedBodyQuery.isPresent()).isTrue();
+        ArtifactBody updatedBody = updatedBodyQuery.get();
         assertThat(updatedBody.getModificationType()).isEqualTo(ModificationType.MODIFIED);
         assertThat(updatedBody.getContent()).isEqualTo(newContent);
     }

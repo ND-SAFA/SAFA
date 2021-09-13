@@ -2,6 +2,8 @@ package edu.nd.crc.safa.server.db.entities.app;
 
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
 
+import org.json.JSONObject;
+
 public class ArtifactAppEntity {
     public String name;
     public String summary;
@@ -60,5 +62,14 @@ public class ArtifactAppEntity {
     public ArtifactAppEntity withName(String name) {
         this.name = name;
         return this;
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        //json.put("name", name);
+        //json.put("summary", summary);
+        json.put("body", body);
+        //json.put("type", type);
+        return json.toString();
     }
 }

@@ -21,4 +21,10 @@ public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
     }
 
     Optional<TraceLink> findBySourceArtifactAndTargetArtifact(Artifact sourceArtifact, Artifact targetArtifact);
+
+    default List<TraceLink> getProjectGeneratedLinks(Project project) {
+        return findBySourceArtifactProjectAndApproved(project, false);
+    }
+
+    List<TraceLink> findBySourceArtifactProjectAndApproved(Project project, boolean approved);
 }

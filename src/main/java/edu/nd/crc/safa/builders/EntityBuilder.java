@@ -200,6 +200,17 @@ public class EntityBuilder extends BaseBuilder {
         return this;
     }
 
+    public EntityBuilder newGeneratedTraceLink(String projectName,
+                                               String sourceName,
+                                               String targetName,
+                                               double score) {
+        Artifact source = this.getArtifact(projectName, sourceName);
+        Artifact target = this.getArtifact(projectName, targetName);
+        TraceLink traceLink = new TraceLink(source, target, 0.5);
+        this.traceLinkRepository.save(traceLink);
+        return this;
+    }
+
     public EntityBuilder updateProjectName(String currentName, String newName) {
         Project project = getProject(currentName);
         project.setName(newName);

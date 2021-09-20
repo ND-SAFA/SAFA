@@ -94,6 +94,10 @@ public class TraceLink implements Serializable {
         return this.traceLinkId;
     }
 
+    public void setTraceLinkId(UUID traceLinkId) {
+        this.traceLinkId = traceLinkId;
+    }
+
     private void setIsManual() {
         this.approved = true;
         this.traceType = TraceType.MANUAL;
@@ -126,7 +130,7 @@ public class TraceLink implements Serializable {
         return this.score;
     }
 
-    public boolean isApproved() {
+    public boolean getIsApproved() {
         return this.approved;
     }
 

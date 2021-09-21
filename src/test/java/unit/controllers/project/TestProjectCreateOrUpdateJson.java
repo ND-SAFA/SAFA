@@ -140,7 +140,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
             .isEqualTo(N_ARTIFACTS);
-        List<TraceLink> traceLinks = traceLinkRepository.findByProject(project);
+        List<TraceLink> traceLinks = traceLinkRepository.getApprovedLinks(project);
         assertThat(traceLinks.size()).isEqualTo(N_TRACES);
     }
 

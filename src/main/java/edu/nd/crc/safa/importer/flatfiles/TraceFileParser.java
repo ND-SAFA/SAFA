@@ -13,12 +13,10 @@ import edu.nd.crc.safa.server.db.entities.sql.ParserError;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.entities.sql.TraceMatrix;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -48,7 +46,6 @@ public class TraceFileParser {
 
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
-    TraceMatrixRepository traceMatrixRepository;
     ParserErrorRepository parserErrorRepository;
     TraceLinkRepository traceLinkRepository;
     TraceLinkGenerator traceLinkGenerator;
@@ -56,13 +53,11 @@ public class TraceFileParser {
     @Autowired
     public TraceFileParser(ArtifactRepository artifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
-                           TraceMatrixRepository traceMatrixRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkGenerator traceLinkGenerator) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
-        this.traceMatrixRepository = traceMatrixRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
@@ -80,24 +75,16 @@ public class TraceFileParser {
     public void parseTraceMatrixDefinition(ProjectVersion projectVersion,
                                            JSONObject traceMatrixDefinition) throws ServerError {
         Project project = projectVersion.getProject();
-        String fileName = traceMatrixDefinition.getString("file");
-        boolean isGenerated = traceMatrixDefinition.has("generateLinks")
-            && traceMatrixDefinition.getBoolean("generateLinks");
+        String fileName = traceMatrixDefinition.getString("file"); // TODO: Make constants and perform validation
+        boolean isGenerated = traceMatrixDefinition.has("generatelinks")
+            && traceMatrixDefinition.getBoolean("generatelinks");
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-
-        TraceMatrix traceMatrix =
-            this.traceMatrixRepository.findBySourceTypeAndTargetType(matrixArtifactTypes.getValue0(),
-                matrixArtifactTypes.getValue1()).orElseGet(() -> new TraceMatrix(project,
-                matrixArtifactTypes.getValue0(),
-                matrixArtifactTypes.getValue1(),
-                isGenerated));
-        this.traceMatrixRepository.save(traceMatrix);
+        parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
 
         if (isGenerated) {
-            traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes, fileName);
+            traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes);
         }
-        parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
     }
 
     /**
@@ -157,6 +144,7 @@ public class TraceFileParser {
                 TraceLink newLink = createTraceLink(project, matrixArtifactTypes, artifactIds);
                 traceLinks.add(newLink);
             }
+            System.out.println("Saving # links" + traceLinks.size());
             this.traceLinkRepository.saveAll(traceLinks);
         } catch (ServerError e) {
             ParserError parserError = new ParserError(projectVersion,
@@ -200,7 +188,7 @@ public class TraceFileParser {
         Artifact targetArtifact = targetArtifactQuery.get();
 
         return this.traceLinkRepository
-            .findBySourceArtifactAndTargetArtifact(sourceArtifact, targetArtifact)
+            .getApprovedLinkIfExist(sourceArtifact, targetArtifact)
             .orElseGet(() -> new TraceLink(sourceArtifact, targetArtifact));
     }
 }

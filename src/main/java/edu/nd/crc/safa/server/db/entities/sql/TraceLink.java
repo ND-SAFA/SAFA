@@ -16,6 +16,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -135,7 +136,10 @@ public class TraceLink implements Serializable {
     }
 
     public String toString() {
-        return String.format("%s -> %s", sourceArtifact, targetArtifact);
+        JSONObject json = new JSONObject();
+        json.put("link", String.format("%s -> %s", sourceArtifact, targetArtifact));
+        json.put("approved", getIsApproved());
+        return json + "\n";
     }
 
     public boolean isSourceName(String sourceName) {
@@ -144,5 +148,13 @@ public class TraceLink implements Serializable {
 
     public boolean isTargetName(String targetName) {
         return this.targetArtifact.getName().equals(targetName);
+    }
+
+    public Artifact getSourceArtifact() {
+        return this.sourceArtifact;
+    }
+
+    public Artifact getTargetArtifact() {
+        return this.targetArtifact;
     }
 }

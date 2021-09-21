@@ -1,26 +1,21 @@
 package edu.nd.crc.safa.importer.flatfiles;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.vsm.Controller;
 
 import org.javatuples.Pair;
@@ -44,24 +39,19 @@ public class TraceLinkGenerator {
     }
 
     public void generateTraceLinksToFile(ProjectVersion projectVersion,
-                                         Pair<ArtifactType, ArtifactType> artifactTypes,
-                                         String outputFileName) throws ServerError {
-        Project project = projectVersion.getProject();
+                                         Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<TraceLink> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
-        this.traceLinkRepository.saveAll(generatedLinks);
-
-        try {
-            String pathToOutputFile = ProjectPaths.getPathToGeneratedFile(project, outputFileName);
-            writeLinksToFile(generatedLinks, pathToOutputFile);
-        } catch (IOException e) {
-            throw new ServerError("error writing trace matrix file", e);
+        for (TraceLink traceLink : generatedLinks) {
+            Optional<TraceLink> alreadyApprovedLink = this.traceLinkRepository
+                .getApprovedLinkIfExist(traceLink.getSourceArtifact(), traceLink.getTargetArtifact());
+            if (!alreadyApprovedLink.isPresent()) {
+                this.traceLinkRepository.save(traceLink);
+            }
         }
     }
 
     public List<TraceLink> generateLinksBetweenTypes(ProjectVersion projectVersion,
-                                                     Pair<ArtifactType, ArtifactType> artifactTypes)
-        throws ServerError {
-
+                                                     Pair<ArtifactType, ArtifactType> artifactTypes) {
         Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(projectVersion,
             artifactTypes.getValue0());
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(projectVersion,
@@ -107,19 +97,5 @@ public class TraceLinkGenerator {
     private List<String> getArtifactWords(ArtifactBody artifactBody) {
         String[] artifactWords = artifactBody.getContent().split(" ");
         return Arrays.asList(artifactWords);
-    }
-
-    private void writeLinksToFile(List<TraceLink> generatedLinks,
-                                  String pathToOutputFile) throws IOException {
-        List<String> lines = new ArrayList<>();
-        String GENERATED_FILES_HEADER = "Source,Target,Score";
-        lines.add(GENERATED_FILES_HEADER);
-        for (TraceLink generatedLink : generatedLinks) {
-            lines.add(String.format("%s,%s,%s",
-                generatedLink.getSourceName(),
-                generatedLink.getTargetName(),
-                generatedLink.getScore()));
-        }
-        Files.write(Paths.get(pathToOutputFile), lines);
     }
 }

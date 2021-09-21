@@ -128,7 +128,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(error.getApplicationActivity()).isEqualTo(ApplicationActivity.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
-        List<TraceLink> traceLinks = traceLinkRepository.findByProject(project);
+        List<TraceLink> traceLinks = traceLinkRepository.findBySourceArtifactProjectAndApproved(project, true);
         assertThat(traceLinks.size()).isEqualTo(TestConstants.N_LINKS);
 
         projectService.deleteProject(project);
@@ -169,7 +169,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(updateBodies.size())
             .as("bodies created in later version")
             .isEqualTo(TestConstants.N_ARTIFACTS);
-        List<TraceLink> updateTraces = this.traceLinkRepository.findByProject(project);
+        List<TraceLink> updateTraces = this.traceLinkRepository.getApprovedLinks(project);
         assertThat(updateTraces.size()).isEqualTo(TestConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
@@ -187,7 +187,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
             .isEqualTo(0);
 
         // VP - No new trace links were created
-        List<TraceLink> noChangeTraces = this.traceLinkRepository.findByProject(project);
+        List<TraceLink> noChangeTraces = this.traceLinkRepository.getApprovedLinks(project);
         assertThat(noChangeTraces.size()).isEqualTo(TestConstants.N_LINKS);
     }
 }

@@ -13,17 +13,25 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
-
-    List<TraceLink> findBySourceArtifactProject(Project project);
-
-    default List<TraceLink> findByProject(Project project) {
-        return findBySourceArtifactProject(project);
+    
+    default List<TraceLink> getApprovedLinks(Project project) {
+        return findBySourceArtifactProjectAndApproved(project, true);
     }
 
-    Optional<TraceLink> findBySourceArtifactAndTargetArtifact(Artifact sourceArtifact, Artifact targetArtifact);
+    default Optional<TraceLink> getApprovedLinkIfExist(Artifact sourceArtifact, Artifact targetArtifact) {
+        return findBySourceArtifactAndTargetArtifactAndApproved(sourceArtifact, targetArtifact, true);
+    }
+
+    Optional<TraceLink> findBySourceArtifactAndTargetArtifactAndApproved(Artifact sourceArtifact,
+                                                                         Artifact targetArtifact,
+                                                                         boolean approved);
 
     default List<TraceLink> getProjectGeneratedLinks(Project project) {
         return findBySourceArtifactProjectAndApproved(project, false);
+    }
+
+    default List<TraceLink> getProjectApprovedLinks(Project project) {
+        return findBySourceArtifactProjectAndApproved(project, true);
     }
 
     List<TraceLink> findBySourceArtifactProjectAndApproved(Project project, boolean approved);

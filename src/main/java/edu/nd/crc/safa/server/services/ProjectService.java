@@ -130,9 +130,8 @@ public class ProjectService {
                 artifacts.add(new ArtifactAppEntity(latest));
             }
         }
-
         List<TraceApplicationEntity> traces = this.traceLinkRepository
-            .findByProject(project)
+            .getProjectApprovedLinks(project)
             .stream()
             .map(TraceApplicationEntity::new)
             .collect(Collectors.toList());

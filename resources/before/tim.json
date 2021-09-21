@@ -26,7 +26,8 @@
   "DesignToRequirement": {
     "Source": "Design",
     "Target": "Requirement",
-    "File": "Design2Requirement.csv"
+    "File": "Design2Requirement.csv",
+    "generateLinks": true
   },
   "RequirementToHazard": {
     "Source": "Requirement",

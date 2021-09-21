@@ -34,7 +34,7 @@ public class TraceLinkController extends BaseController {
     @GetMapping("/projects/{projectId}/links/generated")
     public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
         Project project = this.projectRepository.findByProjectId(projectId);
-        List<TraceLink> projectLinks = this.traceLinkRepository.getProjectGeneratedLinks(project);
+        List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
         return new ServerResponse(TraceApplicationEntity.createEntities(projectLinks));
     }
 }

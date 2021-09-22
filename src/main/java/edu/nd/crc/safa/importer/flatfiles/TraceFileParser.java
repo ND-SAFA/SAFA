@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.server.db.entities.sql.ParserError;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
@@ -18,6 +16,7 @@ import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -44,6 +43,7 @@ public class TraceFileParser {
     private final String TARGET_PARAM = "target";
     private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
 
+    TraceLinkService traceLinkService;
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ParserErrorRepository parserErrorRepository;
@@ -51,11 +51,13 @@ public class TraceFileParser {
     TraceLinkGenerator traceLinkGenerator;
 
     @Autowired
-    public TraceFileParser(ArtifactRepository artifactRepository,
+    public TraceFileParser(TraceLinkService traceLinkService,
+                           ArtifactRepository artifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkGenerator traceLinkGenerator) {
+        this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
@@ -136,59 +138,18 @@ public class TraceFileParser {
 
         List<TraceLink> traceLinks = new ArrayList<>();
 
-        try {
-            for (CSVRecord record : records) {
-                String sourceId = record.get(SOURCE_PARAM).trim();
-                String targetId = record.get(TARGET_PARAM).trim();
-                Pair<String, String> artifactIds = new Pair<>(sourceId, targetId);
-                TraceLink newLink = createTraceLink(project, matrixArtifactTypes, artifactIds);
-                traceLinks.add(newLink);
+        for (CSVRecord record : records) {
+            String sourceId = record.get(SOURCE_PARAM).trim();
+            String targetId = record.get(TARGET_PARAM).trim();
+            Pair<TraceLink, ParserError> traceResult = traceLinkService.createTrace(projectVersion, sourceId,
+                targetId);
+            if (traceResult.getValue0() != null) {
+                traceLinks.add(traceResult.getValue0());
+            } else {
+                traceResult.getValue1().setFileSource(fileName, traceFileParser.getCurrentLineNumber());
+                this.parserErrorRepository.save(traceResult.getValue1());
             }
-            System.out.println("Saving # links" + traceLinks.size());
-            this.traceLinkRepository.saveAll(traceLinks);
-        } catch (ServerError e) {
-            ParserError parserError = new ParserError(projectVersion,
-                e.getMessage(),
-                ApplicationActivity.PARSING_TRACES,
-                fileName,
-                traceFileParser.getCurrentLineNumber());
-            this.parserErrorRepository.save(parserError);
         }
-    }
-
-    /**
-     * Creates a trace links between the artifacts corresponding with source type + id and
-     * target source + id within given project.
-     *
-     * @param project       The project with associated artifact types and artifacts.
-     * @param artifactTypes The source and target types of artifact associated with trace links.
-     * @param artifactNames The source and target names of artifact associated with trace links.
-     * @return unsaved TraceLink containing source and target artifacts identifed by the above params.
-     * @throws ServerError If either source or target artifact are not found.
-     */
-    public TraceLink createTraceLink(Project project,
-                                     Pair<ArtifactType, ArtifactType> artifactTypes,
-                                     Pair<String, String> artifactNames) throws ServerError {
-        ArtifactType sourceType = artifactTypes.getValue0();
-        String sourceId = artifactNames.getValue0();
-        Optional<Artifact> sourceArtifactQuery = this.artifactRepository
-            .findByProjectAndTypeAndNameIgnoreCase(project, sourceType, sourceId);
-        if (!sourceArtifactQuery.isPresent()) {
-            throw new ServerError("Source artifact does not exist: " + sourceId);
-        }
-        Artifact sourceArtifact = sourceArtifactQuery.get();
-
-        ArtifactType targetType = artifactTypes.getValue1();
-        String targetId = artifactNames.getValue1();
-        Optional<Artifact> targetArtifactQuery = this.artifactRepository
-            .findByProjectAndTypeAndNameIgnoreCase(project, targetType, targetId);
-        if (!targetArtifactQuery.isPresent()) {
-            throw new ServerError("Target artifact does not exist: " + sourceId);
-        }
-        Artifact targetArtifact = targetArtifactQuery.get();
-
-        return this.traceLinkRepository
-            .getApprovedLinkIfExist(sourceArtifact, targetArtifact)
-            .orElseGet(() -> new TraceLink(sourceArtifact, targetArtifact));
+        this.traceLinkRepository.saveAll(traceLinks);
     }
 }

@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.vsm.Controller;
 
 import org.javatuples.Pair;
@@ -28,12 +29,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class TraceLinkGenerator {
 
+    private final TraceLinkService traceLinkService;
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactBodyRepository artifactBodyRepository;
 
     @Autowired
-    public TraceLinkGenerator(TraceLinkRepository traceLinkRepository,
+    public TraceLinkGenerator(TraceLinkService traceLinkService,
+                              TraceLinkRepository traceLinkRepository,
                               ArtifactBodyRepository artifactBodyRepository) {
+        this.traceLinkService = traceLinkService;
         this.traceLinkRepository = traceLinkRepository;
         this.artifactBodyRepository = artifactBodyRepository;
     }
@@ -42,8 +46,9 @@ public class TraceLinkGenerator {
                                          Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<TraceLink> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
         for (TraceLink traceLink : generatedLinks) {
-            Optional<TraceLink> alreadyApprovedLink = this.traceLinkRepository
-                .getApprovedLinkIfExist(traceLink.getSourceArtifact(), traceLink.getTargetArtifact());
+            Optional<TraceLink> alreadyApprovedLink = traceLinkService.linkExists(
+                traceLink.getSourceArtifact(),
+                traceLink.getTargetArtifact());
             if (!alreadyApprovedLink.isPresent()) {
                 this.traceLinkRepository.save(traceLink);
             }

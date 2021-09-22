@@ -78,7 +78,27 @@ public class TraceLinkService {
                 ApplicationActivity.PARSING_TRACES);
             return new Pair<>(null, targetError);
         }
-        TraceLink traceLink = new TraceLink(source.get(), target.get());
-        return new Pair<>(traceLink, null);
+        // Check for already existing trace link
+        Artifact sourceArtifact = source.get();
+        Artifact targetArtifact = target.get();
+        Optional<TraceLink> linkQuery = linkExists(sourceArtifact, targetArtifact);
+        if (linkQuery.isPresent()) {
+            ParserError targetError = new ParserError(projectVersion,
+                "Trace link between source and target already exists",
+                ApplicationActivity.PARSING_TRACES);
+            return new Pair<>(null, targetError);
+        } else {
+            return new Pair<>(new TraceLink(sourceArtifact, targetArtifact), null);
+        }
+    }
+
+    public Optional<TraceLink> linkExists(Artifact sourceArtifact, Artifact targetArtifact) {
+        Optional<TraceLink> traceQuery = this.traceLinkRepository
+            .getApprovedLinkIfExist(sourceArtifact, targetArtifact);
+        if (traceQuery.isPresent()) {
+            return traceQuery;
+        }
+        return this.traceLinkRepository
+            .getApprovedLinkIfExist(targetArtifact, sourceArtifact);
     }
 }

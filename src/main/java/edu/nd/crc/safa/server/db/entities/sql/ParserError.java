@@ -61,12 +61,8 @@ public class ParserError implements Serializable {
         this.applicationActivity = applicationActivity;
     }
 
-    public ParserError(ProjectVersion projectVersion,
-                       String description,
-                       ApplicationActivity applicationActivity,
-                       String fileName,
-                       Long lineNumber) {
-        this(projectVersion, description, applicationActivity);
+    public void setFileSource(String fileName,
+                              Long lineNumber) {
         this.fileName = fileName;
         this.lineNumber = lineNumber;
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.TraceType;
 
 public class TraceApplicationEntity {
     public String traceLinkId;
@@ -11,6 +12,7 @@ public class TraceApplicationEntity {
     public String target;
     public boolean isApproved;
     public double score;
+    public TraceType traceType;
 
     public TraceApplicationEntity() {
     }
@@ -21,6 +23,7 @@ public class TraceApplicationEntity {
         this.target = trace.getTargetName();
         this.isApproved = trace.getIsApproved();
         this.score = trace.getScore();
+        this.traceType = trace.getTraceType();
     }
 
     public static List<TraceApplicationEntity> createEntities(List<TraceLink> links) {

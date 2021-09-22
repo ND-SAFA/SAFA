@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.db.entities.app;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.entities.sql.TraceType;
 
@@ -10,7 +11,7 @@ public class TraceApplicationEntity {
     public String traceLinkId;
     public String source;
     public String target;
-    public boolean isApproved;
+    public TraceApproval approvalStatus;
     public double score;
     public TraceType traceType;
 
@@ -21,7 +22,7 @@ public class TraceApplicationEntity {
         this.traceLinkId = trace.getTraceLinkId().toString();
         this.source = trace.getSourceName();
         this.target = trace.getTargetName();
-        this.isApproved = trace.getIsApproved();
+        this.approvalStatus = trace.getApprovalStatus();
         this.score = trace.getScore();
         this.traceType = trace.getTraceType();
     }
@@ -54,12 +55,12 @@ public class TraceApplicationEntity {
         this.traceLinkId = traceLinkId;
     }
 
-    public boolean isApproved() {
-        return isApproved;
+    public TraceApproval isApproved() {
+        return approvalStatus;
     }
 
-    public void setApproved(boolean approved) {
-        isApproved = approved;
+    public void setApproved(TraceApproval approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
     public double getScore() {

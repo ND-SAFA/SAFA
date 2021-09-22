@@ -131,7 +131,7 @@ public class ProjectService {
             }
         }
         List<TraceApplicationEntity> traces = this.traceLinkRepository
-            .getManualLinks(project)
+            .getUnDeclinedLinks(project)
             .stream()
             .map(TraceApplicationEntity::new)
             .collect(Collectors.toList());

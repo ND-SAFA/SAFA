@@ -101,10 +101,6 @@ public class ProjectAppEntity {
         return newArtifacts;
     }
 
-    public boolean hasDefinedId() {
-        return this.projectId != null && !this.projectId.equals("");
-    }
-
     public String toString() {
         JSONObject json = new JSONObject();
         json.put("projectId", this.projectId);

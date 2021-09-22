@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.io.IOException;
 import java.util.List;
@@ -98,6 +99,13 @@ public class EntityBaseTest extends SpringBootBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
+    }
+
+    public JSONObject sendPut(String routeName, JSONObject body, ResultMatcher test) throws Exception {
+        return sendRequest(put(routeName)
+                .content(body.toString())
+                .contentType(MediaType.APPLICATION_JSON),
+            test);
     }
 
     public JSONObject sendPost(String routeName, JSONObject body, ResultMatcher test) throws Exception {

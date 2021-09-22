@@ -60,13 +60,13 @@ public class TraceLink implements Serializable {
     TraceType traceType;
 
     @Column(name = "approved")
-    boolean approved;
+    TraceApproval approvalStatus;
 
     @Column(name = "score")
     double score;
 
     public TraceLink() {
-        this.approved = false;
+        this.approvalStatus = TraceApproval.UNREVIEWED;
         this.score = 0;
     }
 
@@ -100,13 +100,13 @@ public class TraceLink implements Serializable {
     }
 
     private void setIsManual() {
-        this.approved = true;
+        this.approvalStatus = TraceApproval.APPROVED;
         this.traceType = TraceType.MANUAL;
         this.score = 1;
     }
 
     private void setIsGenerated(double score) {
-        this.approved = false;
+        this.approvalStatus = TraceApproval.UNREVIEWED;
         this.traceType = TraceType.GENERATED;
         this.score = score;
     }
@@ -131,14 +131,18 @@ public class TraceLink implements Serializable {
         return this.score;
     }
 
-    public boolean getIsApproved() {
-        return this.approved;
+    public TraceApproval getApprovalStatus() {
+        return this.approvalStatus;
+    }
+
+    public void setApprovalStatus(TraceApproval approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
     public String toString() {
         JSONObject json = new JSONObject();
         json.put("link", String.format("%s -> %s", sourceArtifact, targetArtifact));
-        json.put("approved", getIsApproved());
+        json.put("approved", getApprovalStatus());
         return json + "\n";
     }
 

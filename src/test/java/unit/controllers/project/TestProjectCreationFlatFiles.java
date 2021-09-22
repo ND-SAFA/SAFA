@@ -2,6 +2,7 @@ package unit.controllers.project;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,7 +15,9 @@ import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
 import edu.nd.crc.safa.server.db.entities.sql.ParserError;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.db.entities.sql.TraceType;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -50,6 +53,15 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
             .isEqualTo(TestConstants.N_ARTIFACTS);
         assertThat(projectJson.getJSONArray("traces").length())
             .as("all traces confirmed")
+            .isGreaterThanOrEqualTo(TestConstants.N_LINKS);
+        int nManual = (int) projectJson.getJSONArray("traces")
+            .toList()
+            .stream()
+            .filter((traceJson) ->
+                ((HashMap) traceJson).get("traceType").equals(TraceType.MANUAL.toString())
+            ).count();
+        assertThat(nManual)
+            .as("manual traced confirmed")
             .isEqualTo(TestConstants.N_LINKS);
         JSONObject errors = responseBody.getJSONObject("errors");
         assertThat(errors.getJSONArray("tim").length())
@@ -128,7 +140,8 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(error.getApplicationActivity()).isEqualTo(ApplicationActivity.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
-        List<TraceLink> traceLinks = traceLinkRepository.findBySourceArtifactProjectAndApproved(project, true);
+        List<TraceLink> traceLinks = traceLinkRepository
+            .findBySourceArtifactProjectAndApprovalStatus(project, TraceApproval.APPROVED);
         assertThat(traceLinks.size()).isEqualTo(TestConstants.N_LINKS);
 
         projectService.deleteProject(project);

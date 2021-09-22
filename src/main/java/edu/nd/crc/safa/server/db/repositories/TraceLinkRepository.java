@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.entities.sql.TraceType;
 
@@ -16,26 +17,34 @@ import org.springframework.stereotype.Repository;
 public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
 
     default List<TraceLink> getApprovedLinks(Project project) {
-        return findBySourceArtifactProjectAndApproved(project, true);
+        return findBySourceArtifactProjectAndApprovalStatus(project, TraceApproval.APPROVED);
     }
 
     default List<TraceLink> getGeneratedLinks(Project project) {
         return findBySourceArtifactProjectAndTraceType(project, TraceType.GENERATED);
     }
 
-    default List<TraceLink> getManualLinks(Project project) {
-        return findBySourceArtifactProjectAndTraceType(project, TraceType.MANUAL);
+    default List<TraceLink> getUnDeclinedLinks(Project project) {
+        return findBySourceArtifactProjectAndApprovalStatusNot(project, TraceApproval.DECLINED);
+    }
+
+    default List<TraceLink> getLinks(Project project) {
+        return findBySourceArtifactProject(project);
     }
 
     default Optional<TraceLink> getApprovedLinkIfExist(Artifact sourceArtifact, Artifact targetArtifact) {
-        return findBySourceArtifactAndTargetArtifactAndApproved(sourceArtifact, targetArtifact, true);
+        return findBySourceArtifactAndTargetArtifactAndApprovalStatus(sourceArtifact, targetArtifact, TraceApproval.APPROVED);
     }
 
-    Optional<TraceLink> findBySourceArtifactAndTargetArtifactAndApproved(Artifact sourceArtifact,
-                                                                         Artifact targetArtifact,
-                                                                         boolean approved);
+    Optional<TraceLink> findBySourceArtifactAndTargetArtifactAndApprovalStatus(Artifact sourceArtifact,
+                                                                               Artifact targetArtifact,
+                                                                               TraceApproval approvalStatus);
 
     List<TraceLink> findBySourceArtifactProjectAndTraceType(Project project, TraceType traceType);
 
-    List<TraceLink> findBySourceArtifactProjectAndApproved(Project project, boolean approved);
+    List<TraceLink> findBySourceArtifactProjectAndApprovalStatusNot(Project project, TraceApproval approvalStatus);
+
+    List<TraceLink> findBySourceArtifactProjectAndApprovalStatus(Project project, TraceApproval approvalStatus);
+
+    List<TraceLink> findBySourceArtifactProject(Project project);
 }

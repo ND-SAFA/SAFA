@@ -9,12 +9,12 @@ import java.io.Serializable;
 public enum TraceType implements Serializable {
     MANUAL {
         public String toString() {
-            return "manual";
+            return "MANUAL";
         }
     },
     GENERATED {
         public String toString() {
-            return "generated";
+            return "GENERATED";
         }
     }
 }

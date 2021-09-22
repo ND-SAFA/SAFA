@@ -286,7 +286,7 @@ public class EntityBuilder extends BaseBuilder {
 
     public List<TraceLink> getTraceLinks(String projectName) {
         Project project = getProject(projectName);
-        return this.traceLinkRepository.getApprovedLinks(project);
+        return this.traceLinkRepository.getLinks(project);
     }
 
     private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {

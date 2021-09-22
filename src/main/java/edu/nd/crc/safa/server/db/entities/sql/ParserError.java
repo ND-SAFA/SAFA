@@ -67,15 +67,6 @@ public class ParserError implements Serializable {
         this.lineNumber = lineNumber;
     }
 
-    public String toLogFormat() {
-        String entry = "";
-
-        entry += "File: " + this.fileName + "\n";
-        entry += "Line: " + (this.lineNumber != null ? this.lineNumber : "unknown") + "\n";
-        entry += "Description: " + this.description + "\n";
-        return entry;
-    }
-
     public String getErrorId() {
         return this.id.toString();
     }

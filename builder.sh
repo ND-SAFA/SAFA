@@ -14,11 +14,8 @@ run() {
   JAR_PATH="$PWD/build/libs/edu.nd.crc.safa-0.1.0.jar"
 
   (
-      set -a &&
-      source .env &&
-      java -jar "$JAR_PATH"
+      java -jar -Dspring.profiles.active=dev "$JAR_PATH"
   )
-  rm test.env
 }
 
 if [ $1 == "build" ]; then

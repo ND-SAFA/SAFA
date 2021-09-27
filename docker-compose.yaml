@@ -1,0 +1,38 @@
+version: '3'
+services:
+  safa_api:
+    depends_on: [ "mysql" ]
+    image: "safa_api:latest"
+    container_name: safa_api
+    build: .
+    hostname: safa_api
+    volumes:
+      - api_vol:/app
+      - flatfile_data:/uploadedFlatfiles
+    ports:
+      - 8080:8080
+    networks:
+      - safa
+  mysql:
+    image: mysql:5.7
+    hostname: mysql
+    container_name: mysql-db
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret2
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret3
+      MYSQL_DATABASE: safa-db
+    ports:
+      - 3306:3306
+    networks:
+      - safa
+
+volumes:
+  api_vol:
+  db_data:
+  flatfile_data:
+networks:
+  safa:
+    driver: bridge

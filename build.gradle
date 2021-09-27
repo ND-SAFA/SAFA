@@ -71,10 +71,14 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.4') {
         exclude module: 'logback-classic'
     }
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
 }
 
 test {
+    doFirst {
+        systemProperty 'spring.profiles.active', 'test'
+    }
+
     testLogging {
         outputs.upToDateWhen { false }
         showStandardStreams = true

@@ -37,6 +37,7 @@ public class AppConfig {
     public DataSource getDataSource(@Value(value = "${sql.url}") String url,
                                     @Value(value = "${sql.username}") String username,
                                     @Value(value = "${sql.password}") String password) throws ServerError {
+        System.out.println("CONNECTION URL" + url + ":" + username);
         this.dbProperties = new DatabaseProperties(url, username, password);
         dbProperties.assertValidCredentials();
         BasicDataSource dataSource = new BasicDataSource();

@@ -47,7 +47,7 @@ public class Rule {
         return mTokens.get(0).tokenType == TokenType.TRUE;
     }
 
-    public boolean isValid() {
+    public boolean isValid() { // TODO: Call this when implementing saving project rules
         // Handle unbalanced parenthesis
         long lParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.LEFT_PAREN).count();
         long rParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.RIGHT_PAREN).count();

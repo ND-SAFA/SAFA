@@ -1,8 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
@@ -11,9 +10,9 @@ import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
@@ -25,6 +24,7 @@ import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
 import edu.nd.crc.safa.server.responses.ProjectErrors;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +45,7 @@ public class ProjectService {
     ParserErrorService parserErrorService;
     ArtifactService artifactService;
     TraceLinkService traceLinkService;
+    WarningService warningService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
@@ -56,7 +57,8 @@ public class ProjectService {
                           ParserErrorRepository parserErrorRepository,
                           ParserErrorService parserErrorService,
                           ArtifactService artifactService,
-                          TraceLinkService traceLinkService) {
+                          TraceLinkService traceLinkService,
+                          WarningService warningService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactRepository = artifactRepository;
@@ -67,6 +69,7 @@ public class ProjectService {
         this.parserErrorService = parserErrorService;
         this.artifactService = artifactService;
         this.traceLinkService = traceLinkService;
+        this.warningService = warningService;
     }
 
     @Transactional
@@ -93,49 +96,31 @@ public class ProjectService {
         artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
-
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
         return new ProjectCreationResponse(appEntity, projectVersion, projectErrors); // TODO: Actually retrieve new
     }
 
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        List<ArtifactBody> artifactBodies = artifactService
+            .getArtifactBodiesAtVersion(projectVersion);
 
-        Hashtable<String, List<ArtifactBody>> artifactBodyTable = new Hashtable<>();
-        List<ArtifactBody> projectBodies = this.artifactBodyRepository.findByProject(projectVersion.getProject());
-        for (ArtifactBody body : projectBodies) {
-            String key = body.getArtifact().getArtifactId().toString();
-            if (artifactBodyTable.containsKey(key)) {
-                artifactBodyTable.get(key).add(body);
-            } else {
-                List<ArtifactBody> newList = new ArrayList<>();
-                newList.add(body);
-                artifactBodyTable.put(key, newList);
-            }
-        }
+        List<ArtifactAppEntity> artifacts =
+            artifactBodies
+                .stream()
+                .map(ArtifactAppEntity::new)
+                .collect(Collectors.toList());
+        List<TraceLink> traceLinks = this.traceLinkRepository
+            .getUnDeclinedLinks(project);
+        List<TraceApplicationEntity> traces =
+            traceLinks
+                .stream()
+                .map(TraceApplicationEntity::new)
+                .collect(Collectors.toList());
 
-        for (String key : artifactBodyTable.keySet()) {
-            List<ArtifactBody> bodyVersions = artifactBodyTable.get(key);
-            ArtifactBody latest = null;
-            for (ArtifactBody body : bodyVersions) {
-                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
-                    if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
-                        latest = body;
-                    }
-                }
-            }
-
-            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
-                artifacts.add(new ArtifactAppEntity(latest));
-            }
-        }
-        List<TraceApplicationEntity> traces = this.traceLinkRepository
-            .getUnDeclinedLinks(project)
-            .stream()
-            .map(TraceApplicationEntity::new)
-            .collect(Collectors.toList());
-        return new ProjectAppEntity(projectVersion, artifacts, traces);
+        Map<String, List<RuleName>> warnings = warningService
+            .findViolationsInArtifactTree(project, artifactBodies, traceLinks);
+        return new ProjectAppEntity(projectVersion, artifacts, traces, warnings);
     }
 
     public void deleteProject(Project project) throws ServerError {

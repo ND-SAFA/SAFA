@@ -42,15 +42,23 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         JSONObject responseBody = responseContent.getJSONObject("body");
         assertThat(responseBody).as("response body is non-null").isNotNull();
 
-        // VP 2 - API Response object
+        // Step - Get JSON Response
         JSONObject projectJson = responseBody.getJSONObject("project");
+
+        // VP - Project id is not null
         assertThat(projectJson).as("uploadedFiles non-null").isNotNull();
         String projectId = projectJson.getString("projectId");
+
+        // VP - Project with id was created
         Project project = projectRepository.findByProjectId(UUID.fromString(projectId));
         assertThat(project).as("project was created").isNotNull();
+
+        // VP - Artifacts present in response
         assertThat(projectJson.getJSONArray("artifacts").length())
             .as("all artifacts confirmed")
             .isEqualTo(TestConstants.N_ARTIFACTS);
+
+        // VP - Traces present in response
         assertThat(projectJson.getJSONArray("traces").length())
             .as("all traces confirmed")
             .isGreaterThanOrEqualTo(TestConstants.N_LINKS);
@@ -63,6 +71,8 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(nManual)
             .as("manual traced confirmed")
             .isEqualTo(TestConstants.N_LINKS);
+
+        // VP - Errors are present in response
         JSONObject errors = responseBody.getJSONObject("errors");
         assertThat(errors.getJSONArray("tim").length())
             .as("tim file error")
@@ -79,6 +89,12 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(traceError.get("message")).isNotNull();
         assertThat(traceError.get("location")).isNotNull();
         assertThat(traceError.get("activity")).isNotNull();
+
+
+        // VP - Project warnings present in response
+        System.out.println("Response keys:" + responseBody.keySet());
+        JSONObject projectWarnings = responseBody.getJSONObject("warnings");
+        System.out.println("Project warnings" + projectWarnings);
 
         // VP 3 - Resources were created
         List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);

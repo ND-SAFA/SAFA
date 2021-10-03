@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.app.AddedArtifact;
@@ -76,6 +77,62 @@ public class DeltaService {
         return new ProjectDelta(added, modified, removed, missingArtifacts);
     }
 
+    /**
+     * Creates an artifact's body such that its modification type is calculated relative to the
+     * last registered change. If not change is detected then the body is added as a new change.
+     *
+     * @param projectVersion - The version associated with the change created.
+     * @param artifact       - The registered artifact in the project associated with the project version.
+     * @param appEntity      - The artifact's new changes in the form of the domain model.
+     * @return ArtifactBody - unsaved database entity with given changes and modification type.
+     */
+    public ArtifactBody calculateArtifactChange(ProjectVersion projectVersion,
+                                                Artifact artifact,
+                                                ArtifactAppEntity appEntity) {
+        Project project = projectVersion.getProject();
+        ArtifactBody artifactBody = null;
+        Optional<ArtifactBody> previousBodyQuery = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
+        if (previousBodyQuery.isPresent()) {
+            ArtifactBody previousBody = previousBodyQuery.get();
+            if (appEntity == null) {
+                artifactBody = new ArtifactBody(projectVersion,
+                    ModificationType.REMOVED,
+                    artifact,
+                    null,
+                    null);
+            } else if (previousBody.getModificationType() == ModificationType.REMOVED) {
+                artifactBody = new ArtifactBody(projectVersion,
+                    ModificationType.ADDED,
+                    artifact,
+                    appEntity.summary,
+                    appEntity.body);
+            } else if (!previousBody.getContent().equals(appEntity.body)) {
+                artifactBody = new ArtifactBody(projectVersion,
+                    ModificationType.MODIFIED,
+                    artifact,
+                    appEntity.summary,
+                    appEntity.body);
+            }
+        } else {
+            artifactBody = new ArtifactBody(projectVersion,
+                ModificationType.ADDED,
+                artifact,
+                appEntity.summary,
+                appEntity.body);
+        }
+
+        if (artifactBody == null) {
+            return null;
+        } else {
+            Optional<ArtifactBody> bodyQuery =
+                this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
+            if (bodyQuery.isPresent()) {
+                artifactBody.setArtifactBodyId(bodyQuery.get().getArtifactBodyId());
+            }
+            return artifactBody;
+        }
+    }
+
     public DeltaArtifact getModificationOverDelta(Artifact artifact,
                                                   ProjectVersion beforeVersion,
                                                   ProjectVersion afterVersion) {
@@ -93,6 +150,9 @@ public class DeltaService {
         ArtifactBody afterBody = getBodyAtVersion(bodies, afterVersion);
 
         if (beforeBody == null) {
+            if (afterBody == null) {
+                return null;
+            }
             return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
         }
 

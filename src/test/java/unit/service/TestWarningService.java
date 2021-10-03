@@ -31,15 +31,12 @@ public class TestWarningService extends EntityBaseTest {
         entityBuilder
             .newProject(projectName)
             .newVersion(projectName)
-
             .newType(projectName, targetType)
             .newArtifact(projectName, targetType, targetName)
             .newArtifactBody(projectName, targetName, "", "")
-
             .newType(projectName, sourceType)
             .newArtifact(projectName, sourceType, sourceName)
             .newArtifactBody(projectName, sourceName, "", "")
-
             .newTraceLink(projectName, sourceName, targetName);
 
         Project project = entityBuilder.getProject(projectName);

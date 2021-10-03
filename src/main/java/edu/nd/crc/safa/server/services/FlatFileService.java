@@ -15,7 +15,6 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
@@ -25,7 +24,6 @@ import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.FlatFileResponse;
 import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
-import edu.nd.crc.safa.server.responses.ProjectErrors;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.OSHelper;
@@ -53,6 +51,7 @@ public class FlatFileService {
 
     ProjectService projectService;
     ParserErrorService parserErrorService;
+    WarningService warningService;
 
     @Autowired
     public FlatFileService(FlatFileParser flatFileParser,
@@ -63,7 +62,8 @@ public class FlatFileService {
                            TraceLinkRepository traceLinkRepository,
                            ArtifactBodyRepository artifactBodyRepository,
                            ProjectService projectService,
-                           ParserErrorService parserErrorService) {
+                           ParserErrorService parserErrorService,
+                           WarningService warningService) {
         this.traceLinkGenerator = traceLinkGenerator;
         this.flatFileParser = flatFileParser;
         this.projectVersionRepository = projectVersionRepository;
@@ -73,6 +73,7 @@ public class FlatFileService {
         this.artifactBodyRepository = artifactBodyRepository;
         this.projectService = projectService;
         this.parserErrorService = parserErrorService;
+        this.warningService = warningService;
     }
 
     /**
@@ -98,10 +99,7 @@ public class FlatFileService {
         FlatFileResponse response = new FlatFileResponse();
         response.setUploadedFiles(uploadedFiles);
 
-        ProjectAppEntity projectAppEntity =
-            this.projectService.createApplicationEntity(projectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectCreationResponse(projectAppEntity, projectVersion, projectErrors);
+        return this.projectService.createProjectResponse(projectVersion);
     }
 
     public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {

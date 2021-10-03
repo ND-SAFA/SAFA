@@ -84,9 +84,7 @@ public class ProjectService {
             traceLinkService.createTraceLinks(projectVersion, appEntity.getTraces());
         }
 
-        ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectCreationResponse(projectAppEntity, projectVersion, projectErrors);
+        return this.createProjectResponse(projectVersion);
     }
 
     @Transactional
@@ -96,8 +94,17 @@ public class ProjectService {
         artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
+        Map<String, List<RuleName>> projectWarnings = warningService.findViolationsInArtifactTree(projectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectCreationResponse(appEntity, projectVersion, projectErrors); // TODO: Actually retrieve new
+        return new ProjectCreationResponse(appEntity, projectVersion, projectErrors, projectWarnings); // TODO:
+        // Actually retrieve new
+    }
+
+    public ProjectCreationResponse createProjectResponse(ProjectVersion projectVersion) {
+        ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
+        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
+        return new ProjectCreationResponse(projectAppEntity, projectVersion, projectErrors, projectWarnings);
     }
 
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
@@ -117,10 +124,7 @@ public class ProjectService {
                 .stream()
                 .map(TraceApplicationEntity::new)
                 .collect(Collectors.toList());
-
-        Map<String, List<RuleName>> warnings = warningService
-            .findViolationsInArtifactTree(project, artifactBodies, traceLinks);
-        return new ProjectAppEntity(projectVersion, artifacts, traces, warnings);
+        return new ProjectAppEntity(projectVersion, artifacts, traces);
     }
 
     public void deleteProject(Project project) throws ServerError {

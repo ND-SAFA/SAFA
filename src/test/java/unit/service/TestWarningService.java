@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
@@ -39,10 +39,11 @@ public class TestWarningService extends EntityBaseTest {
             .newArtifactBody(projectName, sourceName, "", "")
             .newTraceLink(projectName, sourceName, targetName);
 
-        Project project = entityBuilder.getProject(projectName);
+        ProjectVersion projectVersion = entityBuilder.getProjectVersion(projectName, 0);
         List<ArtifactBody> projectBodies = entityBuilder.getArtifactBodies(projectName);
         List<TraceLink> traceLinks = entityBuilder.getTraceLinks(projectName);
-        Map<String, List<RuleName>> violations = warningService.findViolationsInArtifactTree(project, projectBodies,
+        Map<String, List<RuleName>> violations = warningService.findViolationsInArtifactTree(projectVersion,
+            projectBodies,
             traceLinks);
 
         assertThat(violations.containsKey(targetName)).isTrue();

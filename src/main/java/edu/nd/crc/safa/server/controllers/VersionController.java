@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.importer.Puller;
+import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
@@ -93,8 +94,10 @@ public class VersionController extends BaseController {
     @GetMapping("projects/versions/{versionId}")
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
+
         if (versionQuery.isPresent()) {
-            return new ServerResponse(this.projectService.createApplicationEntity(versionQuery.get()));
+            ProjectAppEntity projectAppEntity = this.projectService.createApplicationEntity(versionQuery.get());
+            return new ServerResponse(this.projectService.createProjectResponse(versionQuery.get()));
         } else {
             throw new ServerError("Could not find version with id: " + versionId);
         }

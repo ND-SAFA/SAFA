@@ -112,7 +112,7 @@ public class ProjectController extends BaseController {
                     && payload.artifacts.size() > 0)) {
                     throw new ServerError("Cannot update artifacts because project version not defined");
                 }
-                response = new ProjectCreationResponse(payload, null, null);
+                response = new ProjectCreationResponse(payload, null, null, null);
             } else if (!projectVersion.hasValidId()) {
                 throw new ServerError("Invalid Project version: must have a valid ID.");
             } else if (!projectVersion.hasValidVersion()) {

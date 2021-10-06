@@ -21,7 +21,7 @@ bootJar {
     archiveVersion = '0.1.0'
 }
 
-sourceCompatibility = '1.8'
+sourceCompatibility = "1.9"
 
 repositories {
     mavenCentral()
@@ -117,3 +117,4 @@ checkstyleTest {
 }
 
 
+targetCompatibility = JavaVersion.VERSION_1_9

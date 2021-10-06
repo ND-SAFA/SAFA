@@ -123,7 +123,7 @@ public class TestTreeVerifier extends EntityBaseTest {
 
         assertThat(violatedRules.get(targetName).size()).isEqualTo(2);
         String targetRule = violatedRules.get(targetName).get(0).toString();
-        assertThat(targetRule).contains("design or process child for requirements");
+        assertThat(targetRule).contains("design or process");
         targetRule = violatedRules.get(targetName).get(1).toString();
         assertThat(targetRule).contains("must not have package children");
 

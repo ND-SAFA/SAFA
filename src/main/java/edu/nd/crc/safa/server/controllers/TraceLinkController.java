@@ -5,7 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.db.entities.sql.ParserError;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
@@ -13,12 +15,16 @@ import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.responses.ServerError;
 import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.server.services.TraceLinkService;
+import edu.nd.crc.safa.server.services.VersionService;
 
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,13 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class TraceLinkController extends BaseController {
 
     TraceLinkRepository traceLinkRepository;
+    TraceLinkService traceLinkService;
+    VersionService versionService;
 
     @Autowired
     public TraceLinkController(ProjectRepository projectRepository,
                                ProjectVersionRepository projectVersionRepository,
-                               TraceLinkRepository traceLinkRepository) {
+                               TraceLinkRepository traceLinkRepository,
+                               TraceLinkService traceLinkService,
+                               VersionService versionService) {
         super(projectRepository, projectVersionRepository);
         this.traceLinkRepository = traceLinkRepository;
+        this.traceLinkService = traceLinkService;
+        this.versionService = versionService;
     }
 
     @GetMapping("/projects/{projectId}/links/generated")
@@ -54,6 +66,22 @@ public class TraceLinkController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse declineTraceLink(@PathVariable UUID traceLinkId) throws ServerError {
         return changeApprovedHandler(traceLinkId, TraceApproval.DECLINED);
+    }
+
+    @PostMapping("/projects/versions/{versionId}/links/create/{sourceName}/{targetName}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ServerResponse createNewTraceLInk(@PathVariable UUID versionId,
+                                             @PathVariable String sourceName,
+                                             @PathVariable String targetName) throws ServerError {
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        Pair<TraceLink, ParserError> creationResponse = this.traceLinkService.createTrace(projectVersion, sourceName,
+            targetName);
+        if (creationResponse.getValue0() == null) {
+            return new ServerResponse(creationResponse.getValue1());
+        }
+        TraceLink traceLink = creationResponse.getValue0();
+        this.traceLinkRepository.save(traceLink);
+        return new ServerResponse(new TraceApplicationEntity(traceLink));
     }
 
     private ServerResponse changeApprovedHandler(UUID traceLinkId, TraceApproval approvalStatus) throws ServerError {

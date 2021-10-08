@@ -20,4 +20,6 @@ public interface ProjectVersionRepository extends CrudRepository<ProjectVersion,
     Optional<ProjectVersion> findTopByProjectOrderByMajorVersionDescMinorVersionDescRevisionDesc(Project project);
 
     List<ProjectVersion> findByProject(Project project);
+
+    ProjectVersion findByVersionId(UUID versionId);
 }

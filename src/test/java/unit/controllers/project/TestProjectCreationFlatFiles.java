@@ -31,8 +31,8 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
 
+        // Step 1 - Upload flat files
         String routeName = "/projects/flat-files";
-
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated());

@@ -20,9 +20,9 @@ import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
-import edu.nd.crc.safa.server.responses.ProjectErrors;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ProjectCreationResponse;
+import edu.nd.crc.safa.server.messages.ProjectErrors;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 import edu.nd.crc.safa.warnings.RuleName;
 
@@ -84,7 +84,7 @@ public class ProjectService {
             traceLinkService.createTraceLinks(projectVersion, appEntity.getTraces());
         }
 
-        return this.createProjectResponse(projectVersion);
+        return this.retrieveAndCreateProjectResponse(projectVersion);
     }
 
     @Transactional
@@ -100,7 +100,7 @@ public class ProjectService {
         // Actually retrieve new
     }
 
-    public ProjectCreationResponse createProjectResponse(ProjectVersion projectVersion) {
+    public ProjectCreationResponse retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);

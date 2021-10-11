@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONException;
@@ -49,12 +49,13 @@ public class FlatFileParser {
             JSONObject dataFilesJson = timFileJson.getJSONObject(ProjectVariables.DATAFILES_PARAM);
             artifactFileParser.parseArtifactFiles(projectVersion, dataFilesJson);
 
-            for (Iterator keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
-                String traceMatrixKey = keyIterator.next().toString();
-                if (!traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
-                    traceFileParser.parseTraceMatrixDefinition(projectVersion,
-                        timFileJson.getJSONObject(traceMatrixKey));
+            for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
+                String traceMatrixKey = keyIterator.next();
+                if (traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
+                    continue;
                 }
+                traceFileParser.parseTraceMatrixDefinition(projectVersion,
+                    timFileJson.getJSONObject(traceMatrixKey));
             }
         } catch (IOException | JSONException e) {
             throw new ServerError("parsing TIM file", e);

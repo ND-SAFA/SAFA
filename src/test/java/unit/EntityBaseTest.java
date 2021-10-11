@@ -22,7 +22,7 @@ import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
 

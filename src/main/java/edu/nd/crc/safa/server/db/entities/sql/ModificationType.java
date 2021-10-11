@@ -1,7 +1,21 @@
 package edu.nd.crc.safa.server.db.entities.sql;
 
-public enum ModificationType {
-    ADDED,
-    MODIFIED,
-    REMOVED
+import java.io.Serializable;
+
+public enum ModificationType implements Serializable {
+    ADDED {
+        public String toString() {
+            return "added";
+        }
+    },
+    MODIFIED {
+        public String toString() {
+            return "modified";
+        }
+    },
+    REMOVED {
+        public String toString() {
+            return "removed";
+        }
+    }
 }

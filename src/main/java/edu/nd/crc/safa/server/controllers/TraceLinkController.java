@@ -13,8 +13,8 @@ import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
-import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.server.services.VersionService;
 

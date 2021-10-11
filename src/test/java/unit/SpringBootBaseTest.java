@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * Responsible for providing access to application classes
  * using SpringBoot's test loader annotations.
  */
-@SpringBootTest(classes = MainApplication.class)
+@SpringBootTest(classes = MainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public abstract class SpringBootBaseTest {
 

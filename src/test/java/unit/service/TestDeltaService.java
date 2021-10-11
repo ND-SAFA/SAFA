@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import edu.nd.crc.safa.server.db.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.services.DeltaService;
 
 import org.junit.jupiter.api.Test;

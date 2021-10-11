@@ -8,9 +8,9 @@ import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
-import edu.nd.crc.safa.server.responses.ServerError;
-import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.server.messages.ProjectCreationResponse;
+import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
 

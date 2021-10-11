@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.db.entities.app.ErrorApplicationEntity;
 import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.responses.ProjectErrors;
+import edu.nd.crc.safa.server.messages.ProjectErrors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

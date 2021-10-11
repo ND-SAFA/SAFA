@@ -2,7 +2,7 @@ package edu.nd.crc.safa.config;
 
 import java.util.Properties;
 
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 
 public class DatabaseProperties {
 

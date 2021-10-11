@@ -1,0 +1,87 @@
+package unit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
+
+/**
+ * Provides an abstraction over the websocket connection enabling:
+ * 1. connecting to server through websocket endpoint
+ * 2. Reading messages in queue associated
+ */
+public class WebSocketBaseTest extends EntityBaseTest {
+
+    static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
+    private static ObjectMapper mapper;
+    private static WebSocketStompClient stompClient;
+    private static HashMap<String, BlockingQueue<String>> idToQueue;
+    private static HashMap<String, StompSession> idToSession;
+
+    @LocalServerPort
+    private Integer port;
+
+    @BeforeAll
+    public static void setup() {
+        mapper = new ObjectMapper();
+        idToQueue = new HashMap<>();
+        idToSession = new HashMap<>();
+        stompClient = new WebSocketStompClient(new SockJsClient(
+            List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+    }
+
+    @BeforeEach
+    public void clearQueue() {
+        idToQueue = new HashMap<>();
+    }
+
+    public WebSocketBaseTest createNewConnection(String id) throws Exception {
+        StompSession session = stompClient
+            .connect(String.format(WEBSOCKET_URI, port), new StompSessionHandlerAdapter() {
+            })
+            .get(1, SECONDS);
+        idToSession.put(id, session);
+        idToQueue.put(id, new LinkedBlockingDeque<>());
+        return this;
+    }
+
+
+    public void subscribe(String id, String topic) {
+        idToSession.get(id).subscribe(topic, new StompFrameHandler() {
+            public Type getPayloadType(StompHeaders stompHeaders) {
+                return byte[].class;
+            }
+
+            public void handleFrame(StompHeaders stompHeaders, Object o) {
+                idToQueue.get(id).offer(new String((byte[]) o));
+            }
+        });
+    }
+
+    public <T> void sendMessage(String id, String dest, T payload) throws JsonProcessingException {
+        String message = mapper.writeValueAsString(payload);
+        idToSession.get(id).send(dest, message.getBytes());
+    }
+
+    public <T> T getNextMessage(String id, Class<T> tClass) throws InterruptedException, JsonProcessingException {
+        String response = idToQueue.get(id).poll(1, SECONDS);
+        return mapper.readValue(response, tClass);
+    }
+}

@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 
 import edu.nd.crc.safa.config.DatabaseProperties;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -60,4 +60,6 @@ public class AppConfig {
         emf.afterPropertiesSet();
         return emf.getNativeEntityManagerFactory();
     }
+
+
 }

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.responses;
+package edu.nd.crc.safa.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

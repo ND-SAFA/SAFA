@@ -15,7 +15,7 @@ import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

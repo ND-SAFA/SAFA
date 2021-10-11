@@ -7,13 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileParser;
-import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
@@ -22,13 +20,10 @@ import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.responses.FlatFileResponse;
-import edu.nd.crc.safa.server.responses.ProjectCreationResponse;
-import edu.nd.crc.safa.server.responses.ServerError;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.server.messages.ProjectCreationResponse;
+import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +37,6 @@ public class FlatFileService {
 
     FlatFileParser flatFileParser;
     TraceLinkGenerator traceLinkGenerator;
-    TraceFileParser traceFileParser;
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
     ArtifactRepository artifactRepository;
@@ -90,38 +84,9 @@ public class FlatFileService {
                                                            ProjectVersion projectVersion,
                                                            MultipartFile[] files)
         throws ServerError {
-        // TODO: Move uploading into creation method
-        List<String> uploadedFiles = this.uploadFlatFiles(project, Arrays.asList(files));
-
-        this.createProjectFromTIMFile(project, projectVersion);
-        // TODO: Uncomment when in-memory works synchronizeService.projectPull(newProjectVersion);
-
-        FlatFileResponse response = new FlatFileResponse();
-        response.setUploadedFiles(uploadedFiles);
-
-        return this.projectService.createProjectResponse(projectVersion);
-    }
-
-    public void generateLinks(Project project, ProjectVersion projectVersion) throws ServerError {
-        String pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
-        String TIMFileContent;
-        try {
-            TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
-        } catch (IOException e) {
-            throw new ServerError("Could not read TIM.json file.", e);
-        }
-        //TODO: Generalize with FlatFileParser.parseProject
-        JSONObject timJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
-        for (Iterator keyIterator = timJson.keys(); keyIterator.hasNext(); ) {
-            String traceMatrixKey = keyIterator.next().toString();
-            if (!traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
-                boolean isGenerated = timJson.has("generateLinks") && timJson.getBoolean("generateLinks");
-                if (isGenerated) {
-                    this.traceFileParser.parseTraceMatrixDefinition(projectVersion,
-                        timJson.getJSONObject(traceMatrixKey));
-                }
-            }
-        }
+        this.uploadFlatFiles(project, Arrays.asList(files));
+        this.parseProjectFilesFromTIM(project, projectVersion);
+        return this.projectService.retrieveAndCreateProjectResponse(projectVersion);
     }
 
     public List<String> uploadFlatFiles(Project project, List<MultipartFile> requestFiles) throws ServerError {
@@ -134,7 +99,8 @@ public class FlatFileService {
                 String pathToFile = ProjectPaths.getPathToFlatFile(project, requestFile.getOriginalFilename());
                 Path pathToUploadedFile = Paths.get(pathToFile);
                 File newFile = new File(pathToUploadedFile.toString());
-                newFile.getParentFile().mkdirs();
+                File parentFile = newFile.getParentFile();
+                parentFile.mkdirs();
                 newFile.createNewFile();
                 requestFile.transferTo(newFile);
                 uploadedFiles.add(requestFile.getOriginalFilename());
@@ -146,12 +112,11 @@ public class FlatFileService {
         return uploadedFiles;
     }
 
-    private void createProjectFromTIMFile(Project project, ProjectVersion projectVersion) throws ServerError {
+    private void parseProjectFilesFromTIM(Project project, ProjectVersion projectVersion) throws ServerError {
         String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
         if (!Files.exists(Paths.get(pathToFile))) {
             throw new ServerError("TIM.json file was not uploaded for this project");
         }
         this.flatFileParser.parseProject(projectVersion, pathToFile);
-        // TODO: return generated files
     }
 }

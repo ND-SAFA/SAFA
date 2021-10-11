@@ -9,8 +9,8 @@ import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
-import edu.nd.crc.safa.server.responses.ServerResponse;
+import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
 
@@ -97,7 +97,7 @@ public class VersionController extends BaseController {
 
         if (versionQuery.isPresent()) {
             ProjectAppEntity projectAppEntity = this.projectService.createApplicationEntity(versionQuery.get());
-            return new ServerResponse(this.projectService.createProjectResponse(versionQuery.get()));
+            return new ServerResponse(this.projectService.retrieveAndCreateProjectResponse(versionQuery.get()));
         } else {
             throw new ServerError("Could not find version with id: " + versionId);
         }

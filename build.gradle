@@ -71,10 +71,10 @@ dependencies {
 
     // testing
     testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.4') {
+    testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.5') {
         exclude module: 'logback-classic'
     }
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 }
 
 test {

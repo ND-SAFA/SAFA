@@ -29,22 +29,21 @@ repositories {
 
 dependencies {
     // data parsing
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.4'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.12.4'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.0'
     implementation 'com.jsoniter:jsoniter:0.9.23'
     implementation 'org.javatuples:javatuples:1.2'
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
     implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     implementation 'org.apache.commons:commons-csv:1.9.0'
-    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-io:commons-io:2.11.0' // TODO: Integration issue when upgrading
     implementation 'org.json:json:20210307'
     implementation 'org.javatuples:javatuples:1.2'
 
     //database
     implementation 'mysql:mysql-connector-java:8.0.25'
-    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.3.2'
-    implementation 'javax.servlet:javax.servlet-api:4.0.1' // TODO: test to see if required
+    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.3.4'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'org.hibernate:hibernate-core:5.5.7.Final'
     implementation 'org.hibernate:hibernate-entitymanager:5.5.7.Final'

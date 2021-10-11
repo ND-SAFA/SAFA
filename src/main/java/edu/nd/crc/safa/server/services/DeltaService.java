@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.app.AddedArtifact;
 import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
@@ -20,7 +19,7 @@ import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.responses.ServerError;
+import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,67 +135,66 @@ public class DeltaService {
     public DeltaArtifact getModificationOverDelta(Artifact artifact,
                                                   ProjectVersion beforeVersion,
                                                   ProjectVersion afterVersion) {
-        List<ArtifactBody> bodies = this.artifactBodyRepository.findByArtifact(artifact);
-        bodies = bodies
-            .stream()
-            .filter(artifactBody -> artifactBody
-                .getProjectVersion()
-                .isLessThanOrEqualTo(afterVersion))
-            .collect(Collectors.toList());
 
         String artifactName = artifact.getName();
+        List<ArtifactBody> bodies = this.artifactBodyRepository.findByArtifact(artifact);
+        ArtifactBody beforeBody = getArtifactBodyContentAtVersion(bodies, beforeVersion);
+        ArtifactBody afterBody = getArtifactBodyContentAtVersion(bodies, afterVersion);
+        DeltaArtifact deltaArtifact;
 
-        ArtifactBody beforeBody = getBodyAtVersion(bodies, beforeVersion);
-        ArtifactBody afterBody = getBodyAtVersion(bodies, afterVersion);
-
-        if (beforeBody == null) {
-            if (afterBody == null) {
-                return null;
-            }
-            return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
-        }
-
-        String beforeContent = beforeBody.getContent();
-        String beforeSummary = beforeBody.getSummary();
-
-        String afterContent = afterBody.getContent();
-        String afterSummary = afterBody.getSummary();
-
-        if (beforeBody.hasSameId(afterBody)) {
-            return null; // no change
-        } else if (beforeBody.getModificationType() == afterBody.getModificationType()) {
-            // added or modified at two the two versions = compare contents
-            if (beforeBody.getModificationType() == ModificationType.REMOVED) { // both removed = no change
-                return null;
-            }
-            if (beforeContent.equals(afterContent)) { // no change - same body
-                return null;
+        if (beforeBody == null || afterBody == null) {
+            if (beforeBody == afterBody) {
+                deltaArtifact = null;
+            } else if (beforeBody == null) {
+                deltaArtifact = new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
             } else {
-                return new ModifiedArtifact(artifactName, beforeContent, beforeSummary, afterContent, afterSummary);
+                deltaArtifact = new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
             }
         } else {
-            switch (afterBody.getModificationType()) {
-                case MODIFIED:
-                    return new ModifiedArtifact(artifactName, beforeContent, beforeSummary, afterContent, afterSummary);
-                case ADDED:
-                    return new AddedArtifact(artifactName, afterContent, afterSummary);
-                case REMOVED:
-                    return new RemovedArtifact(artifactName, beforeContent, beforeSummary);
-                default:
-                    throw new RuntimeException("New modification type is not supported");
+            String beforeId = beforeBody.getContent() + beforeBody.getSummary();
+            String afterId = afterBody.getContent() + afterBody.getSummary();
+
+            if (beforeId.equals(afterId)) { // no change - same body
+                deltaArtifact = null;
+            } else {
+                if (afterBody.getModificationType() == ModificationType.REMOVED) {
+                    deltaArtifact = new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
+                } else if (beforeBody.getModificationType() == ModificationType.REMOVED) {
+                    deltaArtifact = new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+                } else {
+                    deltaArtifact = new ModifiedArtifact(artifactName,
+                        beforeBody.getContent(),
+                        beforeBody.getSummary(),
+                        afterBody.getContent(),
+                        afterBody.getSummary());
+                }
             }
         }
+
+        return deltaArtifact;
     }
 
-    public ArtifactBody getBodyAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+    /**
+     * Returns the ArtifactBody in given list that is most up to date to given version.
+     *
+     * @param bodies  - List of ArtifactBodies
+     * @param version - The target version whose body we want reflected.
+     * @return ArtifactBody nearest to given version or null if no ArtifactBody found in range.
+     */
+    private ArtifactBody getArtifactBodyContentAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+        ArtifactBody closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
-            ArtifactBody body = bodies.get(i);
-            if (body
-                .getProjectVersion()
-                .isLessThanOrEqualTo(version)) {
-                return body;
+            ArtifactBody currentBody = bodies.get(i);
+            ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
+            if (currentBodyVersion.isLessThanOrEqualTo(version)) {
+                if (closestBodyToVersion == null) {
+                    closestBodyToVersion = currentBody;
+                } else if (currentBodyVersion.isGreaterThan(closestBodyToVersion.getProjectVersion())
+                ) {
+                    closestBodyToVersion = currentBody;
+                }
             }
         }
-        return null;
+        return closestBodyToVersion;
     }
 }

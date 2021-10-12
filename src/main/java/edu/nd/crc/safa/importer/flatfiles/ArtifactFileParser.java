@@ -20,6 +20,7 @@ import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.services.ArtifactService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.json.JSONException;
@@ -63,12 +64,13 @@ public class ArtifactFileParser {
     }
 
     public void parseArtifactFiles(ProjectVersion projectVersion,
-                                   JSONObject dataFilesJson) throws JSONException, ServerError {
+                                   JSONObject dataFilesJson)
+        throws JSONException, ServerError, JsonProcessingException {
         Project project = projectVersion.getProject();
 
         List<ArtifactAppEntity> projectArtifacts = new ArrayList<>();
-        for (Iterator keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
-            String artifactTypeName = keyIterator.next().toString();
+        for (Iterator<String> keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
+            String artifactTypeName = keyIterator.next();
 
             JSONObject artifactDefinitionJson = dataFilesJson.getJSONObject(artifactTypeName);
             if (!artifactDefinitionJson.has("file")) {
@@ -88,7 +90,7 @@ public class ArtifactFileParser {
             List<ArtifactAppEntity> artifactsInFile = parseArtifactFile(projectVersion, artifactType, artifactFileName);
             projectArtifacts.addAll(artifactsInFile);
         }
-        artifactService.createOrUpdateArtifacts(projectVersion, projectArtifacts);
+        artifactService.setArtifactsAtVersion(projectVersion, projectArtifacts);
     }
 
     private List<ArtifactAppEntity> parseArtifactFile(ProjectVersion projectVersion,

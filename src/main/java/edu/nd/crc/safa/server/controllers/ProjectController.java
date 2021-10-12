@@ -88,7 +88,7 @@ public class ProjectController extends BaseController {
         return new ServerResponse(response);
     }
 
-    @PostMapping("projects/")
+    @PostMapping("projects")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@RequestBody ProjectAppEntity payload) throws ServerError {
         Project project = Project.fromAppEntity(payload); // gets
@@ -128,7 +128,7 @@ public class ProjectController extends BaseController {
         return new ServerResponse(response);
     }
 
-    @GetMapping("projects/")
+    @GetMapping("projects")
     public ServerResponse getProjects() {
         return new ServerResponse(this.projectRepository.findAll());
     }

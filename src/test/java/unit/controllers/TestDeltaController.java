@@ -16,7 +16,6 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.EntityBaseTest;
 import unit.TestConstants;
@@ -134,19 +133,10 @@ public class TestDeltaController extends EntityBaseTest {
         ProjectVersion afterVersion = entityBuilder.getProjectVersion(projectName, 1);
 
         if (uploadFiles) {
-            uploadFlatFilesToVersion(project, beforeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
-            uploadFlatFilesToVersion(project, afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
+            uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+            uploadFlatFilesToVersion(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
         }
 
         return new Pair<>(beforeVersion, afterVersion);
-    }
-
-    private void uploadFlatFilesToVersion(Project project, ProjectVersion beforeVersion, String pathToBeforeFiles) throws Exception {
-        String beforeRouteName = String.format("/projects/%s/%s/flat-files",
-            project.getProjectId().toString(),
-            beforeVersion.getVersionId().toString());
-        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(beforeRouteName,
-            pathToBeforeFiles);
-        sendRequest(beforeRequest, MockMvcResultMatchers.status().isCreated());
     }
 }

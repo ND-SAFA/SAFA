@@ -15,6 +15,7 @@ import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
+import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.server.services.VersionService;
 
@@ -36,17 +37,20 @@ public class TraceLinkController extends BaseController {
     TraceLinkRepository traceLinkRepository;
     TraceLinkService traceLinkService;
     VersionService versionService;
+    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceLinkController(ProjectRepository projectRepository,
                                ProjectVersionRepository projectVersionRepository,
                                TraceLinkRepository traceLinkRepository,
                                TraceLinkService traceLinkService,
-                               VersionService versionService) {
+                               VersionService versionService,
+                               RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository);
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkService = traceLinkService;
         this.versionService = versionService;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
     @GetMapping("/projects/{projectId}/links/generated")
@@ -80,7 +84,7 @@ public class TraceLinkController extends BaseController {
             return new ServerResponse(creationResponse.getValue1());
         }
         TraceLink traceLink = creationResponse.getValue0();
-        this.traceLinkRepository.save(traceLink);
+        this.revisionNotificationService.saveAndBroadcastTraceLinks(projectVersion.getProject(), List.of(traceLink));
         return new ServerResponse(new TraceApplicationEntity(traceLink));
     }
 
@@ -89,7 +93,8 @@ public class TraceLinkController extends BaseController {
         if (traceLinkQuery.isPresent()) {
             TraceLink traceLink = traceLinkQuery.get();
             traceLink.setApprovalStatus(approvalStatus);
-            this.traceLinkRepository.save(traceLink);
+            this.revisionNotificationService.saveAndBroadcastTraceLinks(traceLink.getSourceArtifact().getProject(),
+                List.of(traceLink));
             return new ServerResponse("Trace link was successfully approved");
         } else {
             throw new ServerError("Could not find trace link with id:" + traceLinkId);

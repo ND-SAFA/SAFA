@@ -119,7 +119,7 @@ public class Puller {
                             link.InwardKey));
                 }
             }
-            artifactService.createOrUpdateArtifacts(projectVersion, artifactsToUpdate);
+            artifactService.setArtifactsAtVersion(projectVersion, artifactsToUpdate);
         } catch (Exception e) {
             e.printStackTrace();
         }

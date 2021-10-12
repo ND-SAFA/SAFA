@@ -74,10 +74,10 @@ public class ProjectService {
 
     @Transactional
     public ProjectCreationResponse createProject(ProjectVersion projectVersion,
-                                                 ProjectAppEntity appEntity) {
+                                                 ProjectAppEntity appEntity) throws ServerError {
 
         if (appEntity.artifacts != null) {
-            artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
+            artifactService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
         }
 
         if (appEntity.traces != null) {
@@ -89,9 +89,9 @@ public class ProjectService {
 
     @Transactional
     public ProjectCreationResponse updateProject(ProjectVersion projectVersion,
-                                                 ProjectAppEntity appEntity) {
+                                                 ProjectAppEntity appEntity) throws ServerError {
 
-        artifactService.createOrUpdateArtifacts(projectVersion, appEntity.getArtifacts());
+        artifactService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
         Map<String, List<RuleName>> projectWarnings = warningService.findViolationsInArtifactTree(projectVersion);

@@ -63,7 +63,7 @@ public class WebSocketBaseTest extends EntityBaseTest {
     }
 
 
-    public void subscribe(String id, String topic) {
+    public WebSocketBaseTest subscribe(String id, String topic) {
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
                 return byte[].class;
@@ -73,15 +73,15 @@ public class WebSocketBaseTest extends EntityBaseTest {
                 idToQueue.get(id).offer(new String((byte[]) o));
             }
         });
-    }
-
-    public <T> void sendMessage(String id, String dest, T payload) throws JsonProcessingException {
-        String message = mapper.writeValueAsString(payload);
-        idToSession.get(id).send(dest, message.getBytes());
+        return this;
     }
 
     public <T> T getNextMessage(String id, Class<T> tClass) throws InterruptedException, JsonProcessingException {
         String response = idToQueue.get(id).poll(1, SECONDS);
         return mapper.readValue(response, tClass);
+    }
+
+    public int getQueueSize(String id) {
+        return idToQueue.get(id).size();
     }
 }

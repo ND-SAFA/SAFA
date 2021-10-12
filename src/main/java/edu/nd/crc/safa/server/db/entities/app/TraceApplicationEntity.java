@@ -7,6 +7,8 @@ import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.entities.sql.TraceType;
 
+import org.json.JSONObject;
+
 public class TraceApplicationEntity {
     public String traceLinkId;
     public String source;
@@ -69,5 +71,12 @@ public class TraceApplicationEntity {
 
     public void setScore(double score) {
         this.score = score;
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("source:", source);
+        json.put("target:", target);
+        return json.toString();
     }
 }

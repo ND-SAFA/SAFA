@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
 
 public class EntityBaseTest extends SpringBootBaseTest {
@@ -81,6 +82,17 @@ public class EntityBaseTest extends SpringBootBaseTest {
         appBuilder.createEmptyData();
     }
 
+    public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
+                                         String pathToFileDir) throws Exception {
+        Project project = projectVersion.getProject();
+        String beforeRouteName = String.format("/projects/%s/%s/flat-files",
+            project.getProjectId().toString(),
+            projectVersion.getVersionId().toString());
+        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(beforeRouteName,
+            pathToFileDir);
+        sendRequest(beforeRequest, MockMvcResultMatchers.status().isCreated());
+    }
+
     public ProjectVersion createProjectUploadedResources(String projectName) throws ServerError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
@@ -101,8 +113,8 @@ public class EntityBaseTest extends SpringBootBaseTest {
             .getProjectVersion(projectName, 0);
     }
 
-    public JSONObject sendPut(String routeName, JSONObject body, ResultMatcher test) throws Exception {
-        return sendRequest(put(routeName)
+    public void sendPut(String routeName, JSONObject body, ResultMatcher test) throws Exception {
+        sendRequest(put(routeName)
                 .content(body.toString())
                 .contentType(MediaType.APPLICATION_JSON),
             test);

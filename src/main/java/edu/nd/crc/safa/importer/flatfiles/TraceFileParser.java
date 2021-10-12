@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -49,6 +50,7 @@ public class TraceFileParser {
     ParserErrorRepository parserErrorRepository;
     TraceLinkRepository traceLinkRepository;
     TraceLinkGenerator traceLinkGenerator;
+    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceFileParser(TraceLinkService traceLinkService,
@@ -56,13 +58,15 @@ public class TraceFileParser {
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkGenerator traceLinkGenerator) {
+                           TraceLinkGenerator traceLinkGenerator,
+                           RevisionNotificationService revisionNotificationService) {
         this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
     /**
@@ -82,11 +86,13 @@ public class TraceFileParser {
             && traceMatrixDefinition.getBoolean("generatelinks");
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-        parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
-
+        List<TraceLink> manualLinks = parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
+        this.revisionNotificationService.saveAndBroadcastTraceLinks(project, manualLinks);
+        List<TraceLink> generatedLinks = new ArrayList<>();
         if (isGenerated) {
-            traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes);
+            generatedLinks.addAll(traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes));
         }
+        this.revisionNotificationService.saveAndBroadcastTraceLinks(project, generatedLinks);
     }
 
     /**
@@ -122,9 +128,9 @@ public class TraceFileParser {
         return Pair.with(sourceTypeQuery.get(), targetTypeQuery.get());
     }
 
-    public void parseTraceFile(ProjectVersion projectVersion,
-                               Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
-                               String fileName) throws ServerError {
+    public List<TraceLink> parseTraceFile(ProjectVersion projectVersion,
+                                          Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
+                                          String fileName) throws ServerError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
@@ -150,6 +156,6 @@ public class TraceFileParser {
                 this.parserErrorRepository.save(traceResult.getValue1());
             }
         }
-        this.traceLinkRepository.saveAll(traceLinks);
+        return traceLinks;
     }
 }

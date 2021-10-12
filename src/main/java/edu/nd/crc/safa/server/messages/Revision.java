@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.messages;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Revision {
@@ -9,6 +10,8 @@ public class Revision {
     List<ArtifactChange> artifactChanges;
 
     public Revision() {
+        traceChanges = new ArrayList<>();
+        artifactChanges = new ArrayList<>();
     }
 
     public Revision(int revision,

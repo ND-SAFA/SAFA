@@ -118,7 +118,7 @@ public class TestArtifactService extends EntityBaseTest {
         ProjectVersion newVersion = entityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
 
-        artifactService.createOrUpdateArtifacts(newVersion, Arrays.asList(artifactApp));
+        artifactService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
         List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -144,7 +144,7 @@ public class TestArtifactService extends EntityBaseTest {
         ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", newContent);
 
         // VP - Verify that artifact body is detected to be modified
-        this.artifactService.createOrUpdateArtifacts(projectVersion,
+        this.artifactService.setArtifactsAtVersion(projectVersion,
             Arrays.asList(appEntity));
         Optional<ArtifactBody> updatedBodyQuery =
             this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion,

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,8 +59,8 @@ public class ArtifactController extends BaseController {
         @PathVariable UUID projectId,
         @RequestBody ArtifactAppEntity artifact) throws ServerError {
         Project project = this.projectRepository.findByProjectId(projectId);
-        ProjectVersion projectVersion = this.versionService.createNextRevision(project);
-        this.artifactService.createOrUpdateArtifacts(projectVersion, List.of(artifact));
+        ProjectVersion projectVersion = this.versionService.getCurrentVersion(project);
+        this.artifactService.addArtifactToVersion(projectVersion, artifact);
         return new ServerResponse(artifact);
     }
 

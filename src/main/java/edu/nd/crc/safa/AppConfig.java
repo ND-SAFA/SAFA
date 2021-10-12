@@ -60,6 +60,4 @@ public class AppConfig {
         emf.afterPropertiesSet();
         return emf.getNativeEntityManagerFactory();
     }
-
-
 }

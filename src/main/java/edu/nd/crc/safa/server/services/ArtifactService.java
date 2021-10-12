@@ -3,7 +3,9 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
@@ -15,8 +17,8 @@ import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.messages.ServerError;
 
-import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,39 +28,56 @@ public class ArtifactService {
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactBodyRepository artifactBodyRepository;
-
     DeltaService deltaService;
+    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ArtifactService(ArtifactRepository artifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactBodyRepository artifactBodyRepository,
-                           DeltaService deltaService) {
+                           DeltaService deltaService,
+                           RevisionNotificationService revisionNotificationService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.deltaService = deltaService;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
-    public void createOrUpdateArtifacts(ProjectVersion projectVersion,
-                                        List<ArtifactAppEntity> artifactsToUpdate) {
+    public void setArtifactsAtVersion(ProjectVersion projectVersion,
+                                      List<ArtifactAppEntity> artifactsToUpdate) throws ServerError {
         Hashtable<String, ArtifactAppEntity> entitiesSeen = new Hashtable<>();
-        for (ArtifactAppEntity a : artifactsToUpdate) {
-            createOrUpdateArtifact(projectVersion,
-                a.name,
-                a.type,
-                a.summary,
-                a.body);
-            entitiesSeen.put(a.getName(), a);
-        }
+        List<ArtifactBody> artifactBodies = artifactsToUpdate
+            .stream()
+            .map(a -> {
+                entitiesSeen.put(a.getName(), a);
+                return createArtifactBodyAtVersion(projectVersion,
+                    a.name,
+                    a.type,
+                    a.summary,
+                    a.body);
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
-        for (Artifact projectArtifact : this.artifactRepository.findByProject(projectVersion.getProject())) {
-            if (entitiesSeen.containsKey(projectArtifact.getName())) {
-                continue;
-            }
-            ArtifactBody removedBody = deltaService.calculateArtifactChange(projectVersion, projectArtifact, null);
-            this.artifactBodyRepository.save(removedBody);
-        }
+        List<ArtifactBody> removedBodies = this.artifactRepository.findByProject(projectVersion.getProject())
+            .stream()
+            .filter(a -> !entitiesSeen.containsKey(a.getName()))
+            .map(a -> deltaService.calculateArtifactChange(projectVersion, a, null))
+            .collect(Collectors.toList());
+
+        List<ArtifactBody> allArtifactBodies = new ArrayList<>(artifactBodies);
+        allArtifactBodies.addAll(removedBodies);
+        this.revisionNotificationService.saveArtifactBodies(projectVersion, allArtifactBodies);
+    }
+
+    public void addArtifactToVersion(ProjectVersion projectVersion, ArtifactAppEntity a) throws ServerError {
+        ArtifactBody artifactBody = createArtifactBodyAtVersion(projectVersion,
+            a.name,
+            a.type,
+            a.summary,
+            a.body);
+        this.revisionNotificationService.saveArtifactBodies(projectVersion, List.of(artifactBody));
     }
 
     /**
@@ -70,7 +89,7 @@ public class ArtifactService {
      * @param summary        - Summary of the artifact's content. Can be null or empty string.
      * @param content        - The initial content of the artifact being saved.
      */
-    private void createOrUpdateArtifact(
+    private ArtifactBody createArtifactBodyAtVersion(
         ProjectVersion projectVersion,
         String artifactName,
         String typeName,
@@ -87,18 +106,12 @@ public class ArtifactService {
         Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
         this.artifactRepository.save(artifact);
 
-        ArtifactBody artifactBody = deltaService.calculateArtifactChange(projectVersion,
+        return deltaService.calculateArtifactChange(projectVersion,
             artifact,
             new ArtifactAppEntity(typeName,
                 artifactName,
                 summary,
                 content));
-
-        if (artifactBody != null) {
-            this.artifactBodyRepository.save(artifactBody);
-        }
-
-        new Triplet<>(artifactType, artifact, artifactBody);
     }
 
     /**

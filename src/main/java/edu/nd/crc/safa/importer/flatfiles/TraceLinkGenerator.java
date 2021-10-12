@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
@@ -42,17 +43,18 @@ public class TraceLinkGenerator {
         this.artifactBodyRepository = artifactBodyRepository;
     }
 
-    public void generateTraceLinksToFile(ProjectVersion projectVersion,
-                                         Pair<ArtifactType, ArtifactType> artifactTypes) {
+    public List<TraceLink> generateTraceLinksToFile(ProjectVersion projectVersion,
+                                                    Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<TraceLink> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
-        for (TraceLink traceLink : generatedLinks) {
-            Optional<TraceLink> alreadyApprovedLink = traceLinkService.linkExists(
-                traceLink.getSourceArtifact(),
-                traceLink.getTargetArtifact());
-            if (!alreadyApprovedLink.isPresent()) {
-                this.traceLinkRepository.save(traceLink);
-            }
-        }
+        return generatedLinks
+            .stream()
+            .filter(t -> {
+                Optional<TraceLink> alreadyApprovedLink = traceLinkService.linkExists(
+                    t.getSourceArtifact(),
+                    t.getTargetArtifact());
+                return !alreadyApprovedLink.isPresent();
+            })
+            .collect(Collectors.toList());
     }
 
     public List<TraceLink> generateLinksBetweenTypes(ProjectVersion projectVersion,

@@ -58,6 +58,10 @@ public class Artifact implements Serializable {
         setName(name);
     }
 
+    public Project getProject() {
+        return this.project;
+    }
+
     public void setProject(Project project) {
         this.project = project;
     }

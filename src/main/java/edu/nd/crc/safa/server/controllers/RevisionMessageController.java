@@ -21,7 +21,6 @@ public class RevisionMessageController {
         this.template = template;
     }
 
-
     @MessageMapping("/revisions/{versionId}")
     public void handleRevisionMessage(String revision, @DestinationVariable UUID versionId) throws Exception {
         System.out.println("RECEIVED REVISION MESSAGE");

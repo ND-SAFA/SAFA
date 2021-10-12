@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +30,21 @@ public class TraceLinkService {
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactRepository artifactRepository;
     private final ParserErrorRepository parserErrorRepository;
+    private final RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceLinkService(TraceLinkRepository traceLinkRepository,
                             ArtifactRepository artifactRepository,
-                            ParserErrorRepository parserErrorRepository) {
+                            ParserErrorRepository parserErrorRepository,
+                            RevisionNotificationService revisionNotificationService) {
         this.traceLinkRepository = traceLinkRepository;
         this.artifactRepository = artifactRepository;
         this.parserErrorRepository = parserErrorRepository;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
-    public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces) {
+    public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces)
+        throws ServerError {
         List<TraceLink> newLinks = new ArrayList<>();
         List<ParserError> newErrors = new ArrayList<>();
         traces.forEach(t -> {
@@ -51,7 +56,7 @@ public class TraceLinkService {
                 newErrors.add(result.getValue1());
             }
         });
-        this.traceLinkRepository.saveAll(newLinks);
+        this.revisionNotificationService.saveAndBroadcastTraceLinks(projectVersion.getProject(), newLinks);
         this.parserErrorRepository.saveAll(newErrors);
     }
 

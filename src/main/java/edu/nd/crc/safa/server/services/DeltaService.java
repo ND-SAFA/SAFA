@@ -20,6 +20,7 @@ import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.utilities.ArtifactBodyFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,29 +84,30 @@ public class DeltaService {
      * @param projectVersion - The version associated with the change created.
      * @param artifact       - The registered artifact in the project associated with the project version.
      * @param appEntity      - The artifact's new changes in the form of the domain model.
-     * @return ArtifactBody - unsaved database entity with given changes and modification type.
+     * @return ArtifactBody - unsaved database entity with given changes and modification type OR null if no change
+     * is detected.
      */
     public ArtifactBody calculateArtifactChange(ProjectVersion projectVersion,
                                                 Artifact artifact,
                                                 ArtifactAppEntity appEntity) {
-        Project project = projectVersion.getProject();
         ArtifactBody artifactBody = null;
-        Optional<ArtifactBody> previousBodyQuery = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
-        if (previousBodyQuery.isPresent()) {
-            ArtifactBody previousBody = previousBodyQuery.get();
+        ArtifactBody previousBody =
+            getArtifactBodyContentBeforeVersion(this.artifactBodyRepository.findByArtifact(artifact), projectVersion);
+        if (previousBody != null) {
             if (appEntity == null) {
                 artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.REMOVED,
                     artifact,
-                    null,
-                    null);
+                    "",
+                    "");
             } else if (previousBody.getModificationType() == ModificationType.REMOVED) {
                 artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.ADDED,
                     artifact,
                     appEntity.summary,
                     appEntity.body);
-            } else if (!previousBody.getContent().equals(appEntity.body)) {
+            } else if (!previousBody.getContent().equals(appEntity.body)
+                || !previousBody.getSummary().equals(appEntity.summary)) {
                 artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.MODIFIED,
                     artifact,
@@ -113,6 +115,9 @@ public class DeltaService {
                     appEntity.body);
             }
         } else {
+            if (appEntity == null) {
+                return null;
+            }
             artifactBody = new ArtifactBody(projectVersion,
                 ModificationType.ADDED,
                 artifact,
@@ -174,19 +179,28 @@ public class DeltaService {
         return deltaArtifact;
     }
 
+    private ArtifactBody getArtifactBodyContentAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+        return filterArtifactBodies(bodies, (target) -> target.isLessThanOrEqualTo(version));
+    }
+
+    private ArtifactBody getArtifactBodyContentBeforeVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+        return filterArtifactBodies(bodies, (target) -> target.isLessThan(version));
+    }
+
     /**
-     * Returns the ArtifactBody in given list that is most up to date to given version.
+     * Returns the ArtifactBody in given list whose version is greatest while passing given filter.
      *
-     * @param bodies  - List of ArtifactBodies
-     * @param version - The target version whose body we want reflected.
+     * @param bodies - List of ArtifactBodies
+     * @param filter - Filter which is passed version corresponding to each body, return true if valid version
      * @return ArtifactBody nearest to given version or null if no ArtifactBody found in range.
      */
-    private ArtifactBody getArtifactBodyContentAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+    private ArtifactBody filterArtifactBodies(List<ArtifactBody> bodies,
+                                              ArtifactBodyFilter filter) {
         ArtifactBody closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
             ArtifactBody currentBody = bodies.get(i);
             ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
-            if (currentBodyVersion.isLessThanOrEqualTo(version)) {
+            if (filter.compareTo(currentBodyVersion)) {
                 if (closestBodyToVersion == null) {
                     closestBodyToVersion = currentBody;
                 } else if (currentBodyVersion.isGreaterThan(closestBodyToVersion.getProjectVersion())

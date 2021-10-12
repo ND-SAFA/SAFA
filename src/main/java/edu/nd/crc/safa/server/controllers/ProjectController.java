@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.controllers;
 
 import java.util.Optional;
 import java.util.UUID;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
@@ -90,7 +91,7 @@ public class ProjectController extends BaseController {
 
     @PostMapping("projects")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody ProjectAppEntity payload) throws ServerError {
+    public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity payload) throws ServerError {
         Project project = Project.fromAppEntity(payload); // gets
         ProjectVersion projectVersion = payload.projectVersion;
 

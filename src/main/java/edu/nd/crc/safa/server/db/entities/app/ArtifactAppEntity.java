@@ -1,16 +1,27 @@
 package edu.nd.crc.safa.server.db.entities.app;
 
+import javax.validation.constraints.NotNull;
+
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
 
 import org.json.JSONObject;
 
 public class ArtifactAppEntity {
+    @NotNull
     public String name;
+
+    @NotNull
     public String summary;
+
+    @NotNull
     public String body;
+
+    @NotNull
     public String type;
 
     public ArtifactAppEntity() {
+        this.body = "";
+        this.summary = "";
     }
 
     public ArtifactAppEntity(ArtifactBody body) {
@@ -66,10 +77,10 @@ public class ArtifactAppEntity {
 
     public String toString() {
         JSONObject json = new JSONObject();
-        //json.put("name", name);
-        //json.put("summary", summary);
+        json.put("name", name);
+        json.put("summary", summary);
         json.put("body", body);
-        //json.put("type", type);
+        json.put("type", type);
         return json.toString();
     }
 }

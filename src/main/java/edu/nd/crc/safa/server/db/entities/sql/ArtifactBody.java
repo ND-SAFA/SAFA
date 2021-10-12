@@ -56,13 +56,15 @@ public class ArtifactBody implements Serializable {
     )
     ProjectVersion projectVersion;
 
-    @Column(name = "summary")
+    @Column(name = "summary", nullable = false)
     String summary;
 
-    @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH)
+    @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
     String content;
 
     public ArtifactBody() {
+        this.summary = "";
+        this.content = "";
     }
 
     public ArtifactBody(ProjectVersion projectVersion,
@@ -127,6 +129,8 @@ public class ArtifactBody implements Serializable {
     public String toString() {
         JSONObject json = new JSONObject();
         json.put("artifact", artifact);
+        json.put("summary", this.summary);
+        json.put("body", this.content);
         json.put("modificationType", modificationType);
         return json.toString();
     }

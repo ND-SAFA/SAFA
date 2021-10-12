@@ -60,10 +60,12 @@ public class ArtifactService {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-        List<ArtifactBody> removedBodies = this.artifactRepository.findByProject(projectVersion.getProject())
+        List<ArtifactBody> removedBodies = this.artifactRepository
+            .findByProject(projectVersion.getProject())
             .stream()
             .filter(a -> !entitiesSeen.containsKey(a.getName()))
             .map(a -> deltaService.calculateArtifactChange(projectVersion, a, null))
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
         List<ArtifactBody> allArtifactBodies = new ArrayList<>(artifactBodies);
@@ -77,6 +79,9 @@ public class ArtifactService {
             a.type,
             a.summary,
             a.body);
+        if (artifactBody == null) {
+            return;
+        }
         this.revisionNotificationService.saveArtifactBodies(projectVersion, List.of(artifactBody));
     }
 

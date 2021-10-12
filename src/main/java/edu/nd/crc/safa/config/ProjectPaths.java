@@ -59,10 +59,6 @@ public class ProjectPaths {
         return pathHelper(getPathToStorage(project), "generated");
     }
 
-    public static String getPathToGeneratedFile(Project project, String fileName) {
-        return pathHelper(getPathToGeneratedFiles(project), fileName);
-    }
-
     public static String getPathToTestResources(String fileName) {
         return pathHelper(PATH_TO_BEFORE_FILES, fileName);
     }

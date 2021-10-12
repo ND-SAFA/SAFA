@@ -1,8 +1,10 @@
 package edu.nd.crc.safa.builders;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -22,10 +24,6 @@ public class JsonBuilder extends BaseBuilder {
         projectVersions = new Hashtable<>();
     }
 
-    public JSONObject withProjectAndReturn(String id, String name) {
-        return withProject(id, name).getProjectAndReturn(id);
-    }
-
     public JsonBuilder withProject(String id, String name) {
         return withProject(id, name, new ArrayList<>(), new ArrayList<>());
     }
@@ -37,6 +35,7 @@ public class JsonBuilder extends BaseBuilder {
         JSONObject project = new JSONObject();
         project.put("projectId", id);
         project.put("name", name);
+        project.put("description", "");
         project.put("artifacts", artifacts);
         project.put("traces", traces);
         projects.put(name, project);
@@ -63,6 +62,21 @@ public class JsonBuilder extends BaseBuilder {
         return project;
     }
 
+    public JSONObject withArtifactAndReturn(String projectName,
+                                            String name,
+                                            String type,
+                                            String body) {
+        this.withArtifact(projectName, name, type, body);
+        HashMap<String, String> artifactMap = (HashMap<String, String>) this.projects
+            .get(projectName)
+            .getJSONArray("artifacts")
+            .toList()
+            .stream()
+            .filter(a -> ((HashMap<String, String>) a).get("name").equals(name))
+            .collect(Collectors.toList()).get(0);
+        return new JSONObject(artifactMap);
+    }
+
     public JsonBuilder withArtifact(String projectName,
                                     String name,
                                     String type,
@@ -72,6 +86,7 @@ public class JsonBuilder extends BaseBuilder {
         artifact.put("name", name);
         artifact.put("type", type);
         artifact.put("body", body);
+        artifact.put("summary", "");
         project.getJSONArray("artifacts").put(artifact);
         return this;
     }

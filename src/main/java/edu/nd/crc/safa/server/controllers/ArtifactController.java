@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
@@ -19,7 +20,6 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,20 +53,18 @@ public class ArtifactController extends BaseController {
         this.artifactRepository = artifactRepository;
     }
 
-    @PostMapping(value = "projects/{projectId}/artifacts")
+    @PostMapping(value = "projects/versions/{versionId}/artifacts")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
-        @PathVariable UUID projectId,
-        @RequestBody ArtifactAppEntity artifact) throws ServerError {
-        Project project = this.projectRepository.findByProjectId(projectId);
-        ProjectVersion projectVersion = this.versionService.getCurrentVersion(project);
+        @PathVariable UUID versionId,
+        @Valid @RequestBody ArtifactAppEntity artifact) throws ServerError {
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         this.artifactService.addArtifactToVersion(projectVersion, artifact);
         return new ServerResponse(artifact);
     }
 
     @GetMapping("projects/{projectId}/artifacts/validate/{artifactName}")
-    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName)
-        throws JSONException {
+    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) {
         Project project = this.projectRepository.findByProjectId(projectId);
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
         Map<String, Boolean> response = new HashMap<>();

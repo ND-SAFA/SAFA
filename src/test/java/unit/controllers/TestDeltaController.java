@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.services.DeltaService;
 
@@ -128,7 +127,6 @@ public class TestDeltaController extends EntityBaseTest {
             .newVersion(projectName)
             .newVersion(projectName);
 
-        Project project = entityBuilder.getProject(projectName);
         ProjectVersion beforeVersion = entityBuilder.getProjectVersion(projectName, 0);
         ProjectVersion afterVersion = entityBuilder.getProjectVersion(projectName, 1);
 

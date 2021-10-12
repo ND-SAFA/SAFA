@@ -61,11 +61,9 @@ public class RevisionNotificationService {
         }
         String versionTopicDestination = getVersionTopic(projectVersion);
         template.convertAndSend(versionTopicDestination, revisionAsString);
-        System.out.println("BROADCASTING TO:" + versionTopicDestination);
     }
 
     public void saveAndBroadcastTraceLinks(Project project, List<TraceLink> traceLinks) throws ServerError {
-        System.out.println("TRACE LINKS:" + traceLinks);
         traceLinkRepository.saveAll(traceLinks);
         Revision revision = new Revision();
         List<TraceChange> traceChanges =
@@ -73,7 +71,6 @@ public class RevisionNotificationService {
                 .stream()
                 .map(trace -> new TraceChange(ModificationType.ADDED, new TraceApplicationEntity(trace)))
                 .collect(Collectors.toList());
-        System.out.println("SENDING TRACE CHANGES:" + traceChanges);
         revision.setTraceChanges(traceChanges);
         String revisionAsString;
         try {
@@ -83,7 +80,6 @@ public class RevisionNotificationService {
         }
         String projectTopicDestination = getProjectTopic(project);
         template.convertAndSend(projectTopicDestination, revisionAsString);
-        System.out.println("BROADCASTING TO:" + projectTopicDestination);
     }
 
     public String getVersionTopic(ProjectVersion projectVersion) {

@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.db.entities.app;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
@@ -11,11 +12,22 @@ import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import org.json.JSONObject;
 
 public class ProjectAppEntity {
+    @NotNull
     public String projectId;
+
+    @NotNull
     public String name;
+
+    @NotNull
     public String description;
+
+    @NotNull
     public ProjectVersion projectVersion;
+
+    @NotNull
     public List<ArtifactAppEntity> artifacts;
+
+    @NotNull
     public List<TraceApplicationEntity> traces;
 
     public ProjectAppEntity() {

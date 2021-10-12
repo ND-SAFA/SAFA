@@ -56,7 +56,7 @@ public class TestDeltaService extends EntityBaseTest {
         // VP - Remove artifact
         ProjectVersion thirdVersion = entityBuilder.newVersionWithReturn(projectName);
         entityBuilder
-            .newArtifactBody(projectName, 2, ModificationType.REMOVED, artifactName, null, null);
+            .newArtifactBody(projectName, 2, ModificationType.REMOVED, artifactName, "", "");
         ProjectDelta deltaTwo = deltaService.calculateDelta(secondVersion, thirdVersion);
         assertThat(deltaTwo.getModified().size()).isEqualTo(0);
         assertThat(deltaTwo.getRemoved().size()).isEqualTo(1);

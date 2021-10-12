@@ -69,19 +69,29 @@ public class ProjectVersion implements Serializable {
     }
 
     public boolean isLessThanOrEqualTo(ProjectVersion other) {
+        return this.isLessThan(other) || this.isEqualTo(other);
+    }
+
+    public boolean isLessThan(ProjectVersion other) {
         if (this.majorVersion < other.majorVersion) {
             return true;
         } else if (other.majorVersion == this.majorVersion) {
             if (this.minorVersion < other.minorVersion) {
                 return true;
             } else if (other.minorVersion == this.minorVersion) {
-                return this.revision <= other.revision;
+                return this.revision < other.revision;
             } else {
                 return false;
             }
         } else {
             return false;
         }
+    }
+
+    public boolean isEqualTo(ProjectVersion other) {
+        return this.majorVersion == other.majorVersion
+            && this.minorVersion == other.minorVersion
+            && this.revision == other.revision;
     }
 
     public boolean isGreaterThan(ProjectVersion other) {

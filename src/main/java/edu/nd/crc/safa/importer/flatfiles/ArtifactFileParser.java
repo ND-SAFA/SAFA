@@ -124,6 +124,9 @@ public class ArtifactFileParser {
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
 
+            artifactSummary = artifactSummary == null ? "" : artifactSummary;
+            artifactContent = artifactContent == null ? "" : artifactContent;
+
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
                 artifactType.getName(),
                 artifactId,

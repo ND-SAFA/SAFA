@@ -64,8 +64,8 @@ public class TestArtifactService extends EntityBaseTest {
                 2,
                 ModificationType.REMOVED,
                 artifactName,
-                null,
-                null);
+                "",
+                "");
 
         //VP 2 - Find new modified body
         artifactBodyQuery = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
@@ -74,8 +74,8 @@ public class TestArtifactService extends EntityBaseTest {
         artifactBodyFound = artifactBodyQuery.get();
         assertThat(artifactBodyFound.getModificationType()).isEqualTo(ModificationType.REMOVED);
         assertThat(artifactBodyFound.getArtifact().getName()).isEqualTo(artifactName);
-        assertThat(artifactBodyFound.getContent()).isNull();
-        assertThat(artifactBodyFound.getSummary()).isNull();
+        assertThat(artifactBodyFound.getContent()).isEqualTo("");
+        assertThat(artifactBodyFound.getSummary()).isEqualTo("");
     }
 
     @Test

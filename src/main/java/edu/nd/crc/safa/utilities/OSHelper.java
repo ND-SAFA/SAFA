@@ -63,16 +63,4 @@ public class OSHelper {
             }
         }
     }
-
-    private static void recursivelyDeleteDirectory(File pathToObject) throws ServerError {
-        File[] files = pathToObject.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                recursivelyDeleteDirectory(file);
-            }
-        }
-        if (!pathToObject.delete()) {
-            throw new ServerError("Could not delete requested file: " + pathToObject);
-        }
-    }
 }

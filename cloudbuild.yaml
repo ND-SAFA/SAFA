@@ -2,18 +2,11 @@ steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build',
-            '--build-arg', 'DB_HOST=$DB_HOST',
-            '--build-arg', 'DB_USER=$DB_USER',
-            '--build-arg', 'DB_PASSWORD=$DB_PASSWORD',
+            '--build-arg', 'DB_HOST=${_DB_HOST}',
+            '--build-arg', 'DB_USER=${_DB_USER}',
+            '--build-arg', 'DB_PASSWORD=${_DB_PASSWORD}',
             '-t', 'gcr.io/$PROJECT_ID/IMAGE',
             '.' ]
-    env:
-      - 'PROJECT_ID=$PROJECT_ID'
-      - 'DB_HOST=$_DB_HOST'
-      - 'DB_USER=$_DB_USER'
-      - 'DB_PASSWORD=$_DB_PASSWORD'
-      - 'SERVICE_NAME=$_SERVICE_NAME'
-      - 'REGION=$_REGION'
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'gcr.io/$PROJECT_ID/IMAGE' ]
@@ -23,6 +16,6 @@ steps:
     entrypoint: gcloud
     env:
       - 'PROJECT_ID=$PROJECT_ID'
-    args: [ 'run', 'deploy', '$SERVICE_NAME', '--image', 'gcr.io/$PROJECT_ID/IMAGE', '--region', '$REGION' ]
+    args: [ 'run', 'deploy', '${_SERVICE_NAME}', '--image', 'gcr.io/$PROJECT_ID/IMAGE', '--region', '${_REGION}' ]
 images:
   - gcr.io/PROJECT_ID/IMAGE

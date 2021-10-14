@@ -9,9 +9,11 @@ steps:
             '.' ]
     env:
       - 'PROJECT_ID=$PROJECT_ID'
-      - 'DB_HOST=$DB_HOST'
-      - 'DB_USER=$DB_USER'
-      - 'DB_PASSWORD=$DB_PASSWORD'
+      - 'DB_HOST=$_DB_HOST'
+      - 'DB_USER=$_DB_USER'
+      - 'DB_PASSWORD=$_DB_PASSWORD'
+      - 'SERVICE_NAME=$_SERVICE_NAME'
+      - 'REGION=$_REGION'
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'gcr.io/$PROJECT_ID/IMAGE' ]
@@ -21,7 +23,6 @@ steps:
     entrypoint: gcloud
     env:
       - 'PROJECT_ID=$PROJECT_ID'
-      - 'SERVICE-NAME=safa-bend'
-    args: [ 'run', 'deploy', '$SERVICE-NAME', '--image', 'gcr.io/$PROJECT_ID/IMAGE', '--region', '$REGION' ]
+    args: [ 'run', 'deploy', '$SERVICE_NAME', '--image', 'gcr.io/$PROJECT_ID/IMAGE', '--region', '$REGION' ]
 images:
   - gcr.io/PROJECT_ID/IMAGE

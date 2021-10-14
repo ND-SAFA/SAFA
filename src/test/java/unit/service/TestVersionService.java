@@ -1,0 +1,31 @@
+package unit.service;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.services.VersionService;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import unit.EntityBaseTest;
+
+public class TestVersionService extends EntityBaseTest {
+    @Autowired
+    VersionService versionService;
+
+    @Test
+    public void createNextVersion() throws ServerError {
+        String projectName = "test-project";
+        entityBuilder
+            .newProject(projectName)
+            .newVersion(projectName);
+
+        Project project = entityBuilder.getProject(projectName);
+        ProjectVersion nextVersion = versionService.createNextRevision(project);
+        assertThat(nextVersion.getMajorVersion()).isEqualTo(1);
+        assertThat(nextVersion.getMinorVersion()).isEqualTo(1);
+        assertThat(nextVersion.getRevision()).isEqualTo(2);
+    }
+}

@@ -1,0 +1,57 @@
+{
+  "groups": [
+    {
+      "name": "graph"
+    },
+    {
+      "name": "sql"
+    }
+  ],
+  "properties": [
+    {
+      "name": "graph.uri",
+      "type": "java.lang.String",
+      "description": "Description for graph.uri."
+    },
+    {
+      "name": "graph.username",
+      "type": "java.lang.String",
+      "description": "Description for graph.username."
+    },
+    {
+      "name": "graph.password",
+      "type": "java.lang.String",
+      "description": "Password of test graph database."
+    },
+    {
+      "name": "tim.requiredTraceScore",
+      "type": "java.lang.String",
+      "description": "Description for tim.requiredTraceScore."
+    },
+    {
+      "name": "sql.url",
+      "type": "java.lang.String",
+      "description": "Description for sql.url."
+    },
+    {
+      "name": "sql.port",
+      "type": "java.lang.String",
+      "description": "Description for sql.port."
+    },
+    {
+      "name": "sql.password",
+      "type": "java.lang.String",
+      "description": "Description for sql.password."
+    },
+    {
+      "name": "sql.username",
+      "type": "java.lang.String",
+      "description": "Description for sql.username."
+    },
+    {
+      "name": "testMesssage",
+      "type": "java.lang.String",
+      "description": "Description for testMesssage."
+    }
+  ]
+}

@@ -4,6 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+safa-google-key.json
+**/application-prod.properties
 
 ### STS ###
 .apt_generated
@@ -30,3 +32,10 @@ out/
 
 ### VS Code ###
 .vscode/
+bin
+
+
+### Macs ###
+/**/.DS_Store
+
+src/main/resources/*local.properties

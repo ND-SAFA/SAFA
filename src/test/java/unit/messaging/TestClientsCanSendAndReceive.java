@@ -1,13 +1,11 @@
 package unit.messaging;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.messages.Revision;
 
 import org.junit.jupiter.api.Test;
-import unit.TestConstants;
 import unit.WebSocketBaseTest;
 
 public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
@@ -39,15 +37,7 @@ public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
         this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Artifact and traces received
-        assertThat(getQueueSize(clientOne)).isGreaterThan(2);
-        assertThat(getQueueSize(clientTwo)).isGreaterThan(2);
-
-        // Step - Read message
-        Revision clientOneRevision = getNextMessage(clientOne, Revision.class);
-        Revision clientTwoRevision = getNextMessage(clientTwo, Revision.class);
-
-        // VP - Verify that message sent is received
-        assertThat(clientOneRevision.getArtifactChanges().size()).isEqualTo(TestConstants.N_ARTIFACTS);
-        assertThat(clientTwoRevision.getArtifactChanges().size()).isEqualTo(TestConstants.N_ARTIFACTS);
+        assertThat(getQueueSize(clientOne)).isEqualTo(1);
+        assertThat(getQueueSize(clientTwo)).isEqualTo(1);
     }
 }

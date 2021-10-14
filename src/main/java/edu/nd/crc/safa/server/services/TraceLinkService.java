@@ -56,7 +56,7 @@ public class TraceLinkService {
                 newErrors.add(result.getValue1());
             }
         });
-        this.revisionNotificationService.saveAndBroadcastTraceLinks(projectVersion.getProject(), newLinks);
+        this.traceLinkRepository.saveAll(newLinks);
         this.parserErrorRepository.saveAll(newErrors);
     }
 

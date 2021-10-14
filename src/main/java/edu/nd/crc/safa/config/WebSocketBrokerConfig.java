@@ -1,14 +1,29 @@
 package edu.nd.crc.safa.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 @Configuration
+@EnableWebSocket
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
+
+    public static final int messageSizeLimit = 50 * 1024 * 1024;
+    private final Logger log = LoggerFactory.getLogger(WebSocketBrokerConfig.class);
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(messageSizeLimit); // default : 64 * 1024
+        //registration.setSendTimeLimit(10 * 10000); // default : 10 * 10000
+        registration.setSendBufferSizeLimit(messageSizeLimit); // default : 512 * 1024
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -21,6 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry
             .addEndpoint("/websocket")
             .setAllowedOriginPatterns("*")
-            .withSockJS();
+            .withSockJS()
+        ;
     }
 }

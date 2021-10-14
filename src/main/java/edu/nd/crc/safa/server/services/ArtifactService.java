@@ -70,7 +70,7 @@ public class ArtifactService {
 
         List<ArtifactBody> allArtifactBodies = new ArrayList<>(artifactBodies);
         allArtifactBodies.addAll(removedBodies);
-        this.revisionNotificationService.saveArtifactBodies(projectVersion, allArtifactBodies);
+        this.artifactBodyRepository.saveAll(allArtifactBodies);
     }
 
     public void addArtifactToVersion(ProjectVersion projectVersion, ArtifactAppEntity a) throws ServerError {
@@ -82,7 +82,7 @@ public class ArtifactService {
         if (artifactBody == null) {
             return;
         }
-        this.revisionNotificationService.saveArtifactBodies(projectVersion, List.of(artifactBody));
+        this.artifactBodyRepository.save(artifactBody);
     }
 
     /**

@@ -87,12 +87,12 @@ public class TraceFileParser {
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
         List<TraceLink> manualLinks = parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
-        this.revisionNotificationService.saveAndBroadcastTraceLinks(project, manualLinks);
+        this.traceLinkRepository.saveAll(manualLinks);
         List<TraceLink> generatedLinks = new ArrayList<>();
         if (isGenerated) {
             generatedLinks.addAll(traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes));
         }
-        this.revisionNotificationService.saveAndBroadcastTraceLinks(project, generatedLinks);
+        this.traceLinkRepository.saveAll(generatedLinks);
     }
 
     /**

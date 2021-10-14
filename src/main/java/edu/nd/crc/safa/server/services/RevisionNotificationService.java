@@ -1,24 +1,14 @@
 package edu.nd.crc.safa.server.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.messages.ArtifactChange;
-import edu.nd.crc.safa.server.messages.Revision;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.messages.TraceChange;
+import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.messages.Update;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -26,67 +16,44 @@ import org.springframework.stereotype.Service;
 @Service
 public class RevisionNotificationService {
 
-    private final SimpMessagingTemplate template;
-    private final ObjectMapper mapper;
-    private final TraceLinkRepository traceLinkRepository;
-    private final ArtifactBodyRepository artifactBodyRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ProjectVersionRepository projectVersionRepository;
 
     @Autowired
     public RevisionNotificationService(SimpMessagingTemplate template,
-                                       TraceLinkRepository traceLinkRepository,
-                                       ArtifactBodyRepository artifactBodyRepository) {
-        this.template = template;
-        this.traceLinkRepository = traceLinkRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
-        mapper = new ObjectMapper();
+                                       ProjectVersionRepository projectVersionRepository) {
+        this.messagingTemplate = template;
+        this.projectVersionRepository = projectVersionRepository;
     }
 
-    public void saveArtifactBodies(ProjectVersion projectVersion,
-                                   List<ArtifactBody> artifactBodies) throws ServerError {
-        artifactBodyRepository.saveAll(artifactBodies);
-
-        Revision revision = new Revision();
-        revision.setRevision(projectVersion.getRevision());
-        List<ArtifactChange> artifactChanges =
-            artifactBodies
-                .stream()
-                .map(aBody -> new ArtifactChange(ModificationType.MODIFIED, new ArtifactAppEntity(aBody)))
-                .collect(Collectors.toList());
-        revision.setArtifactChanges(artifactChanges);
-        String revisionAsString;
-        try {
-            revisionAsString = mapper.writeValueAsString(revision);
-        } catch (JsonProcessingException e) {
-            throw new ServerError("Internal error occurred while serializing project revision.");
-        }
-        String versionTopicDestination = getVersionTopic(projectVersion);
-        template.convertAndSend(versionTopicDestination, revisionAsString);
-    }
-
-    public void saveAndBroadcastTraceLinks(Project project, List<TraceLink> traceLinks) throws ServerError {
-        traceLinkRepository.saveAll(traceLinks);
-        Revision revision = new Revision();
-        List<TraceChange> traceChanges =
-            traceLinks
-                .stream()
-                .map(trace -> new TraceChange(ModificationType.ADDED, new TraceApplicationEntity(trace)))
-                .collect(Collectors.toList());
-        revision.setTraceChanges(traceChanges);
-        String revisionAsString;
-        try {
-            revisionAsString = mapper.writeValueAsString(revision);
-        } catch (JsonProcessingException e) {
-            throw new ServerError("Internal error occurred while serializing project revision.");
-        }
-        String projectTopicDestination = getProjectTopic(project);
-        template.convertAndSend(projectTopicDestination, revisionAsString);
-    }
-
-    public String getVersionTopic(ProjectVersion projectVersion) {
+    public static String getVersionTopic(ProjectVersion projectVersion) {
         return String.format("/topic/revisions/%s", projectVersion.getVersionId());
     }
 
-    public String getProjectTopic(Project project) {
+    public static String getProjectTopic(Project project) {
         return String.format("/topic/projects/%s", project.getProjectId());
+    }
+
+    public void broadcastUpdateProject(ProjectVersion projectVersion) {
+        String versionTopicDestination = getVersionTopic(projectVersion);
+        Update update = new Update("excluded");
+        messagingTemplate.convertAndSend(versionTopicDestination, update);
+    }
+
+    public void broadcastArtifact(ProjectVersion projectVersion, ArtifactAppEntity artifact) {
+        String versionTopicDestination = getVersionTopic(projectVersion);
+        Update update = new Update("included");
+        update.setArtifacts(List.of(artifact));
+        messagingTemplate.convertAndSend(versionTopicDestination, update);
+    }
+
+    public void broadcastTrace(Project project, TraceApplicationEntity trace) {
+        List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);
+        Update update = new Update("included");
+        update.setTraces(List.of(trace));
+        for (ProjectVersion projectVersion : projectVersions) {
+            String versionTopicDestination = getVersionTopic(projectVersion);
+            messagingTemplate.convertAndSend(versionTopicDestination, update);
+        }
     }
 }

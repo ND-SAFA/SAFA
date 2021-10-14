@@ -17,6 +17,7 @@ import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.ArtifactService;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class ArtifactController extends BaseController {
     VersionService versionService;
 
     ArtifactRepository artifactRepository;
+    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ArtifactController(ProjectRepository projectRepository,
@@ -45,21 +47,24 @@ public class ArtifactController extends BaseController {
                               ProjectService projectService,
                               ArtifactService artifactService,
                               VersionService versionService,
-                              ArtifactRepository artifactRepository) {
+                              ArtifactRepository artifactRepository,
+                              RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository);
         this.projectService = projectService;
         this.artifactService = artifactService;
         this.versionService = versionService;
         this.artifactRepository = artifactRepository;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
     @PostMapping(value = "projects/versions/{versionId}/artifacts")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse updateProjectVersionFromFlatFiles(
+    public ServerResponse createArtifactAtVersion(
         @PathVariable UUID versionId,
         @Valid @RequestBody ArtifactAppEntity artifact) throws ServerError {
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         this.artifactService.addArtifactToVersion(projectVersion, artifact);
+        this.revisionNotificationService.broadcastArtifact(projectVersion, artifact);
         return new ServerResponse(artifact);
     }
 

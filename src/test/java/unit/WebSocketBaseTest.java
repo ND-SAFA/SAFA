@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import edu.nd.crc.safa.config.WebSocketBrokerConfig;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,8 +45,11 @@ public class WebSocketBaseTest extends EntityBaseTest {
         mapper = new ObjectMapper();
         idToQueue = new HashMap<>();
         idToSession = new HashMap<>();
-        stompClient = new WebSocketStompClient(new SockJsClient(
-            List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
+        WebSocketTransport transport = new WebSocketTransport(webSocketClient);
+        SockJsClient client = new SockJsClient(List.of(transport));
+        stompClient = new WebSocketStompClient(client);
+        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.messageSizeLimit);
     }
 
     @BeforeEach
@@ -77,8 +82,12 @@ public class WebSocketBaseTest extends EntityBaseTest {
     }
 
     public <T> T getNextMessage(String id, Class<T> tClass) throws InterruptedException, JsonProcessingException {
-        String response = idToQueue.get(id).poll(1, SECONDS);
+        String response = getNextMessage(id);
         return mapper.readValue(response, tClass);
+    }
+
+    public String getNextMessage(String id) throws InterruptedException {
+        return idToQueue.get(id).poll(3, SECONDS);
     }
 
     public int getQueueSize(String id) {

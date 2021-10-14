@@ -24,6 +24,11 @@ public class JsonBuilder extends BaseBuilder {
         projectVersions = new Hashtable<>();
     }
 
+    public JSONObject withProjectAndReturn(String id, String name) {
+        withProject(id, name, new ArrayList<>(), new ArrayList<>());
+        return this.projects.get(id);
+    }
+
     public JsonBuilder withProject(String id, String name) {
         return withProject(id, name, new ArrayList<>(), new ArrayList<>());
     }
@@ -97,9 +102,5 @@ public class JsonBuilder extends BaseBuilder {
         trace.put("target", target);
         this.projects.get(projectName).getJSONArray("traces").put(trace);
         return this;
-    }
-
-    public JSONObject getProjectAndReturn(String projectName) {
-        return this.projects.get(projectName);
     }
 }

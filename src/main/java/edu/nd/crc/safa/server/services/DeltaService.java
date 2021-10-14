@@ -84,8 +84,7 @@ public class DeltaService {
      * @param projectVersion - The version associated with the change created.
      * @param artifact       - The registered artifact in the project associated with the project version.
      * @param appEntity      - The artifact's new changes in the form of the domain model.
-     * @return ArtifactBody - unsaved database entity with given changes and modification type OR null if no change
-     * is detected.
+     * @return ArtifactBody - unsaved ArtifactBody with changes OR null if no change is detected.
      */
     public ArtifactBody calculateArtifactChange(ProjectVersion projectVersion,
                                                 Artifact artifact,

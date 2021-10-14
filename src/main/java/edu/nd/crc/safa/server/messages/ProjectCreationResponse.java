@@ -13,6 +13,9 @@ public class ProjectCreationResponse {
     ProjectErrors errors;
     Map<String, List<RuleName>> warnings;
 
+    public ProjectCreationResponse() {
+    }
+
     public ProjectCreationResponse(ProjectAppEntity project,
                                    ProjectVersion projectVersion,
                                    ProjectErrors errors,

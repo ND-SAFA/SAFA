@@ -84,9 +84,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {
-        Project project = projectVersion.getProject();
-        String beforeRouteName = String.format("/projects/%s/%s/flat-files",
-            project.getProjectId().toString(),
+        String beforeRouteName = String.format("/projects/versions/%s/flat-files",
             projectVersion.getVersionId().toString());
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(beforeRouteName,
             pathToFileDir);

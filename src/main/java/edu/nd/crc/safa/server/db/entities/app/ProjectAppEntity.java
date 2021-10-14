@@ -12,7 +12,6 @@ import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import org.json.JSONObject;
 
 public class ProjectAppEntity {
-    @NotNull
     public String projectId;
 
     @NotNull
@@ -21,7 +20,6 @@ public class ProjectAppEntity {
     @NotNull
     public String description;
 
-    @NotNull
     public ProjectVersion projectVersion;
 
     @NotNull

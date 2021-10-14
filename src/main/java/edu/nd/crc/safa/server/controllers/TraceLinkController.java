@@ -84,7 +84,9 @@ public class TraceLinkController extends BaseController {
             return new ServerResponse(creationResponse.getValue1());
         }
         TraceLink traceLink = creationResponse.getValue0();
-        this.revisionNotificationService.saveAndBroadcastTraceLinks(projectVersion.getProject(), List.of(traceLink));
+        this.traceLinkRepository.saveAll(List.of(traceLink));
+        this.revisionNotificationService.broadcastTrace(projectVersion.getProject(),
+            new TraceApplicationEntity(traceLink));
         return new ServerResponse(new TraceApplicationEntity(traceLink));
     }
 
@@ -93,8 +95,9 @@ public class TraceLinkController extends BaseController {
         if (traceLinkQuery.isPresent()) {
             TraceLink traceLink = traceLinkQuery.get();
             traceLink.setApprovalStatus(approvalStatus);
-            this.revisionNotificationService.saveAndBroadcastTraceLinks(traceLink.getSourceArtifact().getProject(),
-                List.of(traceLink));
+            this.traceLinkRepository.save(traceLink);
+            Project project = traceLink.getSourceArtifact().getProject();
+            this.revisionNotificationService.broadcastTrace(project, new TraceApplicationEntity(traceLink));
             return new ServerResponse("Trace link was successfully approved");
         } else {
             throw new ServerError("Could not find trace link with id:" + traceLinkId);

@@ -21,7 +21,11 @@ bootJar {
     archiveVersion = '0.1.0'
 }
 
-sourceCompatibility = "1.9"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
 
 repositories {
     mavenCentral()
@@ -68,12 +72,14 @@ dependencies {
     implementation 'org.webjars:stomp-websocket:2.3.4' // not sure I need this
     implementation 'org.springframework:spring-websocket:5.3.10'
     implementation 'org.springframework:spring-messaging:5.3.10'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.5.11'
 
     // testing
     testImplementation 'com.h2database:h2:1.4.200'
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.5') {
         exclude module: 'logback-classic'
     }
+    testImplementation 'org.springdoc:springdoc-openapi-webmvc-core:1.5.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 }
 
@@ -120,4 +126,4 @@ checkstyleTest {
 }
 
 
-targetCompatibility = JavaVersion.VERSION_1_9
+

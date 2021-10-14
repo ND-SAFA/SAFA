@@ -3,6 +3,7 @@ package unit.controllers.project;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -197,6 +198,20 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
         String errorMessage = response.getJSONObject("body").getString("message");
         assertThat(errorMessage).contains("positive major");
+    }
+
+    @Test
+    public void testValidation() throws Exception {
+        String url = "/projects";
+        JSONObject projectJson = new JSONObject();
+        projectJson.put("name", projectName);
+        projectJson.put("artifacts", new ArrayList<String>());
+        projectJson.put("traces", new ArrayList<String>());
+
+        JSONObject response = sendPost(url, projectJson, status().isOk());
+        JSONObject body = response.getJSONObject("body");
+        assertThat(response.getNumber("status")).isEqualTo(1);
+        assertThat(body.getString("message")).contains("description").contains("null");
     }
 
     private JSONObject postProjectJson(JSONObject projectJson) throws Exception {

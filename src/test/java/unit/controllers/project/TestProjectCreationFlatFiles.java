@@ -177,13 +177,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         ProjectVersion noChangeVersion = entityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
-        String updateRouteName = String.format("/projects/%s/%s/flat-files",
-            project.getProjectId().toString(),
-            updateVersion.getVersionId().toString());
-
-        MockMultipartHttpServletRequestBuilder updateRequest = createMultiPartRequest(updateRouteName,
-            ProjectPaths.PATH_TO_BEFORE_FILES);
-        sendRequest(updateRequest, MockMvcResultMatchers.status().isCreated());
+        uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that no artifacts associated with empty version
         List<ArtifactBody> initialBodies = this.artifactBodyRepository.findByProjectVersion(emptyVersion);
@@ -200,12 +194,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         assertThat(updateTraces.size()).isEqualTo(TestConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
-        String noChangeRouteName = String.format("/projects/%s/%s/flat-files",
-            project.getProjectId().toString(),
-            noChangeVersion.getVersionId().toString());
-        MockMultipartHttpServletRequestBuilder noChangeRequest = createMultiPartRequest(noChangeRouteName,
-            ProjectPaths.PATH_TO_BEFORE_FILES);
-        sendRequest(noChangeRequest, MockMvcResultMatchers.status().isCreated());
+        uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - No new artifacts were created
         List<ArtifactBody> noChangeBodies = this.artifactBodyRepository.findByProjectVersion(noChangeVersion);

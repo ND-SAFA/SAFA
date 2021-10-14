@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,42 +35,43 @@ public class ProjectController extends BaseController {
 
     private final ProjectService projectService;
     private final FlatFileService flatFileService;
+    private final RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ProjectService projectService,
-                             FlatFileService flatFileService) {
+                             FlatFileService flatFileService,
+                             RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository);
         this.projectService = projectService;
         this.flatFileService = flatFileService;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
-    @PostMapping(value = "projects/{projectId}/{versionId}/flat-files")
+    /**
+     * Uploads and parses given flat files to the specified version.
+     *
+     * @param versionId - The id of the version that will be modified by given files.
+     * @param files     - The flat files containing tim.json, artifact files, and trace link files.
+     * @return ServerResponse whose body contains all entities in project created.
+     * @throws ServerError - If no files are given.
+     */
+    @PostMapping(value = "projects/versions/{versionId}/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
-        @PathVariable UUID projectId,
         @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
-
-        Optional<Project> project = this.projectRepository.findById(projectId);
-        if (!project.isPresent()) {
-            String message = String.format("Could not find project with id: %s", projectId);
-            throw new ServerError(message);
-        }
-        Optional<ProjectVersion> projectVersion = this.projectVersionRepository.findById(versionId);
-        if (!projectVersion.isPresent()) {
-            String message = String.format("Could not find ProjectVersion with id: %s", versionId);
-            throw new ServerError(message);
-        }
-
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        Project project = projectVersion.getProject();
         ProjectCreationResponse response = this.flatFileService.parseAndUploadFlatFiles(
-            project.get(),
-            projectVersion.get(),
+            project,
+            projectVersion,
             files);
+        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
         return new ServerResponse(response);
     }
 
@@ -86,6 +88,7 @@ public class ProjectController extends BaseController {
         ProjectCreationResponse response = this.flatFileService.parseAndUploadFlatFiles(project,
             projectVersion,
             files);
+        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
         return new ServerResponse(response);
     }
 

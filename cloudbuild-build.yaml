@@ -1,14 +1,8 @@
 steps:
-  # Build the container image
+  # Build the container image and toss result
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build',
-        '--build-arg', 'DB_HOST=${_DB_HOST}',
-        '--build-arg', 'DB_USER=${_DB_USER}',
-        '--build-arg', 'DB_PASSWORD=${_DB_PASSWORD}',
-        '-t', 'gcr.io/$PROJECT_ID/safa-bend-$COMMIT_SHA,
+            '--build-arg', 'DB_HOST=${_DB_HOST}',
+            '--build-arg', 'DB_USER=${_DB_USER}',
+            '--build-arg', 'DB_PASSWORD=${_DB_PASSWORD}',
             '.' ]
-  # Push the container image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'push', 'gcr.io/$PROJECT_ID/safa-bend-$COMMIT_SHA' ]
-images:
-  - gcr.io/$PROJECT_ID/safa-bend-$COMMIT_SHA

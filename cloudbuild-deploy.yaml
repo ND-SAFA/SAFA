@@ -1,22 +1,13 @@
 steps:
-  - # Build the container image
-    - name: 'gcr.io/cloud-builders/docker'
-      args: [ 'build',
-          '--build-arg', 'DB_HOST=${_DB_HOST}',
-          '--build-arg', 'DB_USER=${_DB_USER}',
-          '--build-arg', 'DB_PASSWORD=${_DB_PASSWORD}',
-          '-t', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE},
-               '.' ]
-    # Push the container image to Container Registry
-    - name: 'gcr.io/cloud-builders/docker'
-      args: [ 'push', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}' ]
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '--build-arg', 'DB_HOST=${_DB_HOST}', '--build-arg', 'DB_USER=${_DB_USER}','--build-arg', 'DB_PASSWORD=${_DB_PASSWORD}','-t', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}','.' ]
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}' ]
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    env:
-      - 'PROJECT_ID=$PROJECT_ID'
-    args: [ 'run', 'deploy', '${_SERVICE_NAME}',
-            '--image', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}',
-            '--region', '${_REGION}' ]
+    args: [ 'run', 'deploy', '${_SERVICE_NAME}','--image', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}','--region', '${_REGION}' ]
 images:
   - gcr.io/$PROJECT_ID/safa-bend-${_STAGE}

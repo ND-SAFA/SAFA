@@ -1,0 +1,11 @@
+steps:
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+    args: [ 'run', 'deploy', '${_SERVICE_NAME}',
+            '--image', 'gcr.io/$PROJECT_ID/safa-bend-$COMMIT_SHA',
+            '--region', '${_REGION}' ]
+images:
+  - gcr.io/$PROJECT_ID/safa-bend-${_STAGE}

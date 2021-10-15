@@ -24,9 +24,4 @@ RUN gradle build --stacktrace
 FROM openjdk:11
 COPY --from=0 /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
 
-ENTRYPOINT ["java",
-"-Djava.security.egd=file:/dev/./urandom",
- "-jar",
- "-Dspring.profiles.active=prod",
- "--server.port=$PORT",
-  "/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "-Dspring.profiles.active=prod","--server.port=$PORT", "/app.jar"]

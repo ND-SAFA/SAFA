@@ -16,27 +16,12 @@ public class DatabaseProperties {
         this.username = username;
         this.password = password;
 
-        String MYSQL_ID = "mysql";
         String h2_ID = "h2";
 
-        String prodSqlUrl = System.getenv("_MY_SQL_URL");
-        String prodSqlUsername = System.getenv("_MY_SQL_USERNAME");
-        String prodSqlPassword = System.getenv("_MY_SQL_PASSWORD");
-
-        if (prodSqlUrl != null
-            && prodSqlUsername != null
-            && prodSqlPassword != null) {
-            this.url = prodSqlUrl;
-            this.username = prodSqlUsername;
-            this.password = prodSqlPassword;
-        }
-
-        if (this.url.toLowerCase().contains(MYSQL_ID)) {
-            this.sqlType = SQLServers.MYSQL;
-        } else if (this.url.toLowerCase().contains(h2_ID)) {
+        if (this.url.toLowerCase().contains(h2_ID)) {
             this.sqlType = SQLServers.H2;
         } else {
-            throw new RuntimeException("Hibernate dialect not supported for connection string:" + this.url);
+            this.sqlType = SQLServers.MYSQL;
         }
     }
 

@@ -46,6 +46,7 @@ public class AppConfig {
         Map<String, String> env = System.getenv();
         HikariConfig config = new HikariConfig();
         if (env.containsKey("INSTANCE_CONNECTION_NAME")
+            && !env.get("INSTANCE_CONNECTION_NAME").equals("")
             && this.dbProperties.getSqlType() != SQLServers.H2) {
 
             String instanceConnectionName = env.get("INSTANCE_CONNECTION_NAME");

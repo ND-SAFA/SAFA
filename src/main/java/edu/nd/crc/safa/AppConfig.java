@@ -45,13 +45,18 @@ public class AppConfig {
 
         Map<String, String> env = System.getenv();
         HikariConfig config = new HikariConfig();
-        if (env.containsKey("INSTANCE_CONNECTION_NAME")
-            && !env.get("INSTANCE_CONNECTION_NAME").equals("")
+
+        String instanceConnectionName = env.get("ENV_INSTANCE_CONNECTION_NAME");
+        String databaseName = env.get("ENV_DB_NAME");
+
+        System.out.println("INSTANCE CONNECTION NAME:" + instanceConnectionName);
+        System.out.println("DATABASE NAME:" + databaseName);
+
+        if (instanceConnectionName != null
+            && databaseName != null
+            && !instanceConnectionName.equals("")
             && this.dbProperties.getSqlType() != SQLServers.H2) {
 
-            String instanceConnectionName = env.get("INSTANCE_CONNECTION_NAME");
-            System.out.println("INSTANCE CONNECTION NAME:" + instanceConnectionName);
-            String databaseName = env.get("DB_NAME");
 
             config.setJdbcUrl(String.format("jdbc:mysql:///%s", databaseName));
             config.setUsername(username);

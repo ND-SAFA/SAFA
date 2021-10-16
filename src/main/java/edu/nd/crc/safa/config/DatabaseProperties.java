@@ -40,14 +40,14 @@ public class DatabaseProperties {
         assertValidCredentials();
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty("hibernate.dialect", getHibernateDialect());
-        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create");
+        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "update");
         return hibernateProperties;
     }
 
     private String getHibernateDialect() {
         switch (sqlType) {
             case MYSQL:
-                return "org.hibernate.dialect.MySQL5Dialect";
+                return "org.hibernate.dialect.MySQL5InnoDBDialect";
             case H2:
                 return "org.hibernate.dialect.H2Dialect";
             default:

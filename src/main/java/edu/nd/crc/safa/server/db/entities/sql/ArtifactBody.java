@@ -25,7 +25,7 @@ import org.json.JSONObject;
  * depending on the project version.
  */
 @Entity
-@Table(name = "artifact_content",
+@Table(name = "artifact_body",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "artifact_id", "version_id"

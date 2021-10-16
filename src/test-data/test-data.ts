@@ -1,0 +1,191 @@
+/* eslint-disable max-lines */
+import { Artifact } from "@/types/domain/artifact";
+import { TraceApproval, TraceLink, TraceType } from "@/types/domain/links";
+import { designs } from "@/test-data/designs";
+import { environementalAssumptions } from "@/test-data/environmental-assumptions";
+import { hazards } from "@/test-data/hazards";
+import { requirements } from "@/test-data/requirements";
+
+export const artifacts: Artifact[] = hazards
+  .concat(requirements)
+  .concat(designs)
+  .concat(environementalAssumptions);
+
+export const traces: TraceLink[] = [
+  {
+    target: "F9",
+    source: "F15",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F15",
+    source: "F16",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F15",
+    source: "F17",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F5",
+    source: "D1",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F5",
+    source: "D2",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F6",
+    source: "D3",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F6",
+    source: "D4",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F6",
+    source: "D5",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F10",
+    source: "D7",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F10",
+    source: "D9",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F11",
+    source: "F8",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F11",
+    source: "F9",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F1",
+    source: "EA1",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F1",
+    source: "F2",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F1",
+    source: "F3",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F1",
+    source: "F4",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F4",
+    source: "F20",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.DECLINED,
+    traceType: TraceType.GENERATED,
+  },
+  {
+    target: "F2",
+    source: "F5",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F2",
+    source: "F6",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F4",
+    source: "F11",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.GENERATED,
+  },
+  {
+    target: "F3",
+    source: "F10",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.MANUAL,
+  },
+  {
+    target: "F4",
+    source: "F21",
+    traceLinkId: "",
+    score: 1,
+    approvalStatus: TraceApproval.APPROVED,
+    traceType: TraceType.GENERATED,
+  },
+];

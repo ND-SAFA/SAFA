@@ -1,0 +1,24 @@
+<template>
+  <v-row justify="center">
+    <v-btn
+      small
+      text
+      color="error"
+      outlined
+      @click="$emit('closeAll')"
+      class="ma-1"
+    >
+      <v-icon>mdi-arrow-collapse-all</v-icon>
+    </v-btn>
+    <v-btn
+      small
+      text
+      color="primary"
+      outlined
+      @click="$emit('openAll')"
+      class="ma-1"
+    >
+      <v-icon>mdi-arrow-expand-all</v-icon>
+    </v-btn>
+  </v-row>
+</template>

@@ -1,0 +1,31 @@
+.artifact-container {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.artifact-header {
+  text-align: center;
+  border-bottom: 2px solid black;
+}
+.artifact-sub-header {
+  text-align: center;
+}
+
+.artifact-body {
+  padding: 5px;
+  text-align: center;
+  white-space: initial;
+  flex-grow: 1;
+}
+
+.artifact-warning {
+  background-color: #ffeb3b;
+  border: 1px solid black;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

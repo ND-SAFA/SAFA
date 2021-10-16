@@ -1,0 +1,67 @@
+<template>
+  <v-app class="application">
+    <v-main>
+      <v-container class="elevation-4">
+        <transition name="fade" mode="out-in">
+          <keep-alive>
+            <router-view />
+          </keep-alive>
+        </transition>
+      </v-container>
+    </v-main>
+    <AppBar :isLeftOpen="isLeftOpen" :isRightOpen="isRightOpen" />
+    <Snackbar :timeout="5000" />
+    <LeftNavDrawer :isLeftOpen="isLeftOpen" :width="250" />
+    <RightNavDrawer :isRightOpen="isRightOpen" :width="325" />
+    <ArtifactCreator
+      :isOpen="isArtifactCreatorOpen"
+      @onClose="closeArtifactCreator"
+    />
+  </v-app>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import Snackbar from "@/components/navigation/Snackbar.vue";
+import LeftNavDrawer from "@/components/side-panels/left/LeftNavDrawer.vue";
+import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
+import AppBar from "@/components/navigation/AppBar.vue";
+import ArtifactCreator from "@/components/common/modals/ArtifactCreator.vue";
+import { PanelType } from "@/types/store";
+import { appModule } from "@/store";
+
+
+export default Vue.extend({
+  name: "App",
+  components: {
+    Snackbar,
+    LeftNavDrawer,
+    RightNavDrawer,
+    AppBar,
+    ArtifactCreator,
+  },
+  computed: {
+    isLeftOpen(): boolean {
+      return appModule.getIsLeftOpen;
+    },
+    isRightOpen(): boolean {
+      return appModule.getIsRightOpen;
+    },
+    isArtifactCreatorOpen(): boolean {
+      return appModule.getIsArtifactCreatorOpen;
+    },
+  },
+  methods: {
+    closeArtifactCreator(): void {
+      appModule.closePanel(PanelType.artifactCreator);
+    },
+  },
+});
+</script>
+
+<style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400&display=swap");
+@import "./assets/app-styles.css";
+@import "./assets/artifact-styles.css";
+@import "./assets/context-menu.css";
+</style>

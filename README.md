@@ -1,28 +1,34 @@
-# safa-vue
+# vue2
 
-> SAFA Desktop
-
-#### Build Setup
-
-``` bash
-# install dependencies
+## Project setup
+```
 npm install
-
-# serve with hot reload at localhost:9080
-npm run dev
-
-# build electron application for production
-npm run build
-
-# run unit & end-to-end tests
-npm test
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
 ```
 
----
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Run your unit tests
+```
+npm run test:unit
+```
+
+### Run your end-to-end tests
+```
+npm run test:e2e
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

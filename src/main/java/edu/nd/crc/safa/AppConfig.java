@@ -38,6 +38,8 @@ public class AppConfig {
                                     @Value(value = "${sql.username}") String username,
                                     @Value(value = "${sql.password}") String password) throws ServerError {
         this.dbProperties = new DatabaseProperties(url, username, password);
+        System.out.print("CONNECTING TO:" + url);
+        System.out.println("With " + username + " via " + password);
         dbProperties.assertValidCredentials();
         BasicDataSource dataSource = new BasicDataSource();
 

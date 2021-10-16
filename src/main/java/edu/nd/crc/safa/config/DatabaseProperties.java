@@ -66,4 +66,8 @@ public class DatabaseProperties {
             throw new ServerError("MySQL password is null");
         }
     }
+
+    public SQLServers getSqlType() {
+        return this.sqlType;
+    }
 }

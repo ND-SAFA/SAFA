@@ -6,6 +6,9 @@ ARG DB_PASSWORD=secret3
 ARG DB_PORT=3306
 ARG DB_NAME=safa-db
 
+ENV DB_NAME=$DB_NAME
+ENV INSTANCE_CONNECTION_NAME=poised-elf-246319:us-central1:safa-db-dev
+
 ARG AppProperties=application-prod.properties
 ARG PathToProperties=/app/src/main/resources/$AppProperties
 

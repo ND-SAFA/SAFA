@@ -1,13 +1,16 @@
 package edu.nd.crc.safa;
 
+import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import edu.nd.crc.safa.config.DatabaseProperties;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.config.SQLServers;
 import edu.nd.crc.safa.server.messages.ServerError;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -38,17 +41,30 @@ public class AppConfig {
                                     @Value(value = "${sql.username}") String username,
                                     @Value(value = "${sql.password}") String password) throws ServerError {
         this.dbProperties = new DatabaseProperties(url, username, password);
-        System.out.print("CONNECTING TO:" + url);
-        System.out.println("With " + username + " via " + password);
         dbProperties.assertValidCredentials();
-        BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setUrl(dbProperties.url);
-        dataSource.setUsername(dbProperties.username);
-        dataSource.setPassword(dbProperties.password);
-        dataSource.setDriverClassName(dbProperties.getDriverClassName());
+        Map<String, String> env = System.getenv();
+        HikariConfig config = new HikariConfig();
+        if (env.containsKey("INSTANCE_CONNECTION_NAME")
+            && this.dbProperties.getSqlType() != SQLServers.H2) {
 
-        return dataSource;
+            String instanceConnectionName = env.get("INSTANCE_CONNECTION_NAME");
+            String databaseName = env.get("DB_NAME");
+
+            config.setJdbcUrl(String.format("jdbc:mysql:///%s", databaseName));
+            config.setUsername(username);
+            config.setPassword(password);
+
+            config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+            config.addDataSourceProperty("cloudSqlInstance", instanceConnectionName);
+            config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
+        } else {
+            config.setJdbcUrl(dbProperties.url);
+            config.setUsername(dbProperties.username);
+            config.setPassword(dbProperties.password);
+            config.setDriverClassName(dbProperties.getDriverClassName());
+        }
+        return new HikariDataSource(config);
     }
 
     @Bean

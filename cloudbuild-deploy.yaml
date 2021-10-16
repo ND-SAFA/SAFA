@@ -6,8 +6,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}' ]
   # Deploy container image to Cloud Run
-#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-#    entrypoint: gcloud
-#    args: [ 'run', 'deploy', '${_SERVICE_NAME}','--image', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}','--region', '${_REGION}' ]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [ 'run', 'deploy', '${_SERVICE_NAME}','--image', 'gcr.io/$PROJECT_ID/safa-bend-${_STAGE}','--region', '${_REGION}' ]
 images:
   - gcr.io/$PROJECT_ID/safa-bend-${_STAGE}

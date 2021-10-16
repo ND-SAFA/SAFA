@@ -49,14 +49,10 @@ public class AppConfig {
         String instanceConnectionName = env.get("ENV_INSTANCE_CONNECTION_NAME");
         String databaseName = env.get("ENV_DB_NAME");
 
-        System.out.println("INSTANCE CONNECTION NAME:" + instanceConnectionName);
-        System.out.println("DATABASE NAME:" + databaseName);
-
         if (instanceConnectionName != null
             && databaseName != null
             && !instanceConnectionName.equals("")
             && this.dbProperties.getSqlType() != SQLServers.H2) {
-
 
             config.setJdbcUrl(String.format("jdbc:mysql:///%s", databaseName));
             config.setUsername(username);
@@ -66,7 +62,6 @@ public class AppConfig {
             config.addDataSourceProperty("cloudSqlInstance", instanceConnectionName);
             config.addDataSourceProperty("ipTypes", "PUBLIC,PRIVATE");
         } else {
-            System.out.println("BASIC CONNECTION:" + dbProperties.url);
             config.setJdbcUrl(dbProperties.url);
             config.setUsername(dbProperties.username);
             config.setPassword(dbProperties.password);

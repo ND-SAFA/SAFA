@@ -17,8 +17,7 @@ COPY tsconfig.json ./
 COPY .eslintrc.js ./
 COPY vue.config.js ./
 
-RUN touch .env.production
-RUN sed -i -e "s,VUE_APP_API_ENDPOINT=http://localhost,VUE_APP_API_ENDPOINT=$API_ENDPOINT,g" .env.production
+RUN touch .env.production && echo "VUE_APP_API_ENDPOINT=$API_ENDPOINT" > .env.production
 
 RUN npm install --silent
 RUN npm run build

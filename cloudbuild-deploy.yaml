@@ -9,14 +9,6 @@ steps:
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
-      [
-        "run",
-        "deploy",
-        "${_SERVICE_NAME}",
-        "--image",
-        "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}",
-        "--region",
-        "${_REGION}"
-      ]
+      [ "run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}", "--region", "${_REGION}"]
 images:
   - gcr.io/$PROJECT_ID/safa-fend-${_STAGE}

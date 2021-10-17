@@ -1,6 +1,6 @@
 import { APIOptions, APIResponse, isAPIError } from "@/types/api";
 import { appModule } from "@/store";
-import { baseURL } from "./baseUrl";
+import { baseURL } from "@/api/base-url";
 
 export default async function httpClient<T>(
   relativeUrl: string,

@@ -3,7 +3,7 @@ import Stomp, { Frame } from "webstomp-client";
 import { getProjectVersion } from "@/api/project-api";
 import { Update } from "@/types/api";
 import { projectModule } from "@/store";
-import { baseURL } from "./baseUrl";
+import { baseURL } from "@/api/base-url";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
 

@@ -1,9 +1,8 @@
 # pull official base image
 FROM node:13.12.0-alpine
 
-ARG API_ENDPOINT="localhost"
-
-ENV API_ENDPOINT=$API_ENDPOINT
+ARG API_ENDPOINT
+RUN test -n "$API_ENDPOINT"
 
 # set working directory
 WORKDIR /app
@@ -12,12 +11,12 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 COPY src /app/src
-COPY .env ./
 COPY tsconfig.json ./
 COPY .eslintrc.js ./
 COPY vue.config.js ./
 
-RUN touch .env.production && echo "VUE_APP_API_ENDPOINT=$API_ENDPOINT" > .env.production
+RUN touch ./.env.production && echo "VUE_APP_API_ENDPOINT=$API_ENDPOINT" > ./.env.production
+RUN cat .env.production
 
 RUN npm install --silent
 RUN npm run build

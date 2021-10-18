@@ -40,7 +40,6 @@ public class DatabaseProperties {
         assertValidCredentials();
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty("hibernate.dialect", getHibernateDialect());
-        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "update");
         return hibernateProperties;
     }
 

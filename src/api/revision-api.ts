@@ -10,11 +10,13 @@ const WEBSOCKET_URL = `${baseURL}/websocket`;
 const sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
 const stompClient = Stomp.over(sock, { debug: false });
 
-stompClient.connect(
-  { host: WEBSOCKET_URL },
-  (frame) => console.log("ON CONNECT CALLED!", frame),
-  (e) => console.log("ERROR CONNECTING TO WEBSOCKET:", e)
-);
+function connect() {
+  stompClient.connect(
+    { host: WEBSOCKET_URL },
+    (frame) => console.log("ON CONNECT CALLED!", frame),
+    (e) => console.log("ERROR CONNECTING TO WEBSOCKET:", e)
+  );
+}
 
 function clearSubscriptions() {
   const subscriptionIds = Object.keys(stompClient.subscriptions);
@@ -25,6 +27,9 @@ export function connectAndSubscriptToVersion(
   projectId: string,
   versionId: string
 ): void {
+  if (!stompClient.connected) {
+    connect();
+  }
   clearSubscriptions();
   const projectSubscription = `/topic/projects/${projectId}`;
   const versionSubscription = `/topic/revisions/${versionId}`;
@@ -50,3 +55,5 @@ function revisionMessageHandler(versionId: string, frame: Frame): void {
       });
   }
 }
+
+connect();

@@ -71,11 +71,13 @@ public class AppConfig {
     }
 
     @Bean
-    public EntityManagerFactory entityManagerFactory(DataSource dataSource) throws ServerError {
+    public EntityManagerFactory entityManagerFactory(DataSource dataSource,
+                                                     @Value(value = "${spring.jpa.hibernate.ddl-auto}")
+                                                         String autoProperty) throws ServerError {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         HibernatePersistenceProvider provider = new HibernatePersistenceProvider();
         emf.setDataSource(dataSource);
-        emf.setJpaProperties(dbProperties.getConnectionProperties());
+        emf.setJpaProperties(dbProperties.getConnectionProperties(autoProperty));
         emf.setPersistenceProvider(provider);
         emf.setPackagesToScan(ProjectVariables.ENTITIES_PACKAGE);
         emf.afterPropertiesSet();

@@ -36,10 +36,12 @@ public class DatabaseProperties {
         }
     }
 
-    public Properties getConnectionProperties() throws ServerError {
+    public Properties getConnectionProperties(String autoProperty) throws ServerError {
         assertValidCredentials();
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty("hibernate.dialect", getHibernateDialect());
+        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", autoProperty);
+
         return hibernateProperties;
     }
 

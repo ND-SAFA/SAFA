@@ -77,7 +77,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.11'
 
     // testing
-    testImplementation 'com.h2database:h2:1.4.200'
+    implementation 'com.h2database:h2:1.4.200'
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.5') {
         exclude module: 'logback-classic'
     }

@@ -7,11 +7,9 @@ ARG INSTANCE_CONNECTION_NAME=""
 
 FROM gradle:6.9-jdk11 AS builder
 
-ARG DB_HOST
+ARG DB_URL
 ARG DB_USER
 ARG DB_PASSWORD
-ARG DB_PORT
-ARG DB_NAME
 ARG INSTANCE_CONNECTION_NAME
 
 ARG AppProperties=application-prod.properties
@@ -22,10 +20,10 @@ ADD src/ /app/src/
 ADD checkstyle.xml /app/
 ADD resources/ /app/resources/
 
-RUN sed -i -e "s,sql.url=,sql.url=jdbc:mysql://$DB_HOST:$DB_PORT/$DB_NAME,g" $PathToProperties
-RUN sed -i -e "s,sql.username=,sql.username=$DB_USER,g" $PathToProperties
-RUN sed -i -e "s,sql.password=,sql.password=$DB_PASSWORD,g" $PathToProperties
-RUN sed -i -e "s,sql.port=,sql.port=$DB_PORT,g" $PathToProperties
+RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
+RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
+RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
+RUN sed -i -e "s,cloudSqlInstance=,cloudSqlInstance=$INSTANCE_CONNECTION_NAME,g" $PathToProperties
 
 WORKDIR /app
 RUN gradle build --stacktrace

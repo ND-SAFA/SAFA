@@ -6,10 +6,12 @@ FROM gradle:6.9-jdk11 AS builder
 ARG DB_URL=jdbc:mysql://localhost:3606/safa-db
 ARG DB_USER=user
 ARG DB_PASSWORD=secret3
+ARG DB_INSTANCE=""
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
+RUN test -n "$DB_INSTANCE"
 
 ARG PathToProperties="/app/src/main/resources/application-prod.properties"
 
@@ -21,6 +23,7 @@ ADD resources/ /app/resources/
 RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
+RUN sed -i -e "s,cloudSqlInstance=,cloudSqlInstance=$DB_INSTANCE,g" $PathToProperties
 
 WORKDIR /app
 RUN gradle build --stacktrace

@@ -39,16 +39,16 @@
         </v-col>
       </v-row>
     </template>
-    <template>
+    <template v-slot:[`item.actions`]="{ item }">
       <v-icon
         v-if="hasEdit"
         small
         class="mr-2"
-        @click="$emit('onEditItem', $event)"
+        @click="$emit('onEditItem', item)"
       >
         mdi-pencil
       </v-icon>
-      <v-icon v-if="hasDelete" small @click="$emit('onDeleteItem', $event)">
+      <v-icon v-if="hasDelete" small @click="$emit('onDeleteItem', item)">
         mdi-delete
       </v-icon>
     </template>

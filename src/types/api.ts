@@ -25,7 +25,7 @@ export interface APIError {
 
 export interface APIErrorBody {
   message: string;
-  error: string[];
+  error: string;
 }
 
 export function isAPIError<T>(

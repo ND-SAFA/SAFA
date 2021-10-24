@@ -3,9 +3,7 @@ package edu.nd.crc.safa.server.db.entities.sql;
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -35,15 +33,11 @@ public class ProjectVersion implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "version_id")
-    UUID versionId; //todo: generate in sequence relative to project id using GenericGenerator
+    UUID versionId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(
-        name = "project_id",
-        foreignKey = @ForeignKey(value = ConstraintMode.PROVIDER_DEFAULT),
-        nullable = false
-    )
+    @JoinColumn(name = "project_id")
     Project project;
 
     @Column(name = "major_version", nullable = false)

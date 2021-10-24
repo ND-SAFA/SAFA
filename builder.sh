@@ -14,7 +14,7 @@ run() {
   JAR_PATH="$PWD/build/libs/edu.nd.crc.safa-0.1.0.jar"
 
   (
-      java -jar -Dspring.profiles.active=dev "$JAR_PATH"
+      java -jar -Dspring.profiles.active=dev "$JAR_PATH" --debug
   )
 }
 

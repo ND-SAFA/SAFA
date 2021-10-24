@@ -1,0 +1,8 @@
+{
+    "DataFiles": 
+      {
+        "SafetyRequirement": {
+          "File": "SafetyRequirements.csv"
+        }
+      }
+  }

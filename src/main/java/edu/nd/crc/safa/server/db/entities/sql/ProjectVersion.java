@@ -37,7 +37,7 @@ public class ProjectVersion implements Serializable {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     Project project;
 
     @Column(name = "major_version", nullable = false)

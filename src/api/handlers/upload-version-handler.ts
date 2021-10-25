@@ -13,7 +13,7 @@ import { ProjectCreationResponse } from "@/types/api";
  * @param onLoadEnd - Callback to indicate that loading has finsihed
  * @param onSuccess - Callback to call if upload was successful.
  */
-export function uploadNewProjectVersion(
+export async function uploadNewProjectVersion(
   selectedProject: ProjectIdentifier | undefined,
   selectedVersion: ProjectVersion | undefined,
   selectedFiles: File[],
@@ -21,7 +21,7 @@ export function uploadNewProjectVersion(
   onLoadStart: () => void,
   onLoadEnd: () => void,
   onSuccess: () => void
-): void {
+): Promise<void> {
   if (selectedProject === undefined) {
     appModule.onWarning("Please select a project to update");
   } else if (selectedVersion === undefined) {
@@ -35,10 +35,12 @@ export function uploadNewProjectVersion(
       formData.append("files", file);
     });
     if (setVersionIfSuccessful) {
-      projectModule.subscribeToVersion({
-        projectId: selectedProject.projectId,
-        versionId: selectedVersion.versionId,
-      });
+      await projectModule
+        .subscribeToVersion({
+          projectId: selectedProject.projectId,
+          versionId: selectedVersion.versionId,
+        })
+        .catch((e) => appModule.onError(e.message));
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)

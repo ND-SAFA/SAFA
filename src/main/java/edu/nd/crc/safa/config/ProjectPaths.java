@@ -16,6 +16,9 @@ public class ProjectPaths {
     public static final String PATH_TO_STORAGE = PATH_TO_BUILD + "/storage";
     public static final String PATH_TO_BEFORE_FILES = PATH_TO_ROOT + "/resources/before";
     public static final String PATH_TO_AFTER_FILES = PATH_TO_ROOT + "/resources/after";
+    public static final String PATH_TO_TEST_1 = PATH_TO_ROOT + "/resources/test1";
+    public static final String PATH_TO_TEST_2 = PATH_TO_ROOT + "/resources/test2";
+    public static final String PATH_TO_TEST_3 = PATH_TO_ROOT + "/resources/test3";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();

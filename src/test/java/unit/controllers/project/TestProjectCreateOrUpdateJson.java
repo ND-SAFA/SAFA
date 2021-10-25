@@ -208,7 +208,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
         projectJson.put("artifacts", new ArrayList<String>());
         projectJson.put("traces", new ArrayList<String>());
 
-        JSONObject response = sendPost(url, projectJson, status().isOk());
+        JSONObject response = sendPost(url, projectJson, status().isBadRequest());
         JSONObject body = response.getJSONObject("body");
         assertThat(response.getNumber("status")).isEqualTo(1);
         assertThat(body.getString("message")).contains("description").contains("null");

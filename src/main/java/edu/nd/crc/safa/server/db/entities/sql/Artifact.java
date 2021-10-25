@@ -20,9 +20,14 @@ import org.hibernate.annotations.Type;
  * in a project.
  */
 @Entity
-@Table(name = "artifact", uniqueConstraints = {@UniqueConstraint(name = "unique_name_in_project", columnNames = {
-    "project_id",
-    "name"})})
+@Table(name = "artifact",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {
+                "project_id",
+                "name"
+            }, name = "UNIQUE_ARTIFACT_NAME_PER_PROJECT")
+    })
 public class Artifact implements Serializable {
 
     @Id

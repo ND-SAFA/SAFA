@@ -38,8 +38,8 @@ public class FileUtilities {
 
             return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new ServerError("Could not read CSV file at path: " + pathToFile, e);
+            String error = String.format("Could not read CSV file at path: %s", pathToFile);
+            throw new ServerError(error, e);
         }
     }
 
@@ -68,7 +68,7 @@ public class FileUtilities {
         StringBuilder b = new StringBuilder();
         b.append('[');
         for (int i = 0; ; i++) {
-            b.append(String.valueOf(a[i]));
+            b.append(a[i]);
             if (i == iMax) {
                 return b.append(']').toString();
             }

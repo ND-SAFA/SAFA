@@ -5,6 +5,7 @@ import { MessageType, PanelType } from "@/types/store";
 import type { SnackbarMessage } from "@/types/store";
 
 import type { PanelState } from "@/types/store";
+import { APIErrorBody } from "@/types/api";
 export interface ChannelSubscriptionId {
   projectId?: string;
   versionId?: string;
@@ -16,6 +17,7 @@ export default class ProjectModule extends VuexModule {
   isLoading = false;
   isLeftOpen = false;
   isRightOpen = false;
+  isErrorDisplayOpen = false;
   isArtifactCreatorOpen = false;
 
   @Action
@@ -27,24 +29,34 @@ export default class ProjectModule extends VuexModule {
     this.SET_IS_LOADING(false);
   }
   @Action
+  onServerError(error: APIErrorBody): void {
+    console.error(error.message);
+    const { message, errors } = error;
+    this.SET_MESSAGE({
+      message,
+      type: MessageType.ERROR,
+      errors,
+    });
+  }
+  @Action
   onError(message: string): void {
     console.error(message);
-    this.SET_MESSAGE({ message, type: MessageType.ERROR });
+    this.SET_MESSAGE({ message, type: MessageType.ERROR, errors: [] });
   }
   @Action
   onMessage(message: string): void {
     console.log(message);
-    this.SET_MESSAGE({ message, type: MessageType.INFO });
+    this.SET_MESSAGE({ message, type: MessageType.INFO, errors: [] });
   }
   @Action
   onWarning(message: string): void {
     console.warn(message);
-    this.SET_MESSAGE({ message, type: MessageType.WARNING });
+    this.SET_MESSAGE({ message, type: MessageType.WARNING, errors: [] });
   }
   @Action
   onSuccess(message: string): void {
     console.log(message);
-    this.SET_MESSAGE({ message, type: MessageType.SUCCESS });
+    this.SET_MESSAGE({ message, type: MessageType.SUCCESS, errors: [] });
   }
   @Action
   toggleRightPanel(): void {
@@ -95,6 +107,7 @@ export default class ProjectModule extends VuexModule {
     this.snackbarMessage = {
       message: "This feature is under construction",
       type: MessageType.WARNING,
+      errors: [],
     };
   }
   @Mutation
@@ -109,6 +122,9 @@ export default class ProjectModule extends VuexModule {
         break;
       case PanelType.artifactCreator:
         this.isArtifactCreatorOpen = isOpen;
+        break;
+      case PanelType.errorDisplay:
+        this.isErrorDisplayOpen = isOpen;
         break;
       default:
         throw Error("Unrecognized panel: " + panelState.type);
@@ -139,5 +155,8 @@ export default class ProjectModule extends VuexModule {
   }
   get getIsArtifactCreatorOpen(): boolean {
     return this.isArtifactCreatorOpen;
+  }
+  get getIsErrorDisplayOpen(): boolean {
+    return this.isErrorDisplayOpen;
   }
 }

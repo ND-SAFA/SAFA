@@ -47,7 +47,7 @@ export default class ProjectModule extends VuexModule {
   ): Promise<void> {
     const { projectId, versionId } = subscriptionId;
     if (projectId !== undefined && versionId !== undefined) {
-      connectAndSubscriptToVersion(projectId, versionId);
+      await connectAndSubscriptToVersion(projectId, versionId);
     }
   }
 

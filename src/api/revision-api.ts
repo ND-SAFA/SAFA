@@ -11,7 +11,7 @@ let stompClient: Client;
 
 let recInterval: NodeJS.Timeout;
 let currentReconnectAttempts = 0;
-const MAX_RECONNECT_ATTEMPTS = 10;
+const MAX_RECONNECT_ATTEMPTS = 20;
 const RECONNECT_WAIT_TIME = 5000;
 
 function getStompClient(reconnect = false): Client {

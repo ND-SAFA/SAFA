@@ -150,9 +150,6 @@ export default Vue.extend({
         .then((projects) => {
           this.projects = projects;
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        })
         .finally(() => (this.isLoading = false));
     },
     deleteProjectHandler(project: ProjectIdentifier) {
@@ -162,9 +159,6 @@ export default Vue.extend({
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
-        })
-        .catch((e) => {
-          appModule.onError(e.message);
         })
         .finally(() => (this.isLoading = false));
     },
@@ -192,8 +186,8 @@ export default Vue.extend({
             projectRemoved
           );
         })
-        .catch((e) => {
-          appModule.onError(e.message);
+        .finally(() => {
+          this.isLoading = false;
         });
     },
   },

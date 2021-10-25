@@ -83,7 +83,7 @@ export default Vue.extend({
             appModule.onSuccess("Delta state was updated successfully.");
           });
         } else {
-          appModule.onError("Project source version is not selected.");
+          appModule.onWarning("Project source version is not selected.");
         }
       }
     },

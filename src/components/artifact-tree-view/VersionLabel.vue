@@ -1,9 +1,10 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <label text outlined color="primary">
+      <label v-if="containsProject" text outlined color="primary">
         {{ projectName }}@{{ versionName }}
       </label>
+      <label v-else text outlined color="primary"> No project selected. </label>
     </v-row>
   </v-container>
 </template>
@@ -23,6 +24,9 @@ export default Vue.extend({
   computed: {
     project(): Project {
       return projectModule.getProject;
+    },
+    containsProject(): boolean {
+      return this.project.projectId !== "";
     },
   },
   watch: {

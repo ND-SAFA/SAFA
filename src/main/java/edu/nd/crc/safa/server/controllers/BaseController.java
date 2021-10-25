@@ -41,7 +41,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleValidationError(MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder errorMessage = new StringBuilder();
@@ -57,13 +57,13 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(Exception ex) {
         ex.printStackTrace();
-        ServerError wrapper = new ServerError("unknown activity", ex);
+        ServerError wrapper = new ServerError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
     }
 
     protected Project getProject(String projectId) throws ServerError {
         Optional<Project> queriedProject = this.projectRepository.findById(UUID.fromString(projectId));
-        if (!queriedProject.isPresent()) {
+        if (queriedProject.isEmpty()) {
             throw new ServerError("Could not find project with id:" + projectId);
         }
         return queriedProject.get();

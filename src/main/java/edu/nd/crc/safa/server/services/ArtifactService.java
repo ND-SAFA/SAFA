@@ -70,7 +70,15 @@ public class ArtifactService {
 
         List<ArtifactBody> allArtifactBodies = new ArrayList<>(artifactBodies);
         allArtifactBodies.addAll(removedBodies);
-        this.artifactBodyRepository.saveAll(allArtifactBodies);
+
+        for (ArtifactBody body : allArtifactBodies) {
+            try {
+                this.artifactBodyRepository.save(body);
+            } catch (Exception e) {
+                String error = String.format("An error occurred while parsing artifact: %s", body.getName());
+                throw new ServerError(error, e);
+            }
+        }
     }
 
     public void addArtifactToVersion(ProjectVersion projectVersion, ArtifactAppEntity a) throws ServerError {

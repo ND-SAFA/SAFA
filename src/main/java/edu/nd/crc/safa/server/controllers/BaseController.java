@@ -11,6 +11,7 @@ import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -49,6 +50,17 @@ public abstract class BaseController {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
         ServerError error = new ServerError(errorMessage.toString());
+        error.setDetails(exception.getMessage());
+        return new ServerResponse(error, ResponseCodes.FAILURE);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        exception.printStackTrace();
+        String causeName = exception.getMostSpecificCause().toString();
+        String errorMessage = String.format("Data integrity violation: %s", causeName);
+        ServerError error = new ServerError(errorMessage, exception);
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }

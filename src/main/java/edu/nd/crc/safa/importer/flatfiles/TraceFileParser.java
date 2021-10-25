@@ -108,24 +108,9 @@ public class TraceFileParser {
         throws ServerError {
         String sourceTypeName = traceMatrixDefinition.getString(SOURCE_PARAM);
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
-        Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, sourceTypeName);
-
-        if (!sourceTypeQuery.isPresent()) {
-            String errorMessage = "Source artifact type does not exist: %s";
-            String error = String.format(errorMessage, sourceTypeName);
-            throw new ServerError(error);
-        }
-
-        Optional<ArtifactType> targetTypeQuery = this.artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, targetTypeName);
-        if (!targetTypeQuery.isPresent()) {
-            String errorMessage = "Target artifact type does not exist: %s";
-            String error = String.format(errorMessage, targetTypeName);
-            throw new ServerError(error);
-        }
-
-        return Pair.with(sourceTypeQuery.get(), targetTypeQuery.get());
+        ArtifactType sourceType = findArtifactType(project, sourceTypeName);
+        ArtifactType targetType = findArtifactType(project, targetTypeName);
+        return Pair.with(sourceType, targetType);
     }
 
     public List<TraceLink> parseTraceFile(ProjectVersion projectVersion,
@@ -158,5 +143,19 @@ public class TraceFileParser {
             }
         }
         return traceLinks;
+    }
+
+    private ArtifactType findArtifactType(Project project, String typeName) throws ServerError {
+        Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
+            .findByProjectAndNameIgnoreCase(project, typeName);
+
+        if (sourceTypeQuery.isEmpty()) {
+            List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
+            String errorMessage = String.format("Unexpected artifact type: %s. Expected one of: %s",
+                typeName,
+                artifactTypes);
+            throw new ServerError(errorMessage);
+        }
+        return sourceTypeQuery.get();
     }
 }

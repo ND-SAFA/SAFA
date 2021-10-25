@@ -20,7 +20,7 @@ import org.hibernate.annotations.Type;
  * in a project.
  */
 @Entity
-@Table(name = "artifacts", uniqueConstraints = {@UniqueConstraint(name = "unique_name_in_project", columnNames = {
+@Table(name = "artifact", uniqueConstraints = {@UniqueConstraint(name = "unique_name_in_project", columnNames = {
     "project_id",
     "name"})})
 public class Artifact implements Serializable {

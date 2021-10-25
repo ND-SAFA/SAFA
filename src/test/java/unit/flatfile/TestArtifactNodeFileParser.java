@@ -5,10 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
+import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.db.entities.sql.ArtifactFile;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.json.JSONObject;
@@ -24,9 +25,10 @@ public class TestArtifactNodeFileParser extends EntityBaseTest {
 
     @Test
     public void parseDesignArtifacts() throws Exception {
-        ProjectVersion projectVersion = createProjectUploadedResources("testProject");
+        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
         Project project = projectVersion.getProject();
 
+        // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {\n"
             + "      \"file\": \"Design.csv\"\n"
@@ -34,6 +36,7 @@ public class TestArtifactNodeFileParser extends EntityBaseTest {
             + "  }");
         artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
 
+        // VP - Verify that all design artifacts are created
         List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
         assertThat(projectArtifacts.size())
             .as("artifacts created")
@@ -43,7 +46,7 @@ public class TestArtifactNodeFileParser extends EntityBaseTest {
 
     @Test
     public void missingFileKey() throws Exception {
-        ProjectVersion projectVersion = createProjectUploadedResources("testProject");
+        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
 
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {}\n"

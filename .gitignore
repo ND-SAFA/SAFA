@@ -6,8 +6,8 @@ build/
 !**/src/test/**
 application-credentials.json
 **/application-prod.properties
+**/application-deploy.properties
 docker-build.sh
-
 ### STS ###
 .apt_generated
 .classpath

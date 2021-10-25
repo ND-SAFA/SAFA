@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.messages;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class ServerError extends Exception {
 
     public ServerError(String message) {
         this.message = message;
+        this.errors = new ArrayList<>();
     }
 
     public ServerError(Exception e) {

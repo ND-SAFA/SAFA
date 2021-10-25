@@ -36,12 +36,11 @@ public class TestTraceFileParser extends EntityBaseTest {
         Project project = projectVersion.getProject();
         JSONObject traceMatrixDefinition = new JSONObject(jsonString);
 
-        // VP - verify that target type not found
+        // VP - verify that source type not found
         Exception sourceException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(sourceException.getMessage()).as("source error message")
-            .containsIgnoringCase("source").contains("not exist");
+        assertThat(sourceException.getMessage()).contains("Unexpected artifact type: Requirement");
 
         // VP - verify that source type is found but not target
         ArtifactType sourceType = new ArtifactType(project, sourceTypeName);
@@ -49,8 +48,7 @@ public class TestTraceFileParser extends EntityBaseTest {
         Exception targetException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(targetException.getMessage()).as("target error message")
-            .containsIgnoringCase("target").contains("not exist");
+        assertThat(targetException.getMessage()).contains("Unexpected artifact type: Design");
 
         // VP - verify that source and target types found
         ArtifactType targetType = new ArtifactType(project, targetTypeName);

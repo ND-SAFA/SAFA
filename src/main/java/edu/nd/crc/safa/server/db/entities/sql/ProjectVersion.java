@@ -24,7 +24,7 @@ import org.json.JSONObject;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "project_id", "major_version", "minor_version", "revision"
-        })
+        }, name = "UNIQUE_VERSION_ID_PER_PROJECT")
     }
 )
 public class ProjectVersion implements Serializable {

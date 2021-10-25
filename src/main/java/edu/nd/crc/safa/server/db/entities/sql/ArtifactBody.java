@@ -29,7 +29,7 @@ import org.json.JSONObject;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "artifact_id", "version_id"
-        })
+        }, name = "UNIQUE_ARTIFACT_BODY_PER_VERSION")
     }
 )
 public class ArtifactBody implements Serializable {
@@ -45,7 +45,7 @@ public class ArtifactBody implements Serializable {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "artifact_id")
+    @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
 
     @ManyToOne

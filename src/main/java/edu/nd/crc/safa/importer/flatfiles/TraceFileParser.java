@@ -139,7 +139,8 @@ public class TraceFileParser {
         try {
             records = traceFileParser.getRecords();
         } catch (IOException e) {
-            throw new ServerError("unable to read trace file: " + fileName, e);
+            String error = String.format("Unable to read trace file: %s", fileName);
+            throw new ServerError(error, e);
         }
 
         List<TraceLink> traceLinks = new ArrayList<>();

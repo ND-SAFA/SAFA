@@ -32,7 +32,7 @@ public class TestTraceFileParser extends EntityBaseTest {
     public void testSourceTypeNotFound() throws IOException, ServerError {
         String sourceTypeName = "requirement";
         String targetTypeName = "design";
-        ProjectVersion projectVersion = createProjectUploadedResources("testName");
+        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
         Project project = projectVersion.getProject();
         JSONObject traceMatrixDefinition = new JSONObject(jsonString);
 
@@ -59,7 +59,5 @@ public class TestTraceFileParser extends EntityBaseTest {
             traceMatrixDefinition);
         assertThat(artifactTypes.getValue0().getName()).as("source type found").isEqualTo(sourceTypeName);
         assertThat(artifactTypes.getValue1().getName()).as("target type found").isEqualTo(targetTypeName);
-
-        projectService.deleteProject(project);
     }
 }

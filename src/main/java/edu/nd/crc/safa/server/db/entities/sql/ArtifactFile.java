@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 /**
  * Responsible for mapping which TIM files
@@ -54,5 +55,13 @@ public class ArtifactFile {
         this.project = project;
         this.artifactType = artifactType;
         this.fileName = fileName;
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("project", project.getProjectId());
+        json.put("artifactType", this.artifactType);
+        json.put("fileName", this.fileName);
+        return json.toString();
     }
 }

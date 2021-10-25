@@ -91,7 +91,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
         sendRequest(beforeRequest, MockMvcResultMatchers.status().isCreated());
     }
 
-    public ProjectVersion createProjectUploadedResources(String projectName) throws ServerError, IOException {
+    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws ServerError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(

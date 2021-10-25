@@ -1,0 +1,15 @@
+{
+  "DataFiles": {
+    "SafetyRequirements": {
+      "File": "SafetyRequirements.csv"
+    },
+    "Requirements": {
+      "File": "Requirements.csv"
+    }
+  },
+  "RequirementsToSafetyRequirements": {
+    "Source": "Requirements",
+    "Target": "SafetyRequirements",
+    "File": "Requirements2SafetyRequirements.csv"
+  }
+}

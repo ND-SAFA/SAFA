@@ -43,7 +43,7 @@ public class ArtifactFile {
     )
     ArtifactType artifactType;
 
-    @Column(name = "fileName", nullable = false)
+    @Column(name = "file_name", nullable = false)
     String fileName;
 
     public ArtifactFile() {

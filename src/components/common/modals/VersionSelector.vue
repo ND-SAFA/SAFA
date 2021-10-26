@@ -13,7 +13,7 @@
     @onRefresh="refresh"
   >
     <template v-slot:addItemDialogue>
-      <version-creator
+      <VersionCreator
         :isOpen="addVersionDialogue"
         :project="project"
         @onClose="onCreatorClose"
@@ -21,7 +21,7 @@
       />
     </template>
     <template v-slot:deleteItemDialogue>
-      <confirm-version-delete
+      <ConfirmVersionDelete
         :version="versionToDelete"
         :deleteDialogue="deleteVersionDialogue"
         @onCancelDelete="cancelDelete"

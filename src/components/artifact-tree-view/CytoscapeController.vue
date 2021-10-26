@@ -3,6 +3,7 @@
     :config="config"
     :preConfig="preConfig"
     :afterCreated="afterCreated"
+    style="max-height: 300px"
   >
     <slot name="elements" />
   </cytoscape>

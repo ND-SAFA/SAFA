@@ -1,5 +1,5 @@
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import store, { appModule, projectModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/project-api";
 import { ProjectCreationResponse } from "@/types/api";
 

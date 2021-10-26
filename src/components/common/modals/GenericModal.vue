@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="isOpen" :width="width" @click:outside="$emit('onClose')">
-    <v-card>
+    <v-card height="500px">
       <v-card-title class="grey lighten-2">
         <ModalTitle :title="title" @onClose="$emit('onClose')" />
       </v-card-title>
@@ -57,3 +57,19 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+html {
+  overflow: hidden !important;
+}
+
+.v-card {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.v-card__text {
+  flex-grow: 1;
+  overflow: auto;
+}
+</style>

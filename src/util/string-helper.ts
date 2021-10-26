@@ -38,6 +38,8 @@ export function getArtifactTypePrintName(type: string): string {
       return "Hazards";
     case "environmentalassumption":
       return "Environmental Assumptions";
+    case "safetyrequirement":
+      return "Safety Requirement";
     default:
       throw Error("Unrecognized artifact type:" + type);
   }

@@ -21,21 +21,25 @@
         <slot name="beforeItems" />
 
         <v-stepper-content :step="projectStep">
-          <ProjectSelector
-            :isOpen="isOpen"
-            @onProjectSelected="selectProject"
-            @onProjectUnselected="unselectProject"
-          />
+          <v-container class="pa-10">
+            <ProjectSelector
+              :isOpen="isOpen"
+              @onProjectSelected="selectProject"
+              @onProjectUnselected="unselectProject"
+            />
+          </v-container>
         </v-stepper-content>
 
         <v-stepper-content :step="versionStep">
-          <VersionSelector
-            v-if="selectedProject !== undefined"
-            :isOpen="isOpen"
-            :project="selectedProject"
-            @onVersionSelected="selectVersion"
-            @onVersionUnselected="unselectVersion"
-          />
+          <v-container class="pl-10 pr-10 pt-0 pb-0">
+            <VersionSelector
+              v-if="selectedProject !== undefined"
+              :isOpen="isOpen"
+              :project="selectedProject"
+              @onVersionSelected="selectVersion"
+              @onVersionUnselected="unselectVersion"
+            />
+          </v-container>
         </v-stepper-content>
 
         <slot name="afterItems" />
@@ -46,7 +50,7 @@
 
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import ProjectSelector from "@/components/common/modals/ProjectSelector.vue";
+import ProjectSelector from "@/components/common/ProjectSelector.vue";
 import VersionSelector from "@/components/common/modals/VersionSelector.vue";
 import Vue, { PropType } from "vue";
 import {
@@ -93,6 +97,16 @@ export default Vue.extend({
     value: {
       type: Number,
       required: true,
+    },
+  },
+  watch: {
+    isOpen(isOpen: boolean) {
+      if (isOpen) {
+        this.currentSteps = [
+          SELECT_PROJECT_DEFAULT_NAME,
+          SELECT_VERSION_DEFAULT_NAME,
+        ];
+      }
     },
   },
   computed: {

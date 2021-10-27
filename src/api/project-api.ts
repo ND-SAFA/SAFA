@@ -69,18 +69,24 @@ export async function deleteProject(projectId: string): Promise<void> {
 }
 
 export async function getProjectVersions(
-  project: Project
+  projectId: string
 ): Promise<ProjectVersion[]> {
-  const url = `${PROJECTS_API_PATH}/${project.projectId}/versions`;
+  if (projectId === undefined || projectId === "") {
+    throw Error("Undefined project identifier");
+  }
+  const url = `${PROJECTS_API_PATH}/${projectId}/versions`;
   return httpClient<ProjectVersion[]>(url, {
     method: "GET",
   });
 }
 
 export async function getCurrentVersion(
-  project: Project
+  projectId: string
 ): Promise<ProjectVersion> {
-  const url = `${PROJECTS_API_PATH}/${project.projectId}/versions/current`;
+  if (projectId === undefined || projectId === "") {
+    throw Error("Undefined project identifier");
+  }
+  const url = `${PROJECTS_API_PATH}/${projectId}/versions/current`;
   return httpClient<ProjectVersion>(url, {
     method: "GET",
   });

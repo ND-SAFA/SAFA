@@ -1,12 +1,20 @@
 <template>
-  <v-dialog :value="isOpen" :width="width" @click:outside="$emit('onClose')">
-    <v-card height="500px">
+  <v-dialog
+    :value="isOpen"
+    :width="`${getWidth()}px`"
+    @click:outside="$emit('onClose')"
+  >
+    <v-card :height="`${getHeight()}px`">
       <v-card-title class="grey lighten-2">
         <ModalTitle :title="title" @onClose="$emit('onClose')" />
       </v-card-title>
 
       <v-card-text>
-        <slot name="body" />
+        <v-row class="ma-0 pa-0" style="height: 100%">
+          <v-col align-self="center" class="ma-0 pa-0">
+            <slot name="body" />
+          </v-col>
+        </v-row>
       </v-card-text>
 
       <v-divider />
@@ -24,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import ModalTitle from "@/components/common/modals/ModalTitle.vue";
 export default Vue.extend({
   components: {
@@ -39,11 +47,6 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    width: {
-      type: Number,
-      required: false,
-      default: 700,
-    },
     actionsHeight: {
       type: Number,
       required: false,
@@ -53,6 +56,45 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: false,
+    },
+    size: {
+      type: String as PropType<"xxs" | "xs" | "s" | "m" | "l">,
+      required: false,
+      default: "m",
+    },
+  },
+  methods: {
+    getHeight(): number {
+      switch (this.size) {
+        case "xxs":
+          return 150;
+        case "xs":
+          return 200;
+        case "s":
+          return 300;
+        case "m":
+          return 500;
+        case "l":
+          return 550;
+        default:
+          return 400;
+      }
+    },
+    getWidth(): number {
+      switch (this.size) {
+        case "xxs":
+          return 250;
+        case "xs":
+          return 300;
+        case "s":
+          return 400;
+        case "m":
+          return 600;
+        case "l":
+          return 800;
+        default:
+          return 400;
+      }
     },
   },
 });

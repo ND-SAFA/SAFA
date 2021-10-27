@@ -68,11 +68,6 @@ export default Vue.extend({
     this.loadItems();
   },
   watch: {
-    isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.loadItems();
-      }
-    },
     project() {
       this.loadItems();
     },
@@ -102,6 +97,7 @@ export default Vue.extend({
     onVersionCreated(version: ProjectVersion) {
       this.versions = [version].concat(this.versions);
       this.addVersionDialogue = false;
+      this.$emit("onVersionSelected", version);
     },
     cancelDelete() {
       this.deleteVersionDialogue = false;
@@ -120,13 +116,16 @@ export default Vue.extend({
     },
     loadItems() {
       this.isLoading = true;
-      getProjectVersions(this.$props.project)
-        .then((versions: ProjectVersion[]) => {
-          this.versions = versions;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      const project: ProjectIdentifier = this.$props.project;
+      if (project !== undefined) {
+        getProjectVersions(project.projectId)
+          .then((versions: ProjectVersion[]) => {
+            this.versions = versions;
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      }
     },
   },
 });

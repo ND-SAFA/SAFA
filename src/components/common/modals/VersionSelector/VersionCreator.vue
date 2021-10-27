@@ -1,16 +1,14 @@
 <template>
   <GenericModal
-    title="Create new version"
+    :title="`Current Version: ${versionToString(currentVersion)}`"
+    size="xs"
     :isOpen="isOpen"
-    :width="500"
     @onClose="onClose"
+    :actionsHeight="0"
   >
     <template v-slot:body>
       <v-container>
         <v-row justify="center">
-          CurrentVersion: {{ versionToString(currentVersion) }}
-        </v-row>
-        <v-row justify="center" class="mt-5">
           <v-btn outlined text color="primary" @click="() => onClick('major')">
             New Major Version: {{ nextVersion("major") }}
           </v-btn>
@@ -68,16 +66,11 @@ export default Vue.extend({
       currentVersion: undefined as ProjectVersion | undefined,
     };
   },
-  mounted() {
-    getCurrentVersion(this.$props.project).then(
-      (version) => (this.currentVersion = version)
-    );
-  },
   methods: {
-    versionToString() {
+    versionToString(): string {
       return versionToString(this.currentVersion);
     },
-    nextVersion(type: VersionType) {
+    nextVersion(type: VersionType): string {
       if (this.currentVersion === undefined) {
         return "X.X.X";
       }
@@ -118,6 +111,16 @@ export default Vue.extend({
     },
     onClose() {
       this.$emit("onClose");
+    },
+  },
+
+  watch: {
+    isOpen(isOpen: boolean) {
+      if (isOpen) {
+        getCurrentVersion(this.project.projectId).then(
+          (version) => (this.currentVersion = version)
+        );
+      }
     },
   },
 });

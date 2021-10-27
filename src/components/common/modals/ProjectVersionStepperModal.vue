@@ -4,14 +4,14 @@
     :isOpen="isOpen"
     :isLoading="isLoading"
     @onClose="onClose"
+    size="l"
   >
     <template v-slot:body>
-      <ProjectAndVersionModal
+      <ProjectAndVersionStepper
         v-model="currentStep"
         v-bind:selectedProject.sync="selectedProject"
         v-bind:selectedVersion.sync="selectedVersion"
         :isOpen="isOpen"
-        :stepNames="projectVersionStepNames"
         :beforeSteps="beforeStepNames"
         :afterSteps="afterStepNames"
       >
@@ -21,7 +21,7 @@
         <template v-slot:afterItems>
           <slot name="afterItems" />
         </template>
-      </ProjectAndVersionModal>
+      </ProjectAndVersionStepper>
     </template>
     <template v-slot:actions>
       <v-container class="ma-0 pa-0">
@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ProjectAndVersionModal from "@/components/common/modals/ProjectAndVersionModal.vue";
+import ProjectAndVersionStepper from "@/components/common/modals/ProjectAndVersionStepper.vue";
 import GenericModal from "@/components/common/modals/GenericModal.vue";
 import {
   OptionalProjectIdentifier,
@@ -69,7 +69,7 @@ import {
 export default Vue.extend({
   name: "baseline-version-modal",
   components: {
-    ProjectAndVersionModal,
+    ProjectAndVersionStepper,
     GenericModal,
   },
   props: {
@@ -79,10 +79,6 @@ export default Vue.extend({
     },
     title: {
       type: String,
-      required: true,
-    },
-    projectVersionStepNames: {
-      type: Array as PropType<Array<string>>,
       required: true,
     },
     beforeSteps: {
@@ -184,11 +180,7 @@ export default Vue.extend({
       return this.projectStep + 1;
     },
     numberOfSteps(): number {
-      return (
-        this.beforeSteps.length +
-        this.projectVersionStepNames.length +
-        this.afterSteps.length
-      );
+      return this.beforeSteps.length + 2 + this.afterSteps.length;
     },
     beforeStepNames(): string[] {
       return this.beforeSteps.map((step) => step[0]);

@@ -65,13 +65,14 @@ export default Vue.extend({
     this.clearData();
   },
   watch: {
-    project(newProject: ProjectIdentifier) {
-      this.name = newProject.name;
-      this.description = newProject.description;
-    },
     isOpen(isOpen: boolean) {
       if (isOpen) {
-        this.clearData();
+        if (this.project !== undefined) {
+          this.name = this.project.name;
+          this.description = this.project.description;
+        } else {
+          this.clearData();
+        }
       }
     },
   },

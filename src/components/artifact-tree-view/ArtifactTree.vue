@@ -1,5 +1,5 @@
 <template>
-  <v-container class="elevation-3" style="height: 300px">
+  <v-container class="elevation-3">
     <CytoscapeController>
       <template v-slot:elements>
         <ArtifactNode

@@ -3,13 +3,12 @@
     v-model="currentStep"
     title="Upload Flat Files"
     :isOpen="isOpen"
-    v-bind:isLoading.sync="isLoading"
-    :projectVersionStepNames="['Select Project', 'Select Version']"
     :afterSteps="[['Upload Files', filesSelected.length > 0]]"
-    @onSubmit="onSubmit"
-    @onClose="onClose"
+    v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
+    @onSubmit="onSubmit"
+    @onClose="onClose"
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">

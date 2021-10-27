@@ -1,25 +1,22 @@
 <template>
   <GenericModal
     :isOpen="isOpen"
-    :width="500"
     :title="title"
+    size="s"
     :actionsHeight="50"
     @onClose="onClose"
   >
     <template v-slot:body>
-      <v-container>
+      <v-container class="mb-0 pb-0">
         <v-row>
-          <v-col cols="6">
-            <v-text-field v-model="name" label="Project Name" required />
-          </v-col>
-
-          <v-col cols="6">
-            <v-text-field
-              v-model="description"
-              label="Project description"
-              required
-            ></v-text-field>
-          </v-col>
+          <v-text-field v-model="name" label="Project Name" required />
+        </v-row>
+        <v-row>
+          <v-text-field
+            v-model="description"
+            label="Project description"
+            required
+          />
         </v-row>
       </v-container>
     </template>

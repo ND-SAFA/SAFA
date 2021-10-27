@@ -68,7 +68,7 @@ export default Vue.extend({
   methods: {
     loadGeneratedLinks() {
       if (this.projectId === "") {
-        return appModule.onError("No project has been selected");
+        return appModule.onWarning("No project has been selected");
       }
       getGeneratedLinks(this.projectId).then((links) => {
         links.forEach((link) => {

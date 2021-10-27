@@ -29,3 +29,8 @@
   justify-content: center;
 }
 
+#cy-container,
+#cytoscape-div {
+  max-height: 400px !important;
+  min-height: 400px !important;
+}

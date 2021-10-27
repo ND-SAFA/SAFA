@@ -2,42 +2,53 @@ import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { getProjectVersion } from "@/api/project-api";
 import { Update } from "@/types/api";
-import { projectModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { baseURL } from "@/api/base-url";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
 let sock: WebSocket;
 let stompClient: Client;
 
-function getStompClient(recconnect = false): Client {
-  if (sock === undefined || stompClient === undefined || recconnect) {
-    sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
-    sock.onclose = () => {
-      console.log("web socket close");
-      connect().then();
-    };
-    stompClient = Stomp.over(sock, { debug: false });
+let recInterval: NodeJS.Timeout;
+let currentReconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 20;
+const RECONNECT_WAIT_TIME = 5000;
+
+function getStompClient(reconnect = false): Client {
+  if (sock === undefined || stompClient === undefined || reconnect) {
+    try {
+      sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
+      sock.onclose = () => {
+        console.log("web socket close");
+        connect().then();
+      };
+      stompClient = Stomp.over(sock, { debug: false });
+    } catch (e) {
+      if (!reconnect) {
+        throw e;
+      }
+    }
   }
   return stompClient;
 }
-
-let recInterval: NodeJS.Timeout;
-let currentReconnectAttempts = 0;
-const MAX_RECONNECT_ATTEMPTS = 30;
 
 function connect(isReconnect = false): Promise<void> {
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
     if (stomp.connected) {
       console.log("already connected!");
+      clearInterval(recInterval);
       resolve();
     }
 
-    console.log("attempting web socket connection");
+    console.log("web socket connection attempt:", currentReconnectAttempts);
     currentReconnectAttempts++;
     stomp.connect(
       { host: WEBSOCKET_URL },
       () => {
+        if (currentReconnectAttempts > 1) {
+          appModule.onSuccess("Web Socket reconnected to server.");
+        }
         console.log("connection successful");
         clearInterval(recInterval);
         currentReconnectAttempts = 0;
@@ -45,15 +56,20 @@ function connect(isReconnect = false): Promise<void> {
       },
       () => {
         console.log("attempting re-connect!");
+        if (!isReconnect) {
+          appModule.onError("Web Socket lost connection to server.");
+        }
+        clearInterval(recInterval);
         recInterval = setInterval(function () {
           if (currentReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             connect(true).then(resolve).catch(reject);
           } else {
+            clearInterval(recInterval);
             reject(
               "Reached max web socket reconnect attempts, please reload page."
             );
           }
-        }, 2000);
+        }, RECONNECT_WAIT_TIME);
       }
     );
   });

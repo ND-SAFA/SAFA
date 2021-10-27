@@ -9,12 +9,13 @@ import { Artifact } from "@/types/domain/artifact";
  *APP STATE
  */
 export enum MessageType {
-  INFO,
-  SUCCESS,
-  ERROR,
-  WARNING,
+  INFO = "info",
+  SUCCESS = "success",
+  ERROR = "error",
+  WARNING = "warning",
 }
 export interface SnackbarMessage {
+  errors: string[];
   message: string;
   type: MessageType;
 }
@@ -23,6 +24,7 @@ export enum PanelType {
   left,
   right,
   artifactCreator,
+  errorDisplay,
 }
 
 export interface PanelState {

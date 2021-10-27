@@ -21,7 +21,8 @@ export default async function httpClient<T>(
       .then((a) => a.json())
       .then((responseJson: APIResponse<T>) => {
         if (isAPIError(responseJson)) {
-          reject(new Error(responseJson.body.error));
+          appModule.onServerError(responseJson.body);
+          reject(responseJson.body.message);
         } else {
           resolve(responseJson.body);
         }

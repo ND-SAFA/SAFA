@@ -49,8 +49,7 @@ export default Vue.extend({
             this.isLoading = false;
             this.$emit("onClose");
           })
-          .catch((e) => {
-            appModule.onError(e.message);
+          .finally(() => {
             this.isLoading = false;
             this.$emit("onClose");
           });

@@ -116,9 +116,6 @@ export default Vue.extend({
             (v) => v.versionId != version.versionId
           );
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        })
         .finally(() => (this.isLoading = false));
     },
     loadItems() {
@@ -126,11 +123,9 @@ export default Vue.extend({
       getProjectVersions(this.$props.project)
         .then((versions: ProjectVersion[]) => {
           this.versions = versions;
-          this.isLoading = false;
         })
-        .catch((e) => {
+        .finally(() => {
           this.isLoading = false;
-          appModule.onError(e.message);
         });
     },
   },

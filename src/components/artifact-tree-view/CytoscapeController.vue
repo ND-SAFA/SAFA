@@ -10,10 +10,6 @@
 </template>
 
 <script lang="ts">
-import { GRAPH_CONFIG } from "@/cytoscape/styles/config/graph";
-import { CytoCore } from "@/types/cytoscape";
-import { edgeHandleOptions } from "@/cytoscape/edge-handles/options";
-import { setEdgeHandlesCore } from "@/cytoscape/edge-handles/index";
 import Vue from "vue";
 import contextMenus from "cytoscape-context-menus";
 import nodeHtmlLabel from "cytoscape-node-html-label";
@@ -23,6 +19,10 @@ import edgehandles from "cytoscape-edgehandles";
 import { contextMenuOptions } from "@/cytoscape/context-menu";
 import { resolveCy } from "@/cytoscape/cytoscape";
 import { viewportModule } from "@/store";
+import { GRAPH_CONFIG } from "@/cytoscape/styles/config/graph";
+import { CytoCore } from "@/types/cytoscape";
+import { edgeHandleOptions } from "@/cytoscape/edge-handles/options";
+import { setEdgeHandlesCore } from "@/cytoscape/edge-handles/index";
 
 export default Vue.extend({
   data: () => {

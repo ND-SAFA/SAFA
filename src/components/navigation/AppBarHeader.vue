@@ -49,7 +49,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      newProjectOpen: false,
       openProjectOpen: false,
       uploadVersionOpen: false,
       definitions: [] as ButtonDefinition[], // defined once module has been created
@@ -58,9 +57,6 @@ export default Vue.extend({
   methods: {
     uploadVersionClick(): void {
       this.uploadVersionOpen = true;
-    },
-    newProjectClick(): void {
-      this.newProjectOpen = true;
     },
     openProjectClick(): void {
       this.openProjectOpen = true;
@@ -72,8 +68,8 @@ export default Vue.extend({
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
-        menuItems: ["New", "Open"],
-        menuHandlers: [this.newProjectClick, this.openProjectClick],
+        menuItems: ["Select Project"],
+        menuHandlers: [this.openProjectClick],
       },
       {
         type: ButtonType.LIST_MENU,

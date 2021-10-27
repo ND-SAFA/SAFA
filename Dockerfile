@@ -20,10 +20,10 @@ RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
 
-RUN if [[ ! -z "$DB_INSTANCE" ]] ; \
+RUN if [ ! -z "$DB_INSTANCE" ] ; \
     then \
-      echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE\n" >> $PathToProperties \
-      echo "spring.datasource.hikari.data-source-properties.socketFactory=com.google.cloud.sql.mysql.SocketFactory\n" >> $PathToProperties ; \
+      echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE" >> $PathToProperties && \
+      echo "spring.datasource.hikari.data-source-properties.socketFactory=com.google.cloud.sql.mysql.SocketFactory" >> $PathToProperties ; \
     fi
 RUN cat $PathToProperties
 

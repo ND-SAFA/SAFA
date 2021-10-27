@@ -12,3 +12,5 @@ steps:
       [ "run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}", "--region", "${_REGION}"]
 images:
   - gcr.io/$PROJECT_ID/safa-fend-${_STAGE}
+
+timeout: 900s

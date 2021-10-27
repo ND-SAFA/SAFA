@@ -11,7 +11,6 @@
         v-bind:selectedProject.sync="selectedProject"
         v-bind:selectedVersion.sync="selectedVersion"
         :isOpen="isOpen"
-        :stepNames="projectVersionStepNames"
         :beforeSteps="beforeStepNames"
         :afterSteps="afterStepNames"
       >
@@ -79,10 +78,6 @@ export default Vue.extend({
     },
     title: {
       type: String,
-      required: true,
-    },
-    projectVersionStepNames: {
-      type: Array as PropType<Array<string>>,
       required: true,
     },
     beforeSteps: {
@@ -184,11 +179,7 @@ export default Vue.extend({
       return this.projectStep + 1;
     },
     numberOfSteps(): number {
-      return (
-        this.beforeSteps.length +
-        this.projectVersionStepNames.length +
-        this.afterSteps.length
-      );
+      return this.beforeSteps.length + 2 + this.afterSteps.length;
     },
     beforeStepNames(): string[] {
       return this.beforeSteps.map((step) => step[0]);

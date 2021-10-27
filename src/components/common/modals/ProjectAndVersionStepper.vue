@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-stepper v-model="currentStep">
+    <v-stepper v-model="currentStep" alt-labels>
       <v-stepper-header>
         <template v-for="(stepName, stepIndex) in stepNames">
           <v-stepper-step
             :complete="currentStep > stepIndex + 1"
             :step="stepIndex + 1"
-            :key="stepName"
+            :key="stepIndex"
           >
             {{ stepName }}
           </v-stepper-step>
@@ -53,6 +53,10 @@ import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
 } from "@/types/common-components";
+import { versionToString } from "@/util/to-string";
+
+const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
+const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 
 export default Vue.extend({
   name: "ProjectAndVersionStepper",
@@ -60,17 +64,16 @@ export default Vue.extend({
     ProjectSelector,
     VersionSelector,
   },
+  data() {
+    return {
+      currentSteps: [SELECT_PROJECT_DEFAULT_NAME, SELECT_VERSION_DEFAULT_NAME],
+    };
+  },
   props: {
     beforeSteps: {
       type: Array as PropType<Array<string>>,
       required: false,
       default: () => [] as string[],
-    },
-    currentSteps: {
-      type: Array as PropType<Array<string>>,
-      required: false,
-      default: () =>
-        ["Select a Project to Modify", "Select a Project Version"] as string[],
     },
     afterSteps: {
       type: Array as PropType<Array<string>>,
@@ -126,19 +129,30 @@ export default Vue.extend({
     versionStep(): number {
       return this.projectStep + 1;
     },
+    totalSteps(): number {
+      return this.stepNames.length;
+    },
   },
   methods: {
     selectProject(project: ProjectIdentifier) {
       this.project = project;
+      this.currentStep++;
+      Vue.set(this.currentSteps, 0, project.name);
     },
     unselectProject() {
       this.project = undefined;
+      Vue.set(this.currentSteps, 0, SELECT_PROJECT_DEFAULT_NAME);
     },
     selectVersion(version: ProjectVersion) {
       this.projectVersion = version;
+      Vue.set(this.currentSteps, 1, versionToString(version));
+      if (this.versionStep < this.totalSteps) {
+        this.currentStep++;
+      }
     },
     unselectVersion() {
       this.projectVersion = undefined;
+      Vue.set(this.currentSteps, 1, SELECT_VERSION_DEFAULT_NAME);
     },
   },
 });

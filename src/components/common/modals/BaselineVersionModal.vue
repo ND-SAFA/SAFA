@@ -2,7 +2,6 @@
   <ProjectVersionStepperModal
     title="Select Baseline Project Version"
     :isOpen="isOpen"
-    :projectVersionStepNames="['Select Project', 'Select Version']"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"

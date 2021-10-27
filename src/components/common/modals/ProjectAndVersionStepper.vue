@@ -55,7 +55,7 @@ import {
 } from "@/types/common-components";
 
 export default Vue.extend({
-  name: "ProjectAndVersionModal",
+  name: "ProjectAndVersionStepper",
   components: {
     ProjectSelector,
     VersionSelector,

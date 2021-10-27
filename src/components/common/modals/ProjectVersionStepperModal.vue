@@ -6,7 +6,7 @@
     @onClose="onClose"
   >
     <template v-slot:body>
-      <ProjectAndVersionModal
+      <ProjectAndVersionStepper
         v-model="currentStep"
         v-bind:selectedProject.sync="selectedProject"
         v-bind:selectedVersion.sync="selectedVersion"
@@ -21,7 +21,7 @@
         <template v-slot:afterItems>
           <slot name="afterItems" />
         </template>
-      </ProjectAndVersionModal>
+      </ProjectAndVersionStepper>
     </template>
     <template v-slot:actions>
       <v-container class="ma-0 pa-0">
@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ProjectAndVersionModal from "@/components/common/modals/ProjectAndVersionModal.vue";
+import ProjectAndVersionStepper from "@/components/common/modals/ProjectAndVersionStepper.vue";
 import GenericModal from "@/components/common/modals/GenericModal.vue";
 import {
   OptionalProjectIdentifier,
@@ -69,7 +69,7 @@ import {
 export default Vue.extend({
   name: "baseline-version-modal",
   components: {
-    ProjectAndVersionModal,
+    ProjectAndVersionStepper,
     GenericModal,
   },
   props: {

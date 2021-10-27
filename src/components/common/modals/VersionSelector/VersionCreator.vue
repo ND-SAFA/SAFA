@@ -68,16 +68,11 @@ export default Vue.extend({
       currentVersion: undefined as ProjectVersion | undefined,
     };
   },
-  mounted() {
-    getCurrentVersion(this.$props.project).then(
-      (version) => (this.currentVersion = version)
-    );
-  },
   methods: {
-    versionToString() {
+    versionToString(): string {
       return versionToString(this.currentVersion);
     },
-    nextVersion(type: VersionType) {
+    nextVersion(type: VersionType): string {
       if (this.currentVersion === undefined) {
         return "X.X.X";
       }
@@ -118,6 +113,16 @@ export default Vue.extend({
     },
     onClose() {
       this.$emit("onClose");
+    },
+  },
+
+  watch: {
+    isOpen(isOpen: boolean) {
+      if (isOpen) {
+        getCurrentVersion(this.project.projectId).then(
+          (version) => (this.currentVersion = version)
+        );
+      }
     },
   },
 });

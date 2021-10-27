@@ -4,6 +4,7 @@
     :isOpen="isOpen"
     :isLoading="isLoading"
     @onClose="onClose"
+    size="l"
   >
     <template v-slot:body>
       <ProjectAndVersionStepper

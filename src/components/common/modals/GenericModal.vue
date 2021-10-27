@@ -10,7 +10,11 @@
       </v-card-title>
 
       <v-card-text>
-        <slot name="body" />
+        <v-row class="ma-0 pa-0" style="height: 100%">
+          <v-col align-self="center" class="ma-0 pa-0">
+            <slot name="body" />
+          </v-col>
+        </v-row>
       </v-card-text>
 
       <v-divider />
@@ -54,7 +58,7 @@ export default Vue.extend({
       default: false,
     },
     size: {
-      type: String as PropType<"xs" | "s" | "m" | "l">,
+      type: String as PropType<"xxs" | "xs" | "s" | "m" | "l">,
       required: false,
       default: "m",
     },
@@ -62,6 +66,8 @@ export default Vue.extend({
   methods: {
     getHeight(): number {
       switch (this.size) {
+        case "xxs":
+          return 150;
         case "xs":
           return 200;
         case "s":
@@ -69,13 +75,15 @@ export default Vue.extend({
         case "m":
           return 500;
         case "l":
-          return 600;
+          return 550;
         default:
           return 400;
       }
     },
     getWidth(): number {
       switch (this.size) {
+        case "xxs":
+          return 250;
         case "xs":
           return 300;
         case "s":

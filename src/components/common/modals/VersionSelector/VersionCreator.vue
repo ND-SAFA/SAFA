@@ -1,16 +1,14 @@
 <template>
   <GenericModal
-    title="Create new version"
+    :title="`Current Version: ${versionToString(currentVersion)}`"
+    size="xs"
     :isOpen="isOpen"
-    :size="m"
     @onClose="onClose"
+    :actionsHeight="0"
   >
     <template v-slot:body>
       <v-container>
         <v-row justify="center">
-          CurrentVersion: {{ versionToString(currentVersion) }}
-        </v-row>
-        <v-row justify="center" class="mt-5">
           <v-btn outlined text color="primary" @click="() => onClick('major')">
             New Major Version: {{ nextVersion("major") }}
           </v-btn>

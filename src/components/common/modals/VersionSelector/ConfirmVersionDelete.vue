@@ -1,6 +1,6 @@
 <template>
   <GenericModal
-    size="xs"
+    size="xxs"
     :isOpen="deleteDialogue"
     :title="title"
     @onClose="onCancel"

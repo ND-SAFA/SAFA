@@ -2,7 +2,7 @@
   <GenericModal
     title="Create new version"
     :isOpen="isOpen"
-    :width="500"
+    :size="m"
     @onClose="onClose"
   >
     <template v-slot:body>

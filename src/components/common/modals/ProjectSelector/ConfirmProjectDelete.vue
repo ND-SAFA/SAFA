@@ -1,10 +1,5 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
-    :width="500"
-    :title="title"
-    @onClose="onCancel"
-  >
+  <GenericModal size="xs" :isOpen="isOpen" :title="title" @onClose="onCancel">
     <template v-slot:body>
       <v-container>
         <v-row justify="center">

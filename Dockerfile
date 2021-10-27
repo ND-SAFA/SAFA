@@ -1,29 +1,38 @@
 # Creates application-prod.properties with database connection details.
 # Copies configuration files to test and build server.
 #
-FROM gradle:6.9-jdk11 AS builder
+FROM ubuntu:12.04 as config
 
-ARG DB_URL=jdbc:mysql://localhost:3606/safa-db
-ARG DB_USER=user
-ARG DB_PASSWORD=secret3
-ARG DB_INSTANCE=""
+ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
+ARG DB_USER=root
+ARG DB_PASSWORD=secret2
+ARG DB_INSTANCE
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
-RUN test -n "$DB_INSTANCE"
 
 ARG PathToProperties="/app/src/main/resources/application-prod.properties"
 
 ADD src /app/src
-ADD build.gradle /app/
-ADD checkstyle.xml /app/
-ADD resources/ /app/resources/
 
 RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
-RUN sed -i -e "s,cloudSqlInstance=,cloudSqlInstance=$DB_INSTANCE,g" $PathToProperties
+
+RUN if [[ ! -z "$DB_INSTANCE" ]] ; \
+    then \
+      echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE\n" >> $PathToProperties \
+      echo "spring.datasource.hikari.data-source-properties.socketFactory=com.google.cloud.sql.mysql.SocketFactory\n" >> $PathToProperties ; \
+    fi
+RUN cat $PathToProperties
+
+FROM gradle:6.9-jdk11 AS builder
+
+ADD build.gradle /app/
+ADD checkstyle.xml /app/
+ADD resources/ /app/resources/
+COPY --from=config /app/src /app/src
 
 WORKDIR /app
 RUN gradle build --stacktrace

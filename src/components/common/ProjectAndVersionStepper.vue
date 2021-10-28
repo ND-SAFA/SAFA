@@ -51,7 +51,7 @@
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 import ProjectSelector from "@/components/common/ProjectSelector.vue";
-import VersionSelector from "@/components/common/modals/VersionSelector.vue";
+import VersionSelector from "@/components/common/VersionSelector.vue";
 import Vue, { PropType } from "vue";
 import {
   OptionalProjectIdentifier,

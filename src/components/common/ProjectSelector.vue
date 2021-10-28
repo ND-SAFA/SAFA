@@ -48,7 +48,7 @@ import {
 } from "@/api/project-api";
 import { DataItem, ProjectCreationResponse } from "@/types/api";
 import { ProjectIdentifier } from "@/types/domain/project";
-import GenericSelector from "@/components/common/modals/GenericSelector.vue";
+import GenericSelector from "@/components/common/GenericSelector.vue";
 import ProjectCreator from "@/components/common/ProjectSelector/ProjectCreator.vue";
 import ConfirmProjectDelete from "@/components/common/ProjectSelector/ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "@/components/common/ProjectSelector/headers";

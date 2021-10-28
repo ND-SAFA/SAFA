@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import VersionSelector from "@/components/common/modals/VersionSelector.vue";
+import VersionSelector from "@/components/common/VersionSelector.vue";
 import { Project, ProjectVersion } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
 import { getProjectDelta } from "@/api/project-api";

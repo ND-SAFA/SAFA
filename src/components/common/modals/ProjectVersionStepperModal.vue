@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ProjectAndVersionStepper from "@/components/common/modals/ProjectAndVersionStepper.vue";
+import ProjectAndVersionStepper from "@/components/common/ProjectAndVersionStepper.vue";
 import GenericModal from "@/components/common/modals/GenericModal.vue";
 import {
   OptionalProjectIdentifier,

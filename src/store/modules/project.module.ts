@@ -47,7 +47,7 @@ export default class ProjectModule extends VuexModule {
   ): Promise<void> {
     const { projectId, versionId } = subscriptionId;
     if (projectId !== undefined && versionId !== undefined) {
-      connectAndSubscriptToVersion(projectId, versionId);
+      await connectAndSubscriptToVersion(projectId, versionId);
     }
   }
 
@@ -110,7 +110,9 @@ export default class ProjectModule extends VuexModule {
         (a) => a.name === artifactName
       );
       if (query.length === 0) {
-        appModule.onError(`Could not find artifact with name: ${artifactName}`);
+        appModule.onWarning(
+          `Could not find artifact with name: ${artifactName}`
+        );
       } else if (query.length > 1) {
         appModule.onWarning(
           `Found more than one artifact with name: ${artifactName}`

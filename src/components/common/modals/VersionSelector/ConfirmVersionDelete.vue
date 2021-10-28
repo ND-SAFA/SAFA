@@ -1,12 +1,13 @@
 <template>
   <GenericModal
+    size="xxs"
     :isOpen="deleteDialogue"
-    :width="500"
     :title="title"
     @onClose="onCancel"
+    :actionsHeight="0"
   >
     <template v-slot:body>
-      <v-container>
+      <v-container class="mt-5 mb-0 pb-0">
         <v-row justify="center">
           <v-btn color="error" @click="onConfirm"> Delete Version </v-btn>
         </v-row>

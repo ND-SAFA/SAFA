@@ -1,10 +1,5 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
-    :width="500"
-    :title="title"
-    @onClose="onCancel"
-  >
+  <GenericModal size="xs" :isOpen="isOpen" :title="title" @onClose="onCancel">
     <template v-slot:body>
       <v-container>
         <v-row justify="center">
@@ -37,6 +32,7 @@
 import { ProjectIdentifier } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/modals/GenericModal.vue";
+
 export default Vue.extend({
   components: { GenericModal },
   props: {
@@ -77,7 +73,7 @@ export default Vue.extend({
     project(project: ProjectIdentifier) {
       if (project !== undefined) {
         this.textboxLabel = `Type "${project.name}"`;
-        this.title = `Confirm project name: ${project.name}`;
+        this.title = `Deleting: ${project.name}`;
         this.submitButtonLabel = `Delete Project ${project.name}`;
       }
     },

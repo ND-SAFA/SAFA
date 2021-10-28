@@ -1,5 +1,5 @@
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import store, { appModule, projectModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/project-api";
 import { ProjectCreationResponse } from "@/types/api";
 
@@ -11,17 +11,17 @@ import { ProjectCreationResponse } from "@/types/api";
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful
  * @param onLoadStart - Callback to indicate that loading should be displayed
  * @param onLoadEnd - Callback to indicate that loading has finsihed
- * @param onSuccess - Callback to call if upload was successful.
+ * @param onFinally - Callback to call if upload was successful.
  */
-export function uploadNewProjectVersion(
+export async function uploadNewProjectVersion(
   selectedProject: ProjectIdentifier | undefined,
   selectedVersion: ProjectVersion | undefined,
   selectedFiles: File[],
   setVersionIfSuccessful: boolean,
   onLoadStart: () => void,
   onLoadEnd: () => void,
-  onSuccess: () => void
-): void {
+  onFinally: () => void
+): Promise<void> {
   if (selectedProject === undefined) {
     appModule.onWarning("Please select a project to update");
   } else if (selectedVersion === undefined) {
@@ -35,24 +35,23 @@ export function uploadNewProjectVersion(
       formData.append("files", file);
     });
     if (setVersionIfSuccessful) {
-      projectModule.subscribeToVersion({
-        projectId: selectedProject.projectId,
-        versionId: selectedVersion.versionId,
-      });
+      await projectModule
+        .subscribeToVersion({
+          projectId: selectedProject.projectId,
+          versionId: selectedVersion.versionId,
+        })
+        .catch((e) => appModule.onError(e.message));
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)
       .then((res: ProjectCreationResponse) => {
-        onLoadEnd();
         appModule.onSuccess(
           `Flat files were uploaded successfuly and ${res.project.name} was updated.`
         );
-
-        onSuccess();
       })
-      .catch((e) => {
+      .finally(() => {
         onLoadEnd();
-        appModule.onError(e.message);
+        onFinally();
       });
   }
 }

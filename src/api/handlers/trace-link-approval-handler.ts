@@ -1,5 +1,5 @@
 import { TraceApproval, TraceLink } from "@/types/domain/links";
-import store, { appModule, projectModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/link-api";
 
 export function linkAPIHandler(
@@ -8,10 +8,7 @@ export function linkAPIHandler(
   onSuccess: () => void
 ): void {
   appModule.onLoadStart();
-  linkAPI(link.traceLinkId)
-    .then(onSuccess)
-    .catch((e) => appModule.onError(e.message))
-    .finally(appModule.onLoadEnd);
+  linkAPI(link.traceLinkId).then(onSuccess).finally(appModule.onLoadEnd);
 }
 
 export function approveLinkAPIHandler(

@@ -13,7 +13,7 @@
     @onRefresh="refresh"
   >
     <template v-slot:addItemDialogue>
-      <version-creator
+      <VersionCreator
         :isOpen="addVersionDialogue"
         :project="project"
         @onClose="onCreatorClose"
@@ -21,7 +21,7 @@
       />
     </template>
     <template v-slot:deleteItemDialogue>
-      <confirm-version-delete
+      <ConfirmVersionDelete
         :version="versionToDelete"
         :deleteDialogue="deleteVersionDialogue"
         @onCancelDelete="cancelDelete"
@@ -68,11 +68,6 @@ export default Vue.extend({
     this.loadItems();
   },
   watch: {
-    isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.loadItems();
-      }
-    },
     project() {
       this.loadItems();
     },
@@ -102,6 +97,7 @@ export default Vue.extend({
     onVersionCreated(version: ProjectVersion) {
       this.versions = [version].concat(this.versions);
       this.addVersionDialogue = false;
+      this.$emit("onVersionSelected", version);
     },
     cancelDelete() {
       this.deleteVersionDialogue = false;
@@ -116,22 +112,20 @@ export default Vue.extend({
             (v) => v.versionId != version.versionId
           );
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        })
         .finally(() => (this.isLoading = false));
     },
     loadItems() {
       this.isLoading = true;
-      getProjectVersions(this.$props.project)
-        .then((versions: ProjectVersion[]) => {
-          this.versions = versions;
-          this.isLoading = false;
-        })
-        .catch((e) => {
-          this.isLoading = false;
-          appModule.onError(e.message);
-        });
+      const project: ProjectIdentifier = this.$props.project;
+      if (project !== undefined) {
+        getProjectVersions(project.projectId)
+          .then((versions: ProjectVersion[]) => {
+            this.versions = versions;
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      }
     },
   },
 });

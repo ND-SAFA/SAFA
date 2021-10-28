@@ -27,17 +27,17 @@ import LeftNavDrawer from "@/components/side-panels/left/LeftNavDrawer.vue";
 import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
 import AppBar from "@/components/navigation/AppBar.vue";
 import ArtifactCreator from "@/components/common/modals/ArtifactCreator.vue";
+
 import { PanelType } from "@/types/store";
 import { appModule } from "@/store";
-
 
 export default Vue.extend({
   name: "App",
   components: {
+    AppBar,
     Snackbar,
     LeftNavDrawer,
     RightNavDrawer,
-    AppBar,
     ArtifactCreator,
   },
   computed: {

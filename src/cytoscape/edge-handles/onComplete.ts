@@ -26,7 +26,7 @@ function getVersionId(beforeError: () => void): string {
   if (versionId === undefined) {
     const errorMessage =
       "Please select a project version before creating trace links";
-    appModule.onError(errorMessage);
+    appModule.onWarning(errorMessage);
     beforeError();
     throw Error(errorMessage);
   }

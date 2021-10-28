@@ -1,3 +1,5 @@
+import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+
 export enum ButtonType {
   ICON = "icon",
   TEXT = "text",
@@ -37,3 +39,6 @@ export interface CheckmarkMenuDefinition extends MenuDefinition {
   icon?: string;
   checkmarkValues: boolean[];
 }
+
+export type OptionalProjectIdentifier = ProjectIdentifier | undefined;
+export type OptionalProjectVersion = ProjectVersion | undefined;

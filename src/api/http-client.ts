@@ -1,6 +1,6 @@
 import { APIOptions, APIResponse, isAPIError } from "@/types/api";
 import { appModule } from "@/store";
-import { baseURL } from "./baseUrl";
+import { baseURL } from "@/api/base-url";
 
 export default async function httpClient<T>(
   relativeUrl: string,
@@ -21,7 +21,8 @@ export default async function httpClient<T>(
       .then((a) => a.json())
       .then((responseJson: APIResponse<T>) => {
         if (isAPIError(responseJson)) {
-          reject(new Error(responseJson.body.message));
+          appModule.onServerError(responseJson.body);
+          reject(responseJson.body.message);
         } else {
           resolve(responseJson.body);
         }

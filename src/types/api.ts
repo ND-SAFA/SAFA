@@ -24,8 +24,9 @@ export interface APIError {
 }
 
 export interface APIErrorBody {
+  details: string;
   message: string;
-  error: string[];
+  errors: string[]; //list of stack traces
 }
 
 export function isAPIError<T>(

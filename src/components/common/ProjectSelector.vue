@@ -49,9 +49,9 @@ import {
 import { DataItem, ProjectCreationResponse } from "@/types/api";
 import { ProjectIdentifier } from "@/types/domain/project";
 import GenericSelector from "@/components/common/modals/GenericSelector.vue";
-import ProjectCreator from "@/components/common/modals/ProjectSelector/ProjectCreator.vue";
-import ConfirmProjectDelete from "@/components/common/modals/ProjectSelector/ConfirmProjectDelete.vue";
-import { projectSelectorHeaders } from "@/components/common/modals/ProjectSelector/headers";
+import ProjectCreator from "@/components/common/ProjectSelector/ProjectCreator.vue";
+import ConfirmProjectDelete from "@/components/common/ProjectSelector/ConfirmProjectDelete.vue";
+import { projectSelectorHeaders } from "@/components/common/ProjectSelector/headers";
 import Vue from "vue";
 import { appModule } from "@/store";
 
@@ -70,7 +70,6 @@ export default Vue.extend({
   data() {
     return {
       selected: undefined as ProjectIdentifier | undefined,
-      message: "hello",
       projects: [] as ProjectIdentifier[],
       headers: projectSelectorHeaders,
       editProjectDialogue: false,
@@ -104,7 +103,11 @@ export default Vue.extend({
     },
     onSaveAddProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject, "created");
+      this.saveOrUpdateProjectHandler(newProject, "created").then(
+        (projectCreated: ProjectCreationResponse) => {
+          this.$emit("onProjectSelected", projectCreated.project);
+        }
+      );
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
@@ -150,9 +153,6 @@ export default Vue.extend({
         .then((projects) => {
           this.projects = projects;
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        })
         .finally(() => (this.isLoading = false));
     },
     deleteProjectHandler(project: ProjectIdentifier) {
@@ -163,38 +163,39 @@ export default Vue.extend({
             (p) => p.projectId !== project.projectId
           );
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        })
         .finally(() => (this.isLoading = false));
     },
     saveOrUpdateProjectHandler(
       project: ProjectIdentifier,
       operation: "updated" | "created"
-    ) {
-      saveOrUpdateProject({
-        projectId: project.projectId,
-        description: project.description,
-        name: project.name,
-        artifacts: [],
-        traces: [],
-      })
-        .then((res: ProjectCreationResponse) => {
-          appModule.onSuccess(
-            `${res.project.name} was successfully ${operation}.`
-          );
-          this.isLoading = false;
-          const projectRemoved = this.projects.filter(
-            (p) => res.project.projectId !== p.projectId
-          );
-
-          this.projects = [res.project as ProjectIdentifier].concat(
-            projectRemoved
-          );
+    ): Promise<ProjectCreationResponse> {
+      return new Promise<ProjectCreationResponse>((resolve, reject) => {
+        saveOrUpdateProject({
+          projectId: project.projectId,
+          description: project.description,
+          name: project.name,
+          artifacts: [],
+          traces: [],
         })
-        .catch((e) => {
-          appModule.onError(e.message);
-        });
+          .then((res: ProjectCreationResponse) => {
+            appModule.onSuccess(
+              `${res.project.name} was successfully ${operation}.`
+            );
+            this.isLoading = false;
+            const projectRemoved = this.projects.filter(
+              (p) => res.project.projectId !== p.projectId
+            );
+
+            this.projects = [res.project as ProjectIdentifier].concat(
+              projectRemoved
+            );
+            resolve(res);
+          })
+          .catch(reject)
+          .finally(() => {
+            this.isLoading = false;
+          });
+      });
     },
   },
 });

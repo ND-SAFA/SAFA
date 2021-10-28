@@ -11,6 +11,7 @@ import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -41,7 +42,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleValidationError(MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder errorMessage = new StringBuilder();
@@ -53,17 +54,28 @@ public abstract class BaseController {
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        exception.printStackTrace();
+        String causeName = exception.getMostSpecificCause().toString();
+        String errorMessage = String.format("Data integrity violation: %s", causeName);
+        ServerError error = new ServerError(errorMessage, exception);
+        error.setDetails(exception.getMessage());
+        return new ServerResponse(error, ResponseCodes.FAILURE);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(Exception ex) {
         ex.printStackTrace();
-        ServerError wrapper = new ServerError("unknown activity", ex);
+        ServerError wrapper = new ServerError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
     }
 
     protected Project getProject(String projectId) throws ServerError {
         Optional<Project> queriedProject = this.projectRepository.findById(UUID.fromString(projectId));
-        if (!queriedProject.isPresent()) {
+        if (queriedProject.isEmpty()) {
             throw new ServerError("Could not find project with id:" + projectId);
         }
         return queriedProject.get();

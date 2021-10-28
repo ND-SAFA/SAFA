@@ -32,16 +32,15 @@ public class TestTraceFileParser extends EntityBaseTest {
     public void testSourceTypeNotFound() throws IOException, ServerError {
         String sourceTypeName = "requirement";
         String targetTypeName = "design";
-        ProjectVersion projectVersion = createProjectUploadedResources("testName");
+        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
         Project project = projectVersion.getProject();
         JSONObject traceMatrixDefinition = new JSONObject(jsonString);
 
-        // VP - verify that target type not found
+        // VP - verify that source type not found
         Exception sourceException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(sourceException.getMessage()).as("source error message")
-            .containsIgnoringCase("source").contains("not exist");
+        assertThat(sourceException.getMessage()).contains("Unexpected artifact type: Requirement");
 
         // VP - verify that source type is found but not target
         ArtifactType sourceType = new ArtifactType(project, sourceTypeName);
@@ -49,8 +48,7 @@ public class TestTraceFileParser extends EntityBaseTest {
         Exception targetException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(targetException.getMessage()).as("target error message")
-            .containsIgnoringCase("target").contains("not exist");
+        assertThat(targetException.getMessage()).contains("Unexpected artifact type: Design");
 
         // VP - verify that source and target types found
         ArtifactType targetType = new ArtifactType(project, targetTypeName);
@@ -59,7 +57,5 @@ public class TestTraceFileParser extends EntityBaseTest {
             traceMatrixDefinition);
         assertThat(artifactTypes.getValue0().getName()).as("source type found").isEqualTo(sourceTypeName);
         assertThat(artifactTypes.getValue1().getName()).as("target type found").isEqualTo(targetTypeName);
-
-        projectService.deleteProject(project);
     }
 }

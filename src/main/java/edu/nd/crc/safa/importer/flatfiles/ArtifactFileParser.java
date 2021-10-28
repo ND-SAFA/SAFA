@@ -104,18 +104,18 @@ public class ArtifactFileParser {
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);
 
-        return saveOrUpdateArtifactRecords(project, projectVersion, artifactType, fileParser);
+        return saveOrUpdateArtifactRecords(fileName, artifactType, fileParser);
     }
 
-    private List<ArtifactAppEntity> saveOrUpdateArtifactRecords(Project project,
-                                                                ProjectVersion projectVersion,
+    private List<ArtifactAppEntity> saveOrUpdateArtifactRecords(String fileName,
                                                                 ArtifactType artifactType,
                                                                 CSVParser parsedFile) throws ServerError {
         List<CSVRecord> artifactRecords;
         try {
             artifactRecords = parsedFile.getRecords();
         } catch (IOException e) {
-            throw new ServerError("parsing artifact file", e);
+            String error = String.format("Unable to read records in file: %s", fileName);
+            throw new ServerError(error, e);
         }
 
         List<ArtifactAppEntity> artifactAppEntities = new ArrayList<>();

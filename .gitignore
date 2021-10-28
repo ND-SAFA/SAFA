@@ -4,9 +4,10 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-safa-google-key.json
+application-credentials.json
 **/application-prod.properties
-
+**/application-deploy.properties
+docker-build.sh
 ### STS ###
 .apt_generated
 .classpath

@@ -24,7 +24,7 @@ import org.hibernate.annotations.Type;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "project_id", "name"
-        })
+        }, name = "UNIQUE_ARTIFACT_TYPE_PER_PROJECT")
     }
 )
 public class ArtifactType implements Serializable {
@@ -52,6 +52,10 @@ public class ArtifactType implements Serializable {
     public ArtifactType(Project project, String name) {
         this.project = project;
         this.name = name.toLowerCase();
+    }
+
+    public String toString() {
+        return this.name;
     }
 
     public UUID getTypeId() {

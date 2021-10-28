@@ -1,0 +1,31 @@
+ID,Summary,Content
+SR1,The Thermostat function shall set the value of the heat control.,The Thermostat function shall set the value of the heat control.
+SR2,The Thermostat function shall set the value of the operator feedback.,The Thermostat function shall set the value of the operator feedback.
+SR3,The isolette shall include an independent Thermostat Function that maintains the current temperature within the desired temperature range inside the isolette.,The isolette shall include an independent Thermostat Function that maintains the current temperature within the desired temperature range inside the isolette.
+SR4,An independent monitor function shall activate an alarm within 5 seconds whenever the current temperatue inside the Isolette falls below or rises above the Alarm temperature range.,An independent monitor function shall activate an alarm within 5 seconds whenever the current temperatue inside the Isolette falls below or rises above the Alarm temperature range.
+SR5,An alarm shall sound when the current temperature is flagged as invalid.,An alarm shall sound when the current temperature is flagged as invalid.
+SR6,The heat control shall never run for longer than the maximum run time.,The heat control shall never run for longer than the maximum run time.
+SR7,The physical mechanics of the isolette must be inspected prior to each use.,The physical mechanics of the isolette must be inspected prior to each use.
+SR8,The Thermostat must be self-tested at startup.,The Thermostat must be self-tested at startup.
+SR9,The Thermostat Function shall set the value of the Regulator Status.,The Thermostat Function shall set the value of the Regulator Status.
+SR10,The Thermostat shall set the value of the Display Temperature.,The Thermostat shall set the value of the Display Temperature.
+SR11,The Thermostat shall set the value of the Alarm Control.,The Thermostat shall set the value of the Alarm Control.
+SR12,The Thermostat shall set the value of the Monitor Status.,The Thermostat shall set the value of the Monitor Status.
+SR13,The Regulate Temperature Function shall set the value of the Regulator.,The Regulate Temperature Function shall set the value of the Regulator.
+SR14,The Regulate Temperature Function shall set the value of the Display.,The Regulate Temperature Function shall set the value of the Display.
+SR15,"If the Regulator Mode is INIT, the Regulator Status shall be set to Init.","If the Regulator Mode is INIT, the Regulator Status shall be set to Init."
+SR16,"If the Regulator Mode is FAILED, the Regulator Status shall be set to Failed.","If the Regulator Mode is FAILED, the Regulator Status shall be set to Failed."
+SR17,"If the Regulator Mode is NORMAL, the Regulator Status shall be set to ON.","If the Regulator Mode is NORMAL, the Regulator Status shall be set to ON."
+SR18,"If the Regulator Mode is NORMAL, the Display Temperature shall be set to the value of the Current Temperature rounded to the nearest integer.","If the Regulator Mode is NORMAL, the Display Temperature shall be set to the value of the Current Temperature rounded to the nearest integer."
+SR19,"If the Regulator Mode is not NORMAL, the value of the Display Temperature is UNSPECIFIED.","If the Regulator Mode is not NORMAL, the value of the Display Temperature is UNSPECIFIED."
+SR20,"If the Status attribute of the Lower Desired Temperature or the Upper Desired Temperature is Invalid, the Regulator Interface Failure shall be set to True.","If the Status attribute of the Lower Desired Temperature or the Upper Desired Temperature is Invalid, the Regulator Interface Failure shall be set to True."
+SR21,"If the Status attribute of the Lower Desired Temperature and the Upper Desired Temperature is Valid, the Regulator Interface Failure shall be set to False.","If the Status attribute of the Lower Desired Temperature and the Upper Desired Temperature is Valid, the Regulator Interface Failure shall be set to False."
+SR22,"If the Regulator Interface Failure is False, the Desired Range shall be set to the Desired Temperature Range.","If the Regulator Interface Failure is False, the Desired Range shall be set to the Desired Temperature Range."
+SR23,"If the Regulator Interface Failure is True, the Desired Range is UNSPECIFIED.","If the Regulator Interface Failure is True, the Desired Range is UNSPECIFIED."
+SR24,"If the Regulator Mode is INIT, the Heat Control shall be set to Off.","If the Regulator Mode is INIT, the Heat Control shall be set to Off."
+SR25,"If the Regulator Mode is NORMAL and the Current Temperature is less than the Lower Desired Temperature, the Heat Control shall be set to On.","If the Regulator Mode is NORMAL and the Current Temperature is less than the Lower Desired Temperature, the Heat Control shall be set to On."
+SR26,"If the Regulator Mode is NORMAL and the Current Temperature is greater than the Upper Desired Temperature, the Heat Control shall be set to Off.","If the Regulator Mode is NORMAL and the Current Temperature is greater than the Upper Desired Temperature, the Heat Control shall be set to Off."
+SR27,"If the Regulator Mode is NORMAL and the Current Temperature is greater than or equal to the Lower Desired Temperature and less than or equal to the Upper Desired Temperature, the value of the Heat Con.","If the Regulator Mode is NORMAL and the Current Temperature is greater than or equal to the Lower Desired Temperature and less than or equal to the Upper Desired Temperature, the value of the Heat Con."
+SR28,"If the Regulator Mode is FAILED, the Heat Control shall be set to Off.","If the Regulator Mode is FAILED, the Heat Control shall be set to Off."
+SR29,The Monitor Temperature Function shall set the value of the Alarm Control.,The Monitor Temperature Function shall set the value of the Alarm Control.
+SR30,The Monitor Temperature Function shall set the value of the Monitor Status.,The Monitor Temperature Function shall set the value of the Monitor Status.

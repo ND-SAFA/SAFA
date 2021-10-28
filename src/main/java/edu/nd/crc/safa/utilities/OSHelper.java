@@ -34,7 +34,8 @@ public class OSHelper {
         try {
             FileUtils.cleanDirectory(myDir);
         } catch (IOException e) {
-            throw new ServerError("Could not clear directory", e);
+            String error = String.format("Could not clear directory at path: %s", pathToDir);
+            throw new ServerError(error, e);
         }
     }
 

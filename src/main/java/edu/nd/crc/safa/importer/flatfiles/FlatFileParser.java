@@ -58,7 +58,7 @@ public class FlatFileParser {
                     timFileJson.getJSONObject(traceMatrixKey));
             }
         } catch (IOException | JSONException e) {
-            throw new ServerError("parsing TIM file", e);
+            throw new ServerError("An error occurred while parsing TIM file.", e);
         }
     }
 }

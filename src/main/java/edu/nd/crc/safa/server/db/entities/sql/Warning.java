@@ -40,6 +40,10 @@ public class Warning {
     @Column
     String rule;
 
+    public Warning() {
+
+    }
+
     public Warning(Project project, String nShort, String nLong, String rule) {
         this.project = project;
         this.nShort = nShort;

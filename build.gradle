@@ -32,54 +32,43 @@ repositories {
 }
 
 dependencies {
-    // data parsing
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.0'
+    // JIRA parsing
     implementation 'com.jsoniter:jsoniter:0.9.23'
-    implementation 'org.javatuples:javatuples:1.2'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
+
+    // data parsing
+    implementation 'org.javatuples:javatuples:1.2'
     implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'commons-io:commons-io:2.11.0' // TODO: Integration issue when upgrading
     implementation 'org.json:json:20210307'
-    implementation 'org.javatuples:javatuples:1.2'
 
     //database
     implementation 'mysql:mysql-connector-java:8.0.25'
     implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.3.4'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
-    implementation 'org.hibernate:hibernate-core:5.5.7.Final'
-    implementation 'org.hibernate:hibernate-entitymanager:5.5.7.Final'
-    implementation 'com.github.v-ladynev:fluent-hibernate-core:0.3.1'
+    implementation 'org.hibernate:hibernate-core:5.5.8.Final'
+    implementation 'com.zaxxer:HikariCP:5.0.0'
 
     //Spring
-    implementation 'org.springframework:spring-jdbc:5.3.10'
-    implementation 'org.springframework:spring-beans:5.3.10'
-    implementation 'org.springframework:spring-context:5.3.10'
-    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.5.5'
-    implementation 'org.springframework:spring-webmvc:5.3.9' // TODO: Broken dependency if upgraded
-    implementation 'org.springframework:spring-orm:5.3.10'
-    implementation 'org.springframework.boot:spring-boot:2.5.5'
-    implementation('org.springframework.boot:spring-boot-starter-web:2.5.5') {
-        exclude module: 'logback-classic'
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
     implementation 'org.springframework.data:spring-data-commons:2.5.4'
-    implementation 'org.springframework.data:spring-data-jpa:2.5.4'
-    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.5.5'
+    implementation 'org.springframework.data:spring-data-jpa:2.5.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.5'
+    implementation 'org.springframework:spring-websocket:5.3.11'
+    implementation 'org.springframework:spring-messaging:5.3.11'
+
+    // websockets
     implementation 'org.webjars:sockjs-client:1.5.1'
-    implementation 'org.webjars:stomp-websocket:2.3.4' // not sure I need this
-    implementation 'org.springframework:spring-websocket:5.3.10'
-    implementation 'org.springframework:spring-messaging:5.3.10'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
+
+    // automatic documentation
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.11'
+    implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.5.11'
 
     // testing
     testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.5') {
-        exclude module: 'logback-classic'
-    }
-    testImplementation 'org.springdoc:springdoc-openapi-webmvc-core:1.5.11'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 }
 

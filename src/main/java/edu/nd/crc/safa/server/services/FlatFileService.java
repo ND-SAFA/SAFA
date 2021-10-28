@@ -106,7 +106,8 @@ public class FlatFileService {
                 uploadedFiles.add(requestFile.getOriginalFilename());
 
             } catch (IOException e) {
-                throw new ServerError("Could not upload file: " + requestFile.getOriginalFilename(), e);
+                String error = String.format("Could not upload file: %s", requestFile.getOriginalFilename());
+                throw new ServerError(error, e);
             }
         }
         return uploadedFiles;

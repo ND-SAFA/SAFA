@@ -56,7 +56,6 @@ public class EntityBuilder extends BaseBuilder {
         this.artifactRepository = artifactRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.traceLinkRepository = traceLinkRepository;
-        createEmptyData();
     }
 
     public void createEmptyData() {

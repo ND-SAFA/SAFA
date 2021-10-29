@@ -12,7 +12,7 @@
         </v-row>
         <v-row class="ma-0 pa-0">
           <v-col cols="auto" class="ma-0 pa-0">
-            <button-row :definitions="definitions" justify="start" />
+            <ButtonRow :definitions="definitions" justify="start" />
           </v-col>
         </v-row>
       </v-col>
@@ -25,11 +25,10 @@
       :isOpen="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
-    <CreateNewProjectModal
+    <ProjectCreatorModal
       :isOpen="createProjectOpen"
       @onClose="createProjectOpen = false"
     />
-    <create-new-project-modal />
   </v-container>
 </template>
 
@@ -43,7 +42,7 @@ import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionMo
 import router from "@/router";
 import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
-import CreateNewProjectModal from "@/components/project/creator/ProjectCreatorModal.vue";
+import ProjectCreatorModal from "@/components/project/creator/ProjectCreatorModal.vue";
 
 export default Vue.extend({
   components: {
@@ -52,7 +51,7 @@ export default Vue.extend({
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
-    CreateNewProjectModal,
+    ProjectCreatorModal,
   },
   data() {
     return {
@@ -70,7 +69,7 @@ export default Vue.extend({
       this.openProjectOpen = true;
     },
     onCreateProject(): void {
-      console.log("create project clicked");
+      this.createProjectOpen = true;
     },
   },
 

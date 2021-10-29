@@ -49,7 +49,10 @@ export default Vue.extend({
     ProjectVersionStepperModal,
   },
   props: {
-    isOpen: Boolean,
+    isOpen: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

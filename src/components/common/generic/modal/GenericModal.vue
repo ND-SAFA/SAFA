@@ -4,7 +4,7 @@
     :width="`${getWidth()}px`"
     @click:outside="$emit('onClose')"
   >
-    <v-card :height="`${getHeight()}px`">
+    <v-card :class="`modal-${size}`">
       <v-card-title class="grey lighten-2">
         <ModalTitle :title="title" @onClose="$emit('onClose')" />
       </v-card-title>
@@ -77,7 +77,7 @@ export default Vue.extend({
         case "m":
           return 500;
         case "l":
-          return 500;
+          return 700;
         default:
           return 400;
       }

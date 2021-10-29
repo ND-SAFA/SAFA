@@ -5,7 +5,7 @@
     :isOpen="isOpen"
     :title="title"
     :isLoading="isLoading"
-    size="m"
+    size="l"
     @onClose="onClose"
     @onReset="clearData"
     @onSubmit="$emit('onSubmit')"

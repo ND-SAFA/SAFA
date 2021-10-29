@@ -32,7 +32,7 @@ import {
 } from "@/types/domain/links";
 import Vue, { PropType } from "vue";
 import TraceLinkDisplay from "@/components/approve-links-view/TraceLinkDisplay.vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
 export default Vue.extend({
   components: { GenericModal, TraceLinkDisplay },
   props: {

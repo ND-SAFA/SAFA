@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ButtonRow from "@/components/common/ButtonRow.vue";
+import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types/common-components";
 import { Artifact } from "@/types/domain/artifact";
 import { capitalize } from "@/util/string-helper";

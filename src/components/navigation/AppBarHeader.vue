@@ -37,7 +37,7 @@
 import Vue from "vue";
 import SAFAIcon from "@/components/navigation/SafaIcon.vue";
 import ProjectName from "@/components/navigation/ProjectName.vue";
-import ButtonRow from "@/components/common/ButtonRow.vue";
+import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types/common-components";
 import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
 import router from "@/router";

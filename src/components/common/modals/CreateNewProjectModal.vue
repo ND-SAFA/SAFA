@@ -38,10 +38,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GenericStepperModal from "@/components/common/GenericStepperModal.vue";
+import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
 import type { StepState } from "@/types/common-components";
-import ProjectCreator from "@/components/common/ProjectSelector/ProjectCreator.vue";
-import ArtifactFileUploader from "@/components/common/ArtifactFileUploader.vue";
+import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
+import ArtifactFileUploader from "@/components/project/creator/ArtifactFileUploader.vue";
 
 export default Vue.extend({
   name: "project-version-stepper-modal",

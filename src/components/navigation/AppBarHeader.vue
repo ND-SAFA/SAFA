@@ -12,7 +12,7 @@
         </v-row>
         <v-row class="ma-0 pa-0">
           <v-col cols="auto" class="ma-0 pa-0">
-            <button-row :definitions="definitions" justify="start" />
+            <ButtonRow :definitions="definitions" justify="start" />
           </v-col>
         </v-row>
       </v-col>
@@ -25,6 +25,10 @@
       :isOpen="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
+    <ProjectCreatorModal
+      :isOpen="createProjectOpen"
+      @onClose="createProjectOpen = false"
+    />
   </v-container>
 </template>
 
@@ -32,12 +36,13 @@
 import Vue from "vue";
 import SAFAIcon from "@/components/navigation/SafaIcon.vue";
 import ProjectName from "@/components/navigation/ProjectName.vue";
-import ButtonRow from "@/components/common/ButtonRow.vue";
+import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types/common-components";
 import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
 import router from "@/router";
 import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
+import ProjectCreatorModal from "@/components/project/creator/ProjectCreatorModal.vue";
 
 export default Vue.extend({
   components: {
@@ -46,20 +51,25 @@ export default Vue.extend({
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
+    ProjectCreatorModal,
   },
   data() {
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
+      createProjectOpen: true,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
   methods: {
-    uploadVersionClick(): void {
+    onUploadVersion(): void {
       this.uploadVersionOpen = true;
     },
-    openProjectClick(): void {
+    onOpenProject(): void {
       this.openProjectOpen = true;
+    },
+    onCreateProject(): void {
+      this.createProjectOpen = true;
     },
   },
 
@@ -68,14 +78,14 @@ export default Vue.extend({
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
-        menuItems: ["Select Project"],
-        menuHandlers: [this.openProjectClick],
+        menuItems: ["Create Project", "Open Project"],
+        menuHandlers: [this.onCreateProject, this.onOpenProject],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Version",
         menuItems: ["Upload new version"],
-        menuHandlers: [this.uploadVersionClick],
+        menuHandlers: [this.onUploadVersion],
       },
       {
         type: ButtonType.LIST_MENU,

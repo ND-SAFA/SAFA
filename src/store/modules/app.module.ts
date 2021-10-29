@@ -5,7 +5,7 @@ import { MessageType, PanelType } from "@/types/store";
 import type { SnackbarMessage } from "@/types/store";
 
 import type { PanelState } from "@/types/store";
-import { APIErrorBody } from "@/types/api";
+import type { APIErrorBody } from "@/types/api";
 export interface ChannelSubscriptionId {
   projectId?: string;
   versionId?: string;

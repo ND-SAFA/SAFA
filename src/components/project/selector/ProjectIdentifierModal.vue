@@ -7,18 +7,10 @@
     @onClose="onClose"
   >
     <template v-slot:body>
-      <v-container class="mb-0 pb-0">
-        <v-row>
-          <v-text-field v-model="name" label="Project Name" required />
-        </v-row>
-        <v-row>
-          <v-text-field
-            v-model="description"
-            label="Project description"
-            required
-          />
-        </v-row>
-      </v-container>
+      <ProjectCreator
+        v-bind:name.sync="name"
+        v-bind:description.sync="description"
+      />
     </template>
     <template v-slot:actions>
       <v-container>
@@ -35,11 +27,13 @@
 <script lang="ts">
 import { ProjectIdentifier } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
+import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
 
 export default Vue.extend({
   components: {
     GenericModal,
+    ProjectCreator,
   },
   props: {
     isOpen: {

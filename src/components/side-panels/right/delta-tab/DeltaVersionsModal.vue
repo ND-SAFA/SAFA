@@ -37,12 +37,12 @@
 </template>
 
 <script lang="ts">
-import VersionSelector from "@/components/common/modals/VersionSelector.vue";
+import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import { Project, ProjectVersion } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
 import { getProjectDelta } from "@/api/project-api";
 import { DeltaPayload } from "@/types/store";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
 import { appModule, deltaModule } from "@/store";
 export default Vue.extend({
   components: { VersionSelector, GenericModal },

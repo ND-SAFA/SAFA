@@ -1,5 +1,6 @@
 <template>
   <ProjectVersionStepperModal
+    v-model="currentStep"
     title="Select Baseline Project Version"
     :isOpen="isOpen"
     v-bind:isLoading.sync="isLoading"
@@ -33,6 +34,7 @@ export default Vue.extend({
       isLoading: false,
       selectedProject: undefined as ProjectIdentifier | undefined,
       selectedVersion: undefined as ProjectVersion | undefined,
+      currentStep: 1,
     };
   },
   methods: {

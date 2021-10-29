@@ -26,7 +26,7 @@ import Snackbar from "@/components/navigation/Snackbar.vue";
 import LeftNavDrawer from "@/components/side-panels/left/LeftNavDrawer.vue";
 import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
 import AppBar from "@/components/navigation/AppBar.vue";
-import ArtifactCreator from "@/components/common/modals/ArtifactCreator.vue";
+import ArtifactCreator from "@/components/common/modals/ArtifactCreatorModal.vue";
 
 import { PanelType } from "@/types/store";
 import { appModule } from "@/store";
@@ -64,4 +64,5 @@ export default Vue.extend({
 @import "./assets/app-styles.css";
 @import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";
+@import "./assets/modal-sizes.css";
 </style>

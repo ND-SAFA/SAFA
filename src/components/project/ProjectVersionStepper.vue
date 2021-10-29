@@ -19,7 +19,6 @@
 
       <v-stepper-items>
         <slot name="beforeItems" />
-
         <v-stepper-content :step="projectStep">
           <v-container class="pa-10">
             <ProjectSelector
@@ -50,8 +49,8 @@
 
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import ProjectSelector from "@/components/common/ProjectSelector.vue";
-import VersionSelector from "@/components/common/modals/VersionSelector.vue";
+import ProjectSelector from "@/components/project/selector/ProjectSelector.vue";
+import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import Vue, { PropType } from "vue";
 import {
   OptionalProjectIdentifier,
@@ -63,7 +62,7 @@ const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 
 export default Vue.extend({
-  name: "ProjectAndVersionStepper",
+  name: "project-version-stepper",
   components: {
     ProjectSelector,
     VersionSelector,

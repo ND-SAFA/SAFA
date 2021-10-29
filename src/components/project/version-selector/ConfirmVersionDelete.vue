@@ -20,7 +20,7 @@
 import { ProjectVersion } from "@/types/domain/project";
 import { versionToString } from "@/util/to-string";
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
 export default Vue.extend({
   components: { GenericModal },
   props: {

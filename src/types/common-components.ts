@@ -1,4 +1,10 @@
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { Artifact } from "@/types/domain/artifact";
+import { TraceLink } from "@/types/domain/links";
+import {
+  ParserError,
+  ProjectIdentifier,
+  ProjectVersion,
+} from "@/types/domain/project";
 
 export enum ButtonType {
   ICON = "icon",
@@ -42,3 +48,21 @@ export interface CheckmarkMenuDefinition extends MenuDefinition {
 
 export type OptionalProjectIdentifier = ProjectIdentifier | undefined;
 export type OptionalProjectVersion = ProjectVersion | undefined;
+export type ModalSize = "xxs" | "xs" | "s" | "m" | "l";
+export type StepState = [string, boolean];
+
+interface ProjectFile {
+  file?: File;
+  parserErrors?: ParserError[];
+}
+export interface ArtifactFile extends ProjectFile {
+  type: string;
+  artifacts?: Artifact[];
+}
+
+export interface TraceFile extends ProjectFile {
+  source: string;
+  target: string;
+  isGenerated: boolean;
+  traces?: TraceLink[];
+}

@@ -12,7 +12,7 @@
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
-        <FileSelector
+        <GenericFileSelector
           v-if="selectedVersion !== undefined"
           @onChangeFiles="onChangeFiles"
         />
@@ -38,18 +38,21 @@
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 import Vue from "vue";
-import FileSelector from "@/components/common/modals/UploadNewVersionModal/FileSelector.vue";
+import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 import { uploadNewProjectVersion } from "@/api/handlers/upload-version-handler";
 import ProjectVersionStepperModal from "@/components/common/modals/ProjectVersionStepperModal.vue";
 
 export default Vue.extend({
   name: "UploadNewVersionModal",
   components: {
-    FileSelector,
+    GenericFileSelector,
     ProjectVersionStepperModal,
   },
   props: {
-    isOpen: Boolean,
+    isOpen: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

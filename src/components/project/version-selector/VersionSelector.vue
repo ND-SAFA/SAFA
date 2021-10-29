@@ -33,13 +33,13 @@
 
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import GenericSelector from "@/components/common/modals/GenericSelector.vue";
+import GenericSelector from "@/components/common/generic/GenericSelector.vue";
 import Vue, { PropType } from "vue";
 import { deleteProjectVersion, getProjectVersions } from "@/api/project-api";
-import VersionCreator from "@/components/common/modals/VersionSelector/VersionCreator.vue";
-import ConfirmVersionDelete from "@/components/common/modals/VersionSelector/ConfirmVersionDelete.vue";
+import VersionCreator from "@/components/project/version-selector/VersionCreator.vue";
+import ConfirmVersionDelete from "@/components/project/version-selector/ConfirmVersionDelete.vue";
 import { DataItem } from "@/types/api";
-import { versionSelectorHeader } from "@/components/common/modals/VersionSelector/headers";
+import { versionSelectorHeader } from "@/components/project/version-selector/headers";
 import { appModule } from "@/store";
 
 export default Vue.extend({

@@ -23,8 +23,8 @@
       <v-stepper-content step="2">
         <v-container class="pa-10">
           <ArtifactFileUploader
-            v-bind:name.sync="name"
-            v-bind:description.sync="description"
+            @onIsValid="setStepIsValid(1, true)"
+            @onIsInvalid="setStepIsValid(1, false)"
           />
         </v-container>
       </v-stepper-content>
@@ -44,7 +44,7 @@ import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.v
 import ArtifactFileUploader from "@/components/project/creator/ArtifactFileUploader.vue";
 
 export default Vue.extend({
-  name: "project-version-stepper-modal",
+  name: "project-creator-modal",
   components: {
     GenericStepperModal,
     ProjectCreator,
@@ -70,6 +70,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    setStepIsValid(stepIndex: number, isValid: boolean): void {
+      Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
+    },
     clearData() {
       this.currentStep = 1;
       this.isLoading = false;
@@ -101,11 +104,9 @@ export default Vue.extend({
           break;
       }
     },
-    combinedState(): void {
-      if (this.name !== "" && this.description !== "") {
-        Vue.set(this.steps, 0, [this.name, true]);
-        console.log("FIRST STEP DONE");
-      }
+    name(): void {
+      const isFirstStepValid = this.name !== "";
+      Vue.set(this.steps, 0, [this.name, isFirstStepValid]);
     },
   },
 });

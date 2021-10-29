@@ -16,10 +16,10 @@
       <v-container>
         <v-row><h4>File(s):</h4> </v-row>
         <v-row>
-          <FileSelector
+          <GenericFileSelector
             :multiple="false"
             @onChangeFiles="onChangeFiles"
-            @onClear="$emit('onClearFile')"
+            @onClear="$emit('onclearFileFromArtifactFile')"
           />
         </v-row>
         <v-row v-if="!hasArtifactFile" justify="center" style="color: red">
@@ -142,6 +142,7 @@ export default Vue.extend({
       required: true,
     },
   },
+
   computed: {
     isValid(): boolean {
       return this.hasArtifactFile && this.hasTraceFiles;
@@ -173,15 +174,14 @@ export default Vue.extend({
     },
     onChangeFiles(file: File): void {
       if (file === null) {
-        this.$emit("onClearFile");
+        this.$emit("onclearFileFromArtifactFile");
       } else {
-        this.$emit("onAddFile", file);
+        this.$emit("onaddFileToArtifactFile", file);
       }
     },
     onChangeTraceFiles(traceFile: TraceFile, file: File): void {
       if (file === null) {
         this.$emit("onClearTraceFile", { ...traceFile, file: undefined });
-        console.log("CLEARING TRACE FILE");
       } else {
         this.$emit("onAddTraceFile", { ...traceFile, file });
       }
@@ -196,7 +196,7 @@ export default Vue.extend({
       const isSource = traceFile.source === source;
       return isSource ? `To: ${traceFile.target}` : `From: ${traceFile.source}`;
     },
-    getTraceFiles(artifactFile: ArtifactFile): TraceFile[] {
+    getTraceFilesRelatedTo(artifactFile: ArtifactFile): TraceFile[] {
       return this.traceFiles.filter(
         (f) => f.source === artifactFile.type || f.target === artifactFile.type
       );
@@ -219,6 +219,21 @@ export default Vue.extend({
         ),
       };
     },
+    emitValidationState(): void {
+      if (this.isValid) {
+        this.$emit("onIsValid");
+      } else {
+        this.$emit("onIsInvalid");
+      }
+    },
+  },
+  watch: {
+    isValid(): void {
+      this.emitValidationState();
+    },
+  },
+  mounted() {
+    this.emitValidationState();
   },
 });
 </script>

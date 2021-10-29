@@ -2,18 +2,20 @@
   <v-container>
     <v-row>
       <v-expansion-panels>
-        <artifact-file-panel
+        <ArtifactFilePanel
           v-for="(artifactFile, i) in artifactFiles"
           :key="artifactFile.type"
           :artifactFile="artifactFile"
-          :traceFiles="getTraceFiles(artifactFile)"
-          :menuLabels="getMenuLabels(artifactFile.type)"
+          :traceFiles="getTraceFilesRelatedTo(artifactFile)"
+          :menuLabels="getValidArtifactTypesToTrace(artifactFile.type)"
           @onAddTracePath="addTraceFile($event)"
           @onAddTraceFile="addTraceFile($event)"
           @onClearTraceFile="addTraceFile($event)"
-          @onAddFile="addFile(i, $event)"
-          @onClearFile="clearFile(i)"
+          @onaddFileToArtifactFile="addFileToArtifactFile(i, $event)"
+          @onclearFileFromArtifactFile="clearFileFromArtifactFile(i)"
           @onDelete="deleteArtifactFile(i)"
+          @onIsValid="setIsValid(i, true)"
+          @onIsInvalid="setIsValid(i, false)"
         />
       </v-expansion-panels>
     </v-row>
@@ -53,6 +55,8 @@ import { ArtifactFile, TraceFile } from "@/types/common-components";
 import ArtifactFilePanel from "@/components/project/creator/ArtifactFilePanel.vue";
 import ArtifactNameModal from "@/components/project/creator/ArtifactNameModal.vue";
 
+const DEFAULT_VALID_STATE = true;
+
 export default Vue.extend({
   components: {
     ArtifactFilePanel,
@@ -60,8 +64,9 @@ export default Vue.extend({
   },
   data() {
     return {
-      traceFiles: [] as TraceFile[],
+      isValidStates: [] as boolean[],
       artifactFiles: [] as ArtifactFile[],
+      traceFiles: [] as TraceFile[],
       isCreateArtifactOpen: false,
     };
   },
@@ -69,8 +74,23 @@ export default Vue.extend({
     artifactTypes(): string[] {
       return this.artifactFiles.map((artifactFile) => artifactFile.type);
     },
+    isValid(): boolean {
+      return this.isValidStates.filter((isValid) => !isValid).length === 0;
+    },
+  },
+  watch: {
+    isValid(isValid: boolean): void {
+      if (isValid) {
+        this.$emit("onIsValid");
+      } else {
+        this.$emit("onIsInvalid");
+      }
+    },
   },
   methods: {
+    setIsValid(artifactFileIndex: number, isValid: boolean): void {
+      Vue.set(this.isValidStates, artifactFileIndex, isValid);
+    },
     deleteArtifactFile(i: number): void {
       this.artifactFiles = this.artifactFiles.filter((f, index) => index !== i);
     },
@@ -80,22 +100,23 @@ export default Vue.extend({
           type: artifactName,
         },
       ]);
+      this.isValidStates = this.isValidStates.concat([DEFAULT_VALID_STATE]);
     },
-    addFile(i: number, file: File): void {
+    addFileToArtifactFile(i: number, file: File): void {
       Vue.set(this.artifactFiles, i, { ...this.artifactFiles[i], file });
     },
-    clearFile(i: number): void {
+    clearFileFromArtifactFile(i: number): void {
       Vue.set(this.artifactFiles, i, {
         ...this.artifactFiles[i],
         file: undefined,
       });
     },
-    getTraceFiles(artifactFile: ArtifactFile): TraceFile[] {
+    getTraceFilesRelatedTo(artifactFile: ArtifactFile): TraceFile[] {
       return this.traceFiles.filter(
         (f) => f.source === artifactFile.type || f.target === artifactFile.type
       );
     },
-    getMenuLabels(source: string): string[] {
+    getValidArtifactTypesToTrace(source: string): string[] {
       const traceIds = this.traceFiles.map((f) => `${f.source}-${f.target}`);
       return this.artifactTypes.filter((type) => {
         return (

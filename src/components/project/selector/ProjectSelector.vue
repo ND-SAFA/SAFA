@@ -48,10 +48,10 @@ import {
 } from "@/api/project-api";
 import { DataItem, ProjectCreationResponse } from "@/types/api";
 import { ProjectIdentifier } from "@/types/domain/project";
-import GenericSelector from "@/components/common/GenericSelector.vue";
-import ProjectCreatorModal from "@/components/common/ProjectSelector/ProjectCreatorModal.vue";
-import ConfirmProjectDelete from "@/components/common/ProjectSelector/ConfirmProjectDelete.vue";
-import { projectSelectorHeaders } from "@/components/common/ProjectSelector/headers";
+import GenericSelector from "@/components/common/generic/GenericSelector.vue";
+import ProjectCreatorModal from "@/components/project/selector/ProjectIdentifierModal.vue";
+import ConfirmProjectDelete from "@/components/project/selector/ConfirmProjectDelete.vue";
+import { projectSelectorHeaders } from "@/components/project/selector/headers";
 import Vue from "vue";
 import { appModule } from "@/store";
 
@@ -145,9 +145,6 @@ export default Vue.extend({
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
-    /*
-     * API wrappers for handling error messages and loading status.
-     */
     handleGetProjects() {
       getProjects()
         .then((projects) => {

@@ -50,8 +50,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactFile, TraceFile } from "@/types/common-components";
-import ArtifactFilePanel from "@/components/common/ArtifactFilePanel.vue";
-import ArtifactNameModal from "@/components/common/ArtifactNameModal.vue";
+import ArtifactFilePanel from "@/components/project/creator/ArtifactFilePanel.vue";
+import ArtifactNameModal from "@/components/project/creator/ArtifactNameModal.vue";
 
 export default Vue.extend({
   components: {

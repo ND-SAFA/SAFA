@@ -66,7 +66,7 @@
                 <v-row v-if="!traceFile.isGenerated">
                   <v-col>
                     <v-row>
-                      <FileSelector
+                      <GenericFileSelector
                         :multiple="false"
                         @onChangeFiles="onChangeTraceFiles(traceFile, $event)"
                       />
@@ -118,15 +118,15 @@ import {
   ButtonDefinition,
   ButtonType,
 } from "@/types/common-components";
-import ButtonRow from "@/components/common/ButtonRow.vue";
-import FileSelector from "@/components/common/FileSelector.vue";
+import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
+import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 
 const DEFAULT_IS_GENERATED = true;
 
 export default Vue.extend({
   components: {
     ButtonRow,
-    FileSelector,
+    GenericFileSelector,
   },
   props: {
     artifactFile: {

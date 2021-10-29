@@ -41,7 +41,7 @@ import Vue from "vue";
 import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
 import type { StepState } from "@/types/common-components";
 import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
-import ArtifactFileUploader from "@/components/project/creator/ArtifactFileUploader.vue";
+import ArtifactFileUploader from "@/components/project/creator/ArtifactUploader.vue";
 
 export default Vue.extend({
   name: "project-creator-modal",

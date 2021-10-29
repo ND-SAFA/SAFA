@@ -1,18 +1,26 @@
 <template>
   <v-file-input
-    chips
-    multiple
+    small-chips
+    :multiple="multiple"
     truncate-length="30"
     clearable
     outlined
     class="mt-3"
     @change="onChangeFiles"
-  ></v-file-input>
+    @click:clear="$emit('onClear')"
+  />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
+  props: {
+    multiple: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
   methods: {
     onChangeFiles(files: File[]) {
       this.$emit("onChangeFiles", files);

@@ -25,6 +25,11 @@
       :isOpen="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
+    <CreateNewProjectModal
+      :isOpen="createProjectOpen"
+      @onClose="createProjectOpen = false"
+    />
+    <create-new-project-modal />
   </v-container>
 </template>
 
@@ -38,6 +43,7 @@ import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionMo
 import router from "@/router";
 import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
+import CreateNewProjectModal from "@/components/common/modals/CreateNewProjectModal.vue";
 
 export default Vue.extend({
   components: {
@@ -46,20 +52,25 @@ export default Vue.extend({
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
+    CreateNewProjectModal,
   },
   data() {
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
+      createProjectOpen: true,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
   methods: {
-    uploadVersionClick(): void {
+    onUploadVersion(): void {
       this.uploadVersionOpen = true;
     },
-    openProjectClick(): void {
+    onOpenProject(): void {
       this.openProjectOpen = true;
+    },
+    onCreateProject(): void {
+      console.log("create project clicked");
     },
   },
 
@@ -68,14 +79,14 @@ export default Vue.extend({
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
-        menuItems: ["Select Project"],
-        menuHandlers: [this.openProjectClick],
+        menuItems: ["Create Project", "Open Project"],
+        menuHandlers: [this.onCreateProject, this.onOpenProject],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Version",
         menuItems: ["Upload new version"],
-        menuHandlers: [this.uploadVersionClick],
+        menuHandlers: [this.onUploadVersion],
       },
       {
         type: ButtonType.LIST_MENU,

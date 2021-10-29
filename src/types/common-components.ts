@@ -42,3 +42,17 @@ export interface CheckmarkMenuDefinition extends MenuDefinition {
 
 export type OptionalProjectIdentifier = ProjectIdentifier | undefined;
 export type OptionalProjectVersion = ProjectVersion | undefined;
+export type ModalSize = "xxs" | "xs" | "s" | "m" | "l";
+export type StepState = [string, boolean];
+
+export interface ArtifactFile {
+  type: string;
+  file?: File;
+}
+
+export interface TraceFile {
+  source: string;
+  target: string;
+  isGenerated: boolean;
+  file?: File;
+}

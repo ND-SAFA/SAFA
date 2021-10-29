@@ -38,7 +38,7 @@
 <script lang="ts">
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 import Vue from "vue";
-import FileSelector from "@/components/common/modals/UploadNewVersionModal/FileSelector.vue";
+import FileSelector from "@/components/common/FileSelector.vue";
 import { uploadNewProjectVersion } from "@/api/handlers/upload-version-handler";
 import ProjectVersionStepperModal from "@/components/common/modals/ProjectVersionStepperModal.vue";
 

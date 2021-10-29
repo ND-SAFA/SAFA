@@ -13,7 +13,7 @@
     @onRefresh="refresh"
   >
     <template v-slot:editItemDialogue>
-      <ProjectCreator
+      <ProjectCreatorModal
         title="Edit Project"
         :isOpen="editProjectDialogue"
         :project="projectToEdit"
@@ -22,7 +22,7 @@
       />
     </template>
     <template v-slot:addItemDialogue>
-      <ProjectCreator
+      <ProjectCreatorModal
         title="Create New Project"
         :isOpen="addProjectDialogue"
         @onSave="onSaveAddProject"
@@ -49,7 +49,7 @@ import {
 import { DataItem, ProjectCreationResponse } from "@/types/api";
 import { ProjectIdentifier } from "@/types/domain/project";
 import GenericSelector from "@/components/common/GenericSelector.vue";
-import ProjectCreator from "@/components/common/ProjectSelector/ProjectCreator.vue";
+import ProjectCreatorModal from "@/components/common/ProjectSelector/ProjectCreatorModal.vue";
 import ConfirmProjectDelete from "@/components/common/ProjectSelector/ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "@/components/common/ProjectSelector/headers";
 import Vue from "vue";
@@ -58,7 +58,7 @@ import { appModule } from "@/store";
 export default Vue.extend({
   components: {
     GenericSelector,
-    ProjectCreator,
+    ProjectCreatorModal,
     ConfirmProjectDelete,
   },
   props: {

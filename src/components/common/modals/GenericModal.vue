@@ -34,7 +34,9 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import ModalTitle from "@/components/common/modals/ModalTitle.vue";
+import { ModalSize } from "@/types/common-components";
 export default Vue.extend({
+  name: "generic-modal",
   components: {
     ModalTitle,
   },
@@ -58,7 +60,7 @@ export default Vue.extend({
       default: false,
     },
     size: {
-      type: String as PropType<"xxs" | "xs" | "s" | "m" | "l">,
+      type: String as PropType<ModalSize>,
       required: false,
       default: "m",
     },
@@ -75,7 +77,7 @@ export default Vue.extend({
         case "m":
           return 500;
         case "l":
-          return 550;
+          return 500;
         default:
           return 400;
       }

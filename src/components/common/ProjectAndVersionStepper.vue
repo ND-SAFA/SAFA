@@ -63,7 +63,7 @@ const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 
 export default Vue.extend({
-  name: "ProjectAndVersionStepper",
+  name: "project-version-stepper",
   components: {
     ProjectSelector,
     VersionSelector,

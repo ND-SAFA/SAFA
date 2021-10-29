@@ -29,8 +29,20 @@
   justify-content: center;
 }
 
-#cy-container,
-#cytoscape-div {
-  max-height: 400px !important;
-  min-height: 400px !important;
+@media screen and (min-height: 200px) {
+  #cy-container,
+  #cytoscape-div {
+    height: 300px !important;
+    max-height: 350px !important;
+    min-height: 200px !important;
+  }
+}
+
+@media screen and (min-height: 600px) {
+  #cy-container,
+  #cytoscape-div {
+    height: 600px !important;
+    max-height: 800px !important;
+    min-height: 400px !important;
+  }
 }

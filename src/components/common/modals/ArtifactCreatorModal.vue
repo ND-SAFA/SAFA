@@ -38,9 +38,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { createNewArtifact, isArtifactNameTaken } from "@/api/artifact-api";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
 import { Artifact } from "@/types/domain/artifact";
-import ButtonRow from "@/components/common/ButtonRow.vue";
+import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import {
   ButtonDefinition,
   ButtonType,

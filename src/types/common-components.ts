@@ -1,4 +1,10 @@
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { Artifact } from "@/types/domain/artifact";
+import { TraceLink } from "@/types/domain/links";
+import {
+  ParserError,
+  ProjectIdentifier,
+  ProjectVersion,
+} from "@/types/domain/project";
 
 export enum ButtonType {
   ICON = "icon",
@@ -45,14 +51,18 @@ export type OptionalProjectVersion = ProjectVersion | undefined;
 export type ModalSize = "xxs" | "xs" | "s" | "m" | "l";
 export type StepState = [string, boolean];
 
-export interface ArtifactFile {
-  type: string;
+interface ProjectFile {
   file?: File;
+  parserErrors?: ParserError[];
+}
+export interface ArtifactFile extends ProjectFile {
+  type: string;
+  artifacts?: Artifact[];
 }
 
-export interface TraceFile {
+export interface TraceFile extends ProjectFile {
   source: string;
   target: string;
   isGenerated: boolean;
-  file?: File;
+  traces?: TraceLink[];
 }

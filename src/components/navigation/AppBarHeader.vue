@@ -43,7 +43,7 @@ import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionMo
 import router from "@/router";
 import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
-import CreateNewProjectModal from "@/components/common/modals/CreateNewProjectModal.vue";
+import CreateNewProjectModal from "@/components/project/creator/ProjectCreatorModal.vue";
 
 export default Vue.extend({
   components: {

@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.db.entities.app;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
@@ -21,7 +22,8 @@ public class TraceApplicationEntity {
     }
 
     public TraceApplicationEntity(TraceLink trace) {
-        this.traceLinkId = trace.getTraceLinkId().toString();
+        UUID traceLinkId = trace.getTraceLinkId();
+        this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
         this.source = trace.getSourceName();
         this.target = trace.getTargetName();
         this.approvalStatus = trace.getApprovalStatus();

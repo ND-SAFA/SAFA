@@ -8,13 +8,14 @@ import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
 import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.ParserError;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.utilities.ArtifactFinder;
+import edu.nd.crc.safa.utilities.TraceLinkFinder;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,32 +69,51 @@ public class TraceLinkService {
     public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,
                                                     String sourceName,
                                                     String targetName) {
-        Project project = projectVersion.getProject();
-        Optional<Artifact> source = this.artifactRepository.findByProjectAndName(project, sourceName);
-        if (!source.isPresent()) {
-            ParserError sourceError = new ParserError(projectVersion,
-                "Could not find source artifact: " + sourceName,
-                ApplicationActivity.PARSING_TRACES);
-            return new Pair<>(null, sourceError);
+        ArtifactFinder artifactFinder = (a) ->
+            artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
+        Pair<TraceLink, String> parseResponse = parseTraceLink(artifactFinder, this::linkExists, sourceName,
+            targetName);
+        return new Pair<>(parseResponse.getValue0(), new ParserError(projectVersion, parseResponse.getValue1(),
+            ApplicationActivity.PARSING_TRACES));
+    }
+
+    //TODO: FIX ambuiguity between validation and parsing
+    public Pair<TraceLink, String> parseTraceLink(ArtifactFinder artifactFinder,
+                                                  TraceLinkFinder traceLinkFinder,
+                                                  String sourceName,
+                                                  String targetName) {
+        String error = validateTraceLink(artifactFinder, traceLinkFinder, sourceName, targetName);
+        if (error != null) {
+            return new Pair<>(null, error);
+        } else {
+            Artifact sourceArtifact = artifactFinder.findArtifact(sourceName).get(); // TODO: Fix warning
+            Artifact targetArtifact = artifactFinder.findArtifact(targetName).get();
+            return new Pair<>(new TraceLink(sourceArtifact, targetArtifact), error);
         }
-        Optional<Artifact> target = this.artifactRepository.findByProjectAndName(project, targetName);
-        if (!target.isPresent()) {
-            ParserError targetError = new ParserError(projectVersion,
-                "Could not find target artifact: " + targetName,
-                ApplicationActivity.PARSING_TRACES);
-            return new Pair<>(null, targetError);
+    }
+
+    public String validateTraceLink(ArtifactFinder artifactFinder,
+                                    TraceLinkFinder traceLinkFinder,
+                                    String sourceName,
+                                    String targetName) {
+        Optional<Artifact> source = artifactFinder.findArtifact(sourceName);
+        if (source.isEmpty()) {
+            return "Could not find source artifact: " + sourceName;
         }
+
+        Optional<Artifact> target = artifactFinder.findArtifact(targetName);
+        if (target.isEmpty()) {
+            return "Could not find target artifact: " + targetName;
+        }
+
         // Check for already existing trace link
         Artifact sourceArtifact = source.get();
         Artifact targetArtifact = target.get();
-        Optional<TraceLink> linkQuery = linkExists(sourceArtifact, targetArtifact);
+        Optional<TraceLink> linkQuery = traceLinkFinder.findTrace(sourceArtifact, targetArtifact);
         if (linkQuery.isPresent()) {
-            ParserError targetError = new ParserError(projectVersion,
-                "Trace link between source and target already exists",
-                ApplicationActivity.PARSING_TRACES);
-            return new Pair<>(null, targetError);
+            return "Trace link between source and target already exists";
         } else {
-            return new Pair<>(new TraceLink(sourceArtifact, targetArtifact), null);
+            return null;
         }
     }
 

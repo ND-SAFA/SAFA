@@ -37,8 +37,10 @@ import TraceFilePanel from "@/components/project/creator/trace-uploader/TraceFil
 import PanelController from "@/components/project/creator/shared/PanelController.vue";
 import TraceFileCreator from "./TraceFileCreator.vue";
 import { TraceLink } from "@/types/domain/links";
+import { parseTraceFile } from "@/api/parse-api";
+import { ParseTraceFileResponse } from "@/types/api";
 
-const DEFAULT_IS_GENERATED = true;
+const DEFAULT_IS_GENERATED = false;
 const DEFAULT_VALID_STATE = false;
 
 export default Vue.extend({
@@ -75,8 +77,16 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChange(i: number, file: File | undefined): void {
-      Vue.set(this.traceFiles, i, { ...this.traceFiles[i], file });
+    onChange(i: number, traceFile: TraceFile | undefined): void {
+      Vue.set(this.traceFiles, i, traceFile);
+      if (traceFile !== undefined && traceFile.file !== undefined) {
+        parseTraceFile(traceFile.file).then((res: ParseTraceFileResponse) => {
+          const { traces, errors } = res;
+          Vue.set(this.traceFiles, i, { ...traceFile, traces, errors });
+          this.$emit("onChange", this.traceFiles);
+        });
+      }
+      this.$emit("onChange", this.traceFiles);
     },
     setFileIsValid(traceFileIndex: number, isValid: boolean): void {
       Vue.set(this.isValidStates, traceFileIndex, isValid);
@@ -93,6 +103,7 @@ export default Vue.extend({
         },
       ]);
       this.isValidStates = this.isValidStates.concat([DEFAULT_VALID_STATE]);
+      this.$emit("onChange", this.traceFiles);
     },
   },
 });

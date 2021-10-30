@@ -1,6 +1,6 @@
-import os from "os";
-import { remote } from "electron";
 import { readFileBase64 } from "@/util/os-helper";
+import { remote } from "electron";
+import os from "os";
 
 export interface UploadFilesResponse {
   [key: string]: string;
@@ -71,11 +71,12 @@ export async function readFiles(
 }
 
 export async function createFormData(
-  filesData: Record<string, string>
+  filesData: Record<string, string>,
+  attributeName = "files"
 ): Promise<FormData> {
   const formData = new FormData();
   for (const [fileName, fileContent] of Object.entries(filesData)) {
-    formData.append("files", new Blob([fileContent]), fileName);
+    formData.append(attributeName, new Blob([fileContent]), fileName);
   }
   return formData;
 }

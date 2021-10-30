@@ -41,6 +41,6 @@ export function getArtifactTypePrintName(type: string): string {
     case "safetyrequirement":
       return "Safety Requirement";
     default:
-      throw Error("Unrecognized artifact type:" + type);
+      return capitalize(type.toLowerCase());
   }
 }

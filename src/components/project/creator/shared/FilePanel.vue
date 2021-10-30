@@ -34,9 +34,29 @@
           <label class="text-caption" style="color: red"> {{ error }}</label>
         </v-row>
 
+        <v-row v-if="error.length > 0" justify="center">
+          <label
+            v-for="(error, i) in errors"
+            :key="i"
+            class="text-caption"
+            style="color: red"
+          >
+            {{ error }}
+          </label>
+        </v-row>
+
         <v-row>
           <v-divider />
         </v-row>
+
+        <v-row>
+          <slot name="after-rows" />
+        </v-row>
+
+        <v-row>
+          <v-divider />
+        </v-row>
+
         <v-row class="mt-5 mb-5" justify="center">
           <v-btn
             @click="$emit('onDelete')"
@@ -53,7 +73,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
@@ -70,6 +90,10 @@ export default Vue.extend({
     showFileUploader: {
       type: Boolean,
       default: true,
+    },
+    errors: {
+      type: Array as PropType<string[]>,
+      required: true,
     },
   },
   data() {

@@ -3,6 +3,7 @@
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
     :showFileUploader="!traceFile.isGenerated"
+    :errors="errors"
   >
     <template v-slot:title>
       <label>
@@ -21,6 +22,29 @@
           <v-switch v-model="traceFile.isGenerated" />
         </v-col>
       </v-row>
+    </template>
+
+    <template v-slot:after-rows>
+      <v-container>
+        <v-row><h4>Parsed Traces</h4> </v-row>
+        <v-row v-if="traceFile.traces !== undefined">
+          <v-btn
+            x-small
+            color="primary"
+            class="ma-1"
+            v-for="trace in traceFile.traces"
+            :key="`${trace.source}-${trace.target}`"
+            @click="underDevelopmentError()"
+          >
+            {{ trace.source }}-{{ trace.target }}
+          </v-btn>
+        </v-row>
+        <v-row v-else>
+          <label class="text-caption">
+            No trace links have been parseed.
+          </label>
+        </v-row>
+      </v-container>
     </template>
   </FilePanel>
 </template>
@@ -44,6 +68,9 @@ export default Vue.extend({
   computed: {
     isValid(): boolean {
       return this.traceFile.file !== undefined || this.traceFile.isGenerated;
+    },
+    errors(): string[] {
+      return this.traceFile.errors === undefined ? [] : this.traceFile.errors;
     },
   },
   methods: {

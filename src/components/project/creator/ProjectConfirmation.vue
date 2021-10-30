@@ -14,9 +14,10 @@
         fab
         x-small
         color="primary"
+        class="ma-1"
         v-for="artifact in project.artifacts"
         :key="artifact.name"
-        @click="underDevelopmentError()"
+        @click="() => underDevelopmentError('artifacts')"
       >
         {{ artifact.name }}
       </v-btn>
@@ -35,7 +36,7 @@
         color="primary"
         v-for="trace in project.traces"
         :key="`${trace.source}-${trace.target}`"
-        @click="underDevelopmentError()"
+        @click="() => underDevelopmentError('traces')"
       >
         {{ trace.source }}-{{ trace.target }}
       </v-btn>

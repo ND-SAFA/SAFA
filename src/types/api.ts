@@ -1,7 +1,7 @@
-import { Project, ProjectErrors, ProjectVersion } from "@/types/domain/project";
 import { Artifact, ArtifactWarning } from "@/types/domain/artifact";
 import { ArtifactDeltaState } from "@/types/domain/delta";
 import { TraceLink } from "@/types/domain/links";
+import { Project, ProjectErrors, ProjectVersion } from "@/types/domain/project";
 
 export interface HeaderOption {
   [key: string]: string;
@@ -76,4 +76,15 @@ export interface Update {
   type: "included" | "excluded";
   traces: TraceLink[];
   artifacts: Artifact[];
+}
+
+export interface ParseFileResponse {
+  errors: string[];
+}
+export interface ParseArtifactFileResponse extends ParseFileResponse {
+  artifacts: Artifact[];
+}
+
+export interface ParseTraceFileResponse extends ParseFileResponse {
+  traces: TraceLink[];
 }

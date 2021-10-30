@@ -1,21 +1,34 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
+import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.db.entities.sql.Artifact;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.messages.ParseArtifactFileResponse;
+import edu.nd.crc.safa.server.messages.ParseTraceFileResponse;
 import edu.nd.crc.safa.server.messages.ProjectCreationResponse;
 import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
+import org.apache.commons.csv.CSVParser;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,17 +49,23 @@ public class ProjectController extends BaseController {
     private final ProjectService projectService;
     private final FlatFileService flatFileService;
     private final RevisionNotificationService revisionNotificationService;
+    private final ArtifactFileParser artifactFileParser;
+    private final TraceFileParser traceFileParser;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ProjectService projectService,
                              FlatFileService flatFileService,
-                             RevisionNotificationService revisionNotificationService) {
+                             RevisionNotificationService revisionNotificationService,
+                             ArtifactFileParser artifactFileParser,
+                             TraceFileParser traceFileParser) {
         super(projectRepository, projectVersionRepository);
         this.projectService = projectService;
         this.flatFileService = flatFileService;
         this.revisionNotificationService = revisionNotificationService;
+        this.artifactFileParser = artifactFileParser;
+        this.traceFileParser = traceFileParser;
     }
 
     /**
@@ -75,6 +94,39 @@ public class ProjectController extends BaseController {
         return new ServerResponse(response);
     }
 
+    @PostMapping(value = "projects/parse/artifacts/{artifactType}")
+    @ResponseStatus(HttpStatus.OK)
+    public ServerResponse parseArtifactFile(@PathVariable String artifactType,
+                                            @RequestParam MultipartFile file) throws ServerError, IOException {
+        CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
+        ParseArtifactFileResponse response = new ParseArtifactFileResponse();
+        Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
+            artifactFileParser.parseArtifactFileIntoApplicationEntities(
+                file.getOriginalFilename(),
+                artifactType,
+                fileCSV);
+        response.setArtifacts(parseResponse.getValue0());
+        response.setErrors(parseResponse.getValue1());
+        return new ServerResponse(response);
+    }
+
+    @PostMapping(value = "projects/parse/traces")
+    @ResponseStatus(HttpStatus.OK)
+    public ServerResponse parseTraceFile(@RequestParam MultipartFile file) throws ServerError, IOException {
+        CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
+        ParseTraceFileResponse response = new ParseTraceFileResponse();
+        Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> parseResponse =
+            traceFileParser.readTraceFile(
+                (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json
+                (s, t) -> Optional.empty(), // TODO: Replace with traces from json
+                fileCSV);
+        List<String> errors = parseResponse.getValue1().stream().map(Pair::getValue0).collect(Collectors.toList());
+
+        response.setTraces(parseResponse.getValue0());
+        response.setErrors(errors);
+        return new ServerResponse(response);
+    }
+
     @PostMapping(value = "projects/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
@@ -82,7 +134,7 @@ public class ProjectController extends BaseController {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        Project project = createProject(null, null);
+        Project project = createProjectIdentifier(null, null);
         ProjectVersion projectVersion = createProjectVersion(project);
 
         ProjectCreationResponse response = this.flatFileService.parseAndUploadFlatFiles(project,
@@ -105,9 +157,9 @@ public class ProjectController extends BaseController {
                 && projectVersion.hasValidId()) {
                 throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
             }
-            project = createProject(project.getName(), project.getDescription());
+            project = createProjectIdentifier(project.getName(), project.getDescription());
             projectVersion = createProjectVersion(project);
-            response = this.projectService.createProject(projectVersion, payload);
+            response = this.projectService.saveProjectAppEntity(projectVersion, payload);
         } else {
             this.projectRepository.save(project);
             //TODO: Update traces
@@ -149,7 +201,7 @@ public class ProjectController extends BaseController {
         }
     }
 
-    private Project createProject(String name, String description) {
+    private Project createProjectIdentifier(String name, String description) {
         Project project = new Project(name, description); // TODO: extract name from TIM file
         this.projectRepository.save(project);
         return project;

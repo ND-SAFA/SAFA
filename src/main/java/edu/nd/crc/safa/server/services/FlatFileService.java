@@ -84,6 +84,7 @@ public class FlatFileService {
                                                            ProjectVersion projectVersion,
                                                            MultipartFile[] files)
         throws ServerError {
+
         this.uploadFlatFiles(project, Arrays.asList(files));
         this.parseProjectFilesFromTIM(project, projectVersion);
         return this.projectService.retrieveAndCreateProjectResponse(projectVersion);

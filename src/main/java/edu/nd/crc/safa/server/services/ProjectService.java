@@ -73,8 +73,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResponse createProject(ProjectVersion projectVersion,
-                                                 ProjectAppEntity appEntity) throws ServerError {
+    public ProjectCreationResponse saveProjectAppEntity(ProjectVersion projectVersion,
+                                                        ProjectAppEntity appEntity) throws ServerError {
 
         if (appEntity.artifacts != null) {
             artifactService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());

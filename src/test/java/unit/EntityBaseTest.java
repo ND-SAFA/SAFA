@@ -152,4 +152,15 @@ public class EntityBaseTest extends SpringBootBaseTest {
 
         return request;
     }
+
+    public MockMultipartHttpServletRequestBuilder createSingleFileRequest(String routeName, String pathToFile)
+        throws IOException {
+        String attributeName = "file";
+
+        MockMultipartFile file = MultipartHelper.createFile(pathToFile, attributeName);
+        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
+        request.file(file);
+
+        return request;
+    }
 }

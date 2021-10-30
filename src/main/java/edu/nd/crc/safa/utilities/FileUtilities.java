@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for reading CSV files and validating them
@@ -27,20 +28,27 @@ public class FileUtilities {
                 throw new ServerError("CSV file does not exist: " + pathToFile);
             }
 
-            CSVFormat fileFormat = CSVFormat.DEFAULT
-                .withHeader() // only way to read headers without defining them.
-                .builder()
-                .setSkipHeaderRecord(false)
-                .setIgnoreEmptyLines(true)
-                .setAllowMissingColumnNames(true)
-                .setIgnoreHeaderCase(true)
-                .build();
-
+            CSVFormat fileFormat = getFormat();
             return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
             String error = String.format("Could not read CSV file at path: %s", pathToFile);
             throw new ServerError(error, e);
         }
+    }
+
+    public static CSVParser readMultiPartFile(MultipartFile file) throws IOException {
+        return CSVParser.parse(new String(file.getBytes()), getFormat());
+    }
+
+    private static CSVFormat getFormat() {
+        return CSVFormat.DEFAULT
+            .withHeader() // only way to read headers without defining them.
+            .builder()
+            .setSkipHeaderRecord(false)
+            .setIgnoreEmptyLines(true)
+            .setAllowMissingColumnNames(true)
+            .setIgnoreHeaderCase(true)
+            .build();
     }
 
     public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {

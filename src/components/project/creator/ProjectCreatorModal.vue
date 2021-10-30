@@ -34,7 +34,7 @@
         <v-container class="pa-10">
           <TraceFileUploader
             :artifactTypes="artifactTypes"
-            @change="traceFiles = $event"
+            @onChange="traceFiles = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"
           />
@@ -43,15 +43,7 @@
 
       <v-stepper-content step="4">
         <v-container class="pa-10">
-          <ProjectConfirmation
-            @onConfirm="saveProject"
-            :project="{
-              name: 'SAFA',
-              description: 'Safety Artifact Forest Analysis',
-              artifacts: [],
-              traces: [],
-            }"
-          />
+          <ProjectConfirmation @onConfirm="saveProject" :project="project" />
         </v-container>
       </v-stepper-content>
     </template>
@@ -103,7 +95,7 @@ export default Vue.extend({
       steps: [
         ["Name Project", false],
         ["Upload Artifacts", false],
-        ["Upload Trace Links", false],
+        ["Upload Trace Links", true],
         ["View TIM", false],
       ] as StepState[],
       name: "",

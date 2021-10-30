@@ -1,10 +1,6 @@
 import { Artifact } from "@/types/domain/artifact";
 import { TraceLink } from "@/types/domain/links";
-import {
-  ParserError,
-  ProjectIdentifier,
-  ProjectVersion,
-} from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 
 export enum ButtonType {
   ICON = "icon",
@@ -53,7 +49,7 @@ export type StepState = [string, boolean];
 
 interface ProjectFile {
   file?: File;
-  parserErrors?: ParserError[];
+  errors?: string[];
 }
 export interface ArtifactFile extends ProjectFile {
   type: string;

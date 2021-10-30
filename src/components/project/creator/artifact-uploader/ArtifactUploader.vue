@@ -34,6 +34,8 @@ import { ArtifactFile } from "@/types/common-components";
 import ArtifactFilePanel from "@/components/project/creator/artifact-uploader/ArtifactFilePanel.vue";
 import ArtifactNameModal from "@/components/project/creator/artifact-uploader/ArtifactNameModal.vue";
 import PanelController from "@/components/project/creator/shared/PanelController.vue";
+import { parseArtifactFile } from "@/api/parse-api";
+import { ParseArtifactFileResponse } from "@/types/api";
 
 const DEFAULT_VALID_STATE = false;
 
@@ -65,8 +67,21 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChange(i: number, file: File | undefined): void {
-      Vue.set(this.artifactFiles, i, { ...this.artifactFiles[i], file });
+    onChange(i: number, artifactFile: ArtifactFile | undefined): void {
+      Vue.set(this.artifactFiles, i, artifactFile);
+      if (artifactFile !== undefined && artifactFile.file !== undefined) {
+        parseArtifactFile(this.artifactFiles[i].type, artifactFile.file).then(
+          (res: ParseArtifactFileResponse) => {
+            const { artifacts, errors } = res;
+            Vue.set(this.artifactFiles, i, {
+              ...artifactFile,
+              artifacts,
+              errors,
+            });
+            this.$emit("onChange", this.artifactFiles);
+          }
+        );
+      }
       this.$emit("onChange", this.artifactFiles);
     },
     setFileIsValid(artifactFileIndex: number, isValid: boolean): void {

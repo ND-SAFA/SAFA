@@ -57,7 +57,7 @@ public class FileUtilities {
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                String error = "Expected file to have column [%s] but only saw %s";
+                String error = "Expected file to have column [%s] but found. %s";
                 throw new ServerError(String.format(error, n, file.getHeaderNames()));
             }
         }

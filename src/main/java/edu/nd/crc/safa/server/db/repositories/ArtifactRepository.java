@@ -16,13 +16,11 @@ public interface ArtifactRepository extends CrudRepository<Artifact, UUID> {
 
     Optional<Artifact> findByProjectAndName(Project project, String name);
 
-    Optional<Artifact> findByProjectAndTypeAndNameIgnoreCase(Project project, ArtifactType artifactType, String name);
-
     List<Artifact> findByProject(Project project);
 
     List<Artifact> findByProjectAndType(Project project, ArtifactType artifactType);
 
-    void deleteAllByProject(Project project);
-
-    Artifact findByArtifactId(UUID artifactId);
+    default List<Artifact> getProjectArtifacts(Project project) {
+        return findByProject(project);
+    }
 }

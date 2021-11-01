@@ -29,21 +29,23 @@ public interface ArtifactBodyRepository extends CrudRepository<ArtifactBody, UUI
         return findByProjectVersionProjectAndArtifactName(project, name);
     }
 
-    List<ArtifactBody> findByProjectVersionProjectAndArtifactName(Project project, String name);
-
     default Optional<ArtifactBody> findLastArtifactBody(Project project, Artifact artifact) {
         return this.findTopByProjectVersionProjectAndArtifactOrderByProjectVersionMajorVersionDescProjectVersionMinorVersionDescProjectVersionRevisionDesc(
             project,
             artifact);
     }
 
+    default List<ArtifactBody> findByProject(Project project) {
+        return findByProjectVersionProject(project);
+    }
+
+    List<ArtifactBody> findByProjectVersionProjectAndArtifactName(Project project, String name);
+
+
     Optional<ArtifactBody> findTopByProjectVersionProjectAndArtifactOrderByProjectVersionMajorVersionDescProjectVersionMinorVersionDescProjectVersionRevisionDesc(
         Project project,
         Artifact artifact);
 
-    default List<ArtifactBody> findByProject(Project project) {
-        return findByProjectVersionProject(project);
-    }
 
     List<ArtifactBody> findByProjectVersionProject(Project project);
 }

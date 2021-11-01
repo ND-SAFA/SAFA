@@ -52,7 +52,7 @@ public class DeltaService {
         Hashtable<String, ModifiedArtifact> modified = new Hashtable<>();
         Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
 
-        List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = this.artifactRepository.getProjectArtifacts(project);
         List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : projectArtifacts) {

@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
 import edu.nd.crc.safa.server.db.entities.sql.Project;
 import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
 import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.services.ArtifactService;
+import edu.nd.crc.safa.server.services.ArtifactVersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class TestArtifactService extends EntityBaseTest {
 
 
     @Autowired
-    ArtifactService artifactService;
+    ArtifactVersionService artifactVersionService;
 
     @Test
     public void checkAbleToFindLastArtifactBody() {
@@ -118,7 +118,7 @@ public class TestArtifactService extends EntityBaseTest {
         ProjectVersion newVersion = entityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
 
-        artifactService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
+        artifactVersionService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
         List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -144,7 +144,7 @@ public class TestArtifactService extends EntityBaseTest {
         ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", newContent);
 
         // VP - Verify that artifact body is detected to be modified
-        this.artifactService.setArtifactsAtVersion(projectVersion,
+        this.artifactVersionService.setArtifactsAtVersion(projectVersion,
             Arrays.asList(appEntity));
         Optional<ArtifactBody> updatedBodyQuery =
             this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion,

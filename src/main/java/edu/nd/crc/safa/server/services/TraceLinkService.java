@@ -13,7 +13,6 @@ import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
 import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.TraceLinkFinder;
 
@@ -22,8 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Responsible for providing an access to a project's
- * trace links.
+ * Provides interface to validating and creating trace links.
  */
 @Service
 public class TraceLinkService {
@@ -44,8 +42,7 @@ public class TraceLinkService {
         this.revisionNotificationService = revisionNotificationService;
     }
 
-    public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces)
-        throws ServerError {
+    public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces) {
         List<TraceLink> newLinks = new ArrayList<>();
         List<ParserError> newErrors = new ArrayList<>();
         traces.forEach(t -> {

@@ -23,15 +23,15 @@ import org.springframework.stereotype.Service;
 public class WarningService {
 
     WarningRepository warningRepository;
-    ArtifactService artifactService;
+    ArtifactVersionService artifactVersionService;
     TraceLinkRepository traceLinkRepository;
 
     @Autowired
     public WarningService(WarningRepository warningRepository,
-                          ArtifactService artifactService,
+                          ArtifactVersionService artifactVersionService,
                           TraceLinkRepository traceLinkRepository) {
         this.warningRepository = warningRepository;
-        this.artifactService = artifactService;
+        this.artifactVersionService = artifactVersionService;
         this.traceLinkRepository = traceLinkRepository;
     }
 
@@ -43,7 +43,7 @@ public class WarningService {
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactBody> artifacts = artifactService.getArtifactBodiesAtVersion(projectVersion);
+        List<ArtifactBody> artifacts = artifactVersionService.getArtifactBodiesAtVersion(projectVersion);
         List<TraceLink> traceLinks = this.traceLinkRepository.getApprovedLinks(project);
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);
     }

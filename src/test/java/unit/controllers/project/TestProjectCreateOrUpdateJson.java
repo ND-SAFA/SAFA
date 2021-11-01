@@ -133,7 +133,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
             .as("designs created)")
             .isEqualTo(1);
 
-        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
         assertThat(projectArtifacts.size()).isEqualTo(N_ARTIFACTS);
 
         // VP - Artifact bodies

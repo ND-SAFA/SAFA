@@ -15,7 +15,7 @@ import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
-import edu.nd.crc.safa.server.services.ArtifactService;
+import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.VersionService;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtifactController extends BaseController {
 
     ProjectService projectService;
-    ArtifactService artifactService;
+    ArtifactVersionService artifactVersionService;
     VersionService versionService;
 
     ArtifactRepository artifactRepository;
@@ -45,13 +45,13 @@ public class ArtifactController extends BaseController {
     public ArtifactController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
                               ProjectService projectService,
-                              ArtifactService artifactService,
+                              ArtifactVersionService artifactVersionService,
                               VersionService versionService,
                               ArtifactRepository artifactRepository,
                               RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository);
         this.projectService = projectService;
-        this.artifactService = artifactService;
+        this.artifactVersionService = artifactVersionService;
         this.versionService = versionService;
         this.artifactRepository = artifactRepository;
         this.revisionNotificationService = revisionNotificationService;
@@ -63,7 +63,7 @@ public class ArtifactController extends BaseController {
         @PathVariable UUID versionId,
         @Valid @RequestBody ArtifactAppEntity artifact) throws ServerError {
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        this.artifactService.addArtifactToVersion(projectVersion, artifact);
+        this.artifactVersionService.setArtifactAtProjectVersion(projectVersion, artifact);
         this.revisionNotificationService.broadcastArtifact(projectVersion, artifact);
         return new ServerResponse(artifact);
     }

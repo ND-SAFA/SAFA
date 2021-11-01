@@ -43,7 +43,7 @@ public class ProjectService {
     TraceLinkRepository traceLinkRepository;
     ParserErrorRepository parserErrorRepository;
     ParserErrorService parserErrorService;
-    ArtifactService artifactService;
+    ArtifactVersionService artifactVersionService;
     TraceLinkService traceLinkService;
     WarningService warningService;
 
@@ -56,7 +56,7 @@ public class ProjectService {
                           TraceLinkRepository traceLinkRepository,
                           ParserErrorRepository parserErrorRepository,
                           ParserErrorService parserErrorService,
-                          ArtifactService artifactService,
+                          ArtifactVersionService artifactVersionService,
                           TraceLinkService traceLinkService,
                           WarningService warningService) {
         this.projectRepository = projectRepository;
@@ -67,7 +67,7 @@ public class ProjectService {
         this.traceLinkRepository = traceLinkRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.parserErrorService = parserErrorService;
-        this.artifactService = artifactService;
+        this.artifactVersionService = artifactVersionService;
         this.traceLinkService = traceLinkService;
         this.warningService = warningService;
     }
@@ -77,7 +77,7 @@ public class ProjectService {
                                                         ProjectAppEntity appEntity) throws ServerError {
 
         if (appEntity.artifacts != null) {
-            artifactService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
+            artifactVersionService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
         }
 
         if (appEntity.traces != null) {
@@ -91,7 +91,7 @@ public class ProjectService {
     public ProjectCreationResponse updateProject(ProjectVersion projectVersion,
                                                  ProjectAppEntity appEntity) throws ServerError {
 
-        artifactService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
+        artifactVersionService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
         Map<String, List<RuleName>> projectWarnings = warningService.findViolationsInArtifactTree(projectVersion);
@@ -109,7 +109,7 @@ public class ProjectService {
 
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactBody> artifactBodies = artifactService
+        List<ArtifactBody> artifactBodies = artifactVersionService
             .getArtifactBodiesAtVersion(projectVersion);
 
         List<ArtifactAppEntity> artifacts =

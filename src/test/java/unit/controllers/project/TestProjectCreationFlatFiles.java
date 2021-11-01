@@ -139,7 +139,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
             .as("env assumptions created")
             .isEqualTo(TestConstants.N_ENV_ASSUMPTIONS);
 
-        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
         assertThat(projectArtifacts.size()).isEqualTo(TestConstants.N_ARTIFACTS);
 
         // VP - Artifact bodies

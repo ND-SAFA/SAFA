@@ -32,13 +32,13 @@
 @media screen and (min-height: 200px) {
   #cy-container,
   #cytoscape-div {
-    height: 300px !important;
-    max-height: 350px !important;
+    height: 400px !important;
+    max-height: 400px !important;
     min-height: 200px !important;
   }
 }
 
-@media screen and (min-height: 600px) {
+@media screen and (min-height: 800px) {
   #cy-container,
   #cytoscape-div {
     height: 600px !important;

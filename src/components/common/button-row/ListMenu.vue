@@ -1,7 +1,14 @@
 <template>
   <v-menu offset-y bottom :rounded="false">
     <template v-slot:activator="{ on }">
-      <v-btn :text="buttonIsText" small :color="buttonColor" dark v-on="on">
+      <v-btn
+        :text="buttonIsText"
+        small
+        :color="buttonColor"
+        dark
+        v-on="on"
+        :disabled="disabled"
+      >
         {{ buttonLabel }}
       </v-btn>
     </template>
@@ -48,6 +55,11 @@ export default Vue.extend({
     };
   },
   computed: {
+    disabled(): boolean {
+      return this.definition.isDisabled !== undefined
+        ? this.definition.isDisabled
+        : false;
+    },
     buttonColor(): string {
       const { buttonColor } = this.definition;
       return buttonColor === undefined ? DEFAULT_BUTTON_COLOR : buttonColor;

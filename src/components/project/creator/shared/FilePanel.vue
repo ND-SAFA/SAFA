@@ -4,7 +4,7 @@
       <v-container>
         <v-row>
           <v-col cols="1" align-self="center">
-            <v-icon :color="iconColor">{{ iconName }}</v-icon>
+            <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
           </v-col>
           <v-col cols="11" align-self="center">
             <slot name="title" />
@@ -25,8 +25,11 @@
               <GenericFileSelector
                 :multiple="false"
                 @onChangeFiles="emitChangeFiles"
-                @onClear="$emit('onChange', undefined)"
               />
+            </v-row>
+            <v-row>
+              <v-col cols="9">Ignore Errors:</v-col>
+              <v-col cols="3"><v-switch v-model="ignoreErrors" /> </v-col>
             </v-row>
           </v-container>
         </v-row>
@@ -34,23 +37,49 @@
           <label class="text-caption" style="color: red"> {{ error }}</label>
         </v-row>
 
-        <v-row v-if="error.length > 0" justify="center">
-          <label
-            v-for="(error, i) in errors"
-            :key="i"
-            class="text-caption"
-            style="color: red"
-          >
-            {{ error }}
-          </label>
-        </v-row>
-
-        <v-row>
-          <v-divider />
-        </v-row>
-
-        <v-row>
-          <slot name="after-rows" />
+        <v-row justify="center">
+          <v-expansion-panels accordion>
+            <v-expansion-panel v-if="entityNames.length !== 0">
+              <v-expansion-panel-header>
+                <h4>Entities</h4>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row>
+                  <v-btn
+                    fab
+                    x-small
+                    color="primary"
+                    class="ma-1"
+                    v-for="entityName in entityNames"
+                    :key="entityName"
+                    @click="underDevelopmentError()"
+                  >
+                    {{ entityName }}
+                  </v-btn>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel v-if="errors.length > 0">
+              <v-expansion-panel-header>
+                <h4>
+                  <v-icon small :color="getIconColor(errorIconName)">{{
+                    errorIconName
+                  }}</v-icon
+                  >{{ errors.length === 0 ? "No Errors" : "Errors" }}
+                </h4>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <label
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  class="text-caption"
+                  style="color: red"
+                >
+                  {{ i }}: {{ error }}
+                </label>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </v-row>
 
         <v-row>
@@ -75,6 +104,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
+import { appModule } from "@/store";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
@@ -95,34 +125,68 @@ export default Vue.extend({
       type: Array as PropType<string[]>,
       required: true,
     },
+    entityNames: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    ignoreErrorsFlag: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
-      error: DEFAULT_ERROR_MESSAGE,
+      error: this.showFileUploader ? DEFAULT_ERROR_MESSAGE : "",
     };
   },
   computed: {
+    ignoreErrors: {
+      get(): boolean {
+        return this.ignoreErrorsFlag;
+      },
+      set(ignoreErrors: boolean): void {
+        this.$emit("update:ignoreErrorsFlag", ignoreErrors);
+      },
+    },
     isValid(): boolean {
-      return this.error === "" || !this.showFileUploader;
+      return (
+        this.ignoreErrors || (this.error === "" && this.errors.length === 0)
+      );
     },
     iconName(): string {
       return this.isValid ? "mdi-check" : "mdi-close";
     },
-    iconColor(): string {
-      return this.isValid ? "success" : "error";
+    errorIconName(): string {
+      return this.errors.length > 0 ? "mdi-close" : "mdi-check";
     },
   },
   methods: {
+    getIconColor(iconName: string): string {
+      switch (iconName) {
+        case "mdi-close":
+          return "error";
+        case "mdi-check":
+          return "success";
+        default:
+          return "primary";
+      }
+    },
+    onClear(): void {
+      this.$emit("onChange", undefined);
+    },
     emitChangeFiles(file: File): void {
       const fileIsEmpty = file === null;
       if (this.fileRequired) {
         this.error = fileIsEmpty ? DEFAULT_ERROR_MESSAGE : "";
       }
       if (fileIsEmpty) {
-        this.$emit("onChange", undefined);
+        this.onClear();
       } else {
         this.$emit("onChange", file);
       }
+    },
+    underDevelopmentError(): void {
+      appModule.onWarning("Viewing parsed entities is under development.");
     },
   },
 });

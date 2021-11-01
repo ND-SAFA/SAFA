@@ -13,8 +13,9 @@
           v-for="(traceFile, i) in traceFiles"
           :key="traceFile.type"
           :traceFile="traceFile"
+          :artifactMap="artifactMap"
           @onChange="onChange(i, $event)"
-          @onDelete="deletetraceFile(i)"
+          @onDelete="deleteTraceFile(i)"
           @onIsValid="setFileIsValid(i, true)"
           @onIsInvalid="setFileIsValid(i, false)"
         />
@@ -39,6 +40,7 @@ import TraceFileCreator from "./TraceFileCreator.vue";
 import { TraceLink } from "@/types/domain/links";
 import { parseTraceFile } from "@/api/parse-api";
 import { ParseTraceFileResponse } from "@/types/api";
+import { Artifact } from "@/types/domain/artifact";
 
 const DEFAULT_IS_GENERATED = false;
 const DEFAULT_VALID_STATE = false;
@@ -54,11 +56,18 @@ export default Vue.extend({
       type: Array as PropType<string[]>,
       required: true,
     },
+    artifactMap: {
+      type: Object as PropType<Record<string, Artifact>>,
+      required: true,
+    },
+    traceFiles: {
+      type: Array as PropType<TraceFile[]>,
+      required: true,
+    },
   },
   data() {
     return {
       isValidStates: [] as boolean[],
-      traceFiles: [] as TraceFile[],
       isCreateTraceCreatorOpen: false,
     };
   },
@@ -78,32 +87,37 @@ export default Vue.extend({
   },
   methods: {
     onChange(i: number, traceFile: TraceFile | undefined): void {
-      Vue.set(this.traceFiles, i, traceFile);
-      if (traceFile !== undefined && traceFile.file !== undefined) {
-        parseTraceFile(traceFile.file).then((res: ParseTraceFileResponse) => {
-          const { traces, errors } = res;
-          Vue.set(this.traceFiles, i, { ...traceFile, traces, errors });
-          this.$emit("onChange", this.traceFiles);
-        });
-      }
-      this.$emit("onChange", this.traceFiles);
+      this.$emit(
+        "onChange",
+        this.traceFiles.map((a, currentIndex) => {
+          if (currentIndex === i) return traceFile;
+          return a;
+        })
+      );
     },
     setFileIsValid(traceFileIndex: number, isValid: boolean): void {
       Vue.set(this.isValidStates, traceFileIndex, isValid);
     },
-    deletetraceFile(i: number): void {
-      this.traceFiles = this.traceFiles.filter((f, index) => index !== i);
+    deleteTraceFile(i: number): void {
+      this.$emit(
+        "onChange",
+        this.traceFiles.filter((f, index) => index !== i)
+      );
     },
     addTraceFile(traceLink: TraceLink): void {
-      this.traceFiles = this.traceFiles.concat([
-        {
-          source: traceLink.source,
-          target: traceLink.target,
-          isGenerated: DEFAULT_IS_GENERATED,
-        },
-      ]);
       this.isValidStates = this.isValidStates.concat([DEFAULT_VALID_STATE]);
-      this.$emit("onChange", this.traceFiles);
+      this.$emit(
+        "onChange",
+        this.traceFiles.concat([
+          {
+            source: traceLink.source,
+            target: traceLink.target,
+            isGenerated: DEFAULT_IS_GENERATED,
+            errors: [],
+            traces: [],
+          },
+        ])
+      );
     },
   },
 });

@@ -23,6 +23,7 @@
       <v-stepper-content step="2">
         <v-container class="pa-10">
           <ArtifactFileUploader
+            :artifactFiles="artifactFiles"
             @onChange="artifactFiles = $event"
             @onIsValid="setStepIsValid(1, true)"
             @onIsInvalid="setStepIsValid(1, false)"
@@ -33,7 +34,9 @@
       <v-stepper-content step="3">
         <v-container class="pa-10">
           <TraceFileUploader
+            :traceFiles="traceFiles"
             :artifactTypes="artifactTypes"
+            :artifactMap="artifactMap"
             @onChange="traceFiles = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"
@@ -132,25 +135,36 @@ export default Vue.extend({
     },
   },
   computed: {
-    project(): Project {
+    artifactMap(): Record<string, Artifact> {
+      const artifactMap: Record<string, Artifact> = {};
+      this.artifacts.forEach((a) => (artifactMap[a.name] = a));
+      return artifactMap;
+    },
+    artifacts(): Artifact[] {
       let artifacts: Artifact[] = [];
-      let traces: TraceLink[] = [];
       this.artifactFiles.forEach((artifactFile) => {
         if (artifactFile.artifacts !== undefined) {
           artifacts = artifacts.concat(artifactFile.artifacts);
         }
       });
+      return artifacts;
+    },
+    traces(): TraceLink[] {
+      let traces: TraceLink[] = [];
       this.traceFiles.forEach((traceFile) => {
         if (traceFile.traces !== undefined) {
           traces = traces.concat(traceFile.traces);
         }
       });
+      return traces;
+    },
+    project(): Project {
       return {
         projectId: "",
         name: this.name,
         description: this.description,
-        artifacts: artifacts,
-        traces: traces,
+        artifacts: this.artifacts,
+        traces: this.traces,
       };
     },
     totalSteps(): number {
@@ -170,12 +184,8 @@ export default Vue.extend({
       }
     },
     currentStep(nextStep: number): void {
-      switch (nextStep) {
-        case 2:
-          Vue.set(this.steps, 0, [this.name, true]);
-          break;
-        default:
-          break;
+      if (nextStep >= 2) {
+        Vue.set(this.steps, 0, [this.name, true]);
       }
     },
     name(): void {

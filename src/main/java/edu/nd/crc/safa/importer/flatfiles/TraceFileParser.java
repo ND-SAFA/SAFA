@@ -7,17 +7,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.ParserError;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
@@ -127,7 +127,7 @@ public class TraceFileParser {
 
         Pair<List<TraceLink>, List<Pair<String, Long>>> parseResponse =
             parseTraceFile((a) -> artifactRepository.findByProjectAndName(project, a),
-                (s, t) -> traceLinkService.linkExists(s, t),
+                (s, t) -> traceLinkService.queryForLinkBetween(s, t),
                 traceFileParser);
         List<ParserError> parserErrors = parseResponse.getValue1().stream().map(error -> {
             ParserError parserError = new ParserError(projectVersion, error.getValue0(),

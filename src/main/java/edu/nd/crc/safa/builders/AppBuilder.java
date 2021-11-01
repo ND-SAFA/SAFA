@@ -2,8 +2,8 @@ package edu.nd.crc.safa.builders;
 
 import java.util.Hashtable;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 
 import org.springframework.stereotype.Component;
 

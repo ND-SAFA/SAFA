@@ -3,8 +3,8 @@ package edu.nd.crc.safa.server.messages;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;
 
 public class ProjectCreationResponse {

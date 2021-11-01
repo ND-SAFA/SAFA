@@ -2,11 +2,11 @@ package edu.nd.crc.safa.server.services;
 
 import java.util.List;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.messages.Update;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ public class RevisionNotificationService {
     }
 
     public static String getProjectTopic(Project project) {
+        // TODO: Send notification when project name/description updated
         return String.format("/topic/projects/%s", project.getProjectId());
     }
 

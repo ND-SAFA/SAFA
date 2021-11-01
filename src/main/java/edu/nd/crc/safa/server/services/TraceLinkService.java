@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ParserError;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.TraceLinkFinder;
 
@@ -29,7 +29,6 @@ public class TraceLinkService {
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactRepository artifactRepository;
     private final ParserErrorRepository parserErrorRepository;
-    private final RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceLinkService(TraceLinkRepository traceLinkRepository,
@@ -39,7 +38,6 @@ public class TraceLinkService {
         this.traceLinkRepository = traceLinkRepository;
         this.artifactRepository = artifactRepository;
         this.parserErrorRepository = parserErrorRepository;
-        this.revisionNotificationService = revisionNotificationService;
     }
 
     public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces) {
@@ -68,7 +66,7 @@ public class TraceLinkService {
                                                     String targetName) {
         ArtifactFinder artifactFinder = (a) ->
             artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
-        Pair<TraceLink, String> parseResponse = parseTraceLink(artifactFinder, this::linkExists, sourceName,
+        Pair<TraceLink, String> parseResponse = parseTraceLink(artifactFinder, this::queryForLinkBetween, sourceName,
             targetName);
         return new Pair<>(parseResponse.getValue0(), new ParserError(projectVersion, parseResponse.getValue1(),
             ApplicationActivity.PARSING_TRACES));
@@ -114,7 +112,7 @@ public class TraceLinkService {
         }
     }
 
-    public Optional<TraceLink> linkExists(Artifact sourceArtifact, Artifact targetArtifact) {
+    public Optional<TraceLink> queryForLinkBetween(Artifact sourceArtifact, Artifact targetArtifact) {
         Optional<TraceLink> traceQuery = this.traceLinkRepository
             .getApprovedLinkIfExist(sourceArtifact, targetArtifact);
         if (traceQuery.isPresent()) {

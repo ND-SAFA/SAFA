@@ -5,8 +5,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.db.entities.sql.TraceApproval;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceApproval;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

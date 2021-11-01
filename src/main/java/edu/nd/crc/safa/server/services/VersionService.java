@@ -3,10 +3,10 @@ package edu.nd.crc.safa.server.services;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;

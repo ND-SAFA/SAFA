@@ -2,7 +2,7 @@ package edu.nd.crc.safa.server.messages;
 
 import java.util.List;
 
-import edu.nd.crc.safa.server.db.entities.app.ErrorApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
 
 public class ProjectErrors {
     List<ErrorApplicationEntity> tim;

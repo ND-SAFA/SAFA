@@ -6,13 +6,13 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 import edu.nd.crc.safa.server.messages.ServerResponse;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
@@ -34,11 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ArtifactController extends BaseController {
 
+    ArtifactRepository artifactRepository;
+
     ProjectService projectService;
     ArtifactVersionService artifactVersionService;
     VersionService versionService;
-
-    ArtifactRepository artifactRepository;
     RevisionNotificationService revisionNotificationService;
 
     @Autowired

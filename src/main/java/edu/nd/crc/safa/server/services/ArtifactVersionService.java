@@ -7,16 +7,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.messages.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +34,29 @@ public class ArtifactVersionService {
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactBodyRepository artifactBodyRepository;
+
     DeltaService deltaService;
-    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ArtifactVersionService(ArtifactRepository artifactRepository,
                                   ArtifactTypeRepository artifactTypeRepository,
                                   ArtifactBodyRepository artifactBodyRepository,
-                                  DeltaService deltaService,
-                                  RevisionNotificationService revisionNotificationService) {
+                                  DeltaService deltaService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.deltaService = deltaService;
-        this.revisionNotificationService = revisionNotificationService;
+    }
+
+    /**
+     * Calculates contents of each artifact at given version and returns bodies at version.
+     *
+     * @param projectVersion - The version of the artifact bodies that are returned
+     * @return list of artifact bodies in project at given version
+     */
+    public List<ArtifactBody> getArtifactBodiesAtVersion(ProjectVersion projectVersion) {
+        Hashtable<String, List<ArtifactBody>> artifactBodyTable = groupProjectArtifactBodiesByArtifactName(projectVersion);
+        return calculateArtifactBodiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
 
     /**
@@ -64,17 +73,6 @@ public class ArtifactVersionService {
         for (ArtifactBody body : allArtifactBodies) {
             saveArtifactBody(body);
         }
-    }
-
-    /**
-     * Calculates contents of each artifact at given version and returns bodies at version.
-     *
-     * @param projectVersion - The version of the artifact bodies that are returned
-     * @return list of artifact bodies in project at given version
-     */
-    public List<ArtifactBody> getArtifactBodiesAtVersion(ProjectVersion projectVersion) {
-        Hashtable<String, List<ArtifactBody>> artifactBodyTable = groupProjectArtifactBodiesByArtifactName(projectVersion);
-        return calculateArtifactBodiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
 
     /**

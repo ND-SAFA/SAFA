@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.messages;
 
-import edu.nd.crc.safa.server.db.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
 
 import org.json.JSONObject;
 

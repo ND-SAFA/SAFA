@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.db.entities.sql.Warning;
+import edu.nd.crc.safa.server.entities.db.Warning;
 
 public class Rule {
     private final RuleName mRuleName;

@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.messages;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
 
 public class ArtifactChange {
     ModificationType revisionType;

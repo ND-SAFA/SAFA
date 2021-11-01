@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import edu.nd.crc.safa.server.db.entities.sql.Project;
+import edu.nd.crc.safa.server.entities.db.Project;
 
 /**
  * Contains common full paths used through app.

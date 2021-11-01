@@ -4,13 +4,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.messages.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
 
@@ -31,17 +32,20 @@ public class VersionController extends BaseController {
     Puller mPuller;
     VersionService versionService;
     ProjectService projectService;
+    ProjectRetrievalService projectRetrievalService;
 
     @Autowired
     public VersionController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              Puller mPuller,
                              VersionService versionService,
-                             ProjectService projectService) {
+                             ProjectService projectService,
+                             ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository);
         this.mPuller = mPuller;
         this.versionService = versionService;
         this.projectService = projectService;
+        this.projectRetrievalService = projectRetrievalService;
     }
 
     @GetMapping("projects/{projectId}/versions")
@@ -96,8 +100,9 @@ public class VersionController extends BaseController {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
 
         if (versionQuery.isPresent()) {
-            ProjectAppEntity projectAppEntity = this.projectService.createApplicationEntity(versionQuery.get());
-            return new ServerResponse(this.projectService.retrieveAndCreateProjectResponse(versionQuery.get()));
+            ProjectCreationResponse response = this.projectRetrievalService
+                .retrieveAndCreateProjectResponse(versionQuery.get());
+            return new ServerResponse(response);
         } else {
             throw new ServerError("Could not find version with id: " + versionId);
         }

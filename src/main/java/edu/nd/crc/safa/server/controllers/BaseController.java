@@ -3,12 +3,13 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ResponseCodes;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.messages.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.ResponseCodes;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -90,5 +91,17 @@ public abstract class BaseController {
         } else {
             return objectName + message;
         }
+    }
+
+    protected Project createProjectIdentifier(String name, String description) {
+        Project project = new Project(name, description); // TODO: extract name from TIM file
+        this.projectRepository.save(project);
+        return project;
+    }
+
+    protected ProjectVersion createProjectVersion(Project project) {
+        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
+        this.projectVersionRepository.save(projectVersion);
+        return projectVersion;
     }
 }

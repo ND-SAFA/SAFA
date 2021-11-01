@@ -3,11 +3,11 @@ package edu.nd.crc.safa.server.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.db.entities.app.ErrorApplicationEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ApplicationActivity;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.messages.ProjectErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectErrors;
+import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,12 @@ public class ParserErrorService {
         this.parserErrorRepository = parserErrorRepository;
     }
 
+    /**
+     * Retrieves, collections, and separates errors generated during given project version.
+     *
+     * @param projectVersion The ProjectVersion which returned errors are associated with.
+     * @return Separated errors by ApplicationActivity.
+     */
     public ProjectErrors collectionProjectErrors(ProjectVersion projectVersion) {
 
         List<ErrorApplicationEntity> timErrors = this.parserErrorRepository

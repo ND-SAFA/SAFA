@@ -10,13 +10,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.vsm.Controller;
 
@@ -49,7 +49,7 @@ public class TraceLinkGenerator {
         return generatedLinks
             .stream()
             .filter(t -> {
-                Optional<TraceLink> alreadyApprovedLink = traceLinkService.linkExists(
+                Optional<TraceLink> alreadyApprovedLink = traceLinkService.queryForLinkBetween(
                     t.getSourceArtifact(),
                     t.getTargetArtifact());
                 return !alreadyApprovedLink.isPresent();

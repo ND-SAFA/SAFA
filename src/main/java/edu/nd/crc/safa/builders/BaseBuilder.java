@@ -2,7 +2,7 @@ package edu.nd.crc.safa.builders;
 
 import java.util.Hashtable;
 
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 
 public abstract class BaseBuilder {
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -57,7 +57,7 @@ public class FileUtilities {
 
         for (String n : names) {
             if (!headerNamesLower.contains(n)) {
-                String error = "Expected file to have column [%s] but only saw %s";
+                String error = "Expected file to have column [%s] but found. %s";
                 throw new ServerError(String.format(error, n, file.getHeaderNames()));
             }
         }

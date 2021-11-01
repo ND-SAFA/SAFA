@@ -2,7 +2,7 @@ package unit.entities.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;

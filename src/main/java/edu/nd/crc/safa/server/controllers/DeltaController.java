@@ -3,11 +3,11 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.messages.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.DeltaService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +42,6 @@ public class DeltaController extends BaseController {
         if (!targetQuery.isPresent()) {
             throw new ServerError("Target version with id not found: " + targetVersionId);
         }
-        return new ServerResponse(this.deltaService.calculateDelta(sourceQuery.get(), targetQuery.get()));
+        return new ServerResponse(this.deltaService.calculateProjectDelta(sourceQuery.get(), targetQuery.get()));
     }
 }

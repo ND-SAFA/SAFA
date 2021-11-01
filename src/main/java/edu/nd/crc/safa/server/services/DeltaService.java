@@ -59,7 +59,10 @@ public class DeltaService {
         List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : projectArtifacts) {
-            DeltaArtifact deltaArtifact = calcualteArtifactModificationBetweenVersions(artifact, baselineVersion, targetVersion);
+            DeltaArtifact deltaArtifact = calcualteArtifactModificationBetweenVersions(
+                artifact,
+                baselineVersion,
+                targetVersion);
             if (deltaArtifact == null) {
                 continue;
             }

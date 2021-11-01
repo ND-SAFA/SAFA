@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.ArtifactFile;
@@ -20,7 +21,6 @@ import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

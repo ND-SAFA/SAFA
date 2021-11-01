@@ -7,15 +7,17 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.server.entities.api.FileParser;
+import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
+import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
+import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
-import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
-import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -53,16 +55,18 @@ public class ParseFileController extends BaseController {
     @PostMapping(value = "projects/parse/artifacts/{artifactType}")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
-                                            @RequestParam MultipartFile file) throws ServerError, IOException {
+                                            @RequestParam MultipartFile file) throws IOException {
         CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
         ParseArtifactFileResponse response = new ParseArtifactFileResponse();
-        Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
-            artifactFileParser.parseArtifactFileIntoApplicationEntities(
-                file.getOriginalFilename(),
-                artifactType,
-                fileCSV);
-        response.setArtifacts(parseResponse.getValue0());
-        response.setErrors(parseResponse.getValue1());
+        tryParseFile(response, () -> {
+            Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
+                artifactFileParser.parseArtifactFileIntoApplicationEntities(
+                    file.getOriginalFilename(),
+                    artifactType,
+                    fileCSV);
+            response.setArtifacts(parseResponse.getValue0());
+            response.setErrors(parseResponse.getValue1());
+        });
         return new ServerResponse(response);
     }
 
@@ -71,15 +75,25 @@ public class ParseFileController extends BaseController {
     public ServerResponse parseTraceFile(@RequestParam MultipartFile file) throws ServerError, IOException {
         CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
         ParseTraceFileResponse response = new ParseTraceFileResponse();
-        Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> parseResponse =
-            traceFileParser.readTraceFile(
-                (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json
-                (s, t) -> Optional.empty(), // TODO: Replace with traces from json
-                fileCSV);
-        List<String> errors = parseResponse.getValue1().stream().map(Pair::getValue0).collect(Collectors.toList());
+        tryParseFile(response, () -> {
+            Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> parseResponse =
+                traceFileParser.readTraceFile(
+                    (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json
+                    (s, t) -> Optional.empty(), // TODO: Replace with traces from json
+                    fileCSV);
+            List<String> errors = parseResponse.getValue1().stream().map(Pair::getValue0).collect(Collectors.toList());
 
-        response.setTraces(parseResponse.getValue0());
-        response.setErrors(errors);
+            response.setTraces(parseResponse.getValue0());
+            response.setErrors(errors);
+        });
         return new ServerResponse(response);
+    }
+
+    private void tryParseFile(ParseFileResponse response, FileParser fileParser) {
+        try {
+            fileParser.parseFile();
+        } catch (Exception e) {
+            response.setErrors(List.of(e.getMessage()));
+        }
     }
 }

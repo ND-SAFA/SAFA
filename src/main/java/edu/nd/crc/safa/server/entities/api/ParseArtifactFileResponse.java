@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 
-public class ParseArtifactFileResponse {
+public class ParseArtifactFileResponse implements ParseFileResponse {
 
     List<ArtifactAppEntity> artifacts;
     List<String> errors;

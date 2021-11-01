@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -13,8 +15,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;

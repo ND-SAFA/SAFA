@@ -12,15 +12,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.EntityBaseTest;
 import unit.TestConstants;
 
-public class TestParseIndividualFiles extends EntityBaseTest {
+public class TestParseDataFilesErrors extends EntityBaseTest {
 
     @Test
-    public void testArtifactTypeNotFound() throws Exception {
+    public void testDuplicateArtifact() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/parse/artifacts/Designs";
-        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
-            ProjectPaths.PATH_TO_BEFORE_FILES + "/Design.csv");
+        String routeName = "/projects/parse/artifacts/designs";
+        String pathToArtifactFile = ProjectPaths.PATH_TO_ARTIFACT_FILES + "/DuplicateArtifact.csv";
+        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToArtifactFile);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk());
 
         // VP - Verify that error occurred.

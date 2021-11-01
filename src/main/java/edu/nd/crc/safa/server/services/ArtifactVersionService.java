@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
@@ -17,7 +18,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,8 @@ public class ArtifactVersionService {
      * @return list of artifact bodies in project at given version
      */
     public List<ArtifactBody> getArtifactBodiesAtVersion(ProjectVersion projectVersion) {
-        Hashtable<String, List<ArtifactBody>> artifactBodyTable = groupProjectArtifactBodiesByArtifactName(projectVersion);
+        Hashtable<String, List<ArtifactBody>> artifactBodyTable =
+            groupProjectArtifactBodiesByArtifactName(projectVersion);
         return calculateArtifactBodiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
 
@@ -117,7 +118,9 @@ public class ArtifactVersionService {
         return artifacts;
     }
 
-    private List<ArtifactBody> calculateArtifactBodiesAtVersion(ProjectVersion projectVersion, List<ArtifactAppEntity> projectArtifacts) {
+    private List<ArtifactBody> calculateArtifactBodiesAtVersion(
+        ProjectVersion projectVersion,
+        List<ArtifactAppEntity> projectArtifacts) {
         Hashtable<String, ArtifactAppEntity> artifactsUpdated = new Hashtable<>();
         List<ArtifactBody> updatedArtifactBodies = projectArtifacts
             .stream()

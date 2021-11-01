@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 
-public class ParseTraceFileResponse {
+public class ParseTraceFileResponse implements ParseFileResponse {
 
     List<TraceApplicationEntity> traces;
     List<String> errors;

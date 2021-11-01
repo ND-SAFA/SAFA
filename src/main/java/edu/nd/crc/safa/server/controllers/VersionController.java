@@ -4,13 +4,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
@@ -100,8 +100,9 @@ public class VersionController extends BaseController {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
 
         if (versionQuery.isPresent()) {
-            ProjectAppEntity projectAppEntity = this.projectRetrievalService.createApplicationEntity(versionQuery.get());
-            return new ServerResponse(this.projectRetrievalService.retrieveAndCreateProjectResponse(versionQuery.get()));
+            ProjectCreationResponse response = this.projectRetrievalService
+                .retrieveAndCreateProjectResponse(versionQuery.get());
+            return new ServerResponse(response);
         } else {
             throw new ServerError("Could not find version with id: " + versionId);
         }

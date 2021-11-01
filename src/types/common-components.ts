@@ -34,6 +34,7 @@ interface MenuDefinition {
 }
 export interface ListMenuDefinition extends MenuDefinition {
   type: ButtonType.LIST_MENU;
+  isDisabled?: boolean;
 }
 
 export interface CheckmarkMenuDefinition extends MenuDefinition {
@@ -47,18 +48,18 @@ export type OptionalProjectVersion = ProjectVersion | undefined;
 export type ModalSize = "xxs" | "xs" | "s" | "m" | "l";
 export type StepState = [string, boolean];
 
-interface ProjectFile {
+export interface ProjectFile {
   file?: File;
-  errors?: string[];
+  errors: string[];
 }
 export interface ArtifactFile extends ProjectFile {
   type: string;
-  artifacts?: Artifact[];
+  artifacts: Artifact[];
 }
 
 export interface TraceFile extends ProjectFile {
   source: string;
   target: string;
   isGenerated: boolean;
-  traces?: TraceLink[];
+  traces: TraceLink[];
 }

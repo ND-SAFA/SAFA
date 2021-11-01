@@ -57,7 +57,7 @@ export default Vue.extend({
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
-      createProjectOpen: true,
+      createProjectOpen: false,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },

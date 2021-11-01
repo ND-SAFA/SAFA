@@ -123,6 +123,7 @@ export default Vue.extend({
         buttonColor: "primary",
         buttonIsText: false,
         showSelectedValue: true,
+        isDisabled: this.targetTypes.length === 0,
       };
     },
   },

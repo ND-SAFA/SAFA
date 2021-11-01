@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-expansion-panels>
+      <v-expansion-panels :value="0">
         <slot name="panels" />
       </v-expansion-panels>
     </v-row>

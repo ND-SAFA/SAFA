@@ -29,13 +29,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { ArtifactFile } from "@/types/common-components";
 import ArtifactFilePanel from "@/components/project/creator/artifact-uploader/ArtifactFilePanel.vue";
 import ArtifactNameModal from "@/components/project/creator/artifact-uploader/ArtifactNameModal.vue";
 import PanelController from "@/components/project/creator/shared/PanelController.vue";
-import { parseArtifactFile } from "@/api/parse-api";
-import { ParseArtifactFileResponse } from "@/types/api";
 
 const DEFAULT_VALID_STATE = false;
 
@@ -45,10 +43,15 @@ export default Vue.extend({
     ArtifactNameModal,
     PanelController,
   },
+  props: {
+    artifactFiles: {
+      type: Array as PropType<Array<ArtifactFile>>,
+      required: true,
+    },
+  },
   data() {
     return {
       isValidStates: [] as boolean[],
-      artifactFiles: [] as ArtifactFile[],
       isCreateArtifactOpen: false,
     };
   },
@@ -67,37 +70,36 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChange(i: number, artifactFile: ArtifactFile | undefined): void {
-      Vue.set(this.artifactFiles, i, artifactFile);
-      if (artifactFile !== undefined && artifactFile.file !== undefined) {
-        parseArtifactFile(this.artifactFiles[i].type, artifactFile.file).then(
-          (res: ParseArtifactFileResponse) => {
-            const { artifacts, errors } = res;
-            Vue.set(this.artifactFiles, i, {
-              ...artifactFile,
-              artifacts,
-              errors,
-            });
-            this.$emit("onChange", this.artifactFiles);
-          }
-        );
-      }
-      this.$emit("onChange", this.artifactFiles);
+    onChange(i: number, artifactFile: ArtifactFile): void {
+      this.$emit(
+        "onChange",
+        this.artifactFiles.map((a, currentIndex) => {
+          if (currentIndex === i) return artifactFile;
+          return a;
+        })
+      );
     },
     setFileIsValid(artifactFileIndex: number, isValid: boolean): void {
       Vue.set(this.isValidStates, artifactFileIndex, isValid);
     },
     deleteArtifactFile(i: number): void {
-      this.artifactFiles = this.artifactFiles.filter((f, index) => index !== i);
+      this.$emit(
+        "onChange",
+        this.artifactFiles.filter((f, index) => index !== i)
+      );
     },
     addArtifactFile(artifactName: string): void {
-      this.artifactFiles = this.artifactFiles.concat([
-        {
-          type: artifactName,
-        },
-      ]);
       this.isValidStates = this.isValidStates.concat([DEFAULT_VALID_STATE]);
-      this.$emit("onChange", this.artifactFiles);
+      this.$emit(
+        "onChange",
+        this.artifactFiles.concat([
+          {
+            type: artifactName,
+            artifacts: [],
+            errors: [],
+          },
+        ])
+      );
     },
   },
 });

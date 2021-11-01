@@ -2,41 +2,24 @@
   <FilePanel
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
-    :errors="errors"
+    :errors="artifactFile.errors"
+    :entityNames="artifactNames"
+    v-bind:ignoreErrorsFlag.sync="ignoreErrors"
   >
     <template v-slot:title>
       <h3>{{ artifactFile.type }}</h3>
-    </template>
-
-    <template v-slot:after-rows>
-      <v-container>
-        <v-row><h4>Parsed Artifacts</h4> </v-row>
-        <v-row v-if="artifactFile.artifacts !== undefined">
-          <v-btn
-            fab
-            x-small
-            color="primary"
-            class="ma-1"
-            v-for="artifact in artifactFile.artifacts"
-            :key="artifact.name"
-            @click="underDevelopmentError()"
-          >
-            {{ artifact.name }}
-          </v-btn>
-        </v-row>
-        <v-row v-else>
-          <label class="text-caption"> No Artifacts have been parseed. </label>
-        </v-row>
-      </v-container>
     </template>
   </FilePanel>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactFile } from "@/types/common-components";
 import FilePanel from "@/components/project/creator/shared/FilePanel.vue";
+import type { ArtifactFile } from "@/types/common-components";
+
 import { appModule } from "@/store";
+import { parseArtifactFile } from "@/api/parse-api";
+import { ParseArtifactFileResponse } from "@/types/api";
 
 export default Vue.extend({
   components: {
@@ -48,21 +31,43 @@ export default Vue.extend({
       required: true,
     },
   },
+  data() {
+    return {
+      ignoreErrors: false,
+    };
+  },
   computed: {
     isValid(): boolean {
-      return this.artifactFile.file !== undefined;
+      return this.ignoreErrors || this.artifactFile.file !== undefined;
     },
-    errors(): string[] {
-      return this.artifactFile.errors === undefined
-        ? []
-        : this.artifactFile.errors;
+    artifactNames(): string[] {
+      return this.artifactFile.artifacts.map((a) => a.name);
     },
   },
   methods: {
-    onChange(file: File): void {
-      this.$emit("onChange", { ...this.artifactFile, file });
+    onChange(file: File | undefined): void {
+      if (file === undefined) {
+        this.$emit("onChange", {
+          ...this.artifactFile,
+          file,
+          errors: [],
+          artifacts: [],
+        });
+      } else {
+        parseArtifactFile(this.artifactFile.type, file).then(
+          (res: ParseArtifactFileResponse) => {
+            const { artifacts, errors } = res;
+            const updatedFile: ArtifactFile = {
+              ...this.artifactFile,
+              artifacts,
+              errors,
+              file,
+            };
+            this.$emit("onChange", updatedFile);
+          }
+        );
+      }
     },
-
     emitValidationState(): void {
       if (this.isValid) {
         this.$emit("onIsValid");

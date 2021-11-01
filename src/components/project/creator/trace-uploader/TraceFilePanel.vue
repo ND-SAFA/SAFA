@@ -4,6 +4,8 @@
     @onDelete="$emit('onDelete')"
     :showFileUploader="!traceFile.isGenerated"
     :errors="errors"
+    :entityNames="traceIds"
+    v-bind:ignoreErrorsFlag.sync="ignoreErrors"
   >
     <template v-slot:title>
       <label>
@@ -23,29 +25,6 @@
         </v-col>
       </v-row>
     </template>
-
-    <template v-slot:after-rows>
-      <v-container>
-        <v-row><h4>Parsed Traces</h4> </v-row>
-        <v-row v-if="traceFile.traces !== undefined">
-          <v-btn
-            x-small
-            color="primary"
-            class="ma-1"
-            v-for="trace in traceFile.traces"
-            :key="`${trace.source}-${trace.target}`"
-            @click="underDevelopmentError()"
-          >
-            {{ trace.source }}-{{ trace.target }}
-          </v-btn>
-        </v-row>
-        <v-row v-else>
-          <label class="text-caption">
-            No trace links have been parseed.
-          </label>
-        </v-row>
-      </v-container>
-    </template>
   </FilePanel>
 </template>
 
@@ -53,29 +32,75 @@
 import Vue, { PropType } from "vue";
 import { TraceFile } from "@/types/common-components";
 import FilePanel from "@/components/project/creator/shared/FilePanel.vue";
+import { Artifact } from "@/types/domain/artifact";
+import { TraceLink } from "@/types/domain/links";
+import { ParseTraceFileResponse } from "@/types/api";
+import { parseTraceFile } from "@/api/parse-api";
 
 export default Vue.extend({
   components: {
     FilePanel,
   },
   props: {
+    artifactMap: {
+      type: Object as PropType<Record<string, Artifact>>,
+      required: true,
+    },
     traceFile: {
       type: Object as PropType<TraceFile>,
       required: true,
     },
   },
-
+  data() {
+    return {
+      localErrors: [] as string[],
+      ignoreErrors: false,
+    };
+  },
   computed: {
     isValid(): boolean {
-      return this.traceFile.file !== undefined || this.traceFile.isGenerated;
+      return (
+        this.ignoreErrors ||
+        this.traceFile.file !== undefined ||
+        this.traceFile.isGenerated
+      );
     },
     errors(): string[] {
-      return this.traceFile.errors === undefined ? [] : this.traceFile.errors;
+      return (
+        this.traceFile.errors === undefined ? [] : this.traceFile.errors
+      ).concat(this.localErrors);
+    },
+    traces(): TraceLink[] {
+      return this.traceFile.traces;
+    },
+    traceIds(): string[] {
+      return this.traceFile.traces
+        .filter((t) => this.getTraceError(t) === undefined)
+        .map((t) => `${t.source}-${t.target}`);
     },
   },
   methods: {
     onChange(file: File | undefined): void {
-      this.$emit("onChange", { ...this.traceFile, file });
+      if (file === undefined) {
+        this.$emit("onChange", {
+          ...this.traceFile,
+          file,
+          traces: [],
+          errors: [],
+        });
+      } else {
+        // eslint-disable-next-line no-undef
+        parseTraceFile(file).then((res: ParseTraceFileResponse) => {
+          const { traces, errors } = res;
+          const updatedTraceFile: TraceFile = {
+            ...this.traceFile,
+            traces,
+            errors,
+            file,
+          };
+          this.$emit("onChange", updatedTraceFile);
+        });
+      }
     },
     emitValidationState(): void {
       if (this.isValid) {
@@ -84,10 +109,37 @@ export default Vue.extend({
         this.$emit("onIsInvalid");
       }
     },
+    getTraceError(traceLink: TraceLink): string | undefined {
+      const { source, target } = traceLink;
+      if (!(source in this.artifactMap)) {
+        return `Artifact ${source} in does not exist.`;
+      } else if (!(target in this.artifactMap)) {
+        return `Artifact ${target} does not exist.`;
+      } else {
+        const sourceArtifact = this.artifactMap[source];
+        const targetArtifact = this.artifactMap[target];
+
+        if (sourceArtifact.type !== this.traceFile.source) {
+          return `${sourceArtifact.name} is not of type ${this.traceFile.source}.`;
+        }
+
+        if (targetArtifact.type !== this.traceFile.target) {
+          return `${targetArtifact.name} is not of type ${this.traceFile.target}.`;
+        }
+      }
+    },
   },
   watch: {
     isValid(): void {
       this.emitValidationState();
+    },
+    traces(traces: TraceLink[]) {
+      traces.forEach((traceLink) => {
+        const error = this.getTraceError(traceLink);
+        if (error !== undefined) {
+          this.localErrors = this.localErrors.concat([error]);
+        }
+      });
     },
   },
   mounted() {

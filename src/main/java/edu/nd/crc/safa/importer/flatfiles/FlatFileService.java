@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONException;

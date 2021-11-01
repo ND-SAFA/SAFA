@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.messages;
+package edu.nd.crc.safa.server.entities.api;
 
 import java.util.ArrayList;
 import java.util.Arrays;

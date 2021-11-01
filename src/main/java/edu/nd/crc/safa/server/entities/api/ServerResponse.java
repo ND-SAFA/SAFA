@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.messages;
+package edu.nd.crc.safa.server.entities.api;
 
 public class ServerResponse {
     private Object body;

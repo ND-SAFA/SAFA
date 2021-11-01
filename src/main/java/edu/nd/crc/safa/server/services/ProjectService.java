@@ -8,9 +8,9 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.messages.ProjectCreationResponse;
-import edu.nd.crc.safa.server.messages.ProjectErrors;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectErrors;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 import edu.nd.crc.safa.warnings.RuleName;
 

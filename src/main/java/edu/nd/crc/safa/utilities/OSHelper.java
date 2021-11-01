@@ -3,7 +3,7 @@ package edu.nd.crc.safa.utilities;
 import java.io.File;
 import java.io.IOException;
 
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.apache.commons.io.FileUtils;
 

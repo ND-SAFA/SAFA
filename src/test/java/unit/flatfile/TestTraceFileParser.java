@@ -9,7 +9,7 @@ import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;

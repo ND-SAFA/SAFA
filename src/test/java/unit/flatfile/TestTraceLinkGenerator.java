@@ -8,7 +8,7 @@ import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;

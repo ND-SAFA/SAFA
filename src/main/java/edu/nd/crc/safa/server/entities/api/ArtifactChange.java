@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.messages;
+package edu.nd.crc.safa.server.entities.api;
 
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;

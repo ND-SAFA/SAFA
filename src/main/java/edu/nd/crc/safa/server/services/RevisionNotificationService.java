@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.Update;
+import edu.nd.crc.safa.server.entities.api.Update;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

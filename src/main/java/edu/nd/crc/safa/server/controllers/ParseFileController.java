@@ -12,10 +12,10 @@ import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ParseArtifactFileResponse;
-import edu.nd.crc.safa.server.messages.ParseTraceFileResponse;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.messages.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
+import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;

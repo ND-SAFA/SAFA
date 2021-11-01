@@ -8,7 +8,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.stereotype.Service;

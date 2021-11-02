@@ -55,6 +55,15 @@
       <v-row v-if="currentStep === 4" justify="center">
         <v-btn color="secondary" @click="saveProject()">Create Project</v-btn>
       </v-row>
+      <v-row>
+        <GenericConfirmDialog
+          :isOpen="isConfirmOpen"
+          title="Project In Progress"
+          body="Closing will delete any progress you have made."
+          @onSubmit="onConfirmClose"
+          @onClose="isConfirmOpen = false"
+        />
+      </v-row>
     </template>
   </GenericStepperModal>
 </template>
@@ -77,6 +86,7 @@ import { saveOrUpdateProject } from "@/api/project-api";
 import { Project } from "@/types/domain/project";
 import { ProjectCreationResponse } from "@/types/api";
 import { projectModule } from "@/store";
+import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
 
 export default Vue.extend({
   name: "project-creator-modal",
@@ -86,6 +96,7 @@ export default Vue.extend({
     ArtifactFileUploader,
     TraceFileUploader,
     ProjectConfirmation,
+    GenericConfirmDialog,
   },
   props: {
     isOpen: {
@@ -107,6 +118,7 @@ export default Vue.extend({
       isLoading: false,
       artifactFiles: [] as ArtifactFile[],
       traceFiles: [] as TraceFile[],
+      isConfirmOpen: false,
     };
   },
   methods: {
@@ -118,9 +130,11 @@ export default Vue.extend({
       this.description = "";
       this.currentStep = 1;
       this.isLoading = false;
+      this.artifactFiles = [];
+      this.traceFiles = [];
     },
     onClose() {
-      this.$emit("onClose");
+      this.isConfirmOpen = true;
     },
     saveProject(): void {
       this.isLoading = true;
@@ -132,6 +146,9 @@ export default Vue.extend({
         .finally(() => {
           this.isLoading = false;
         });
+    },
+    onConfirmClose(): void {
+      this.$emit("onClose");
     },
   },
   computed: {

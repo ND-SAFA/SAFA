@@ -31,9 +31,9 @@
     <v-row class="mt-5"> <h3>Traces</h3></v-row>
     <v-row>
       <v-btn
-        fab
         x-small
         color="primary"
+        class="ma-1"
         v-for="trace in project.traces"
         :key="`${trace.source}-${trace.target}`"
         @click="() => underDevelopmentError('traces')"

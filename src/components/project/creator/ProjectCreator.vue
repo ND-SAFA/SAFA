@@ -22,25 +22,43 @@
 
       <v-stepper-content step="2">
         <v-container class="pa-10">
-          <ArtifactFileUploader
-            :artifactFiles="artifactFiles"
-            @onChange="artifactFiles = $event"
+          <GenericUploader
+            :uploader="artifactUploader"
+            :artifactMap="artifactMap"
+            @onChange="artifactUploader.panels = $event"
             @onIsValid="setStepIsValid(1, true)"
             @onIsInvalid="setStepIsValid(1, false)"
-          />
+          >
+            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+              <ArtifactNameModal
+                :isOpen="isCreatorOpen"
+                @onSubmit="onAddFile"
+                @onClose="onClose"
+              />
+            </template>
+          </GenericUploader>
         </v-container>
       </v-stepper-content>
 
       <v-stepper-content step="3">
         <v-container class="pa-10">
-          <TraceFileUploader
-            :traceFiles="traceFiles"
-            :artifactTypes="artifactTypes"
+          <GenericUploader
+            :uploader="traceUploader"
             :artifactMap="artifactMap"
-            @onChange="traceFiles = $event"
+            @onChange="traceUploader.panels = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"
-          />
+          >
+            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+              <TraceFileCreator
+                :isOpen="isCreatorOpen"
+                :traceFiles="traceFiles"
+                :artifactTypes="artifactTypes"
+                @onSubmit="onAddFile"
+                @onClose="onClose"
+              />
+            </template>
+          </GenericUploader>
         </v-container>
       </v-stepper-content>
 
@@ -71,32 +89,32 @@
 <script lang="ts">
 import Vue from "vue";
 import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
-import type {
-  ArtifactFile,
-  StepState,
-  TraceFile,
-} from "@/types/common-components";
+import type { StepState, TraceFile } from "@/types/common-components";
 import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
-import ArtifactFileUploader from "@/components/project/creator/artifact-uploader/ArtifactUploader.vue";
-import TraceFileUploader from "@/components/project/creator/trace-uploader/TraceUploader.vue";
 import { TraceLink } from "@/types/domain/links";
 import { Artifact } from "@/types/domain/artifact";
-import ProjectConfirmation from "@/components/project/creator/ProjectConfirmation.vue";
+import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api/project-api";
 import { Project } from "@/types/domain/project";
 import { ProjectCreationResponse } from "@/types/api";
 import { projectModule } from "@/store";
 import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
+import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
+import ArtifactNameModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
+import { createArtifactUploader } from "@/components/project/creator/uploaders/artifact-uploader";
+import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
+import { createTraceUploader } from "@/components/project/creator/uploaders/trace-uploader";
 
 export default Vue.extend({
   name: "project-creator-modal",
   components: {
     GenericStepperModal,
     ProjectCreator,
-    ArtifactFileUploader,
-    TraceFileUploader,
+    GenericUploader,
     ProjectConfirmation,
     GenericConfirmDialog,
+    ArtifactNameModal,
+    TraceFileCreator,
   },
   props: {
     isOpen: {
@@ -116,9 +134,9 @@ export default Vue.extend({
       description: "",
       currentStep: 1,
       isLoading: false,
-      artifactFiles: [] as ArtifactFile[],
-      traceFiles: [] as TraceFile[],
       isConfirmOpen: false,
+      traceUploader: createTraceUploader(),
+      artifactUploader: createArtifactUploader(),
     };
   },
   methods: {
@@ -130,8 +148,8 @@ export default Vue.extend({
       this.description = "";
       this.currentStep = 1;
       this.isLoading = false;
-      this.artifactFiles = [];
-      this.traceFiles = [];
+      this.artifactUploader = createArtifactUploader();
+      this.traceUploader = createTraceUploader();
     },
     onClose() {
       this.isConfirmOpen = true;
@@ -159,21 +177,27 @@ export default Vue.extend({
     },
     artifacts(): Artifact[] {
       let artifacts: Artifact[] = [];
-      this.artifactFiles.forEach((artifactFile) => {
-        if (artifactFile.artifacts !== undefined) {
-          artifacts = artifacts.concat(artifactFile.artifacts);
+      this.artifactUploader.panels.forEach(({ projectFile }) => {
+        if (projectFile.artifacts !== undefined) {
+          artifacts = artifacts.concat(projectFile.artifacts);
         }
       });
       return artifacts;
     },
+    artifactTypes(): string[] {
+      return this.artifactUploader.panels.map((p) => p.projectFile.type);
+    },
     traces(): TraceLink[] {
       let traces: TraceLink[] = [];
-      this.traceFiles.forEach((traceFile) => {
-        if (traceFile.traces !== undefined) {
-          traces = traces.concat(traceFile.traces);
+      this.traceUploader.panels.forEach(({ projectFile }) => {
+        if (projectFile.traces !== undefined) {
+          traces = traces.concat(projectFile.traces);
         }
       });
       return traces;
+    },
+    traceFiles(): TraceFile[] {
+      return this.traceUploader.panels.map((p) => p.projectFile);
     },
     project(): Project {
       return {
@@ -189,9 +213,6 @@ export default Vue.extend({
     },
     combinedState(): string {
       return this.name + this.description;
-    },
-    artifactTypes(): string[] {
-      return this.artifactFiles.map((f) => f.type);
     },
   },
   watch: {

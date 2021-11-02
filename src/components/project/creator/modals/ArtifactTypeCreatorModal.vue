@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
 
 export default Vue.extend({
@@ -31,6 +31,10 @@ export default Vue.extend({
   props: {
     isOpen: {
       type: Boolean,
+      required: true,
+    },
+    artifactTypes: {
+      type: Array as PropType<string[]>,
       required: true,
     },
   },

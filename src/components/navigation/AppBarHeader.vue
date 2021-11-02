@@ -42,7 +42,7 @@ import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionMo
 import router from "@/router";
 import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
-import ProjectCreatorModal from "@/components/project/creator/ProjectCreatorModal.vue";
+import ProjectCreatorModal from "@/components/project/creator/ProjectCreator.vue";
 
 export default Vue.extend({
   components: {
@@ -57,7 +57,7 @@ export default Vue.extend({
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
-      createProjectOpen: false,
+      createProjectOpen: true,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },

@@ -116,7 +116,7 @@ function getTraceError(
 ): string | undefined {
   const { source, target } = traceLink;
   if (!(source in artifactMap)) {
-    return `Artifact ${source} in does not exist.`;
+    return `Artifact ${source} does not exist.`;
   } else if (!(target in artifactMap)) {
     return `Artifact ${target} does not exist.`;
   } else {

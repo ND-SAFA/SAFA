@@ -102,9 +102,9 @@ import { projectModule } from "@/store";
 import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
 import ArtifactTypeCreatorModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
-import { createArtifactUploader } from "@/components/project/creator/uploaders/artifact-uploader";
+import { createArtifactUploader } from "@/components/project/creator/definitions/artifact-uploader";
 import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
-import { createTraceUploader } from "@/components/project/creator/uploaders/trace-uploader";
+import { createTraceUploader } from "@/components/project/creator/definitions/trace-uploader";
 
 export default Vue.extend({
   name: "project-creator-modal",
@@ -208,12 +208,6 @@ export default Vue.extend({
         artifacts: this.artifacts,
         traces: this.traces,
       };
-    },
-    totalSteps(): number {
-      return this.steps.length;
-    },
-    combinedState(): string {
-      return this.name + this.description;
     },
   },
   watch: {

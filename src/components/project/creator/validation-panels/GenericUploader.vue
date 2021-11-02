@@ -39,7 +39,7 @@ import {
   IGenericFilePanel,
   IGenericUploader,
   ValidFileTypes,
-} from "@/components/project/creator/uploaders/types";
+} from "@/components/project/creator/definitions/types";
 import { ProjectFile } from "@/types/common-components";
 import { TraceLink } from "@/types/domain/links";
 import GenericFilePanel from "@/components/project/creator/validation-panels/FilePanelController.vue";

@@ -20,7 +20,7 @@ import {
   ArtifactMap,
   IGenericFilePanel,
   ValidFileTypes,
-} from "@/components/project/creator/uploaders/types";
+} from "@/components/project/creator/definitions/types";
 
 export default Vue.extend({
   components: {

@@ -5,7 +5,6 @@
         :text="buttonIsText"
         small
         :color="buttonColor"
-        dark
         v-on="on"
         :disabled="disabled"
       >

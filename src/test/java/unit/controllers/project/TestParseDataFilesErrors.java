@@ -19,11 +19,11 @@ public class TestParseDataFilesErrors extends EntityBaseTest {
 
         // Step 1 - Upload flat files
         String routeName = "/projects/parse/artifacts/designs";
-        String pathToArtifactFile = ProjectPaths.PATH_TO_ARTIFACT_FILES + "/DuplicateArtifact.csv";
+        String pathToArtifactFile = ProjectPaths.PATH_TO_BEFORE_FILES + "/Design.csv";
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToArtifactFile);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk());
 
-        // VP - Verify that error occurred.
+        // VP - Verify that no error occurred
         assertThat(responseContent.getInt("status")).isEqualTo(0);
 
         // VP - Verify that message contains constraint

@@ -69,14 +69,16 @@
                 </h4>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <label
-                  v-for="(error, i) in errors"
-                  :key="i"
-                  class="text-caption"
-                  style="color: red"
-                >
-                  {{ i }}: {{ error }}
-                </label>
+                <v-container>
+                  <v-row v-for="(error, i) in errors" :key="i">
+                    <v-col align-self="center" class="ma-0 pa-0">
+                      {{ i }}:
+                      <label class="text-caption" style="color: red">{{
+                        error
+                      }}</label>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
@@ -158,6 +160,11 @@ export default Vue.extend({
     },
     errorIconName(): string {
       return this.errors.length > 0 ? "mdi-close" : "mdi-check";
+    },
+  },
+  watch: {
+    isValid(): void {
+      this.$emit("onValidate", this.isValid);
     },
   },
   methods: {

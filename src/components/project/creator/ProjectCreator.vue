@@ -30,8 +30,9 @@
             @onIsInvalid="setStepIsValid(1, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <ArtifactNameModal
+              <ArtifactTypeCreatorModal
                 :isOpen="isCreatorOpen"
+                :artifactTypes="artifactTypes"
                 @onSubmit="onAddFile"
                 @onClose="onClose"
               />
@@ -77,7 +78,7 @@
         <GenericConfirmDialog
           :isOpen="isConfirmOpen"
           title="Project In Progress"
-          body="Closing will delete any progress you have made."
+          body="Closing panel will delete any progress you have made."
           @onSubmit="onConfirmClose"
           @onClose="isConfirmOpen = false"
         />
@@ -100,7 +101,7 @@ import { ProjectCreationResponse } from "@/types/api";
 import { projectModule } from "@/store";
 import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
-import ArtifactNameModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
+import ArtifactTypeCreatorModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
 import { createArtifactUploader } from "@/components/project/creator/uploaders/artifact-uploader";
 import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
 import { createTraceUploader } from "@/components/project/creator/uploaders/trace-uploader";
@@ -113,7 +114,7 @@ export default Vue.extend({
     GenericUploader,
     ProjectConfirmation,
     GenericConfirmDialog,
-    ArtifactNameModal,
+    ArtifactTypeCreatorModal,
     TraceFileCreator,
   },
   props: {

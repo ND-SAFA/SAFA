@@ -6,7 +6,13 @@
     @onClose="$emit('onClose')"
   >
     <template v-slot:body>
-      <v-text-field v-model="artifactName" label="Artifact Name" required />
+      <v-text-field
+        v-model="artifactName"
+        label="Artifact Name"
+        required
+        :error-messages="errors"
+        @keydown.enter="onEnterPress"
+      />
     </template>
     <template v-slot:actions>
       <v-container>
@@ -41,12 +47,24 @@ export default Vue.extend({
   data() {
     return {
       artifactName: "",
+      errors: [] as string[],
     };
   },
   methods: {
     onSubmit() {
-      this.$emit("onSubmit", this.artifactName);
-      this.$emit("onClose");
+      if (this.artifactName === "")
+        this.errors = ["Artifact type cannot be empty."];
+      else if (this.artifactTypes.includes(this.artifactName))
+        this.errors = [`Artifact type has already been created.`];
+      else this.errors = [];
+      if (this.errors.length === 0) {
+        this.$emit("onSubmit", this.artifactName);
+        this.$emit("onClose");
+      }
+    },
+    onEnterPress(event: Event): void {
+      event.preventDefault();
+      this.onSubmit();
     },
   },
   watch: {

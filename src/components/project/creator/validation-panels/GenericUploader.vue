@@ -106,7 +106,6 @@ export default Vue.extend({
       Vue.set(this.isValidStates, artifactFileIndex, isValid);
     },
     deleteFile(i: number): void {
-      console.log("DELETING FILE");
       this.$emit(
         "onChange",
         this.panels.filter((f, index) => index !== i)

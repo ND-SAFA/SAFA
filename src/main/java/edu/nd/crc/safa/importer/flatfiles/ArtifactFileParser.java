@@ -125,8 +125,7 @@ public class ArtifactFileParser {
 
     public Pair<List<ArtifactAppEntity>, List<String>> parseArtifactFileIntoApplicationEntities(String fileName,
                                                                                                 String artifactType,
-                                                                                                CSVParser parsedFile)
-        throws ServerError {
+                                                                                                CSVParser parsedFile) {
         List<CSVRecord> artifactRecords = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         try {

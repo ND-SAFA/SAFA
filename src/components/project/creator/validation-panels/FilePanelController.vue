@@ -10,6 +10,10 @@
     <template v-slot:title>
       <h3>{{ title }}</h3>
     </template>
+
+    <template v-slot:after-rows>
+      <h3 v-if="isTraceFile">I AM A TRACE FILE</h3>
+    </template>
   </FilePanel>
 </template>
 
@@ -19,6 +23,7 @@ import FilePanel from "@/components/project/creator/validation-panels/FilePanel.
 import {
   ArtifactMap,
   IGenericFilePanel,
+  isTraceFile,
   ValidFileTypes,
 } from "@/components/project/creator/definitions/types";
 
@@ -42,6 +47,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    isTraceFile(): boolean {
+      return isTraceFile(this.panel.projectFile);
+    },
     isValid(): boolean {
       return this.panel.getIsValid();
     },

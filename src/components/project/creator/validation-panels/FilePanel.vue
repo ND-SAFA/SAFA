@@ -15,21 +15,24 @@
     <v-expansion-panel-content>
       <v-container>
         <v-row>
-          <slot name="before-rows" />
+          <v-container>
+            <v-row style="width: 100%">
+              <slot name="before-rows" />
+            </v-row>
+            <v-row>
+              <v-divider />
+            </v-row>
+          </v-container>
         </v-row>
 
         <v-row v-if="showFileUploader">
-          <v-container>
+          <v-container class="mt-2">
             <v-row><h4>File:</h4> </v-row>
             <v-row>
               <GenericFileSelector
                 :multiple="false"
                 @onChangeFiles="emitChangeFiles"
               />
-            </v-row>
-            <v-row>
-              <v-col cols="9">Ignore Errors:</v-col>
-              <v-col cols="3"><v-switch v-model="ignoreErrors" /> </v-col>
             </v-row>
           </v-container>
         </v-row>
@@ -84,11 +87,13 @@
           </v-expansion-panels>
         </v-row>
 
-        <v-row>
-          <slot name="after-rows" />
-        </v-row>
+        <GenericSwitch
+          v-if="showFileUploader"
+          v-model="ignoreErrors"
+          label="Ignore Errors"
+        />
 
-        <v-row>
+        <v-row v-if="showFileUploader">
           <v-divider />
         </v-row>
 
@@ -111,11 +116,13 @@
 import Vue, { PropType } from "vue";
 import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 import { appModule } from "@/store";
+import GenericSwitch from "@/components/common/generic/GenericSwitch.vue";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
 export default Vue.extend({
   components: {
+    GenericSwitch,
     GenericFileSelector,
   },
   props: {
@@ -156,7 +163,9 @@ export default Vue.extend({
     },
     isValid(): boolean {
       return (
-        this.ignoreErrors || (this.error === "" && this.errors.length === 0)
+        this.ignoreErrors ||
+        (this.error === "" && this.errors.length === 0) ||
+        !this.showFileUploader
       );
     },
     iconName(): string {

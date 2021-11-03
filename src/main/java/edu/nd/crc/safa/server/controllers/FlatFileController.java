@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
-import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -66,7 +66,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         Project project = projectVersion.getProject();
-        ProjectCreationResponse response = this.uploadAndCreateProjectFromFlatFiles(
+        ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,
             files);
@@ -74,6 +74,13 @@ public class FlatFileController extends BaseController {
         return new ServerResponse(response);
     }
 
+    /**
+     * Creates a new project using the given flat files to create the project arifacts, traces, and artifact types.
+     *
+     * @param files Files including artifact and traces files and requiring at minimum a Tim.json file.
+     * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
+     * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
+     */
     @PostMapping(value = "projects/flat-files")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
@@ -84,7 +91,7 @@ public class FlatFileController extends BaseController {
         Project project = createProjectIdentifier(null, null);
         ProjectVersion projectVersion = createProjectVersion(project);
 
-        ProjectCreationResponse response = this.uploadAndCreateProjectFromFlatFiles(project,
+        ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
@@ -95,15 +102,15 @@ public class FlatFileController extends BaseController {
      * Responsible for creating a project from given flat files. This includes
      * parsing tim.json, creating artifacts, and their trace links.
      *
-     * @param project        the project whose artifacts and trace links should be associated with
-     * @param projectVersion - the version that the artifacts and errors will be associated with.
+     * @param project        The project whose artifacts and trace links should be associated with
+     * @param projectVersion The version that the artifacts and errors will be associated with.
      * @param files          the flat files defining the project
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
      */
-    private ProjectCreationResponse uploadAndCreateProjectFromFlatFiles(Project project,
-                                                                        ProjectVersion projectVersion,
-                                                                        MultipartFile[] files)
+    private ProjectEntities uploadAndCreateProjectFromFlatFiles(Project project,
+                                                                ProjectVersion projectVersion,
+                                                                MultipartFile[] files)
         throws ServerError {
 
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));

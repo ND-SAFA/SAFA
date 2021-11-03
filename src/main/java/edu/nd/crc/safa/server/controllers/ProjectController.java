@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
@@ -39,27 +39,48 @@ public class ProjectController extends BaseController {
         this.projectService = projectService;
     }
 
+    /**
+     * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
+     * not specified are assumed to be removed if version is specified..
+     *
+     * @param project The project entity containing artifacts, traces, name, and decriptions.
+     * @return The project and associated entities created.
+     * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
+     *                     payload.
+     */
     @PostMapping("projects")
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity payload) throws ServerError {
-        Project project = Project.fromAppEntity(payload); // gets
-        ProjectVersion projectVersion = payload.projectVersion;
+    public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity project) throws ServerError {
+        Project payloadProject = Project.fromAppEntity(project); // gets
+        ProjectVersion payloadProjectVersion = project.projectVersion;
 
-        ProjectCreationResponse response;
-        if (!project.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            response = createNewProjectWithVersion(project, projectVersion, payload);
+        ProjectEntities response;
+        if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
+            response = createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
-            response = updateProjectAtVersion(project, projectVersion, payload);
+            response = updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
         return new ServerResponse(response);
     }
 
+    /**
+     * Returns list of all project identifiers present in the database.
+     *
+     * @return List of project identifiers.
+     */
     @GetMapping("projects")
     public ServerResponse getProjects() {
         return new ServerResponse(this.projectRepository.findAll());
     }
 
+    /**
+     * Deletes project with associated projectId.
+     *
+     * @param projectId UUID of project to delete.
+     * @return String with success message.
+     * @throws ServerError Throws error if project with associated id is not found.
+     */
     @DeleteMapping("projects/{projectId}")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
@@ -72,10 +93,10 @@ public class ProjectController extends BaseController {
         }
     }
 
-    private ProjectCreationResponse updateProjectAtVersion(Project project,
-                                                           ProjectVersion projectVersion,
-                                                           ProjectAppEntity payload) throws ServerError {
-        ProjectCreationResponse response;
+    private ProjectEntities updateProjectAtVersion(Project project,
+                                                   ProjectVersion projectVersion,
+                                                   ProjectAppEntity payload) throws ServerError {
+        ProjectEntities response;
         this.projectRepository.save(project);
         //TODO: Update traces
         if (projectVersion == null) {
@@ -83,7 +104,7 @@ public class ProjectController extends BaseController {
                 && payload.artifacts.size() > 0)) {
                 throw new ServerError("Cannot update artifacts because project version not defined");
             }
-            response = new ProjectCreationResponse(payload, null, null, null);
+            response = new ProjectEntities(payload, null, null, null);
         } else if (!projectVersion.hasValidId()) {
             throw new ServerError("Invalid Project version: must have a valid ID.");
         } else if (!projectVersion.hasValidVersion()) {
@@ -97,11 +118,11 @@ public class ProjectController extends BaseController {
         return response;
     }
 
-    private ProjectCreationResponse createNewProjectWithVersion(
+    private ProjectEntities createNewProjectWithVersion(
         Project project,
         ProjectVersion projectVersion,
         ProjectAppEntity payload) throws ServerError {
-        ProjectCreationResponse response;
+        ProjectEntities response;
         if (projectVersion != null
             && projectVersion.hasValidVersion()
             && projectVersion.hasValidId()) {

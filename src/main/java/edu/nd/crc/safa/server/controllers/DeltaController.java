@@ -30,13 +30,21 @@ public class DeltaController extends BaseController {
         this.deltaService = deltaService;
     }
 
-    @GetMapping("projects/delta/{sourceVersionId}/{targetVersionId}")
-    public ServerResponse getVersionDelta(@PathVariable UUID sourceVersionId,
-                                          @PathVariable UUID targetVersionId) throws ServerError {
+    /**
+     * Returns ProjectDelta response object indicating changes in artifacts between the two versions specified.
+     *
+     * @param baselineVersionId UUID indicating the baseline version.
+     * @param targetVersionId   UUID of the target version to compare the baseline against.
+     * @return ProjectDelta with artifacts that were added, removed, and modified between versions.
+     * @throws ServerError Throws error if baseline or target version is not found.
+     */
+    @GetMapping("projects/delta/{baselineVersionId}/{targetVersionId}")
+    public ServerResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
+                                                @PathVariable UUID targetVersionId) throws ServerError {
 
-        Optional<ProjectVersion> sourceQuery = this.projectVersionRepository.findById(sourceVersionId);
+        Optional<ProjectVersion> sourceQuery = this.projectVersionRepository.findById(baselineVersionId);
         if (!sourceQuery.isPresent()) {
-            throw new ServerError("Source version with id not found: " + sourceVersionId);
+            throw new ServerError("Source version with id not found: " + baselineVersionId);
         }
         Optional<ProjectVersion> targetQuery = this.projectVersionRepository.findById(targetVersionId);
         if (!targetQuery.isPresent()) {

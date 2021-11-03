@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --mode=development",
-    "serve:prod": "vue-cli-service serve --mode=production",
+    "serve:local": "vue-cli-service serve",
+    "serve:dev": "vue-cli-service serve --mode=dev",
+    "serve:prod": "vue-cli-service serve --mode=prod",
     "build": "vue-cli-service build",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vue-cli-service test:unit",

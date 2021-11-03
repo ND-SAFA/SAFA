@@ -133,7 +133,7 @@ export default Vue.extend({
       ] as StepState[],
       name: "",
       description: "",
-      currentStep: 3,
+      currentStep: 1,
       isLoading: false,
       isConfirmOpen: false,
       traceUploader: createTraceUploader(),

@@ -1,5 +1,6 @@
 <template>
   <FilePanel
+    :showFileUploader="!isGeneratedToggle"
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
     @onValidate="emitValidationState"
@@ -12,7 +13,11 @@
     </template>
 
     <template v-slot:after-rows>
-      <h3 v-if="isTraceFile">I AM A TRACE FILE</h3>
+      <v-switch
+        v-model="isGeneratedToggle"
+        label="Generate Trace Links"
+        @change="toggleGenerated"
+      />
     </template>
   </FilePanel>
 </template>
@@ -44,6 +49,7 @@ export default Vue.extend({
   data() {
     return {
       ignoreErrors: false,
+      isGeneratedToggle: false,
     };
   },
   computed: {
@@ -78,6 +84,11 @@ export default Vue.extend({
         this.$emit("onIsValid");
       } else {
         this.$emit("onIsInvalid");
+      }
+    },
+    toggleGenerated() {
+      if (isTraceFile(this.panel.projectFile)) {
+        this.panel.projectFile.isGenerated = this.isGeneratedToggle;
       }
     },
   },

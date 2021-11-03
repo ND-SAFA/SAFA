@@ -12,10 +12,8 @@ export function createArtifactUploader(): IGenericUploader<
   ArtifactFile
 > {
   return {
-    panels: [createNewPanel("Requirements"), createNewPanel("Designs")],
-    createNewPanel(artifactName: string): ArtifactPanel {
-      return createNewPanel(artifactName);
-    },
+    panels: [],
+    createNewPanel,
   };
 }
 

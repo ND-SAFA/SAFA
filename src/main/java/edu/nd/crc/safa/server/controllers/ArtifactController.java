@@ -57,6 +57,14 @@ public class ArtifactController extends BaseController {
         this.revisionNotificationService = revisionNotificationService;
     }
 
+    /**
+     * Creates a new artifact at the specified version within the verion's associated project.
+     *
+     * @param versionId UUID of versionId of associated project verison.
+     * @param artifact  The artifact to be created.
+     * @return The artifact created.
+     * @throws ServerError Throws error if artifact already exists in project.
+     */
     @PostMapping(value = "projects/versions/{versionId}/artifacts")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createArtifactAtVersion(
@@ -68,10 +76,17 @@ public class ArtifactController extends BaseController {
         return new ServerResponse(artifact);
     }
 
-    @GetMapping("projects/{projectId}/artifacts/validate/{artifactName}")
-    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) {
+    /**
+     * Returns flag `artifactExists` indicating whether artifact exists in the project.
+     *
+     * @param projectId  UUID identifying unique project.
+     * @param artifactId The name / identifier of the artifact.
+     * @return `artifactExists` flag indicating presence of artifact in project.
+     */
+    @GetMapping("projects/{projectId}/artifacts/validate/{artifactId}")
+    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactId) {
         Project project = this.projectRepository.findByProjectId(projectId);
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactId);
         Map<String, Boolean> response = new HashMap<>();
         response.put("artifactExists", artifactQuery.isPresent());
         return new ServerResponse(response);

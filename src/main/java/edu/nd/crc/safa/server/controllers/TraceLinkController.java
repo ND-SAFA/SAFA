@@ -66,21 +66,37 @@ public class TraceLinkController extends BaseController {
         return changeApprovedHandler(traceLinkId, TraceApproval.APPROVED);
     }
 
+    /**
+     * Modifies trace link have an approval status of DECLINED.
+     *
+     * @param traceLinkId UUID associated with a unique trace link in the system.
+     * @return String with generic success message.
+     * @throws ServerError - Throws error if no trace with given id is found.
+     */
     @PutMapping("/projects/links/{traceLinkId}/decline")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse declineTraceLink(@PathVariable UUID traceLinkId) throws ServerError {
         return changeApprovedHandler(traceLinkId, TraceApproval.DECLINED);
     }
 
-    @PostMapping("/projects/versions/{versionId}/links/create/{sourceName}/{targetName}")
+    /**
+     * Creates a trace link between specified sourceId and target artifact ids at given version.
+     *
+     * @param versionId UIUD of the project version that will be marked with the new trace link.
+     * @param sourceId  UUID of source artifact.
+     * @param targetId  UUID of target artifact.
+     * @return TraceApplicationEntity representing the created entity.
+     * @throws ServerError Throws error if either project version, source, or target artifact not found.
+     */
+    @PostMapping("/projects/versions/{versionId}/links/create/{sourceId}/{targetId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewTraceLInk(@PathVariable UUID versionId,
-                                             @PathVariable String sourceName,
-                                             @PathVariable String targetName) throws ServerError {
+                                             @PathVariable String sourceId,
+                                             @PathVariable String targetId) throws ServerError {
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        Pair<TraceLink, ParserError> creationResponse = this.traceLinkService.createTrace(projectVersion, sourceName,
-            targetName);
-        if (creationResponse.getValue0() == null) {
+        Pair<TraceLink, ParserError> creationResponse = this.traceLinkService.createTrace(projectVersion, sourceId,
+            targetId);
+        if (creationResponse.getValue1() != null) {
             return new ServerResponse(creationResponse.getValue1());
         }
         TraceLink traceLink = creationResponse.getValue0();

@@ -36,7 +36,7 @@ public class FlatFileService {
 
     /**
      * Constructs a project from the specification in TIM.json file.
-     * Note, this methods expects all files to be stored in local storage
+     * Note, this route expects all files to be stored in local storage
      * before processing.
      *
      * @param projectVersion the project version to be associated with the files specified.

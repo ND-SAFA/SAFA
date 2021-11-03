@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.importer.Puller;
-import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -48,18 +48,39 @@ public class VersionController extends BaseController {
         this.projectRetrievalService = projectRetrievalService;
     }
 
+    /**
+     * Returns list of versions in project associated with given projectId.
+     *
+     * @param projectId UUID of project whose versions are returned.
+     * @return List of project versions associated with project.
+     * @throws ServerError Throws error if project with ID is not found.
+     */
     @GetMapping("projects/{projectId}/versions")
     public ServerResponse versions(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getProjectVersions(project));
     }
 
+    /**
+     * Returns the greatest version of associated project.
+     *
+     * @param projectId UUID identifying project whose version is returned.
+     * @return Most up-to-date project version.
+     * @throws ServerError Throws error if not project if found with associated id.
+     */
     @GetMapping("projects/{projectId}/versions/current")
     public ServerResponse getCurrentVersion(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getCurrentVersion(project));
     }
 
+    /**
+     * Creates a new major version from the current project version.
+     *
+     * @param projectId UUID of project whose version will be created for.
+     * @return Project version created.
+     * @throws ServerError Throws error if no project found with given id.
+     */
     @PostMapping("projects/{projectId}/versions/major")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewMajorVersion(@PathVariable String projectId) throws ServerError {
@@ -68,6 +89,13 @@ public class VersionController extends BaseController {
         return new ServerResponse(nextVersion);
     }
 
+    /**
+     * Creates a new minor version of the current project version.
+     *
+     * @param projectId UUID of project whose version will be created for.
+     * @return Project version created.
+     * @throws ServerError Throws error if no project found with given id.
+     */
     @PostMapping("projects/{projectId}/versions/minor")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewMinorVersion(@PathVariable String projectId) throws ServerError {
@@ -76,6 +104,13 @@ public class VersionController extends BaseController {
         return new ServerResponse(nextVersion);
     }
 
+    /**
+     * Creates a new revision of the current project version.
+     *
+     * @param projectId UUID of project whose version will be created for.
+     * @return Project version created.
+     * @throws ServerError Throws error if no project found with given id.
+     */
     @PostMapping("projects/{projectId}/versions/revision")
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewRevisionVersion(@PathVariable String projectId) throws ServerError {
@@ -84,6 +119,13 @@ public class VersionController extends BaseController {
         return new ServerResponse(nextVersion);
     }
 
+    /**
+     * Deletes version associated with given version id.
+     *
+     * @param versionId UUID identifying version to delete.
+     * @return String representing success message.
+     * @throws ServerError Throws error if not version is associated with given id.
+     */
     @DeleteMapping("projects/versions/{versionId}")
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
@@ -95,12 +137,19 @@ public class VersionController extends BaseController {
         }
     }
 
+    /**
+     * Returns a project and associated artifacts at version associated with given id.
+     *
+     * @param versionId UUID of version whose artifacts and trace links are retrieved.
+     * @return ProjectCreationResponse containing artifacts, traces, and warnings of project at version specified.
+     * @throws ServerError Throws error if no version is associated with given id.
+     */
     @GetMapping("projects/versions/{versionId}")
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
 
         if (versionQuery.isPresent()) {
-            ProjectCreationResponse response = this.projectRetrievalService
+            ProjectEntities response = this.projectRetrievalService
                 .retrieveAndCreateProjectResponse(versionQuery.get());
             return new ServerResponse(response);
         } else {

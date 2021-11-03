@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ProjectCreationResponse;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectErrors;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
@@ -49,8 +49,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResponse saveProjectAppEntity(ProjectVersion projectVersion,
-                                                        ProjectAppEntity appEntity) throws ServerError {
+    public ProjectEntities saveProjectAppEntity(ProjectVersion projectVersion,
+                                                ProjectAppEntity appEntity) throws ServerError {
 
         if (appEntity.artifacts != null) {
             artifactVersionService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
@@ -64,15 +64,15 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResponse updateProject(ProjectVersion projectVersion,
-                                                 ProjectAppEntity appEntity) throws ServerError {
+    public ProjectEntities updateProject(ProjectVersion projectVersion,
+                                         ProjectAppEntity appEntity) throws ServerError {
 
         artifactVersionService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
 
         //TODO: Update trace links
         Map<String, List<RuleName>> projectWarnings = warningService.findViolationsInArtifactTree(projectVersion);
         ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectCreationResponse(appEntity, projectVersion, projectErrors, projectWarnings); // TODO:
+        return new ProjectEntities(appEntity, projectVersion, projectErrors, projectWarnings); // TODO:
         // Actually retrieve new
     }
 

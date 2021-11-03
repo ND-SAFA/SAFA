@@ -52,6 +52,14 @@ public class ParseFileController extends BaseController {
         this.traceFileParser = traceFileParser;
     }
 
+    /**
+     * Parses an artifact data file defining artifact id, summary, and content into artifact entities.
+     *
+     * @param artifactType The name of the artifact type associated with artifacts.
+     * @param file         The file defining a list of artifacts containing columns id, summary, and content.
+     * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
+     * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
+     */
     @PostMapping(value = "projects/parse/artifacts/{artifactType}")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
@@ -70,6 +78,13 @@ public class ParseFileController extends BaseController {
         return new ServerResponse(response);
     }
 
+    /**
+     * Parses an trace link data file containing list of source and target artifact pairs into trace links entities.
+     *
+     * @param file The file defining a list of trace links containing columns source and target.
+     * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
+     * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
+     */
     @PostMapping(value = "projects/parse/traces")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseTraceFile(@RequestParam MultipartFile file) throws ServerError, IOException {

@@ -36,6 +36,13 @@
             </v-row>
           </v-container>
         </v-row>
+
+        <GenericSwitch
+          v-if="showFileUploader"
+          v-model="ignoreErrors"
+          label="Ignore Errors"
+        />
+
         <v-row v-if="!isValid && showFileUploader" justify="center">
           <label class="text-caption" style="color: red"> {{ error }}</label>
         </v-row>
@@ -86,12 +93,6 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </v-row>
-
-        <GenericSwitch
-          v-if="showFileUploader"
-          v-model="ignoreErrors"
-          label="Ignore Errors"
-        />
 
         <v-row v-if="showFileUploader">
           <v-divider />

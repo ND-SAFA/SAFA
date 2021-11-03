@@ -23,7 +23,7 @@ export function createTraceUploader(): IGenericUploader<
 
 function createNewPanel(traceLink: Link): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
-  const newPanel: TracePanel = {
+  return {
     title: getTraceId(traceLink),
     entityNames: [],
     projectFile: emptyArtifactFile,
@@ -37,7 +37,6 @@ function createNewPanel(traceLink: Link): TracePanel {
       return createParsedArtifactFile(artifactMap, this, file);
     },
   };
-  return newPanel;
 }
 
 function createTraceFile(traceLink: Link): TraceFile {

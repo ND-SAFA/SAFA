@@ -1,10 +1,7 @@
 <template>
-  <v-row>
-    <v-col align-self="center" cols="9">{{ label }}</v-col>
-    <v-col align-self="center" cols="3"
-      ><v-switch v-model="switchValue" />
-    </v-col>
-  </v-row>
+  <v-container>
+    <v-switch v-model="switchValue" :label="label" class="generic-switch" />
+  </v-container>
 </template>
 
 <script lang="ts">

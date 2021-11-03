@@ -1,5 +1,6 @@
 <template>
   <FilePanel
+    :showFileUploader="!isGeneratedToggle"
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
     @onValidate="emitValidationState"
@@ -10,6 +11,14 @@
     <template v-slot:title>
       <h3>{{ title }}</h3>
     </template>
+
+    <template v-slot:after-rows>
+      <v-switch
+        v-model="isGeneratedToggle"
+        label="Generate Trace Links"
+        @change="toggleGenerated"
+      />
+    </template>
   </FilePanel>
 </template>
 
@@ -19,6 +28,7 @@ import FilePanel from "@/components/project/creator/validation-panels/FilePanel.
 import {
   ArtifactMap,
   IGenericFilePanel,
+  isTraceFile,
   ValidFileTypes,
 } from "@/components/project/creator/definitions/types";
 
@@ -39,9 +49,13 @@ export default Vue.extend({
   data() {
     return {
       ignoreErrors: false,
+      isGeneratedToggle: false,
     };
   },
   computed: {
+    isTraceFile(): boolean {
+      return isTraceFile(this.panel.projectFile);
+    },
     isValid(): boolean {
       return this.panel.getIsValid();
     },
@@ -70,6 +84,11 @@ export default Vue.extend({
         this.$emit("onIsValid");
       } else {
         this.$emit("onIsInvalid");
+      }
+    },
+    toggleGenerated() {
+      if (isTraceFile(this.panel.projectFile)) {
+        this.panel.projectFile.isGenerated = this.isGeneratedToggle;
       }
     },
   },

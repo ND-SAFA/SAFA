@@ -13,28 +13,30 @@ export function createArtifactUploader(): IGenericUploader<
 > {
   return {
     panels: [],
-    createNewPanel(artifactName: string): ArtifactPanel {
-      const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
-      const newPanel: ArtifactPanel = {
-        title: artifactName,
-        entityNames: [],
-        projectFile: emptyArtifactFile,
-        getIsValid(): boolean {
-          return isArtifactPanelValid(this);
-        },
-        clearFile(): ArtifactPanel {
-          return clearPanelFile(this);
-        },
-        parseFile(
-          artifactMap: ArtifactMap,
-          file: File
-        ): Promise<IGenericFilePanel<ArtifactMap, ArtifactFile>> {
-          return createParsedArtifactFile(artifactMap, this, file);
-        },
-      };
-      return newPanel;
+    createNewPanel,
+  };
+}
+
+function createNewPanel(artifactName: string): ArtifactPanel {
+  const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
+  const newPanel: ArtifactPanel = {
+    title: artifactName,
+    entityNames: [],
+    projectFile: emptyArtifactFile,
+    getIsValid(): boolean {
+      return isArtifactPanelValid(this);
+    },
+    clearFile(): ArtifactPanel {
+      return clearPanelFile(this);
+    },
+    parseFile(
+      artifactMap: ArtifactMap,
+      file: File
+    ): Promise<IGenericFilePanel<ArtifactMap, ArtifactFile>> {
+      return createParsedArtifactFile(artifactMap, this, file);
     },
   };
+  return newPanel;
 }
 
 function createArtifactFile(artifactType: string): ArtifactFile {

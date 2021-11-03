@@ -85,6 +85,10 @@
         </v-row>
 
         <v-row>
+          <slot name="after-rows" />
+        </v-row>
+
+        <v-row>
           <v-divider />
         </v-row>
 

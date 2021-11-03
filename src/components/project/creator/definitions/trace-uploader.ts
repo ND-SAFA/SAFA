@@ -14,15 +14,10 @@ export function createTraceUploader(): IGenericUploader<
   TraceFile
 > {
   return {
-    panels: [
-      createNewPanel({
-        source: "Requirements",
-        target: "Requirements",
-      }),
-    ],
     createNewPanel(traceLink: Link): TracePanel {
       return createNewPanel(traceLink);
     },
+    panels: [],
   };
 }
 

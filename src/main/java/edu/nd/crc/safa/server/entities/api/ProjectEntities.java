@@ -7,25 +7,31 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;
 
-public class ProjectCreationResponse {
+public class ProjectEntities {
+
     ProjectAppEntity project;
     ProjectVersion projectVersion;
     ProjectErrors errors;
     Map<String, List<RuleName>> warnings;
 
-    public ProjectCreationResponse() {
+    public ProjectEntities() {
     }
 
-    public ProjectCreationResponse(ProjectAppEntity project,
-                                   ProjectVersion projectVersion,
-                                   ProjectErrors errors,
-                                   Map<String, List<RuleName>> warnings) {
+    public ProjectEntities(ProjectAppEntity project,
+                           ProjectVersion projectVersion,
+                           ProjectErrors errors,
+                           Map<String, List<RuleName>> warnings) {
         this.project = project;
         this.projectVersion = projectVersion;
         this.errors = errors;
         this.warnings = warnings;
     }
 
+    /**
+     * {@Link ProjectEntities#project}
+     *
+     * @return Front-end project object.
+     */
     public ProjectAppEntity getProject() {
         return this.project;
     }

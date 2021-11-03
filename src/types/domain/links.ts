@@ -14,10 +14,13 @@ export enum TraceType {
   MANUAL = "MANUAL",
 }
 
-export interface TraceLink {
-  traceLinkId: string;
+export interface Link {
   source: string;
   target: string;
+}
+
+export interface TraceLink extends Link {
+  traceLinkId: string;
   approvalStatus: TraceApproval;
   score: number;
   traceType: TraceType;

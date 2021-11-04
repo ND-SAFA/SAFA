@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
+import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { appModule } from "@/store";
 import { PanelType } from "@/types/store";
 

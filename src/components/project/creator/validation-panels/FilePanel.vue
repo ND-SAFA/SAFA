@@ -56,7 +56,7 @@
               <v-expansion-panel-content>
                 <v-row>
                   <v-btn
-                    fab
+                    :fab="entitiesAreFab"
                     x-small
                     color="primary"
                     class="ma-1"
@@ -142,6 +142,10 @@ export default Vue.extend({
     entityNames: {
       type: Array as PropType<string[]>,
       required: true,
+    },
+    entitiesAreFab: {
+      type: Boolean,
+      default: true,
     },
     ignoreErrorsFlag: {
       type: Boolean,

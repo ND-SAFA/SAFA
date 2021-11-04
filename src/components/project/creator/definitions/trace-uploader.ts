@@ -4,9 +4,13 @@ import { TraceFile } from "@/types/common-components";
 import { Artifact } from "@/types/domain/artifact";
 import { Link, TraceLink } from "@/types/domain/links";
 import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
+import { generateLinks } from "@/api/link-api";
 
 const DEFAULT_IS_GENERATED = false;
-type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
+
+export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
+  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
+}
 
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
@@ -28,13 +32,36 @@ function createNewPanel(traceLink: Link): TracePanel {
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },
-    clearFile(): TracePanel {
-      return clearPanelFile(this);
+    clearPanel(): void {
+      return clearPanel(this);
     },
-    parseFile(artifactMap: ArtifactMap, file: File): Promise<TracePanel> {
+    parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
+    generateTraceLinks(artifactMap: ArtifactMap): Promise<void> {
+      return generateTraceLinks(artifactMap, this);
+    },
   };
+}
+
+function generateTraceLinks(
+  artifactMap: ArtifactMap,
+  tracePanel: TracePanel
+): Promise<void> {
+  const sourceType = tracePanel.projectFile.source;
+  const targetType = tracePanel.projectFile.target;
+  const artifacts: Artifact[] = Object.values(artifactMap);
+  const sourceArtifacts: Artifact[] = artifacts.filter(
+    (a) => a.type === sourceType
+  );
+  const targetArtifacts: Artifact[] = artifacts.filter(
+    (a) => a.type === targetType
+  );
+
+  return generateLinks(sourceArtifacts, targetArtifacts).then((traceLinks) => {
+    tracePanel.projectFile.traces = traceLinks;
+    tracePanel.entityNames = traceLinks.map(getTraceId);
+  });
 }
 
 function createTraceFile(traceLink: Link): TraceFile {
@@ -54,55 +81,37 @@ function isArtifactPanelValid(panel: TracePanel): boolean {
   );
 }
 
-function clearPanelFile(panel: TracePanel): TracePanel {
-  const updatedFile: TraceFile = {
+function clearPanel(panel: TracePanel): void {
+  panel.projectFile = {
     ...panel.projectFile,
     file: undefined,
     traces: [],
     errors: [],
   };
-  return {
-    ...panel,
-    projectFile: updatedFile,
-    entityNames: [],
-  };
+  panel.entityNames = [];
 }
 
 function createParsedArtifactFile(
   artifactMap: ArtifactMap,
   panel: TracePanel,
   file: File
-): Promise<TracePanel> {
-  return new Promise((resolve, reject) => {
-    const { projectFile } = panel;
-    parseTraceFile(file)
-      .then((res: ParseTraceFileResponse) => {
-        const { traces, errors } = res;
-        const validTraces: TraceLink[] = [];
-        traces.forEach((t) => {
-          const error = getTraceError(panel.projectFile, artifactMap, t);
-          if (error === undefined) {
-            validTraces.push(t);
-          } else {
-            errors.push(error);
-          }
-        });
-        const updatedFile: TraceFile = {
-          ...projectFile,
-          traces: validTraces,
-          errors,
-          file,
-        };
+): Promise<void> {
+  return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
+    const { traces, errors } = res;
+    const validTraces: TraceLink[] = [];
+    traces.forEach((t) => {
+      const error = getTraceError(panel.projectFile, artifactMap, t);
+      if (error === undefined) {
+        validTraces.push(t);
+      } else {
+        errors.push(error);
+      }
+    });
 
-        const updatedPanel: TracePanel = {
-          ...panel,
-          entityNames: traces.map(getTraceId),
-          projectFile: updatedFile,
-        };
-
-        resolve(updatedPanel);
-      })
-      .catch(reject);
+    panel.projectFile.traces = validTraces;
+    panel.projectFile.errors = errors;
+    panel.projectFile.file = file;
+    panel.entityNames = traces.map(getTraceId);
   });
 }
 

@@ -21,6 +21,15 @@ public class TraceApplicationEntity {
     public TraceApplicationEntity() {
     }
 
+    public TraceApplicationEntity(String source, String target, double score) {
+        this.traceLinkId = "";
+        this.source = source;
+        this.target = target;
+        this.approvalStatus = TraceApproval.UNREVIEWED;
+        this.score = score;
+        this.traceType = TraceType.GENERATED;
+    }
+
     public TraceApplicationEntity(TraceLink trace) {
         UUID traceLinkId = trace.getTraceLinkId();
         this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";

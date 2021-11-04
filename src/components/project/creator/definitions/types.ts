@@ -27,5 +27,16 @@ export type ValidFileTypes = ArtifactFile | TraceFile;
 export type ArtifactMap = Record<string, Artifact>;
 
 export function isTraceFile(obj: ProjectFile): obj is TraceFile {
-  return "isGenerated" in obj;
+  return (
+    "source" in obj &&
+    "target" in obj &&
+    "isGenerated" in obj &&
+    "traces" in obj
+  );
+}
+
+export function isTracePanel(
+  obj: IGenericFilePanel<any, any>
+): obj is TracePanel {
+  return isTraceFile(obj.projectFile);
 }

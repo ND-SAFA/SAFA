@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
+import GenericModal from "@/components/common/generic/GenericModal.vue";
 
 export default Vue.extend({
   components: {

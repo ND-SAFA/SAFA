@@ -2,7 +2,7 @@ import { parseTraceFile } from "@/api/parse-api";
 import { ParseTraceFileResponse } from "@/types/api";
 import { TraceFile } from "@/types/common-components";
 import { Artifact } from "@/types/domain/artifact";
-import { TraceLink } from "@/types/domain/links";
+import { Link, TraceLink } from "@/types/domain/links";
 import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
 
 const DEFAULT_IS_GENERATED = false;
@@ -10,33 +10,34 @@ type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
 
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
-  TraceLink,
+  Link,
   TraceFile
 > {
   return {
     panels: [],
-    createNewPanel(traceLink: TraceLink): TracePanel {
-      const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
-      const newPanel: TracePanel = {
-        title: getTraceId(traceLink),
-        entityNames: [],
-        projectFile: emptyArtifactFile,
-        getIsValid(): boolean {
-          return isArtifactPanelValid(this);
-        },
-        clearFile(): TracePanel {
-          return clearPanelFile(this);
-        },
-        parseFile(artifactMap: ArtifactMap, file: File): Promise<TracePanel> {
-          return createParsedArtifactFile(artifactMap, this, file);
-        },
-      };
-      return newPanel;
+    createNewPanel,
+  };
+}
+
+function createNewPanel(traceLink: Link): TracePanel {
+  const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
+  return {
+    title: getTraceId(traceLink),
+    entityNames: [],
+    projectFile: emptyArtifactFile,
+    getIsValid(): boolean {
+      return isArtifactPanelValid(this);
+    },
+    clearFile(): TracePanel {
+      return clearPanelFile(this);
+    },
+    parseFile(artifactMap: ArtifactMap, file: File): Promise<TracePanel> {
+      return createParsedArtifactFile(artifactMap, this, file);
     },
   };
 }
 
-function createTraceFile(traceLink: TraceLink): TraceFile {
+function createTraceFile(traceLink: Link): TraceFile {
   return {
     source: traceLink.source,
     target: traceLink.target,
@@ -105,14 +106,14 @@ function createParsedArtifactFile(
   });
 }
 
-function getTraceId(traceLink: TraceLink): string {
+function getTraceId(traceLink: Link): string {
   return `${traceLink.source}-${traceLink.target}`;
 }
 
 function getTraceError(
   traceFile: TraceFile,
   artifactMap: Record<string, Artifact>,
-  traceLink: TraceLink
+  traceLink: Link
 ): string | undefined {
   const { source, target } = traceLink;
   if (!(source in artifactMap)) {

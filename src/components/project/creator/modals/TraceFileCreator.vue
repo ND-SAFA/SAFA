@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
+import GenericModal from "@/components/common/generic/GenericModal.vue";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import {
   ButtonDefinition,
@@ -95,7 +95,7 @@ export default Vue.extend({
       } else {
         return this.artifactTypes.filter((t) => {
           const currentTraceId = `${this.source}-${t}`;
-          return t !== this.source && !traceIds.includes(currentTraceId);
+          return !traceIds.includes(currentTraceId);
         });
       }
     },

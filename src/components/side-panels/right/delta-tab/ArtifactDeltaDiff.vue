@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/modal/GenericModal.vue";
+import GenericModal from "@/components/common/generic/GenericModal.vue";
 import CodeDiff from "vue-code-diff";
 import { DeltaArtifact, DeltaType, getDeltaType } from "@/types/domain/delta";
 import { splitIntoLines } from "@/util/string-helper";

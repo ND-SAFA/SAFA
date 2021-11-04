@@ -28,10 +28,10 @@ function createNewPanel(traceLink: Link): TracePanel {
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },
-    clearFile(): TracePanel {
-      return clearPanelFile(this);
+    clearPanel(): void {
+      return clearPanel(this);
     },
-    parseFile(artifactMap: ArtifactMap, file: File): Promise<TracePanel> {
+    parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
   };
@@ -54,55 +54,37 @@ function isArtifactPanelValid(panel: TracePanel): boolean {
   );
 }
 
-function clearPanelFile(panel: TracePanel): TracePanel {
-  const updatedFile: TraceFile = {
+function clearPanel(panel: TracePanel): void {
+  panel.projectFile = {
     ...panel.projectFile,
     file: undefined,
     traces: [],
     errors: [],
   };
-  return {
-    ...panel,
-    projectFile: updatedFile,
-    entityNames: [],
-  };
+  panel.entityNames = [];
 }
 
 function createParsedArtifactFile(
   artifactMap: ArtifactMap,
   panel: TracePanel,
   file: File
-): Promise<TracePanel> {
-  return new Promise((resolve, reject) => {
-    const { projectFile } = panel;
-    parseTraceFile(file)
-      .then((res: ParseTraceFileResponse) => {
-        const { traces, errors } = res;
-        const validTraces: TraceLink[] = [];
-        traces.forEach((t) => {
-          const error = getTraceError(panel.projectFile, artifactMap, t);
-          if (error === undefined) {
-            validTraces.push(t);
-          } else {
-            errors.push(error);
-          }
-        });
-        const updatedFile: TraceFile = {
-          ...projectFile,
-          traces: validTraces,
-          errors,
-          file,
-        };
+): Promise<void> {
+  return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
+    const { traces, errors } = res;
+    const validTraces: TraceLink[] = [];
+    traces.forEach((t) => {
+      const error = getTraceError(panel.projectFile, artifactMap, t);
+      if (error === undefined) {
+        validTraces.push(t);
+      } else {
+        errors.push(error);
+      }
+    });
 
-        const updatedPanel: TracePanel = {
-          ...panel,
-          entityNames: traces.map(getTraceId),
-          projectFile: updatedFile,
-        };
-
-        resolve(updatedPanel);
-      })
-      .catch(reject);
+    panel.projectFile.traces = validTraces;
+    panel.projectFile.errors = errors;
+    panel.projectFile.file = file;
+    panel.entityNames = traces.map(getTraceId);
   });
 }
 

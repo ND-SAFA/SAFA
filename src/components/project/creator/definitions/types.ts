@@ -4,17 +4,15 @@ import {
   TraceFile,
 } from "@/types/common-components";
 import { Artifact } from "@/types/domain/artifact";
+import { TracePanel } from "@/components/project/creator/definitions/trace-uploader";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   title: string;
   projectFile: F;
   entityNames: string[];
   getIsValid(): boolean;
-  clearFile(): IGenericFilePanel<Environment, F>;
-  parseFile(
-    env: Environment,
-    file: File
-  ): Promise<IGenericFilePanel<Environment, F>>;
+  clearPanel(): void;
+  parseFile(env: Environment, file: File): Promise<void>;
 }
 
 export interface IGenericUploader<Environment, T, F extends ProjectFile> {

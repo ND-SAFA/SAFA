@@ -24,7 +24,6 @@ import FilePanel from "@/components/project/creator/validation-panels/FilePanel.
 import {
   ArtifactMap,
   IGenericFilePanel,
-  isTraceFile,
   isTracePanel,
   ValidFileTypes,
 } from "@/components/project/creator/definitions/types";
@@ -69,13 +68,11 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChange(file: File | undefined): void {
+    async onChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
-        this.$emit("onChange", this.panel.clearFile());
+        this.panel.clearPanel();
       } else {
-        this.panel.parseFile(this.artifactMap, file).then((updatedPanel) => {
-          this.$emit("onChange", updatedPanel);
-        });
+        await this.panel.parseFile(this.artifactMap, file);
       }
     },
     emitValidationState(isValid: boolean): void {

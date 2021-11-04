@@ -19,24 +19,20 @@ export function createArtifactUploader(): IGenericUploader<
 
 function createNewPanel(artifactName: string): ArtifactPanel {
   const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
-  const newPanel: ArtifactPanel = {
+  return {
     title: artifactName,
     entityNames: [],
     projectFile: emptyArtifactFile,
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },
-    clearFile(): ArtifactPanel {
-      return clearPanelFile(this);
+    clearPanel(): void {
+      return clearPanel(this);
     },
-    parseFile(
-      artifactMap: ArtifactMap,
-      file: File
-    ): Promise<IGenericFilePanel<ArtifactMap, ArtifactFile>> {
+    parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
   };
-  return newPanel;
 }
 
 function createArtifactFile(artifactType: string): ArtifactFile {
@@ -55,56 +51,43 @@ function isArtifactPanelValid(panel: ArtifactPanel): boolean {
   );
 }
 
-function clearPanelFile(panel: ArtifactPanel): ArtifactPanel {
-  const updatedFile: ArtifactFile = {
+function clearPanel(panel: ArtifactPanel): void {
+  panel.projectFile = {
     ...panel.projectFile,
     file: undefined,
     artifacts: [],
     errors: [],
   };
-  return {
-    ...panel,
-    projectFile: updatedFile,
-    entityNames: [],
-  };
+  panel.entityNames = [];
 }
 
 function createParsedArtifactFile(
   artifactMap: ArtifactMap,
   panel: ArtifactPanel,
   file: File
-): Promise<ArtifactPanel> {
-  return new Promise((resolve, reject) => {
-    const { projectFile } = panel;
-    parseArtifactFile(projectFile.type, file)
-      .then((res: ParseArtifactFileResponse) => {
-        const { artifacts, errors } = res;
-        const validArtifacts: Artifact[] = [];
-        artifacts.forEach((a) => {
-          const error = getArtifactError(artifactMap, a);
-          if (error === undefined) {
-            validArtifacts.push(a);
-          } else {
-            errors.push(error);
-          }
-        });
-        const updatedFile: ArtifactFile = {
-          ...projectFile,
-          artifacts: validArtifacts,
-          errors,
-          file,
-        };
+): Promise<void> {
+  return parseArtifactFile(panel.projectFile.type, file).then(
+    (res: ParseArtifactFileResponse) => {
+      const { artifacts, errors } = res;
+      const validArtifacts: Artifact[] = [];
+      artifacts.forEach((a) => {
+        const error = getArtifactError(artifactMap, a);
+        if (error === undefined) {
+          validArtifacts.push(a);
+        } else {
+          errors.push(error);
+        }
+      });
 
-        const updatedPanel: IGenericFilePanel<ArtifactMap, ArtifactFile> = {
-          ...panel,
-          entityNames: artifacts.map((a) => a.name),
-          projectFile: updatedFile,
-        };
-
-        resolve(updatedPanel);
-      })
-      .catch(reject);
-  });
+      panel.projectFile = {
+        ...panel.projectFile,
+        artifacts: validArtifacts,
+        errors,
+        file,
+      };
+      panel.entityNames = artifacts.map((a) => a.name);
+    }
+  );
 }
 
 function getArtifactError(

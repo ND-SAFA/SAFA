@@ -6,6 +6,7 @@
     @onValidate="emitValidationState"
     :errors="errors"
     :entityNames="entityNames"
+    :entities-are-fab="!isTracePanel"
     v-bind:ignoreErrorsFlag.sync="ignoreErrors"
   >
     <template v-slot:title>
@@ -84,9 +85,14 @@ export default Vue.extend({
     },
   },
   watch: {
-    isGeneratedToggle(isGenerated: boolean) {
+    async isGeneratedToggle(isGenerated: boolean) {
       if (isTracePanel(this.panel)) {
         this.panel.projectFile.isGenerated = isGenerated;
+        if (isGenerated) {
+          await this.panel.generateTraceLinks(this.artifactMap);
+        } else {
+          this.panel.clearPanel();
+        }
       }
     },
   },

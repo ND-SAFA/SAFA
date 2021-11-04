@@ -4,9 +4,13 @@ import { TraceFile } from "@/types/common-components";
 import { Artifact } from "@/types/domain/artifact";
 import { Link, TraceLink } from "@/types/domain/links";
 import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
+import { generateLinks } from "@/api/link-api";
 
 const DEFAULT_IS_GENERATED = false;
-type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
+
+export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
+  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
+}
 
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
@@ -34,7 +38,30 @@ function createNewPanel(traceLink: Link): TracePanel {
     parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
+    generateTraceLinks(artifactMap: ArtifactMap): Promise<void> {
+      return generateTraceLinks(artifactMap, this);
+    },
   };
+}
+
+function generateTraceLinks(
+  artifactMap: ArtifactMap,
+  tracePanel: TracePanel
+): Promise<void> {
+  const sourceType = tracePanel.projectFile.source;
+  const targetType = tracePanel.projectFile.target;
+  const artifacts: Artifact[] = Object.values(artifactMap);
+  const sourceArtifacts: Artifact[] = artifacts.filter(
+    (a) => a.type === sourceType
+  );
+  const targetArtifacts: Artifact[] = artifacts.filter(
+    (a) => a.type === targetType
+  );
+
+  return generateLinks(sourceArtifacts, targetArtifacts).then((traceLinks) => {
+    tracePanel.projectFile.traces = traceLinks;
+    tracePanel.entityNames = traceLinks.map(getTraceId);
+  });
 }
 
 function createTraceFile(traceLink: Link): TraceFile {

@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ModalTitle from "@/components/common/generic/modal/GenericModalTitle.vue";
+import ModalTitle from "@/components/common/generic/GenericModalTitle.vue";
 import { ModalSize } from "@/types/common-components";
 export default Vue.extend({
   name: "generic-modal",

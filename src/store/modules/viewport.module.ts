@@ -10,7 +10,7 @@ import {
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles/config/graph";
 import GraphLayout from "@/cytoscape/layout/graph-layout";
-import { areEqual } from "@/util/array-helper";
+import { areArraysEqual } from "@/util";
 import {
   isInSubtree,
   doesNotContainType,
@@ -68,7 +68,6 @@ export default class ViewportModule extends VuexModule {
   }
 
   @Action
-
   /**
    * Moves the viewport such that given set of artifacts is in the middle of the viewport.
    * If not artifacts are given, the entire collection of nodes is centered.
@@ -82,7 +81,7 @@ export default class ViewportModule extends VuexModule {
       if (cyCore.animated()) {
         if (
           this.currentCenteringCollection !== undefined &&
-          areEqual(this.currentCenteringCollection, artifacts)
+          areArraysEqual(this.currentCenteringCollection, artifacts)
         ) {
           console.warn("collection is already being rendered: ", artifacts);
           return;

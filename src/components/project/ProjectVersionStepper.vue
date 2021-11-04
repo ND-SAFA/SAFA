@@ -56,7 +56,7 @@ import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
 } from "@/types/common-components";
-import { versionToString } from "@/util/to-string";
+import { versionToString } from "@/util";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";

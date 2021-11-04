@@ -54,7 +54,7 @@ import type {
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 import ProjectSelector from "@/components/project/selector/ProjectSelector.vue";
 import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
-import { versionToString } from "@/util/to-string";
+import { versionToString } from "@/util";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";

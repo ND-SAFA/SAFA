@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { ProjectVersion } from "@/types/domain/project";
-import { versionToString } from "@/util/to-string";
+import { versionToString } from "@/util";
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 export default Vue.extend({

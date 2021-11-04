@@ -21,7 +21,7 @@
 import { DeltaArtifact, DeltaType } from "@/types/domain/delta";
 import Vue, { PropType } from "vue";
 import ArtifactDeltaButton from "@/components/side-panels/right/delta-tab/ArtifactDeltaButton.vue";
-import { capitalize } from "@/util/string-helper";
+import { capitalize } from "@/util";
 
 export default Vue.extend({
   components: { ArtifactDeltaButton },

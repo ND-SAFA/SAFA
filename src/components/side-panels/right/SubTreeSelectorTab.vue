@@ -50,7 +50,7 @@
 <script lang="ts">
 import { Artifact } from "@/types/domain/artifact";
 import Vue from "vue";
-import { getArtifactTypePrintName } from "@/util/string-helper";
+import { getArtifactTypePrintName } from "@/util";
 import { projectModule, viewportModule } from "@/store";
 
 export default Vue.extend({
@@ -61,9 +61,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    getTypePrintName(type: string): string {
-      return getArtifactTypePrintName(type);
-    },
+    getTypePrintName: getArtifactTypePrintName,
     getIconName(type: string): string {
       switch (type.toLowerCase()) {
         case "requirement":

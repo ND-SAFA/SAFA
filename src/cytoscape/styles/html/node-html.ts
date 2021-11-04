@@ -4,7 +4,7 @@ import {
   ARTIFACT_HEIGHT,
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact";
-import { getArtifactTypePrintName } from "@/util/string-helper";
+import { getArtifactTypePrintName } from "@/util";
 import { TRUNCATE_LENGTH } from "@/cytoscape/styles/config/graph";
 
 export const nodeHtml: HtmlDefinition = {

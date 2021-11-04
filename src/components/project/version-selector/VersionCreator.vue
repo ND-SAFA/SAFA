@@ -42,7 +42,7 @@ import {
 } from "@/api/project-api";
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
-import { versionToString } from "@/util/to-string";
+import { versionToString } from "@/util";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 
 type VersionType = "major" | "minor" | "revision";

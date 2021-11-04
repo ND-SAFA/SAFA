@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.vsm;
+package edu.nd.crc.safa.importer.tracegenerator.vsm;
 
 import java.util.Collection;
 

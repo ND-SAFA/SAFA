@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;

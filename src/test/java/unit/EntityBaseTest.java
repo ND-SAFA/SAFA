@@ -12,6 +12,7 @@ import edu.nd.crc.safa.builders.AppBuilder;
 import edu.nd.crc.safa.builders.EntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
@@ -21,7 +22,6 @@ import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 

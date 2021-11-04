@@ -12,12 +12,8 @@
       <h3>{{ title }}</h3>
     </template>
 
-    <template v-slot:after-rows>
-      <v-switch
-        v-model="isGeneratedToggle"
-        label="Generate Trace Links"
-        @change="toggleGenerated"
-      />
+    <template v-slot:before-rows v-if="isTraceFile">
+      <GenericSwitch v-model="isGeneratedToggle" label="Generate Trace Links" />
     </template>
   </FilePanel>
 </template>
@@ -31,9 +27,11 @@ import {
   isTraceFile,
   ValidFileTypes,
 } from "@/components/project/creator/definitions/types";
+import GenericSwitch from "@/components/common/generic/GenericSwitch.vue";
 
 export default Vue.extend({
   components: {
+    GenericSwitch,
     FilePanel,
   },
   props: {
@@ -86,9 +84,11 @@ export default Vue.extend({
         this.$emit("onIsInvalid");
       }
     },
-    toggleGenerated() {
+  },
+  watch: {
+    isGeneratedToggle(isGenerated: boolean) {
       if (isTraceFile(this.panel.projectFile)) {
-        this.panel.projectFile.isGenerated = this.isGeneratedToggle;
+        this.panel.projectFile.isGenerated = isGenerated;
       }
     },
   },

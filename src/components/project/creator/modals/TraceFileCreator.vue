@@ -95,7 +95,7 @@ export default Vue.extend({
       } else {
         return this.artifactTypes.filter((t) => {
           const currentTraceId = `${this.source}-${t}`;
-          return t !== this.source && !traceIds.includes(currentTraceId);
+          return !traceIds.includes(currentTraceId);
         });
       }
     },

@@ -1,5 +1,5 @@
 import { Artifact } from "@/types/domain/artifact";
-import { TraceLink } from "@/types/domain/links";
+import { Link, TraceLink } from "@/types/domain/links";
 import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
 
 export enum ButtonType {

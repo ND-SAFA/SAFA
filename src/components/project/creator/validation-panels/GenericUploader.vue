@@ -47,6 +47,8 @@ import GenericFilePanel from "@/components/project/creator/validation-panels/Fil
 const DEFAULT_VALID_STATE = false;
 type ValidPayloads = string | TraceLink;
 
+//TODO: move isValidStates from GenericUpload to Panel object.
+
 export default Vue.extend({
   components: {
     ValidatedPanels,
@@ -106,6 +108,9 @@ export default Vue.extend({
       Vue.set(this.isValidStates, artifactFileIndex, isValid);
     },
     deleteFile(i: number): void {
+      this.isValidStates = this.isValidStates.filter(
+        (state, index) => index !== i
+      );
       this.$emit(
         "onChange",
         this.panels.filter((f, index) => index !== i)

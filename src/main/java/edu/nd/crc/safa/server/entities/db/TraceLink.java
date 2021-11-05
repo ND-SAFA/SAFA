@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -36,7 +38,6 @@ public class TraceLink implements Serializable {
     @Type(type = "uuid-char")
     @Column(name = "trace_link_id")
     UUID traceLinkId;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -45,7 +46,6 @@ public class TraceLink implements Serializable {
         nullable = false
     )
     Artifact sourceArtifact;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -54,20 +54,24 @@ public class TraceLink implements Serializable {
         nullable = false
     )
     Artifact targetArtifact;
-
     @Column(name = "trace_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     TraceType traceType;
-
     @Column(name = "approved")
     TraceApproval approvalStatus;
-
     @Column(name = "score")
     double score;
 
     public TraceLink() {
         this.approvalStatus = TraceApproval.UNREVIEWED;
         this.score = 0;
+    }
+
+    public TraceLink(TraceApplicationEntity traceLink) {
+        this();
+        this.approvalStatus = traceLink.approvalStatus == null ? this.approvalStatus : traceLink.approvalStatus;
+        this.traceType = traceLink.traceType == null ? this.traceType : traceLink.traceType;
+        this.score = traceLink.score == 0 ? this.score : traceLink.score;
     }
 
     public TraceLink(Artifact sourceArtifact,
@@ -158,7 +162,15 @@ public class TraceLink implements Serializable {
         return this.sourceArtifact;
     }
 
+    public void setSourceArtifact(Artifact sourceArtifact) {
+        this.sourceArtifact = sourceArtifact;
+    }
+
     public Artifact getTargetArtifact() {
         return this.targetArtifact;
+    }
+
+    public void setTargetArtifact(Artifact targetArtifact) {
+        this.targetArtifact = targetArtifact;
     }
 }

@@ -69,6 +69,7 @@ function createTraceFile(traceLink: Link): TraceFile {
     source: traceLink.source,
     target: traceLink.target,
     isGenerated: DEFAULT_IS_GENERATED,
+    isValid: false,
     errors: [],
     traces: [],
   };

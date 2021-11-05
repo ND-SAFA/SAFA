@@ -51,6 +51,7 @@ export type StepState = [string, boolean];
 export interface ProjectFile {
   file?: File;
   errors: string[];
+  isValid: boolean;
 }
 export interface ArtifactFile extends ProjectFile {
   type: string;

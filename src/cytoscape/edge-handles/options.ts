@@ -1,5 +1,5 @@
-import store, { projectModule } from "@/store";
-import { EdgeHandlersOptions } from "@/types/cytoscape/edge-handles";
+import { projectModule } from "@/store";
+import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 

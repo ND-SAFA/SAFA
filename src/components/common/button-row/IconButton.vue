@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { ButtonDefinition } from "@/types/common-components";
+import { ButtonDefinition } from "@/types";
 import Vue, { PropType } from "vue";
 export default Vue.extend({
   props: {

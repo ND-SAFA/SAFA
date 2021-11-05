@@ -1,4 +1,6 @@
-import { APIOptions, APIResponse, isAPIError } from "@/types/api";
+import { APIOptions, APIResponse } from "@/types";
+import { isAPIError } from "@/util";
+
 import { appModule } from "@/store";
 import { baseURL } from "@/api/base-url";
 

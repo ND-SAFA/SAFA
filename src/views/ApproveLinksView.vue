@@ -43,8 +43,8 @@ import {
   declineLinkAPIHandler,
 } from "@/api/handlers/trace-link-approval-handler";
 import ApprovalSection from "@/components/approve-links-view/ApprovalSection.vue";
-import { Artifact } from "@/types/domain/artifact";
-import { TraceApproval, TraceLink } from "@/types/domain/links";
+import { Artifact } from "@/types";
+import { TraceApproval, TraceLink } from "@/types";
 import Vue from "vue";
 import { appModule, projectModule } from "@/store";
 export default Vue.extend({

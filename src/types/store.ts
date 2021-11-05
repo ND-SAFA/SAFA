@@ -2,11 +2,11 @@ import {
   AddedArtifact,
   ModifiedArtifact,
   RemovedArtifact,
-} from "@/types/domain/delta";
-import { Artifact } from "@/types/domain/artifact";
+  Artifact,
+} from "@/types";
 
 /**
- *APP STATE
+ * Enumerates app store message types.
  */
 export enum MessageType {
   INFO = "info",
@@ -14,12 +14,28 @@ export enum MessageType {
   ERROR = "error",
   WARNING = "warning",
 }
+
+/**
+ * Defines a snackbar message.
+ */
 export interface SnackbarMessage {
+  /**
+   * A list of errors.
+   */
   errors: string[];
+  /**
+   * The message text.
+   */
   message: string;
+  /**
+   * The message type.
+   */
   type: MessageType;
 }
 
+/**
+ * Enumerates types of panels.
+ */
 export enum PanelType {
   left,
   right,
@@ -27,23 +43,44 @@ export enum PanelType {
   errorDisplay,
 }
 
+/**
+ * Defines the state of a panel.
+ */
 export interface PanelState {
+  /**
+   * The type of panel.
+   */
   type: PanelType;
+  /**
+   * Whether the panel is open.
+   */
   isOpen: boolean;
 }
 
 /**
- * DELTA STATE
+ * Defines the delta artifacts state.
  */
-export interface DeltaPayload {
+export interface DeltaArtifacts {
+  /**
+   * A collection of all added artifacts.
+   */
   added: Record<string, AddedArtifact>;
+  /**
+   * A collection of all removed artifacts.
+   */
   removed: Record<string, RemovedArtifact>;
+  /**
+   * A collection of all modified artifacts.
+   */
   modified: Record<string, ModifiedArtifact>;
-  missingArtifacts: Artifact[];
 }
 
-export interface DeltaArtifacts {
-  added: Record<string, AddedArtifact>;
-  removed: Record<string, RemovedArtifact>;
-  modified: Record<string, ModifiedArtifact>;
+/**
+ * Defines the delta payload state.
+ */
+export interface DeltaPayload extends DeltaArtifacts {
+  /**
+   * A list of all missing artifacts.
+   */
+  missingArtifacts: Artifact[];
 }

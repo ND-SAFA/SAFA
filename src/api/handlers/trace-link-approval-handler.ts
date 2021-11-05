@@ -1,4 +1,4 @@
-import { TraceApproval, TraceLink } from "@/types/domain/links";
+import { TraceApproval, TraceLink } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/link-api";
 

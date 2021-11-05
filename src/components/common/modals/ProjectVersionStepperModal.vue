@@ -46,12 +46,13 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
-import type {
+import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
   StepState,
-} from "@/types/common-components";
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+  ProjectIdentifier,
+  ProjectVersion,
+} from "@/types";
 import ProjectSelector from "@/components/project/selector/ProjectSelector.vue";
 import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import { versionToString } from "@/util";

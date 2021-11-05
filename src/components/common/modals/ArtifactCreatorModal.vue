@@ -39,14 +39,9 @@
 import Vue from "vue";
 import { createNewArtifact, isArtifactNameTaken } from "@/api/artifact-api";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact } from "@/types";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import {
-  ButtonDefinition,
-  ButtonType,
-  ListMenuDefinition,
-} from "@/types/common-components";
-import { Project } from "@/types/domain/project";
+import { ButtonDefinition, ButtonType, ListMenuDefinition } from "@/types";
 import { appModule, projectModule } from "@/store";
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
 

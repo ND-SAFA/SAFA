@@ -1,7 +1,7 @@
 import { NodeSingular, EventObject, CollectionReturnValue } from "cytoscape";
 import store, { appModule, projectModule } from "@/store";
 import { createLink } from "@/api/link-api";
-import { Project } from "@/types/domain/project";
+import { Project } from "@/types";
 import { disableDrawMode } from "@/cytoscape/edge-handles";
 
 export function onEdgeComplete(

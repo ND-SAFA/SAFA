@@ -1,4 +1,4 @@
-import { ProjectVersion } from "@/types/domain/project";
+import { ProjectVersion } from "@/types";
 
 /**
  * Stringifies the version number.

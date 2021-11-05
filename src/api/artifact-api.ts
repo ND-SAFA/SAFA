@@ -1,6 +1,6 @@
 import { PROJECTS_API_PATH } from "@/api/project-api";
-import { ArtifactNameValidationResponse } from "@/types/api";
-import { Artifact } from "@/types/domain/artifact";
+import { ArtifactNameValidationResponse } from "@/types";
+import { Artifact } from "@/types";
 import httpClient from "@/api/http-client";
 
 export async function isArtifactNameTaken(

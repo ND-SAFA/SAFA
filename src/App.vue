@@ -28,7 +28,7 @@ import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
 import AppBar from "@/components/navigation/AppBar.vue";
 import ArtifactCreator from "@/components/common/modals/ArtifactCreatorModal.vue";
 
-import { PanelType } from "@/types/store";
+import { PanelType } from "@/types";
 import { appModule } from "@/store";
 
 export default Vue.extend({

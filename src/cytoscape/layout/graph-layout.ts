@@ -1,18 +1,17 @@
 import { NodeCollection } from "cytoscape";
-import { CytoCore } from "@/types/cytoscape";
 import { DefaultKlayLayout } from "@/cytoscape/layout/klay-layout-settings";
-import {
-  AutoMoveEventHandlers,
-  DefaultAutoMoveEventHandlers,
-} from "@/cytoscape/automove";
-import {
-  CytoEventHandlers,
-  DefaultCytoEventHandlers,
-} from "@/cytoscape/events/cyto-events";
-import IGraphLayout from "@/types/cytoscape/igraph-layout";
+import { DefaultAutoMoveEventHandlers } from "@/cytoscape/automove";
+import { DefaultCytoEventHandlers } from "@/cytoscape/events/cyto-events";
 import { DefaultPreLayoutHooks } from "@/cytoscape/hooks/pre-layout";
 import { DefaultPostLayoutHooks } from "@/cytoscape/hooks/post-layout";
-import { KlayLayoutSettings, LayoutHook } from "@/types/cytoscape/klay";
+import {
+  KlayLayoutSettings,
+  LayoutHook,
+  IGraphLayout,
+  AutoMoveEventHandlers,
+  CytoCore,
+  CytoEventHandlers,
+} from "@/types";
 
 export default class GraphLayout implements IGraphLayout {
   klaySettings: KlayLayoutSettings;

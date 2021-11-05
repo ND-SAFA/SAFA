@@ -29,7 +29,7 @@ import {
   TraceLink,
   TraceLinkDisplayData,
   TraceType,
-} from "@/types/domain/links";
+} from "@/types";
 import Vue, { PropType } from "vue";
 import TraceLinkDisplay from "@/components/approve-links-view/TraceLinkDisplay.vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";

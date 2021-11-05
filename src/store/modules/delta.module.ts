@@ -2,10 +2,10 @@ import {
   AddedArtifact,
   RemovedArtifact,
   ModifiedArtifact,
-} from "@/types/domain/delta";
-import { ProjectVersion } from "@/types/domain/project";
-import type { DeltaPayload } from "@/types/store";
-import { PanelType } from "@/types/store";
+  ProjectVersion,
+  PanelType,
+  DeltaPayload,
+} from "@/types";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import { appModule, projectModule } from "..";
 

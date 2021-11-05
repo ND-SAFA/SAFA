@@ -1,7 +1,9 @@
-import { LayoutHook } from "@/types/cytoscape/klay";
-import { AutoMoveReposition } from "@/types/cytoscape/automove";
-import { CytoCore } from "@/types/cytoscape";
-import IGraphLayout from "@/types/cytoscape/igraph-layout";
+import {
+  LayoutHook,
+  AutoMoveReposition,
+  CytoCore,
+  IGraphLayout,
+} from "@/types";
 import { EventObject } from "cytoscape";
 import {
   ANIMATION_DURATION,

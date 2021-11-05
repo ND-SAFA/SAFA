@@ -1,5 +1,5 @@
 import httpClient from "@/api/http-client";
-import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types/api";
+import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
 
 export const PROJECTS_API_PATH = "projects";
 

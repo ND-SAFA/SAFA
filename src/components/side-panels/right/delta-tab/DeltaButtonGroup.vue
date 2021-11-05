@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { DeltaArtifact, DeltaType } from "@/types/domain/delta";
+import { DeltaArtifact, DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
 import ArtifactDeltaButton from "@/components/side-panels/right/delta-tab/ArtifactDeltaButton.vue";
 import { capitalize } from "@/util";

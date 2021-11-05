@@ -46,8 +46,8 @@ import {
   getProjects,
   saveOrUpdateProject,
 } from "@/api/project-api";
-import { DataItem, ProjectCreationResponse } from "@/types/api";
-import { ProjectIdentifier } from "@/types/domain/project";
+import { DataItem, ProjectCreationResponse } from "@/types";
+import { ProjectIdentifier } from "@/types";
 import GenericSelector from "@/components/common/generic/GenericSelector.vue";
 import ProjectCreatorModal from "@/components/project/selector/ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "@/components/project/selector/ConfirmProjectDelete.vue";

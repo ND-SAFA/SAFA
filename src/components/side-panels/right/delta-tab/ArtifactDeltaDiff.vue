@@ -40,8 +40,8 @@
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import CodeDiff from "vue-code-diff";
-import { DeltaArtifact, DeltaType, getDeltaType } from "@/types/domain/delta";
-import { splitIntoLines } from "@/util";
+import { DeltaArtifact, DeltaType } from "@/types";
+import { getDeltaType, splitIntoLines } from "@/util";
 
 export default Vue.extend({
   components: { GenericModal, CodeDiff },

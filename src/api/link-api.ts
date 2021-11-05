@@ -1,4 +1,4 @@
-import { TraceLink } from "@/types/domain/links";
+import { TraceLink } from "@/types";
 import httpClient from "@/api/http-client";
 import { PROJECTS_API_PATH } from "@/api/project-api";
 

@@ -1,9 +1,7 @@
-import type { Artifact } from "@/types/domain/artifact";
 import { cyPromise, getArtifactSubTree } from "@/cytoscape/cytoscape";
 import { appModule, artifactSelectionModule, projectModule } from "@/store";
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore } from "@/types/cytoscape";
-import { PanelType } from "@/types/store";
+import { PanelType, CytoCore, Artifact } from "@/types";
 import {
   ANIMATION_DURATION,
   DEFAULT_ZOOM,

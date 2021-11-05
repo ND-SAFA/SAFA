@@ -3,9 +3,10 @@ import {
   LayoutDirection,
   NodeLayering,
   NodePlacement,
-} from "@/types/cytoscape/klay";
+} from "@/types";
 import { GraphStyle } from "@/cytoscape/styles/stylesheets";
 import { CytoscapeOptions } from "cytoscape";
+
 export const EDGE_CURVE_STYLE = "bezier";
 export const CORE_PEER_SPACING = 1;
 

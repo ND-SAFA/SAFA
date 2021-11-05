@@ -1,5 +1,4 @@
-import type { ArtifactWarning, ProjectWarnings } from "@/types/domain/artifact";
-import { ProjectErrors } from "@/types/domain/project";
+import { ArtifactWarning, ProjectWarnings, ProjectErrors } from "@/types";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 @Module({ namespaced: true, name: "error" })

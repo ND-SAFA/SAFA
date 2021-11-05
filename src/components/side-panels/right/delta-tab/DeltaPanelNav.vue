@@ -38,7 +38,7 @@
 <script lang="ts">
 import Vue from "vue";
 import DeltaVersionModal from "@/components/side-panels/right/delta-tab/DeltaVersionsModal.vue";
-import { Project } from "@/types/domain/project";
+import { Project } from "@/types";
 import { versionToString } from "@/util";
 import { deltaModule, projectModule } from "@/store";
 

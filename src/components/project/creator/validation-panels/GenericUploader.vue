@@ -39,9 +39,9 @@ import {
   IGenericFilePanel,
   IGenericUploader,
   ValidFileTypes,
-} from "@/components/project/creator/definitions/types";
-import { ProjectFile } from "@/types/common-components";
-import { TraceLink } from "@/types/domain/links";
+  ProjectFile,
+  TraceLink,
+} from "@/types";
 import GenericFilePanel from "@/components/project/creator/validation-panels/FilePanelController.vue";
 
 const DEFAULT_VALID_STATE = false;

@@ -40,7 +40,7 @@ import {
   createNewRevisionVersion,
   getCurrentVersion,
 } from "@/api/project-api";
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import Vue, { PropType } from "vue";
 import { versionToString } from "@/util";
 import GenericModal from "@/components/common/generic/GenericModal.vue";

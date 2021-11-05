@@ -27,8 +27,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData } from "@/types/domain/links";
-import { Artifact } from "@/types/domain/artifact";
+import { TraceLink, TraceLinkDisplayData } from "@/types";
+import { Artifact } from "@/types";
 import ArtifactNode from "@/components/artifact-tree-view/ArtifactNode.vue";
 import TraceLinkEdge from "@/components/artifact-tree-view/TraceLinkEdge.vue";
 import TraceLinkApprovalModal from "@/components/approve-links-view/TraceLinkApprovalModal.vue";

@@ -1,4 +1,4 @@
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact } from "@/types";
 import { SingularElementArgument } from "cytoscape";
 
 export function isRelatedToArtifacts(
@@ -14,9 +14,11 @@ export function isRelatedToArtifacts(
     return artifactsIds.includes(e.data().id);
   }
 }
+
 export function isInSubtree(subtree: string[], a: Artifact): boolean {
   return subtree.length === 0 || subtree.includes(a.name);
 }
+
 export function doesNotContainType(
   ignoreTypes: string[] | undefined,
   a: Artifact
@@ -34,3 +36,5 @@ export interface SubtreeFilterAction {
   type: "subtree";
   artifactsInSubtree: string[];
 }
+
+export type FilterAction = IgnoreTypeFilterAction | SubtreeFilterAction;

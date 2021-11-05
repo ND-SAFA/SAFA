@@ -1,19 +1,10 @@
-import { AutoMoveRule } from "@/types/cytoscape/automove";
-import { CytoEvent } from "@/types/cytoscape";
-import { CSSCursor } from "@/types/cytoscape/cursor";
-import { NodeSingular, EventObject } from "cytoscape";
-
-export type AutoMoveNodeEvent = (
-  node: NodeSingular,
-  rule: AutoMoveRule,
-  event: EventObject
-) => void;
-
-export interface AutoMoveEventDefinition {
-  triggers: CytoEvent[];
-  action: AutoMoveNodeEvent;
-}
-export type AutoMoveEventHandlers = Record<string, AutoMoveEventDefinition>;
+import {
+  AutoMoveEventHandlers,
+  AutoMoveRule,
+  CSSCursor,
+  CytoEvent,
+} from "@/types";
+import { EventObject, NodeSingular } from "cytoscape";
 
 export const DefaultAutoMoveEventHandlers: AutoMoveEventHandlers = {
   onContextDrag: {

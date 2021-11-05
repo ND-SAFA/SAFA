@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectVersion } from "@/types/domain/project";
+import { ProjectVersion } from "@/types";
 import { versionToString } from "@/util";
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";

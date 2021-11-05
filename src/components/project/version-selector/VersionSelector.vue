@@ -32,13 +32,13 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import GenericSelector from "@/components/common/generic/GenericSelector.vue";
 import Vue, { PropType } from "vue";
 import { deleteProjectVersion, getProjectVersions } from "@/api/project-api";
 import VersionCreator from "@/components/project/version-selector/VersionCreator.vue";
 import ConfirmVersionDelete from "@/components/project/version-selector/ConfirmVersionDelete.vue";
-import { DataItem } from "@/types/api";
+import { DataItem } from "@/types";
 import { versionSelectorHeader } from "@/components/project/version-selector/headers";
 import { appModule } from "@/store";
 

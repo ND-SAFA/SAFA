@@ -90,14 +90,17 @@
 <script lang="ts">
 import Vue from "vue";
 import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
-import type { StepState, TraceFile } from "@/types/common-components";
+import {
+  StepState,
+  TraceFile,
+  ProjectCreationResponse,
+  TraceLink,
+  Artifact,
+  Project,
+} from "@/types";
 import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
-import { TraceLink } from "@/types/domain/links";
-import { Artifact } from "@/types/domain/artifact";
 import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api/project-api";
-import { Project } from "@/types/domain/project";
-import { ProjectCreationResponse } from "@/types/api";
 import { projectModule } from "@/store";
 import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";

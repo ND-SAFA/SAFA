@@ -1,17 +1,14 @@
-import type { Project } from "@/types/domain/project";
-import type { Artifact } from "@/types/domain/artifact";
-import type { TraceLink } from "@/types/domain/links";
 import { connectAndSubscriptToVersion } from "@/api/revision-api";
-import type { ProjectCreationResponse } from "@/types/api";
+import { ProjectCreationResponse, Project, Artifact, TraceLink } from "@/types";
 import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
-export interface ChannelSubscriptionId {
+interface ChannelSubscriptionId {
   projectId?: string;
   versionId?: string;
 }
 
-export type ArtifactQueryFunction = (q: string) => Artifact | undefined;
+type ArtifactQueryFunction = (q: string) => Artifact | undefined;
 
 @Module({ namespaced: true, name: "project" })
 export default class ProjectModule extends VuexModule {

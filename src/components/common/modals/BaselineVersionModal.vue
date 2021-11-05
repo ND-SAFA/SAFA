@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import Vue from "vue";
 import { getProjectVersion } from "@/api/project-api";
 import { appModule, projectModule } from "@/store";

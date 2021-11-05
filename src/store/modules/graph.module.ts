@@ -1,18 +1,7 @@
-import type { Artifact } from "@/types/domain/artifact";
 import { appModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import {
-  IgnoreTypeFilterAction,
-  SubtreeFilterAction,
-} from "@/cytoscape/filters/graph-filters";
-import { PanelType } from "@/types/store";
-
-export type FilterAction = IgnoreTypeFilterAction | SubtreeFilterAction;
-
-export interface ChannelSubscriptionId {
-  projectId?: string;
-  versionId?: string;
-}
+import { FilterAction } from "@/cytoscape/filters/graph-filters";
+import { PanelType, Artifact } from "@/types";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 export default class ArtifactSelectionModule extends VuexModule {

@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact } from "@/types";
 import Vue from "vue";
 import { getArtifactTypePrintName } from "@/util";
 import { projectModule, viewportModule } from "@/store";

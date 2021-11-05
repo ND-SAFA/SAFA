@@ -9,13 +9,11 @@ import {
   ArtifactData,
   ArtifactWarning,
   ProjectWarnings,
-} from "@/types/domain/artifact";
-import {
   AddedArtifact,
   ArtifactDeltaState,
   ModifiedArtifact,
   RemovedArtifact,
-} from "@/types/domain/delta";
+} from "@/types";
 import Vue, { PropType } from "vue";
 
 interface ArtifactElement {

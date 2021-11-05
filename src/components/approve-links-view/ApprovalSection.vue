@@ -26,8 +26,8 @@
 import TraceLinkExpansionPanel from "@/components/approve-links-view/TraceLinkExpansionPanel.vue";
 import SectionControls from "@/components/approve-links-view/SectionControls.vue";
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types/domain/links";
-import { Artifact } from "@/types/domain/artifact";
+import { TraceLink } from "@/types";
+import { Artifact } from "@/types";
 export default Vue.extend({
   components: { TraceLinkExpansionPanel, SectionControls },
   props: {

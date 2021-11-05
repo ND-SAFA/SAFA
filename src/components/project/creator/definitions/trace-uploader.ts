@@ -1,12 +1,18 @@
 import { parseTraceFile } from "@/api/parse-api";
-import { ParseTraceFileResponse } from "@/types/api";
-import { TraceFile } from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
-import { Link, TraceLink } from "@/types/domain/links";
-import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
+import {
+  ArtifactMap,
+  IGenericFilePanel,
+  IGenericUploader,
+  Artifact,
+  TraceFile,
+  ParseTraceFileResponse,
+  Link,
+  TraceLink,
+} from "@/types";
+
+type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
 
 const DEFAULT_IS_GENERATED = false;
-type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
 
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,

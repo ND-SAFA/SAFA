@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { TraceLink } from "@/types/domain/links";
+import { TraceLink } from "@/types";
 import Vue, { PropType } from "vue";
 import TraceLinkDisplay from "@/components/approve-links-view/TraceLinkDisplay.vue";
 export default Vue.extend({

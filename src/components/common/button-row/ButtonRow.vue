@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType } from "@/types/common-components";
+import { ButtonDefinition, ButtonType } from "@/types";
 import IconButtonItem from "@/components/common/button-row/IconButton.vue";
 import CheckmarkMenuItem from "@/components/common/button-row/CheckmarkMenu.vue";
 import ListMenu from "@/components/common/button-row/ListMenu.vue";

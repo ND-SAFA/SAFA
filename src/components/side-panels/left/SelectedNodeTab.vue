@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { Artifact, ProjectWarnings } from "@/types/domain/artifact";
+import { Artifact, ProjectWarnings } from "@/types";
 import Vue from "vue";
 import { errorModule, artifactSelectionModule, projectModule } from "@/store";
 

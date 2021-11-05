@@ -9,7 +9,7 @@
   </v-container>
 </template>
 <script lang="ts">
-import { Project } from "@/types/domain/project";
+import { Project } from "@/types";
 import { versionToString } from "@/util";
 import Vue from "vue";
 import { projectModule } from "@/store";

@@ -1,5 +1,4 @@
-import { CytoCore } from "@/types/cytoscape";
-import { LayoutHook } from "@/types/cytoscape/klay";
+import { CytoCore, LayoutHook } from "@/types";
 import { EdgeSingular } from "cytoscape";
 import {
   nodeHtml as nodeHTML,

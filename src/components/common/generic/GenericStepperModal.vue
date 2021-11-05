@@ -55,7 +55,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
-import { ModalSize } from "@/types/common-components";
+import { ModalSize } from "@/types";
 import GenericStepper from "@/components/common/generic/GenericStepper.vue";
 
 export default Vue.extend({

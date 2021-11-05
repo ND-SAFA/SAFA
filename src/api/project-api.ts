@@ -1,10 +1,5 @@
-import { ProjectCreationResponse } from "@/types/api";
-import {
-  Project,
-  ProjectIdentifier,
-  ProjectVersion,
-} from "@/types/domain/project";
-import { DeltaPayload } from "@/types/store";
+import { ProjectCreationResponse, DeltaPayload } from "@/types";
+import { Project, ProjectIdentifier, ProjectVersion } from "@/types";
 import httpClient from "@/api/http-client";
 
 export const PROJECTS_API_PATH = "projects";

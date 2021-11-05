@@ -1,11 +1,14 @@
-import type { Project } from "@/types/domain/project";
 import { projectModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { MessageType, PanelType } from "@/types/store";
-import type { SnackbarMessage } from "@/types/store";
+import {
+  MessageType,
+  PanelType,
+  SnackbarMessage,
+  PanelState,
+  APIErrorBody,
+  Project,
+} from "@/types";
 
-import type { PanelState } from "@/types/store";
-import type { APIErrorBody } from "@/types/api";
 export interface ChannelSubscriptionId {
   projectId?: string;
   versionId?: string;

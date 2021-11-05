@@ -1,9 +1,4 @@
-import {
-  ArtifactFile,
-  ProjectFile,
-  TraceFile,
-} from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact, ArtifactFile, ProjectFile, TraceFile } from "@/types";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   title: string;
@@ -25,7 +20,3 @@ export interface IGenericUploader<Environment, T, F extends ProjectFile> {
 export type ValidFileTypes = ArtifactFile | TraceFile;
 
 export type ArtifactMap = Record<string, Artifact>;
-
-export function isTraceFile(obj: ProjectFile): obj is TraceFile {
-  return "isGenerated" in obj;
-}

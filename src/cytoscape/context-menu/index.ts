@@ -4,10 +4,10 @@ import {
   projectModule,
   viewportModule,
 } from "@/store";
-import { PanelType } from "@/types/store";
+import { PanelType } from "@/types";
 import { enableDrawMode } from "@/cytoscape/edge-handles";
 import { EventObject } from "cytoscape";
-import { Artifact, ArtifactData } from "@/types/domain/artifact";
+import { Artifact, ArtifactData } from "@/types";
 
 export const contextMenuOptions = {
   // Customize event to bring up the context menu

@@ -38,10 +38,10 @@
 
 <script lang="ts">
 import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
-import { Project, ProjectVersion } from "@/types/domain/project";
+import { Project, ProjectVersion } from "@/types";
 import Vue, { PropType } from "vue";
 import { getProjectDelta } from "@/api/project-api";
-import { DeltaPayload } from "@/types/store";
+import { DeltaPayload } from "@/types";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { appModule, deltaModule } from "@/store";
 export default Vue.extend({

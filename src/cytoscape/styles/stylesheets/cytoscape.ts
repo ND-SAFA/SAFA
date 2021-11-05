@@ -18,7 +18,7 @@ import {
   TRACE_WIDTH,
   GENERATED_TRACE_COLOR,
 } from "@/cytoscape/styles/config/trace";
-import { ArtifactDeltaState } from "@/types/domain/delta";
+import { ArtifactDeltaState } from "@/types";
 import { Stylesheet } from "cytoscape";
 
 export const GENERATED_LINK_SELECTOR = 'edge[traceType="GENERATED"]';

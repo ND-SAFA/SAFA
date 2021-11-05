@@ -1,32 +1,84 @@
-import { ArtifactDeltaState } from "@/types/domain/delta";
+import { ArtifactDeltaState } from "./delta";
 
+/**
+ * Defines an artifact file.
+ */
 export interface Artifact {
+  /**
+   * The name of the artifact.
+   */
   name: string;
+  /**
+   * A summary of the artifact.
+   */
   summary?: string;
+  /**
+   * The content of the artifact.
+   */
   body: string;
+  /**
+   * The type of the artifact.
+   */
   type: string;
 }
 
-export interface TraceDefinition {
-  source: string;
-  target: string;
-}
-
+/**
+ * Defines an artifact's data.
+ */
 export interface ArtifactData {
+  /**
+   * The ID of the artifact.
+   */
   id: string;
+  /**
+   * The content of the artifact.
+   */
   body: string;
+  /**
+   * The type of the artifact data.
+   */
   type: string;
+  /**
+   * Any warnings generated from the artifact.
+   */
   warnings?: ArtifactWarning[];
+  /**
+   * The name of the artifact.
+   */
   artifactName: string;
+  /**
+   * The type of the artifact.
+   */
   artifactType: string;
+  /**
+   * The state of changes to the artifact.
+   */
   artifactDeltaState: ArtifactDeltaState;
+  /**
+   * Whether the artifact is selected.
+   */
   isSelected: boolean;
+  /**
+   * The opacity of this artifact.
+   */
   opacity: number;
 }
 
+/**
+ * Defines an artifact warning.
+ */
 export interface ArtifactWarning {
+  /**
+   * The artifact rule name.
+   */
   ruleName: string;
+  /**
+   * The artifact rule message.
+   */
   ruleMessage: string;
 }
 
+/**
+ * A collection of warnings for all artifacts.
+ */
 export type ProjectWarnings = Record<string, ArtifactWarning[]>;

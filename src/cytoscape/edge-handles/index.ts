@@ -1,8 +1,7 @@
-import { CytoCore, CytoEvent } from "@/types/cytoscape";
+import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
 import { cyPromise } from "@/cytoscape/cytoscape";
 import { NodeSingular, CollectionReturnValue } from "cytoscape";
 import { onEdgeComplete } from "@/cytoscape/edge-handles/onComplete";
-import { EdgeHandleCore } from "@/types/cytoscape/edge-handles";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 

@@ -1,7 +1,7 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { getProjectVersion } from "@/api/project-api";
-import { Update } from "@/types/api";
+import { Update } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { baseURL } from "@/api/base-url";
 

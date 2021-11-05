@@ -88,6 +88,7 @@ public class TraceApplicationEntity {
         JSONObject json = new JSONObject();
         json.put("source:", source);
         json.put("target:", target);
+        json.put("traceType:", traceType);
         return json.toString();
     }
 }

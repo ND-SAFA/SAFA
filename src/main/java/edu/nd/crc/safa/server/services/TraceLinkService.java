@@ -58,7 +58,23 @@ public class TraceLinkService {
 
     public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,
                                                     TraceApplicationEntity t) {
-        return createTrace(projectVersion, t.source, t.target);
+        ArtifactFinder artifactFinder = (a) ->
+            artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
+        String sourceName = t.getSource();
+        String targetName = t.getTarget();
+        String error = validateTraceLink(artifactFinder, this::queryForLinkBetween, sourceName, targetName);
+
+        if (error != null) {
+            return new Pair<>(null, new ParserError(projectVersion, error,
+                ApplicationActivity.PARSING_TRACES));
+        } else {
+            Artifact sourceArtifact = artifactFinder.findArtifact(sourceName).get(); // TODO: Fix warning
+            Artifact targetArtifact = artifactFinder.findArtifact(targetName).get();
+            TraceLink traceLink = new TraceLink(t);
+            traceLink.setSourceArtifact(sourceArtifact);
+            traceLink.setTargetArtifact(targetArtifact);
+            return new Pair<>(traceLink, null);
+        }
     }
 
     public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,

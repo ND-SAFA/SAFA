@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -36,7 +38,6 @@ public class TraceLink implements Serializable {
     @Type(type = "uuid-char")
     @Column(name = "trace_link_id")
     UUID traceLinkId;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -45,7 +46,6 @@ public class TraceLink implements Serializable {
         nullable = false
     )
     Artifact sourceArtifact;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -70,6 +70,14 @@ public class TraceLink implements Serializable {
         this.score = 0;
     }
 
+    public TraceLink(TraceApplicationEntity traceLink) {
+        this();
+        this.traceType = traceLink.traceType == null ? TraceType.MANUAL : traceLink.traceType;
+        this.approvalStatus = traceLink.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
+            traceLink.approvalStatus;
+        this.score = traceLink.score == 0 ? this.score : traceLink.score;
+    }
+
     public TraceLink(Artifact sourceArtifact,
                      Artifact targetArtifact) {
         this();
@@ -85,6 +93,13 @@ public class TraceLink implements Serializable {
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
         setIsGenerated(score);
+    }
+
+    private TraceApproval getDefaultApprovalStatus(TraceType traceType) {
+        if (traceType == TraceType.MANUAL) {
+            return TraceApproval.APPROVED;
+        }
+        return TraceApproval.UNREVIEWED;
     }
 
     public TraceType getTraceType() {
@@ -158,7 +173,15 @@ public class TraceLink implements Serializable {
         return this.sourceArtifact;
     }
 
+    public void setSourceArtifact(Artifact sourceArtifact) {
+        this.sourceArtifact = sourceArtifact;
+    }
+
     public Artifact getTargetArtifact() {
         return this.targetArtifact;
+    }
+
+    public void setTargetArtifact(Artifact targetArtifact) {
+        this.targetArtifact = targetArtifact;
     }
 }

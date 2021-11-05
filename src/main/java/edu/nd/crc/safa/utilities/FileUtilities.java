@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import edu.nd.crc.safa.server.entities.api.ServerError;
 
@@ -36,8 +37,20 @@ public class FileUtilities {
         }
     }
 
-    public static CSVParser readMultiPartFile(MultipartFile file) throws IOException {
-        return CSVParser.parse(new String(file.getBytes()), getFormat());
+    public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
+        ServerError {
+        String requiredColumnsLabel = String.join(", ", requiredColumns);
+        if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
+            throw new ServerError("Expected file to be a CSV file with columns: " + requiredColumnsLabel);
+        }
+        try {
+            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
+            assertHasColumns(parsedFile, requiredColumns);
+            return parsedFile;
+        } catch (IOException e) {
+            String error = "Unable to read csv file: " + file.getOriginalFilename();
+            throw new ServerError(error, e);
+        }
     }
 
     private static CSVFormat getFormat() {
@@ -51,14 +64,15 @@ public class FileUtilities {
             .build();
     }
 
-    public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {
+    public static void assertHasColumns(CSVParser file, String[] requiredColumns) throws ServerError {
         List<String> headerNames = file.getHeaderNames();
         List<String> headerNamesLower = toLowerCase(headerNames);
 
-        for (String n : names) {
-            if (!headerNamesLower.contains(n)) {
-                String error = "Expected file to have column [%s] but found. %s";
-                throw new ServerError(String.format(error, n, file.getHeaderNames()));
+        for (String rColumn : requiredColumns) {
+            if (!headerNamesLower.contains(rColumn)) {
+                String requiredColumnsLabel = String.join(", ", requiredColumns);
+                String error = "Expected CSV to have column [%s] but found: %s";
+                throw new ServerError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
             }
         }
     }

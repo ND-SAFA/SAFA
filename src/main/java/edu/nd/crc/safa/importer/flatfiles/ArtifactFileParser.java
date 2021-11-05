@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for parsing flat files including reading,
@@ -111,10 +112,10 @@ public class ArtifactFileParser {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
-        FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);
+        //TODO: Remove artifact file repository;
 
         Pair<List<ArtifactAppEntity>, List<String>> response = parseArtifactFileIntoApplicationEntities(fileName,
             artifactType.getName(), fileParser);
@@ -154,5 +155,9 @@ public class ArtifactFileParser {
         }
 
         return new Pair<>(artifactAppEntities, errors);
+    }
+
+    public CSVParser readArtifactFile(MultipartFile file) throws ServerError {
+        return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 }

@@ -41,6 +41,7 @@ function createArtifactFile(artifactType: string): ArtifactFile {
     file: undefined,
     artifacts: [],
     errors: [],
+    isValid: false,
   };
 }
 

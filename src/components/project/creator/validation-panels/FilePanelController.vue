@@ -3,7 +3,7 @@
     :showFileUploader="!isGeneratedToggle"
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
-    @onValidate="emitValidationState"
+    @onValidate="setValidationState"
     :errors="errors"
     :entityNames="entityNames"
     :entities-are-fab="!isTracePanel"
@@ -76,12 +76,8 @@ export default Vue.extend({
         await this.panel.parseFile(this.artifactMap, file);
       }
     },
-    emitValidationState(isValid: boolean): void {
-      if (isValid) {
-        this.$emit("onIsValid");
-      } else {
-        this.$emit("onIsInvalid");
-      }
+    setValidationState(isValid: boolean): void {
+      this.panel.projectFile.isValid = isValid;
     },
   },
   watch: {

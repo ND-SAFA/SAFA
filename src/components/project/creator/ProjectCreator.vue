@@ -25,6 +25,7 @@
           <GenericUploader
             :uploader="artifactUploader"
             :artifactMap="artifactMap"
+            noItemError="No artifact types have been defined."
             @onChange="artifactUploader.panels = $event"
             @onIsValid="setStepIsValid(1, true)"
             @onIsInvalid="setStepIsValid(1, false)"
@@ -46,6 +47,7 @@
           <GenericUploader
             :uploader="traceUploader"
             :artifactMap="artifactMap"
+            noItemError="No trace links have been defined."
             @onChange="traceUploader.panels = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"

@@ -3,16 +3,17 @@
     :showFileUploader="!isGeneratedToggle"
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
-    @onValidate="emitValidationState"
+    @onValidate="setValidationState"
     :errors="errors"
     :entityNames="entityNames"
+    :entities-are-fab="!isTracePanel"
     v-bind:ignoreErrorsFlag.sync="ignoreErrors"
   >
     <template v-slot:title>
       <h3>{{ title }}</h3>
     </template>
 
-    <template v-slot:before-rows v-if="isTraceFile">
+    <template v-slot:before-rows v-if="isTracePanel">
       <GenericSwitch v-model="isGeneratedToggle" label="Generate Trace Links" />
     </template>
   </FilePanel>
@@ -23,7 +24,7 @@ import Vue, { PropType } from "vue";
 import FilePanel from "@/components/project/creator/validation-panels/FilePanel.vue";
 import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
 import GenericSwitch from "@/components/common/generic/GenericSwitch.vue";
-import { isTraceFile } from "@/util";
+import { isTracePanel } from "@/util";
 
 export default Vue.extend({
   components: {
@@ -47,8 +48,8 @@ export default Vue.extend({
     };
   },
   computed: {
-    isTraceFile(): boolean {
-      return isTraceFile(this.panel.projectFile);
+    isTracePanel(): boolean {
+      return isTracePanel(this.panel);
     },
     isValid(): boolean {
       return this.panel.getIsValid();
@@ -64,27 +65,26 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChange(file: File | undefined): void {
+    async onChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
-        this.$emit("onChange", this.panel.clearFile());
+        this.panel.clearPanel();
       } else {
-        this.panel.parseFile(this.artifactMap, file).then((updatedPanel) => {
-          this.$emit("onChange", updatedPanel);
-        });
+        await this.panel.parseFile(this.artifactMap, file);
       }
     },
-    emitValidationState(isValid: boolean): void {
-      if (isValid) {
-        this.$emit("onIsValid");
-      } else {
-        this.$emit("onIsInvalid");
-      }
+    setValidationState(isValid: boolean): void {
+      this.panel.projectFile.isValid = isValid;
     },
   },
   watch: {
-    isGeneratedToggle(isGenerated: boolean) {
-      if (isTraceFile(this.panel.projectFile)) {
+    async isGeneratedToggle(isGenerated: boolean) {
+      if (isTracePanel(this.panel)) {
         this.panel.projectFile.isGenerated = isGenerated;
+        if (isGenerated) {
+          await this.panel.generateTraceLinks(this.artifactMap);
+        } else {
+          this.panel.clearPanel();
+        }
       }
     },
   },

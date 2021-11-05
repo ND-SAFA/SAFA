@@ -43,7 +43,8 @@ import Vue, { PropType } from "vue";
 import { getProjectDelta } from "@/api/project-api";
 import { DeltaPayload } from "@/types";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
-import { appModule, deltaModule } from "@/store";
+import { appModule, deltaModule, viewportModule } from "@/store";
+
 export default Vue.extend({
   components: { VersionSelector, GenericModal },
   props: {
@@ -81,6 +82,7 @@ export default Vue.extend({
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("onClose");
             appModule.onSuccess("Delta state was updated successfully.");
+            viewportModule.setGraphLayout();
           });
         } else {
           appModule.onWarning("Project source version is not selected.");

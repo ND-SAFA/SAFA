@@ -1,6 +1,7 @@
 import { TraceLink } from "@/types";
 import httpClient from "@/api/http-client";
 import { PROJECTS_API_PATH } from "@/api/project-api";
+import { Artifact } from "@/types/domain/artifact";
 
 export async function getGeneratedLinks(
   projectId: string
@@ -8,6 +9,18 @@ export async function getGeneratedLinks(
   const url = `${PROJECTS_API_PATH}/${projectId}/links/generated`;
   return httpClient<TraceLink[]>(url, {
     method: "GET",
+  });
+}
+
+export async function generateLinks(
+  sourceArtifacts: Artifact[],
+  targetArtifacts: Artifact[]
+): Promise<TraceLink[]> {
+  const url = `${PROJECTS_API_PATH}/links/generate`;
+  const payload = { sourceArtifacts, targetArtifacts };
+  return httpClient<TraceLink[]>(url, {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 }
 

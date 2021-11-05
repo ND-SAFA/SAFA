@@ -3,8 +3,8 @@
     <v-row justify="center">
       <v-switch
         color="primary"
-        @click="onSwitchChange"
-        :value="isSwitchOn"
+        @click="onChange"
+        :value="isDeltaViewEnabled"
         :error-messages="errorMessage"
         readonly
       >
@@ -49,27 +49,22 @@ export default Vue.extend({
   },
   data: () => ({
     isModalOpen: false,
-    isSwitchOn: false,
     errorMessage: undefined as string | undefined,
   }),
   methods: {
-    onSwitchChange() {
-      if (this.isSwitchOn) {
-        // always allow turn off
-        deltaModule.setIsDeltaViewEnabled(false);
-        this.isSwitchOn = false;
-      } else {
-        if (this.isProjectDefined()) {
-          deltaModule.setIsDeltaViewEnabled(true);
-          this.isSwitchOn = true;
-        } else {
-          this.errorMessage = "Please select a baseline project version";
-          this.isSwitchOn = false;
-        }
-      }
-    },
     isProjectDefined(): boolean {
       return this.project !== undefined && this.project.projectId !== "";
+    },
+    onChange(): void {
+      if (!this.isDeltaViewEnabled) {
+        if (this.isProjectDefined()) {
+          deltaModule.setIsDeltaViewEnabled(true);
+        } else {
+          this.errorMessage = "Please select a baseline project version";
+        }
+      } else {
+        deltaModule.setIsDeltaViewEnabled(false);
+      }
     },
   },
   computed: {

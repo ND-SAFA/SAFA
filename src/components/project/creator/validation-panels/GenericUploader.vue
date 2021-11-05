@@ -16,8 +16,6 @@
           :artifactMap="artifactMap"
           @onChange="onChange(i, $event)"
           @onDelete="deleteFile(i)"
-          @onIsValid="setFileIsValid(i, true)"
-          @onIsInvalid="setFileIsValid(i, false)"
         />
       </template>
     </ValidatedPanels>
@@ -70,17 +68,19 @@ export default Vue.extend({
   },
   data() {
     return {
-      isValidStates: [] as boolean[],
       isCreatorOpen: false,
     };
   },
 
   computed: {
+    isValidStates(): boolean[] {
+      return this.panels.map((p) => p.projectFile.isValid);
+    },
     panels(): IGenericFilePanel<ArtifactMap, ValidFileTypes>[] {
       return this.uploader.panels;
     },
     isValid(): boolean {
-      return this.isValidStates.filter((isValid) => !isValid).length === 0;
+      return this.panels.filter((p) => !p.projectFile.isValid).length === 0;
     },
     projectFiles(): ProjectFile[] {
       return this.uploader.panels.map((p) => p.projectFile);
@@ -102,17 +102,16 @@ export default Vue.extend({
         })
       );
     },
-    setFileIsValid(artifactFileIndex: number, isValid: boolean): void {
-      Vue.set(this.isValidStates, artifactFileIndex, isValid);
-    },
     deleteFile(i: number): void {
       this.$emit(
         "onChange",
         this.panels.filter((f, index) => index !== i)
       );
+      if (this.panels.length === 0) {
+        this.$emit("onIsInvalid");
+      }
     },
     addFile(payload: string | TraceLink): void {
-      this.isValidStates = this.isValidStates.concat([DEFAULT_VALID_STATE]);
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("onChange", this.panels.concat([newPanel]));
     },

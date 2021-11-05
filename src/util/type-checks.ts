@@ -4,10 +4,12 @@ import {
   APIResponse,
   DeltaArtifact,
   DeltaType,
+  IGenericFilePanel,
   ModifiedArtifact,
   ProjectFile,
   RemovedArtifact,
   TraceFile,
+  TracePanel,
 } from "@/types";
 
 /**
@@ -86,5 +88,23 @@ export function getDeltaType(artifact: DeltaArtifact): DeltaType {
  * @return Whether this file is a trace file.
  */
 export function isTraceFile(file: ProjectFile): file is TraceFile {
-  return "isGenerated" in file;
+  return (
+    "source" in file &&
+    "target" in file &&
+    "isGenerated" in file &&
+    "traces" in file
+  );
+}
+
+/**
+ * Determines whether this panel is a trace panel.
+ *
+ * @param panel - The panel to check.
+ *
+ * @return Whether this panel is a trace panel.
+ */
+export function isTracePanel(
+  panel: IGenericFilePanel<any, any>
+): panel is TracePanel {
+  return isTraceFile(panel.projectFile);
 }

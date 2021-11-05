@@ -5,11 +5,8 @@ export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   projectFile: F;
   entityNames: string[];
   getIsValid(): boolean;
-  clearFile(): IGenericFilePanel<Environment, F>;
-  parseFile(
-    env: Environment,
-    file: File
-  ): Promise<IGenericFilePanel<Environment, F>>;
+  clearPanel(): void;
+  parseFile(env: Environment, file: File): Promise<void>;
 }
 
 export interface IGenericUploader<Environment, T, F extends ProjectFile> {
@@ -20,3 +17,7 @@ export interface IGenericUploader<Environment, T, F extends ProjectFile> {
 export type ValidFileTypes = ArtifactFile | TraceFile;
 
 export type ArtifactMap = Record<string, Artifact>;
+
+export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
+  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
+}

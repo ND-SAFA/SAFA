@@ -97,6 +97,7 @@ export interface ProjectFile {
    * Any errors with the file.
    */
   errors: string[];
+  isValid: boolean;
 }
 
 /**

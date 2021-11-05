@@ -1,2 +1,8 @@
-export const TRACE_LINK_ROUTE_NAME = "/links";
-export const ERROR_ROUTE_NAME = "/error";
+/**
+ * Enumerates the possible routes within the app.
+ */
+export enum Routes {
+  HOME = "/",
+  TRACE_LINK = "/links",
+  ERROR = "/error",
+}

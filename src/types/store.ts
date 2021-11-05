@@ -103,3 +103,8 @@ export interface ChannelSubscriptionId {
  * Returns an artifact matching the given query, if one exists.
  */
 export type ArtifactQueryFunction = (q: string) => Artifact | undefined;
+
+/**
+ * Returns whether a link exists from the given source to the given target ID.
+ */
+export type LinkValidator = (sourceId: string, targetId: string) => boolean;

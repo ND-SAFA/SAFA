@@ -39,8 +39,7 @@ import ProjectName from "@/components/navigation/ProjectName.vue";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
-import router from "@/router";
-import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
+import router, { Routes } from "@/router";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
 import ProjectCreatorModal from "@/components/project/creator/ProjectCreator.vue";
 
@@ -92,8 +91,7 @@ export default Vue.extend({
         label: "Trace Links",
         menuItems: ["Approve Generated Trace Links"],
         menuHandlers: [
-          () =>
-            router.push(TRACE_LINK_ROUTE_NAME).catch((e) => console.warn(e)),
+          () => router.push(Routes.TRACE_LINK).catch((e) => console.warn(e)),
         ],
       },
     ];

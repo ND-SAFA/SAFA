@@ -95,7 +95,7 @@ export default Vue.extend({
       return artifactSelectionModule.getSelectedArtifact;
     },
     projectWarnings(): ProjectWarnings {
-      return errorModule.artifactWarnings;
+      return errorModule.getArtifactWarnings;
     },
     selectedArtifactWarnings(): string | undefined {
       if (

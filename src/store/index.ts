@@ -1,12 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import AppModule from "@/store/modules/app.module";
-import ProjectModule from "@/store/modules/project.module";
-import DeltaModule from "@/store/modules/delta.module";
-import ArtifactSelectionModule from "@/store/modules/graph.module";
-import ErrorModule from "@/store/modules/error.module";
 import { getModule } from "vuex-module-decorators";
-import ViewportModule from "@/store/modules/viewport.module";
+import {
+  AppModule,
+  ArtifactSelectionModule,
+  DeltaModule,
+  ErrorModule,
+  ProjectModule,
+  ViewportModule,
+} from "./modules";
 
 Vue.use(Vuex);
 Vue.config.devtools = true;

@@ -54,11 +54,14 @@ public class TraceLink implements Serializable {
         nullable = false
     )
     Artifact targetArtifact;
+
     @Column(name = "trace_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     TraceType traceType;
+
     @Column(name = "approved")
     TraceApproval approvalStatus;
+
     @Column(name = "score")
     double score;
 
@@ -69,8 +72,9 @@ public class TraceLink implements Serializable {
 
     public TraceLink(TraceApplicationEntity traceLink) {
         this();
-        this.approvalStatus = traceLink.approvalStatus == null ? this.approvalStatus : traceLink.approvalStatus;
-        this.traceType = traceLink.traceType == null ? this.traceType : traceLink.traceType;
+        this.traceType = traceLink.traceType == null ? TraceType.MANUAL : traceLink.traceType;
+        this.approvalStatus = traceLink.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
+            traceLink.approvalStatus;
         this.score = traceLink.score == 0 ? this.score : traceLink.score;
     }
 
@@ -89,6 +93,13 @@ public class TraceLink implements Serializable {
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
         setIsGenerated(score);
+    }
+
+    private TraceApproval getDefaultApprovalStatus(TraceType traceType) {
+        if (traceType == TraceType.MANUAL) {
+            return TraceApproval.APPROVED;
+        }
+        return TraceApproval.UNREVIEWED;
     }
 
     public TraceType getTraceType() {

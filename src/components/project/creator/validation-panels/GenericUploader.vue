@@ -107,6 +107,9 @@ export default Vue.extend({
         "onChange",
         this.panels.filter((f, index) => index !== i)
       );
+      if (this.panels.length === 0) {
+        this.$emit("onIsInvalid");
+      }
     },
     addFile(payload: string | TraceLink): void {
       const newPanel = this.uploader.createNewPanel(payload);

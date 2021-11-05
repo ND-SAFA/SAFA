@@ -37,13 +37,23 @@ public class TestParseDataFiles extends EntityBaseTest {
     }
 
     @Test
+    public void errorForWrongColumnsInTraceFile() throws Exception {
+        String routeName = "/projects/parse/traces";
+        String fileName = "Design.csv";
+
+        // VP - Verify error message informs that columns are wrong
+        String c = uploadTraceFileAndGetError(routeName, fileName);
+        assertThat(c).contains("source, target");
+    }
+
+    @Test
     public void errorForWrongFileToArtifactParser() throws Exception {
         String routeName = "/projects/parse/artifacts/Designs";
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
         String c = uploadArtifactFileAndGetError(routeName, fileName);
-        assertThat(c).contains("Expected file to be a CSV file");
+        assertThat(c).contains("Expected a CSV file");
     }
 
     @Test
@@ -53,7 +63,7 @@ public class TestParseDataFiles extends EntityBaseTest {
 
         // VP - Verify error message informs that columns are wrong
         String c = uploadTraceFileAndGetError(routeName, fileName);
-        assertThat(c).contains("Expected file to be a CSV file");
+        assertThat(c).contains("Expected a CSV file");
     }
 
     @Test

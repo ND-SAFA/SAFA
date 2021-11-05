@@ -41,7 +41,7 @@ public class FileUtilities {
         ServerError {
         String requiredColumnsLabel = String.join(", ", requiredColumns);
         if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
-            throw new ServerError("Expected file to be a CSV file with columns: " + requiredColumnsLabel);
+            throw new ServerError("Expected a CSV file with columns: " + requiredColumnsLabel);
         }
         try {
             CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
@@ -71,7 +71,7 @@ public class FileUtilities {
         for (String rColumn : requiredColumns) {
             if (!headerNamesLower.contains(rColumn)) {
                 String requiredColumnsLabel = String.join(", ", requiredColumns);
-                String error = "Expected CSV to have column [%s] but found: %s";
+                String error = "Expected CSV to have column(s) [%s] but found: %s";
                 throw new ServerError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
             }
         }

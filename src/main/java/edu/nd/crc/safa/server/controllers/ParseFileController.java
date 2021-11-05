@@ -11,14 +11,12 @@ import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
@@ -63,10 +61,10 @@ public class ParseFileController extends BaseController {
     @PostMapping(value = "projects/parse/artifacts/{artifactType}")
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
-                                            @RequestParam MultipartFile file) throws IOException {
-        CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
+                                            @RequestParam MultipartFile file) {
         ParseArtifactFileResponse response = new ParseArtifactFileResponse();
         tryParseFile(response, () -> {
+            CSVParser fileCSV = artifactFileParser.readArtifactFile(file);
             Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
                 artifactFileParser.parseArtifactFileIntoApplicationEntities(
                     file.getOriginalFilename(),
@@ -83,14 +81,13 @@ public class ParseFileController extends BaseController {
      *
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
-     * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
     @PostMapping(value = "projects/parse/traces")
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse parseTraceFile(@RequestParam MultipartFile file) throws ServerError, IOException {
-        CSVParser fileCSV = FileUtilities.readMultiPartFile(file);
+    public ServerResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();
         tryParseFile(response, () -> {
+            CSVParser fileCSV = traceFileParser.readTraceFile(file);
             Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> parseResponse =
                 traceFileParser.readTraceFile(
                     (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json

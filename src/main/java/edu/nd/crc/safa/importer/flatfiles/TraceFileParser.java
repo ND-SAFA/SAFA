@@ -32,6 +32,7 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for parsing, validating, and creating trace links.
@@ -196,6 +197,10 @@ public class TraceFileParser {
             traceLinks.add(trace);
         }
         return new Pair<>(traceLinks, errors);
+    }
+
+    public CSVParser readTraceFile(MultipartFile file) throws ServerError {
+        return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 
     private ArtifactType findArtifactType(Project project, String typeName) throws ServerError {

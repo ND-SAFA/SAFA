@@ -9,11 +9,6 @@ import {
   Project,
 } from "@/types";
 
-export interface ChannelSubscriptionId {
-  projectId?: string;
-  versionId?: string;
-}
-
 @Module({ namespaced: true, name: "app" })
 export default class ProjectModule extends VuexModule {
   snackbarMessage: SnackbarMessage | undefined = undefined;

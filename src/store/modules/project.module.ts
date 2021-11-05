@@ -1,14 +1,14 @@
 import { connectAndSubscriptToVersion } from "@/api/revision-api";
-import { ProjectCreationResponse, Project, Artifact, TraceLink } from "@/types";
+import {
+  ProjectCreationResponse,
+  Project,
+  Artifact,
+  TraceLink,
+  ChannelSubscriptionId,
+  ArtifactQueryFunction,
+} from "@/types";
 import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-
-interface ChannelSubscriptionId {
-  projectId?: string;
-  versionId?: string;
-}
-
-type ArtifactQueryFunction = (q: string) => Artifact | undefined;
 
 @Module({ namespaced: true, name: "project" })
 export default class ProjectModule extends VuexModule {

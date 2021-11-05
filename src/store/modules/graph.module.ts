@@ -1,7 +1,6 @@
 import { appModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { FilterAction } from "@/cytoscape/filters/graph-filters";
-import { PanelType, Artifact } from "@/types";
+import { PanelType, Artifact, FilterAction } from "@/types";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 export default class ArtifactSelectionModule extends VuexModule {

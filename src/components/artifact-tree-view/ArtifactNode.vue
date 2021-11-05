@@ -6,19 +6,16 @@
 import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
 import {
   Artifact,
-  ArtifactData,
   ArtifactWarning,
   ProjectWarnings,
   AddedArtifact,
   ArtifactDeltaState,
   ModifiedArtifact,
   RemovedArtifact,
+  ArtifactElement,
 } from "@/types";
 import Vue, { PropType } from "vue";
 
-interface ArtifactElement {
-  data: ArtifactData;
-}
 export default Vue.extend({
   name: "artifact",
   props: {

@@ -25,16 +25,3 @@ export function doesNotContainType(
 ): boolean {
   return ignoreTypes === undefined || !ignoreTypes.includes(a.type);
 }
-
-export interface IgnoreTypeFilterAction {
-  type: "ignore";
-  ignoreType: string;
-  action: "add" | "remove";
-}
-
-export interface SubtreeFilterAction {
-  type: "subtree";
-  artifactsInSubtree: string[];
-}
-
-export type FilterAction = IgnoreTypeFilterAction | SubtreeFilterAction;

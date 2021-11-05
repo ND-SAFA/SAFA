@@ -84,3 +84,22 @@ export interface DeltaPayload extends DeltaArtifacts {
    */
   missingArtifacts: Artifact[];
 }
+
+/**
+ * Defines a channel subscription.
+ */
+export interface ChannelSubscriptionId {
+  /**
+   * The project's id.
+   */
+  projectId?: string;
+  /**
+   * The version's id.
+   */
+  versionId?: string;
+}
+
+/**
+ * Returns an artifact matching the given query, if one exists.
+ */
+export type ArtifactQueryFunction = (q: string) => Artifact | undefined;

@@ -18,7 +18,7 @@ import {
   TRACE_WIDTH,
   GENERATED_TRACE_COLOR,
 } from "@/cytoscape/styles/config/trace";
-import { ArtifactDeltaState } from "@/types";
+import { ArtifactDeltaState, CytoStyleSheet } from "@/types";
 import { Stylesheet } from "cytoscape";
 
 export const GENERATED_LINK_SELECTOR = 'edge[traceType="GENERATED"]';
@@ -26,10 +26,7 @@ export const UNREVIEWED_LINK_SELECTOR = 'edge[approvalStatus="UNREVIEWED"]';
 export const DECLINED_LINK_SELECTOR = 'edge[approvalStatus="DECLINED"]';
 export const APPROVED_LINK_SELECTOR =
   'edge[traceType="GENERATED"][approvalStatus="APPROVED"]';
-export interface CytoStyleSheet {
-  selector: string;
-  style: Record<string, unknown>;
-}
+
 export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
     selector: "edge",

@@ -29,7 +29,7 @@ export const USE_MOTION_BLUR = false;
 export const MOTION_BLUE_OPACITY = 0.2;
 export const ZOOM_INCREMENT = 0.05;
 
-export const DEFAULT_ZOOM = 5;
+export const DEFAULT_ZOOM = 0.75;
 export const DEFAULT_PAN = 1;
 export const ANIMATION_DURATION = 250; // ms
 export const CENTER_GRAPH_PADDING = 10;

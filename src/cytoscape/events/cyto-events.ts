@@ -1,5 +1,5 @@
 import { CSSCursor, CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
 import { EventObject } from "cytoscape";
 
 export const DefaultCytoEventHandlers: CytoEventHandlers = {

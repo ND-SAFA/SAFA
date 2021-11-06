@@ -43,9 +43,7 @@ export default class ProjectModule extends VuexModule {
     await this.setProject(res.project);
 
     errorModule.setArtifactWarnings(res.warnings);
-
     await viewportModule.setGraphLayout();
-
     deltaModule.setIsDeltaViewEnabled(false);
   }
 

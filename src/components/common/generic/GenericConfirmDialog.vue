@@ -47,7 +47,6 @@ export default Vue.extend({
   },
   methods: {
     onConfirm(): void {
-      this.$emit("onClose");
       this.$emit("onSubmit");
     },
   },

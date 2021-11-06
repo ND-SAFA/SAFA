@@ -6,7 +6,7 @@ import { baseURL } from "@/api/endpoints";
 /**
  * Executes an http request with the given parameters.
  *
- * @param relativeUrl - The relative URL for this request.
+ * @param relativeUrl - The URL relative to the BEND API endpoint.
  * @param options - Any options for this request, such as the method and any data.
  * @param setContentType - If true, sets the content type of the request.
  *

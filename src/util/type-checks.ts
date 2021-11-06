@@ -2,7 +2,7 @@ import {
   AddedArtifact,
   APIError,
   APIResponse,
-  DeltaArtifact,
+  ArtifactDelta,
   DeltaType,
   IGenericFilePanel,
   ModifiedArtifact,
@@ -13,7 +13,7 @@ import {
 } from "@/types";
 
 /**
- * Returns whether the given value is an API error.
+ * Returns whether the given APIResponse is an API error.
  *
  * @param blob - The response to check.
  *
@@ -26,51 +26,51 @@ export function isAPIError<T>(
 }
 
 /**
- * Returns whether the given value is an added artifact.
+ * Returns whether the given ArtifactDelta is an added artifact.
  *
  * @param artifact - The artifact to check.
  *
  * @return Whether this item is an added artifact.
  */
 export function isAddedArtifact(
-  artifact: DeltaArtifact
+  artifact: ArtifactDelta
 ): artifact is AddedArtifact {
   return "after" in artifact && !("before" in artifact);
 }
 
 /**
- * Returns whether the given value is an removed artifact.
+ * Returns whether the given ArtifactDelta is an removed artifact.
  *
  * @param artifact - The artifact to check.
  *
  * @return Whether this item is an removed artifact.
  */
 export function isRemovedArtifact(
-  artifact: DeltaArtifact
+  artifact: ArtifactDelta
 ): artifact is RemovedArtifact {
   return "before" in artifact && !("after" in artifact);
 }
 /**
- * Returns whether the given value is an modified artifact.
+ * Returns whether the given ArtifactDelta is an modified artifact.
  *
  * @param artifact - The artifact to check.
  *
  * @return Whether this item is an modified artifact.
  */
 export function isModifiedArtifact(
-  artifact: DeltaArtifact
+  artifact: ArtifactDelta
 ): artifact is ModifiedArtifact {
   return "before" in artifact && "after" in artifact;
 }
 
 /**
- * Returns the delta type of of the given artifact.
+ * Returns the delta type of the given ArtifactDelta.
  *
- * @param artifact - The artifact to check.
+ * @param artifact - The ArtifactDelta to check.
  *
- * @return The corresponding delta type.
+ * @return The corresponding delta type (e.g. added, removed, modified).
  */
-export function getDeltaType(artifact: DeltaArtifact): DeltaType {
+export function getDeltaType(artifact: ArtifactDelta): DeltaType {
   if (isAddedArtifact(artifact)) return "added";
   if (isModifiedArtifact(artifact)) return "modified";
   if (isRemovedArtifact(artifact)) return "removed";

@@ -11,7 +11,12 @@ export default class ErrorModule extends VuexModule {
    */
   private artifactWarnings: ProjectWarnings = {};
   /**
-   * A collection of errors encountered within different segments of the project files.
+   * A collection of errors encountered within different segments of the
+   * project files including:
+   *
+   * - tim.json file parsing
+   * - parsing artifacts from artifact data files
+   * - parsing traces from trace data files
    */
   private projectErrors: ProjectErrors = {
     tim: [],

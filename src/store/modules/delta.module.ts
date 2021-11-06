@@ -23,15 +23,15 @@ export default class ErrorModule extends VuexModule {
    */
   private afterVersion?: ProjectVersion;
   /**
-   * A collection of all added deltas.
+   * A collection of all added artifacts.
    */
   private added: Record<string, AddedArtifact> = {};
   /**
-   * A collection of all removed deltas.
+   * A collection of all removed artifacts.
    */
   private removed: Record<string, RemovedArtifact> = {};
   /**
-   * A collection of all modified deltas.
+   * A collection of all modified artifacts.
    */
   private modified: Record<string, ModifiedArtifact> = {};
 

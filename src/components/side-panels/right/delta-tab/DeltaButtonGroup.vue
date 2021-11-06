@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { DeltaArtifact, DeltaType } from "@/types";
+import { ArtifactDelta, DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
 import ArtifactDeltaButton from "@/components/side-panels/right/delta-tab/ArtifactDeltaButton.vue";
 import { capitalize } from "@/util";
@@ -31,14 +31,14 @@ export default Vue.extend({
       required: true,
     },
     artifacts: {
-      type: Object as PropType<Record<string, DeltaArtifact>>,
+      type: Object as PropType<Record<string, ArtifactDelta>>,
       required: true,
     },
   },
   data() {
     return {
       isDeltaOpen: false,
-      selectedArtifact: undefined as DeltaArtifact | undefined,
+      selectedArtifact: undefined as ArtifactDelta | undefined,
       selectedName: undefined as string | undefined,
     };
   },

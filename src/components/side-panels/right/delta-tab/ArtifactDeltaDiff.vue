@@ -40,7 +40,7 @@
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import CodeDiff from "vue-code-diff";
-import { DeltaArtifact, DeltaType } from "@/types";
+import { ArtifactDelta, DeltaType } from "@/types";
 import { getDeltaType, splitIntoLines } from "@/util";
 
 export default Vue.extend({
@@ -51,7 +51,7 @@ export default Vue.extend({
       required: true,
     },
     artifact: {
-      type: Object as PropType<DeltaArtifact>,
+      type: Object as PropType<ArtifactDelta>,
       required: true,
     },
     name: {

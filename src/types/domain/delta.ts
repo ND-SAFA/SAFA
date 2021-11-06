@@ -33,7 +33,7 @@ export interface ModifiedArtifact {
 /**
  * Defines all types of artifact deltas.
  */
-export type DeltaArtifact = AddedArtifact | RemovedArtifact | ModifiedArtifact;
+export type ArtifactDelta = AddedArtifact | RemovedArtifact | ModifiedArtifact;
 
 /**
  * Defines all artifact delta types.

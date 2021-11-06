@@ -12,7 +12,7 @@ import {
   ArtifactDeltaState,
   ModifiedArtifact,
   RemovedArtifact,
-  ArtifactElement,
+  ArtifactCytoCoreElement,
 } from "@/types";
 import Vue, { PropType } from "vue";
 
@@ -104,7 +104,7 @@ export default Vue.extend({
         return ArtifactDeltaState.NO_CHANGE;
       }
     },
-    definition(): ArtifactElement {
+    definition(): ArtifactCytoCoreElement {
       const id = this.artifactDefinition.name;
       const body = this.artifactDefinition.body;
       const artifactType = this.artifactDefinition.type;

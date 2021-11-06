@@ -51,7 +51,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Creates a snackbar message with the given server error.
+   * Creates a snackbar error message with the given server error.
    *
    * @param error - The error encountered.
    */
@@ -67,7 +67,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Creates a snackbar message with the given error message.
+   * Creates a snackbar error message with the given message.
    *
    * @param message - The error message encountered.
    */
@@ -77,18 +77,18 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Creates a snackbar message with the given message.
+   * Creates a snackbar information message with the given message.
    *
    * @param message - The message to display.
    */
-  onMessage(message: string): void {
+  onInfo(message: string): void {
     console.log(message);
     this.SET_MESSAGE({ message, type: MessageType.INFO, errors: [] });
   }
 
   @Action
   /**
-   * Creates a snackbar message with the given warning message.
+   * Creates a snackbar warning message with the given message.
    *
    * @param message - The message to display.
    */
@@ -99,7 +99,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Creates a snackbar message with the given success message.
+   * Creates a snackbar success message with the given message.
    *
    * @param message - The message to display.
    */

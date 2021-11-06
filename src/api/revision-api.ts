@@ -1,7 +1,7 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { getProjectVersion } from "@/api/project-api";
-import { Update } from "@/types";
+import { ProjectVersionUpdate } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { baseURL } from "@/api/endpoints";
 
@@ -9,16 +9,18 @@ const WEBSOCKET_URL = `${baseURL}/websocket`;
 let sock: WebSocket;
 let stompClient: Client;
 
-let recInterval: NodeJS.Timeout;
-let currentReconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 20;
 const RECONNECT_WAIT_TIME = 5000;
+let recInterval: NodeJS.Timeout;
+let currentReconnectAttempts = 0;
 
 /**
- * Returns a new stomp client.
+ * Returns singleton Stomp client or create new one if undefined.
  *
- * @param reconnect - If false, an error is thrown when the socket closes.
- *
+ * @param reconnect - Whether to create a new connection regardless
+ * of websocket state.
+ * @throws Throws errors if can't connect to server and reconnect is
+ * not enabled.
  * @return The stomp client.
  */
 function getStompClient(reconnect = false): Client {
@@ -27,7 +29,7 @@ function getStompClient(reconnect = false): Client {
       sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
       sock.onclose = () => {
         console.log("web socket close");
-        connect().then();
+        connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();
       };
       stompClient = Stomp.over(sock, { debug: false });
     } catch (e) {
@@ -40,11 +42,20 @@ function getStompClient(reconnect = false): Client {
 }
 
 /**
- * Connects to a stomp client.
+ * Connects to BEND websocket with a Stomp protocol and tries to reconnect if
+ * the connection fails.
  *
+ * @param maxReconnectAttempts - The number of times to try to reconnect before
+ * failing.
+ * @param reconnectWaitTime - The number of milliseconds to wait before attempting
+ * reconnect
  * @param isReconnect - Whether this is a reconnect attempt.
  */
-function connect(isReconnect = false): Promise<void> {
+function connect(
+  maxReconnectAttempts: number,
+  reconnectWaitTime: number,
+  isReconnect = false
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
     if (stomp.connected) {
@@ -53,7 +64,10 @@ function connect(isReconnect = false): Promise<void> {
       resolve();
     }
 
-    console.log("web socket connection attempt:", currentReconnectAttempts);
+    if (currentReconnectAttempts > 0) {
+      console.log("web socket reconnect attempt:", currentReconnectAttempts);
+    }
+
     currentReconnectAttempts++;
     stomp.connect(
       { host: WEBSOCKET_URL },
@@ -73,15 +87,18 @@ function connect(isReconnect = false): Promise<void> {
         }
         clearInterval(recInterval);
         recInterval = setInterval(function () {
-          if (currentReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            connect(true).then(resolve).catch(reject);
+          if (currentReconnectAttempts < maxReconnectAttempts) {
+            connect(maxReconnectAttempts, reconnectWaitTime, true)
+              .then(resolve)
+              .catch(reject);
           } else {
             clearInterval(recInterval);
-            reject(
-              "Reached max web socket reconnect attempts, please reload page."
-            );
+            const error =
+              "Reached max web socket reconnect attempts, please reload page.";
+            appModule.onError(error);
+            reject(error);
           }
-        }, RECONNECT_WAIT_TIME);
+        }, reconnectWaitTime);
       }
     );
   });
@@ -108,7 +125,7 @@ export function connectAndSubscribeToVersion(
   versionId: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    connect()
+    connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME)
       .then(() => {
         clearSubscriptions();
         const projectSubscription = `/topic/projects/${projectId}`;
@@ -132,7 +149,9 @@ export function connectAndSubscribeToVersion(
  * @param frame - The frame of the revision.
  */
 function revisionMessageHandler(versionId: string, frame: Frame): void {
-  const revision: Update = JSON.parse(frame.body) as Update;
+  const revision: ProjectVersionUpdate = JSON.parse(
+    frame.body
+  ) as ProjectVersionUpdate;
 
   switch (revision.type) {
     case "included":
@@ -146,4 +165,4 @@ function revisionMessageHandler(versionId: string, frame: Frame): void {
   }
 }
 
-connect();
+connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();

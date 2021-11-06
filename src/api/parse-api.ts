@@ -3,7 +3,7 @@ import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
 import { Endpoint, fillEndpoint } from "@/api/endpoints";
 
 /**
- * Parses an artifact file.
+ * Sends BEND an ArtifactDefinition file and returns parsed artifacts and errors.
  *
  * @param artifactType - The type of artifact to parse.
  * @param file - The artifact file to parse.

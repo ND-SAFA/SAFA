@@ -20,7 +20,7 @@ export async function getGeneratedLinks(
 }
 
 /**
- * Generates links from the source to target artifacts.
+ * Generates links between source and target artifacts.
  *
  * @param sourceArtifacts - The artifacts to generate links from.
  * @param targetArtifacts - The artifacts to generate links to.

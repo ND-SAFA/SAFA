@@ -134,11 +134,11 @@ export interface TraceChange {
 }
 
 /**
- * Defines an update to traces and artifacts.
+ * Defines an update to traces and artifacts within a project version.
  */
-export interface Update {
+export interface ProjectVersionUpdate {
   /**
-   * The type of update.
+   * Whether the data modified is included in the Update.
    */
   type: "included" | "excluded";
   /**

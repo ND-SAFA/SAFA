@@ -39,7 +39,7 @@
 <script lang="ts">
 import {
   AddedArtifact,
-  DeltaArtifact,
+  ArtifactDelta,
   ModifiedArtifact,
   RemovedArtifact,
   DeltaArtifacts,
@@ -51,7 +51,7 @@ import DeltaStateNav from "@/components/side-panels/right/delta-tab/DeltaPanelNa
 import Vue from "vue";
 import { deltaModule, projectModule } from "@/store";
 
-type OptionalDeltaArtifact = [string, DeltaArtifact] | undefined;
+type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
 
 export default Vue.extend({
   components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaStateNav },
@@ -62,7 +62,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    selectArtifact(name: string, artifact: DeltaArtifact): void {
+    selectArtifact(name: string, artifact: ArtifactDelta): void {
       this.selectedDeltaArtifact = [name, artifact];
     },
     closeDeltaModal(): void {

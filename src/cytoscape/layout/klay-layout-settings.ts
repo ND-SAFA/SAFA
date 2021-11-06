@@ -1,4 +1,4 @@
-import { KlayLayoutSettings } from "@/types/cytoscape/klay";
+import { KlayLayoutSettings } from "@/types";
 import {
   LAYOUT_NODE_SPACING,
   LAYOUT_NODE_DIRECTION,

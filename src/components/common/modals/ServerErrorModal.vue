@@ -23,7 +23,7 @@
 import Vue, { PropType } from "vue";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { appModule } from "@/store";
-import { PanelType } from "@/types/store";
+import { PanelType } from "@/types";
 
 export default Vue.extend({
   components: {

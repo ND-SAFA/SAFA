@@ -1,21 +1,25 @@
-import type { Project } from "@/types/domain/project";
-import type { Artifact } from "@/types/domain/artifact";
-import type { TraceLink } from "@/types/domain/links";
-import { connectAndSubscriptToVersion } from "@/api/revision-api";
-import type { ProjectCreationResponse } from "@/types/api";
-import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-
-export interface ChannelSubscriptionId {
-  projectId?: string;
-  versionId?: string;
-}
-
-export type ArtifactQueryFunction = (q: string) => Artifact | undefined;
+import { connectAndSubscribeToVersion } from "@/api";
+import type {
+  ProjectCreationResponse,
+  Project,
+  Artifact,
+  TraceLink,
+  ChannelSubscriptionId,
+  ArtifactQueryFunction,
+} from "@/types";
+import { LinkValidator } from "@/types";
+import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
 
 @Module({ namespaced: true, name: "project" })
+/**
+ * This module tracks the currently loaded project.
+ */
 export default class ProjectModule extends VuexModule {
-  project: Project = {
+  /**
+   * The currently loaded project.
+   */
+  private project: Project = {
     projectId: "",
     description: "",
     name: "Untitled",
@@ -25,54 +29,107 @@ export default class ProjectModule extends VuexModule {
   };
 
   @Action
+  /**
+   * 1. Sets the current project to the created project.
+   * 2. Sets any warnings generated when loading the project.
+   * 3. Resets the viewport to frame the new project graph.
+   * 4. Disables delta view, if it was enabled.
+   *
+   * @param res - The response from creating the project.
+   */
   async setProjectCreationResponse(
     res: ProjectCreationResponse
   ): Promise<void> {
     await this.setProject(res.project);
+
     errorModule.setArtifactWarnings(res.warnings);
+
     await viewportModule.setGraphLayout();
+
     deltaModule.setIsDeltaViewEnabled(false);
   }
+
   @Action
+  /**
+   * 1. Sets a new project.
+   * 2. Subscribes to the new project's version.
+   * 3. Clears any deltas to previous projects.
+   *
+   * @param newProject - The new project to set.
+   */
   async setProject(newProject: Project): Promise<void> {
-    this.SAVE_PROJECT(newProject);
     const projectId = newProject.projectId;
     const versionId = newProject.projectVersion?.versionId;
+
+    this.SAVE_PROJECT(newProject);
+
     await this.subscribeToVersion({ projectId, versionId });
+
     deltaModule.clearDelta();
   }
 
   @Action
+  /**
+   * Subscribes to a new project version.
+   *
+   * @param subscriptionId - The project and version ID to subscribe to.
+   */
   async subscribeToVersion(
     subscriptionId: ChannelSubscriptionId
   ): Promise<void> {
     const { projectId, versionId } = subscriptionId;
+
     if (projectId !== undefined && versionId !== undefined) {
-      await connectAndSubscriptToVersion(projectId, versionId);
+      await connectAndSubscribeToVersion(projectId, versionId);
     }
   }
 
   @Action
+  /**
+   * Updates the current trace links in the project, preserving any that already existed.
+   *
+   * @param traceLinks - The trace links to set.
+   */
   addOrUpdateTraceLinks(traceLinks: TraceLink[]): void {
     this.ADD_OR_UPDATE_TRACE_LINKS(traceLinks);
   }
 
   @Action
+  /**
+   * Updates the current artifacts in the project, preserving any that already existed.
+   *
+   * @param artifacts - The artifacts to set.
+   */
   addOrUpdateArtifacts(artifacts: Artifact[]): void {
     this.ADD_OR_UPDATE_ARTIFACTS(artifacts);
   }
 
   @Action
+  /**
+   * Removes the given trace link.
+   *
+   * @param traceLink - The trace link to remove.
+   */
   removeTraceLink(traceLink: TraceLink): void {
     this.REMOVE_TRACE_LINK(traceLink);
   }
 
   @Mutation
+  /**
+   * Sets a new project.
+   *
+   * @param project - The new project to track.
+   */
   SAVE_PROJECT(project: Project): void {
     this.project = project;
   }
 
   @Mutation
+  /**
+   * Updates the current trace links in the project, preserving any that already existed.
+   *
+   * @param traceLinks - The trace links to set.
+   */
   ADD_OR_UPDATE_TRACE_LINKS(traceLinks: TraceLink[]): void {
     const traceLinkIds = traceLinks.map((t) => t.traceLinkId);
     const unaffected = this.project.traces.filter(
@@ -82,6 +139,11 @@ export default class ProjectModule extends VuexModule {
   }
 
   @Mutation
+  /**
+   * Removes the given trace link.
+   *
+   * @param traceLink - The trace link to remove.
+   */
   REMOVE_TRACE_LINK(traceLink: TraceLink): void {
     this.project.traces = this.project.traces.filter(
       (link) => link.traceLinkId !== traceLink.traceLinkId
@@ -89,6 +151,11 @@ export default class ProjectModule extends VuexModule {
   }
 
   @Mutation
+  /**
+   * Updates the current artifacts in the project, preserving any that already existed.
+   *
+   * @param artifacts - The artifacts to set.
+   */
   ADD_OR_UPDATE_ARTIFACTS(artifacts: Artifact[]): void {
     const newArtifactIds = artifacts.map((a) => a.name);
     const unaffected = this.project.artifacts.filter(
@@ -97,16 +164,25 @@ export default class ProjectModule extends VuexModule {
     this.project.artifacts = unaffected.concat(artifacts);
   }
 
+  /**
+   * @return The current project.
+   */
   get getProject(): Project {
     return this.project;
   }
 
+  /**
+   * @return The current project artifacts.
+   */
   get getArtifacts(): Artifact[] {
     return this.project.artifacts;
   }
 
+  /**
+   * @return A function for finding an artifact by name.
+   */
   get getArtifactByName(): ArtifactQueryFunction {
-    return (artifactName: string) => {
+    return (artifactName) => {
       const query = this.project.artifacts.filter(
         (a) => a.name === artifactName
       );
@@ -123,23 +199,35 @@ export default class ProjectModule extends VuexModule {
       }
     };
   }
+
+  /**
+   * @return A collection of artifacts, keyed by their name.
+   */
   get getArtifactHashmap(): Record<string, Artifact> {
-    const artifactMap: Record<string, Artifact> = {};
-    this.project.artifacts.forEach((artifact) => {
-      artifactMap[artifact.name] = artifact;
-    });
-    return artifactMap;
+    return this.project.artifacts
+      .map((artifact) => ({ [artifact.name]: artifact }))
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {});
   }
 
+  /**
+   * @return All artifact types in the current project.
+   */
   get getArtifactTypes(): string[] {
     return Array.from(new Set(this.project.artifacts.map((a) => a.type)));
   }
+
+  /**
+   * @return All trace links in the current project.
+   */
   get getTraceLinks(): TraceLink[] {
     return this.project.traces;
   }
 
-  get doesLinkExist(): (s: string, t: string) => boolean {
-    return (sourceId: string, targetId: string) => {
+  /**
+   * @return A function that determines whether a link with the given source and target IDs exists.
+   */
+  get doesLinkExist(): LinkValidator {
+    return (sourceId, targetId) => {
       const traceLinks: TraceLink[] = this.project.traces;
       const traceLinkQuery = traceLinks.filter(
         (t) =>

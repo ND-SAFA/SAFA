@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import { appModule } from "@/store";
-import { Project } from "@/types/domain/project";
+import { Project } from "@/types";
 import Vue, { PropType } from "vue";
 export default Vue.extend({
   props: {

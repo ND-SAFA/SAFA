@@ -34,15 +34,15 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import {
   createNewMajorVersion,
   createNewMinorVersion,
   createNewRevisionVersion,
   getCurrentVersion,
-} from "@/api/project-api";
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
-import Vue, { PropType } from "vue";
-import { versionToString } from "@/util/to-string";
+} from "@/api";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
+import { versionToString } from "@/util";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 
 type VersionType = "major" | "minor" | "revision";

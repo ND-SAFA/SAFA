@@ -1,5 +1,5 @@
-import { CytoCore } from "@/types/cytoscape";
-import { Artifact } from "@/types/domain/artifact";
+import { CytoCore } from "@/types";
+import { Artifact } from "@/types";
 import { SingularElementArgument, CollectionReturnValue } from "cytoscape";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

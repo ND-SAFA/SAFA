@@ -34,7 +34,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import ModalTitle from "@/components/common/generic/GenericModalTitle.vue";
-import { ModalSize } from "@/types/common-components";
+import { ModalSize } from "@/types";
 export default Vue.extend({
   name: "generic-modal",
   components: {

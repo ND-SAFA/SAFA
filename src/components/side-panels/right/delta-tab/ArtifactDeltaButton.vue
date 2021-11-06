@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { DeltaType } from "@/types/domain/delta";
+import { DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
 
 export default Vue.extend({

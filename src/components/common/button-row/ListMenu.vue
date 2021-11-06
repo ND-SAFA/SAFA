@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { MENU_HIGHLIGHT_COLOR } from "@/cytoscape/styles/config/theme";
-import { ListMenuDefinition } from "@/types/common-components";
+import { ListMenuDefinition } from "@/types";
 import Vue, { PropType } from "vue";
 
 const DEFAULT_BUTTON_COLOR = "secondary";

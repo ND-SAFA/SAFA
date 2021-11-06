@@ -1,29 +1,29 @@
-import { ArtifactData } from "@/types/domain/artifact";
-import { HtmlDefinition } from "@/types/cytoscape/node-html-label";
+import { ArtifactData } from "@/types";
+import { HtmlDefinition } from "@/types";
 import {
   ARTIFACT_HEIGHT,
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact";
-import { getArtifactTypePrintName } from "@/util/string-helper";
+import { getArtifactTypePrintName } from "@/util";
 import { TRUNCATE_LENGTH } from "@/cytoscape/styles/config/graph";
 
 export const nodeHtml: HtmlDefinition = {
-  query: "node", // cytoscape que./cytoscape-stylesheets
+  query: "node",
   halign: "center",
   valign: "center",
-  halignBox: "center", // title vertical position. Can be 'left',''center, 'right'
-  valignBox: "center", // title relative box vertical position. Can be 'top',''center, 'bottom'
+  halignBox: "center",
+  valignBox: "center",
   tpl(data: ArtifactData) {
     return data.body !== undefined ? createNodeHtml(data) : "";
   },
 };
 
 export const nodeWarningHtml: HtmlDefinition = {
-  query: "node[warnings]", // cytoscape query selector
-  halign: "center", // title vertical position. Can be 'left',''center, 'right'
-  valign: "center", // title vertical position. Can be 'top',''center, 'bottom'
-  halignBox: "center", // title vertical position. Can be 'left',''center, 'right'
-  valignBox: "center", // title relative box vertical position. Can be 'top',''center, 'bottom'
+  query: "node[warnings]",
+  halign: "center",
+  valign: "center",
+  halignBox: "center",
+  valignBox: "center",
   tpl(data: ArtifactData) {
     const message =
       data.warnings !== undefined ? data.warnings[0].ruleName : "idk";

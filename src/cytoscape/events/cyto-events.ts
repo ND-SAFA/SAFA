@@ -1,17 +1,8 @@
-import { CytoCore } from "@/types/cytoscape";
-import { CytoEvent } from "@/types/cytoscape";
-import { CSSCursor } from "@/types/cytoscape/cursor";
+import { CSSCursor, CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
 import { artifactSelectionModule, viewportModule } from "@/store";
 import { EventObject } from "cytoscape";
 
-export interface CytoEventDefinition {
-  events: CytoEvent[];
-  selector?: string;
-  action: (cy: CytoCore, event: EventObject) => void;
-}
-export type CytoEventHandlers = Record<string, CytoEventDefinition>;
-
-let timeout: NodeJS.Timeout; // used for restricting number of resize events called
+let timeout: NodeJS.Timeout; // Used for restricting number of resize events called.
 
 export const DefaultCytoEventHandlers: CytoEventHandlers = {
   mouseOverCursor: {

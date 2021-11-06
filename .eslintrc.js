@@ -16,7 +16,7 @@ module.exports = {
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "max-lines": ["warn", 200]
+    "max-lines": ["warn", 300]
   },
   overrides: [
     {

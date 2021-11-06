@@ -6,21 +6,16 @@
 import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
 import {
   Artifact,
-  ArtifactData,
   ArtifactWarning,
   ProjectWarnings,
-} from "@/types/domain/artifact";
-import {
   AddedArtifact,
   ArtifactDeltaState,
   ModifiedArtifact,
   RemovedArtifact,
-} from "@/types/domain/delta";
+  ArtifactCytoCoreElement,
+} from "@/types";
 import Vue, { PropType } from "vue";
 
-interface ArtifactElement {
-  data: ArtifactData;
-}
 export default Vue.extend({
   name: "artifact",
   props: {
@@ -109,7 +104,7 @@ export default Vue.extend({
         return ArtifactDeltaState.NO_CHANGE;
       }
     },
-    definition(): ArtifactElement {
+    definition(): ArtifactCytoCoreElement {
       const id = this.artifactDefinition.name;
       const body = this.artifactDefinition.body;
       const artifactType = this.artifactDefinition.type;

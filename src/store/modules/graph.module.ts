@@ -1,27 +1,36 @@
-import type { Artifact } from "@/types/domain/artifact";
 import { appModule, viewportModule } from "@/store";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import {
-  IgnoreTypeFilterAction,
-  SubtreeFilterAction,
-} from "@/cytoscape/filters/graph-filters";
-import { PanelType } from "@/types/store";
-
-export type FilterAction = IgnoreTypeFilterAction | SubtreeFilterAction;
-
-export interface ChannelSubscriptionId {
-  projectId?: string;
-  versionId?: string;
-}
+import type { Artifact, FilterAction } from "@/types";
+import { PanelType } from "@/types";
 
 @Module({ namespaced: true, name: "artifactSelection" })
+/**
+ * This module defines the currently selected artifact and downstream artifacts associated with it.
+ */
 export default class ArtifactSelectionModule extends VuexModule {
-  selectedArtifact: Artifact | undefined = undefined;
-  selectedSubtree: string[] = [];
-  unselectedNodeOpacity = 0.1;
-  ignoreTypes: string[] = [];
+  /**
+   * The currently selected artifact.
+   */
+  private selectedArtifact?: Artifact;
+  /**
+   * The currently selected subtree.
+   */
+  private selectedSubtree: string[] = [];
+  /**
+   * The opacity of unselected artifact nodes.
+   */
+  private unselectedNodeOpacity = 0.1;
+  /**
+   * Types to ignore.
+   */
+  private ignoreTypes: string[] = [];
 
   @Action
+  /**
+   * Filters the current artifact graph by the given filter type and action.
+   *
+   * @param filterAction - How to filter the graph.
+   */
   async filterGraph(filterAction: FilterAction): Promise<void> {
     switch (filterAction.type) {
       case "ignore":
@@ -39,49 +48,97 @@ export default class ArtifactSelectionModule extends VuexModule {
   }
 
   @Action
+  /**
+   * Sets the given artifact as selected.
+   *
+   * @param artifact - The artifact to select.
+   */
   selectArtifact(artifact: Artifact): void {
     this.SELECT_ARTIFACT(artifact);
   }
+
   @Action
+  /**
+   * Unselects any selected artifact and closes the left app panel.
+   */
   unselectArtifact(): void {
     this.UNSELECT_ARTIFACT();
     appModule.closePanel(PanelType.left);
   }
 
   @Mutation
+  /**
+   * Sets a subtree of artifacts as selected.
+   * @param artifacts - The artifact subtree to select.
+   */
   SET_SELECTED_SUBTREE(artifacts: string[]): void {
     this.selectedSubtree = artifacts;
   }
 
   @Mutation
+  /**
+   * Adds an artifact type to ignore from selection.
+   *
+   * @param artifactTypeKey - The type to ignore.
+   */
   ADD_IGNORE_TYPE(artifactTypeKey: string): void {
     this.ignoreTypes.push(artifactTypeKey);
   }
+
   @Mutation
+  /**
+   * Removes an ignored artifact type.
+   *
+   * @param artifactTypeKey - The type to stop ignoring.
+   */
   REMOVE_IGNORE_TYPE(artifactTypeKey: string): void {
     this.ignoreTypes = this.ignoreTypes.filter(
       (at: string) => at !== artifactTypeKey
     );
   }
+
   @Mutation
+  /**
+   * Sets the given artifact as selected.
+   *
+   * @param artifact - The artifact to select.
+   */
   SELECT_ARTIFACT(artifact: Artifact): void {
     this.selectedArtifact = artifact;
   }
+
   @Mutation
+  /**
+   * Unselects any selected artifact and closes the left app panel.
+   */
   UNSELECT_ARTIFACT(): void {
     this.selectedArtifact = undefined;
   }
 
+  /**
+   * @return The currently selected artifact.
+   */
   get getSelectedArtifact(): Artifact | undefined {
     return this.selectedArtifact;
   }
+
+  /**
+   * @return The currently selected artifact subtree.
+   */
   get getSelectedSubtree(): string[] {
     return this.selectedSubtree;
   }
+
+  /**
+   * @return The node opacity for unselected artifacts.
+   */
   get getUnselectedNodeOpacity(): number {
     return this.unselectedNodeOpacity;
   }
 
+  /**
+   * @return The currently ignored artifact types.
+   */
   get getIgnoreTypes(): string[] {
     return this.ignoreTypes;
   }

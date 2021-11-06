@@ -35,8 +35,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import type { SnackbarMessage } from "@/types/store";
-import { MessageType, PanelType } from "@/types/store";
+import { MessageType, PanelType, SnackbarMessage } from "@/types";
 import { appModule } from "@/store";
 import ServerErrorModal from "@/components/common/modals/ServerErrorModal.vue";
 

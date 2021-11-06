@@ -1,8 +1,13 @@
-import { ProjectVersion } from "@/types/domain/project";
+import { ProjectVersion } from "@/types";
 
-export function versionToString(
-  currentVersion: ProjectVersion | undefined
-): string {
+/**
+ * Stringifies the version number.
+ *
+ * @param currentVersion - The current version number.
+ *
+ * @return The stringified version number.
+ */
+export function versionToString(currentVersion?: ProjectVersion): string {
   if (currentVersion === undefined) {
     return "X.X.X";
   }

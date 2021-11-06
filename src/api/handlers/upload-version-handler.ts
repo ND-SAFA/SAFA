@@ -1,10 +1,11 @@
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/project-api";
-import { ProjectCreationResponse } from "@/types/api";
+import { ProjectCreationResponse } from "@/types";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
+ *
  * @param selectedProject - The project that has been selected by the user
  * @param selectedVersion - The version associated with given project to update.
  * @param selectedFiles  - The flat files that will update given version

@@ -1,8 +1,12 @@
-import { parseArtifactFile } from "@/api/parse-api";
-import { ParseArtifactFileResponse } from "@/types/api";
-import { ArtifactFile } from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
-import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
+import { parseArtifactFile } from "@/api";
+import {
+  ArtifactMap,
+  IGenericFilePanel,
+  IGenericUploader,
+  Artifact,
+  ParseArtifactFileResponse,
+  ArtifactFile,
+} from "@/types";
 
 type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
 

@@ -2,25 +2,27 @@ import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import Home from "@/views/ArtifactTreeView.vue";
 import TraceLinks from "@/views/ApproveLinksView.vue";
-import { ERROR_ROUTE_NAME, TRACE_LINK_ROUTE_NAME } from "@/router/routes";
+import { Routes } from "./routes";
 import ErrorPage from "@/views/ErrorPageView.vue";
-import store, { appModule, projectModule } from "@/store";
+import { appModule, projectModule } from "@/store";
+
+export { Routes };
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
-    path: "/",
+    path: Routes.HOME,
     name: "Home",
     component: Home,
   },
   {
-    path: TRACE_LINK_ROUTE_NAME,
+    path: Routes.TRACE_LINK,
     name: "Trace Links",
     component: TraceLinks,
   },
   {
-    path: ERROR_ROUTE_NAME,
+    path: Routes.ERROR,
     name: "Error Page",
     component: ErrorPage,
   },
@@ -32,7 +34,7 @@ const router = new VueRouter({
   routes,
 });
 
-const routesWithRequiredProject = [TRACE_LINK_ROUTE_NAME];
+const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
 
 router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
   const isProjectDefined: boolean = projectModule.getProject.projectId !== "";

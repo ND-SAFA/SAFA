@@ -1,10 +1,4 @@
-import {
-  ArtifactFile,
-  ProjectFile,
-  TraceFile,
-} from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
-import { TracePanel } from "@/components/project/creator/definitions/trace-uploader";
+import { Artifact, ArtifactFile, ProjectFile, TraceFile } from "@/types";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   title: string;
@@ -24,17 +18,6 @@ export type ValidFileTypes = ArtifactFile | TraceFile;
 
 export type ArtifactMap = Record<string, Artifact>;
 
-export function isTraceFile(obj: ProjectFile): obj is TraceFile {
-  return (
-    "source" in obj &&
-    "target" in obj &&
-    "isGenerated" in obj &&
-    "traces" in obj
-  );
-}
-
-export function isTracePanel(
-  obj: IGenericFilePanel<any, any>
-): obj is TracePanel {
-  return isTraceFile(obj.projectFile);
+export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
+  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
 }

@@ -48,15 +48,12 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier, ProjectVersion } from "@/types/domain/project";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import ProjectSelector from "@/components/project/selector/ProjectSelector.vue";
 import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import Vue, { PropType } from "vue";
-import {
-  OptionalProjectIdentifier,
-  OptionalProjectVersion,
-} from "@/types/common-components";
-import { versionToString } from "@/util/to-string";
+import { OptionalProjectIdentifier, OptionalProjectVersion } from "@/types";
+import { versionToString } from "@/util";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";

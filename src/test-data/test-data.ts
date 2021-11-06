@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
-import { Artifact } from "@/types/domain/artifact";
-import { TraceApproval, TraceLink, TraceType } from "@/types/domain/links";
+import { Artifact } from "@/types";
+import { TraceApproval, TraceLink, TraceType } from "@/types";
 import { designs } from "@/test-data/designs";
 import { environementalAssumptions } from "@/test-data/environmental-assumptions";
 import { hazards } from "@/test-data/hazards";

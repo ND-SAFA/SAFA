@@ -58,7 +58,7 @@ export default Vue.extend({
   },
   computed: {
     isLoading(): boolean {
-      return appModule.isLoading;
+      return appModule.getIsLoading;
     },
   },
   methods: {

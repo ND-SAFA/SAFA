@@ -1,21 +1,34 @@
 import { NodeSingular, NodeCollection } from "cytoscape";
 
 /**
- * Types were manually constructed from https://github.com/cytoscape/cytoscape.js-automove
+ * Types were manually constructed from: https://github.com/cytoscape/cytoscape.js-automove
  */
 
+/**
+ * Returns whether to select the given node.
+ */
 type NodeSelectionFunction = (node: NodeSingular) => boolean;
 
+/**
+ * Enumerates the types of auto move repositions.
+ */
 export enum AutoMoveReposition {
   MEAN = "mean",
   VIEWPORT = "viewport",
   DRAG = "drag",
 }
 
+/**
+ * Enumerates the types of bounding boxes.
+ */
 enum AutoMoveBoundingBoxType {
   INSIDE = "inside",
   OUTSIDE = "outside",
 }
+
+/**
+ * Defines a bounding box.
+ */
 interface AutoMoveBoundingBox {
   x1: number;
   y1: number;
@@ -24,15 +37,27 @@ interface AutoMoveBoundingBox {
   type?: AutoMoveBoundingBoxType;
 }
 
+/**
+ * Defines the position of a node.
+ */
 interface NodePosition {
   x: number;
   y: number;
 }
 
+/**
+ * Returns an updated position of the given node.
+ */
 type NodePositioningFunction = (node: NodeSingular) => NodePosition;
-type UpdateCallback = () => void;
-type UpdateHandler = (update: UpdateCallback) => void;
 
+/**
+ * Run when an update is made.
+ */
+type UpdateHandler = (update: () => void) => void;
+
+/**
+ * Defines the options for auto moving a node.
+ */
 export interface AutoMoveOptions {
   nodesMatching?: NodeSelectionFunction | string | NodeCollection;
   reposition?:
@@ -45,11 +70,32 @@ export interface AutoMoveOptions {
   dragWith?: NodeSelectionFunction | string | NodeCollection | NodeSingular;
 }
 
+/**
+ * Defines rule callbacks for an auto move.
+ */
 export interface AutoMoveRule {
-  apply: () => void; // manually apply a rule
-  enabled: () => boolean; // get whether rule is enabled
-  toggle: () => void; // toggle whether the rule is enabled
-  disable: () => void; // temporarily disable the rule
-  enable: () => void; // re-enable the rule
-  destroy: () => void; // remove and clean up just this rule
+  /**
+   * Manually applies a rule.
+   */
+  apply(): void;
+  /**
+   * Returns whether a rule is enabled.
+   */
+  enabled(): boolean;
+  /**
+   * Toggles whether the rule is enabled.
+   */
+  toggle(): void;
+  /**
+   * Temporarily disables the rule.
+   */
+  disable(): void;
+  /**
+   * Re-enables a disabled rule.
+   */
+  enable(): void;
+  /**
+   * Removes and cleans up this rule.
+   */
+  destroy(): void;
 }

@@ -1,16 +1,16 @@
-import { parseTraceFile } from "@/api/parse-api";
-import { ParseTraceFileResponse } from "@/types/api";
-import { TraceFile } from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
-import { Link, TraceLink } from "@/types/domain/links";
-import { ArtifactMap, IGenericFilePanel, IGenericUploader } from "./types";
-import { generateLinks } from "@/api/link-api";
+import { parseTraceFile, generateLinks } from "@/api";
+import {
+  ArtifactMap,
+  IGenericUploader,
+  Artifact,
+  TraceFile,
+  ParseTraceFileResponse,
+  Link,
+  TraceLink,
+  TracePanel,
+} from "@/types";
 
 const DEFAULT_IS_GENERATED = false;
-
-export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
-  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
-}
 
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,

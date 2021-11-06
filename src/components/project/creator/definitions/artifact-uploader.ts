@@ -1,4 +1,4 @@
-import { parseArtifactFile } from "@/api/parse-api";
+import { parseArtifactFile } from "@/api";
 import {
   ArtifactMap,
   IGenericFilePanel,

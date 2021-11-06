@@ -37,16 +37,16 @@
 </template>
 
 <script lang="ts">
-import { getGeneratedLinks } from "@/api/link-api";
+import Vue from "vue";
 import {
   approveLinkAPIHandler,
   declineLinkAPIHandler,
-} from "@/api/handlers/trace-link-approval-handler";
+  getGeneratedLinks,
+} from "@/api";
 import ApprovalSection from "@/components/approve-links-view/ApprovalSection.vue";
-import { Artifact } from "@/types";
-import { TraceApproval, TraceLink } from "@/types";
-import Vue from "vue";
+import { TraceApproval, TraceLink, Artifact } from "@/types";
 import { appModule, projectModule } from "@/store";
+
 export default Vue.extend({
   components: { ApprovalSection },
   name: "trace-link-approval",

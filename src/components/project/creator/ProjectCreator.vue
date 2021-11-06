@@ -102,7 +102,7 @@ import {
 } from "@/types";
 import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
 import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
-import { saveOrUpdateProject } from "@/api/project-api";
+import { saveOrUpdateProject } from "@/api";
 import { projectModule } from "@/store";
 import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";

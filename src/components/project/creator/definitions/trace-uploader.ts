@@ -1,4 +1,4 @@
-import { parseTraceFile } from "@/api/parse-api";
+import { parseTraceFile, generateLinks } from "@/api";
 import {
   ArtifactMap,
   IGenericUploader,
@@ -9,7 +9,6 @@ import {
   TraceLink,
   TracePanel,
 } from "@/types";
-import { generateLinks } from "@/api/link-api";
 
 const DEFAULT_IS_GENERATED = false;
 

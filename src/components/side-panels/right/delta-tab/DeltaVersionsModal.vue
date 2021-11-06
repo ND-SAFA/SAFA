@@ -37,10 +37,10 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import { Project, ProjectVersion } from "@/types";
-import Vue, { PropType } from "vue";
-import { getProjectDelta } from "@/api/project-api";
+import { getProjectDelta } from "@/api";
 import { DeltaPayload } from "@/types";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { appModule, deltaModule, viewportModule } from "@/store";

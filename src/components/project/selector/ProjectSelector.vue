@@ -41,18 +41,14 @@
 </template>
 
 <script lang="ts">
-import {
-  deleteProject,
-  getProjects,
-  saveOrUpdateProject,
-} from "@/api/project-api";
+import Vue from "vue";
+import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
 import { DataItem, ProjectCreationResponse } from "@/types";
 import { ProjectIdentifier } from "@/types";
 import GenericSelector from "@/components/common/generic/GenericSelector.vue";
 import ProjectCreatorModal from "@/components/project/selector/ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "@/components/project/selector/ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "@/components/project/selector/headers";
-import Vue from "vue";
 import { appModule } from "@/store";
 
 export default Vue.extend({

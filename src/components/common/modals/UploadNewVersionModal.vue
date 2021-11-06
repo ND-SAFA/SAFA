@@ -36,10 +36,10 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier, ProjectVersion } from "@/types";
 import Vue from "vue";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
-import { uploadNewProjectVersion } from "@/api/handlers/upload-version-handler";
+import { uploadNewProjectVersion } from "@/api";
 import ProjectVersionStepperModal from "@/components/common/modals/ProjectVersionStepperModal.vue";
 
 export default Vue.extend({

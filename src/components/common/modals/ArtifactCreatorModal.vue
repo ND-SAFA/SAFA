@@ -37,7 +37,7 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import { createNewArtifact, isArtifactNameTaken } from "@/api/artifact-api";
+import { createNewArtifact, isArtifactNameTaken } from "@/api";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { Artifact } from "@/types";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";

@@ -1,5 +1,5 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { connectAndSubscriptToVersion } from "@/api/revision-api";
+import { connectAndSubscribeToVersion } from "@/api";
 import type {
   ProjectCreationResponse,
   Project,
@@ -80,7 +80,7 @@ export default class ProjectModule extends VuexModule {
     const { projectId, versionId } = subscriptionId;
 
     if (projectId !== undefined && versionId !== undefined) {
-      await connectAndSubscriptToVersion(projectId, versionId);
+      await connectAndSubscribeToVersion(projectId, versionId);
     }
   }
 

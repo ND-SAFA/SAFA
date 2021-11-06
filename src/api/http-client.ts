@@ -1,9 +1,18 @@
 import { APIOptions, APIResponse } from "@/types";
 import { isAPIError } from "@/util";
-
 import { appModule } from "@/store";
-import { baseURL } from "@/api/base-url";
+import { baseURL } from "@/api/endpoints";
 
+/**
+ * Executes an http request with the given parameters.
+ *
+ * @param relativeUrl - The relative URL for this request.
+ * @param options - Any options for this request, such as the method and any data.
+ * @param setContentType - If true, sets the content type of the request.
+ *
+ * @return The request's response data.
+ * @throws Any errors received from the request.
+ */
 export default async function httpClient<T>(
   relativeUrl: string,
   options: APIOptions,

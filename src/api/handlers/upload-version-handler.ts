@@ -5,6 +5,7 @@ import { ProjectCreationResponse } from "@/types";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
+ *
  * @param selectedProject - The project that has been selected by the user
  * @param selectedVersion - The version associated with given project to update.
  * @param selectedFiles  - The flat files that will update given version

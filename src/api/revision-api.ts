@@ -3,7 +3,7 @@ import Stomp, { Client, Frame } from "webstomp-client";
 import { getProjectVersion } from "@/api/project-api";
 import { Update } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { baseURL } from "@/api/base-url";
+import { baseURL } from "@/api/endpoints";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -14,6 +14,13 @@ let currentReconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 20;
 const RECONNECT_WAIT_TIME = 5000;
 
+/**
+ * Returns a new stomp client.
+ *
+ * @param reconnect - If false, an error is thrown when the socket closes.
+ *
+ * @return The stomp client.
+ */
 function getStompClient(reconnect = false): Client {
   if (sock === undefined || stompClient === undefined || reconnect) {
     try {
@@ -32,6 +39,11 @@ function getStompClient(reconnect = false): Client {
   return stompClient;
 }
 
+/**
+ * Connects to a stomp client.
+ *
+ * @param isReconnect - Whether this is a reconnect attempt.
+ */
 function connect(isReconnect = false): Promise<void> {
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
@@ -75,13 +87,23 @@ function connect(isReconnect = false): Promise<void> {
   });
 }
 
+/**
+ * Clears all stomp client subscriptions.
+ */
 function clearSubscriptions() {
   const stomp = getStompClient();
   const subscriptionIds = Object.keys(stomp.subscriptions);
+
   subscriptionIds.forEach((subId) => stomp.unsubscribe(subId));
 }
 
-export function connectAndSubscriptToVersion(
+/**
+ * Connects and subscribes to the given project and version.
+ *
+ * @param projectId - The project ID to connect to.
+ * @param versionId - The project version ID to connect to.
+ */
+export function connectAndSubscribeToVersion(
   projectId: string,
   versionId: string
 ): Promise<void> {
@@ -103,6 +125,12 @@ export function connectAndSubscriptToVersion(
   });
 }
 
+/**
+ * Handles revision messages.
+ *
+ * @param versionId - The project version ID of the revision.
+ * @param frame - The frame of the revision.
+ */
 function revisionMessageHandler(versionId: string, frame: Frame): void {
   const revision: Update = JSON.parse(frame.body) as Update;
 

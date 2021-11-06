@@ -20,10 +20,7 @@
 </template>
 
 <script lang="ts">
-import {
-  approveLinkAPIHandler,
-  declineLinkAPIHandler,
-} from "@/api/handlers/trace-link-approval-handler";
+import { approveLinkAPIHandler, declineLinkAPIHandler } from "@/api";
 import {
   TraceApproval,
   TraceLink,

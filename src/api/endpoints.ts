@@ -7,6 +7,7 @@ export const baseURL = process.env.VUE_APP_API_ENDPOINT;
  * Enumerates all of the possible endpoint paths.
  */
 export enum Endpoint {
+  deleteArtifact = "projects/:projectId/artifacts/:artifactName",
   isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
   createNewArtifact = "projects/versions/:versionId/artifacts",
   getGeneratedLinks = "projects/:projectId/links/generated",

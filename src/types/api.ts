@@ -13,9 +13,11 @@ import {
  */
 export interface APIOptions {
   headers?: Record<string, string>;
-  method: string;
+  method: APIMethods;
   body?: string | FormData;
 }
+
+type APIMethods = "GET" | "POST" | "PUT" | "DELETE";
 
 /**
  * Defines a response from the API.

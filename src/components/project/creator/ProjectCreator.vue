@@ -8,7 +8,6 @@
     :isLoading="isLoading"
     @onClose="onClose"
     @onReset="clearData"
-    @onSubmit="$emit('onSubmit')"
   >
     <template v-slot:items>
       <v-stepper-content step="1">

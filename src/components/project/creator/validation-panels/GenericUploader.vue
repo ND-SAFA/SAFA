@@ -4,6 +4,7 @@
       :noItemError="noItemError"
       :showError="projectFiles.length === 0"
       :isValidStates="isValidStates"
+      :defaultValidState="defaultValidState"
       @onAdd="isCreatorOpen = true"
       @onIsValid="$emit('onIsValid')"
       @onIsInvalid="$emit('onIsInvalid')"
@@ -64,6 +65,10 @@ export default Vue.extend({
     noItemError: {
       type: String,
       default: "No entities have been created.",
+    },
+    defaultValidState: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

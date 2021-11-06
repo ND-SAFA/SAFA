@@ -42,9 +42,14 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    defaultValidState: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     isValid(): boolean {
+      if (this.isValidStates.length === 0) return this.defaultValidState;
       return this.isValidStates.filter((isValid) => !isValid).length === 0;
     },
   },

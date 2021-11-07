@@ -9,7 +9,13 @@ import type {
   ArtifactQueryFunction,
 } from "@/types";
 import { LinkValidator } from "@/types";
-import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
+import {
+  appModule,
+  artifactSelectionModule,
+  deltaModule,
+  errorModule,
+  viewportModule,
+} from "@/store";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -102,6 +108,14 @@ export default class ProjectModule extends VuexModule {
    */
   addOrUpdateArtifacts(artifacts: Artifact[]): void {
     this.ADD_OR_UPDATE_ARTIFACTS(artifacts);
+    const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
+
+    if (selectedArtifact !== undefined) {
+      const query = artifacts.filter((a) => a.name === selectedArtifact.name);
+      if (query.length > 0) {
+        artifactSelectionModule.selectArtifact(query[0]);
+      }
+    }
   }
 
   @Action
@@ -147,6 +161,18 @@ export default class ProjectModule extends VuexModule {
   REMOVE_TRACE_LINK(traceLink: TraceLink): void {
     this.project.traces = this.project.traces.filter(
       (link) => link.traceLinkId !== traceLink.traceLinkId
+    );
+  }
+
+  @Mutation
+  /**
+   * Deletes given artifact.
+   *
+   * @param artifact - The artifact to remove.
+   */
+  DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
+    this.project.artifacts = this.project.artifacts.filter(
+      (a) => a.name !== artifactName
     );
   }
 

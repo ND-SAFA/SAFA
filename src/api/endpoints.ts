@@ -9,7 +9,7 @@ export const baseURL = process.env.VUE_APP_API_ENDPOINT;
 export enum Endpoint {
   deleteArtifact = "projects/:projectId/artifacts/:artifactName",
   isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
-  createNewArtifact = "projects/versions/:versionId/artifacts",
+  createOrUpdateArtifact = "projects/versions/:versionId/artifacts",
   getGeneratedLinks = "projects/:projectId/links/generated",
   generateLinks = "projects/links/generate",
   approveLink = "projects/links/:traceLinkId/approve",

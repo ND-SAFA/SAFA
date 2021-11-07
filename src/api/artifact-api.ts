@@ -45,12 +45,12 @@ export async function deleteArtifact(
  *
  * @return The created artifact.
  */
-export async function createNewArtifact(
+export async function createOrUpdateArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<Artifact> {
   return httpClient<Artifact>(
-    fillEndpoint(Endpoint.createNewArtifact, { versionId }),
+    fillEndpoint(Endpoint.createOrUpdateArtifact, { versionId }),
     {
       method: "POST",
       body: JSON.stringify(artifact),

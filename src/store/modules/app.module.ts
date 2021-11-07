@@ -1,6 +1,6 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { projectModule } from "@/store";
-import type { SnackbarMessage, PanelState, APIErrorBody } from "@/types";
+import type { APIErrorBody, PanelState, SnackbarMessage } from "@/types";
 import { MessageType, PanelType } from "@/types";
 
 @Module({ namespaced: true, name: "app" })
@@ -11,7 +11,11 @@ export default class ProjectModule extends VuexModule {
   /**
    * The current snackbar message.
    */
-  private snackbarMessage?: SnackbarMessage;
+  private snackbarMessage: SnackbarMessage = {
+    errors: [],
+    message: "",
+    type: MessageType.CLEAR,
+  };
   /**
    * Whether the app is currently loading.
    */
@@ -183,7 +187,10 @@ export default class ProjectModule extends VuexModule {
    * Clears the current snackbar message.
    */
   CLEAR_MESSAGE(): void {
-    this.snackbarMessage = undefined;
+    this.snackbarMessage = {
+      ...this.snackbarMessage,
+      type: MessageType.CLEAR,
+    };
   }
 
   @Mutation

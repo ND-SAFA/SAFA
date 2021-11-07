@@ -42,6 +42,7 @@ import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionMo
 import router, { Routes } from "@/router";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
 import ProjectCreatorModal from "@/components/project/creator/ProjectCreator.vue";
+import { appModule } from "@/store";
 
 export default Vue.extend({
   components: {
@@ -90,9 +91,7 @@ export default Vue.extend({
         type: ButtonType.LIST_MENU,
         label: "Trace Links",
         menuItems: ["Approve Generated Trace Links"],
-        menuHandlers: [
-          () => router.push(Routes.TRACE_LINK).catch((e) => console.warn(e)),
-        ],
+        menuHandlers: [() => router.push(Routes.TRACE_LINK)],
       },
     ];
   },

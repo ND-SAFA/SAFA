@@ -40,7 +40,7 @@ router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
   const isProjectDefined: boolean = projectModule.getProject.projectId !== "";
   if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
     appModule.onWarning(
-      "Project must be selected before approving trace links"
+      "Project must be selected before approving trace links."
     );
     next("/");
   } else {

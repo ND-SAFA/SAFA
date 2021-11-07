@@ -70,7 +70,7 @@ export async function getRootNode(
   const cyCore = await cyPromise;
 
   if (currentNode === undefined) {
-    currentNode = cyCore.elements().first();
+    currentNode = cyCore.nodes().first();
   }
 
   const edgesOutOfNode: EdgeCollection = cyCore

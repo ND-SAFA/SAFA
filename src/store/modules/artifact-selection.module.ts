@@ -11,7 +11,12 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * The currently selected artifact.
    */
-  private selectedArtifact?: Artifact;
+  private selectedArtifact?: Artifact = {
+    type: "Requirement",
+    name: "RE-10",
+    body: "this is a body",
+    summary: "this is a summary",
+  };
   /**
    * The currently selected subtree.
    */

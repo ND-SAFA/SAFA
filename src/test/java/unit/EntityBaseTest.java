@@ -1,9 +1,6 @@
 package unit;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -123,6 +120,10 @@ public class EntityBaseTest extends SpringBootBaseTest {
 
     public JSONObject sendGet(String routeName, ResultMatcher test) throws Exception {
         return sendRequest(get(routeName), test);
+    }
+
+    public JSONObject sendDelete(String routeName, ResultMatcher test) throws Exception {
+        return sendRequest(delete(routeName), test);
     }
 
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,

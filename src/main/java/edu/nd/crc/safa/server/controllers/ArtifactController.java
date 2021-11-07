@@ -23,6 +23,7 @@ import edu.nd.crc.safa.server.services.VersionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,6 +75,24 @@ public class ArtifactController extends BaseController {
         this.artifactVersionService.setArtifactAtProjectVersion(projectVersion, artifact);
         this.revisionNotificationService.broadcastArtifact(projectVersion, artifact);
         return new ServerResponse(artifact);
+    }
+
+    /**
+     * Deletes artifact with given name within given project.
+     *
+     * @param projectId    UUID of versionId of associated project version.
+     * @param artifactName The name of the artifact to be deleted.
+     * @return ServerResponse with success message.
+     */
+    @DeleteMapping(value = "projects/{projectId}/artifacts/{artifactName}")
+    @ResponseStatus(HttpStatus.OK)
+    public ServerResponse deleteArtifact(
+        @PathVariable UUID projectId,
+        @PathVariable String artifactName) {
+        Project project = this.projectRepository.findByProjectId(projectId);
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+        artifactQuery.ifPresent(artifact -> this.artifactRepository.delete(artifact));
+        return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 
     /**

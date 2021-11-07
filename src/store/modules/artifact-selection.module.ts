@@ -1,5 +1,5 @@
 import { appModule, viewportModule } from "@/store";
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, FilterAction } from "@/types";
 import { PanelType } from "@/types";
 
@@ -11,12 +11,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * The currently selected artifact.
    */
-  private selectedArtifact?: Artifact = {
-    type: "Requirement",
-    name: "RE-10",
-    body: "this is a body",
-    summary: "this is a summary",
-  };
+  private selectedArtifact?: Artifact = undefined;
   /**
    * The currently selected subtree.
    */
@@ -60,6 +55,7 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   selectArtifact(artifact: Artifact): void {
     this.SELECT_ARTIFACT(artifact);
+    appModule.openPanel(PanelType.left);
   }
 
   @Action

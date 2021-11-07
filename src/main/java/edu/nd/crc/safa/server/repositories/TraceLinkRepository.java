@@ -47,4 +47,12 @@ public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
     List<TraceLink> findBySourceArtifactProjectAndApprovalStatus(Project project, TraceApproval approvalStatus);
 
     List<TraceLink> findBySourceArtifactProject(Project project);
+
+    default Optional<TraceLink> getByProjectAndSourceAndTarget(Project project, String sourceName, String targetName) {
+        return findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(project, sourceName, targetName);
+    }
+
+    Optional<TraceLink> findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(Project project,
+                                                                                              String sourceName,
+                                                                                              String targetName);
 }

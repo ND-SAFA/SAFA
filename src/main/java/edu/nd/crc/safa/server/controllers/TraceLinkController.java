@@ -10,11 +10,11 @@ import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TraceLinkController extends BaseController {
 
     TraceLinkRepository traceLinkRepository;
+    ParserErrorRepository parserErrorRepository;
 
     TraceLinkService traceLinkService;
     VersionService versionService;
@@ -49,12 +50,14 @@ public class TraceLinkController extends BaseController {
     @Autowired
     public TraceLinkController(ProjectRepository projectRepository,
                                ProjectVersionRepository projectVersionRepository,
+                               ParserErrorRepository parserErrorRepository,
                                TraceLinkRepository traceLinkRepository,
                                TraceLinkService traceLinkService,
                                VersionService versionService,
                                RevisionNotificationService revisionNotificationService,
                                TraceLinkGenerator traceLinkGenerator) {
         super(projectRepository, projectVersionRepository);
+        this.parserErrorRepository = parserErrorRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkService = traceLinkService;
         this.versionService = versionService;
@@ -112,10 +115,11 @@ public class TraceLinkController extends BaseController {
                                              @PathVariable String sourceId,
                                              @PathVariable String targetId) throws ServerError {
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        Pair<TraceLink, ParserError> creationResponse = this.traceLinkService.createTrace(projectVersion, sourceId,
+        Pair<TraceLink, String> creationResponse = this.traceLinkService.createTrace(projectVersion, sourceId,
             targetId);
         if (creationResponse.getValue1() != null) {
-            return new ServerResponse(creationResponse.getValue1());
+            String errorMessage = creationResponse.getValue1();
+            throw new ServerError(errorMessage);
         }
         TraceLink traceLink = creationResponse.getValue0();
         this.traceLinkRepository.saveAll(List.of(traceLink));

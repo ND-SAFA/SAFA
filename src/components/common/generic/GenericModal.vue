@@ -3,6 +3,7 @@
     :value="isOpen"
     :width="`${getWidth()}px`"
     @click:outside="$emit('onClose')"
+    persistent
   >
     <v-card :class="`modal-${size}`">
       <v-card-title class="grey lighten-2">

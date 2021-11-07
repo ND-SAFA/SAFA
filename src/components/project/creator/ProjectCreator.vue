@@ -6,9 +6,8 @@
     :steps="steps"
     :isOpen="isOpen"
     :isLoading="isLoading"
-    @onClose="onClose"
     @onReset="clearData"
-    @onSubmit="$emit('onSubmit')"
+    @onClose="onClose"
   >
     <template v-slot:items>
       <v-stepper-content step="1">
@@ -172,6 +171,7 @@ export default Vue.extend({
         });
     },
     onConfirmClose(): void {
+      this.isConfirmOpen = false;
       this.$emit("onClose");
     },
   },

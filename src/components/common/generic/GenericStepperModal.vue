@@ -3,8 +3,8 @@
     :title="title"
     :isOpen="isOpen"
     :isLoading="isLoading"
-    @onClose="$emit('onClose')"
     :size="size"
+    @onClose="$emit('onClose')"
   >
     <template v-slot:body>
       <GenericStepper

@@ -77,15 +77,13 @@ public class TraceLinkService {
         }
     }
 
-    public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,
-                                                    String sourceName,
-                                                    String targetName) {
+    public Pair<TraceLink, String> createTrace(ProjectVersion projectVersion,
+                                               String sourceName,
+                                               String targetName) {
         ArtifactFinder artifactFinder = (a) ->
             artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
-        Pair<TraceLink, String> parseResponse = parseTraceLink(artifactFinder, this::queryForLinkBetween, sourceName,
+        return parseTraceLink(artifactFinder, this::queryForLinkBetween, sourceName,
             targetName);
-        return new Pair<>(parseResponse.getValue0(), new ParserError(projectVersion, parseResponse.getValue1(),
-            ApplicationActivity.PARSING_TRACES));
     }
 
     //TODO: FIX ambuiguity between validation and parsing

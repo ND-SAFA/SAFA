@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 /**
  * Responsible for storing parsing errors when
@@ -59,6 +60,14 @@ public class ParserError implements Serializable {
         this.projectVersion = projectVersion;
         this.description = description;
         this.applicationActivity = applicationActivity;
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("id", this.id);
+        json.put("description:", this.description);
+        json.put("activity:", this.applicationActivity);
+        return json.toString();
     }
 
     public void setFileSource(String fileName,

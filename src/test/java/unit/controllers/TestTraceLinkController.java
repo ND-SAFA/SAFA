@@ -137,8 +137,53 @@ public class TestTraceLinkController extends EntityBaseTest {
         assertThat(generatedLinks.length()).isEqualTo(numberOfLinks);
     }
 
+    /**
+     * The following test verifies that a trace link can be created.
+     */
+    @Test
+    public void testCreateTraceLink() throws Exception {
+        String projectName = "project-name";
+        String sourceName = "D9";
+        String targetName = "F21";
+
+        // Step - Create project with artifacts.
+        ProjectVersion projectVersion = entityBuilder.newProject(projectName).newVersionWithReturn(projectName);
+        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+
+        // VP - Verify that trace does not exist
+        Project project = projectVersion.getProject();
+        assertTraceDoesNotExist(project, sourceName, targetName);
+
+        // Step - POST trace links creation
+        String versionId = projectVersion.getVersionId().toString();
+        String url = String.format("/projects/versions/%s/links/create/%s/%s", versionId, sourceName, targetName);
+        JSONObject response = sendPost(url, new JSONObject(), status().is2xxSuccessful());
+
+        // VP - Verify that no error
+        int status = response.getInt("status");
+        assertThat(status).isEqualTo(0);
+
+        // VP - Verify that link created
+        assertTraceExists(project, sourceName, targetName);
+    }
+
+    private void assertTraceExists(Project project, String sourceName, String targetName) {
+        assertTraceStatus(project, sourceName, targetName, true);
+    }
+
+    private void assertTraceDoesNotExist(Project project, String sourceName, String targetName) {
+        assertTraceStatus(project, sourceName, targetName, false);
+    }
+
+    private void assertTraceStatus(Project project, String sourceName, String targetName, boolean exists) {
+        Optional<TraceLink> traceLinkQuery =
+            this.traceLinkRepository.getByProjectAndSourceAndTarget(project,
+                sourceName,
+                targetName);
+        assertThat(traceLinkQuery.isPresent()).isEqualTo(exists);
+    }
+
     private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
         return String.format("/projects/%s/links/generated", projectVersion.getProject().getProjectId().toString());
     }
-
 }

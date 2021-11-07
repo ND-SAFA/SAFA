@@ -104,8 +104,8 @@ export default Vue.extend({
     },
   },
   watch: {
-    message(newMessage: SnackbarMessage | undefined) {
-      if (newMessage !== undefined) {
+    message(newMessage: SnackbarMessage) {
+      if (newMessage.type !== MessageType.CLEAR) {
         this.showMessage(newMessage);
         appModule.CLEAR_MESSAGE();
       }

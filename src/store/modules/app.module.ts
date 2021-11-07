@@ -76,6 +76,7 @@ export default class ProjectModule extends VuexModule {
    * @param message - The error message encountered.
    */
   onError(message: string): void {
+    console.error(message);
     this.SET_MESSAGE({ message, type: MessageType.ERROR, errors: [] });
   }
 

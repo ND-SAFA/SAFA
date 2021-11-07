@@ -34,7 +34,6 @@ export const contextMenuOptions = {
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
           artifactSelectionModule.selectArtifact(artifact);
-          appModule.openPanel(PanelType.left);
         });
       },
     },

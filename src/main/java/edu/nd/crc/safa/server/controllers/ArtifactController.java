@@ -82,7 +82,7 @@ public class ArtifactController extends BaseController {
      *
      * @param projectId    UUID of versionId of associated project version.
      * @param artifactName The name of the artifact to be deleted.
-     * @throws ServerError Throws error if artifact already exists in project.
+     * @return ServerResponse with success message.
      */
     @DeleteMapping(value = "projects/{projectId}/artifacts/{artifactName}")
     @ResponseStatus(HttpStatus.OK)

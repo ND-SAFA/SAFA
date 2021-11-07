@@ -1,6 +1,10 @@
 import { CytoCore } from "@/types";
 import { Artifact } from "@/types";
-import { SingularElementArgument, CollectionReturnValue } from "cytoscape";
+import {
+  SingularElementArgument,
+  CollectionReturnValue,
+  EdgeCollection,
+} from "cytoscape";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export let resolveCy: any = null;
@@ -52,4 +56,30 @@ function getSubTree(
     });
 
   return subTree;
+}
+
+/**
+ * Returns the top most parent from all elements in the cytoscape object.
+ * Picks a random node and follows the parents until no more exist.
+ *
+ * @param currentNode - Defines where we are in the tree during recursion.
+ */
+export async function getRootNode(
+  currentNode?: SingularElementArgument
+): Promise<SingularElementArgument> {
+  const cyCore = await cyPromise;
+
+  if (currentNode === undefined) {
+    currentNode = cyCore.nodes().first();
+  }
+
+  const edgesOutOfNode: EdgeCollection = cyCore
+    .edges()
+    .filter((e) => e.target() === currentNode);
+
+  if (edgesOutOfNode.length === 0) {
+    return currentNode;
+  } else {
+    return getRootNode(edgesOutOfNode[0].source());
+  }
 }

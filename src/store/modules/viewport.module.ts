@@ -1,7 +1,12 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import { cyPromise, getArtifactSubTree } from "@/cytoscape/cytoscape";
+import {
+  cyPromise,
+  getArtifactSubTree,
+  getRootNode,
+} from "@/cytoscape/cytoscape";
 import {
   ANIMATION_DURATION,
+  CENTER_GRAPH_PADDING,
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles/config/graph";
@@ -79,7 +84,6 @@ export default class ViewportModule extends VuexModule {
    */
   async onZoomOut(): Promise<void> {
     const cy = await cyPromise;
-
     cy.zoom(cy.zoom() - ZOOM_INCREMENT);
   }
 
@@ -89,8 +93,18 @@ export default class ViewportModule extends VuexModule {
    */
   async onZoomIn(): Promise<void> {
     const cy = await cyPromise;
-
     cy.zoom(cy.zoom() + ZOOM_INCREMENT);
+  }
+
+  @Action
+  /**
+   * Moves the viewport such that top most parent is centered at default zoom.
+   *
+   */
+  async centerOnRootNode(): Promise<void> {
+    getRootNode().then((rootNode) =>
+      this.centerOnArtifacts([rootNode.data().id])
+    );
   }
 
   @Action
@@ -122,12 +136,20 @@ export default class ViewportModule extends VuexModule {
       artifacts.length === 0
         ? cy.nodes()
         : cy.nodes().filter((n) => artifacts.includes(n.data().id));
-
-    cy.animate({
-      center: { eles: collection },
-      duration: ANIMATION_DURATION,
-      complete: () => this.SET_CURRENT_COLLECTION(undefined),
-    });
+    if (collection.length > 1) {
+      cy.animate({
+        fit: { eles: collection, padding: CENTER_GRAPH_PADDING },
+        duration: ANIMATION_DURATION,
+        complete: () => this.SET_CURRENT_COLLECTION(undefined),
+      });
+    } else {
+      cy.animate({
+        zoom: DEFAULT_ZOOM,
+        center: { eles: collection },
+        duration: ANIMATION_DURATION,
+        complete: () => this.SET_CURRENT_COLLECTION(undefined),
+      });
+    }
   }
 
   /**

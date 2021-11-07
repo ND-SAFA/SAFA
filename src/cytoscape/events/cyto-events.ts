@@ -1,8 +1,6 @@
 import { CSSCursor, CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
 import { EventObject } from "cytoscape";
-
-let timeout: NodeJS.Timeout; // Used for restricting number of resize events called.
 
 export const DefaultCytoEventHandlers: CytoEventHandlers = {
   mouseOverCursor: {
@@ -34,27 +32,11 @@ export const DefaultCytoEventHandlers: CytoEventHandlers = {
       document.body.style.cursor = "auto";
     },
   },
-  onResizeContainer: {
-    events: [CytoEvent.RESIZE],
-    action: () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(
-        async () => await viewportModule.repositionSelectedSubtree(),
-        500
-      );
-    },
-  },
   unselectArtifactOnBackgroundClick: {
     events: [CytoEvent.TAP],
     action: (cy: CytoCore, event: EventObject) => {
       if (event.target === cy) {
         artifactSelectionModule.unselectArtifact();
-        artifactSelectionModule
-          .filterGraph({
-            type: "subtree",
-            artifactsInSubtree: [],
-          })
-          .then();
       }
     },
   },

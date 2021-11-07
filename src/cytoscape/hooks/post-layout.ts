@@ -5,10 +5,7 @@ import {
   IGraphLayout,
 } from "@/types";
 import { EventObject } from "cytoscape";
-import {
-  ANIMATION_DURATION,
-  CENTER_GRAPH_PADDING,
-} from "@/cytoscape/styles/config/graph";
+import { viewportModule } from "@/store";
 
 export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
@@ -44,15 +41,12 @@ export const applyCytoEvents: LayoutHook = (
   }
 };
 
-export const centerView: LayoutHook = (cy: CytoCore): void => {
-  cy.animate({
-    fit: { eles: cy.nodes(), padding: CENTER_GRAPH_PADDING },
-    duration: ANIMATION_DURATION,
-  });
+export const centerViewOnRootNode: LayoutHook = (): void => {
+  viewportModule.centerOnRootNode().then();
 };
 
 export const DefaultPostLayoutHooks: LayoutHook[] = [
-  centerView,
+  centerViewOnRootNode,
   applyAutoMoveEvents,
   applyCytoEvents,
 ];

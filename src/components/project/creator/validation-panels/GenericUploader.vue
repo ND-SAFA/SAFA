@@ -4,6 +4,7 @@
       :noItemError="noItemError"
       :showError="projectFiles.length === 0"
       :isValidStates="isValidStates"
+      :defaultValidState="defaultValidState"
       @onAdd="isCreatorOpen = true"
       @onIsValid="$emit('onIsValid')"
       @onIsInvalid="$emit('onIsInvalid')"
@@ -65,6 +66,10 @@ export default Vue.extend({
       type: String,
       default: "No entities have been created.",
     },
+    defaultValidState: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -78,9 +83,6 @@ export default Vue.extend({
     },
     panels(): IGenericFilePanel<ArtifactMap, ValidFileTypes>[] {
       return this.uploader.panels;
-    },
-    isValid(): boolean {
-      return this.panels.filter((p) => !p.projectFile.isValid).length === 0;
     },
     projectFiles(): ProjectFile[] {
       return this.uploader.panels.map((p) => p.projectFile);
@@ -114,15 +116,6 @@ export default Vue.extend({
     addFile(payload: string | TraceLink): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("onChange", this.panels.concat([newPanel]));
-    },
-  },
-  watch: {
-    isValid(): void {
-      if (this.isValid) {
-        this.$emit("onIsValid");
-      } else {
-        this.$emit("onIsInvalid");
-      }
     },
   },
 });

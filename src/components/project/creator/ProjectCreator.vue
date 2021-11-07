@@ -46,6 +46,7 @@
           <GenericUploader
             :uploader="traceUploader"
             :artifactMap="artifactMap"
+            :defaultValidState="true"
             noItemError="No trace links have been defined."
             @onChange="traceUploader.panels = $event"
             @onIsValid="setStepIsValid(2, true)"

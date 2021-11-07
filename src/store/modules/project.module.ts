@@ -198,6 +198,15 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * Returns whether project is defined
+   *
+   * @returns Boolean representing whether project is defined.
+   */
+  get isProjectDefined(): boolean {
+    return this.project.projectId !== "";
+  }
+
+  /**
    * @return The current project artifacts.
    */
   get getArtifacts(): Artifact[] {

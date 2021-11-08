@@ -1,4 +1,4 @@
-export const errorMessages = [
+export const testErrors = [
   "could not execute statement; SQL [n/a]; constraint [UK4mx1w6ngc9kks13gf0jn07ipf]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement",
   "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:276)",
   "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:233)",

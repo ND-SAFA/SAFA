@@ -3,7 +3,12 @@
 </template>
 
 <script lang="ts">
-import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
+import {
+  deltaModule,
+  errorModule,
+  artifactSelectionModule,
+  projectModule,
+} from "@/store";
 import {
   Artifact,
   ArtifactWarning,
@@ -57,11 +62,14 @@ export default Vue.extend({
     },
   },
   computed: {
+    selectedArtifact(): Artifact | undefined {
+      return artifactSelectionModule.getSelectedArtifact;
+    },
     selectedSubtree(): string[] {
       return artifactSelectionModule.getSelectedSubtree;
     },
     isSelected(): boolean {
-      const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
+      const selectedArtifact = this.selectedArtifact;
       return (
         selectedArtifact !== undefined &&
         selectedArtifact.name === this.artifactDefinition.name

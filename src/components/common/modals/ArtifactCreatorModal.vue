@@ -36,15 +36,21 @@
   </GenericModal>
 </template>
 <script lang="ts">
-import Vue from "vue";
-import { createNewArtifact, isArtifactNameTaken } from "@/api";
+import Vue, { PropType } from "vue";
+import { createOrUpdateArtifact, isArtifactNameTaken } from "@/api";
 import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { Artifact } from "@/types";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType, ListMenuDefinition } from "@/types";
 import { appModule, projectModule } from "@/store";
+import { createOrUpdateArtifactHandler } from "@/api/handlers/artifact-edit-handler";
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
-
+const EMPTY_ARTIFACT: Artifact = {
+  type: "",
+  name: "",
+  summary: "",
+  body: "",
+};
 export default Vue.extend({
   components: { GenericModal, ButtonRow },
   props: {
@@ -52,26 +58,26 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    artifact: {
+      type: Object as PropType<Artifact>,
+      required: false,
+      default: () => EMPTY_ARTIFACT,
+    },
   },
   data() {
     return {
-      name: "",
-      summary: "",
-      body: "",
+      name: this.artifact.name,
+      summary: this.artifact.summary,
+      body: this.artifact.body,
+      type: this.artifact.type,
       isLoading: false,
-      isValid: false,
-      isNameValid: false,
+      isNameValid: this.artifact.name !== "",
       nameHint: DEFAULT_NAME_HINT,
       nameError: "",
       buttonDefinitions: [] as ButtonDefinition[],
-      type: "",
     };
   },
   computed: {
-    aggregate(): string {
-      return this.name + this.summary + this.body + this.type;
-    },
-
     projectId(): string {
       return projectModule.getProject.projectId;
     },
@@ -80,6 +86,9 @@ export default Vue.extend({
     },
     artifactTypes(): string[] {
       return projectModule.getArtifactTypes;
+    },
+    isValid(): boolean {
+      return this.isNameValid && this.body !== "" && this.type !== "";
     },
   },
   watch: {
@@ -101,19 +110,13 @@ export default Vue.extend({
         }
       });
     },
-    aggregate(): void {
-      if (this.isNameValid && this.body !== "" && this.type !== "") {
-        this.isValid = true;
-      } else {
-        this.isValid = false;
-      }
-    },
   },
   methods: {
     setButtonDefinitions(): void {
+      const label = this.type !== "" ? this.type : "Artifact Type";
       const menuItem: ListMenuDefinition = {
         type: ButtonType.LIST_MENU,
-        label: "Artifact Type",
+        label,
         menuItems: this.artifactTypes,
         menuHandlers: this.artifactTypes.map(
           (type) => () => (this.type = type)
@@ -137,7 +140,7 @@ export default Vue.extend({
         appModule.onWarning("Please select a project version.");
         return;
       }
-      createNewArtifact(this.versionId, artifact)
+      createOrUpdateArtifactHandler(this.versionId, artifact)
         .then(() => {
           this.$emit("onClose");
         })

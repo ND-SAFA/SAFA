@@ -8,6 +8,7 @@ import { PanelType } from "@/types";
 import { enableDrawMode } from "@/cytoscape/edge-handles";
 import { EventObject } from "cytoscape";
 import { Artifact, ArtifactData } from "@/types";
+import { deleteArtifactHandler } from "@/api/handlers/artifact-edit-handler";
 
 export const contextMenuOptions = {
   // Customize event to bring up the context menu
@@ -17,44 +18,67 @@ export const contextMenuOptions = {
   // A menu item must have either onClickFunction or submenu or both
   menuItems: [
     {
-      id: "add-node",
+      id: "add-artifact",
       content: "Add Artifact",
       tooltipText: "Create new artifact",
-      selector: "node",
+      selector: "node, edge",
       coreAsWell: true,
-      onClickFunction: (): void =>
-        appModule.openPanel(PanelType.artifactCreator),
-    },
-    {
-      id: "view-artifact",
-      content: "View Artifact",
-      tooltipText: "View Artifact",
-      selector: "node",
-      coreAsWell: true,
-      onClickFunction: (thing: EventObject): void => {
-        handleOnClick(thing, async (artifact: Artifact) => {
-          artifactSelectionModule.selectArtifact(artifact);
-          appModule.openPanel(PanelType.left);
-        });
-      },
-    },
-    {
-      id: "view-artifact-subtree",
-      content: "View Subtree",
-      tooltipText: "View Subtree",
-      selector: "node",
-      coreAsWell: true,
-      onClickFunction: (thing: EventObject): void => {
-        handleOnClick(thing, viewportModule.viewArtifactSubtree);
+      onClickFunction: () => {
+        if (projectModule.isProjectDefined) {
+          appModule.openPanel(PanelType.artifactCreator);
+        } else {
+          appModule.onWarning("Please select a project to create artifacts.");
+        }
       },
     },
     {
       id: "add-link",
       content: "Add Link",
       tooltipText: "Create new trace link",
-      selector: "edge",
+      selector: "node",
       coreAsWell: true,
-      onClickFunction: (): void => enableDrawMode(),
+      onClickFunction: (): void => {
+        if (projectModule.isProjectDefined) {
+          enableDrawMode();
+        } else {
+          appModule.onWarning("Please select a project to create trace links.");
+        }
+      },
+    },
+    {
+      id: "view-artifact",
+      content: "View Artifact",
+      tooltipText: "View Artifact",
+      selector: "node",
+      coreAsWell: false,
+      onClickFunction: (thing: EventObject): void => {
+        handleOnClick(thing, async (artifact: Artifact) => {
+          artifactSelectionModule.selectArtifact(artifact);
+        }).then();
+      },
+    },
+    {
+      id: "delete-artifact",
+      content: "Delete Artifact",
+      tooltipText: "Delete Artifact",
+      selector: "node",
+      coreAsWell: false,
+      onClickFunction: (thing: EventObject): void => {
+        handleOnClick(thing, async (artifact: Artifact) => {
+          const projectId = projectModule.getProject.projectId;
+          deleteArtifactHandler(projectId, artifact.name).then();
+        }).then();
+      },
+    },
+    {
+      id: "view-artifact-subtree",
+      content: "Highlight Subtree",
+      tooltipText: "View Subtree",
+      selector: "node",
+      coreAsWell: false,
+      onClickFunction: (thing: EventObject): void => {
+        handleOnClick(thing, viewportModule.viewArtifactSubtree).then();
+      },
     },
   ],
   // css classes that menu items will have

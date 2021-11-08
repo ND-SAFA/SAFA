@@ -43,8 +43,6 @@ export default class ViewportModule extends VuexModule {
    */
   async viewArtifactSubtree(artifact: Artifact): Promise<void> {
     const artifactsInSubtree = await getArtifactSubTree(artifact);
-
-    appModule.openPanel(PanelType.left);
     artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({

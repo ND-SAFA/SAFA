@@ -3,6 +3,9 @@
     <v-container v-if="selectedArtifact !== undefined">
       <h3 class="text-center">
         {{ selectedArtifact.name }}
+        <v-btn icon small @click="onArtifactEdit">
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
       </h3>
       <v-divider />
       <p class="text-body-1 mt-2 pa-2">
@@ -10,19 +13,22 @@
       </p>
       <v-divider class="mb-1" />
       <v-row>
-        <v-col class="mr-1" cols="5" v-if="parents.length > 0">
-          <h4>Parents</h4>
-          <v-btn
-            fab
-            x-small
-            class="ma-2"
-            color="primary"
-            v-for="parentName in parents"
-            :key="parentName"
-            @click="onArtifactClick(parentName)"
-          >
-            {{ parentName }}
-          </v-btn>
+        <v-col class="mr-1" cols="5">
+          <v-container v-if="parents.length > 0">
+            <h4>Parents</h4>
+            <v-btn
+              fab
+              x-small
+              class="ma-2"
+              color="primary"
+              v-for="parentName in parents"
+              :key="parentName"
+              @click="onArtifactClick(parentName)"
+            >
+              {{ parentName }}
+            </v-btn>
+          </v-container>
+          <p v-else>No parents linked.</p>
         </v-col>
 
         <v-col cols="5" v-if="children.length > 0">
@@ -50,25 +56,55 @@
           {{ selectedArtifactWarnings }}
         </p>
       </v-row>
+      <v-row>
+        <v-divider />
+      </v-row>
+      <v-row justify="center">
+        <v-btn icon fab color="error" @click="onDeleteArtifact">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </v-row>
+      <ArtifactCreatorModal
+        :is-open="isArtifactCreatorOpen"
+        :artifact="selectedArtifact"
+        @onClose="isArtifactCreatorOpen = false"
+      />
     </v-container>
     <p v-else>No artifact selected</p>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Artifact, ProjectWarnings } from "@/types";
+import { Artifact, PanelType, ProjectWarnings } from "@/types";
 import Vue from "vue";
-import { errorModule, artifactSelectionModule, projectModule } from "@/store";
+import {
+  appModule,
+  artifactSelectionModule,
+  errorModule,
+  projectModule,
+} from "@/store";
+import ArtifactCreatorModal from "@/components/common/modals/ArtifactCreatorModal.vue";
+import { deleteArtifactHandler } from "@/api/handlers/artifact-edit-handler";
 
 export default Vue.extend({
+  components: { ArtifactCreatorModal },
   data() {
     return {
       previousArtifact: undefined as Artifact | undefined,
+      isArtifactCreatorOpen: false,
     };
   },
   computed: {
+    selectedArtifact(): Artifact | undefined {
+      return artifactSelectionModule.getSelectedArtifact;
+    },
+    selectedArtifactName(): string | undefined {
+      return this.selectedArtifact === undefined
+        ? undefined
+        : this.selectedArtifact.name;
+    },
     parents(): string[] {
-      const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
+      const selectedArtifact = this.selectedArtifact;
       if (selectedArtifact !== undefined) {
         const traceLinks = projectModule.getTraceLinks;
         const query = traceLinks.filter(
@@ -80,19 +116,16 @@ export default Vue.extend({
       }
     },
     children(): string[] {
-      const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
-      if (selectedArtifact !== undefined) {
+      const selectedArtifactName = this.selectedArtifactName;
+      if (selectedArtifactName !== undefined) {
         const traceLinks = projectModule.getTraceLinks;
         const query = traceLinks.filter(
-          (l) => l.target === selectedArtifact.name
+          (l) => l.target === selectedArtifactName
         );
         return query.map((l) => l.source);
       } else {
         return [];
       }
-    },
-    selectedArtifact(): Artifact | undefined {
-      return artifactSelectionModule.getSelectedArtifact;
     },
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
@@ -108,10 +141,23 @@ export default Vue.extend({
     },
   },
   methods: {
+    onArtifactEdit(): void {
+      this.isArtifactCreatorOpen = true;
+    },
     onArtifactClick(artifactName: string): void {
       const artifactQuery = projectModule.getArtifactByName(artifactName);
       if (artifactQuery !== undefined) {
         artifactSelectionModule.selectArtifact(artifactQuery);
+      }
+    },
+    onDeleteArtifact(): void {
+      if (this.selectedArtifact !== undefined) {
+        const { projectId } = projectModule.getProject;
+        const artifactName = this.selectedArtifact.name;
+        deleteArtifactHandler(projectId, artifactName).then(() => {
+          artifactSelectionModule.UNSELECT_ARTIFACT();
+          appModule.closePanel(PanelType.left);
+        });
       }
     },
   },

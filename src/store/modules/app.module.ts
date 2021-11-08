@@ -96,6 +96,7 @@ export default class ProjectModule extends VuexModule {
    * @param message - The error message encountered.
    */
   onError(message: string): void {
+    console.error(message);
     this.SET_MESSAGE({ message, type: MessageType.ERROR, errors: [] });
   }
 
@@ -155,14 +156,6 @@ export default class ProjectModule extends VuexModule {
    * @param panel - The type of panel.
    */
   openPanel(panel: PanelType): void {
-    if (
-      panel === PanelType.artifactCreator &&
-      projectModule.getProject.projectId === ""
-    ) {
-      this.onWarning("Cannot create an artifact until a project is selected.");
-      return;
-    }
-
     this.SET_PANEL_STATE({
       type: panel,
       isOpen: true,

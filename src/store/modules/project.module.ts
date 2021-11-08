@@ -9,7 +9,13 @@ import type {
   ArtifactQueryFunction,
 } from "@/types";
 import { LinkValidator } from "@/types";
-import { appModule, deltaModule, errorModule, viewportModule } from "@/store";
+import {
+  appModule,
+  artifactSelectionModule,
+  deltaModule,
+  errorModule,
+  viewportModule,
+} from "@/store";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -100,6 +106,14 @@ export default class ProjectModule extends VuexModule {
    */
   addOrUpdateArtifacts(artifacts: Artifact[]): void {
     this.ADD_OR_UPDATE_ARTIFACTS(artifacts);
+    const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
+
+    if (selectedArtifact !== undefined) {
+      const query = artifacts.filter((a) => a.name === selectedArtifact.name);
+      if (query.length > 0) {
+        artifactSelectionModule.selectArtifact(query[0]);
+      }
+    }
   }
 
   @Action
@@ -150,6 +164,18 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * Deletes given artifact.
+   *
+   * @param artifact - The artifact to remove.
+   */
+  DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
+    this.project.artifacts = this.project.artifacts.filter(
+      (a) => a.name !== artifactName
+    );
+  }
+
+  @Mutation
+  /**
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.
@@ -167,6 +193,15 @@ export default class ProjectModule extends VuexModule {
    */
   get getProject(): Project {
     return this.project;
+  }
+
+  /**
+   * Returns whether project is defined
+   *
+   * @returns Boolean representing whether project is defined.
+   */
+  get isProjectDefined(): boolean {
+    return this.project.projectId !== "";
   }
 
   /**

@@ -1,7 +1,25 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { projectModule } from "@/store";
 import type { APIErrorBody, PanelState, SnackbarMessage } from "@/types";
-import { MessageType, PanelType } from "@/types";
+import {
+  ConfirmationType,
+  ConfirmDialogueMessage,
+  MessageType,
+  PanelType,
+} from "@/types";
+
+const emptySnackbarMessage = {
+  errors: [],
+  message: "",
+  type: MessageType.CLEAR,
+};
+
+const emptyConfirmationMessage = {
+  type: ConfirmationType.CLEAR,
+  title: "",
+  body: "",
+  statusCallback: () => null,
+};
 
 @Module({ namespaced: true, name: "app" })
 /**
@@ -11,11 +29,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * The current snackbar message.
    */
-  private snackbarMessage: SnackbarMessage = {
-    errors: [],
-    message: "",
-    type: MessageType.CLEAR,
-  };
+  private snackbarMessage: SnackbarMessage = emptySnackbarMessage;
   /**
    * Whether the app is currently loading.
    */
@@ -36,6 +50,12 @@ export default class ProjectModule extends VuexModule {
    * Whether the artifact creator is open.
    */
   private isArtifactCreatorOpen = false;
+
+  /**
+   * Whether the confirmation modal is open.
+   */
+  private confirmationMessage: ConfirmDialogueMessage =
+    emptyConfirmationMessage;
 
   @Action
   /**
@@ -251,6 +271,24 @@ export default class ProjectModule extends VuexModule {
     }
   }
 
+  @Mutation
+  /**
+   * Shows message in confirmation box to user, returns whether confirmed or not.
+   *
+   */
+  SET_CONFIRMATION_MESSAGE(message: ConfirmDialogueMessage): void {
+    this.confirmationMessage = message;
+  }
+
+  @Mutation
+  /**
+   * Shows message in confirmation box to user, returns whether confirmed or not.
+   *
+   */
+  CLEAR_CONFIRMATION_MESSAGE(): void {
+    this.confirmationMessage = emptyConfirmationMessage;
+  }
+
   /**
    * @return Whether the app is currently loading.
    */
@@ -291,5 +329,12 @@ export default class ProjectModule extends VuexModule {
    */
   get getIsErrorDisplayOpen(): boolean {
     return this.isErrorDisplayOpen;
+  }
+
+  /**
+   * @return Whether the artifact creator is open.
+   */
+  get getConfirmationMessage(): ConfirmDialogueMessage | undefined {
+    return this.confirmationMessage;
   }
 }

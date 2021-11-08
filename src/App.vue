@@ -17,6 +17,7 @@
       :isOpen="isArtifactCreatorOpen"
       @onClose="closeArtifactCreator"
     />
+    <GenericConfirmDialog :message="confirmationMessage" />
   </v-app>
 </template>
 
@@ -28,12 +29,14 @@ import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
 import AppBar from "@/components/navigation/AppBar.vue";
 import ArtifactCreator from "@/components/common/modals/ArtifactCreatorModal.vue";
 
-import { PanelType } from "@/types";
+import { ConfirmDialogueMessage, PanelType } from "@/types";
 import { appModule } from "@/store";
+import GenericConfirmDialog from "@/components/common/modals/AppConfirmModal.vue";
 
 export default Vue.extend({
   name: "App",
   components: {
+    GenericConfirmDialog,
     AppBar,
     Snackbar,
     LeftNavDrawer,
@@ -49,6 +52,9 @@ export default Vue.extend({
     },
     isArtifactCreatorOpen(): boolean {
       return appModule.getIsArtifactCreatorOpen;
+    },
+    confirmationMessage(): ConfirmDialogueMessage | undefined {
+      return appModule.getConfirmationMessage;
     },
   },
   methods: {

@@ -76,15 +76,6 @@
       <v-row v-if="currentStep === 4" justify="center">
         <v-btn color="secondary" @click="saveProject()">Create Project</v-btn>
       </v-row>
-      <v-row>
-        <GenericConfirmDialog
-          :isOpen="isConfirmOpen"
-          title="Project In Progress"
-          body="Closing panel will delete any progress you have made."
-          @onSubmit="onConfirmClose"
-          @onClose="isConfirmOpen = false"
-        />
-      </v-row>
     </template>
   </GenericStepperModal>
 </template>
@@ -93,18 +84,19 @@
 import Vue from "vue";
 import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
 import {
+  Artifact,
+  ConfirmationType,
+  Project,
+  ProjectCreationResponse,
   StepState,
   TraceFile,
-  ProjectCreationResponse,
   TraceLink,
-  Artifact,
-  Project,
 } from "@/types";
 import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
 import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api";
-import { projectModule } from "@/store";
-import GenericConfirmDialog from "@/components/common/generic/GenericConfirmDialog.vue";
+import { appModule, projectModule } from "@/store";
+import GenericConfirmDialog from "@/components/common/modals/AppConfirmModal.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
 import ArtifactTypeCreatorModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
 import { createArtifactUploader } from "@/components/project/creator/definitions/artifact-uploader";
@@ -158,6 +150,16 @@ export default Vue.extend({
       this.traceUploader = createTraceUploader();
     },
     onClose() {
+      appModule.SET_CONFIRMATION_MESSAGE({
+        type: ConfirmationType.INFO,
+        title: "Project In Progress",
+        body: "Closing panel will delete any progress you have made.",
+        statusCallback: (status: boolean) => {
+          if (status) {
+            this.$emit("onClose");
+          }
+        },
+      });
       this.isConfirmOpen = true;
     },
     saveProject(): void {
@@ -173,7 +175,6 @@ export default Vue.extend({
     },
     onConfirmClose(): void {
       this.isConfirmOpen = false;
-      this.$emit("onClose");
     },
   },
   computed: {

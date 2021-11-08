@@ -42,6 +42,7 @@ export enum PanelType {
   right,
   artifactCreator,
   errorDisplay,
+  confirmationModal,
 }
 
 /**
@@ -109,3 +110,18 @@ export type ArtifactQueryFunction = (q: string) => Artifact | undefined;
  * Returns whether a link exists from the given source to the given target ID.
  */
 export type LinkValidator = (sourceId: string, targetId: string) => boolean;
+
+/**
+ * Defines a title and message for a confirmation dialog.
+ */
+export interface ConfirmDialogueMessage {
+  type: ConfirmationType;
+  title: string;
+  body: string;
+  statusCallback: (status: boolean) => void;
+}
+
+export enum ConfirmationType {
+  INFO = "info",
+  CLEAR = "clear",
+}

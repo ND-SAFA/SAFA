@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-row>
-      <v-expansion-panels :value="0">
+      <v-expansion-panels>
         <slot name="panels" />
       </v-expansion-panels>
     </v-row>
-    <v-row justify="center" class="mt-5">
+    <v-row justify="center">
       <v-container>
         <v-row
           v-if="showError"
@@ -15,7 +15,7 @@
         >
           <label>{{ noItemError }}</label>
         </v-row>
-        <v-row justify="center">
+        <v-row justify="center" class="mt-5">
           <v-btn @click="$emit('onAdd')" small fab color="secondary">
             <v-icon> mdi-plus </v-icon>
           </v-btn>

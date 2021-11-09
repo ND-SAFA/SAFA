@@ -3,8 +3,8 @@
     <v-row>Create a new project</v-row>
     <template v-slot:items>
       <v-stepper-content step="1">
-        <v-container class="pa-10">
-          <ProjectCreator
+        <v-container>
+          <ProjectIdentifierInput
             v-bind:name.sync="name"
             v-bind:description.sync="description"
           />
@@ -12,7 +12,7 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <v-container class="pa-10">
+        <v-container>
           <GenericUploader
             :uploader="artifactUploader"
             :artifactMap="artifactMap"
@@ -34,7 +34,7 @@
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <v-container class="pa-10">
+        <v-container>
           <GenericUploader
             :uploader="traceUploader"
             :artifactMap="artifactMap"
@@ -59,7 +59,17 @@
 
       <v-stepper-content step="4">
         <v-container class="pa-10">
-          <ProjectConfirmation @onConfirm="saveProject" :project="project" />
+          <v-row>
+            <ProjectConfirmation @onConfirm="saveProject" :project="project" />
+          </v-row>
+          <v-row>
+            <v-divider />
+          </v-row>
+          <v-row v-if="currentStep === 4" justify="center" class="mt-5">
+            <v-btn color="secondary" @click="saveProject()">
+              Create Project
+            </v-btn>
+          </v-row>
         </v-container>
       </v-stepper-content>
     </template>
@@ -70,14 +80,13 @@
 import Vue from "vue";
 import {
   Artifact,
-  ConfirmationType,
   Project,
   ProjectCreationResponse,
   StepState,
   TraceFile,
   TraceLink,
 } from "@/types";
-import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
+import ProjectIdentifierInput from "@/components/project/shared/ProjectIdentifierInput.vue";
 import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
@@ -87,11 +96,14 @@ import { createArtifactUploader } from "@/components/project/creator/definitions
 import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
 import { createTraceUploader } from "@/components/project/creator/definitions/trace-uploader";
 import GenericStepper from "@/components/common/generic/GenericStepper.vue";
+import router, { Routes } from "@/router";
+
+const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
 export default Vue.extend({
   components: {
     GenericStepper,
-    ProjectCreator,
+    ProjectIdentifierInput,
     GenericUploader,
     ProjectConfirmation,
     ArtifactTypeCreatorModal,
@@ -100,7 +112,7 @@ export default Vue.extend({
   data() {
     return {
       steps: [
-        ["Name Project", false],
+        [PROJECT_IDENTIFIER_STEP_NAME, false],
         ["Upload Artifacts", false],
         ["Upload Trace Links", true],
         ["View TIM", false],
@@ -124,25 +136,14 @@ export default Vue.extend({
       this.artifactUploader = createArtifactUploader();
       this.traceUploader = createTraceUploader();
     },
-    onClose() {
-      appModule.SET_CONFIRMATION_MESSAGE({
-        type: ConfirmationType.INFO,
-        title: "Project In Progress",
-        body: "Closing panel will delete any progress you have made.",
-        statusCallback: (status: boolean) => {
-          if (status) {
-            this.$emit("onClose");
-          }
-        },
-      });
-      this.isConfirmOpen = true;
-    },
+
     saveProject(): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
         .then((projectCreationResponse: ProjectCreationResponse) => {
           projectModule.setProjectCreationResponse(projectCreationResponse);
-          this.$emit("onClose");
+          router.push(Routes.HOME);
+          this.clearData();
         })
         .finally(() => {
           appModule.SET_IS_LOADING(false);
@@ -193,14 +194,18 @@ export default Vue.extend({
     },
   },
   watch: {
-    currentStep(nextStep: number): void {
-      if (nextStep >= 2) {
+    currentStep(stepNumber: number): void {
+      if (stepNumber === 1) {
+        const hasName = this.name !== "";
+        Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
+      }
+      if (stepNumber === 2) {
         Vue.set(this.steps, 0, [this.name, true]);
       }
     },
     name(): void {
-      const isFirstStepValid = this.name !== "";
-      Vue.set(this.steps, 0, [this.name, isFirstStepValid]);
+      const hasName = this.name !== "";
+      Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
     },
   },
 });

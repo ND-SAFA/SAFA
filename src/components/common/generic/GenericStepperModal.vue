@@ -12,6 +12,7 @@
         v-model="currentStep"
         :steps="steps"
         @onReset="$emit('onReset')"
+        @onSubmit="$emit('onSubmit')"
       >
         <template v-slot:items>
           <slot name="items" />

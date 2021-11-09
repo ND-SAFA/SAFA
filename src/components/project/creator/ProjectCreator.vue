@@ -1,10 +1,5 @@
 <template>
-  <GenericStepper
-    v-model="currentStep"
-    :steps="steps"
-    @onReset="clearData"
-    @onClose="onClose"
-  >
+  <GenericStepper v-model="currentStep" :steps="steps" @onReset="clearData">
     <v-row>Create a new project</v-row>
     <template v-slot:items>
       <v-stepper-content step="1">
@@ -67,12 +62,6 @@
           <ProjectConfirmation @onConfirm="saveProject" :project="project" />
         </v-container>
       </v-stepper-content>
-    </template>
-
-    <template v-slot:action:main>
-      <v-row v-if="currentStep === 4" justify="center">
-        <v-btn color="secondary" @click="saveProject()">Create Project</v-btn>
-      </v-row>
     </template>
   </GenericStepper>
 </template>

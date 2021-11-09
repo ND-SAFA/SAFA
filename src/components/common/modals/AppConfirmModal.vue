@@ -8,9 +8,7 @@
     <template v-slot:body>{{ body }}</template>
     <template v-slot:actions>
       <v-row justify="center">
-        <v-btn outlined text color="primary" @click="onConfirm">
-          I accept
-        </v-btn>
+        <v-btn outlined color="primary" @click="onConfirm"> I accept </v-btn>
       </v-row>
     </template>
   </GenericModal>

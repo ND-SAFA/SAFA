@@ -1,14 +1,11 @@
 <template>
-  <GenericStepperModal
+  <GenericStepper
     v-model="currentStep"
-    title="Create a New Project"
-    size="l"
     :steps="steps"
-    :isOpen="isOpen"
-    :isLoading="isLoading"
     @onReset="clearData"
     @onClose="onClose"
   >
+    <v-row>Create a new project</v-row>
     <template v-slot:items>
       <v-stepper-content step="1">
         <v-container class="pa-10">
@@ -77,12 +74,11 @@
         <v-btn color="secondary" @click="saveProject()">Create Project</v-btn>
       </v-row>
     </template>
-  </GenericStepperModal>
+  </GenericStepper>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
 import {
   Artifact,
   ConfirmationType,
@@ -96,29 +92,21 @@ import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.v
 import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import GenericConfirmDialog from "@/components/common/modals/AppConfirmModal.vue";
 import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
 import ArtifactTypeCreatorModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
 import { createArtifactUploader } from "@/components/project/creator/definitions/artifact-uploader";
 import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
 import { createTraceUploader } from "@/components/project/creator/definitions/trace-uploader";
+import GenericStepper from "@/components/common/generic/GenericStepper.vue";
 
 export default Vue.extend({
-  name: "project-creator-modal",
   components: {
-    GenericStepperModal,
+    GenericStepper,
     ProjectCreator,
     GenericUploader,
     ProjectConfirmation,
-    GenericConfirmDialog,
     ArtifactTypeCreatorModal,
     TraceFileCreator,
-  },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
   },
   data() {
     return {
@@ -131,7 +119,6 @@ export default Vue.extend({
       name: "",
       description: "",
       currentStep: 1,
-      isLoading: false,
       isConfirmOpen: false,
       traceUploader: createTraceUploader(),
       artifactUploader: createArtifactUploader(),
@@ -145,7 +132,6 @@ export default Vue.extend({
       this.name = "";
       this.description = "";
       this.currentStep = 1;
-      this.isLoading = false;
       this.artifactUploader = createArtifactUploader();
       this.traceUploader = createTraceUploader();
     },
@@ -163,14 +149,14 @@ export default Vue.extend({
       this.isConfirmOpen = true;
     },
     saveProject(): void {
-      this.isLoading = true;
+      appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
         .then((projectCreationResponse: ProjectCreationResponse) => {
           projectModule.setProjectCreationResponse(projectCreationResponse);
           this.$emit("onClose");
         })
         .finally(() => {
-          this.isLoading = false;
+          appModule.SET_IS_LOADING(false);
         });
     },
     onConfirmClose(): void {
@@ -218,11 +204,6 @@ export default Vue.extend({
     },
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
-    },
     currentStep(nextStep: number): void {
       if (nextStep >= 2) {
         Vue.set(this.steps, 0, [this.name, true]);

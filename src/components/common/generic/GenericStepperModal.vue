@@ -4,50 +4,19 @@
     :isOpen="isOpen"
     :isLoading="isLoading"
     :size="size"
+    :actionsHeight="0"
     @onClose="$emit('onClose')"
   >
     <template v-slot:body>
       <GenericStepper
         v-model="currentStep"
-        :isOpen="isOpen"
-        :stepNames="stepNames"
+        :steps="steps"
         @onReset="$emit('onReset')"
       >
         <template v-slot:items>
           <slot name="items" />
         </template>
       </GenericStepper>
-    </template>
-    <template v-slot:actions>
-      <v-container class="ma-0 pa-0">
-        <v-row class="ma-0">
-          <v-col cols="4" align-self="center">
-            <v-btn v-if="currentStep > 1" @click="onStepBack" fab small>
-              <v-icon id="upload-button">mdi-arrow-left</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="4">
-            <slot name="action:main" />
-          </v-col>
-          <v-col cols="4" align-self="center">
-            <v-row justify="end">
-              <v-btn
-                v-if="isStepDone"
-                @click="onStepForward"
-                fab
-                small
-                :color="currentStep === numberOfSteps ? 'secondary' : undefined"
-              >
-                <v-icon id="upload-button">{{
-                  currentStep === numberOfSteps
-                    ? "mdi-check"
-                    : "mdi-arrow-right"
-                }}</v-icon>
-              </v-btn>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
     </template>
   </GenericModal>
 </template>
@@ -66,7 +35,6 @@ export default Vue.extend({
   },
   props: {
     value: {
-      //curent step
       type: Number,
       required: true,
       default: 1,
@@ -94,25 +62,7 @@ export default Vue.extend({
       default: "m",
     },
   },
-  methods: {
-    onStepBack(): void {
-      this.currentStep--;
-    },
-    onStepForward(): void {
-      if (this.currentStep === this.numberOfSteps) {
-        this.$emit("onSubmit");
-      } else {
-        this.currentStep++;
-      }
-    },
-  },
   computed: {
-    isStepDone(): boolean {
-      return this.steps[this.value - 1][1];
-    },
-    numberOfSteps(): number {
-      return this.steps.length;
-    },
     currentStep: {
       get(): number {
         return this.value;
@@ -120,9 +70,6 @@ export default Vue.extend({
       set(newStep: number): void {
         this.$emit("input", newStep);
       },
-    },
-    stepNames(): string[] {
-      return this.steps.map((step) => step[0]);
     },
   },
   watch: {

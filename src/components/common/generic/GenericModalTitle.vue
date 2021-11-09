@@ -1,20 +1,23 @@
 <template>
   <v-row justify="space-between" class="pb-1">
     <label>{{ title }}</label>
-    <v-tooltip bottom>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn @click="$emit('onClose')" icon v-bind="attrs" v-on="on">
-          <v-icon id="close-button">mdi-close</v-icon>
-        </v-btn>
+    <GenericIconButton tooltip="Close" @onClick="$emit('onClose')">
+      <template v-slot:icon>
+        <v-icon id="close-button">mdi-close</v-icon>
       </template>
-      <span>Close</span>
-    </v-tooltip>
+    </GenericIconButton>
   </v-row>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { GenericIconButton } from "@/components";
+
 export default Vue.extend({
+  name: "generic-modal-title",
+  components: {
+    GenericIconButton,
+  },
   props: {
     title: {
       type: String,

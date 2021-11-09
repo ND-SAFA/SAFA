@@ -3,7 +3,7 @@
  */
 export enum ThemeColors {
   primary = "#00304c",
-  secondary = "#EEBC3D",
+  secondary = "#FFD740",
   accent = "#006aff",
 
   menuHighlight = "#f0f0f0",

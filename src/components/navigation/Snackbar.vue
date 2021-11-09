@@ -38,7 +38,6 @@ import Vue from "vue";
 import { MessageType, PanelType, SnackbarMessage } from "@/types";
 import { appModule } from "@/store";
 import ServerErrorModal from "@/components/common/modals/ServerErrorModal.vue";
-import { testErrors } from "@/test-data/test-errors";
 
 export default Vue.extend({
   name: "snackbar",
@@ -48,17 +47,11 @@ export default Vue.extend({
   props: {
     timeout: Number,
   },
-  // data: () => ({
-  //   showSnackbar: false,
-  //   snackbarMessage: "",
-  //   messageType: MessageType.CLEAR,
-  //   errors: [] as string[],
-  // }),
   data: () => ({
-    showSnackbar: true,
-    snackbarMessage: "Error!",
-    messageType: MessageType.ERROR,
-    errors: testErrors as string[],
+    showSnackbar: false,
+    snackbarMessage: "",
+    messageType: MessageType.CLEAR,
+    errors: [] as string[],
   }),
   methods: {
     showMessage(snackbarMessage: SnackbarMessage) {

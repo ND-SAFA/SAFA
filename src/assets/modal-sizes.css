@@ -1,45 +1,45 @@
 @media screen and (min-height: 200px) {
   .modal-xxs {
-    min-height: 150px;
+    /*min-height: 150px;*/
     width: 250px;
   }
   .modal-xs {
-    min-height: 200px;
+    /*min-height: 200px;*/
     width: 300px;
   }
   .modal-s {
-    min-height: 300px;
+    /*min-height: 300px;*/
     width: 400px;
   }
   .modal-m {
-    min-height: 500px;
+    /*min-height: 500px;*/
     width: 600px;
   }
   .modal-l {
-    min-height: 550px !important;
+    /*min-height: 550px !important;*/
     width: 800px !important;
   }
 }
 
 @media screen and (min-height: 800px) {
   .modal-xxs {
-    min-height: 150px;
+    /*min-height: 150px;*/
     width: 250px;
   }
   .modal-xs {
-    min-height: 200px;
+    /*min-height: 200px;*/
     width: 300px;
   }
   .modal-s {
-    min-height: 300px;
+    /*min-height: 300px;*/
     width: 400px;
   }
   .modal-m {
-    min-height: 500px;
+    /*min-height: 500px;*/
     width: 600px;
   }
   .modal-l {
-    min-height: 800px !important ;
+    /*min-height: 800px !important;*/
     width: 800px !important;
   }
 }

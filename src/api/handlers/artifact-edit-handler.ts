@@ -1,5 +1,11 @@
-import { Artifact, TraceApproval, TraceLink } from "@/types";
-import { appModule, projectModule } from "@/store";
+import {
+  Artifact,
+  ConfirmationType,
+  PanelType,
+  TraceApproval,
+  TraceLink,
+} from "@/types";
+import { appModule, artifactSelectionModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/link-api";
 import { createOrUpdateArtifact, deleteArtifact } from "@/api";
 
@@ -36,11 +42,17 @@ export function deleteArtifactHandler(
   artifactName: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    deleteArtifact(projectId, artifactName)
-      .then(() => {
-        projectModule.DELETE_ARTIFACT_BY_NAME(artifactName);
-        resolve();
-      })
-      .catch(reject);
+    appModule.SET_CONFIRMATION_MESSAGE({
+      type: ConfirmationType.INFO,
+      title: `Delete ${artifactName}?`,
+      body: `Deleting this artifact cannot be undone in this version of SAFA.`,
+      statusCallback: () =>
+        deleteArtifact(projectId, artifactName)
+          .then(() => {
+            projectModule.DELETE_ARTIFACT_BY_NAME(artifactName);
+            resolve();
+          })
+          .catch(reject),
+    });
   });
 }

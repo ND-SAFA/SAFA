@@ -1,5 +1,4 @@
 <template>
-  <!--  <button-row :definitions="definitions" justify="center" />-->
   <v-row class="ma-0 pa-0" justify="center">
     <v-col
       v-for="definition in definitions"
@@ -11,11 +10,8 @@
           :tooltip="definition.label"
           @onClick="definition.handler"
           color="secondary"
-        >
-          <template v-slot:icon>
-            <v-icon>{{ definition.icon }}</v-icon>
-          </template>
-        </GenericIconButton>
+          :icon-id="definition.icon"
+        />
       </v-row>
     </v-col>
   </v-row>

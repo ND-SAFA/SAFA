@@ -14,12 +14,10 @@
               "
               color="secondary"
               @onClick="onLeftPanelClick"
-            >
-              <template v-slot:icon>
-                <v-icon v-if="isLeftOpen">mdi-arrow-left</v-icon>
-                <v-icon v-else>mdi-information-outline</v-icon>
-              </template>
-            </GenericIconButton>
+              :icon-id="
+                isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
+              "
+            />
           </v-col>
           <v-col cols="4">
             <GraphNavIcons />
@@ -32,12 +30,8 @@
                 "
                 color="secondary"
                 @onClick="onRightPanelClick"
-              >
-                <template v-slot:icon>
-                  <v-icon v-if="isRightOpen">mdi-arrow-right</v-icon>
-                  <v-icon v-else>mdi-family-tree</v-icon>
-                </template>
-              </GenericIconButton>
+                :iconId="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+              />
             </v-row>
           </v-col>
         </v-row>

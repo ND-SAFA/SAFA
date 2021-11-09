@@ -8,7 +8,7 @@
         v-on="on"
         :color="color"
       >
-        <slot name="icon" />
+        <v-icon>{{ iconId }}</v-icon>
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -22,6 +22,10 @@ export default Vue.extend({
   name: "generic-icon-button",
   props: {
     tooltip: {
+      type: String,
+      required: true,
+    },
+    iconId: {
       type: String,
       required: true,
     },

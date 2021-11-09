@@ -1,11 +1,11 @@
 <template>
   <v-row justify="space-between" class="pb-1">
     <label>{{ title }}</label>
-    <GenericIconButton tooltip="Close" @onClick="$emit('onClose')">
-      <template v-slot:icon>
-        <v-icon id="close-button">mdi-close</v-icon>
-      </template>
-    </GenericIconButton>
+    <GenericIconButton
+      tooltip="Close"
+      @onClick="$emit('onClose')"
+      icon-id="mdi-close"
+    />
   </v-row>
 </template>
 

@@ -7,14 +7,15 @@
     @onClose="onClose"
   >
     <template v-slot:body>
-      <code
-        v-for="(error, errorIndex) in errors"
-        :key="errorIndex"
-        justify="left"
-      >
-        <b>{{ errorIndex }}:</b>
-        <p>{{ error }}</p>
-      </code>
+      <v-list disabled>
+        <v-list-item v-for="(error, errorIndex) in errors" :key="errorIndex">
+          <v-list-item-content class="pa-0">
+            <code class="word-break-all">
+              {{ error }}
+            </code>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
     </template>
   </GenericModal>
 </template>

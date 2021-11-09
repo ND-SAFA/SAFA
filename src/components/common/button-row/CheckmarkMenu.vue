@@ -25,9 +25,9 @@
 </template>
 
 <script lang="ts">
-import { MENU_HIGHLIGHT_COLOR } from "@/cytoscape/styles/config/theme";
 import { ButtonDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { ThemeColors } from "@/util";
 
 export default Vue.extend({
   props: {
@@ -35,7 +35,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      hoverColor: MENU_HIGHLIGHT_COLOR,
+      hoverColor: ThemeColors.menuHighlight,
     };
   },
 });

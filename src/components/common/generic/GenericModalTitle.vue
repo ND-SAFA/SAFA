@@ -1,9 +1,14 @@
 <template>
-  <v-row justify="space-between">
+  <v-row justify="space-between" class="pb-1">
     <label>{{ title }}</label>
-    <v-btn @click="$emit('onClose')" icon>
-      <v-icon id="close-button">mdi-close</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn @click="$emit('onClose')" icon v-bind="attrs" v-on="on">
+          <v-icon id="close-button">mdi-close</v-icon>
+        </v-btn>
+      </template>
+      <span>Close</span>
+    </v-tooltip>
   </v-row>
 </template>
 

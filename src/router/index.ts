@@ -5,6 +5,7 @@ import TraceLinks from "@/views/ApproveLinksView.vue";
 import { Routes } from "./routes";
 import ErrorPage from "@/views/ErrorPageView.vue";
 import { appModule, projectModule } from "@/store";
+import ProjectCreator from "@/components/project/creator/ProjectCreator.vue";
 
 export { Routes };
 
@@ -20,6 +21,11 @@ const routes: Array<RouteConfig> = [
     path: Routes.TRACE_LINK,
     name: "Trace Links",
     component: TraceLinks,
+  },
+  {
+    path: Routes.PROJECT_CREATOR,
+    name: "Project Creator",
+    component: ProjectCreator,
   },
   {
     path: Routes.ERROR,

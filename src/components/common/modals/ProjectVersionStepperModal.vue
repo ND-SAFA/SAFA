@@ -14,7 +14,7 @@
       <slot name="beforeItems" />
 
       <v-stepper-content :step="projectStep">
-        <v-container class="pa-10">
+        <v-container>
           <ProjectSelector
             :isOpen="isOpen"
             @onProjectSelected="selectProject"
@@ -24,7 +24,7 @@
       </v-stepper-content>
 
       <v-stepper-content :step="versionStep">
-        <v-container class="pl-10 pr-10 pt-0 pb-0">
+        <v-container>
           <VersionSelector
             v-if="selectedProject !== undefined"
             :isOpen="isOpen"

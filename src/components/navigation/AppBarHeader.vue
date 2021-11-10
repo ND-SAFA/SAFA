@@ -25,10 +25,6 @@
       :isOpen="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
-    <ProjectCreatorModal
-      :isOpen="createProjectOpen"
-      @onClose="createProjectOpen = false"
-    />
   </v-container>
 </template>
 
@@ -41,8 +37,6 @@ import { ButtonDefinition, ButtonType } from "@/types";
 import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
 import router, { Routes } from "@/router";
 import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
-import ProjectCreatorModal from "@/components/project/creator/ProjectCreator.vue";
-import { appModule } from "@/store";
 
 export default Vue.extend({
   components: {
@@ -51,13 +45,11 @@ export default Vue.extend({
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
-    ProjectCreatorModal,
   },
   data() {
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
-      createProjectOpen: false,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
@@ -68,9 +60,6 @@ export default Vue.extend({
     onOpenProject(): void {
       this.openProjectOpen = true;
     },
-    onCreateProject(): void {
-      this.createProjectOpen = true;
-    },
   },
 
   created() {
@@ -79,7 +68,10 @@ export default Vue.extend({
         type: ButtonType.LIST_MENU,
         label: "Project",
         menuItems: ["Create Project", "Open Project"],
-        menuHandlers: [this.onCreateProject, this.onOpenProject],
+        menuHandlers: [
+          () => router.push(Routes.PROJECT_CREATOR),
+          this.onOpenProject,
+        ],
       },
       {
         type: ButtonType.LIST_MENU,

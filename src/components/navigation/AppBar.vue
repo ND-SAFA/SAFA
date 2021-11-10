@@ -9,9 +9,7 @@
         <v-row>
           <v-col cols="4">
             <GenericIconButton
-              :tooltip="
-                isLeftOpen ? 'Close artifact details' : 'Open artifact details'
-              "
+              :tooltip="leftPanelTooltip"
               color="secondary"
               @onClick="onLeftPanelClick"
               :icon-id="
@@ -25,9 +23,7 @@
           <v-col cols="4">
             <v-row justify="end" class="ma-0 pa-0">
               <GenericIconButton
-                :tooltip="
-                  isRightOpen ? 'Close graph options' : 'Open graph options'
-                "
+                :tooltip="rightPanelTooltip"
                 color="secondary"
                 @onClick="onRightPanelClick"
                 :iconId="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
@@ -71,6 +67,14 @@ export default Vue.extend({
   computed: {
     isLoading(): boolean {
       return appModule.getIsLoading;
+    },
+    leftPanelTooltip(): string {
+      return this.isLeftOpen
+        ? "Close artifact details"
+        : "Open artifact details";
+    },
+    rightPanelTooltip(): string {
+      return this.isRightOpen ? "Close graph options" : "Open graph options";
     },
   },
   methods: {

@@ -15,7 +15,7 @@
         <v-row justify="end" class="ma-0 pa-0">
           <v-btn
             v-if="hasErrors"
-            color="secondary"
+            :color="messageColor"
             @click="onSeeErrorClick"
             class="ma-0"
           >
@@ -50,7 +50,7 @@ export default Vue.extend({
   data: () => ({
     showSnackbar: false,
     snackbarMessage: "",
-    messageType: "info",
+    messageType: MessageType.CLEAR,
     errors: [] as string[],
   }),
   methods: {

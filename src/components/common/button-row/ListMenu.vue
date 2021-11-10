@@ -30,9 +30,9 @@
 </template>
 
 <script lang="ts">
-import { MENU_HIGHLIGHT_COLOR } from "@/cytoscape/styles/config/theme";
 import { ListMenuDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { ThemeColors } from "@/util";
 
 const DEFAULT_BUTTON_COLOR = "secondary";
 const DEFAULT_ITEM_COLOR = "primary";
@@ -49,7 +49,7 @@ export default Vue.extend({
   data() {
     return {
       hover: true,
-      hoverColor: MENU_HIGHLIGHT_COLOR,
+      hoverColor: ThemeColors.menuHighlight,
       selectedValue: "",
     };
   },

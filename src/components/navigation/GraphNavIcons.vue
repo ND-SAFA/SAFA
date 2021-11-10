@@ -1,10 +1,24 @@
 <template>
-  <button-row :definitions="definitions" justify="center" />
+  <v-row class="ma-0 pa-0" justify="center">
+    <v-col
+      v-for="definition in definitions"
+      :key="definition.label"
+      :cols="12 / definitions.length"
+    >
+      <v-row justify="center">
+        <GenericIconButton
+          :tooltip="definition.label"
+          @onClick="definition.handler"
+          color="secondary"
+          :icon-id="definition.icon"
+        />
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import { Artifact } from "@/types";
 import { capitalize } from "@/util";
@@ -13,10 +27,11 @@ import {
   projectModule,
   viewportModule,
 } from "@/store";
+import { GenericIconButton } from "@/components";
 
 export default Vue.extend({
   components: {
-    ButtonRow,
+    GenericIconButton,
   },
   data() {
     return {

@@ -75,8 +75,8 @@
 </template>
 
 <script lang="ts">
-import { Artifact, PanelType, ProjectWarnings } from "@/types";
 import Vue from "vue";
+import { Artifact, PanelType, ProjectWarnings } from "@/types";
 import {
   appModule,
   artifactSelectionModule,
@@ -84,7 +84,7 @@ import {
   projectModule,
 } from "@/store";
 import ArtifactCreatorModal from "@/components/common/modals/ArtifactCreatorModal.vue";
-import { deleteArtifactHandler } from "@/api/handlers/artifact-edit-handler";
+import { deleteArtifactHandler } from "@/api";
 
 export default Vue.extend({
   components: { ArtifactCreatorModal },

@@ -8,7 +8,7 @@ import { PanelType } from "@/types";
 import { enableDrawMode } from "@/cytoscape/edge-handles";
 import { EventObject } from "cytoscape";
 import { Artifact, ArtifactData } from "@/types";
-import { deleteArtifactHandler } from "@/api/handlers/artifact-edit-handler";
+import { deleteArtifactHandler } from "@/api";
 
 export const contextMenuOptions = {
   // Customize event to bring up the context menu

@@ -1,12 +1,5 @@
-import {
-  Artifact,
-  ConfirmationType,
-  PanelType,
-  TraceApproval,
-  TraceLink,
-} from "@/types";
-import { appModule, artifactSelectionModule, projectModule } from "@/store";
-import { approveLink, declineLink } from "@/api/link-api";
+import { Artifact, ConfirmationType } from "@/types";
+import { appModule, projectModule } from "@/store";
 import { createOrUpdateArtifact, deleteArtifact } from "@/api";
 
 /**
@@ -14,7 +7,6 @@ import { createOrUpdateArtifact, deleteArtifact } from "@/api";
  *
  * @param versionId - The version that the artifact is stored within.
  * @param artifact - The artifact to create.
- *
  */
 export function createOrUpdateArtifactHandler(
   versionId: string,
@@ -35,7 +27,6 @@ export function createOrUpdateArtifactHandler(
  *
  * @param projectId - The project whose artifact is going to be deleted.
  * @param artifactName - The name of the artifact to delete.
- *
  */
 export function deleteArtifactHandler(
   projectId: string,

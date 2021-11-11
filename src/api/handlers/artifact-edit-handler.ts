@@ -37,13 +37,16 @@ export function deleteArtifactHandler(
       type: ConfirmationType.INFO,
       title: `Delete ${artifactName}?`,
       body: `Deleting this artifact cannot be undone in this version of SAFA.`,
-      statusCallback: () =>
-        deleteArtifact(projectId, artifactName)
-          .then(() => {
-            projectModule.DELETE_ARTIFACT_BY_NAME(artifactName);
-            resolve();
-          })
-          .catch(reject),
+      statusCallback: (isConfirmed: boolean) => {
+        if (isConfirmed) {
+          deleteArtifact(projectId, artifactName)
+            .then(() => {
+              projectModule.DELETE_ARTIFACT_BY_NAME(artifactName);
+              resolve();
+            })
+            .catch(reject);
+        }
+      },
     });
   });
 }

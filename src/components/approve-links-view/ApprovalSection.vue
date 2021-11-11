@@ -3,10 +3,10 @@
     <v-row justify="center">
       <h2>{{ title }}</h2>
     </v-row>
-    <SectionControls @open-all="openAll" @close-all="closeAll" />
+    <section-controls @open-all="openAll" @close-all="closeAll" />
     <v-row class="pt-5">
       <v-expansion-panels multiple v-model="openLinks">
-        <TraceLinkExpansionPanel
+        <trace-link-expansion-panel
           v-for="link in links"
           :key="link.traceLinkId"
           :link="link"

@@ -1,12 +1,12 @@
 <template>
-  <GenericModal
+  <generic-modal
     title="Approve Link"
     :is-open="isOpen"
     :actions-height="0"
     @onClose="$emit('close')"
   >
     <template v-slot:body>
-      <TraceLinkDisplay
+      <trace-link-display
         :link="link"
         :source-body="link.sourceBody"
         :target-body="link.targetBody"
@@ -16,7 +16,7 @@
         @decline-link="onDeclineLink"
       />
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">
@@ -36,6 +36,7 @@ import { TraceLinkDisplay, GenericModal } from "@/components";
  * @emits `close` - On close.
  */
 export default Vue.extend({
+  name: "trace-link-approval-modal",
   components: { GenericModal, TraceLinkDisplay },
   props: {
     isOpen: {

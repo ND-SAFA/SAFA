@@ -2,8 +2,8 @@
   <v-menu offset-y bottom :rounded="false">
     <template v-slot:activator="{ on }">
       <v-btn
+        outlined
         :text="buttonIsText"
-        small
         :color="buttonColor"
         v-on="on"
         :disabled="disabled"

@@ -1,45 +1,35 @@
 <template>
-  <GenericModal
-    title="Create Trace Links"
-    :isOpen="isOpen"
-    @onClose="$emit('onClose')"
-    size="s"
+  <v-row
+    v-if="isOpen"
+    align="center"
+    class="mx-auto my-3"
+    style="max-width: 30em"
   >
-    <template v-slot:body>
-      <v-container>
-        <v-row>
-          <v-col align-self="center">
-            <ButtonRow :definitions="[sourceDefinition]"
-          /></v-col>
-          <v-col align-self="center">
-            <v-row justify="center">
-              <v-icon>mdi-arrow-right</v-icon>
-            </v-row>
-          </v-col>
-          <v-col align-self="center">
-            <ButtonRow :definitions="[targetDefinition]" />
-          </v-col>
+    <v-row>
+      <v-col align-self="center">
+        <ButtonRow :definitions="[sourceDefinition]"
+      /></v-col>
+      <v-col align-self="center">
+        <v-row justify="center">
+          <v-icon>mdi-arrow-right</v-icon>
         </v-row>
-      </v-container>
-    </template>
-
-    <template v-slot:actions>
-      <v-row justify="center">
-        <v-btn @click="onSubmit" small color="primary">Create</v-btn>
-      </v-row>
-    </template>
-  </GenericModal>
+      </v-col>
+      <v-col align-self="center">
+        <ButtonRow :definitions="[targetDefinition]" />
+      </v-col>
+    </v-row>
+    <v-btn @click="onSubmit" color="primary" class="ml-10"> Create </v-btn>
+  </v-row>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, TraceFile } from "@/types";
 import { appModule } from "@/store";
-import { GenericModal, ButtonRow } from "@/components";
+import { ButtonRow } from "@/components";
 
 export default Vue.extend({
   components: {
-    GenericModal,
     ButtonRow,
   },
   props: {

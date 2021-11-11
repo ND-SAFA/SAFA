@@ -54,7 +54,7 @@ export default Vue.extend({
     actionsHeight: {
       type: Number,
       required: false,
-      default: 75,
+      default: 50,
     },
     isLoading: {
       type: Boolean,

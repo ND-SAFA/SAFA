@@ -23,7 +23,8 @@
 import Vue, { PropType } from "vue";
 import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch, FilePanel } from "@/components";
+import { GenericSwitch } from "@/components/common";
+import FilePanel from "./FilePanel.vue";
 
 export default Vue.extend({
   components: {

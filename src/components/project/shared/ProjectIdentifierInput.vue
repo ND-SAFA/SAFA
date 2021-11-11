@@ -1,15 +1,11 @@
 <template>
-  <v-container class="mb-0 pb-0">
-    <v-row>
-      <v-text-field v-model="currentName" label="Project Name" required />
-    </v-row>
-    <v-row>
-      <v-text-field
-        v-model="currentDescription"
-        label="Project description"
-        required
-      />
-    </v-row>
+  <v-container class="mb-0 pb-0" style="max-width: 30em">
+    <v-text-field v-model="currentName" label="Project Name" required />
+    <v-text-field
+      v-model="currentDescription"
+      label="Project description"
+      required
+    />
   </v-container>
 </template>
 

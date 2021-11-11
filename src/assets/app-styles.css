@@ -27,10 +27,6 @@
   opacity: 0;
 }
 
-.generic-switch > .v-input__control > .v-input__slot {
-  flex-direction: row-reverse;
-}
-
 .word-break-all {
   word-break: break-all;
 }

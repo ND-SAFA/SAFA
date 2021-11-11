@@ -1,5 +1,6 @@
 <template>
   <v-file-input
+    label="File"
     small-chips
     :multiple="multiple"
     truncate-length="30"

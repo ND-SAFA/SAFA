@@ -14,9 +14,9 @@
       <v-stepper-content step="2">
         <v-container>
           <GenericUploader
+            itemName="artifact"
             :uploader="artifactUploader"
             :artifactMap="artifactMap"
-            noItemError="No artifact types have been defined."
             @onChange="artifactUploader.panels = $event"
             @onIsValid="setStepIsValid(1, true)"
             @onIsInvalid="setStepIsValid(1, false)"
@@ -36,10 +36,10 @@
       <v-stepper-content step="3">
         <v-container>
           <GenericUploader
+            itemName="trace link"
             :uploader="traceUploader"
             :artifactMap="artifactMap"
             :defaultValidState="true"
-            noItemError="No trace links have been defined."
             @onChange="traceUploader.panels = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"
@@ -69,7 +69,7 @@
             <v-divider />
           </v-row>
           <v-row v-if="currentStep === 4" justify="center" class="mt-5">
-            <v-btn color="secondary" @click="saveProject()">
+            <v-btn color="primary" @click="saveProject()">
               Create Project
             </v-btn>
           </v-row>
@@ -146,7 +146,7 @@ export default Vue.extend({
       saveOrUpdateProject(this.project)
         .then((projectCreationResponse: ProjectCreationResponse) => {
           projectModule.setProjectCreationResponse(projectCreationResponse);
-          router.push(Routes.HOME);
+          router.push(Routes.ARTIFACT_TREE);
           this.clearData();
         })
         .finally(() => {

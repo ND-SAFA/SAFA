@@ -1,70 +1,48 @@
 <template>
   <v-container>
-    <v-row>
-      <v-stepper v-model="currentStep" style="width: 100%" alt-labels>
-        <v-container>
-          <v-row>
-            <v-col cols="1" align-self="center">
-              <v-row justify="center">
-                <v-btn
-                  v-show="currentStep > 1"
-                  @click="onStepBack"
-                  fab
-                  icon
-                  outlined
-                  small
-                  color="primary"
-                >
-                  <v-icon id="upload-button">mdi-chevron-left</v-icon>
-                </v-btn>
-              </v-row>
-            </v-col>
-            <v-col cols="10">
-              <v-stepper-header>
-                <template v-for="(stepName, stepIndex) in stepNames">
-                  <v-stepper-step
-                    :complete="currentStep > stepIndex + 1"
-                    :step="stepIndex + 1"
-                    :key="stepIndex"
-                  >
-                    {{ stepName }}
-                  </v-stepper-step>
-                  <v-divider
-                    :key="`${stepName}-divider`"
-                    v-if="stepIndex < stepNames.length - 1"
-                  />
-                </template>
-              </v-stepper-header>
-            </v-col>
-            <v-col cols="1" align-self="center">
-              <v-row justify="center">
-                <v-btn
-                  v-if="isStepDone"
-                  @click="onStepForward"
-                  fab
-                  outlined
-                  icon
-                  small
-                  :color="
-                    currentStep === numberOfSteps ? 'secondary' : 'primary'
-                  "
-                >
-                  <v-icon id="upload-button">{{
-                    currentStep === numberOfSteps
-                      ? "mdi-check"
-                      : "mdi-chevron-right"
-                  }}</v-icon>
-                </v-btn>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-container>
+    <v-card outlined elevation="1">
+      <v-row>
+        <v-stepper v-model="currentStep" style="width: 100%" alt-labels>
+          <v-stepper-header>
+            <template v-for="(stepName, stepIndex) in stepNames">
+              <v-stepper-step
+                :complete="currentStep > stepIndex + 1"
+                :step="stepIndex + 1"
+                :key="stepIndex"
+                :editable="currentStep > stepIndex"
+              >
+                {{ stepName }}
+              </v-stepper-step>
+              <v-divider
+                :key="`${stepName}-divider`"
+                v-if="stepIndex < stepNames.length - 1"
+              />
+            </template>
+          </v-stepper-header>
 
-        <v-stepper-items>
-          <slot name="items" />
-        </v-stepper-items>
-      </v-stepper>
-    </v-row>
+          <v-stepper-items>
+            <slot name="items" />
+            <v-container>
+              <v-btn
+                :disabled="!isStepDone"
+                @click="onStepForward"
+                :color="currentStep === numberOfSteps ? 'secondary' : 'primary'"
+              >
+                {{ currentStep === numberOfSteps ? "Submit" : "Continue" }}
+              </v-btn>
+              <v-btn
+                text
+                @click="onStepBack"
+                :disabled="currentStep === 1"
+                color="primary"
+              >
+                Go Back
+              </v-btn>
+            </v-container>
+          </v-stepper-items>
+        </v-stepper>
+      </v-row>
+    </v-card>
   </v-container>
 </template>
 
@@ -90,7 +68,7 @@ export default Vue.extend({
       this.currentStep--;
     },
     onStepForward(): void {
-      if (this.currentStep === this.numberOfSteps) {
+      if (this.currentStep >= this.numberOfSteps) {
         this.$emit("onSubmit");
       } else {
         this.currentStep++;

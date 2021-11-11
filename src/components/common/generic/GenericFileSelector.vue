@@ -1,21 +1,28 @@
 <template>
   <v-file-input
-    label="File"
-    small-chips
-    :multiple="multiple"
-    truncate-length="30"
     clearable
     outlined
+    small-chips
+    label="File"
+    :multiple="multiple"
+    truncate-length="30"
     class="mt-3"
     @change="onChangeFiles"
-    @click:clear="$emit('onClear')"
+    @click:clear="$emit('clear')"
   />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+
+/**
+ * Displays a generic file selector.
+ *
+ * @emits-1 `clear` - On clear.
+ * @emits-2 `change-files` - On file change.
+ */
 export default Vue.extend({
-  name: "GenericFileSelector",
+  name: "generic-file-selector",
   props: {
     multiple: {
       type: Boolean,
@@ -25,7 +32,7 @@ export default Vue.extend({
   },
   methods: {
     onChangeFiles(files: File[]) {
-      this.$emit("onChangeFiles", files);
+      this.$emit("change-files", files);
     },
   },
 });

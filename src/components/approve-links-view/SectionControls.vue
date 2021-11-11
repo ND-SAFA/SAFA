@@ -29,8 +29,8 @@ import Vue from "vue";
 /**
  * Displays section controls.
  *
- * @emits `open-all` - On left button click.
- * @emits `close-all` - On right button click.
+ * @emits-1 `open-all` - On left button click.
+ * @emits-2 `close-all` - On right button click.
  */
 export default Vue.extend({
   name: "section-controls",

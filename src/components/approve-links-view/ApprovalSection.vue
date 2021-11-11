@@ -31,8 +31,8 @@ import SectionControls from "./SectionControls.vue";
 /**
  * Displays link approvals.
  *
- * @emits `approve-link` - On Link Approval.
- * @emits `decline-link` - On Link Decline.
+ * @emits-1 `approve-link` - On Link Approval.
+ * @emits-2 `decline-link` - On Link Decline.
  */
 export default Vue.extend({
   name: "approval-section",

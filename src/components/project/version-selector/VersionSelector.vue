@@ -1,34 +1,34 @@
 <template>
-  <GenericSelector
-    itemKey="versionId"
-    noDataText="Project contains no versions"
+  <generic-selector
+    item-key="versionId"
+    no-data-text="Project contains no versions"
     :headers="headers"
     :items="versions"
-    :isOpen="isOpen"
-    :isLoading="isLoading"
-    :hasEdit="false"
-    @onSelectItem="selectItem"
-    @onDeleteItem="deleteItem"
-    @onAddItem="addItem"
-    @onRefresh="refresh"
+    :is-open="isOpen"
+    :is-loading="isLoading"
+    :has-edit="false"
+    @select-item="selectItem"
+    @delete-item="deleteItem"
+    @add-item="addItem"
+    @refresh="refresh"
   >
     <template v-slot:addItemDialogue>
-      <VersionCreator
-        :isOpen="addVersionDialogue"
+      <version-creator
+        :is-open="addVersionDialogue"
         :project="project"
         @onClose="onCreatorClose"
         @onCreate="onVersionCreated"
       />
     </template>
     <template v-slot:deleteItemDialogue>
-      <ConfirmVersionDelete
+      <confirm-version-delete
         :version="versionToDelete"
-        :deleteDialogue="deleteVersionDialogue"
+        :delete-dialogue="deleteVersionDialogue"
         @onCancelDelete="cancelDelete"
         @onConfirmDelete="confirmDelete"
       />
     </template>
-  </GenericSelector>
+  </generic-selector>
 </template>
 
 <script lang="ts">

@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
+  <generic-modal
     :title="`Artifact Changes: ${name}`"
-    :isOpen="isOpen"
-    @onClose="$emit('onClose')"
-    :actionsHeight="0"
+    :is-open="isOpen"
+    :actions-height="0"
+    @close="$emit('onClose')"
   >
     <template v-slot:body>
       <v-container class="mt-5">
@@ -33,7 +33,7 @@
         />
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <ProjectVersionStepperModal
+  <project-version-stepper-modal
     v-model="currentStep"
     title="Select Baseline Project Version"
     :isOpen="isOpen"
@@ -45,11 +45,7 @@ export default Vue.extend({
         appModule.onWarning("Please select a baseline version");
       } else {
         getProjectVersion(this.selectedVersion.versionId)
-          .then(async (res) => {
-            await projectModule.setProjectCreationResponse(res);
-            this.isLoading = false;
-            this.$emit("onClose");
-          })
+          .then(projectModule.setProjectCreationResponse)
           .finally(() => {
             this.isLoading = false;
             this.$emit("onClose");

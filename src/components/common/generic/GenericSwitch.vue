@@ -5,7 +5,13 @@
 <script lang="ts">
 import Vue from "vue";
 
+/**
+ * Displays a generic switch.
+ *
+ * @emits `input` (boolean) - On input change.
+ */
 export default Vue.extend({
+  name: "generic-switch",
   props: {
     label: {
       type: String,

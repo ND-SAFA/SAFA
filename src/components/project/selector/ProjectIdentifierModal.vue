@@ -1,13 +1,13 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
+  <generic-modal
+    :is-open="isOpen"
     :title="title"
     size="s"
     :actionsHeight="50"
-    @onClose="onClose"
+    @close="onClose"
   >
     <template v-slot:body>
-      <ProjectIdentifierInput
+      <project-identifier-input
         v-bind:name.sync="name"
         v-bind:description.sync="description"
       />
@@ -21,7 +21,7 @@
         </v-row>
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

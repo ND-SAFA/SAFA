@@ -25,8 +25,8 @@ import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 /**
  * Displays trace links on a panel.
  *
- * @emits `approve-link` - On Link Approval.
- * @emits `decline-link` - On Link Decline.
+ * @emits-1 `approve-link` - On Link Approval.
+ * @emits-2 `decline-link` - On Link Decline.
  */
 export default Vue.extend({
   name: "trace-link-expansion-panel",

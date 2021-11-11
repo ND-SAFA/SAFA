@@ -1,5 +1,5 @@
 <template>
-  <GenericModal size="xs" :isOpen="isOpen" :title="title" @onClose="onCancel">
+  <generic-modal size="xs" :is-open="isOpen" :title="title" @close="onCancel">
     <template v-slot:body>
       <v-container>
         <v-row justify="center">
@@ -25,7 +25,7 @@
         </v-row>
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

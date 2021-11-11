@@ -3,7 +3,7 @@
     title="Approve Link"
     :is-open="isOpen"
     :actions-height="0"
-    @onClose="$emit('close')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <trace-link-display

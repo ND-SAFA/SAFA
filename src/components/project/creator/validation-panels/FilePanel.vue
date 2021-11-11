@@ -24,15 +24,15 @@
         </v-row>
 
         <v-row v-if="showFileUploader">
-          <GenericFileSelector
+          <generic-file-selector
             :multiple="false"
-            @onChangeFiles="emitChangeFiles"
+            @change-files="emitChangeFiles"
           />
         </v-row>
 
         <v-row justify="space-between" align="center" dense>
           <v-col>
-            <GenericSwitch
+            <generic-switch
               v-if="showFileUploader"
               v-model="ignoreErrors"
               label="Ignore Errors"
@@ -110,6 +110,7 @@ import { GenericSwitch, GenericFileSelector } from "@/components";
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
 export default Vue.extend({
+  name: "file-panel",
   components: {
     GenericSwitch,
     GenericFileSelector,

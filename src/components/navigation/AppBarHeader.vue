@@ -21,8 +21,8 @@
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
     />
-    <BaselineVersionModal
-      :isOpen="openProjectOpen"
+    <baseline-version-modal
+      :is-open="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
   </v-container>

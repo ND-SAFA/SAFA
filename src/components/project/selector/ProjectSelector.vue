@@ -1,43 +1,43 @@
 <template>
-  <GenericSelector
+  <generic-selector
     :headers="headers"
     :items="projects"
-    :isOpen="isOpen"
-    itemKey="projectId"
-    noDataText="No projects created."
-    :isLoading="isLoading"
-    @onEditItem="editItem"
-    @onSelectItem="selectItem"
-    @onDeleteItem="deleteItem"
-    @onAddItem="addItem"
-    @onRefresh="refresh"
+    :is-open="isOpen"
+    item-key="projectId"
+    no-data-text="No projects created."
+    :is-loading="isLoading"
+    @edit-item="editItem"
+    @select-item="selectItem"
+    @delete-item="deleteItem"
+    @add-item="addItem"
+    @refresh="refresh"
   >
     <template v-slot:editItemDialogue>
-      <ProjectIdentifierModal
+      <project-identifier-modal
         title="Edit Project"
-        :isOpen="editProjectDialogue"
+        :is-open="editProjectDialogue"
         :project="projectToEdit"
         @onSave="onUpdateProject"
         @onClose="onCloseProject"
       />
     </template>
     <template v-slot:addItemDialogue>
-      <ProjectIdentifierModal
+      <project-identifier-modal
         title="Create New Project"
-        :isOpen="addProjectDialogue"
+        :is-open="addProjectDialogue"
         @onSave="onSaveAddProject"
         @onClose="onCloseAddProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
-      <ConfirmProjectDelete
-        :isOpen="deleteProjectDialogue"
+      <confirm-project-delete
+        :is-open="deleteProjectDialogue"
         :project="projectToDelete"
         @onConfirmDelete="onConfirmProjectDelete"
         @onCancelDelete="onCancelDelete"
       />
     </template>
-  </GenericSelector>
+  </generic-selector>
 </template>
 
 <script lang="ts">

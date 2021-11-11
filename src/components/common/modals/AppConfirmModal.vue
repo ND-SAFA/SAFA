@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
+  <generic-modal
     size="xs"
     :isOpen="isMessageDefined"
     :title="title"
-    @onClose="onClose"
+    @close="onClose"
   >
     <template v-slot:body>{{ body }}</template>
     <template v-slot:actions>
@@ -11,7 +11,7 @@
         <v-btn outlined color="primary" @click="onConfirm"> I accept </v-btn>
       </v-row>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

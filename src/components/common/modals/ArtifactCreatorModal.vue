@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
+  <generic-modal
     title="Create New Artifact"
     :isOpen="isOpen"
     :isLoading="isLoading"
-    @onClose="$emit('onClose')"
+    @close="$emit('onClose')"
   >
     <template v-slot:body>
       <v-container>
@@ -33,7 +33,7 @@
         </v-btn>
       </v-row>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 <script lang="ts">
 import Vue, { PropType } from "vue";

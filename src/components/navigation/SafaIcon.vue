@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import router from "@/router";
+import router, { Routes } from "@/router";
 
 export default Vue.extend({
   name: "safa-icon",
@@ -24,7 +24,7 @@ export default Vue.extend({
   },
   methods: {
     onAvatarClick() {
-      router.push("/");
+      router.push(Routes.ARTIFACT_TREE);
     },
   },
 });

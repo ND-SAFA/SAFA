@@ -98,9 +98,9 @@ export default class ViewportModule extends VuexModule {
    *
    */
   async centerOnRootNode(): Promise<void> {
-    getRootNode().then((rootNode) =>
-      this.centerOnArtifacts([rootNode.data()?.id])
-    );
+    getRootNode()
+      .then((rootNode) => this.centerOnArtifacts([rootNode.data()?.id]))
+      .catch((e) => console.warn(e.message));
   }
 
   @Action

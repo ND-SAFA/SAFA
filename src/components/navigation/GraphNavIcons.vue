@@ -6,13 +6,14 @@
       :cols="12 / definitions.length"
     >
       <v-row justify="center">
-        <GenericIconButton
+        <generic-icon-button
           v-if="definition.handler"
           color="secondary"
           :tooltip="definition.label"
           :icon-id="definition.icon"
           @click="definition.handler"
         />
+        <CheckmarkMenu v-else :definition="definition" />
       </v-row>
     </v-col>
   </v-row>
@@ -27,11 +28,12 @@ import {
   projectModule,
   viewportModule,
 } from "@/store";
-import { GenericIconButton } from "@/components";
+import { GenericIconButton, CheckmarkMenu } from "@/components";
 
 export default Vue.extend({
   components: {
     GenericIconButton,
+    CheckmarkMenu,
   },
   data() {
     return {

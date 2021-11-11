@@ -146,7 +146,7 @@ export default Vue.extend({
       saveOrUpdateProject(this.project)
         .then((projectCreationResponse: ProjectCreationResponse) => {
           projectModule.setProjectCreationResponse(projectCreationResponse);
-          router.push(Routes.HOME);
+          router.push(Routes.ARTIFACT_TREE);
           this.clearData();
         })
         .finally(() => {

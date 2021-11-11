@@ -5,22 +5,22 @@
         <ArtifactNode
           v-for="artifact in artifacts"
           :key="artifact.name"
-          :artifactDefinition="artifact"
+          :artifact-definition="artifact"
           :opacity="getArtifactOpacity(artifact.name)"
         />
         <TraceLinkEdge
           v-for="traceLink in traces"
           :key="`${traceLink.source}-${traceLink.target}`"
-          :traceDefinition="traceLink"
-          @onRightClick="onLinkRightClick"
+          :trace-definition="traceLink"
+          @right-click="onLinkRightClick"
         />
       </template>
     </CytoscapeController>
     <TraceLinkApprovalModal
       v-if="selectedLink !== undefined"
-      :isOpen="isTraceModalOpen"
+      :is-open="isTraceModalOpen"
       :link="selectedLink"
-      @onClose="onTraceModalClose"
+      @close="onTraceModalClose"
     />
   </v-container>
 </template>

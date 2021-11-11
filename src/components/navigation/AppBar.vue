@@ -9,12 +9,12 @@
         <v-row>
           <v-col cols="4">
             <GenericIconButton
-              :tooltip="leftPanelTooltip"
               color="secondary"
-              @onClick="onLeftPanelClick"
+              :tooltip="leftPanelTooltip"
               :icon-id="
                 isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
               "
+              @click="onLeftPanelClick"
             />
           </v-col>
           <v-col cols="4">
@@ -23,10 +23,10 @@
           <v-col cols="4">
             <v-row justify="end" class="ma-0 pa-0">
               <GenericIconButton
-                :tooltip="rightPanelTooltip"
                 color="secondary"
-                @onClick="onRightPanelClick"
-                :iconId="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+                :tooltip="rightPanelTooltip"
+                :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+                @click="onRightPanelClick"
               />
             </v-row>
           </v-col>

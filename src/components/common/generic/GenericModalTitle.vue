@@ -3,7 +3,7 @@
     <label>{{ title }}</label>
     <GenericIconButton
       tooltip="Close"
-      @onClick="$emit('onClose')"
+      @click="$emit('onClose')"
       icon-id="mdi-close"
     />
   </v-row>

@@ -7,30 +7,30 @@
         :showDecline="true"
         :links="links"
         :artifacts="artifactHashmap"
-        @approveLink="onApproveLink"
-        @declineLink="onDeclineLink"
+        @approve-link="onApproveLink"
+        @decline-link="onDeclineLink"
       />
     </v-row>
     <v-row justify="center">
       <ApprovalSection
+        showApprove
         title="Declined Trace Links"
-        :showApprove="true"
         :showDecline="false"
+        :startOpen="false"
         :links="declinedLinks"
         :artifacts="artifactHashmap"
-        @approveLink="onApproveDeclinedLink"
-        :startOpen="false"
+        @approve-link="onApproveDeclinedLink"
       />
     </v-row>
     <v-row justify="center">
       <ApprovalSection
+        showDecline
         title="Approved Trace Links"
         :showApprove="false"
-        :showDecline="true"
+        :startOpen="false"
         :links="approvedLinks"
         :artifacts="artifactHashmap"
-        @declineLink="onDeclineApprovedLink"
-        :startOpen="false"
+        @decline-link="onDeclineApprovedLink"
       />
     </v-row>
   </v-container>
@@ -48,8 +48,8 @@ import { appModule, projectModule } from "@/store";
 import { ApprovalSection } from "@/components/approve-links-view";
 
 export default Vue.extend({
+  name: "approval-links-view",
   components: { ApprovalSection },
-  name: "trace-link-approval",
   data() {
     return {
       links: [] as TraceLink[],

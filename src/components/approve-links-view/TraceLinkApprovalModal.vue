@@ -1,19 +1,19 @@
 <template>
   <GenericModal
     title="Approve Link"
-    :isOpen="isOpen"
-    :actionsHeight="0"
-    @onClose="$emit('onClose')"
+    :is-open="isOpen"
+    :actions-height="0"
+    @onClose="$emit('close')"
   >
     <template v-slot:body>
       <TraceLinkDisplay
         :link="link"
-        :sourceBody="link.sourceBody"
-        :targetBody="link.targetBody"
-        :showApprove="canBeApproved"
-        :showDecline="canBeDeclined"
-        @approveLink="onApproveLink"
-        @declineLink="onDeclineLink"
+        :source-body="link.sourceBody"
+        :target-body="link.targetBody"
+        :show-approve="canBeApproved"
+        :show-decline="canBeDeclined"
+        @approve-link="onApproveLink"
+        @decline-link="onDeclineLink"
       />
     </template>
   </GenericModal>
@@ -30,6 +30,11 @@ import {
 import Vue, { PropType } from "vue";
 import { TraceLinkDisplay, GenericModal } from "@/components";
 
+/**
+ * Displays trace links on a panel.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   components: { GenericModal, TraceLinkDisplay },
   props: {
@@ -65,11 +70,11 @@ export default Vue.extend({
   methods: {
     onApproveLink(traceLink: TraceLink): void {
       approveLinkAPIHandler(traceLink, undefined);
-      this.$emit("onClose");
+      this.$emit("close");
     },
     onDeclineLink(traceLink: TraceLink): void {
       declineLinkAPIHandler(traceLink, undefined);
-      this.$emit("onClose");
+      this.$emit("close");
     },
   },
 });

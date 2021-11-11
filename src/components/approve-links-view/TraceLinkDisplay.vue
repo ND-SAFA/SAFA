@@ -17,7 +17,7 @@
         small
         color="error"
         class="ma-1"
-        @click="$emit('declineLink', link)"
+        @click="$emit('decline-link', link)"
       >
         <v-icon>mdi-close</v-icon> Decline
       </v-btn>
@@ -26,7 +26,7 @@
         small
         color="primary"
         class="ma-1"
-        @click="$emit('approveLink', link)"
+        @click="$emit('approve-link', link)"
       >
         <v-icon>mdi-check</v-icon>
         Approve
@@ -39,7 +39,14 @@
 import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
 
+/**
+ * Displays a trace link.
+ *
+ * @emits `approve-link` - On Link Approval.
+ * @emits `decline-link` - On Link Decline.
+ */
 export default Vue.extend({
+  name: "trace-link-display",
   props: {
     link: {
       type: Object as PropType<TraceLink>,

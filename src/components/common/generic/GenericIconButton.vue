@@ -18,6 +18,11 @@
 <script lang="ts">
 import Vue from "vue";
 
+/**
+ * A generic icon button.
+ *
+ * @emits `onClick` - On button click.
+ */
 export default Vue.extend({
   name: "generic-icon-button",
   props: {

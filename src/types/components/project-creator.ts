@@ -1,4 +1,10 @@
-import { Artifact, ArtifactFile, ProjectFile, TraceFile } from "@/types";
+import {
+  Artifact,
+  ArtifactFile,
+  ProjectFile,
+  TraceFile,
+  TraceLink,
+} from "@/types";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   title: string;
@@ -15,6 +21,8 @@ export interface IGenericUploader<Environment, T, F extends ProjectFile> {
 }
 
 export type ValidFileTypes = ArtifactFile | TraceFile;
+
+export type ValidPayloads = string | TraceLink;
 
 export type ArtifactMap = Record<string, Artifact>;
 

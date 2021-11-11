@@ -45,7 +45,6 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericStepperModal from "@/components/common/generic/GenericStepperModal.vue";
 import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
@@ -53,9 +52,10 @@ import {
   ProjectIdentifier,
   ProjectVersion,
 } from "@/types";
-import ProjectSelector from "@/components/project/selector/ProjectSelector.vue";
-import VersionSelector from "@/components/project/version-selector/VersionSelector.vue";
 import { versionToString } from "@/util";
+import { GenericStepperModal } from "@/components/common/generic";
+import { ProjectSelector } from "@/components/project/selector";
+import { VersionSelector } from "@/components/project/version-selector";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";

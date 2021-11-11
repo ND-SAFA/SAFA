@@ -1,3 +1,4 @@
+import { EventObject } from "cytoscape";
 import {
   appModule,
   artifactSelectionModule,
@@ -5,8 +6,7 @@ import {
   viewportModule,
 } from "@/store";
 import { PanelType } from "@/types";
-import { enableDrawMode } from "@/cytoscape/edge-handles";
-import { EventObject } from "cytoscape";
+import { enableDrawMode } from "@/cytoscape";
 import { Artifact, ArtifactData } from "@/types";
 import { deleteArtifactHandler } from "@/api";
 

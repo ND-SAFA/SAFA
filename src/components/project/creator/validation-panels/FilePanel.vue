@@ -115,9 +115,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 import { appModule } from "@/store";
-import GenericSwitch from "@/components/common/generic/GenericSwitch.vue";
+import { GenericSwitch, GenericFileSelector } from "@/components";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 

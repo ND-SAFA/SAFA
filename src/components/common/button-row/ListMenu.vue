@@ -30,8 +30,8 @@
 </template>
 
 <script lang="ts">
-import { ListMenuDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { ListMenuDefinition } from "@/types";
 import { ThemeColors } from "@/util";
 
 const DEFAULT_BUTTON_COLOR = "secondary";

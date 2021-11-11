@@ -77,14 +77,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { Artifact, PanelType, ProjectWarnings } from "@/types";
+import { deleteArtifactHandler } from "@/api";
 import {
   appModule,
   artifactSelectionModule,
   errorModule,
   projectModule,
 } from "@/store";
-import ArtifactCreatorModal from "@/components/common/modals/ArtifactCreatorModal.vue";
-import { deleteArtifactHandler } from "@/api";
+import { ArtifactCreatorModal } from "@/components";
 
 export default Vue.extend({
   components: { ArtifactCreatorModal },

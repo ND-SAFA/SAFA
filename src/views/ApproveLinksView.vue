@@ -43,9 +43,9 @@ import {
   declineLinkAPIHandler,
   getGeneratedLinks,
 } from "@/api";
-import ApprovalSection from "@/components/approve-links-view/ApprovalSection.vue";
 import { TraceApproval, TraceLink, Artifact } from "@/types";
 import { appModule, projectModule } from "@/store";
+import { ApprovalSection } from "@/components/approve-links-view";
 
 export default Vue.extend({
   components: { ApprovalSection },

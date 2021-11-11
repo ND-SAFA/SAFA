@@ -6,11 +6,11 @@
       :cols="12 / definitions.length"
     >
       <v-row :justify="justify">
-        <IconButtonItem
+        <IconButton
           v-if="definition.type === iconType"
           :definition="definition"
         />
-        <CheckmarkMenuItem
+        <CheckmarkMenu
           v-else-if="definition.type === checkmarkMenuType"
           :definition="definition"
         />
@@ -26,12 +26,12 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import IconButtonItem from "@/components/common/button-row/IconButton.vue";
-import CheckmarkMenuItem from "@/components/common/button-row/CheckmarkMenu.vue";
-import ListMenu from "@/components/common/button-row/ListMenu.vue";
+import IconButton from "./IconButton.vue";
+import CheckmarkMenu from "./CheckmarkMenu.vue";
+import ListMenu from "./ListMenu.vue";
 
 export default Vue.extend({
-  components: { IconButtonItem, CheckmarkMenuItem, ListMenu },
+  components: { IconButton, CheckmarkMenu, ListMenu },
   props: {
     definitions: Array as PropType<ButtonDefinition[]>,
     justify: {

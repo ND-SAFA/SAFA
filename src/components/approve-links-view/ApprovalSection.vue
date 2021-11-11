@@ -23,12 +23,13 @@
 </template>
 
 <script lang="ts">
-import TraceLinkExpansionPanel from "@/components/approve-links-view/TraceLinkExpansionPanel.vue";
-import SectionControls from "@/components/approve-links-view/SectionControls.vue";
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types";
-import { Artifact } from "@/types";
+import { TraceLink, Artifact } from "@/types";
+import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
+import SectionControls from "./TraceLinkExpansionPanel.vue";
+
 export default Vue.extend({
+  name: "ApprovalSection",
   components: { TraceLinkExpansionPanel, SectionControls },
   props: {
     title: String,

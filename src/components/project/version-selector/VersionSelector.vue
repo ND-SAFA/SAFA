@@ -34,12 +34,12 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion, DataItem } from "@/types";
-import GenericSelector from "@/components/common/generic/GenericSelector.vue";
 import { deleteProjectVersion, getProjectVersions } from "@/api";
-import VersionCreator from "@/components/project/version-selector/VersionCreator.vue";
-import ConfirmVersionDelete from "@/components/project/version-selector/ConfirmVersionDelete.vue";
-import { versionSelectorHeader } from "@/components/project/version-selector/headers";
 import { appModule } from "@/store";
+import { GenericSelector } from "@/components/common";
+import { versionSelectorHeader } from "./headers";
+import VersionCreator from "./VersionCreator.vue";
+import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
 
 export default Vue.extend({
   components: { GenericSelector, VersionCreator, ConfirmVersionDelete },

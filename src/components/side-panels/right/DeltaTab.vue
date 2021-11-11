@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
-      <DeltaStateNav />
+      <DeltaPanelNav />
       <DeltaButtonGroup
         v-if="isDeltaMode"
         deltaType="added"
@@ -45,16 +45,18 @@ import {
   DeltaArtifacts,
   Artifact,
 } from "@/types";
-import ArtifactDeltaDiff from "@/components/side-panels/right/delta-tab/ArtifactDeltaDiff.vue";
-import DeltaButtonGroup from "@/components/side-panels/right/delta-tab/DeltaButtonGroup.vue";
-import DeltaStateNav from "@/components/side-panels/right/delta-tab/DeltaPanelNav.vue";
 import Vue from "vue";
 import { deltaModule, projectModule } from "@/store";
+import {
+  DeltaPanelNav,
+  DeltaButtonGroup,
+  ArtifactDeltaDiff,
+} from "./delta-tab";
 
 type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
 
 export default Vue.extend({
-  components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaStateNav },
+  components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaPanelNav },
   data() {
     return {
       selectedDeltaArtifact: undefined as OptionalDeltaArtifact,

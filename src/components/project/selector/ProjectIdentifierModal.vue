@@ -7,7 +7,7 @@
     @onClose="onClose"
   >
     <template v-slot:body>
-      <ProjectCreator
+      <ProjectIdentifierInput
         v-bind:name.sync="name"
         v-bind:description.sync="description"
       />
@@ -25,15 +25,15 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier } from "@/types";
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
-import ProjectCreator from "@/components/project/shared/ProjectIdentifierInput.vue";
+import { ProjectIdentifier } from "@/types";
+import { GenericModal } from "@/components/common";
+import { ProjectIdentifierInput } from "@/components/project/shared";
 
 export default Vue.extend({
   components: {
     GenericModal,
-    ProjectCreator,
+    ProjectIdentifierInput,
   },
   props: {
     isOpen: {

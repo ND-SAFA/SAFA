@@ -10,7 +10,7 @@
       @onIsInvalid="$emit('onIsInvalid')"
     >
       <template v-slot:panels>
-        <GenericFilePanel
+        <FilePanelController
           v-for="(panel, i) in panels"
           :key="panel.title"
           :panel="panel"
@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ValidatedPanels from "@/components/project/creator/validation-panels/ValidatedPanels.vue";
 import {
   ArtifactMap,
   IGenericFilePanel,
@@ -40,16 +39,15 @@ import {
   ValidFileTypes,
   ProjectFile,
   TraceLink,
+  ValidPayloads,
 } from "@/types";
-import GenericFilePanel from "@/components/project/creator/validation-panels/FilePanelController.vue";
-
-const DEFAULT_VALID_STATE = false;
-type ValidPayloads = string | TraceLink;
+import FilePanelController from "./FilePanelController.vue";
+import ValidatedPanels from "./ValidatedPanels.vue";
 
 export default Vue.extend({
   components: {
     ValidatedPanels,
-    GenericFilePanel,
+    FilePanelController,
   },
   props: {
     artifactMap: {

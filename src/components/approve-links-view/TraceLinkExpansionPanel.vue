@@ -18,9 +18,10 @@
 </template>
 
 <script lang="ts">
-import { TraceLink } from "@/types";
 import Vue, { PropType } from "vue";
-import TraceLinkDisplay from "@/components/approve-links-view/TraceLinkDisplay.vue";
+import { TraceLink } from "@/types";
+import TraceLinkDisplay from "./TraceLinkDisplay.vue";
+
 export default Vue.extend({
   components: { TraceLinkDisplay },
   props: {

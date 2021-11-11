@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col align-self="center">
         <safa-icon />
-        Sorry, an error has occurred please refresh your broswer and try again.
+        Sorry, an error has occurred please refresh your browser and try again.
       </v-col>
     </v-row>
   </v-container>

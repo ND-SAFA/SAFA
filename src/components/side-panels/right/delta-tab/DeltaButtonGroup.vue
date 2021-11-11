@@ -18,10 +18,10 @@
 </template>
 
 <script lang="ts">
-import { ArtifactDelta, DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
-import ArtifactDeltaButton from "@/components/side-panels/right/delta-tab/ArtifactDeltaButton.vue";
+import { ArtifactDelta, DeltaType } from "@/types";
 import { capitalize } from "@/util";
+import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
 export default Vue.extend({
   components: { ArtifactDeltaButton },

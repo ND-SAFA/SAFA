@@ -9,10 +9,11 @@
   </v-container>
 </template>
 <script lang="ts">
+import Vue from "vue";
 import { Project } from "@/types";
 import { versionToString } from "@/util";
-import Vue from "vue";
 import { projectModule } from "@/store";
+
 export default Vue.extend({
   name: "version-label",
   data() {

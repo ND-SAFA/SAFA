@@ -66,10 +66,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //waiting for generics to be added to vue: https://github.com/vuejs/rfcs/pull/310
 import { DataItemProps, DataTableHeader } from "vuetify";
-import { PropType } from "vue";
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 
 export default Vue.extend({
+  name: "GenericSelector",
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

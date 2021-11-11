@@ -60,7 +60,10 @@
       <v-stepper-content step="4">
         <v-container class="pa-10">
           <v-row>
-            <ProjectConfirmation @onConfirm="saveProject" :project="project" />
+            <LeaveConfirmationModal
+              @onConfirm="saveProject"
+              :project="project"
+            />
           </v-row>
           <v-row>
             <v-divider />
@@ -86,17 +89,18 @@ import {
   TraceFile,
   TraceLink,
 } from "@/types";
-import ProjectIdentifierInput from "@/components/project/shared/ProjectIdentifierInput.vue";
-import ProjectConfirmation from "@/components/project/creator/modals/LeaveConfirmationModal.vue";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import GenericUploader from "@/components/project/creator/validation-panels/GenericUploader.vue";
-import ArtifactTypeCreatorModal from "@/components/project/creator/modals/ArtifactTypeCreatorModal.vue";
-import { createArtifactUploader } from "@/components/project/creator/definitions/artifact-uploader";
-import TraceFileCreator from "@/components/project/creator/modals/TraceFileCreator.vue";
-import { createTraceUploader } from "@/components/project/creator/definitions/trace-uploader";
-import GenericStepper from "@/components/common/generic/GenericStepper.vue";
 import router, { Routes } from "@/router";
+import { GenericStepper } from "@/components";
+import { ProjectIdentifierInput } from "@/components/project/shared";
+import { createTraceUploader, createArtifactUploader } from "./definitions";
+import {
+  TraceFileCreator,
+  ArtifactTypeCreatorModal,
+  LeaveConfirmationModal,
+} from "./modals";
+import { GenericUploader } from "./validation-panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -105,7 +109,7 @@ export default Vue.extend({
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
-    ProjectConfirmation,
+    LeaveConfirmationModal,
     ArtifactTypeCreatorModal,
     TraceFileCreator,
   },

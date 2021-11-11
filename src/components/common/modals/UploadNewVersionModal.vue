@@ -38,9 +38,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
-import GenericFileSelector from "@/components/common/generic/GenericFileSelector.vue";
 import { uploadNewProjectVersion } from "@/api";
-import ProjectVersionStepperModal from "@/components/common/modals/ProjectVersionStepperModal.vue";
+import { GenericFileSelector } from "@/components";
+import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 export default Vue.extend({
   name: "UploadNewVersionModal",

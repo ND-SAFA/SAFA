@@ -16,13 +16,15 @@ import nodeHtmlLabel from "cytoscape-node-html-label";
 import klay from "cytoscape-klay";
 import automove from "cytoscape-automove";
 import edgehandles from "cytoscape-edgehandles";
-import { contextMenuOptions } from "@/cytoscape/context-menu";
-import { resolveCy } from "@/cytoscape/cytoscape";
+import {
+  resolveCy,
+  contextMenuOptions,
+  edgeHandleOptions,
+  setEdgeHandlesCore,
+  GRAPH_CONFIG,
+} from "@/cytoscape";
 import { viewportModule } from "@/store";
-import { GRAPH_CONFIG } from "@/cytoscape/styles/config/graph";
 import { CytoCore } from "@/types";
-import { edgeHandleOptions } from "@/cytoscape/edge-handles/options";
-import { setEdgeHandlesCore } from "@/cytoscape/edge-handles";
 
 export default Vue.extend({
   data: () => {

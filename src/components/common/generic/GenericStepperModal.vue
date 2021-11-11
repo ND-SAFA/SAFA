@@ -24,9 +24,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
 import { ModalSize } from "@/types";
-import GenericStepper from "@/components/common/generic/GenericStepper.vue";
+import GenericModal from "./GenericModal.vue";
+import GenericStepper from "./GenericStepper.vue";
 
 export default Vue.extend({
   name: "generic-stepper-modal",

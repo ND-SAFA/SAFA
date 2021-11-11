@@ -27,17 +27,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData } from "@/types";
-import { Artifact } from "@/types";
-import ArtifactNode from "@/components/artifact-tree-view/ArtifactNode.vue";
-import TraceLinkEdge from "@/components/artifact-tree-view/TraceLinkEdge.vue";
-import TraceLinkApprovalModal from "@/components/approve-links-view/TraceLinkApprovalModal.vue";
-import CytoscapeController from "@/components/artifact-tree-view/CytoscapeController.vue";
+import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
 import {
   artifactSelectionModule,
   projectModule,
   viewportModule,
 } from "@/store";
+import { TraceLinkApprovalModal } from "@/components";
+import CytoscapeController from "./CytoscapeController.vue";
+import TraceLinkEdge from "./TraceLinkEdge.vue";
+import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
   name: "artifact-view",

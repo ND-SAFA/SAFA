@@ -13,35 +13,36 @@
     <Snackbar :timeout="5000" />
     <LeftNavDrawer :isLeftOpen="isLeftOpen" :width="250" />
     <RightNavDrawer :isRightOpen="isRightOpen" :width="325" />
-    <ArtifactCreator
+    <ArtifactCreatorModal
       :isOpen="isArtifactCreatorOpen"
       @onClose="closeArtifactCreator"
     />
-    <GenericConfirmDialog :message="confirmationMessage" />
+    <AppConfirmModal :message="confirmationMessage" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Snackbar from "@/components/navigation/Snackbar.vue";
-import LeftNavDrawer from "@/components/side-panels/left/LeftNavDrawer.vue";
-import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
-import AppBar from "@/components/navigation/AppBar.vue";
-import ArtifactCreator from "@/components/common/modals/ArtifactCreatorModal.vue";
-
 import { ConfirmDialogueMessage, PanelType } from "@/types";
 import { appModule } from "@/store";
-import GenericConfirmDialog from "@/components/common/modals/AppConfirmModal.vue";
+import {
+  AppBar,
+  Snackbar,
+  LeftNavDrawer,
+  RightNavDrawer,
+  ArtifactCreatorModal,
+  AppConfirmModal,
+} from "@/components";
 
 export default Vue.extend({
   name: "App",
   components: {
-    GenericConfirmDialog,
+    AppConfirmModal,
     AppBar,
     Snackbar,
     LeftNavDrawer,
     RightNavDrawer,
-    ArtifactCreator,
+    ArtifactCreatorModal,
   },
   computed: {
     isLeftOpen(): boolean {

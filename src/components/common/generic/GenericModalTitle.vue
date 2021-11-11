@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericIconButton } from "@/components";
+import GenericIconButton from "./GenericIconButton.vue";
 
 export default Vue.extend({
   name: "generic-modal-title",

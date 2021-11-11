@@ -1,11 +1,13 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
-import Home from "@/views/ArtifactTreeView.vue";
-import TraceLinks from "@/views/ApproveLinksView.vue";
 import { Routes } from "./routes";
-import ErrorPage from "@/views/ErrorPageView.vue";
 import { appModule, projectModule } from "@/store";
-import ProjectCreator from "@/components/project/creator/ProjectCreator.vue";
+import {
+  ErrorPageView,
+  ApproveLinksView,
+  ArtifactTreeView,
+  ProjectCreatorView,
+} from "@/views";
 
 export { Routes };
 
@@ -15,22 +17,27 @@ const routes: Array<RouteConfig> = [
   {
     path: Routes.HOME,
     name: "Home",
-    component: Home,
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.ARTIFACT_TREE,
+    name: "Artifact Tree",
+    component: ArtifactTreeView,
   },
   {
     path: Routes.TRACE_LINK,
     name: "Trace Links",
-    component: TraceLinks,
+    component: ApproveLinksView,
   },
   {
     path: Routes.PROJECT_CREATOR,
     name: "Project Creator",
-    component: ProjectCreator,
+    component: ProjectCreatorView,
   },
   {
     path: Routes.ERROR,
     name: "Error Page",
-    component: ErrorPage,
+    component: ErrorPageView,
   },
 ];
 

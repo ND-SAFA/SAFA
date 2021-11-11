@@ -15,7 +15,7 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import SelectedNodeTab from "@/components/side-panels/left/SelectedNodeTab.vue";
+import SelectedNodeTab from "./SelectedNodeTab.vue";
 
 export default Vue.extend({
   components: {

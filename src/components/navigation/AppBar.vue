@@ -49,10 +49,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GraphNavIcons from "@/components/navigation/GraphNavIcons.vue";
-import AppBarHeader from "@/components/navigation//AppBarHeader.vue";
 import { appModule } from "@/store";
 import { GenericIconButton } from "@/components";
+import AppBarHeader from "./AppBarHeader.vue";
+import GraphNavIcons from "./GraphNavIcons.vue";
 
 export default Vue.extend({
   components: {

@@ -73,14 +73,22 @@ export default Vue.extend({
       return artifactSelectionModule.getUnselectedNodeOpacity;
     },
   },
+  mounted() {
+    this.nodesInView.then((artifactIds: string[]) => {
+      this.artifactsInView = artifactIds;
+    });
+  },
   watch: {
-    nodesInView(artifactIdsPromise: Promise<string[]>): void {
-      artifactIdsPromise.then((artifactIds: string[]) => {
-        this.artifactsInView = artifactIds;
-      });
+    nodesInView(): void {
+      this.setNodesInView();
     },
   },
   methods: {
+    setNodesInView(): void {
+      this.nodesInView.then((artifactIds: string[]) => {
+        this.artifactsInView = artifactIds;
+      });
+    },
     getArtifactOpacity(name: string): number {
       if (this.artifactsInView.includes(name)) {
         return 1;

@@ -144,11 +144,8 @@ export default Vue.extend({
     saveProject(): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
-        .then((projectCreationResponse: ProjectCreationResponse) => {
-          projectModule.setProjectCreationResponse(projectCreationResponse);
-          navigateTo(Routes.ARTIFACT_TREE);
-          this.clearData();
-        })
+        .then(projectModule.setProjectCreationResponse)
+        .then(() => this.clearData())
         .finally(() => {
           appModule.SET_IS_LOADING(false);
         });

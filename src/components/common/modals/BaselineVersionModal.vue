@@ -44,6 +44,8 @@ export default Vue.extend({
       } else if (this.selectedVersion === undefined) {
         appModule.onWarning("Please select a baseline version");
       } else {
+        this.isLoading = true;
+
         getProjectVersion(this.selectedVersion.versionId)
           .then(projectModule.setProjectCreationResponse)
           .finally(() => {

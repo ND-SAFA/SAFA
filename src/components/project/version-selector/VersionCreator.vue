@@ -3,8 +3,9 @@
     :title="`Current Version: ${versionToString(currentVersion)}`"
     size="xs"
     :is-open="isOpen"
-    @close="onClose"
     :actions-height="0"
+    v-bind:isLoading.sync="isLoading"
+    @close="onClose"
   >
     <template v-slot:body>
       <v-container>
@@ -61,6 +62,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isLoading: false,
       currentVersion: undefined as ProjectVersion | undefined,
     };
   },
@@ -85,27 +87,36 @@ export default Vue.extend({
       }
     },
     onClick(versionType: VersionType) {
-      if (this.project === undefined) {
+      const projectId = this.project?.projectId;
+
+      if (projectId === undefined) {
         throw Error("project expected to be defined");
       }
-      const projectId = this.project.projectId;
-      let creationPromise: Promise<ProjectVersion>;
+
+      const createVersionFrom = async (
+        createVersion: (projectId: string) => Promise<ProjectVersion>
+      ) => {
+        this.isLoading = true;
+
+        const version = await createVersion(projectId);
+
+        this.$emit("onCreate", version);
+        this.isLoading = false;
+      };
+
       switch (versionType) {
         case "major":
-          creationPromise = createNewMajorVersion(projectId);
+          createVersionFrom(createNewMajorVersion);
           break;
         case "minor":
-          creationPromise = createNewMinorVersion(projectId);
+          createVersionFrom(createNewMinorVersion);
           break;
         case "revision":
-          creationPromise = createNewRevisionVersion(projectId);
+          createVersionFrom(createNewRevisionVersion);
           break;
         default:
           throw Error("Unknown type" + versionType);
       }
-      creationPromise.then((version: ProjectVersion) => {
-        this.$emit("onCreate", version);
-      });
     },
     onClose() {
       this.$emit("onClose");

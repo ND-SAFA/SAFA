@@ -80,7 +80,9 @@ export default class ViewportModule extends VuexModule {
    */
   async onZoomOut(): Promise<void> {
     const cy = await cyPromise;
+
     cy.zoom(cy.zoom() - ZOOM_INCREMENT);
+    cy.center(cy.nodes());
   }
 
   @Action
@@ -89,7 +91,9 @@ export default class ViewportModule extends VuexModule {
    */
   async onZoomIn(): Promise<void> {
     const cy = await cyPromise;
+
     cy.zoom(cy.zoom() + ZOOM_INCREMENT);
+    cy.center(cy.nodes());
   }
 
   @Action

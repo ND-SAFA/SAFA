@@ -31,7 +31,7 @@ export const ZOOM_INCREMENT = 0.05;
 
 export const DEFAULT_ZOOM = 0.75;
 export const DEFAULT_PAN = 1;
-export const ANIMATION_DURATION = 250; // ms
+export const ANIMATION_DURATION = 150; // ms
 export const CENTER_GRAPH_PADDING = 10;
 export const TRUNCATE_LENGTH = 75;
 export const GRAPH_CONFIG: CytoscapeOptions = {

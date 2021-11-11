@@ -17,7 +17,7 @@
         </v-row>
       </v-col>
     </v-row>
-    <UploadNewVersionModal
+    <upload-new-version-modal
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
     />
@@ -69,6 +69,7 @@ export default Vue.extend({
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
+        buttonIsText: true,
         menuItems: ["Create Project", "Open Project"],
         menuHandlers: [
           () => navigateTo(Routes.PROJECT_CREATOR),
@@ -78,12 +79,14 @@ export default Vue.extend({
       {
         type: ButtonType.LIST_MENU,
         label: "Version",
+        buttonIsText: true,
         menuItems: ["Upload new version"],
         menuHandlers: [this.onUploadVersion],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Trace Links",
+        buttonIsText: true,
         menuItems: ["Approve Generated Trace Links"],
         menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
       },

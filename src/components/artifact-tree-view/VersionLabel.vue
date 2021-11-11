@@ -14,12 +14,15 @@ import { Project } from "@/types";
 import { versionToString } from "@/util";
 import { projectModule } from "@/store";
 
+const DEFAULT_PROJECT_NAME = "Untitled";
+const DEFAULT_VERSION_NAME = "X.X.X";
+
 export default Vue.extend({
   name: "version-label",
   data() {
     return {
-      projectName: "Unititled",
-      versionName: "X.X.X",
+      projectName: DEFAULT_PROJECT_NAME,
+      versionName: DEFAULT_VERSION_NAME,
     };
   },
   computed: {
@@ -30,12 +33,26 @@ export default Vue.extend({
       return this.project.projectId !== "";
     },
   },
-  watch: {
-    project(project: Project) {
-      this.projectName = project.name;
-      if (project.projectVersion !== undefined) {
-        this.versionName = versionToString(project.projectVersion);
+  mounted() {
+    this.setProjectName();
+  },
+  methods: {
+    setProjectName() {
+      const project = this.project;
+      if (this.containsProject) {
+        this.projectName = project.name;
+        if (project.projectVersion !== undefined) {
+          this.versionName = versionToString(project.projectVersion);
+        }
+      } else {
+        this.projectName = DEFAULT_PROJECT_NAME;
+        this.versionName = DEFAULT_VERSION_NAME;
       }
+    },
+  },
+  watch: {
+    project() {
+      this.setProjectName();
     },
   },
 });

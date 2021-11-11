@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
-    :isLoading="isLoading"
+  <generic-modal
     title="Delta View Target Version"
-    @onClose="$emit('onClose')"
+    :is-open="isOpen"
+    :is-loading="isLoading"
+    @close="$emit('onClose')"
   >
     <template v-slot:body>
       <v-row justify="center" class="mt-5">
@@ -33,7 +33,7 @@
         </v-row>
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

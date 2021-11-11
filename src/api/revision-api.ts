@@ -159,9 +159,9 @@ function revisionMessageHandler(versionId: string, frame: Frame): void {
       projectModule.addOrUpdateTraceLinks(revision.traces);
       break;
     case "excluded":
-      getProjectVersion(versionId).then(async (projectCreationResponse) => {
-        await projectModule.setProjectCreationResponse(projectCreationResponse);
-      });
+      getProjectVersion(versionId).then(
+        projectModule.setProjectCreationResponse
+      );
   }
 }
 

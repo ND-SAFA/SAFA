@@ -49,6 +49,12 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 
+/**
+ * Displays a generic stepper.
+ *
+ * @emits-1 `input` (number) - On input change.
+ * @emits-2 `submit` - On submit.
+ */
 export default Vue.extend({
   name: "generic-stepper",
   props: {
@@ -69,7 +75,7 @@ export default Vue.extend({
     },
     onStepForward(): void {
       if (this.currentStep >= this.numberOfSteps) {
-        this.$emit("onSubmit");
+        this.$emit("submit");
       } else {
         this.currentStep++;
       }

@@ -1,25 +1,24 @@
 <template>
-  <GenericModal
+  <generic-modal
     :title="title"
-    :isOpen="isOpen"
-    :isLoading="isLoading"
+    :is-open="isOpen"
+    :is-loading="isLoading"
     :size="size"
-    :actionsHeight="0"
-    @onClose="$emit('onClose')"
+    :actions-height="0"
+    @close="$emit('close')"
   >
     <template v-slot:body>
-      <GenericStepper
+      <generic-stepper
         v-model="currentStep"
         :steps="steps"
-        @onReset="$emit('onReset')"
-        @onSubmit="$emit('onSubmit')"
+        @submit="$emit('submit')"
       >
         <template v-slot:items>
           <slot name="items" />
         </template>
-      </GenericStepper>
+      </generic-stepper>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">
@@ -28,6 +27,14 @@ import { ModalSize } from "@/types";
 import GenericModal from "./GenericModal.vue";
 import GenericStepper from "./GenericStepper.vue";
 
+/**
+ * Displays a generic stepper modal.
+ *
+ * @emits-1 `input` (number) - On input change.
+ * @emits-2 `reset` - On reset.
+ * @emits-3 `close` - On close.
+ * @emits-4 `submit` - On submit.
+ */
 export default Vue.extend({
   name: "generic-stepper-modal",
   components: {
@@ -76,7 +83,7 @@ export default Vue.extend({
   watch: {
     isOpen(isOpen: boolean) {
       if (isOpen) {
-        this.$emit("onReset");
+        this.$emit("reset");
       }
     },
   },

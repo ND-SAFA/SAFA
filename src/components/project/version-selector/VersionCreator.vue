@@ -1,10 +1,10 @@
 <template>
-  <GenericModal
+  <generic-modal
     :title="`Current Version: ${versionToString(currentVersion)}`"
     size="xs"
-    :isOpen="isOpen"
-    @onClose="onClose"
-    :actionsHeight="0"
+    :is-open="isOpen"
+    @close="onClose"
+    :actions-height="0"
   >
     <template v-slot:body>
       <v-container>
@@ -30,7 +30,7 @@
         </v-row>
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

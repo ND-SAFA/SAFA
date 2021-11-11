@@ -8,10 +8,10 @@
       <v-row justify="center">
         <GenericIconButton
           v-if="definition.handler"
-          :tooltip="definition.label"
-          @onClick="definition.handler"
           color="secondary"
+          :tooltip="definition.label"
           :icon-id="definition.icon"
+          @click="definition.handler"
         />
       </v-row>
     </v-col>

@@ -1,10 +1,10 @@
 <template>
-  <GenericModal
+  <generic-modal
     title="Server Errors"
     :isOpen="isOpen"
     :actionsHeight="0"
     :isLoading="isLoading"
-    @onClose="onClose"
+    @close="onClose"
   >
     <template v-slot:body>
       <v-list disabled>
@@ -17,7 +17,7 @@
         </v-list-item>
       </v-list>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">

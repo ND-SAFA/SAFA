@@ -6,12 +6,12 @@
     <v-expansion-panel-content>
       <trace-link-display
         :link="link"
-        :sourceBody="sourceBody"
-        :targetBody="targetBody"
-        :showDecline="showDecline"
-        :showApprove="showApprove"
-        @approveLink="$emit('approveLink', $event)"
-        @declineLink="$emit('declineLink', $event)"
+        :source-body="sourceBody"
+        :target-body="targetBody"
+        :show-decline="showDecline"
+        :show-approve="showApprove"
+        @approve-link="$emit('approve-link', $event)"
+        @decline-link="$emit('decline-link', $event)"
       />
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -22,7 +22,14 @@ import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 
+/**
+ * Displays trace links on a panel.
+ *
+ * @emits-1 `approve-link` - On Link Approval.
+ * @emits-2 `decline-link` - On Link Decline.
+ */
 export default Vue.extend({
+  name: "trace-link-expansion-panel",
   components: { TraceLinkDisplay },
   props: {
     link: {

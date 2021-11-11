@@ -1,22 +1,22 @@
 <template>
-  <GenericStepperModal
+  <generic-stepper-modal
     v-model="currentStep"
     :steps="steps"
-    :isOpen="isOpen"
+    :is-open="isOpen"
     :title="title"
-    :isLoading="isLoading"
+    :is-loading="isLoading"
     size="l"
-    @onClose="onClose"
-    @onReset="clearData"
-    @onSubmit="$emit('onSubmit')"
+    @close="onClose"
+    @reset="clearData"
+    @submit="$emit('onSubmit')"
   >
     <template v-slot:items>
       <slot name="beforeItems" />
 
       <v-stepper-content :step="projectStep">
         <v-container>
-          <ProjectSelector
-            :isOpen="isOpen"
+          <project-selector
+            :is-open="isOpen"
             @onProjectSelected="selectProject"
             @onProjectUnselected="unselectProject"
           />
@@ -25,9 +25,9 @@
 
       <v-stepper-content :step="versionStep">
         <v-container>
-          <VersionSelector
+          <version-selector
             v-if="selectedProject !== undefined"
-            :isOpen="isOpen"
+            :is-open="isOpen"
             :project="selectedProject"
             @onVersionSelected="selectVersion"
             @onVersionUnselected="unselectVersion"
@@ -40,7 +40,7 @@
     <template v-slot:action:main>
       <slot name="action:main" />
     </template>
-  </GenericStepperModal>
+  </generic-stepper-modal>
 </template>
 
 <script lang="ts">

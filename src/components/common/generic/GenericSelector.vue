@@ -13,7 +13,7 @@
     :loading="isLoading"
     :search="search"
     :no-data-text="noDataText"
-    @item-selected="$emit('onSelectItem', $event)"
+    @item-selected="$emit('select-item', $event)"
   >
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
@@ -32,7 +32,7 @@
         </v-col>
         <v-col cols="1" class="ma-0 pa-0">
           <v-row justify="center" class="ma-0 pa-0">
-            <v-btn icon @click="$emit('onRefresh')">
+            <v-btn icon @click="$emit('refresh')">
               <v-icon>mdi-refresh</v-icon>
             </v-btn>
           </v-row>
@@ -44,17 +44,17 @@
         v-if="hasEdit"
         small
         class="mr-2"
-        @click="$emit('onEditItem', item)"
+        @click="$emit('edit-item', item)"
       >
         mdi-pencil
       </v-icon>
-      <v-icon v-if="hasDelete" small @click="$emit('onDeleteItem', item)">
+      <v-icon v-if="hasDelete" small @click="$emit('delete-item', item)">
         mdi-delete
       </v-icon>
     </template>
     <template v-slot:footer>
       <v-row justify="end" class="mt-1">
-        <v-btn fab small color="secondary" @click="$emit('onAddItem')">
+        <v-btn fab small color="secondary" @click="$emit('add-item')">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </v-row>
@@ -68,8 +68,17 @@
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
 
+/**
+ * Displays a generic selector.
+ *
+ * @emits-1 `refresh` - On refresh.
+ * @emits-2 `select-item` - On select item.
+ * @emits-3 `edit-item` - On edit item.
+ * @emits-4 `delete-item` - On delete item.
+ * @emits-5 `add-item` - On add item.
+ */
 export default Vue.extend({
-  name: "GenericSelector",
+  name: "generic-selector",
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

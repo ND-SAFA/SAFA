@@ -15,6 +15,7 @@ import {
 import type { CytoCore, Artifact } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
+import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -64,6 +65,8 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(): Promise<void> {
+    await navigateTo(Routes.ARTIFACT_TREE);
+
     const cy = await cyPromise;
     const layout = new GraphLayout();
 
@@ -95,9 +98,9 @@ export default class ViewportModule extends VuexModule {
    *
    */
   async centerOnRootNode(): Promise<void> {
-    getRootNode().then((rootNode) =>
-      this.centerOnArtifacts([rootNode.data()?.id])
-    );
+    getRootNode()
+      .then((rootNode) => this.centerOnArtifacts([rootNode.data()?.id]))
+      .catch((e) => console.warn(e.message));
   }
 
   @Action

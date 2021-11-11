@@ -2,12 +2,12 @@
   <v-dialog
     :value="isOpen"
     :width="`${getWidth()}px`"
-    @click:outside="$emit('onClose')"
+    @click:outside="$emit('close')"
     persistent
   >
     <v-card :class="`modal-${size}`">
       <v-card-title class="grey lighten-2">
-        <GenericModalTitle :title="title" @onClose="$emit('onClose')" />
+        <generic-modal-title :title="title" @close="$emit('close')" />
       </v-card-title>
 
       <v-card-text>
@@ -37,6 +37,11 @@ import Vue, { PropType } from "vue";
 import { ModalSize } from "@/types";
 import GenericModalTitle from "./GenericModalTitle.vue";
 
+/**
+ * Displays a generic modal.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   name: "generic-modal",
   components: {

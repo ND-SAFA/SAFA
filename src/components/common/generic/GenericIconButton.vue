@@ -2,11 +2,11 @@
   <v-tooltip bottom>
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        @click="$emit('onClick')"
         icon
-        v-bind="attrs"
         v-on="on"
+        v-bind="attrs"
         :color="color"
+        @click="$emit('click')"
       >
         <v-icon>{{ iconId }}</v-icon>
       </v-btn>
@@ -21,7 +21,7 @@ import Vue from "vue";
 /**
  * A generic icon button.
  *
- * @emits `onClick` - On button click.
+ * @emits `click` - On button click.
  */
 export default Vue.extend({
   name: "generic-icon-button",

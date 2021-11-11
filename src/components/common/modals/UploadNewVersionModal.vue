@@ -1,9 +1,9 @@
 <template>
-  <ProjectVersionStepperModal
+  <project-version-stepper-modal
     v-model="currentStep"
     title="Upload Flat Files"
-    :isOpen="isOpen"
-    :afterSteps="[['Upload Files', filesSelected.length > 0]]"
+    :is-open="isOpen"
+    :after-steps="[['Upload Files', filesSelected.length > 0]]"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -12,9 +12,9 @@
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
-        <GenericFileSelector
+        <generic-file-selector
           v-if="selectedVersion !== undefined"
-          @onChangeFiles="onChangeFiles"
+          @change-files="onChangeFiles"
         />
       </v-stepper-content>
     </template>
@@ -32,7 +32,7 @@
         </template>
       </v-checkbox>
     </template>
-  </ProjectVersionStepperModal>
+  </project-version-stepper-modal>
 </template>
 
 <script lang="ts">
@@ -43,7 +43,7 @@ import { GenericFileSelector } from "@/components";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 export default Vue.extend({
-  name: "UploadNewVersionModal",
+  name: "upload-new-version-modal",
   components: {
     GenericFileSelector,
     ProjectVersionStepperModal,

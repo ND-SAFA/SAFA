@@ -1,5 +1,5 @@
 <template>
-  <GenericStepper v-model="currentStep" :steps="steps" @onReset="clearData">
+  <generic-stepper v-model="currentStep" :steps="steps">
     <v-row>Create a new project</v-row>
     <template v-slot:items>
       <v-stepper-content step="1">
@@ -13,56 +13,56 @@
 
       <v-stepper-content step="2">
         <v-container>
-          <GenericUploader
-            itemName="artifact"
+          <generic-uploader
+            item-name="artifact"
             :uploader="artifactUploader"
-            :artifactMap="artifactMap"
+            :artifact-map="artifactMap"
             @onChange="artifactUploader.panels = $event"
             @onIsValid="setStepIsValid(1, true)"
             @onIsInvalid="setStepIsValid(1, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <ArtifactTypeCreatorModal
-                :isOpen="isCreatorOpen"
-                :artifactTypes="artifactTypes"
+              <artifact-type-creator-modal
+                :is-open="isCreatorOpen"
+                :artifact-types="artifactTypes"
                 @onSubmit="onAddFile"
                 @onClose="onClose"
               />
             </template>
-          </GenericUploader>
+          </generic-uploader>
         </v-container>
       </v-stepper-content>
 
       <v-stepper-content step="3">
         <v-container>
-          <GenericUploader
-            itemName="trace link"
+          <generic-uploader
+            item-name="trace link"
             :uploader="traceUploader"
-            :artifactMap="artifactMap"
-            :defaultValidState="true"
+            :artifact-map="artifactMap"
+            :default-valid-state="true"
             @onChange="traceUploader.panels = $event"
             @onIsValid="setStepIsValid(2, true)"
             @onIsInvalid="setStepIsValid(2, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <TraceFileCreator
-                :isOpen="isCreatorOpen"
-                :traceFiles="traceFiles"
-                :artifactTypes="artifactTypes"
+              <trace-file-creator
+                :is-open="isCreatorOpen"
+                :trace-files="traceFiles"
+                :artifact-types="artifactTypes"
                 @onSubmit="onAddFile"
                 @onClose="onClose"
               />
             </template>
-          </GenericUploader>
+          </generic-uploader>
         </v-container>
       </v-stepper-content>
 
       <v-stepper-content step="4">
         <v-container class="pa-10">
           <v-row>
-            <LeaveConfirmationModal
-              @onConfirm="saveProject"
+            <leave-confirmation-modal
               :project="project"
+              @onConfirm="saveProject"
             />
           </v-row>
           <v-row>
@@ -76,7 +76,7 @@
         </v-container>
       </v-stepper-content>
     </template>
-  </GenericStepper>
+  </generic-stepper>
 </template>
 
 <script lang="ts">
@@ -91,7 +91,7 @@ import {
 } from "@/types";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import router, { Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./definitions";
@@ -144,11 +144,8 @@ export default Vue.extend({
     saveProject(): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
-        .then((projectCreationResponse: ProjectCreationResponse) => {
-          projectModule.setProjectCreationResponse(projectCreationResponse);
-          router.push(Routes.ARTIFACT_TREE);
-          this.clearData();
-        })
+        .then(projectModule.setProjectCreationResponse)
+        .then(() => this.clearData())
         .finally(() => {
           appModule.SET_IS_LOADING(false);
         });

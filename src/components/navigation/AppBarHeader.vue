@@ -21,8 +21,8 @@
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
     />
-    <BaselineVersionModal
-      :isOpen="openProjectOpen"
+    <baseline-version-modal
+      :is-open="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
   </v-container>
@@ -31,7 +31,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import router, { Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 import {
   BaselineVersionModal,
   UploadNewVersionModal,
@@ -71,7 +71,7 @@ export default Vue.extend({
         label: "Project",
         menuItems: ["Create Project", "Open Project"],
         menuHandlers: [
-          () => router.push(Routes.PROJECT_CREATOR),
+          () => navigateTo(Routes.PROJECT_CREATOR),
           this.onOpenProject,
         ],
       },
@@ -85,7 +85,7 @@ export default Vue.extend({
         type: ButtonType.LIST_MENU,
         label: "Trace Links",
         menuItems: ["Approve Generated Trace Links"],
-        menuHandlers: [() => router.push(Routes.TRACE_LINK)],
+        menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
       },
     ];
   },

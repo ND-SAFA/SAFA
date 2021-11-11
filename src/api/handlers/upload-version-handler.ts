@@ -2,7 +2,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/project-api";
 import { ProjectCreationResponse } from "@/types";
-import router, { Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -51,7 +51,7 @@ export async function uploadNewProjectVersion(
           `Flat files were uploaded successfully and ${res.project.name} was updated.`
         );
         if (setVersionIfSuccessful) {
-          await router.push(Routes.ARTIFACT_TREE);
+          await navigateTo(Routes.ARTIFACT_TREE);
         }
       })
       .finally(() => {

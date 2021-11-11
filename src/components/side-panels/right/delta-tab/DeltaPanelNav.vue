@@ -26,7 +26,7 @@
       </v-btn>
       <p v-else>No project has been selected.</p>
     </v-row>
-    <DeltaVersionModal
+    <DeltaVersionsModal
       v-if="isProjectDefined()"
       :isOpen="isModalOpen"
       :project="project"
@@ -37,15 +37,15 @@
 
 <script lang="ts">
 import Vue from "vue";
-import DeltaVersionModal from "@/components/side-panels/right/delta-tab/DeltaVersionsModal.vue";
 import { Project } from "@/types";
 import { versionToString } from "@/util";
 import { deltaModule, projectModule } from "@/store";
+import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 
 export default Vue.extend({
   name: "left-panel-nav",
   components: {
-    DeltaVersionModal,
+    DeltaVersionsModal,
   },
   data: () => ({
     isModalOpen: false,

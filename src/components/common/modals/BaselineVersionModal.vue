@@ -12,11 +12,11 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier, ProjectVersion } from "@/types";
 import Vue from "vue";
+import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
-import ProjectVersionStepperModal from "@/components/common/modals/ProjectVersionStepperModal.vue";
+import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 export default Vue.extend({
   name: "baseline-version-modal",

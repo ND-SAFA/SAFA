@@ -37,19 +37,26 @@
 </template>
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import {
+  ButtonDefinition,
+  ButtonType,
+  ListMenuDefinition,
+  Artifact,
+} from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
-import { Artifact } from "@/types";
-import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import { ButtonDefinition, ButtonType, ListMenuDefinition } from "@/types";
 import { appModule, projectModule } from "@/store";
+import { GenericModal } from "@/components/common/generic";
+import { ButtonRow } from "@/components/common/button-row";
+
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
+
 const EMPTY_ARTIFACT: Artifact = {
   type: "",
   name: "",
   summary: "",
   body: "",
 };
+
 export default Vue.extend({
   components: { GenericModal, ButtonRow },
   props: {

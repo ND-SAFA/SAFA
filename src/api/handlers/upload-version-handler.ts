@@ -2,6 +2,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/project-api";
 import { ProjectCreationResponse } from "@/types";
+import router, { Routes } from "@/router";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -11,7 +12,7 @@ import { ProjectCreationResponse } from "@/types";
  * @param selectedFiles  - The flat files that will update given version
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful
  * @param onLoadStart - Callback to indicate that loading should be displayed
- * @param onLoadEnd - Callback to indicate that loading has finsihed
+ * @param onLoadEnd - Callback to indicate that loading has finished
  * @param onFinally - Callback to call if upload was successful.
  */
 export async function uploadNewProjectVersion(
@@ -45,10 +46,13 @@ export async function uploadNewProjectVersion(
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)
-      .then((res: ProjectCreationResponse) => {
+      .then(async (res: ProjectCreationResponse) => {
         appModule.onSuccess(
-          `Flat files were uploaded successfuly and ${res.project.name} was updated.`
+          `Flat files were uploaded successfully and ${res.project.name} was updated.`
         );
+        if (setVersionIfSuccessful) {
+          await router.push(Routes.ARTIFACT_TREE);
+        }
       })
       .finally(() => {
         onLoadEnd();

@@ -3,7 +3,7 @@
     <v-row class="ma-0 pa-0">
       <v-col cols="1" class="ma-0 pa-0" align-self="center">
         <v-row class="ma-0 pa-0" justify="center">
-          <SAFAIcon />
+          <SafaIcon />
         </v-row>
       </v-col>
       <v-col cols="11" class="ma-0 pa-0">
@@ -30,17 +30,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import SAFAIcon from "@/components/navigation/SafaIcon.vue";
-import ProjectName from "@/components/navigation/ProjectName.vue";
-import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
 import router, { Routes } from "@/router";
-import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
+import {
+  BaselineVersionModal,
+  UploadNewVersionModal,
+  ButtonRow,
+} from "@/components";
+import ProjectName from "./ProjectName.vue";
+import SafaIcon from "./SafaIcon.vue";
 
 export default Vue.extend({
   components: {
-    SAFAIcon,
+    SafaIcon,
     ProjectName,
     ButtonRow,
     UploadNewVersionModal,

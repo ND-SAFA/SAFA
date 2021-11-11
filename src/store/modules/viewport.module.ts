@@ -3,23 +3,18 @@ import {
   cyPromise,
   getArtifactSubTree,
   getRootNode,
-} from "@/cytoscape/cytoscape";
-import {
+  isInSubtree,
+  doesNotContainType,
+  isRelatedToArtifacts,
+  GraphLayout,
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
-} from "@/cytoscape/styles/config/graph";
-import GraphLayout from "@/cytoscape/layout/graph-layout";
-import {
-  isInSubtree,
-  doesNotContainType,
-  isRelatedToArtifacts,
-} from "@/cytoscape/filters/graph-filters";
+} from "@/cytoscape";
 import type { CytoCore, Artifact } from "@/types";
-import { PanelType } from "@/types";
 import { areArraysEqual } from "@/util";
-import { appModule, artifactSelectionModule, projectModule } from "@/store";
+import { artifactSelectionModule, projectModule } from "@/store";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -101,7 +96,7 @@ export default class ViewportModule extends VuexModule {
    */
   async centerOnRootNode(): Promise<void> {
     getRootNode().then((rootNode) =>
-      this.centerOnArtifacts([rootNode.data().id])
+      this.centerOnArtifacts([rootNode.data()?.id])
     );
   }
 

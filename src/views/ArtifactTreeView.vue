@@ -11,8 +11,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ArtifactTree from "@/components/artifact-tree-view/ArtifactTree.vue";
-import VersionLabel from "@/components/artifact-tree-view/VersionLabel.vue";
+import { ArtifactTree, VersionLabel } from "@/components/artifact-tree-view";
 
 export default Vue.extend({
   name: "Home",

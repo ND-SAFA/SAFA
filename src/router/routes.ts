@@ -3,6 +3,7 @@
  */
 export enum Routes {
   HOME = "/",
+  ARTIFACT_TREE = "/tree",
   TRACE_LINK = "/links",
   ERROR = "/error",
   PROJECT_CREATOR = "/create",

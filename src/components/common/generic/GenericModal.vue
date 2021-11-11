@@ -7,7 +7,7 @@
   >
     <v-card :class="`modal-${size}`">
       <v-card-title class="grey lighten-2">
-        <ModalTitle :title="title" @onClose="$emit('onClose')" />
+        <GenericModalTitle :title="title" @onClose="$emit('onClose')" />
       </v-card-title>
 
       <v-card-text>
@@ -34,12 +34,13 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ModalTitle from "@/components/common/generic/GenericModalTitle.vue";
 import { ModalSize } from "@/types";
+import GenericModalTitle from "./GenericModalTitle.vue";
+
 export default Vue.extend({
   name: "generic-modal",
   components: {
-    ModalTitle,
+    GenericModalTitle,
   },
   props: {
     title: {

@@ -103,3 +103,5 @@ export interface Project extends ProjectIdentifier {
    */
   traces: TraceLink[];
 }
+
+export type VersionType = "major" | "minor" | "revision";

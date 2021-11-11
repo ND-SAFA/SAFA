@@ -7,6 +7,7 @@
     >
       <v-row justify="center">
         <GenericIconButton
+          v-if="definition.handler"
           :tooltip="definition.label"
           @onClick="definition.handler"
           color="secondary"
@@ -19,8 +20,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType } from "@/types";
-import { Artifact } from "@/types";
+import { ButtonDefinition, ButtonType, Artifact } from "@/types";
 import { capitalize } from "@/util";
 import {
   artifactSelectionModule,

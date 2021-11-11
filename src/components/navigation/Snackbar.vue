@@ -37,7 +37,7 @@
 import Vue from "vue";
 import { MessageType, PanelType, SnackbarMessage } from "@/types";
 import { appModule } from "@/store";
-import ServerErrorModal from "@/components/common/modals/ServerErrorModal.vue";
+import { ServerErrorModal } from "@/components";
 
 export default Vue.extend({
   name: "snackbar",

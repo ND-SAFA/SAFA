@@ -31,7 +31,7 @@
 <script lang="ts">
 import { ProjectIdentifier } from "@/types";
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
+import { GenericModal } from "@/components/common";
 
 export default Vue.extend({
   components: { GenericModal },

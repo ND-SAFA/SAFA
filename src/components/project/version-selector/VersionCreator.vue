@@ -35,17 +35,15 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { ProjectIdentifier, ProjectVersion, VersionType } from "@/types";
+import { versionToString } from "@/util";
 import {
   createNewMajorVersion,
   createNewMinorVersion,
   createNewRevisionVersion,
   getCurrentVersion,
 } from "@/api";
-import { ProjectIdentifier, ProjectVersion } from "@/types";
-import { versionToString } from "@/util";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
-
-type VersionType = "major" | "minor" | "revision";
+import { GenericModal } from "@/components/common";
 
 export default Vue.extend({
   components: {

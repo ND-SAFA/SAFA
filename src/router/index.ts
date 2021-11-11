@@ -64,6 +64,7 @@ router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
 /**
  * Navigates app to given route, if app is already on the route then
  * does nothing. This wrapper stops DuplicateNavigation exceptions.
+ *
  * @param route - The route to navigate to.
  */
 export async function navigateTo(route: Routes): Promise<void> {

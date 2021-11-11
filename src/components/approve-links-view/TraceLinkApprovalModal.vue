@@ -28,7 +28,8 @@ import {
   TraceType,
 } from "@/types";
 import Vue, { PropType } from "vue";
-import { TraceLinkDisplay, GenericModal } from "@/components";
+import { GenericModal } from "@/components/common";
+import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 
 /**
  * Displays trace links on a panel.

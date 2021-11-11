@@ -1,7 +1,5 @@
 <template>
-  <v-container>
-    <v-switch v-model="switchValue" :label="label" class="generic-switch" />
-  </v-container>
+  <v-switch v-model="switchValue" :label="label" class="generic-switch" />
 </template>
 
 <script lang="ts">

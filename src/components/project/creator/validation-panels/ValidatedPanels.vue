@@ -5,22 +5,19 @@
         <slot name="panels" />
       </v-expansion-panels>
     </v-row>
-    <v-row justify="center">
-      <v-container>
-        <v-row
-          v-if="showError"
-          justify="center"
-          :style="`color: ${errorColor}`"
-          class="mb-10"
+    <v-row align="center" class="mx-auto" style="width: fit-content">
+      <v-col>
+        <v-btn
+          color="primary"
+          :disabled="isButtonDisabled"
+          @click="$emit('onAdd')"
         >
-          <label>{{ noItemError }}</label>
-        </v-row>
-        <v-row justify="center" class="mt-5">
-          <v-btn @click="$emit('onAdd')" small fab color="secondary">
-            <v-icon> mdi-plus </v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
+          Create new {{ itemName }}</v-btn
+        >
+      </v-col>
+      <v-col v-if="showError" style="white-space: nowrap">
+        Requires at least 1 {{ itemName }}.
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -31,12 +28,12 @@ import { ThemeColors } from "@/util";
 
 export default Vue.extend({
   props: {
-    isValidStates: {
-      type: Array as PropType<boolean[]>,
+    itemName: {
+      type: String,
       required: true,
     },
-    noItemError: {
-      type: String,
+    isValidStates: {
+      type: Array as PropType<boolean[]>,
       required: true,
     },
     showError: {
@@ -46,6 +43,10 @@ export default Vue.extend({
     defaultValidState: {
       type: Boolean,
       required: true,
+    },
+    isButtonDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

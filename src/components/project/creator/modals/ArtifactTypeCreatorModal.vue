@@ -1,39 +1,25 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
-    size="s"
-    title="Create Artifact Type"
-    @onClose="$emit('onClose')"
+  <v-row
+    v-if="isOpen"
+    align="center"
+    class="mx-auto my-3"
+    style="max-width: 30em"
   >
-    <template v-slot:body>
-      <v-text-field
-        v-model="artifactName"
-        label="Artifact Name"
-        required
-        :error-messages="errors"
-        @keydown.enter="onEnterPress"
-      />
-    </template>
-    <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn @click="onSubmit" fab color="secondary">
-            <v-icon> mdi-content-save </v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
-    </template>
-  </GenericModal>
+    <v-text-field
+      v-model="artifactName"
+      label="Artifact Name"
+      required
+      :error-messages="errors"
+      @keydown.enter="onEnterPress"
+    />
+    <v-btn @click="onSubmit" color="primary" class="ml-1"> Create </v-btn>
+  </v-row>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenericModal } from "@/components";
 
 export default Vue.extend({
-  components: {
-    GenericModal,
-  },
   props: {
     isOpen: {
       type: Boolean,

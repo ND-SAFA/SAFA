@@ -1,9 +1,10 @@
 <template>
   <v-container>
     <ValidatedPanels
-      :noItemError="noItemError"
+      :itemName="itemName"
       :showError="projectFiles.length === 0"
       :isValidStates="isValidStates"
+      :isButtonDisabled="isCreatorOpen"
       :defaultValidState="defaultValidState"
       @onAdd="isCreatorOpen = true"
       @onIsValid="$emit('onIsValid')"
@@ -18,15 +19,14 @@
           @onChange="onChange(i, $event)"
           @onDelete="deleteFile(i)"
         />
+        <slot
+          name="creator"
+          v-bind:isCreatorOpen="isCreatorOpen"
+          v-bind:onAddFile="addFile"
+          v-bind:onClose="onCloseCreator"
+        />
       </template>
     </ValidatedPanels>
-
-    <slot
-      name="creator"
-      v-bind:isCreatorOpen="isCreatorOpen"
-      v-bind:onAddFile="addFile"
-      v-bind:onClose="onCloseCreator"
-    />
   </v-container>
 </template>
 
@@ -50,6 +50,10 @@ export default Vue.extend({
     FilePanelController,
   },
   props: {
+    itemName: {
+      type: String,
+      required: true,
+    },
     artifactMap: {
       type: Object as PropType<ArtifactMap>,
       required: true,
@@ -59,10 +63,6 @@ export default Vue.extend({
         IGenericUploader<ArtifactMap, ValidPayloads, ValidFileTypes>
       >,
       required: true,
-    },
-    noItemError: {
-      type: String,
-      default: "No entities have been created.",
     },
     defaultValidState: {
       type: Boolean,

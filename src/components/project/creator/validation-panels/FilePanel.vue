@@ -1,16 +1,14 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <v-container>
-        <v-row>
-          <v-col cols="1" align-self="center">
-            <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
-          </v-col>
-          <v-col cols="11" align-self="center">
-            <slot name="title" />
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-row dense>
+        <v-col cols="1" align-self="center">
+          <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
+        </v-col>
+        <v-col cols="11" align-self="center">
+          <slot name="title" />
+        </v-col>
+      </v-row>
     </v-expansion-panel-header>
     <v-expansion-panel-content>
       <v-container>
@@ -26,25 +24,23 @@
         </v-row>
 
         <v-row v-if="showFileUploader">
-          <v-container class="mt-2">
-            <v-row><h4>File:</h4> </v-row>
-            <v-row>
-              <GenericFileSelector
-                :multiple="false"
-                @onChangeFiles="emitChangeFiles"
-              />
-            </v-row>
-          </v-container>
+          <GenericFileSelector
+            :multiple="false"
+            @onChangeFiles="emitChangeFiles"
+          />
         </v-row>
 
-        <GenericSwitch
-          v-if="showFileUploader"
-          v-model="ignoreErrors"
-          label="Ignore Errors"
-        />
-
-        <v-row v-if="!isValid && showFileUploader" justify="center">
-          <label class="text-caption" style="color: red"> {{ error }}</label>
+        <v-row justify="space-between" align="center" dense>
+          <v-col>
+            <GenericSwitch
+              v-if="showFileUploader"
+              v-model="ignoreErrors"
+              label="Ignore Errors"
+            />
+          </v-col>
+          <v-col v-if="!isValid && showFileUploader" style="text-align: end">
+            {{ error }}
+          </v-col>
         </v-row>
 
         <v-row justify="center">
@@ -98,15 +94,8 @@
           <v-divider />
         </v-row>
 
-        <v-row class="mt-5 mb-5" justify="center">
-          <v-btn
-            @click="$emit('onDelete')"
-            small
-            color="error"
-            class="pa-2 ma-2"
-          >
-            Delete
-          </v-btn>
+        <v-row class="mt-5" justify="end">
+          <v-btn @click="$emit('onDelete')" color="error"> Delete </v-btn>
         </v-row>
       </v-container>
     </v-expansion-panel-content>

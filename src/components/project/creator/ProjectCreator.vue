@@ -91,7 +91,7 @@ import {
 } from "@/types";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import router, { Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./definitions";
@@ -146,7 +146,7 @@ export default Vue.extend({
       saveOrUpdateProject(this.project)
         .then((projectCreationResponse: ProjectCreationResponse) => {
           projectModule.setProjectCreationResponse(projectCreationResponse);
-          router.push(Routes.ARTIFACT_TREE);
+          navigateTo(Routes.ARTIFACT_TREE);
           this.clearData();
         })
         .finally(() => {

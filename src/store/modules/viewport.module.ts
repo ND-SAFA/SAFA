@@ -15,7 +15,7 @@ import {
 import type { CytoCore, Artifact } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
-import router, { Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -65,7 +65,7 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(): Promise<void> {
-    await router.push(Routes.ARTIFACT_TREE);
+    await navigateTo(Routes.ARTIFACT_TREE);
 
     const cy = await cyPromise;
     const layout = new GraphLayout();

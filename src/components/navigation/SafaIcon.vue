@@ -23,8 +23,8 @@ export default Vue.extend({
     };
   },
   methods: {
-    async onAvatarClick() {
-      await router.push(Routes.ARTIFACT_TREE);
+    onAvatarClick() {
+      router.push(Routes.ARTIFACT_TREE);
     },
   },
 });

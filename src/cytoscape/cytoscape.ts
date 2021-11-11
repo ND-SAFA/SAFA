@@ -48,7 +48,7 @@ function getSubTree(
       const nodeLevel = typeHierarchy.indexOf(nodeType);
       const rootLevel = typeHierarchy.indexOf(rootType);
       if (nodeLevel === -1 || rootLevel === -1) {
-        throw Error("undefine types:" + rootType + ":" + nodeType);
+        throw Error("undefined types:" + rootType + ":" + nodeType);
       }
       if (nodeLevel >= rootLevel) {
         subTree = subTree.union(getSubTree(cyCore, node, artifactsSeen));
@@ -69,8 +69,12 @@ export async function getRootNode(
 ): Promise<SingularElementArgument> {
   const cyCore = await cyPromise;
 
+  if (cyCore.nodes().length === 0) {
+    throw Error("Root node does not exist because no nodes are in view.");
+  }
+
   if (currentNode === undefined) {
-    currentNode = cyCore.nodes().first();
+    currentNode = getMostConnectedNode(cyCore);
   }
 
   const edgesOutOfNode: EdgeCollection = cyCore
@@ -82,4 +86,40 @@ export async function getRootNode(
   } else {
     return getRootNode(edgesOutOfNode[0].source());
   }
+}
+
+/**
+ * Returns the node in given Cytoscape instance with the most number of
+ * connected edges.
+ * @param cyCore
+ */
+function getMostConnectedNode(cyCore: CytoCore): SingularElementArgument {
+  const counts: Record<string, number> = {};
+  cyCore.edges().forEach((edge) => {
+    const sourceName = edge.source().data().id;
+    const targetName = edge.target().data().id;
+    const increaseCounts = (name: string) => {
+      if (name in counts) {
+        counts[name]++;
+      } else {
+        counts[name] = 1;
+      }
+    };
+    increaseCounts(sourceName);
+    increaseCounts(targetName);
+  });
+
+  let max = -1;
+  let maxName = cyCore.nodes().first().data().name;
+  for (const [name, count] of Object.entries(counts)) {
+    if (count > max) {
+      max = count;
+      maxName = name;
+    }
+  }
+
+  return cyCore
+    .nodes()
+    .filter((n) => n.data().id === maxName)
+    .first();
 }

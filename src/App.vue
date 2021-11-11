@@ -1,7 +1,7 @@
 <template>
   <v-app class="application">
     <v-main>
-      <v-container class="elevation-4">
+      <v-container>
         <transition name="fade" mode="out-in">
           <keep-alive>
             <router-view />

@@ -10,7 +10,7 @@
         <v-row
           v-if="showError"
           justify="center"
-          style="color: red"
+          :style="`color: ${errorColor}`"
           class="mb-10"
         >
           <label>{{ noItemError }}</label>
@@ -27,6 +27,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { ThemeColors } from "@/util";
 
 export default Vue.extend({
   props: {
@@ -48,6 +49,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    errorColor(): string {
+      return ThemeColors.error;
+    },
     isValid(): boolean {
       if (this.isValidStates.length === 0) return this.defaultValidState;
       return this.isValidStates.filter((isValid) => !isValid).length === 0;

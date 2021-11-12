@@ -95,7 +95,7 @@ export default Vue.extend({
               type: "subtree",
               artifactsInSubtree: [],
             });
-            await viewportModule.setGraphLayout();
+            await viewportModule.setArtifactTreeLayout();
           },
           label: "Center Graph",
           icon: "mdi-graphql",

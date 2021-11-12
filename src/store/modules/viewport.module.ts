@@ -11,6 +11,8 @@ import {
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
   ArtifactGraphLayout,
+  TimGraphLayout,
+  timTreeCyPromise,
 } from "@/cytoscape";
 import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
@@ -65,11 +67,33 @@ export default class ViewportModule extends VuexModule {
 
   @Action
   /**
+   * Resets the graph layout of the artifact tree
+   */
+  async setArtifactTreeLayout(): Promise<void> {
+    const layout = new ArtifactGraphLayout();
+    await ViewportModule.setGraphLayout(
+      artifactTreeCyPromise,
+      layout,
+      Routes.ARTIFACT_TREE
+    );
+  }
+
+  @Action
+  /**
+   * Resets the graph layout of the tim tree graph.
+   */
+  async setTimTreeLayout(): Promise<void> {
+    const layout = new TimGraphLayout();
+    await ViewportModule.setGraphLayout(timTreeCyPromise, layout, undefined);
+  }
+
+  /**
    * Resets the graph layout.
    */
-  async setGraphLayout(
-    cyPromise: Promise<CytoCore> = artifactTreeCyPromise,
-    layout: IGraphLayout = new ArtifactGraphLayout()
+  static async setGraphLayout(
+    cyPromise: Promise<CytoCore>,
+    layout: IGraphLayout,
+    routeTo?: Routes
   ): Promise<void> {
     const cy = await cyPromise;
 

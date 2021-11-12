@@ -15,12 +15,5 @@ export interface IGraphLayout {
   postLayoutHooks: LayoutHook[];
   autoMoveHandlers: AutoMoveEventHandlers;
   cytoEventHandlers: CytoEventHandlers;
-  peerNodes?: NodeCollection;
-  temporaryEdges?: NodeCollection;
-  packageNodes?: NodeCollection;
-  ancestorNodes?: NodeCollection;
-  codeNodes?: NodeCollection;
-  codeElements?: NodeCollection;
-  peerElements?: NodeCollection;
   createLayout(cy: CytoCore): void;
 }

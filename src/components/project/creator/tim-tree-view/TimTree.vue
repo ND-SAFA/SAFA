@@ -57,7 +57,7 @@ export default Vue.extend({
   },
   computed: {
     cytoCoreGraph(): CytoCoreGraph {
-      return timTreeDefinition;
+      return timGraph;
     },
   },
 });

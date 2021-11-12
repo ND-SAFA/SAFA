@@ -69,7 +69,7 @@ export default class ArtifactSelectionModule extends VuexModule {
 
   @Action
   /**
-   * Clears any selected artifact(s) in given cytoscape instance.
+   * Clears any selected artifact(s) in artifact tree.
    */
   clearSelections(): void {
     this.unselectArtifact();

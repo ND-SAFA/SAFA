@@ -65,6 +65,7 @@
         </v-btn>
       </v-row>
       <ArtifactCreatorModal
+        title="Edit Artifact Contents"
         :is-open="isArtifactCreatorOpen"
         :artifact="selectedArtifact"
         @onClose="isArtifactCreatorOpen = false"

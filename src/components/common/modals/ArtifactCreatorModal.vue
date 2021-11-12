@@ -1,6 +1,6 @@
 <template>
   <generic-modal
-    title="Create New Artifact"
+    :title="title"
     :isOpen="isOpen"
     :isLoading="isLoading"
     @close="$emit('onClose')"
@@ -60,6 +60,10 @@ const EMPTY_ARTIFACT: Artifact = {
 export default Vue.extend({
   components: { GenericModal, ButtonRow },
   props: {
+    title: {
+      type: String,
+      default: "Create New Artifact",
+    },
     isOpen: {
       type: Boolean,
       required: true,

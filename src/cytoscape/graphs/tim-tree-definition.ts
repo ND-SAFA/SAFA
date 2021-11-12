@@ -3,10 +3,14 @@ import {
   CytoscapeStyle,
   DEFAULT_ZOOM,
   MOTION_BLUE_OPACITY,
+  TimGraphLayout,
+  timTreeResolveCy,
   USE_MOTION_BLUR,
-} from "@/cytoscape/styles";
-import { CytoCoreGraph } from "@/types";
-import { timTreeResolveCy } from "./tim-tree-cy";
+} from "@/cytoscape";
+import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
+import { viewportModule } from "@/store";
+import { CytoCore, IGraphLayout } from "@/types";
+import ArtifactGraphLayout from "../layout/artifact-graph-layout";
 
 const timTreeConfig: CytoscapeOptions = {
   style: CytoscapeStyle,
@@ -20,5 +24,9 @@ export const timTreeDefinition: CytoCoreGraph = {
   config: timTreeConfig,
   saveCy: timTreeResolveCy,
   plugins: [],
-  afterInit: () => undefined,
+  afterInit: async (cy: CytoCore) => {
+    const cyPromise: Promise<CytoCore> = new Promise((resolve) => resolve(cy));
+    const layout = new TimGraphLayout();
+    await viewportModule.setGraphLayout(cyPromise, layout as IGraphLayout);
+  },
 };

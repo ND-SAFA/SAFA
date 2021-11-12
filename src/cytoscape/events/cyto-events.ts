@@ -1,8 +1,10 @@
-import { CSSCursor, CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
-import { artifactSelectionModule } from "@/store";
-import { EventObject } from "cytoscape";
+import {
+  CSSCursor,
+  CytoEvent,
+  CytoEventHandlers,
+} from "@/types/cytoscape/core";
 
-export const DefaultCytoEventHandlers: CytoEventHandlers = {
+export const DefaultCytoEvents: CytoEventHandlers = {
   mouseOverCursor: {
     events: [CytoEvent.MOUSE_OVER],
     selector: "node",
@@ -30,14 +32,6 @@ export const DefaultCytoEventHandlers: CytoEventHandlers = {
     selector: "node",
     action: () => {
       document.body.style.cursor = "auto";
-    },
-  },
-  unselectArtifactOnBackgroundClick: {
-    events: [CytoEvent.TAP],
-    action: (cy: CytoCore, event: EventObject) => {
-      if (event.target === cy) {
-        artifactSelectionModule.clearSelections();
-      }
     },
   },
 };

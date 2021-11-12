@@ -10,6 +10,7 @@ import {
   CENTER_GRAPH_PADDING,
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
+  ArtifactGraphLayout,
 } from "@/cytoscape";
 import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
@@ -68,7 +69,7 @@ export default class ViewportModule extends VuexModule {
    */
   async setGraphLayout(
     cyPromise: Promise<CytoCore> = artifactTreeCyPromise,
-    layout: IGraphLayout = new ArtifactTreeGraphLayout()
+    layout: IGraphLayout = new ArtifactGraphLayout()
   ): Promise<void> {
     const cy = await cyPromise;
 

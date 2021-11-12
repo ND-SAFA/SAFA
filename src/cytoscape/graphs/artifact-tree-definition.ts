@@ -18,10 +18,9 @@ import {
 } from "@/cytoscape/styles";
 import { GraphLayout } from "@/cytoscape/layout";
 import { viewportModule } from "@/store";
-import {
-  artifactTreeResolveCy,
-  artifactTreeCyPromise,
-} from "./artifact-tree-cy";
+import ArtifactGraphLayout from "@/cytoscape/layout/artifact-graph-layout";
+import { CytoscapeOptions } from "cytoscape";
+import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
 
 const artifactTreeConfig: CytoscapeOptions = {
   style: GraphStyle,
@@ -64,7 +63,7 @@ export const artifactTreeGraph: CytoCoreGraph = {
   ],
   async afterInit(cy) {
     const cyPromise: Promise<CytoCore> = new Promise((resolve) => resolve(cy));
-    const layout = new GraphLayout();
+    const layout = new ArtifactGraphLayout();
     await viewportModule.setGraphLayout(cyPromise, layout as IGraphLayout);
   },
 };

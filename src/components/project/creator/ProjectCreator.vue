@@ -60,9 +60,10 @@
       <v-stepper-content step="4">
         <v-container class="pa-10">
           <v-row>
-            <leave-confirmation-modal
-              :project="project"
-              @onConfirm="saveProject"
+            <TimTree
+              class="debug"
+              :artifact-panels="artifactUploader.panels"
+              :trace-panels="traceUploader.panels"
             />
           </v-row>
           <v-row>
@@ -81,25 +82,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  Project,
-  ProjectCreationResponse,
-  StepState,
-  TraceFile,
-  TraceLink,
-} from "@/types";
+import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./definitions";
-import {
-  TraceFileCreator,
-  ArtifactTypeCreatorModal,
-  LeaveConfirmationModal,
-} from "./modals";
+import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
+import { TimTree } from "@/components/tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
@@ -109,9 +99,9 @@ export default Vue.extend({
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
-    LeaveConfirmationModal,
     ArtifactTypeCreatorModal,
     TraceFileCreator,
+    TimTree,
   },
   data() {
     return {
@@ -123,10 +113,10 @@ export default Vue.extend({
       ] as StepState[],
       name: "",
       description: "",
-      currentStep: 1,
+      currentStep: 4,
       isConfirmOpen: false,
-      traceUploader: createTraceUploader(),
       artifactUploader: createArtifactUploader(),
+      traceUploader: createTraceUploader(),
     };
   },
   methods: {

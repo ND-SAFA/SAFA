@@ -34,8 +34,8 @@ import {
   viewportModule,
 } from "@/store";
 import { TraceLinkApprovalModal } from "@/components";
-import CytoscapeController from "./CytoscapeController.vue";
-import TraceLinkEdge from "./TraceLinkEdge.vue";
+import CytoscapeController from "../common/generic/GenericCytoscapeController.vue";
+import TraceLinkEdge from "../common/generic/GenericGraphLink.vue";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({

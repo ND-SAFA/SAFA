@@ -35,11 +35,11 @@ export default Vue.extend({
     },
     menuOptions: {
       type: Object,
-      default: contextMenuOptions,
+      default: () => contextMenuOptions,
     },
     edgeHandleOptions: {
       type: Object as PropType<EdgeHandlersOptions>,
-      default: edgeHandleOptions,
+      default: () => edgeHandleOptions,
     },
   },
   data: () => {

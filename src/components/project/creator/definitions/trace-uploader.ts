@@ -12,13 +12,16 @@ import {
 
 const DEFAULT_IS_GENERATED = false;
 
+const testPanels = [
+  createNewPanel({ source: "Designs", target: "Requirements" }),
+];
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
   Link,
   TraceFile
 > {
   return {
-    panels: [],
+    panels: testPanels,
     createNewPanel,
   };
 }

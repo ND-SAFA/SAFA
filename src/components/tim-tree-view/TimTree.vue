@@ -1,15 +1,20 @@
 <template>
-  <v-container class="elevation-3">
-    <CytoscapeController>
+  <v-container class="elevation-3" style="width: 500px; height: 300px">
+    <GenericCytoscapeController>
       <template v-slot:elements>
         <ArtifactTypeNode
           v-for="artifactPanel in artifactPanels"
           :key="artifactPanel.title"
-          :type
+          :type="artifactPanel.title"
+          :artifacts="artifactPanel.projectFile.artifacts"
         />
-        <TypeLink />
+        <GenericGraphLink
+          v-for="tracePanel in tracePanels"
+          :key="getTraceId(tracePanel)"
+          :trace-definition="tracePanel.projectFile"
+        />
       </template>
-    </CytoscapeController>
+    </GenericCytoscapeController>
   </v-container>
 </template>
 
@@ -17,7 +22,9 @@
 import Vue, { PropType } from "vue";
 import { TracePanel } from "@/types";
 import { ArtifactPanel } from "@/components";
+import GenericCytoscapeController from "@/components/common/generic/GenericCytoscapeController.vue";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
+import GenericGraphLink from "@/components/common/generic/GenericGraphLink.vue";
 
 export default Vue.extend({
   props: {
@@ -30,6 +37,16 @@ export default Vue.extend({
       required: true,
     },
   },
-  components: {},
+  methods: {
+    getTraceId(tracePanel: TracePanel): string {
+      const traceFile = tracePanel.projectFile;
+      return `${traceFile.source}-${traceFile.target}`;
+    },
+  },
+  components: {
+    ArtifactTypeNode,
+    GenericCytoscapeController,
+    GenericGraphLink,
+  },
 });
 </script>

@@ -4,15 +4,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  Artifact,
-  ArtifactCytoCoreElement,
-  CytoCoreElementData,
-  CytoCoreElementDefinition,
-} from "@/types";
+import { Artifact, CytoCoreElementDefinition } from "@/types";
 
 export default Vue.extend({
-  name: "artifact",
+  name: "artifact-type-node",
   props: {
     type: {
       type: String,

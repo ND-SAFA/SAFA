@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <h1 class="my-2">Delta View</h1>
     <v-row justify="center">
       <v-switch
         color="primary"
@@ -8,9 +9,7 @@
         :error-messages="errorMessage"
         readonly
       >
-        <template v-slot:label>
-          <span class="text-h5">Delta View Mode</span>
-        </template>
+        <template v-slot:label> Enable Delta View Mode </template>
       </v-switch>
     </v-row>
     <v-row justify="center" v-if="isDeltaViewEnabled">

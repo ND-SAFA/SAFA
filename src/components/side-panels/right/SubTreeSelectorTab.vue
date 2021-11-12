@@ -1,12 +1,10 @@
 <template>
   <v-container>
+    <h1 class="my-2">Artifact Hierarchy</h1>
     <v-col>
-      <v-row class="mb-2 mt-2">
-        <h3 class="text-center">Artifact Hierarchy</h3>
-      </v-row>
       <v-row>
         <v-text-field
-          label="search"
+          label="Search"
           solo
           rounded
           class="mt-5"

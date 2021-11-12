@@ -24,9 +24,10 @@
             <slot name="items" />
             <v-container>
               <v-btn
+                color="primary"
+                :outlined="currentStep !== numberOfSteps"
                 :disabled="!isStepDone"
                 @click="onStepForward"
-                :color="currentStep === numberOfSteps ? 'secondary' : 'primary'"
               >
                 {{ currentStep === numberOfSteps ? "Submit" : "Continue" }}
               </v-btn>

@@ -4,7 +4,6 @@
     dense
     single-select
     v-model="selected"
-    class="elevation-1"
     checkbox-color="primary"
     :headers="headers"
     :items="items"
@@ -19,7 +18,7 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <v-row class="ma-3 pa-0">
+      <v-row class="ma-1">
         <v-col cols="11" class="ma-0 pa-0">
           <v-text-field
             v-model="search"
@@ -32,31 +31,38 @@
         </v-col>
         <v-col cols="1" class="ma-0 pa-0">
           <v-row justify="center" class="ma-0 pa-0">
-            <v-btn icon @click="$emit('refresh')">
-              <v-icon>mdi-refresh</v-icon>
-            </v-btn>
+            <generic-icon-button
+              tooltip="Refresh"
+              icon-id="mdi-refresh"
+              @click="$emit('refresh')"
+            />
           </v-row>
         </v-col>
       </v-row>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <v-icon
+      <generic-icon-button
         v-if="hasEdit"
-        small
-        class="mr-2"
+        icon-id="mdi-pencil"
+        tooltip="Edit"
         @click="$emit('edit-item', item)"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon v-if="hasDelete" small @click="$emit('delete-item', item)">
-        mdi-delete
-      </v-icon>
+      />
+      <generic-icon-button
+        v-if="hasDelete"
+        icon-id="mdi-delete"
+        tooltip="Delete"
+        @click="$emit('delete-item', item)"
+      />
     </template>
     <template v-slot:footer>
-      <v-row justify="end" class="mt-1">
-        <v-btn fab small color="secondary" @click="$emit('add-item')">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+      <v-row justify="end" class="mr-2 mt-1">
+        <generic-icon-button
+          fab
+          color="primary"
+          icon-id="mdi-plus"
+          tooltip="Create"
+          @click="$emit('add-item')"
+        />
       </v-row>
     </template>
   </v-data-table>
@@ -67,6 +73,7 @@
 //waiting for generics to be added to vue: https://github.com/vuejs/rfcs/pull/310
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
+import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
 
 /**
  * Displays a generic selector.
@@ -79,6 +86,7 @@ import Vue, { PropType } from "vue";
  */
 export default Vue.extend({
   name: "generic-selector",
+  components: { GenericIconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

@@ -2,10 +2,11 @@
   <v-tooltip bottom>
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        icon
         v-on="on"
         v-bind="attrs"
         :color="color"
+        :icon="!fab"
+        :fab="fab"
         @click="$emit('click')"
       >
         <v-icon>{{ iconId }}</v-icon>
@@ -34,10 +35,8 @@ export default Vue.extend({
       type: String,
       required: true,
     },
-    color: {
-      type: String,
-      required: false,
-    },
+    color: String,
+    fab: Boolean,
   },
 });
 </script>

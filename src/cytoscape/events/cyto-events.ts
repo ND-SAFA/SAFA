@@ -36,7 +36,7 @@ export const DefaultCytoEventHandlers: CytoEventHandlers = {
     events: [CytoEvent.TAP],
     action: (cy: CytoCore, event: EventObject) => {
       if (event.target === cy) {
-        artifactSelectionModule.unselectArtifact();
+        artifactSelectionModule.clearSelections();
       }
     },
   },

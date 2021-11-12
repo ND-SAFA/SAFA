@@ -1,5 +1,5 @@
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
-import { cyPromise } from "@/cytoscape/cytoscape";
+import { artifactTreeCyPromise } from "@/cytoscape/cytoscape";
 import { NodeSingular, CollectionReturnValue } from "cytoscape";
 import { onEdgeComplete } from "@/cytoscape/edge-handles/onComplete";
 
@@ -9,7 +9,7 @@ let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
 export function setEdgeHandlesCore(instance: EdgeHandleCore): Promise<void> {
   edgeHandlesCore = instance;
-  return cyPromise.then((cytoCore: CytoCore) => {
+  return artifactTreeCyPromise.then((cytoCore: CytoCore) => {
     cytoCore.on(CytoEvent.EH_COMPLETE, (event, ...args: unknown[]) =>
       onEdgeComplete(
         event,

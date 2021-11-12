@@ -1,7 +1,7 @@
 import { EventObject, NodeCollection, NodeSingular } from "cytoscape";
 import { KlayLayoutSettings, LayoutHook } from "./klay";
 import { AutoMoveRule } from "./automove";
-import { CytoEvent, CytoEventHandlers } from "@/types";
+import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
 
 /**
  * Fired on an auto move event.
@@ -51,4 +51,5 @@ export interface IGraphLayout {
   codeNodes?: NodeCollection;
   codeElements?: NodeCollection;
   peerElements?: NodeCollection;
+  createLayout(cy: CytoCore): void;
 }

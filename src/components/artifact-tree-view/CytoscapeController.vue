@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import contextMenus from "cytoscape-context-menus";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import klay from "cytoscape-klay";
@@ -24,9 +24,24 @@ import {
   GRAPH_CONFIG,
 } from "@/cytoscape";
 import { viewportModule } from "@/store";
-import { CytoCore } from "@/types";
+import { CytoCore, EdgeHandlersOptions, IGraphLayout } from "@/types";
+import GraphLayout from "@/cytoscape/layout/graph-layout";
 
 export default Vue.extend({
+  props: {
+    layout: {
+      type: Object as PropType<IGraphLayout>,
+      default: GraphLayout,
+    },
+    menuOptions: {
+      type: Object,
+      default: contextMenuOptions,
+    },
+    edgeHandleOptions: {
+      type: Object as PropType<EdgeHandlersOptions>,
+      default: edgeHandleOptions,
+    },
+  },
   data: () => {
     return {
       config: GRAPH_CONFIG,
@@ -48,9 +63,15 @@ export default Vue.extend({
       // waits for elements to be added
       // see: https://github.com/rcarcasses/vue-cytoscape/issues/50
       resolveCy(cy);
-      await viewportModule.setGraphLayout();
-      cy.contextMenus(contextMenuOptions);
-      await setEdgeHandlesCore(cy.edgehandles(edgeHandleOptions));
+      const cyPromise: Promise<CytoCore> = new Promise((resolve) =>
+        resolve(cy)
+      );
+      await viewportModule.setGraphLayout(
+        cyPromise,
+        this.layout as IGraphLayout
+      );
+      cy.contextMenus(this.menuOptions);
+      await setEdgeHandlesCore(cy.edgehandles(this.edgeHandleOptions));
     },
   },
 });

@@ -7,29 +7,32 @@
   >
     <template v-slot:body>
       <v-container>
-        <v-row justify="center">
-          <v-col cols="6">
-            <v-text-field
-              v-model="name"
-              outlined
-              dense
-              rounded
-              label="Artifact Id"
-              color="primary"
-              :hint="nameHint"
-              :error-messages="nameError"
-            />
-            <button-row :definitions="buttonDefinitions" justify="center" />
-            <v-text-field label="Artifact Summary" v-model="summary" />
-            <v-text-field label="Artifact Body" v-model="body" />
-          </v-col>
-        </v-row>
+        <v-text-field
+          v-model="name"
+          outlined
+          dense
+          rounded
+          label="Artifact Id"
+          color="primary"
+          :hint="nameHint"
+          :error-messages="nameError"
+        />
+        <button-row :definitions="buttonDefinitions" justify="center" />
+        <v-textarea
+          filled
+          label="Artifact Summary"
+          v-model="summary"
+          class="mt-3"
+          rows="3"
+        />
+        <v-textarea filled label="Artifact Body" v-model="body" rows="3" />
       </v-container>
     </template>
     <template v-slot:actions>
-      <v-row justify="center">
+      <v-row justify="end">
         <v-btn color="primary" :disabled="!isValid" @click="onSubmit">
           <v-icon>mdi-content-save</v-icon>
+          <span class="ml-1">Save</span>
         </v-btn>
       </v-row>
     </template>

@@ -1,53 +1,82 @@
 <template>
   <v-container>
     <v-container v-if="selectedArtifact !== undefined">
-      <h3 class="text-center">
-        {{ selectedArtifact.name }}
-        <v-btn icon small @click="onArtifactEdit">
-          <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
-      </h3>
-      <v-divider />
-      <p class="text-body-1 mt-2 pa-2">
-        {{ selectedArtifact.body }}
-      </p>
-      <v-divider class="mb-1" />
-      <v-row>
-        <v-col class="mr-1" cols="5">
-          <v-container v-if="parents.length > 0">
-            <h4>Parents</h4>
-            <v-btn
-              fab
-              x-small
-              class="ma-2"
-              color="primary"
-              v-for="parentName in parents"
-              :key="parentName"
-              @click="onArtifactClick(parentName)"
-            >
-              {{ parentName }}
-            </v-btn>
-          </v-container>
-          <p v-else>No parents linked.</p>
+      <v-row align="center">
+        <v-col>
+          <h1>{{ selectedArtifact.name }}</h1>
         </v-col>
-
-        <v-col cols="5" v-if="children.length > 0">
-          <h4>Children</h4>
-          <v-btn
-            fab
-            x-small
-            class="ma-1"
-            color="primary"
-            v-for="childName in children"
-            :key="childName"
-            @click="onArtifactClick(childName)"
-          >
-            {{ childName }}
-          </v-btn>
+        <v-col>
+          <v-row justify="end">
+            <generic-icon-button
+              tooltip="Edit"
+              icon-id="mdi-pencil"
+              @click="onArtifactEdit"
+            />
+            <generic-icon-button
+              color="error"
+              tooltip="Delete"
+              icon-id="mdi-delete"
+              @click="onDeleteArtifact"
+            />
+          </v-row>
         </v-col>
       </v-row>
-      <v-divider class="mt-2" />
-      <v-row class="pa-1 mt-10">
+
+      <v-divider class="mb-2" />
+
+      <p class="text-body-1">
+        {{ selectedArtifact.body }}
+      </p>
+
+      <v-divider />
+
+      <v-row>
+        <v-col>
+          <v-subheader>Parents</v-subheader>
+          <v-divider />
+          <p v-if="parents.length === 0" class="text-caption text-center mt-1">
+            No parents linked.
+          </p>
+          <v-list dense v-else>
+            <v-list-item-group>
+              <v-list-item
+                v-for="parentName in parents"
+                :key="parentName"
+                @click="onArtifactClick(parentName)"
+              >
+                <v-list-item-content>
+                  <v-list-item-title v-text="parentName" />
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-col>
+
+        <v-col>
+          <v-subheader>Children</v-subheader>
+          <v-divider />
+          <p v-if="children.length === 0" class="text-caption text-center mt-1">
+            No children linked.
+          </p>
+          <v-list dense v-else>
+            <v-list-item-group>
+              <v-list-item
+                v-for="childName in children"
+                :key="childName"
+                @click="onArtifactClick(childName)"
+              >
+                <v-list-item-content>
+                  <v-list-item-title v-text="childName" />
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-col>
+      </v-row>
+
+      <v-divider class="mb-2" />
+
+      <v-row class="pa-1">
         <p
           class="text-body-2 font-italic"
           v-if="selectedArtifactWarnings !== undefined"
@@ -56,20 +85,14 @@
           {{ selectedArtifactWarnings }}
         </p>
       </v-row>
-      <v-row>
-        <v-divider />
-      </v-row>
-      <v-row justify="center">
-        <v-btn icon fab color="error" @click="onDeleteArtifact">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-row>
+
       <ArtifactCreatorModal
         :is-open="isArtifactCreatorOpen"
         :artifact="selectedArtifact"
         @onClose="isArtifactCreatorOpen = false"
       />
     </v-container>
+
     <p v-else>No artifact selected</p>
   </v-container>
 </template>
@@ -85,9 +108,10 @@ import {
   projectModule,
 } from "@/store";
 import { ArtifactCreatorModal } from "@/components";
+import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
 
 export default Vue.extend({
-  components: { ArtifactCreatorModal },
+  components: { GenericIconButton, ArtifactCreatorModal },
   data() {
     return {
       previousArtifact: undefined as Artifact | undefined,

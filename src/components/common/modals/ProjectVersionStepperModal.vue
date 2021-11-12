@@ -14,25 +14,21 @@
       <slot name="beforeItems" />
 
       <v-stepper-content :step="projectStep">
-        <v-container>
-          <project-selector
-            :is-open="isOpen"
-            @onProjectSelected="selectProject"
-            @onProjectUnselected="unselectProject"
-          />
-        </v-container>
+        <project-selector
+          :is-open="isOpen"
+          @onProjectSelected="selectProject"
+          @onProjectUnselected="unselectProject"
+        />
       </v-stepper-content>
 
       <v-stepper-content :step="versionStep">
-        <v-container>
-          <version-selector
-            v-if="selectedProject !== undefined"
-            :is-open="isOpen"
-            :project="selectedProject"
-            @onVersionSelected="selectVersion"
-            @onVersionUnselected="unselectVersion"
-          />
-        </v-container>
+        <version-selector
+          v-if="selectedProject !== undefined"
+          :is-open="isOpen"
+          :project="selectedProject"
+          @onVersionSelected="selectVersion"
+          @onVersionUnselected="unselectVersion"
+        />
       </v-stepper-content>
       <slot name="afterItems" />
     </template>

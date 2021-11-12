@@ -1,6 +1,6 @@
 <template>
   <v-container class="elevation-3">
-    <CytoscapeController>
+    <CytoscapeController :graphDefinition="graphDefinition">
       <template v-slot:elements>
         <ArtifactNode
           v-for="artifact in artifacts"
@@ -27,7 +27,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
+import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types/domain";
+import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
@@ -37,6 +38,7 @@ import { TraceLinkApprovalModal } from "@/components";
 import CytoscapeController from "../common/generic/GenericCytoscapeController.vue";
 import TraceLinkEdge from "../common/generic/GenericGraphLink.vue";
 import ArtifactNode from "./ArtifactNode.vue";
+import { artifactTreeGraph } from "@/types/cytoscape/graphs/artifact-tree-definition";
 
 export default Vue.extend({
   name: "artifact-view",
@@ -54,6 +56,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    graphDefinition(): CytoCoreGraph {
+      return artifactTreeGraph;
+    },
     artifactHashMap(): Record<string, Artifact> {
       return projectModule.getArtifactHashmap;
     },

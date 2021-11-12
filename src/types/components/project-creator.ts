@@ -1,10 +1,5 @@
-import {
-  Artifact,
-  ArtifactFile,
-  ProjectFile,
-  TraceFile,
-  TraceLink,
-} from "@/types";
+import { Artifact, TraceLink } from "@/types/domain";
+import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
   title: string;

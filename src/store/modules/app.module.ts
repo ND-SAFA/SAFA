@@ -1,11 +1,9 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type {
-  APIErrorBody,
-  ConfirmDialogueMessage,
-  PanelState,
-  SnackbarMessage,
-} from "@/types";
-import { ConfirmationType, MessageType, PanelType } from "@/types";
+import type { ConfirmDialogueMessage, PanelState } from "@/types/store/general";
+import { APIErrorBody } from "@/types/api";
+import { ConfirmationType, PanelType } from "@/types";
+import type { SnackbarMessage } from "@/types/store/snackbar";
+import { MessageType } from "@/types/store/snackbar";
 
 const emptySnackbarMessage = {
   errors: [],

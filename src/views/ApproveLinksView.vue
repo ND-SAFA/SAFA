@@ -43,7 +43,7 @@ import {
   declineLinkAPIHandler,
   getGeneratedLinks,
 } from "@/api";
-import { TraceApproval, TraceLink, Artifact } from "@/types";
+import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
 import { appModule, projectModule } from "@/store";
 import { ApprovalSection } from "@/components/approve-links-view";
 

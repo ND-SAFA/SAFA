@@ -6,10 +6,11 @@ import {
   EdgeHandlersOptions,
   HtmlDefinition,
   KlayLayoutOptions,
-} from "@/types";
+} from "@/types/cytoscape";
 
 /**
- * Defines callbacks for Cyto Core layout.
+ * Defines CytoCore, an application specific definition of cytoscape defining
+ * interfaces with the plugin made available.
  */
 export interface CytoCore extends Core {
   nodeHtmlLabel(defs: HtmlDefinition[]): void;

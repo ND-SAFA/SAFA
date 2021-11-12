@@ -1,4 +1,4 @@
-import { CytoCore } from "@/types";
+import { CytoCore, ResolveCy } from "@/types";
 import { Artifact } from "@/types";
 import {
   SingularElementArgument,
@@ -6,11 +6,16 @@ import {
   EdgeCollection,
 } from "cytoscape";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export let resolveCy: any = null;
+export let artifactTreeResolveCy: ResolveCy = null;
 
 export const artifactTreeCyPromise: Promise<CytoCore> = new Promise(
-  (resolve) => (resolveCy = resolve)
+  (resolve) => (artifactTreeResolveCy = resolve)
+);
+
+export let timTreeResolveCy: ResolveCy = null;
+
+export const timTreeCyPromise: Promise<CytoCore> = new Promise(
+  (resolve) => (timTreeResolveCy = resolve)
 );
 
 export function getArtifactSubTree(artifact: Artifact): Promise<string[]> {
@@ -24,6 +29,7 @@ export function getArtifactSubTree(artifact: Artifact): Promise<string[]> {
 }
 
 const typeHierarchy = [
+  // todo: Move into more specific file
   "hazard",
   "requirement",
   "design",

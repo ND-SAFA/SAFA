@@ -1,17 +1,19 @@
-import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
-import { artifactTreeCyPromise } from "@/cytoscape/cytoscape";
+import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types/cytoscape";
 import { NodeSingular, CollectionReturnValue } from "cytoscape";
-import { onEdgeComplete } from "@/cytoscape/edge-handles/onComplete";
+import { onArtifactTreeEdgeComplete } from "@/cytoscape/edge-handles/onComplete";
 
 export * from "./options";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
-export function setEdgeHandlesCore(instance: EdgeHandleCore): Promise<void> {
+export function setEdgeHandlesCore(
+  cyPromise: Promise<CytoCore>,
+  instance: EdgeHandleCore
+): Promise<void> {
   edgeHandlesCore = instance;
-  return artifactTreeCyPromise.then((cytoCore: CytoCore) => {
+  return cyPromise.then((cytoCore: CytoCore) => {
     cytoCore.on(CytoEvent.EH_COMPLETE, (event, ...args: unknown[]) =>
-      onEdgeComplete(
+      onArtifactTreeEdgeComplete(
         event,
         args[0] as NodeSingular,
         args[1] as NodeSingular,
@@ -20,6 +22,7 @@ export function setEdgeHandlesCore(instance: EdgeHandleCore): Promise<void> {
     );
   });
 }
+
 export function getEdgeHandlesCore(): EdgeHandleCore {
   if (edgeHandlesCore === undefined) {
     throw Error("EdgeHandles has not been instantiated");

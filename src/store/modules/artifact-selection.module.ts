@@ -1,7 +1,8 @@
 import { appModule, viewportModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, FilterAction } from "@/types";
+import type { Artifact } from "@/types";
 import { PanelType } from "@/types";
+import { FilterAction } from "@/types/store/filters";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**

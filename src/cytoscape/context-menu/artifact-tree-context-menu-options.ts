@@ -10,7 +10,7 @@ import { enableDrawMode } from "@/cytoscape";
 import { Artifact, ArtifactData } from "@/types";
 import { deleteArtifactHandler } from "@/api";
 
-export const contextMenuOptions = {
+export const artifactTreeContextMenuOptions = {
   // Customize event to bring up the context menu
   // Possible options https://js.cytoscape.org/#events/user-input-device-events
   evtType: "cxttap",

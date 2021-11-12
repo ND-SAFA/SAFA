@@ -1,6 +1,6 @@
 <template>
   <v-container class="elevation-3" style="width: 500px; height: 300px">
-    <GenericCytoscapeController>
+    <GenericCytoscapeController :graph-definition="graphDefinition">
       <template v-slot:elements>
         <ArtifactTypeNode
           v-for="artifactPanel in artifactPanels"
@@ -25,6 +25,8 @@ import { ArtifactPanel } from "@/components";
 import GenericCytoscapeController from "@/components/common/generic/GenericCytoscapeController.vue";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 import GenericGraphLink from "@/components/common/generic/GenericGraphLink.vue";
+import { timTreeDefinition } from "@/types/cytoscape/graphs";
+import { CytoCoreGraph } from "@/types/cytoscape";
 
 export default Vue.extend({
   props: {
@@ -41,6 +43,11 @@ export default Vue.extend({
     getTraceId(tracePanel: TracePanel): string {
       const traceFile = tracePanel.projectFile;
       return `${traceFile.source}-${traceFile.target}`;
+    },
+  },
+  computed: {
+    graphDefinition(): CytoCoreGraph {
+      return timTreeDefinition;
     },
   },
   components: {

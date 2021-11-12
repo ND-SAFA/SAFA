@@ -1,6 +1,8 @@
 /**
  * Enumerates the types of artifact deltas.
  */
+import { Artifact } from "@/types";
+
 export enum ArtifactDeltaState {
   NO_CHANGE = "no_change",
   MODIFIED = "modified",
@@ -39,3 +41,31 @@ export type ArtifactDelta = AddedArtifact | RemovedArtifact | ModifiedArtifact;
  * Defines all artifact delta types.
  */
 export type DeltaType = "added" | "modified" | "removed";
+
+/**
+ * Defines the delta artifacts state.
+ */
+export interface DeltaArtifacts {
+  /**
+   * A collection of all added artifacts.
+   */
+  added: Record<string, AddedArtifact>;
+  /**
+   * A collection of all removed artifacts.
+   */
+  removed: Record<string, RemovedArtifact>;
+  /**
+   * A collection of all modified artifacts.
+   */
+  modified: Record<string, ModifiedArtifact>;
+}
+
+/**
+ * Defines the delta payload state.
+ */
+export interface DeltaPayload extends DeltaArtifacts {
+  /**
+   * A list of all missing artifacts.
+   */
+  missingArtifacts: Artifact[];
+}

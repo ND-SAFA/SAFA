@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ConfirmDialogueMessage, PanelType } from "@/types";
+import { ConfirmDialogueMessage, PanelType } from "@/types/store";
 import { appModule } from "@/store";
 import {
   AppBar,

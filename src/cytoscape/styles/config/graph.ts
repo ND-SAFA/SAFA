@@ -3,9 +3,7 @@ import {
   LayoutDirection,
   NodeLayering,
   NodePlacement,
-} from "@/types";
-import { GraphStyle } from "@/cytoscape/styles/stylesheets";
-import { CytoscapeOptions } from "cytoscape";
+} from "@/types/cytoscape/plugins/klay";
 
 export const EDGE_CURVE_STYLE = "bezier";
 export const CORE_PEER_SPACING = 1;
@@ -30,13 +28,6 @@ export const MOTION_BLUE_OPACITY = 0.2;
 export const ZOOM_INCREMENT = 0.05;
 
 export const DEFAULT_ZOOM = 0.75;
-export const DEFAULT_PAN = 1;
 export const ANIMATION_DURATION = 150; // ms
 export const CENTER_GRAPH_PADDING = 10;
 export const TRUNCATE_LENGTH = 75;
-export const GRAPH_CONFIG: CytoscapeOptions = {
-  style: GraphStyle,
-  motionBlur: USE_MOTION_BLUR,
-  motionBlurOpacity: MOTION_BLUE_OPACITY,
-  zoom: DEFAULT_ZOOM,
-};

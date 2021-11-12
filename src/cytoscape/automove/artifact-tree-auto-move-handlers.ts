@@ -1,13 +1,12 @@
-import {
-  AutoMoveEventHandlers,
-  AutoMoveRule,
-  CSSCursor,
-  CytoEvent,
-} from "@/types";
+import { CSSCursor, CytoEvent } from "@/types/cytoscape/core";
+import { AutoMoveEventHandlers, AutoMoveRule } from "@/types/cytoscape/plugins";
 import { EventObject, NodeSingular } from "cytoscape";
 
-export const DefaultAutoMoveEventHandlers: AutoMoveEventHandlers = {
-  onContextDrag: {
+/**
+ * Defines a set of triggers-handler pairs for use in the artifact tree graph.
+ */
+export const ArtifactTreeAutoMoveHandlers: AutoMoveEventHandlers = {
+  moveArtifactWithoutSubtree: {
     triggers: [CytoEvent.CXT_DRAG],
     action: (node: NodeSingular, rule: AutoMoveRule, event: EventObject) => {
       document.body.style.cursor = CSSCursor.GRAB;

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h2 class="text-h6">Notation Key</h2>
+    <h1 class="my-2">Notation Key</h1>
     <v-container>
       <p>General Safety Tree Notation</p>
       <p>

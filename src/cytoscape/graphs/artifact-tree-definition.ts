@@ -7,7 +7,6 @@ import {
   artifactTreeContextMenuOptions,
   artifactTreeCyPromise,
   artifactTreeEdgeHandleOptions,
-  artifactTreeResolveCy,
   DEFAULT_ZOOM,
   GraphStyle,
   MOTION_BLUE_OPACITY,
@@ -19,6 +18,7 @@ import { viewportModule } from "@/store";
 import ArtifactTreeGraphLayout from "@/cytoscape/layout/artifact-tree-graph-layout";
 import { CytoscapeOptions } from "cytoscape";
 import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
+import { artifactTreeResolveCy } from "./artifact-tree-cy";
 
 const artifactTreeConfig: CytoscapeOptions = {
   style: GraphStyle,

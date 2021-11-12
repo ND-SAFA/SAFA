@@ -12,7 +12,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { CytoCore, CytoCoreGraph } from "@/types/cytoscape/core";
-import { appModule, viewportModule } from "@/store";
+import { appModule } from "@/store";
 
 /**
  * Abstracts setting up a cytoscape instance and corresponding
@@ -48,8 +48,6 @@ export default Vue.extend({
         plugin.afterInit(cy);
       });
       this.cytoCoreGraph.afterInit(cy);
-
-      await viewportModule.setGraphLayout();
     },
   },
 });

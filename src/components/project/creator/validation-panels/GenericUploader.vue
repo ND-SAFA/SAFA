@@ -115,7 +115,6 @@ export default Vue.extend({
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("onChange", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);
-      console.log(this.openPanelIndexes);
     },
   },
 });

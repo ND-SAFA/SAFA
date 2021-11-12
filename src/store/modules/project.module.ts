@@ -47,7 +47,6 @@ export default class ProjectModule extends VuexModule {
   async setProjectCreationResponse(
     res: ProjectCreationResponse
   ): Promise<void> {
-    console.log(res);
     await this.setProject(res.project);
 
     errorModule.setArtifactWarnings(res.warnings);

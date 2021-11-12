@@ -21,11 +21,13 @@
 import Vue, { PropType } from "vue";
 import { TracePanel } from "@/types";
 import { ArtifactPanel } from "@/components";
-import GenericCytoscapeController from "@/components/common/generic/GenericCytoscapeController.vue";
-import GenericGraphLink from "@/components/common/generic/GenericGraphLink.vue";
 import { timTreeDefinition } from "@/cytoscape/graphs";
 import { CytoCoreGraph } from "@/types/cytoscape";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
+import {
+  GenericGraphLink,
+  GenericCytoscapeController,
+} from "@/components/common";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes

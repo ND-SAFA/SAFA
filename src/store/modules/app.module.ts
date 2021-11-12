@@ -172,6 +172,32 @@ export default class ProjectModule extends VuexModule {
     } as PanelState);
   }
 
+  @Action
+  /**
+   * Logs and prints message to the console.
+   */
+  onDevMessage(message: string): void {
+    console.log(message);
+    //TODO: Add to log
+  }
+  @Action
+  /**
+   * Logs and prints warning to the console.
+   */
+  onDevWarning(message: string): void {
+    console.warn(message);
+    //TODO: Add to log
+  }
+
+  @Action
+  /**
+   * Logs and prints error to the console.
+   */
+  onDevError(message: string): void {
+    console.error(message);
+    //TODO: Add to log
+  }
+
   @Mutation
   /**
    * Sets the current loading state.

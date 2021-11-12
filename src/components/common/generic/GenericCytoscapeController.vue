@@ -1,7 +1,7 @@
 <template>
   <cytoscape
     id="cy-container"
-    :config="graphDefinition.config"
+    :config="cytoCoreGraph.config"
     :preConfig="preConfig"
     :afterCreated="afterCreated"
   >
@@ -12,41 +12,42 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { CytoCore, CytoCoreGraph } from "@/types/cytoscape/core";
+import { appModule } from "@/store";
 
 /**
  * Abstracts setting up a cytoscape instance and corresponding
  * plugins.
+ *
  */
 export default Vue.extend({
   props: {
-    graphDefinition: {
+    cytoCoreGraph: {
       type: Object as PropType<CytoCoreGraph>,
       required: true,
     },
   },
   methods: {
     preConfig(cy: CytoCore) {
-      this.graphDefinition.plugins.forEach((plugin) => {
+      this.cytoCoreGraph.plugins.forEach((plugin) => {
         try {
-          plugin.plugin(cy);
+          plugin.initialize(cy);
         } catch (e) {
-          console.log("plugin already installed");
+          console.warn(`Plugin installation error: ${e}`);
         }
       });
     },
     async afterCreated(cy: CytoCore) {
-      if (this.graphDefinition.saveCy) {
-        this.graphDefinition.saveCy(cy);
+      if (this.cytoCoreGraph.saveCy) {
+        this.cytoCoreGraph.saveCy(cy);
       } else {
-        console.warn(
-          "Unable to save cytoscape instance in: ",
-          this.graphDefinition.name
+        appModule.onDevError(
+          `Unable to save cytoscape instance in: ${this.cytoCoreGraph.name}`
         );
       }
-      this.graphDefinition.plugins.forEach((plugin) => {
+      this.cytoCoreGraph.plugins.forEach((plugin) => {
         plugin.afterInit(cy);
       });
-      this.graphDefinition.afterInit(cy);
+      this.cytoCoreGraph.afterInit(cy);
     },
   },
 });

@@ -1,6 +1,6 @@
 <template>
   <v-container class="elevation-3">
-    <CytoscapeController :graphDefinition="graphDefinition">
+    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
         <ArtifactNode
           v-for="artifact in artifacts"
@@ -8,14 +8,14 @@
           :artifact-definition="artifact"
           :opacity="getArtifactOpacity(artifact.name)"
         />
-        <TraceLinkEdge
+        <GenericGraphLink
           v-for="traceLink in traces"
           :key="`${traceLink.source}-${traceLink.target}`"
           :trace-definition="traceLink"
           @right-click="onLinkRightClick"
         />
       </template>
-    </CytoscapeController>
+    </GenericCytoscapeController>
     <TraceLinkApprovalModal
       v-if="selectedLink !== undefined"
       :is-open="isTraceModalOpen"
@@ -27,26 +27,28 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types/domain";
+import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
 import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
   viewportModule,
 } from "@/store";
-import { TraceLinkApprovalModal } from "@/components";
-import CytoscapeController from "../common/generic/GenericCytoscapeController.vue";
-import TraceLinkEdge from "../common/generic/GenericGraphLink.vue";
+import {
+  TraceLinkApprovalModal,
+  GenericGraphLink,
+  GenericCytoscapeController,
+} from "@/components";
 import ArtifactNode from "./ArtifactNode.vue";
-import { artifactTreeGraph } from "@/types/cytoscape/graphs/artifact-tree-definition";
+import { artifactTreeGraph } from "@/cytoscape/graphs/artifact-tree-definition";
 
 export default Vue.extend({
   name: "artifact-view",
   components: {
     ArtifactNode,
-    TraceLinkEdge,
+    GenericGraphLink,
     TraceLinkApprovalModal,
-    CytoscapeController,
+    GenericCytoscapeController,
   },
   data: () => {
     return {
@@ -56,7 +58,7 @@ export default Vue.extend({
     };
   },
   computed: {
-    graphDefinition(): CytoCoreGraph {
+    cytoCoreGraph(): CytoCoreGraph {
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {

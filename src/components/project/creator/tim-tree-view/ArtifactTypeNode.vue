@@ -5,20 +5,26 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Artifact, CytoCoreElementDefinition } from "@/types";
+import { ArtifactPanel } from "@/components";
 
+/**
+ * The node representing an artifact type in the tim tree.
+ */
 export default Vue.extend({
   name: "artifact-type-node",
   props: {
-    type: {
-      type: String,
-      required: true,
-    },
-    artifacts: {
-      type: Array as PropType<Artifact[]>,
+    artifactPanel: {
+      type: Object as PropType<ArtifactPanel>,
       required: true,
     },
   },
   computed: {
+    artifacts(): Artifact[] {
+      return this.artifactPanel.projectFile.artifacts;
+    },
+    type(): string {
+      return this.artifactPanel.projectFile.type;
+    },
     count(): number {
       return this.artifacts.length;
     },

@@ -33,25 +33,25 @@ export const artifactTreeGraph: CytoCoreGraph = {
   saveCy: artifactTreeResolveCy,
   plugins: [
     {
-      plugin: nodeHtmlLabel,
+      initialize: nodeHtmlLabel,
       afterInit: () => undefined,
     },
     {
-      plugin: klay,
+      initialize: klay,
       afterInit: () => undefined,
     },
     {
-      plugin: automove,
+      initialize: automove,
       afterInit: () => undefined,
     },
     {
-      plugin: contextMenus,
+      initialize: contextMenus,
       afterInit(cy: CytoCore): void {
         cy.contextMenus(artifactTreeContextMenuOptions);
       },
     },
     {
-      plugin: edgehandles,
+      initialize: edgehandles,
       afterInit: async (cy: CytoCore) =>
         await setEdgeHandlesCore(
           artifactTreeCyPromise,

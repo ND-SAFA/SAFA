@@ -15,7 +15,7 @@ import {
 export interface CytoCore extends Core {
   nodeHtmlLabel(defs: HtmlDefinition[]): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
-  contextMenus(options: unknown): void;
+  contextMenus(options: unknown): void; //todo: add types for options
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }

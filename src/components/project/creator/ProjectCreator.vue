@@ -87,9 +87,9 @@ import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
 import { GenericStepper } from "@/components";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createTraceUploader, createArtifactUploader } from "./definitions";
+import { createTraceUploader, createArtifactUploader } from "./uploaders";
 import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
-import { TimTree } from "@/components/tim-tree-view";
+import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
@@ -113,7 +113,7 @@ export default Vue.extend({
       ] as StepState[],
       name: "",
       description: "",
-      currentStep: 4,
+      currentStep: 1,
       isConfirmOpen: false,
       artifactUploader: createArtifactUploader(),
       traceUploader: createTraceUploader(),

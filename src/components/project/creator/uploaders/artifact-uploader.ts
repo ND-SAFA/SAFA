@@ -10,18 +10,13 @@ import {
 
 export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
 
-export const testPanels: ArtifactPanel[] = [
-  createNewPanel("Requirements"),
-  createNewPanel("Designs"),
-];
-
 export function createArtifactUploader(): IGenericUploader<
   ArtifactMap,
   string,
   ArtifactFile
 > {
   return {
-    panels: testPanels,
+    panels: [],
     createNewPanel,
   };
 }

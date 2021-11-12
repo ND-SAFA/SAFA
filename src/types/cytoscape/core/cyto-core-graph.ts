@@ -1,11 +1,25 @@
 import { CytoCore } from "@/types/cytoscape/core";
 import { CytoscapeOptions } from "cytoscape";
 
-// waits for elements to be added to cytoscape instance before returning
-// see: https://github.com/rcarcasses/vue-cytoscape/issues/50
+/**
+ * Background: Cytoscape has to be wrapped in a promise in order to
+ * wait for all elements to be loaded into the instance.
+ *
+ * See issue: https://github.com/rcarcasses/vue-cytoscape/issues/50
+ */
+
+/**
+ * Wraps cytoscape instance in a promise.
+ */
 export type ResolveCy =
   | ((value: CytoCore | PromiseLike<CytoCore>) => void)
   | null;
+
+/**
+ * Returns an instance of cytoscape when all elements have
+ * been loaded
+ */
+export type CyPromise = Promise<CytoCore>;
 
 /**
  * A generic function type using a CytoCore instance.
@@ -16,7 +30,7 @@ export type CytoCoreAction = (cy: CytoCore) => void;
  * Defines an plugin to be used on cytoscape
  */
 export interface CytoCorePlugin {
-  plugin: CytoCoreAction;
+  initialize: CytoCoreAction;
   afterInit: CytoCoreAction;
 }
 

@@ -1,4 +1,4 @@
-import { CytoCore, ResolveCy } from "@/types";
+import { CytoCore, CyPromise } from "@/types";
 import { Artifact } from "@/types";
 import {
   SingularElementArgument,
@@ -6,20 +6,11 @@ import {
   EdgeCollection,
 } from "cytoscape";
 
-export let artifactTreeResolveCy: ResolveCy = null;
-
-export const artifactTreeCyPromise: Promise<CytoCore> = new Promise(
-  (resolve) => (artifactTreeResolveCy = resolve)
-);
-
-export let timTreeResolveCy: ResolveCy = null;
-
-export const timTreeCyPromise: Promise<CytoCore> = new Promise(
-  (resolve) => (timTreeResolveCy = resolve)
-);
-
-export function getArtifactSubTree(artifact: Artifact): Promise<string[]> {
-  return artifactTreeCyPromise.then((cyCore: CytoCore) => {
+export function getArtifactSubTree(
+  cyPromise: CyPromise,
+  artifact: Artifact
+): Promise<string[]> {
+  return cyPromise.then((cyCore: CytoCore) => {
     const artifactNode = cyCore
       .elements(`node[id = "${artifact.name}"]`)
       .first();

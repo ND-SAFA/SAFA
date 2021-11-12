@@ -12,7 +12,7 @@ import {
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape";
-import type { CytoCore, Artifact } from "@/types";
+import type { CytoCore, Artifact, CyPromise } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
@@ -38,8 +38,11 @@ export default class ViewportModule extends VuexModule {
    *
    * @param artifact - The artifact to select and view.
    */
-  async viewArtifactSubtree(artifact: Artifact): Promise<void> {
-    const artifactsInSubtree = await getArtifactSubTree(artifact);
+  async viewArtifactSubtree(
+    artifact: Artifact,
+    cyPromise: CyPromise = artifactTreeCyPromise
+  ): Promise<void> {
+    const artifactsInSubtree = await getArtifactSubTree(cyPromise, artifact);
     artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({

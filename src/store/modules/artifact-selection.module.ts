@@ -67,6 +67,15 @@ export default class ArtifactSelectionModule extends VuexModule {
     appModule.closePanel(PanelType.left);
   }
 
+  @Action
+  /**
+   * Clears any selected artifact(s) in given cytoscape instance.
+   */
+  clearSelections(): void {
+    this.unselectArtifact();
+    this.SET_SELECTED_SUBTREE([]);
+  }
+
   @Mutation
   /**
    * Sets a subtree of artifacts as selected.

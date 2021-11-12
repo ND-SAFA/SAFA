@@ -1,5 +1,5 @@
 <template>
-  <FilePanel
+  <file-panel
     :showFileUploader="!isGeneratedToggle"
     @onChange="onChange"
     @onDelete="$emit('onDelete')"
@@ -14,9 +14,12 @@
     </template>
 
     <template v-slot:before-rows v-if="isTracePanel">
-      <GenericSwitch v-model="isGeneratedToggle" label="Generate Trace Links" />
+      <generic-switch
+        v-model="isGeneratedToggle"
+        label="Generate Trace Links"
+      />
     </template>
-  </FilePanel>
+  </file-panel>
 </template>
 
 <script lang="ts">

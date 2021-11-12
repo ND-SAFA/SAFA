@@ -1,9 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-expansion-panels>
-        <slot name="panels" />
-      </v-expansion-panels>
+      <slot name="panels" />
     </v-row>
     <v-row align="center" class="mx-auto" style="width: fit-content">
       <v-col>

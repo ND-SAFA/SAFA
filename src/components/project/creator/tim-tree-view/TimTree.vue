@@ -1,19 +1,19 @@
 <template>
   <v-container class="elevation-3" style="width: 500px; height: 300px">
-    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
+    <generic-cytoscape-controller :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
-        <ArtifactTypeNode
+        <artifact-type-node
           v-for="artifactPanel in artifactPanels"
           :artifact-panel="artifactPanel"
           :key="artifactPanel.title"
         />
-        <GenericGraphLink
+        <generic-graph-link
           v-for="tracePanel in tracePanels"
           :key="getTraceId(tracePanel)"
           :trace-definition="tracePanel.projectFile"
         />
       </template>
-    </GenericCytoscapeController>
+    </generic-cytoscape-controller>
   </v-container>
 </template>
 

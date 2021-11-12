@@ -59,17 +59,15 @@
 
       <v-stepper-content step="4">
         <v-container class="pa-10">
-          <v-row>
-            <TimTree
-              class="debug"
-              :artifact-panels="artifactUploader.panels"
-              :trace-panels="traceUploader.panels"
-            />
+          <v-row justify="center" class="mb-2">
+            <h1 class="text-h6">Graph Preview</h1>
           </v-row>
-          <v-row>
-            <v-divider />
-          </v-row>
-          <v-row v-if="currentStep === 4" justify="center" class="mt-5">
+          <TimTree
+            :artifact-panels="artifactUploader.panels"
+            :trace-panels="traceUploader.panels"
+          />
+          <v-divider class="my-5" />
+          <v-row v-if="currentStep === 4" justify="center">
             <v-btn color="primary" @click="saveProject()">
               Create Project
             </v-btn>

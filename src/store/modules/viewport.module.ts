@@ -12,11 +12,9 @@ import {
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape";
-import type { CytoCore, Artifact, CyPromise } from "@/types";
+import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
-import { IGraphLayout } from "@/types";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -72,8 +70,6 @@ export default class ViewportModule extends VuexModule {
     cyPromise: Promise<CytoCore> = artifactTreeCyPromise,
     layout: IGraphLayout = new GraphLayout()
   ): Promise<void> {
-    await navigateTo(Routes.ARTIFACT_TREE);
-
     const cy = await cyPromise;
 
     layout.createLayout(cy);

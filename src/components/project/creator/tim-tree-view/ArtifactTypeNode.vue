@@ -6,7 +6,7 @@
 import Vue, { PropType } from "vue";
 import { Artifact } from "@/types";
 import { ArtifactPanel } from "@/components/project/creator/uploaders";
-import { TypeNodeDefinitions } from "@/types/components/tim-tree";
+import { TimNodeDefinition } from "@/types/components/tim-tree";
 
 /**
  * The node representing an artifact type in the tim tree.
@@ -29,7 +29,7 @@ export default Vue.extend({
     count(): number {
       return this.artifacts.length;
     },
-    definition(): TypeNodeDefinitions {
+    definition(): TimNodeDefinition {
       return {
         data: {
           id: this.type,

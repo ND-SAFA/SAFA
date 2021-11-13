@@ -7,7 +7,7 @@ import {
   HtmlDefinition,
   KlayLayoutOptions,
 } from "@/types/cytoscape";
-import { ArtifactTypeNodeData } from "@/types/components/tim-tree";
+import { TimNodeData } from "@/types/components/tim-tree";
 import { ArtifactData } from "@/types";
 
 /**
@@ -15,7 +15,7 @@ import { ArtifactData } from "@/types";
  */
 type AppHtmlDefinitions = (
   | HtmlDefinition<ArtifactData>
-  | HtmlDefinition<ArtifactTypeNodeData>
+  | HtmlDefinition<TimNodeData>
 )[];
 
 /**

@@ -1,8 +1,8 @@
 import { CytoCoreElementData, CytoCoreElementDefinition } from "@/types";
 
-export interface TypeNodeDefinitions extends CytoCoreElementDefinition {
-  data: ArtifactTypeNodeData;
+export interface TimNodeDefinition extends CytoCoreElementDefinition {
+  data: TimNodeData;
 }
-export interface ArtifactTypeNodeData extends CytoCoreElementData {
+export interface TimNodeData extends CytoCoreElementData {
   count: number;
 }

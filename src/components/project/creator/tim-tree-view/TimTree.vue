@@ -20,21 +20,15 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TracePanel } from "@/types";
+import { TracePanel, CytoCoreGraph } from "@/types";
 import { ArtifactPanel } from "@/components";
 import { timGraph } from "@/cytoscape/graphs";
-import { CytoCoreGraph } from "@/types/cytoscape";
+import { viewportModule } from "@/store";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
-import {
-  ANIMATION_DURATION,
-  TimGraphLayout,
-  timTreeCyPromise,
-} from "@/cytoscape";
-import { appModule, viewportModule } from "@/store";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes

@@ -111,7 +111,7 @@ export default Vue.extend({
       ] as StepState[],
       name: "",
       description: "",
-      currentStep: 4,
+      currentStep: 1,
       isConfirmOpen: false,
       artifactUploader: createArtifactUploader(),
       traceUploader: createTraceUploader(),

@@ -17,7 +17,6 @@ import {
   viewportModule,
 } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { ArtifactGraphLayout, artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -48,18 +47,15 @@ export default class ProjectModule extends VuexModule {
   async setProjectCreationResponse(
     res: ProjectCreationResponse
   ): Promise<void> {
+    console.log("STEP 1");
     await this.setProject(res.project);
-
+    console.log("STEP 2");
     errorModule.setArtifactWarnings(res.warnings);
-
-    await navigateTo(Routes.ARTIFACT_TREE);
-
-    await viewportModule.setGraphLayout(
-      artifactTreeCyPromise,
-      new ArtifactGraphLayout()
-    );
-
+    console.log("STEP 3");
+    await viewportModule.setArtifactTreeLayout();
+    console.log("STEP 4");
     deltaModule.setIsDeltaViewEnabled(false);
+    console.log("STEP 5");
   }
 
   @Action
@@ -175,7 +171,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Deletes given artifact.
    *
-   * @param artifact - The artifact to remove.
+   * @param artifactName - The artifact to remove.
    */
   DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
     this.project.artifacts = this.project.artifacts.filter(

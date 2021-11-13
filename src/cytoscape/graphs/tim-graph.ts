@@ -3,8 +3,6 @@ import {
   CytoscapeStyle,
   DEFAULT_ZOOM,
   MOTION_BLUE_OPACITY,
-  TimGraphLayout,
-  timTreeCyPromise,
   timTreeResolveCy,
   USE_MOTION_BLUR,
 } from "@/cytoscape";
@@ -30,7 +28,6 @@ export const timGraph: CytoCoreGraph = {
     },
   ],
   afterInit: async () => {
-    const layout = new TimGraphLayout();
-    await viewportModule.setGraphLayout(timTreeCyPromise, layout);
+    await viewportModule.setTimTreeLayout();
   },
 };

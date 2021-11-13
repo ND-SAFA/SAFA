@@ -17,6 +17,7 @@ import {
 import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
+import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -69,6 +70,7 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout of the artifact tree
    */
   async setArtifactTreeLayout(): Promise<void> {
+    await navigateTo(Routes.ARTIFACT_TREE);
     const layout = new ArtifactGraphLayout();
     const payload = { layout, cyPromise: artifactTreeCyPromise };
     await this.setGraphLayout(payload);
@@ -79,6 +81,7 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout of the tim tree graph.
    */
   async setTimTreeLayout(): Promise<void> {
+    console.log("setting tim layout");
     const layout = new TimGraphLayout();
     const payload = { layout, cyPromise: timTreeCyPromise };
     await this.setGraphLayout(payload);

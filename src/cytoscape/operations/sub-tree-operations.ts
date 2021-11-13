@@ -56,7 +56,8 @@ function getSubTree(
 
 /**
  * Returns the top most parent from all elements in the cytoscape object.
- * Picks a random node and follows the parents until no more exist.
+ * Starting at the node with most edges, its parent is followed until no
+ * more exist. If a loop is encountered, then the first repeated node is returned.
  *
  * @param cyPromise - A promise returning cytoscape whose root node is returned.
  * @param currentNode - Defines where we are in the tree during recursion.
@@ -79,7 +80,7 @@ export async function getRootNode(
 
   // Avoid getting stuck in cycles.
   if (traversedNodes.includes(currentNode.id())) {
-    throw Error("Root node doesnt exist on a circular graph.");
+    return currentNode;
   } else {
     traversedNodes.push(currentNode.id());
   }

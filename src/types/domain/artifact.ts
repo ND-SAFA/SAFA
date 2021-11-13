@@ -1,4 +1,5 @@
 import { ArtifactDeltaState } from "./delta";
+import { CytoCoreElementData } from "@/types/cytoscape";
 
 /**
  * Defines an artifact file.
@@ -25,19 +26,11 @@ export interface Artifact {
 /**
  * Defines an artifact's data.
  */
-export interface ArtifactData {
-  /**
-   * The ID of the artifact.
-   */
-  id: string;
+export interface ArtifactData extends CytoCoreElementData {
   /**
    * The content of the artifact.
    */
   body: string;
-  /**
-   * The type of the artifact data.
-   */
-  type: string;
   /**
    * Any warnings generated from the artifact.
    */
@@ -82,3 +75,8 @@ export interface ArtifactWarning {
  * A collection of warnings for all artifacts.
  */
 export type ProjectWarnings = Record<string, ArtifactWarning[]>;
+
+/**
+ * Returns an artifact matching the given query, if one exists.
+ */
+export type ArtifactQueryFunction = (q: string) => Artifact | undefined;

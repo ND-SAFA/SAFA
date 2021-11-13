@@ -6,7 +6,7 @@ import {
   Project,
   ProjectErrors,
   ProjectVersion,
-} from "@/types";
+} from "@/types/domain";
 
 /**
  * Defines the options for interacting with API endpoints.

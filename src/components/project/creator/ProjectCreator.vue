@@ -59,16 +59,15 @@
 
       <v-stepper-content step="4">
         <v-container class="pa-10">
-          <v-row>
-            <leave-confirmation-modal
-              :project="project"
-              @onConfirm="saveProject"
-            />
+          <v-row justify="center" class="mb-2">
+            <h1 class="text-h6">Graph Preview</h1>
           </v-row>
-          <v-row>
-            <v-divider />
-          </v-row>
-          <v-row v-if="currentStep === 4" justify="center" class="mt-5">
+          <TimTree
+            :artifact-panels="artifactUploader.panels"
+            :trace-panels="traceUploader.panels"
+          />
+          <v-divider class="my-5" />
+          <v-row v-if="currentStep === 4" justify="center">
             <v-btn color="primary" @click="saveProject()">
               Create Project
             </v-btn>
@@ -81,25 +80,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  Project,
-  ProjectCreationResponse,
-  StepState,
-  TraceFile,
-  TraceLink,
-} from "@/types";
+import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
-import { GenericStepper } from "@/components";
+import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createTraceUploader, createArtifactUploader } from "./definitions";
-import {
-  TraceFileCreator,
-  ArtifactTypeCreatorModal,
-  LeaveConfirmationModal,
-} from "./modals";
+import { createTraceUploader, createArtifactUploader } from "./uploaders";
+import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
+import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
@@ -109,9 +97,9 @@ export default Vue.extend({
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
-    LeaveConfirmationModal,
     ArtifactTypeCreatorModal,
     TraceFileCreator,
+    TimTree,
   },
   data() {
     return {
@@ -125,8 +113,8 @@ export default Vue.extend({
       description: "",
       currentStep: 1,
       isConfirmOpen: false,
-      traceUploader: createTraceUploader(),
       artifactUploader: createArtifactUploader(),
+      traceUploader: createTraceUploader(),
     };
   },
   methods: {

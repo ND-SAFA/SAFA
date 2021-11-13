@@ -15,7 +15,7 @@
     <v-row justify="center" v-if="isDeltaViewEnabled">
       <v-btn
         v-if="isProjectDefined()"
-        color="secondary"
+        color="primary"
         @click="isModalOpen = true"
         class="pt-6 pb-6"
       >

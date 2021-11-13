@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appModule } from "@/store";
-import { GenericIconButton } from "@/components";
+import { GenericIconButton } from "@/components/common";
 import AppBarHeader from "./AppBarHeader.vue";
 import GraphNavIcons from "./GraphNavIcons.vue";
 

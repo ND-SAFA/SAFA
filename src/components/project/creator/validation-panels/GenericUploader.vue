@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <ValidatedPanels
+    <validated-panels
       :itemName="itemName"
       :showError="projectFiles.length === 0"
       :isValidStates="isValidStates"
@@ -11,14 +11,16 @@
       @onIsInvalid="$emit('onIsInvalid')"
     >
       <template v-slot:panels>
-        <FilePanelController
-          v-for="(panel, i) in panels"
-          :key="panel.title"
-          :panel="panel"
-          :artifactMap="artifactMap"
-          @onChange="onChange(i, $event)"
-          @onDelete="deleteFile(i)"
-        />
+        <v-expansion-panels multiple v-model="openPanelIndexes">
+          <file-panel-controller
+            v-for="(panel, i) in panels"
+            :key="panel.title"
+            :panel="panel"
+            :artifactMap="artifactMap"
+            @onChange="onChange(i, $event)"
+            @onDelete="deleteFile(i)"
+          />
+        </v-expansion-panels>
         <slot
           name="creator"
           v-bind:isCreatorOpen="isCreatorOpen"
@@ -26,7 +28,7 @@
           v-bind:onClose="onCloseCreator"
         />
       </template>
-    </ValidatedPanels>
+    </validated-panels>
   </v-container>
 </template>
 
@@ -69,12 +71,10 @@ export default Vue.extend({
       default: false,
     },
   },
-  data() {
-    return {
-      isCreatorOpen: false,
-    };
-  },
-
+  data: () => ({
+    isCreatorOpen: false,
+    openPanelIndexes: [] as number[],
+  }),
   computed: {
     isValidStates(): boolean[] {
       return this.panels.map((p) => p.projectFile.isValid);
@@ -114,6 +114,7 @@ export default Vue.extend({
     addFile(payload: string | TraceLink): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("onChange", this.panels.concat([newPanel]));
+      this.openPanelIndexes.push(this.panels.length - 1);
     },
   },
 });

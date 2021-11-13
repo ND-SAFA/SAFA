@@ -1,11 +1,11 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { ConfirmationType, PanelType, MessageType } from "@/types";
 import type {
+  SnackbarMessage,
   APIErrorBody,
   ConfirmDialogueMessage,
   PanelState,
-  SnackbarMessage,
 } from "@/types";
-import { ConfirmationType, MessageType, PanelType } from "@/types";
 
 const emptySnackbarMessage = {
   errors: [],
@@ -172,6 +172,32 @@ export default class ProjectModule extends VuexModule {
       type: panel,
       isOpen: false,
     } as PanelState);
+  }
+
+  @Action
+  /**
+   * Logs and prints message to the console.
+   */
+  onDevMessage(message: string): void {
+    console.log(message);
+    //TODO: Add to log
+  }
+  @Action
+  /**
+   * Logs and prints warning to the console.
+   */
+  onDevWarning(message: string): void {
+    console.warn(message);
+    //TODO: Add to log
+  }
+
+  @Action
+  /**
+   * Logs and prints error to the console.
+   */
+  onDevError(message: string): void {
+    console.error(message);
+    //TODO: Add to log
   }
 
   @Mutation

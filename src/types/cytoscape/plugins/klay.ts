@@ -1,4 +1,4 @@
-import { CytoCore, IGraphLayout } from "@/types";
+import { CytoCore, IGraphLayout } from "@/types/cytoscape/";
 
 /**
  * Types were extracted from: https://github.com/cytoscape/cytoscape.js-klay

@@ -1,5 +1,5 @@
 import store from "@/store";
-import { SnackbarMessage } from "@/types/store";
+import { SnackbarMessage } from "@/types/store/snackbar";
 import { expect } from "chai";
 
 describe("Vuex store", () => {
@@ -11,7 +11,7 @@ describe("Vuex store", () => {
     const snackMessage = "hello world";
     store.commit("app/setMessage", snackMessage);
 
-    //VP 2: Able to set mesage
+    //VP 2: Able to set message
     appErrorMessage = store.getters["app/getMessage"];
     expect(appErrorMessage).to.equal(snackMessage);
     store.commit("app/clearMessage");

@@ -1,19 +1,14 @@
-import { CytoCore } from "@/types";
-import { Artifact } from "@/types";
+import { CytoCore, CyPromise, Artifact } from "@/types";
 import {
   SingularElementArgument,
   CollectionReturnValue,
   EdgeCollection,
 } from "cytoscape";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export let resolveCy: any = null;
-
-export const cyPromise: Promise<CytoCore> = new Promise(
-  (resolve) => (resolveCy = resolve)
-);
-
-export function getArtifactSubTree(artifact: Artifact): Promise<string[]> {
+export function getArtifactSubTree(
+  cyPromise: CyPromise,
+  artifact: Artifact
+): Promise<string[]> {
   return cyPromise.then((cyCore: CytoCore) => {
     const artifactNode = cyCore
       .elements(`node[id = "${artifact.name}"]`)
@@ -24,6 +19,7 @@ export function getArtifactSubTree(artifact: Artifact): Promise<string[]> {
 }
 
 const typeHierarchy = [
+  // todo: Move into more specific file
   "hazard",
   "requirement",
   "design",
@@ -62,9 +58,11 @@ function getSubTree(
  * Returns the top most parent from all elements in the cytoscape object.
  * Picks a random node and follows the parents until no more exist.
  *
+ * @param cyPromise - A promise returning cytoscape whose root node is returned.
  * @param currentNode - Defines where we are in the tree during recursion.
  */
 export async function getRootNode(
+  cyPromise: Promise<CytoCore>,
   currentNode?: SingularElementArgument
 ): Promise<SingularElementArgument> {
   const cyCore = await cyPromise;
@@ -84,7 +82,7 @@ export async function getRootNode(
   if (edgesOutOfNode.length === 0) {
     return currentNode;
   } else {
-    return getRootNode(edgesOutOfNode[0].source());
+    return getRootNode(cyPromise, edgesOutOfNode[0].source());
   }
 }
 

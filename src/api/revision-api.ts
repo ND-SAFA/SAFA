@@ -65,7 +65,9 @@ function connect(
     }
 
     if (currentReconnectAttempts > 0) {
-      console.log("web socket reconnect attempt:", currentReconnectAttempts);
+      appModule.onDevMessage(
+        `Websocket reconnect attempt:${currentReconnectAttempts}`
+      );
     }
 
     currentReconnectAttempts++;
@@ -75,13 +77,14 @@ function connect(
         if (currentReconnectAttempts > 1) {
           appModule.onSuccess("Web Socket reconnected to server.");
         }
-        console.log("connection successful");
+        appModule.onDevMessage("Websocket connection successful.");
         clearInterval(recInterval);
         currentReconnectAttempts = 0;
         resolve();
       },
       () => {
-        console.log("attempting re-connect!");
+        appModule.onDevMessage("Re-connecting with WebSocket.");
+
         if (!isReconnect) {
           appModule.onError("Web Socket lost connection to server.");
         }

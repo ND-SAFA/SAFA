@@ -6,15 +6,16 @@ import {
   EdgeHandlersOptions,
   HtmlDefinition,
   KlayLayoutOptions,
-} from "@/types";
+} from "@/types/cytoscape";
 
 /**
- * Defines callbacks for Cyto Core layout.
+ * Defines CytoCore, an application specific definition of cytoscape defining
+ * interfaces with the plugin made available.
  */
 export interface CytoCore extends Core {
   nodeHtmlLabel(defs: HtmlDefinition[]): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
-  contextMenus(options: unknown): void;
+  contextMenus(options: unknown): void; //todo: add types for options
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }
@@ -239,4 +240,33 @@ export type CytoEventHandlers = Record<string, CytoEventDefinition>;
 export interface CytoStyleSheet {
   selector: string;
   style: Record<string, unknown>;
+}
+
+/**
+ * The required properties for defining an element (e.g. node or edge)
+ * in cytoscape.
+ */
+export interface CytoCoreElementDefinition {
+  data: CytoCoreElementData;
+}
+
+/**
+ * Required properties for defining the data that is held within each
+ * cytoscape element.
+ */
+export interface CytoCoreElementData {
+  /*
+   * A unique identifier for the element with cytoscape instance.
+   */
+  id: string;
+
+  /*
+   * The type of element being represented.
+   */
+  type: "node" | "edge";
+
+  /*
+   * The cytoscape label placed within nodes and besides edges.
+   */
+  label?: string;
 }

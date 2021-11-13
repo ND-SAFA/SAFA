@@ -1,6 +1,6 @@
 <template>
   <v-container class="elevation-3">
-    <CytoscapeController>
+    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
         <ArtifactNode
           v-for="artifact in artifacts"
@@ -8,14 +8,14 @@
           :artifact-definition="artifact"
           :opacity="getArtifactOpacity(artifact.name)"
         />
-        <TraceLinkEdge
+        <GenericGraphLink
           v-for="traceLink in traces"
           :key="`${traceLink.source}-${traceLink.target}`"
           :trace-definition="traceLink"
           @right-click="onLinkRightClick"
         />
       </template>
-    </CytoscapeController>
+    </GenericCytoscapeController>
     <TraceLinkApprovalModal
       v-if="selectedLink !== undefined"
       :is-open="isTraceModalOpen"
@@ -28,23 +28,27 @@
 <script lang="ts">
 import Vue from "vue";
 import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
+import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
   viewportModule,
 } from "@/store";
-import { TraceLinkApprovalModal } from "@/components";
-import CytoscapeController from "./CytoscapeController.vue";
-import TraceLinkEdge from "./TraceLinkEdge.vue";
+import {
+  GenericGraphLink,
+  GenericCytoscapeController,
+} from "@/components/common";
+import { TraceLinkApprovalModal } from "@/components/approve-links-view";
 import ArtifactNode from "./ArtifactNode.vue";
+import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
   name: "artifact-view",
   components: {
     ArtifactNode,
-    TraceLinkEdge,
+    GenericGraphLink,
     TraceLinkApprovalModal,
-    CytoscapeController,
+    GenericCytoscapeController,
   },
   data: () => {
     return {
@@ -54,6 +58,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    cytoCoreGraph(): CytoCoreGraph {
+      return artifactTreeGraph;
+    },
     artifactHashMap(): Record<string, Artifact> {
       return projectModule.getArtifactHashmap;
     },

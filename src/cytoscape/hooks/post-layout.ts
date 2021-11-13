@@ -1,10 +1,10 @@
+import { EventObject } from "cytoscape";
 import {
   LayoutHook,
   AutoMoveReposition,
   CytoCore,
   IGraphLayout,
 } from "@/types";
-import { EventObject } from "cytoscape";
 import { viewportModule } from "@/store";
 
 export const applyAutoMoveEvents: LayoutHook = (

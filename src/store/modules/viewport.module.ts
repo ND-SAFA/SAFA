@@ -1,21 +1,20 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import {
-  cyPromise,
+  artifactTreeCyPromise,
   getArtifactSubTree,
   getRootNode,
   isInSubtree,
   doesNotContainType,
   isRelatedToArtifacts,
-  GraphLayout,
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape";
-import type { CytoCore, Artifact } from "@/types";
+import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import ArtifactTreeGraphLayout from "@/cytoscape/layout/artifact-tree-graph-layout";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -37,8 +36,11 @@ export default class ViewportModule extends VuexModule {
    *
    * @param artifact - The artifact to select and view.
    */
-  async viewArtifactSubtree(artifact: Artifact): Promise<void> {
-    const artifactsInSubtree = await getArtifactSubTree(artifact);
+  async viewArtifactSubtree(
+    artifact: Artifact,
+    cyPromise: CyPromise = artifactTreeCyPromise
+  ): Promise<void> {
+    const artifactsInSubtree = await getArtifactSubTree(cyPromise, artifact);
     artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({
@@ -52,7 +54,7 @@ export default class ViewportModule extends VuexModule {
    * Repositions the currently selected subtree of artifacts.
    */
   async repositionSelectedSubtree(): Promise<void> {
-    const cy = await cyPromise;
+    const cy = await artifactTreeCyPromise;
     const artifactsInSubTree = artifactSelectionModule.getSelectedSubtree;
 
     if (!cy.animated()) {
@@ -64,11 +66,11 @@ export default class ViewportModule extends VuexModule {
   /**
    * Resets the graph layout.
    */
-  async setGraphLayout(): Promise<void> {
-    await navigateTo(Routes.ARTIFACT_TREE);
-
+  async setGraphLayout(
+    cyPromise: Promise<CytoCore> = artifactTreeCyPromise,
+    layout: IGraphLayout = new ArtifactTreeGraphLayout()
+  ): Promise<void> {
     const cy = await cyPromise;
-    const layout = new GraphLayout();
 
     layout.createLayout(cy);
     cy.zoom(DEFAULT_ZOOM);
@@ -78,7 +80,9 @@ export default class ViewportModule extends VuexModule {
   /**
    * Zooms the viewport out.
    */
-  async onZoomOut(): Promise<void> {
+  async onZoomOut(
+    cyPromise: Promise<CytoCore> = artifactTreeCyPromise
+  ): Promise<void> {
     const cy = await cyPromise;
 
     cy.zoom(cy.zoom() - ZOOM_INCREMENT);
@@ -88,8 +92,12 @@ export default class ViewportModule extends VuexModule {
   @Action
   /**
    * Zooms the viewport in.
+   *
+   * @param cyPromise - A promise returning cytoscape instance to zoom on.
    */
-  async onZoomIn(): Promise<void> {
+  async onZoomIn(
+    cyPromise: Promise<CytoCore> = artifactTreeCyPromise
+  ): Promise<void> {
     const cy = await cyPromise;
 
     cy.zoom(cy.zoom() + ZOOM_INCREMENT);
@@ -99,10 +107,13 @@ export default class ViewportModule extends VuexModule {
   @Action
   /**
    * Moves the viewport such that top most parent is centered at default zoom.
-   *
+   * @param cyPromise - A promise returning a cytoscape instance whose root
+   * node is calculated relative to.
    */
-  async centerOnRootNode(): Promise<void> {
-    getRootNode()
+  async centerOnRootNode(
+    cyPromise: Promise<CytoCore> = artifactTreeCyPromise
+  ): Promise<void> {
+    getRootNode(cyPromise)
       .then((rootNode) => this.centerOnArtifacts([rootNode.data()?.id]))
       .catch((e) => console.warn(e.message));
   }
@@ -116,7 +127,7 @@ export default class ViewportModule extends VuexModule {
    * @param artifacts - The artifacts whose average point will be centered.
    */
   async centerOnArtifacts(artifacts: string[]): Promise<void> {
-    const cy = await cyPromise;
+    const cy = await artifactTreeCyPromise;
 
     if (cy.animated()) {
       if (
@@ -169,7 +180,7 @@ export default class ViewportModule extends VuexModule {
       .map((a) => a.name);
 
     return new Promise((resolve) => {
-      cyPromise.then((cyCore: CytoCore) => {
+      artifactTreeCyPromise.then((cyCore: CytoCore) => {
         cyCore.elements().style("opacity", 1);
         cyCore
           .elements()

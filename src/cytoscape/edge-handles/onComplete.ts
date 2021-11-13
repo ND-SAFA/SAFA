@@ -3,7 +3,7 @@ import { appModule, projectModule } from "@/store";
 import { createLink } from "@/api";
 import { disableDrawMode } from "@/cytoscape/edge-handles";
 
-export function onEdgeComplete(
+export function onArtifactTreeEdgeComplete(
   event: EventObject,
   sourceNode: NodeSingular,
   targetNode: NodeSingular,

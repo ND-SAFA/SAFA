@@ -8,7 +8,7 @@ import {
   ArtifactFile,
 } from "@/types";
 
-type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
+export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
 
 export function createArtifactUploader(): IGenericUploader<
   ArtifactMap,

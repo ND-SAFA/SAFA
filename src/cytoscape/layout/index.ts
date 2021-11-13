@@ -1,2 +1,2 @@
-export { default as GraphLayout } from "./graph-layout";
+export { default as GraphLayout } from "./artifact-tree-graph-layout";
 export * from "./klay-layout-settings";

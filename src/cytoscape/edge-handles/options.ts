@@ -4,7 +4,7 @@ import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 
 // the default values of each option are outlined below:
-export const edgeHandleOptions: EdgeHandlersOptions = {
+export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
   /**
    * Return whether any two nodes can be traced. Criteria includes:
    * - source != target.

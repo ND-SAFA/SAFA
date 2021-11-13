@@ -26,7 +26,7 @@
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, TraceFile } from "@/types";
 import { appModule } from "@/store";
-import { ButtonRow } from "@/components";
+import { ButtonRow } from "@/components/common";
 
 export default Vue.extend({
   components: {

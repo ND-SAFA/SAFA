@@ -1,16 +1,17 @@
 import {
   AddedArtifact,
-  APIError,
-  APIResponse,
   ArtifactDelta,
   DeltaType,
-  IGenericFilePanel,
   ModifiedArtifact,
-  ProjectFile,
   RemovedArtifact,
+} from "@/types/domain";
+import { APIError, APIResponse } from "@/types/api";
+import {
+  IGenericFilePanel,
+  ProjectFile,
   TraceFile,
   TracePanel,
-} from "@/types";
+} from "@/types/components";
 
 /**
  * Returns whether the given APIResponse is an API error.

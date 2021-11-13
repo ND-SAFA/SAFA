@@ -1,8 +1,8 @@
-import { ArtifactData } from "@/types";
+import { ArtifactData, CytoCoreElementDefinition } from "@/types";
 
 /**
  * Defines an artifact element.
  */
-export interface ArtifactCytoCoreElement {
+export interface ArtifactCytoCoreElement extends CytoCoreElementDefinition {
   data: ArtifactData;
 }

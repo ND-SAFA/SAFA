@@ -16,6 +16,7 @@ import {
   errorModule,
   viewportModule,
 } from "@/store";
+import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -49,6 +50,8 @@ export default class ProjectModule extends VuexModule {
     await this.setProject(res.project);
 
     errorModule.setArtifactWarnings(res.warnings);
+
+    await navigateTo(Routes.ARTIFACT_TREE);
 
     await viewportModule.setGraphLayout();
 

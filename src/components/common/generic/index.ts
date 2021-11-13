@@ -6,3 +6,5 @@ export { default as GenericSelector } from "./GenericSelector.vue";
 export { default as GenericStepper } from "./GenericStepper.vue";
 export { default as GenericStepperModal } from "./GenericStepperModal.vue";
 export { default as GenericSwitch } from "./GenericSwitch.vue";
+export { default as GenericCytoscapeController } from "./GenericCytoscapeController.vue";
+export { default as GenericGraphLink } from "./GenericGraphLink.vue";

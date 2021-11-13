@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { TraceLink } from "@/types";
+import { Link } from "@/types";
 import Vue, { PropType } from "vue";
 
 /**
@@ -17,7 +17,7 @@ import Vue, { PropType } from "vue";
 export default Vue.extend({
   name: "trace-link",
   props: {
-    traceDefinition: Object as PropType<TraceLink>,
+    traceDefinition: Object as PropType<Link>,
   },
   computed: {
     definition() {

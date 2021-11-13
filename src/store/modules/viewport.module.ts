@@ -6,7 +6,6 @@ import {
   isInSubtree,
   doesNotContainType,
   isRelatedToArtifacts,
-  GraphLayout,
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ZOOM,
@@ -15,6 +14,7 @@ import {
 import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
+import ArtifactTreeGraphLayout from "@/cytoscape/layout/artifact-tree-graph-layout";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -68,7 +68,7 @@ export default class ViewportModule extends VuexModule {
    */
   async setGraphLayout(
     cyPromise: Promise<CytoCore> = artifactTreeCyPromise,
-    layout: IGraphLayout = new GraphLayout()
+    layout: IGraphLayout = new ArtifactTreeGraphLayout()
   ): Promise<void> {
     const cy = await cyPromise;
 

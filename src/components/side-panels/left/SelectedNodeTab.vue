@@ -74,17 +74,20 @@
         </v-col>
       </v-row>
 
-      <v-divider class="mb-2" />
+      <v-divider />
 
-      <v-row class="pa-1">
-        <p
-          class="text-body-2 font-italic"
-          v-if="selectedArtifactWarnings !== undefined"
-        >
+      <v-row justify="center" v-if="selectedArtifactWarnings !== undefined">
+        <v-col class="flex-grow-0 my-1">
           <v-icon color="secondary"> mdi-hazard-lights </v-icon>
-          {{ selectedArtifactWarnings }}
-        </p>
+        </v-col>
       </v-row>
+
+      <p
+        class="text-body-2 font-italic"
+        v-if="selectedArtifactWarnings !== undefined"
+      >
+        {{ selectedArtifactWarnings }}
+      </p>
 
       <ArtifactCreatorModal
         title="Edit Artifact Contents"
@@ -108,8 +111,7 @@ import {
   errorModule,
   projectModule,
 } from "@/store";
-import { ArtifactCreatorModal } from "@/components";
-import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
+import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
 
 export default Vue.extend({
   components: { GenericIconButton, ArtifactCreatorModal },

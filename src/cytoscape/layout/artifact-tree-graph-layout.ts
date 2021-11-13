@@ -1,9 +1,11 @@
 import { NodeCollection } from "cytoscape";
-import { DefaultKlayLayout } from "@/cytoscape/layout/klay-layout-settings";
-import { ArtifactTreeAutoMoveHandlers } from "@/cytoscape/automove/artifact-tree-auto-move-handlers";
-import { DefaultCytoEventHandlers } from "@/cytoscape/events/cyto-events";
-import { DefaultPreLayoutHooks } from "@/cytoscape/hooks/pre-layout";
-import { DefaultPostLayoutHooks } from "@/cytoscape/hooks/post-layout";
+import { DefaultKlayLayout } from "@/cytoscape/layout";
+import { ArtifactTreeAutoMoveHandlers } from "@/cytoscape/automove";
+import { DefaultCytoEventHandlers } from "@/cytoscape/events";
+import {
+  DefaultPostLayoutHooks,
+  DefaultPreLayoutHooks,
+} from "@/cytoscape/hooks";
 import {
   KlayLayoutSettings,
   LayoutHook,

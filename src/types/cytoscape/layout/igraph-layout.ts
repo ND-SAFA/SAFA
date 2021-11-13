@@ -1,7 +1,10 @@
 import { NodeCollection } from "cytoscape";
-import { KlayLayoutSettings, LayoutHook } from "../plugins/klay";
-import { AutoMoveEventHandlers } from "@/types";
-import { CytoCore, CytoEventHandlers } from "@/types";
+import {
+  KlayLayoutSettings,
+  LayoutHook,
+  AutoMoveEventHandlers,
+} from "@/types/cytoscape/plugins";
+import { CytoCore, CytoEventHandlers } from "@/types/cytoscape/core";
 
 /**
  * Defines the layout and event handlers of a graph.

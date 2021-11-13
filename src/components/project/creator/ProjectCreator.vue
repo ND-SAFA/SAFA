@@ -83,7 +83,7 @@ import Vue from "vue";
 import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
 import { saveOrUpdateProject } from "@/api";
 import { appModule, projectModule } from "@/store";
-import { GenericStepper } from "@/components";
+import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./uploaders";
 import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";

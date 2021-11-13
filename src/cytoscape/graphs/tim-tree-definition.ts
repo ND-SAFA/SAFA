@@ -4,8 +4,8 @@ import {
   DEFAULT_ZOOM,
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
-} from "@/cytoscape";
-import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
+} from "@/cytoscape/styles";
+import { CytoCoreGraph } from "@/types";
 import { timTreeResolveCy } from "./tim-tree-cy";
 
 const timTreeConfig: CytoscapeOptions = {

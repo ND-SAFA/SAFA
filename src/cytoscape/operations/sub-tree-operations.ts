@@ -1,5 +1,4 @@
-import { CytoCore, CyPromise } from "@/types";
-import { Artifact } from "@/types";
+import { CytoCore, CyPromise, Artifact } from "@/types";
 import {
   SingularElementArgument,
   CollectionReturnValue,

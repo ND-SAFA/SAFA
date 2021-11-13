@@ -36,7 +36,7 @@ import {
   BaselineVersionModal,
   UploadNewVersionModal,
   ButtonRow,
-} from "@/components";
+} from "@/components/common";
 import ProjectName from "./ProjectName.vue";
 import SafaIcon from "./SafaIcon.vue";
 

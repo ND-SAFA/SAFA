@@ -35,12 +35,12 @@ import {
   viewportModule,
 } from "@/store";
 import {
-  TraceLinkApprovalModal,
   GenericGraphLink,
   GenericCytoscapeController,
-} from "@/components";
+} from "@/components/common";
+import { TraceLinkApprovalModal } from "@/components/approve-links-view";
 import ArtifactNode from "./ArtifactNode.vue";
-import { artifactTreeGraph } from "@/cytoscape/graphs/artifact-tree-definition";
+import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
   name: "artifact-view",

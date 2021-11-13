@@ -5,7 +5,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Artifact, CytoCoreElementDefinition } from "@/types";
-import { ArtifactPanel } from "@/components";
+import { ArtifactPanel } from "@/components/project/creator/uploaders";
 
 /**
  * The node representing an artifact type in the tim tree.

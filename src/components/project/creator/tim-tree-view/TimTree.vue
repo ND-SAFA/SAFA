@@ -21,7 +21,7 @@
 import Vue, { PropType } from "vue";
 import { TracePanel } from "@/types";
 import { ArtifactPanel } from "@/components";
-import { timTreeDefinition } from "@/cytoscape/graphs";
+import { timTreeDefinition } from "@/cytoscape";
 import { CytoCoreGraph } from "@/types/cytoscape";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 import {

@@ -9,7 +9,7 @@ import {
   LAYOUT_THOROUGHNESS,
   LAYOUT_NODE_INNER_SPACING,
   LAYOUT_RANDOM_SEED,
-} from "@/cytoscape/styles/config/graph";
+} from "@/cytoscape/styles";
 
 // docs: https://github.com/cytoscape/cytoscape.js-klay
 export const DefaultKlayLayout: KlayLayoutSettings = {

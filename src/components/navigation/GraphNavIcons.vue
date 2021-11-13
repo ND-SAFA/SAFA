@@ -28,7 +28,7 @@ import {
   projectModule,
   viewportModule,
 } from "@/store";
-import { GenericIconButton, CheckmarkMenu } from "@/components";
+import { GenericIconButton, CheckmarkMenu } from "@/components/common";
 
 export default Vue.extend({
   components: {

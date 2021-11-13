@@ -1,4 +1,4 @@
-import { ArtifactData } from "@/types";
+import { ArtifactData } from "@/types/domain";
 
 /**
  * Defines horizontal alignment options.

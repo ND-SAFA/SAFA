@@ -1,9 +1,4 @@
-import {
-  CSSCursor,
-  CytoCore,
-  CytoEvent,
-  CytoEventHandlers,
-} from "@/types/cytoscape/core";
+import { CSSCursor, CytoCore, CytoEvent, CytoEventHandlers } from "@/types";
 import { artifactSelectionModule } from "@/store";
 import { EventObject } from "cytoscape";
 

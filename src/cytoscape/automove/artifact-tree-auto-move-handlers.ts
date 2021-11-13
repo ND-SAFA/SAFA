@@ -1,5 +1,9 @@
-import { CSSCursor, CytoEvent } from "@/types/cytoscape/core";
-import { AutoMoveEventHandlers, AutoMoveRule } from "@/types/cytoscape/plugins";
+import {
+  AutoMoveEventHandlers,
+  AutoMoveRule,
+  CSSCursor,
+  CytoEvent,
+} from "@/types";
 import { EventObject, NodeSingular } from "cytoscape";
 
 /**

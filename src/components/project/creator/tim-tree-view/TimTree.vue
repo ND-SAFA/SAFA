@@ -66,9 +66,6 @@ export default Vue.extend({
       return `${traceFile.source}-${traceFile.target}`;
     },
   },
-  async mounted() {
-    await viewportModule.setTimTreeLayout();
-  },
   computed: {
     cytoCoreGraph(): CytoCoreGraph {
       return timGraph;

@@ -1,8 +1,4 @@
-import {
-  CSSCursor,
-  CytoEvent,
-  CytoEventHandlers,
-} from "@/types/cytoscape/core";
+import { CSSCursor, CytoEvent, CytoEventHandlers } from "@/types";
 
 export const DefaultCytoEvents: CytoEventHandlers = {
   mouseOverCursor: {

@@ -56,6 +56,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   selectArtifact(artifact: Artifact): void {
     this.SELECT_ARTIFACT(artifact);
     appModule.openPanel(PanelType.left);
+    viewportModule.centerOnArtifacts([artifact.name]).then();
   }
 
   @Action

@@ -34,20 +34,7 @@ export const timGraph: CytoCoreGraph = {
       afterInit: () => undefined,
     },
   ],
-  afterInit: async (cy: CytoCore) => {
-    const layout = new TimGraphLayout();
-    const payload = { layout, cyPromise: timTreeCyPromise };
-    //TODO: Figure out why I can't immediately call animate function
-    //after setting graph layout
-    appModule.SET_IS_LOADING(true);
-    await viewportModule.setGraphLayout(payload);
-    cy.nodeHtmlLabel([timNodeHtml]);
-    setTimeout(() => {
-      cy.animate({
-        center: { eles: cy.nodes() },
-        duration: ANIMATION_DURATION,
-        complete: () => appModule.SET_IS_LOADING(false),
-      });
-    }, 250);
+  afterInit: async () => {
+    await viewportModule.setTimTreeLayout();
   },
 };

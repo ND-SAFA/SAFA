@@ -65,6 +65,7 @@
           <TimTree
             :artifact-panels="artifactUploader.panels"
             :trace-panels="traceUploader.panels"
+            :in-view="currentStep === 4"
           />
           <v-divider class="my-5" />
           <v-row v-if="currentStep === 4" justify="center">

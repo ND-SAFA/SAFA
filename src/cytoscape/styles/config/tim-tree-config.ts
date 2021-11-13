@@ -4,7 +4,7 @@
 export const TIM_EDGE_STYLE = "taxi";
 export const TIM_EDGE_ARROW_SHAPE = "chevron";
 export const TIM_EDGE_WIDTH = "2";
-export const TIM_EDGE_X_MARGIN = "10";
+export const TIM_EDGE_X_MARGIN = 10;
 
 /**
  * Nodes

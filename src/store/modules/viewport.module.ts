@@ -17,8 +17,14 @@ import {
 } from "@/cytoscape";
 import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
-import { appModule, artifactSelectionModule, projectModule } from "@/store";
+import {
+  appModule,
+  artifactSelectionModule,
+  projectModule,
+  viewportModule,
+} from "@/store";
 import { navigateTo, Routes } from "@/router";
+import { timNodeHtml } from "@/cytoscape/styles/html/tim-html";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -76,6 +82,27 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: artifactTreeCyPromise };
     const cy = await this.setGraphLayout(payload);
     cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
+  }
+
+  @Action
+  /**
+   * Resets the TIM graph back to fit all nodes.
+   */
+  async setTimTreeLayout(): Promise<void> {
+    const layout = new TimGraphLayout();
+    const payload = { layout, cyPromise: timTreeCyPromise };
+    //TODO: Figure out why I can't immediately call animate function
+    //after setting graph layout
+    appModule.SET_IS_LOADING(true);
+    const cy = await viewportModule.setGraphLayout(payload);
+    cy.nodeHtmlLabel([timNodeHtml]);
+    setTimeout(() => {
+      cy.animate({
+        center: { eles: cy.nodes() },
+        duration: ANIMATION_DURATION,
+        complete: () => appModule.SET_IS_LOADING(false),
+      });
+    }, 250);
   }
 
   @Action

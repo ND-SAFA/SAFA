@@ -29,6 +29,12 @@ import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
+import {
+  ANIMATION_DURATION,
+  TimGraphLayout,
+  timTreeCyPromise,
+} from "@/cytoscape";
+import { appModule, viewportModule } from "@/store";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -49,6 +55,10 @@ export default Vue.extend({
       type: Array as PropType<ArtifactPanel[]>,
       required: true,
     },
+    inView: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     getTraceId(tracePanel: TracePanel): string {
@@ -56,9 +66,17 @@ export default Vue.extend({
       return `${traceFile.source}-${traceFile.target}`;
     },
   },
+  async mounted() {
+    await viewportModule.setTimTreeLayout();
+  },
   computed: {
     cytoCoreGraph(): CytoCoreGraph {
       return timGraph;
+    },
+  },
+  watch: {
+    async inView(): Promise<void> {
+      await viewportModule.setTimTreeLayout();
     },
   },
 });

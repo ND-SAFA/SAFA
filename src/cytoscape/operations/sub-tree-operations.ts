@@ -60,10 +60,12 @@ function getSubTree(
  *
  * @param cyPromise - A promise returning cytoscape whose root node is returned.
  * @param currentNode - Defines where we are in the tree during recursion.
+ * @param traversedNodes - A list of all traversed node IDs to avoid loops.
  */
 export async function getRootNode(
   cyPromise: Promise<CytoCore>,
-  currentNode?: SingularElementArgument
+  currentNode?: SingularElementArgument,
+  traversedNodes: string[] = []
 ): Promise<SingularElementArgument> {
   const cyCore = await cyPromise;
 
@@ -75,6 +77,13 @@ export async function getRootNode(
     currentNode = getMostConnectedNode(cyCore);
   }
 
+  // Avoid getting stuck in cycles.
+  if (traversedNodes.includes(currentNode.id())) {
+    throw Error("Root node doesnt exist on a circular graph.");
+  } else {
+    traversedNodes.push(currentNode.id());
+  }
+
   const edgesOutOfNode: EdgeCollection = cyCore
     .edges()
     .filter((e) => e.target() === currentNode);
@@ -82,7 +91,7 @@ export async function getRootNode(
   if (edgesOutOfNode.length === 0) {
     return currentNode;
   } else {
-    return getRootNode(cyPromise, edgesOutOfNode[0].source());
+    return getRootNode(cyPromise, edgesOutOfNode[0].source(), traversedNodes);
   }
 }
 

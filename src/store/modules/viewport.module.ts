@@ -14,10 +14,9 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
-import type { CytoCore, Artifact, CyPromise, IGraphLayout } from "@/types";
+import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
 import { artifactSelectionModule, projectModule } from "@/store";
-import ArtifactTreeGraphLayout from "@/cytoscape/layout/artifact-tree-graph-layout";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -71,11 +70,8 @@ export default class ViewportModule extends VuexModule {
    */
   async setArtifactTreeLayout(): Promise<void> {
     const layout = new ArtifactGraphLayout();
-    await ViewportModule.setGraphLayout(
-      artifactTreeCyPromise,
-      layout,
-      Routes.ARTIFACT_TREE
-    );
+    const payload = { layout, cyPromise: artifactTreeCyPromise };
+    await this.setGraphLayout(payload);
   }
 
   @Action
@@ -84,20 +80,18 @@ export default class ViewportModule extends VuexModule {
    */
   async setTimTreeLayout(): Promise<void> {
     const layout = new TimGraphLayout();
-    await ViewportModule.setGraphLayout(timTreeCyPromise, layout, undefined);
+    const payload = { layout, cyPromise: timTreeCyPromise };
+    await this.setGraphLayout(payload);
   }
 
+  @Action
   /**
    * Resets the graph layout.
    */
-  static async setGraphLayout(
-    cyPromise: Promise<CytoCore>,
-    layout: IGraphLayout,
-    routeTo?: Routes
-  ): Promise<void> {
-    const cy = await cyPromise;
-
-    layout.createLayout(cy);
+  async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
+    console.log("GRAPH PAYLOAD: ", layoutPayload);
+    const cy = await layoutPayload.cyPromise;
+    layoutPayload.layout.createLayout(cy);
     cy.zoom(DEFAULT_ZOOM);
   }
 

@@ -17,6 +17,7 @@ import {
   viewportModule,
 } from "@/store";
 import { navigateTo, Routes } from "@/router";
+import { ArtifactGraphLayout, artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -53,7 +54,10 @@ export default class ProjectModule extends VuexModule {
 
     await navigateTo(Routes.ARTIFACT_TREE);
 
-    await viewportModule.setGraphLayout();
+    await viewportModule.setGraphLayout(
+      artifactTreeCyPromise,
+      new ArtifactGraphLayout()
+    );
 
     deltaModule.setIsDeltaViewEnabled(false);
   }

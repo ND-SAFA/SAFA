@@ -11,7 +11,6 @@ import {
 import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
 import { viewportModule } from "@/store";
 import klay from "cytoscape-klay";
-import { ViewportModule } from "@/store/modules";
 
 const timTreeConfig: CytoscapeOptions = {
   style: CytoscapeStyle,
@@ -32,6 +31,6 @@ export const timGraph: CytoCoreGraph = {
   ],
   afterInit: async () => {
     const layout = new TimGraphLayout();
-    await ViewportModule.setGraphLayout(timTreeCyPromise, layout, undefined);
+    await viewportModule.setGraphLayout(timTreeCyPromise, layout);
   },
 };

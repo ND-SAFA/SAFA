@@ -1,25 +1,24 @@
-import { CytoCore } from "@/types/cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import klay from "cytoscape-klay";
 import automove from "cytoscape-automove";
 import contextMenus from "cytoscape-context-menus";
 import edgehandles from "cytoscape-edgehandles";
-import { CytoCore, IGraphLayout, CytoCoreGraph } from "@/types";
-import { artifactTreeContextMenuOptions } from "@/cytoscape/context-menu";
+import { CytoCore } from "@/types/cytoscape";
 import {
+  artifactTreeContextMenuOptions,
   artifactTreeEdgeHandleOptions,
   setEdgeHandlesCore,
-} from "@/cytoscape/edge-handles";
+} from "@/cytoscape/plugins";
 import {
   DEFAULT_ZOOM,
   GraphStyle,
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
 } from "@/cytoscape/styles";
-import { GraphLayout } from "@/cytoscape/layout";
 import { viewportModule } from "@/store";
 import { CytoscapeOptions } from "cytoscape";
 import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
+import { artifactTreeCyPromise, artifactTreeResolveCy } from "@/cytoscape";
 
 const artifactTreeConfig: CytoscapeOptions = {
   style: GraphStyle,

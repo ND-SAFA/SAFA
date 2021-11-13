@@ -75,8 +75,10 @@ export default Vue.extend({
     },
   },
   watch: {
-    async inView(): Promise<void> {
-      await viewportModule.setTimTreeLayout();
+    async inView(inView: boolean): Promise<void> {
+      if (inView) {
+        await viewportModule.setTimTreeLayout();
+      }
     },
   },
 });

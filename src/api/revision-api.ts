@@ -28,7 +28,7 @@ function getStompClient(reconnect = false): Client {
     try {
       sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
       sock.onclose = () => {
-        console.log("web socket close");
+        appModule.onDevMessage("Closing WebSocket.");
         connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();
       };
       stompClient = Stomp.over(sock, { debug: false });
@@ -59,7 +59,7 @@ function connect(
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
     if (stomp.connected) {
-      console.log("already connected!");
+      appModule.onDevMessage("Client is connected to WebSocket.");
       clearInterval(recInterval);
       resolve();
     }

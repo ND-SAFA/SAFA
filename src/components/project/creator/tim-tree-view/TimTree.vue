@@ -1,5 +1,5 @@
 <template>
-  <v-container class="elevation-3" style="width: 500px; height: 300px">
+  <v-container class="elevation-3">
     <generic-cytoscape-controller :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
         <artifact-type-node

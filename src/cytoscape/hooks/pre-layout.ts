@@ -1,7 +1,7 @@
 import { CytoCore, LayoutHook } from "@/types";
 import { EdgeSingular } from "cytoscape";
 import {
-  nodeHtml as nodeHTML,
+  artifactHtml as nodeHTML,
   nodeWarningHtml,
   GENERATED_LINK_SELECTOR,
   GENERATED_TRACE_MAX_WIDTH,

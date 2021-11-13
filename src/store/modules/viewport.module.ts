@@ -8,15 +8,16 @@ import {
   isRelatedToArtifacts,
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
-  DEFAULT_ZOOM,
+  DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
   ArtifactGraphLayout,
   TimGraphLayout,
   timTreeCyPromise,
+  DEFAULT_TIM_TREE_ZOOM,
 } from "@/cytoscape";
 import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
-import { artifactSelectionModule, projectModule } from "@/store";
+import { appModule, artifactSelectionModule, projectModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -73,7 +74,8 @@ export default class ViewportModule extends VuexModule {
     await navigateTo(Routes.ARTIFACT_TREE);
     const layout = new ArtifactGraphLayout();
     const payload = { layout, cyPromise: artifactTreeCyPromise };
-    await this.setGraphLayout(payload);
+    const cy = await this.setGraphLayout(payload);
+    cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
   }
 
   @Action
@@ -81,21 +83,19 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout of the tim tree graph.
    */
   async setTimTreeLayout(): Promise<void> {
-    console.log("setting tim layout");
     const layout = new TimGraphLayout();
     const payload = { layout, cyPromise: timTreeCyPromise };
-    await this.setGraphLayout(payload);
+    const cy = await this.setGraphLayout(payload);
   }
 
   @Action
   /**
    * Resets the graph layout.
    */
-  async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
-    console.log("GRAPH PAYLOAD: ", layoutPayload);
+  async setGraphLayout(layoutPayload: LayoutPayload): Promise<CytoCore> {
     const cy = await layoutPayload.cyPromise;
     layoutPayload.layout.createLayout(cy);
-    cy.zoom(DEFAULT_ZOOM);
+    return cy;
   }
 
   @Action
@@ -147,16 +147,22 @@ export default class ViewportModule extends VuexModule {
    * Request is ignored if current animation is in progress to center the same collection of artifacts.
    *
    * @param artifacts - The artifacts whose average point will be centered.
+   * @param cyPromise - A promise returning an instance of cytoscape.
    */
-  async centerOnArtifacts(artifacts: string[]): Promise<void> {
-    const cy = await artifactTreeCyPromise;
+  async centerOnArtifacts(
+    artifacts: string[],
+    cyPromise = artifactTreeCyPromise
+  ): Promise<void> {
+    const cy = await cyPromise;
 
     if (cy.animated()) {
       if (
         this.currentCenteringCollection !== undefined &&
         areArraysEqual(this.currentCenteringCollection, artifacts)
       ) {
-        console.warn("collection is already being rendered: ", artifacts);
+        appModule.onDevWarning(
+          `Collection is already being rendered: ${artifacts}`
+        );
         return;
       } else {
         cy.stop(false, false);
@@ -177,7 +183,7 @@ export default class ViewportModule extends VuexModule {
       });
     } else {
       cy.animate({
-        zoom: DEFAULT_ZOOM,
+        zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
         center: { eles: collection },
         duration: ANIMATION_DURATION,
         complete: () => this.SET_CURRENT_COLLECTION(undefined),

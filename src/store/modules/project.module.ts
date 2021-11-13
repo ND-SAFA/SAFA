@@ -47,15 +47,10 @@ export default class ProjectModule extends VuexModule {
   async setProjectCreationResponse(
     res: ProjectCreationResponse
   ): Promise<void> {
-    console.log("STEP 1");
     await this.setProject(res.project);
-    console.log("STEP 2");
     errorModule.setArtifactWarnings(res.warnings);
-    console.log("STEP 3");
     await viewportModule.setArtifactTreeLayout();
-    console.log("STEP 4");
     deltaModule.setIsDeltaViewEnabled(false);
-    console.log("STEP 5");
   }
 
   @Action

@@ -7,13 +7,23 @@ import {
   HtmlDefinition,
   KlayLayoutOptions,
 } from "@/types/cytoscape";
+import { ArtifactTypeNodeData } from "@/types/components/tim-tree";
+import { ArtifactData } from "@/types";
+
+/**
+ * The HtmlDefinitions used with in the application.
+ */
+type AppHtmlDefinitions = (
+  | HtmlDefinition<ArtifactData>
+  | HtmlDefinition<ArtifactTypeNodeData>
+)[];
 
 /**
  * Defines CytoCore, an application specific definition of cytoscape defining
  * interfaces with the plugin made available.
  */
 export interface CytoCore extends Core {
-  nodeHtmlLabel(defs: HtmlDefinition[]): void;
+  nodeHtmlLabel(defs: AppHtmlDefinitions): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
   contextMenus(options: unknown): void; //todo: add types for options
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;

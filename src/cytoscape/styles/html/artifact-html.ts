@@ -3,11 +3,10 @@ import { HtmlDefinition } from "@/types";
 import {
   ARTIFACT_HEIGHT,
   ARTIFACT_WIDTH,
-} from "@/cytoscape/styles/config/artifact";
-import { getArtifactTypePrintName } from "@/util";
-import { TRUNCATE_LENGTH } from "@/cytoscape/styles/config/graph";
+} from "@/cytoscape/styles/config/artifact-tree-config";
+import { TRUNCATE_LENGTH } from "@/cytoscape/styles/config";
 
-export const nodeHtml: HtmlDefinition = {
+export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",
   halign: "center",
   valign: "center",
@@ -18,7 +17,7 @@ export const nodeHtml: HtmlDefinition = {
   },
 };
 
-export const nodeWarningHtml: HtmlDefinition = {
+export const nodeWarningHtml: HtmlDefinition<ArtifactData> = {
   query: "node[warnings]",
   halign: "center",
   valign: "center",
@@ -56,7 +55,7 @@ function createNodeHtml(
 function createNodeHeader(data: ArtifactData, height: number): string {
   return `
   <strong class="artifact-header" style="height:${height}px">
-  ${getArtifactTypePrintName(data.artifactType)}
+  ${data.artifactType}
   </strong>`;
 }
 

@@ -80,16 +80,6 @@ export default class ViewportModule extends VuexModule {
 
   @Action
   /**
-   * Resets the graph layout of the tim tree graph.
-   */
-  async setTimTreeLayout(): Promise<void> {
-    const layout = new TimGraphLayout();
-    const payload = { layout, cyPromise: timTreeCyPromise };
-    const cy = await this.setGraphLayout(payload);
-  }
-
-  @Action
-  /**
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<CytoCore> {

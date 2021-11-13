@@ -1,15 +1,14 @@
-import { CytoscapeOptions } from "cytoscape";
 import {
-  CytoscapeStyle,
   DEFAULT_ARTIFACT_TREE_ZOOM,
   MOTION_BLUE_OPACITY,
-  artifactHtml as nodeHTML,
-  nodeWarningHtml,
   timTreeResolveCy,
   USE_MOTION_BLUR,
+  TimGraphLayout,
+  timTreeCyPromise,
+  ANIMATION_DURATION,
 } from "@/cytoscape";
 import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
-import { viewportModule } from "@/store";
+import { appModule, viewportModule } from "@/store";
 import klay from "cytoscape-klay";
 import { TimStyleSheets } from "@/cytoscape/styles/stylesheets/tim-styles";
 import { CytoCore } from "@/types";
@@ -36,9 +35,19 @@ export const timGraph: CytoCoreGraph = {
     },
   ],
   afterInit: async (cy: CytoCore) => {
-    await viewportModule.setTimTreeLayout();
-    // cy.zoom(1);
-    cy.fit(cy.nodes());
+    const layout = new TimGraphLayout();
+    const payload = { layout, cyPromise: timTreeCyPromise };
+    //TODO: Figure out why I can't immediately call animate function
+    //after setting graph layout
+    appModule.SET_IS_LOADING(true);
+    await viewportModule.setGraphLayout(payload);
     cy.nodeHtmlLabel([timNodeHtml]);
+    setTimeout(() => {
+      cy.animate({
+        center: { eles: cy.nodes() },
+        duration: ANIMATION_DURATION,
+        complete: () => appModule.SET_IS_LOADING(false),
+      });
+    }, 250);
   },
 };

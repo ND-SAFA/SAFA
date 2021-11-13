@@ -60,7 +60,7 @@
       <v-stepper-content step="4">
         <v-container class="pa-10">
           <v-row justify="center" class="mb-2">
-            <h1 class="text-h6">Graph Preview</h1>
+            <h1 class="text-h6">Project TIM</h1>
           </v-row>
           <TimTree
             :artifact-panels="artifactUploader.panels"

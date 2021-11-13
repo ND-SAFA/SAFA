@@ -11,6 +11,7 @@
           v-for="tracePanel in tracePanels"
           :key="getTraceId(tracePanel)"
           :trace-definition="tracePanel.projectFile"
+          :count="tracePanel.projectFile.traces.length"
         />
       </template>
     </generic-cytoscape-controller>
@@ -21,7 +22,7 @@
 import Vue, { PropType } from "vue";
 import { TracePanel } from "@/types";
 import { ArtifactPanel } from "@/components";
-import { timGraph } from "@/cytoscape";
+import { timGraph } from "@/cytoscape/graphs";
 import { CytoCoreGraph } from "@/types/cytoscape";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 import {

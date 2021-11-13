@@ -1,9 +1,5 @@
 import { HtmlDefinition } from "@/types";
 import { TimNodeData } from "@/types/components/tim-tree";
-import {
-  TIM_NODE_HEIGHT,
-  TIM_NODE_WIDTH,
-} from "@/cytoscape/styles/config/tim-tree-config";
 
 export const timNodeHtml: HtmlDefinition<TimNodeData> = {
   query: "node",
@@ -16,21 +12,27 @@ export const timNodeHtml: HtmlDefinition<TimNodeData> = {
   },
 };
 
+/**
+ * Creates the HTML for displaying nodes with in the TIM tree.
+ * @param data The TIM's node data.
+ */
 function createTimNodeHtml(data: TimNodeData): string {
-  const height = TIM_NODE_HEIGHT;
-  const width = TIM_NODE_WIDTH;
-  const elements = [data.id, data.count];
-  return wrapInNodeContainer(data, elements, width, height);
+  const borderStyle = "border-bottom: 1px solid black";
+  const elements: string[] = [
+    `<strong class="pa-0 ma-0" style="${borderStyle}">${data.id}</strong>`,
+    `<div class="text-center pa-0 ma-0" >${data.count}</div>`,
+  ];
+  return wrapInColumnContainer(data, elements);
 }
 
-function wrapInNodeContainer(
-  data: TimNodeData,
-  elements: any[],
-  width: number,
-  height: number
-): string {
+/**
+ * Creates a div surrounding all of the given html laid out in columns order
+ * @param data
+ * @param elements
+ */
+function wrapInColumnContainer(data: TimNodeData, elements: string[]): string {
   return `
-  <div class="debug" style="width:${width}px;height:${height}px;">
-   <p>${elements.join("\n")}</p>
+  <div style="display: flex;flex-direction: column;">
+    ${elements.join("")}
   </div>`;
 }

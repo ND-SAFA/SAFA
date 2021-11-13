@@ -5,6 +5,7 @@ import {
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { TRUNCATE_LENGTH } from "@/cytoscape/styles/config";
+import { capitalize } from "@/util";
 
 export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",
@@ -55,7 +56,7 @@ function createNodeHtml(
 function createNodeHeader(data: ArtifactData, height: number): string {
   return `
   <strong class="artifact-header" style="height:${height}px">
-  ${data.artifactType}
+  ${capitalize(data.artifactType)}
   </strong>`;
 }
 

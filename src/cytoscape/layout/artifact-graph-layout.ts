@@ -1,4 +1,4 @@
-import { DefaultKlayLayout } from "@/cytoscape/layout/klay-layout-settings";
+import { ArtifactKlaySettings } from "@/cytoscape/layout/artifact-klay-settings";
 import { ArtifactTreeAutoMoveHandlers } from "@/cytoscape/plugins/automove/artifact-tree-auto-move-handlers";
 import { ArtifactTreeCytoEvents } from "@/cytoscape/events/artifact-tree-events";
 import { DefaultPreLayoutHooks } from "@/cytoscape/hooks/pre-layout";
@@ -10,7 +10,7 @@ export default class ArtifactGraphLayout extends GraphLayout {
     super(
       ArtifactTreeAutoMoveHandlers,
       ArtifactTreeCytoEvents,
-      DefaultKlayLayout,
+      ArtifactKlaySettings,
       DefaultPreLayoutHooks,
       DefaultPostLayoutHooks
     );

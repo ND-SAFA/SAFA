@@ -38,16 +38,13 @@ public class ArtifactBody implements Serializable {
     @Type(type = "uuid-char")
     @Column
     UUID artifactBodyId;
-
     @Column(name = "modification_type")
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -55,10 +52,8 @@ public class ArtifactBody implements Serializable {
         nullable = false
     )
     ProjectVersion projectVersion;
-
     @Column(name = "summary", nullable = false)
     String summary;
-
     @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
     String content;
 
@@ -106,20 +101,40 @@ public class ArtifactBody implements Serializable {
         return this.content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public String getSummary() {
         return this.summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Artifact getArtifact() {
         return this.artifact;
     }
 
+    public void setArtifact(Artifact artifact) {
+        this.artifact = artifact;
+    }
+
     public ModificationType getModificationType() {
         return this.modificationType;
     }
 
+    public void setModificationType(ModificationType modificationType) {
+        this.modificationType = modificationType;
+    }
+
     public ProjectVersion getProjectVersion() {
         return this.projectVersion;
+    }
+
+    public void setProjectVersion(ProjectVersion projectVersion) {
+        this.projectVersion = projectVersion;
     }
 
     public boolean hasSameId(ArtifactBody other) {

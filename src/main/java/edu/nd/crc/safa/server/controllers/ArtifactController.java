@@ -11,6 +11,7 @@ import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
@@ -94,10 +95,26 @@ public class ArtifactController extends BaseController {
     public ServerResponse deleteArtifactBody(
         @PathVariable UUID versionId,
         @PathVariable String artifactName) {
-        ProjectVersion project = this.projectVersionRepository.findByVersionId(versionId);
-        Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(project,
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion,
             artifactName);
-        bodyToRemove.ifPresent(artifactBody -> this.artifactBodyRepository.delete(artifactBody));
+        bodyToRemove.ifPresentOrElse(artifactBody -> {
+            artifactBody.setModificationType(ModificationType.REMOVED);
+            artifactBody.setSummary("");
+            artifactBody.setContent("");
+            this.artifactBodyRepository.save(artifactBody);
+        }, () -> {
+            Project project = projectVersion.getProject();
+            Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+            artifactQuery.ifPresent((artifact -> {
+                ArtifactBody artifactBody = new ArtifactBody(
+                    projectVersion,
+                    ModificationType.REMOVED,
+                    artifact,
+                    "", "");
+                this.artifactBodyRepository.save(artifactBody);
+            }));
+        });
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 

@@ -1,5 +1,6 @@
 <template>
   <generic-selector
+    v-if="this.isOpen"
     item-key="versionId"
     no-data-text="Project contains no versions"
     :headers="headers"
@@ -7,10 +8,10 @@
     :is-open="isOpen"
     :is-loading="isLoading"
     :has-edit="false"
-    @select-item="selectItem"
-    @delete-item="deleteItem"
-    @add-item="addItem"
-    @refresh="refresh"
+    @select-item="onSelectVersion"
+    @delete-item="onDeleteVersion"
+    @add-item="onAddItem"
+    @refresh="loadProjectVersions"
   >
     <template v-slot:addItemDialogue>
       <version-creator
@@ -24,8 +25,8 @@
       <confirm-version-delete
         :version="versionToDelete"
         :delete-dialogue="deleteVersionDialogue"
-        @onCancelDelete="cancelDelete"
-        @onConfirmDelete="confirmDelete"
+        @onCancelDelete="onCancelDeleteVersion"
+        @onConfirmDelete="onConfirmDeleteVersion"
       />
     </template>
   </generic-selector>
@@ -41,16 +42,29 @@ import { versionSelectorHeader } from "./headers";
 import VersionCreator from "./VersionCreator.vue";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
 
+/**
+ * Displays list of project versions available to given project and allows them
+ * to select, edit, delete, or create projects. Versions list is refreshed
+ * whenever mounted or isOpen is changed to true.
+ *
+ */
 export default Vue.extend({
   components: { GenericSelector, VersionCreator, ConfirmVersionDelete },
   props: {
+    /**
+     * Whether this component is currently in view. If within
+     * a stepper then this is true when the this component is within the current step.
+     */
     isOpen: {
       type: Boolean,
       required: true,
     },
+    /**
+     * The currently selected project whose versions we are displaying.
+     */
     project: {
       type: Object as PropType<ProjectIdentifier>,
-      required: true,
+      required: false,
     },
   },
   data() {
@@ -64,44 +78,40 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.loadItems();
+    this.loadProjectVersions();
   },
   watch: {
     project() {
-      this.loadItems();
+      this.loadProjectVersions();
     },
   },
   methods: {
     onCreatorClose() {
       this.addVersionDialogue = false;
     },
-    refresh() {
-      this.loadItems();
-    },
-    selectItem(item: DataItem<ProjectVersion>) {
+    onSelectVersion(item: DataItem<ProjectVersion>) {
       if (item.value) {
         this.$emit("onVersionSelected", item.item);
       } else {
         this.$emit("onVersionUnselected");
       }
     },
-    addItem() {
+    onAddItem() {
       this.addVersionDialogue = true;
     },
-    deleteItem(version: ProjectVersion) {
+    onDeleteVersion(version: ProjectVersion) {
       this.versionToDelete = version;
       this.deleteVersionDialogue = true;
     },
-
     onVersionCreated(version: ProjectVersion) {
       this.versions = [version].concat(this.versions);
       this.addVersionDialogue = false;
       this.$emit("onVersionSelected", version);
     },
-    cancelDelete() {
+    onCancelDeleteVersion() {
       this.deleteVersionDialogue = false;
     },
-    confirmDelete(version: ProjectVersion) {
+    onConfirmDeleteVersion(version: ProjectVersion) {
       this.deleteVersionDialogue = false;
       this.isLoading = true;
       deleteProjectVersion(version.versionId)
@@ -113,9 +123,9 @@ export default Vue.extend({
         })
         .finally(() => (this.isLoading = false));
     },
-    loadItems() {
+    loadProjectVersions() {
       this.isLoading = true;
-      const project: ProjectIdentifier = this.$props.project;
+      const project: ProjectIdentifier | undefined = this.project;
       if (project !== undefined) {
         getProjectVersions(project.projectId)
           .then((versions: ProjectVersion[]) => {

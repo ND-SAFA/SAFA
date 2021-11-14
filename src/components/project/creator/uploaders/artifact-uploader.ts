@@ -67,7 +67,7 @@ function clearPanel(panel: ArtifactPanel): void {
 }
 
 function createParsedArtifactFile(
-  artifactMap: ArtifactMap,
+  previousArtifactMap: ArtifactMap,
   panel: ArtifactPanel,
   file: File
 ): Promise<void> {
@@ -76,9 +76,10 @@ function createParsedArtifactFile(
       const { artifacts, errors } = res;
       const validArtifacts: Artifact[] = [];
       artifacts.forEach((a) => {
-        const error = getArtifactError(artifactMap, a);
+        const error = getArtifactError(previousArtifactMap, a);
         if (error === undefined) {
           validArtifacts.push(a);
+          previousArtifactMap[a.name] = a;
         } else {
           errors.push(error);
         }
@@ -100,6 +101,6 @@ function getArtifactError(
   artifact: Artifact
 ): string | undefined {
   if (artifact.name in artifactMap) {
-    return "Found duplicate artifact: " + artifact.name;
+    return `Could not parse duplicate artifact: ${artifact.name}`;
   }
 }

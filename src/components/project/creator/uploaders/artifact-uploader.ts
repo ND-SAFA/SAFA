@@ -67,7 +67,7 @@ function clearPanel(panel: ArtifactPanel): void {
 }
 
 function createParsedArtifactFile(
-  previousArtifactMap: ArtifactMap,
+  validArtifactMap: ArtifactMap,
   panel: ArtifactPanel,
   file: File
 ): Promise<void> {
@@ -76,10 +76,10 @@ function createParsedArtifactFile(
       const { artifacts, errors } = res;
       const validArtifacts: Artifact[] = [];
       artifacts.forEach((a) => {
-        const error = getArtifactError(previousArtifactMap, a);
+        const error = getArtifactError(validArtifactMap, a);
         if (error === undefined) {
           validArtifacts.push(a);
-          previousArtifactMap[a.name] = a;
+          validArtifactMap[a.name] = a;
         } else {
           errors.push(error);
         }

@@ -198,11 +198,6 @@ export default Vue.extend({
     totalSteps(): number {
       return this.beforeSteps.length + 2 + this.afterSteps.length;
     },
-    beforeStepNames(): string[] {
-      return this.beforeSteps.map((step) => step[0]);
-    },
-    afterStepNames(): string[] {
-      return this.afterSteps.map((step) => step[0]);
     },
   },
   watch: {

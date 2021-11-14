@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType } from "@/types";
+import { ButtonDefinition, ButtonType, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import {
   BaselineVersionModal,
@@ -46,6 +46,7 @@ import {
 } from "@/components/common";
 import ProjectName from "./ProjectName.vue";
 import SafaIcon from "./SafaIcon.vue";
+import { appModule, projectModule } from "@/store";
 
 export default Vue.extend({
   components: {
@@ -64,32 +65,44 @@ export default Vue.extend({
     };
   },
   methods: {
-    onUploadVersion(): void {
-      this.uploadVersionOpen = true;
-    },
     onOpenProject(): void {
       this.openProjectOpen = true;
     },
+    onUploadVersion(): void {
+      this.uploadVersionOpen = true;
+    },
+    onChangeVersion(): void {
+      const versionId = this.project.projectVersion?.versionId;
+      if (versionId !== undefined && versionId !== "") {
+        this.changeVersionOpen = true;
+      } else {
+        appModule.onWarning("Please select a project.");
+      }
+    },
   },
-
+  computed: {
+    project(): Project {
+      return projectModule.getProject;
+    },
+  },
   created() {
     this.definitions = [
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
         buttonIsText: true,
-        menuItems: ["Create Project", "Open Project"],
+        menuItems: ["Open Project", "Create Project"],
         menuHandlers: [
-          () => navigateTo(Routes.PROJECT_CREATOR),
           this.onOpenProject,
+          () => navigateTo(Routes.PROJECT_CREATOR),
         ],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Version",
         buttonIsText: true,
-        menuItems: ["Upload new version"],
-        menuHandlers: [this.onUploadVersion],
+        menuItems: ["Change Version", "Upload new version"],
+        menuHandlers: [this.onChangeVersion, this.onUploadVersion],
       },
       {
         type: ButtonType.LIST_MENU,

@@ -13,7 +13,6 @@ import {
   ArtifactGraphLayout,
   TimGraphLayout,
   timTreeCyPromise,
-  DEFAULT_TIM_TREE_ZOOM,
 } from "@/cytoscape";
 import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
@@ -24,7 +23,6 @@ import {
   viewportModule,
 } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { timNodeHtml } from "@/cytoscape/styles/html/tim-html";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -95,7 +93,6 @@ export default class ViewportModule extends VuexModule {
     //after setting graph layout
     appModule.SET_IS_LOADING(true);
     const cy = await viewportModule.setGraphLayout(payload);
-    cy.nodeHtmlLabel([timNodeHtml]);
     setTimeout(() => {
       cy.animate({
         center: { eles: cy.nodes() },

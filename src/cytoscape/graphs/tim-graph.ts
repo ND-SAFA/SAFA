@@ -31,7 +31,7 @@ export const timGraph: CytoCoreGraph = {
     },
     {
       initialize: nodeHtmlLabel,
-      afterInit: () => undefined,
+      afterInit: (cy: CytoCore) => cy.nodeHtmlLabel([timNodeHtml]),
     },
   ],
   afterInit: async () => {

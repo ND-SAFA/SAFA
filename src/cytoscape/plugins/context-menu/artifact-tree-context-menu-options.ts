@@ -7,7 +7,7 @@ import {
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
-import { deleteArtifactHandler } from "@/api";
+import { deleteArtifactFromCurrentVersion } from "@/api";
 
 export const artifactTreeContextMenuOptions = {
   // Customize event to bring up the context menu
@@ -64,8 +64,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          const projectId = projectModule.getProject.projectId;
-          deleteArtifactHandler(projectId, artifact.name).then();
+          deleteArtifactFromCurrentVersion(artifact.name).then();
         }).then();
       },
     },

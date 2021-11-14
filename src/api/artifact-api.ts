@@ -21,18 +21,18 @@ export async function isArtifactNameTaken(
 }
 
 /**
- * Deletes artifact in project specified.
+ * Deletes artifact body in project version specified.
  *
- * @param projectId - The project to search within.
- * @param artifactName - The artifact name to search for.
+ * @param versionId - The version belonging to the artifact being deleted.
+ * @param artifactName - The name of the artifact being deleted.
  *
  */
-export async function deleteArtifact(
-  projectId: string,
+export async function deleteArtifactBody(
+  versionId: string,
   artifactName: string
 ): Promise<void> {
   return httpClient<void>(
-    fillEndpoint(Endpoint.deleteArtifact, { projectId, artifactName }),
+    fillEndpoint(Endpoint.deleteArtifact, { versionId, artifactName }),
     { method: "DELETE" }
   );
 }

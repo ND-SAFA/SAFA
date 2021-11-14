@@ -104,7 +104,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Artifact, PanelType, ProjectWarnings } from "@/types";
-import { deleteArtifactHandler } from "@/api";
+import { deleteArtifactFromCurrentVersion } from "@/api";
 import {
   appModule,
   artifactSelectionModule,
@@ -179,9 +179,8 @@ export default Vue.extend({
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
-        const { projectId } = projectModule.getProject;
         const artifactName = this.selectedArtifact.name;
-        deleteArtifactHandler(projectId, artifactName).then(() => {
+        deleteArtifactFromCurrentVersion(artifactName).then(() => {
           artifactSelectionModule.UNSELECT_ARTIFACT();
           appModule.closePanel(PanelType.left);
         });

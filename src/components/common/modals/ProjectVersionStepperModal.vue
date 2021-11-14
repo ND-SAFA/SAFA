@@ -32,10 +32,6 @@
       </v-stepper-content>
       <slot name="afterItems" />
     </template>
-
-    <template v-slot:action:main>
-      <slot name="action:main" />
-    </template>
   </generic-stepper-modal>
 </template>
 
@@ -65,7 +61,6 @@ export default Vue.extend({
   },
   props: {
     value: {
-      // TODO: Check if can delete
       type: Number,
       default: 1,
     },

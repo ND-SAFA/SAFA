@@ -10,8 +10,10 @@ import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtifactController extends BaseController {
 
     ArtifactRepository artifactRepository;
+    ArtifactBodyRepository artifactBodyRepository;
 
     ProjectService projectService;
     ArtifactVersionService artifactVersionService;
@@ -44,6 +47,7 @@ public class ArtifactController extends BaseController {
 
     @Autowired
     public ArtifactController(ProjectRepository projectRepository,
+                              ArtifactBodyRepository artifactBodyRepository,
                               ProjectVersionRepository projectVersionRepository,
                               ProjectService projectService,
                               ArtifactVersionService artifactVersionService,
@@ -51,6 +55,7 @@ public class ArtifactController extends BaseController {
                               ArtifactRepository artifactRepository,
                               RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository);
+        this.artifactBodyRepository = artifactBodyRepository;
         this.projectService = projectService;
         this.artifactVersionService = artifactVersionService;
         this.versionService = versionService;
@@ -80,18 +85,19 @@ public class ArtifactController extends BaseController {
     /**
      * Deletes artifact with given name within given project.
      *
-     * @param projectId    UUID of versionId of associated project version.
+     * @param versionId    UUID of versionId of associated project version.
      * @param artifactName The name of the artifact to be deleted.
      * @return ServerResponse with success message.
      */
-    @DeleteMapping(value = "projects/{projectId}/artifacts/{artifactName}")
+    @DeleteMapping(value = "projects/versions/{versionId}/artifacts/{artifactName}")
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteArtifact(
-        @PathVariable UUID projectId,
+    public ServerResponse deleteArtifactBody(
+        @PathVariable UUID versionId,
         @PathVariable String artifactName) {
-        Project project = this.projectRepository.findByProjectId(projectId);
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
-        artifactQuery.ifPresent(artifact -> this.artifactRepository.delete(artifact));
+        ProjectVersion project = this.projectVersionRepository.findByVersionId(versionId);
+        Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(project,
+            artifactName);
+        bodyToRemove.ifPresent(artifactBody -> this.artifactBodyRepository.delete(artifactBody));
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 

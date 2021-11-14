@@ -38,7 +38,7 @@ public class TestArtifactController extends EntityBaseTest {
         String versionId = projectVersion.getVersionId().toString();
         JSONObject artifactJson = response.getValue1();
 
-        verifyArtifactExists(projectVersion, artifactName);
+        verifyArtifactStatus(projectVersion, artifactName, true);
 
         // Step - Modify artifact summary
         artifactJson.put("summary", modifiedSummary);
@@ -70,17 +70,19 @@ public class TestArtifactController extends EntityBaseTest {
         // Step - Create artifact
         Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
         ProjectVersion projectVersion = response.getValue0();
-        String projectId = projectVersion.getProject().getProjectId().toString();
+        String versionId = projectVersion.getVersionId().toString();
 
         // VP - Verify that artifact exists
-        verifyArtifactExists(projectVersion, artifactName);
+        verifyArtifactStatus(projectVersion, artifactName, true);
+        verifyArtifactBodyStatus(projectVersion, artifactName, true);
 
         // Step - Delete artifact
-        String deleteUrl = String.format("/projects/%s/artifacts/%s", projectId, artifactName);
+        String deleteUrl = String.format("/projects/versions/%s/artifacts/%s", versionId, artifactName);
         sendDelete(deleteUrl, status().is2xxSuccessful());
 
         // VP - Verify artifact does not exist
-        verifyArtifactDoesNotExist(projectVersion, artifactName);
+        verifyArtifactStatus(projectVersion, artifactName, true);
+        verifyArtifactBodyStatus(projectVersion, artifactName, false);
     }
 
     private Pair<ProjectVersion, JSONObject> createArtifact(String projectName, String artifactName) throws Exception {
@@ -99,30 +101,6 @@ public class TestArtifactController extends EntityBaseTest {
         sendPost(getArtifactUrl(versionId), artifactJson, status().isCreated());
 
         return new Pair<>(projectVersion, artifactJson);
-    }
-
-    private String getArtifactUrl(String versionId) {
-        return String.format("/projects/versions/%s/artifacts", versionId);
-    }
-
-    private void verifyArtifactExists(ProjectVersion projectVersion, String artifactName) {
-        verifyArtifactStatus(projectVersion, artifactName, true);
-    }
-
-    private void verifyArtifactDoesNotExist(ProjectVersion projectVersion, String artifactName) {
-        verifyArtifactStatus(projectVersion, artifactName, false);
-    }
-
-    private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName, boolean exists) {
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
-            artifactName);
-
-        assertThat(artifactQuery.isPresent()).isEqualTo(exists);
-        if (exists) {
-            Artifact artifact = artifactQuery.get();
-            List<ArtifactBody> artifactBody = this.artifactBodyRepository.findByArtifact(artifact);
-            assertThat(artifactBody.size()).isEqualTo(1);
-        }
     }
 
     @Test
@@ -147,5 +125,21 @@ public class TestArtifactController extends EntityBaseTest {
         response = sendGet(url, status().isOk());
         artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
         assertThat(artifactExists).isTrue();
+    }
+
+    private String getArtifactUrl(String versionId) {
+        return String.format("/projects/versions/%s/artifacts", versionId);
+    }
+
+    private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName, boolean exists) {
+        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
+            artifactName);
+        assertThat(artifactQuery.isPresent()).isEqualTo(exists);
+    }
+
+    private void verifyArtifactBodyStatus(ProjectVersion projectVersion, String artifactName, boolean exists) {
+        Optional<ArtifactBody> artifactBody =
+            this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
+        assertThat(artifactBody.isPresent()).isEqualTo(exists);
     }
 }

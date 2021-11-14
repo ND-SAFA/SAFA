@@ -51,6 +51,10 @@ import { VersionSelector } from "@/components/project/version-selector";
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 
+/**
+ * Presents a stepper in a modal for selecting a project and version.
+ *
+ */
 export default Vue.extend({
   name: "project-version-stepper-modal",
   components: {
@@ -59,41 +63,70 @@ export default Vue.extend({
     VersionSelector,
   },
   props: {
+    /**
+     * The current step of the stepper, used as the v-model value.
+     * @model
+     */
     value: {
       type: Number,
       default: 1,
     },
+    /**
+     * The title of the modal
+     */
     title: {
       type: String,
       required: true,
     },
+    /**
+     *  Whether this current modal is open and in view.
+     */
     isOpen: {
       type: Boolean,
       required: true,
     },
+    /**
+     * Whether the current modal is loading.
+     */
     isLoading: {
       type: Boolean,
       required: false,
       default: false,
     },
+    /**
+     * The project used to bind and synchronize with parent.
+     */
     project: {
       type: Object as PropType<OptionalProjectIdentifier>,
       required: false,
     },
+    /**
+     * The version used to bind and synchronize with parent.
+     */
     version: {
       type: Object as PropType<OptionalProjectVersion>,
       required: false,
     },
+    /**
+     * The StepStates of the steps coming before selection a project.
+     */
     beforeSteps: {
       type: Array as PropType<Array<StepState>>,
       required: false,
       default: () => [] as StepState[],
     },
+    /**
+     * The StepStates of the steps coming after selecting a version.
+     */
     afterSteps: {
       type: Array as PropType<Array<StepState>>,
       required: false,
       default: () => [] as StepState[],
     },
+    /**
+     * Defines the starting step in the stepper. Useful if project or versions is
+     * already selected.
+     */
     startStep: {
       type: Number,
       default: 1,
@@ -122,7 +155,6 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.$emit("onClose");
     },
-
     selectProject(project: ProjectIdentifier) {
       this.selectedProject = project;
       this.currentStep++;

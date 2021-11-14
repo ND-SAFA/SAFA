@@ -19,6 +19,9 @@ import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
+const PROJECT_SELECTION_STEP = 1;
+const VERSION_SELECTION_STEP = 2;
+
 /**
  * Stepper for setting the current project and version.
  *
@@ -30,40 +33,59 @@ export default Vue.extend({
     ProjectVersionStepperModal,
   },
   props: {
+    /**
+     * Whether the current component should be in open.
+     */
     isOpen: {
       type: Boolean,
       required: true,
     },
-    project: {
-      type: Object as PropType<ProjectIdentifier>,
-      required: false,
-    },
-    startStep: {
-      type: Number,
-      default: 1,
-      required: false,
-    },
+    /**
+     * The title of the modal encapsulating this component.
+     */
     title: {
       type: String,
       default: "Select Baseline Project Version",
     },
+    /**
+     * Optional project which if defined begins the stepper on version selection
+     * fetching the versions of given project.
+     */
+    project: {
+      type: Object as PropType<ProjectIdentifier>,
+      required: false,
+    },
   },
   data() {
     return {
-      isLoading: false,
+      currentStep:
+        this.project === undefined
+          ? PROJECT_SELECTION_STEP
+          : VERSION_SELECTION_STEP,
       selectedVersion: undefined as ProjectVersion | undefined,
-      currentStep: this.startStep,
       selectedProject: this.project,
+      isLoading: false,
     };
+  },
+  computed: {
+    startStep(): number {
+      return this.project === undefined
+        ? PROJECT_SELECTION_STEP
+        : VERSION_SELECTION_STEP;
+    },
   },
   watch: {
     /**
-     * Overrides selectedProject with the project prop.
+     * If project property changes to defined project then selected project
+     * is set and stepper is advanced to version selection step.
      *
      * @param newProject - The new project prop.
      */
-    project(newProject: ProjectIdentifier): void {
-      this.selectedProject = newProject;
+    project(newProject: ProjectIdentifier | undefined): void {
+      if (newProject !== undefined) {
+        this.selectedProject = newProject;
+        this.currentStep = VERSION_SELECTION_STEP;
+      }
     },
   },
   methods: {

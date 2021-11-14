@@ -81,7 +81,7 @@ export type OptionalProjectVersion = ProjectVersion | undefined;
 export type ModalSize = "xxs" | "xs" | "s" | "m" | "l";
 
 /**
- * Defines the state of a stepper.
+ * Defines the name of a step and whether the step is currently valid.
  */
 export type StepState = [string, boolean];
 

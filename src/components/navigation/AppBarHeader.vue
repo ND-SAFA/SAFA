@@ -29,7 +29,6 @@
       title="Change project version"
       :is-open="changeVersionOpen"
       :project="project"
-      :start-step="2"
       @onClose="changeVersionOpen = false"
     />
   </v-container>

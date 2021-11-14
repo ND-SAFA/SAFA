@@ -6,11 +6,11 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    @edit-item="editItem"
-    @select-item="selectItem"
-    @delete-item="deleteItem"
-    @add-item="addItem"
-    @refresh="refresh"
+    @edit-item="onEditProject"
+    @select-item="onSelectProject"
+    @delete-item="onDeleteProject"
+    @add-item="onAddItem"
+    @refresh="fetchProjects"
   >
     <template v-slot:editItemDialogue>
       <project-identifier-modal
@@ -18,14 +18,14 @@
         :is-open="editProjectDialogue"
         :project="projectToEdit"
         @onSave="onUpdateProject"
-        @onClose="onCloseProject"
+        @onClose="onCloseProjectEdit"
       />
     </template>
     <template v-slot:addItemDialogue>
       <project-identifier-modal
         title="Create New Project"
         :is-open="addProjectDialogue"
-        @onSave="onSaveAddProject"
+        @onSave="onSaveNewProject"
         @onClose="onCloseAddProject"
       />
     </template>
@@ -33,8 +33,8 @@
       <confirm-project-delete
         :is-open="deleteProjectDialogue"
         :project="projectToDelete"
-        @onConfirmDelete="onConfirmProjectDelete"
-        @onCancelDelete="onCancelDelete"
+        @onConfirmDelete="onConfirmDeleteProject"
+        @onCancelDelete="onCancelDeleteProject"
       />
     </template>
   </generic-selector>
@@ -50,6 +50,12 @@ import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "./headers";
 
+/**
+ * Displays list of project available to current user and allows them to
+ * select, edit, delete, or create projects. Project list is refreshed whenever
+ * mounted or isOpen is changed to true.
+ *
+ */
 export default Vue.extend({
   name: "ProjectSelector",
   components: {
@@ -59,8 +65,8 @@ export default Vue.extend({
   },
   props: {
     /**
-     * Whether this component is currently in view. If within a stepper then
-     * this is true when the this component is within the current step.
+     * Whether this component is currently in view. If within
+     * a stepper then this is true when the this component is within the current step.
      */
     isOpen: {
       type: Boolean,
@@ -81,27 +87,23 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.refresh();
+    this.fetchProjects();
   },
   watch: {
     isOpen(isOpen: boolean): void {
       if (isOpen) {
-        this.refresh();
+        this.fetchProjects();
       }
     },
   },
   methods: {
-    refresh() {
-      this.isLoading = true;
-      this.handleGetProjects();
-    },
     onUpdateProject(project: ProjectIdentifier) {
       this.isLoading = true;
       this.saveOrUpdateProjectHandler(project, "updated");
       this.editProjectDialogue = false;
       this.selected = project;
     },
-    onSaveAddProject(newProject: ProjectIdentifier) {
+    onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
       this.saveOrUpdateProjectHandler(newProject, "created").then(
         (projectCreated: ProjectCreationResponse) => {
@@ -111,41 +113,40 @@ export default Vue.extend({
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
-    onCloseProject() {
+    onCloseProjectEdit() {
       this.editProjectDialogue = false;
     },
-    selectItem(item: DataItem<ProjectIdentifier>) {
+    onSelectProject(item: DataItem<ProjectIdentifier>) {
       if (item.value) {
         this.$emit("onProjectSelected", item.item);
       } else {
         this.$emit("onProjectUnselected");
       }
     },
-    addItem() {
+    onAddItem() {
       this.addProjectDialogue = true;
     },
-
     onCloseAddProject() {
       this.addProjectDialogue = false;
     },
-    editItem(item: ProjectIdentifier) {
+    onEditProject(item: ProjectIdentifier) {
       this.projectToEdit = item;
       this.editProjectDialogue = true;
     },
-    deleteItem(item: ProjectIdentifier) {
+    onDeleteProject(item: ProjectIdentifier) {
       this.deleteProjectDialogue = true;
       this.projectToDelete = item;
     },
-    onCancelDelete() {
+    onCancelDeleteProject() {
       this.deleteProjectDialogue = false;
     },
-
-    onConfirmProjectDelete(project: ProjectIdentifier) {
+    onConfirmDeleteProject(project: ProjectIdentifier) {
       this.isLoading = true;
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
-    handleGetProjects() {
+    fetchProjects(): void {
+      this.isLoading = true;
       getProjects()
         .then((projects) => {
           this.projects = projects;

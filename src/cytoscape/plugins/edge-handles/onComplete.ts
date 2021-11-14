@@ -1,7 +1,7 @@
 import { NodeSingular, EventObject, CollectionReturnValue } from "cytoscape";
 import { appModule, projectModule } from "@/store";
 import { createLink } from "@/api";
-import { disableDrawMode } from "@/cytoscape/edge-handles";
+import { disableDrawMode } from "@/cytoscape/plugins/edge-handles/index";
 
 export function onArtifactTreeEdgeComplete(
   event: EventObject,

@@ -1,3 +1,3 @@
 export * from "./config";
-export * from "./html/node-html";
+export * from "./html/artifact-html";
 export * from "./stylesheets";

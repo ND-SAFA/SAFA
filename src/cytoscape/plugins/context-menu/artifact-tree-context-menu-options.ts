@@ -6,7 +6,7 @@ import {
   viewportModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
-import { enableDrawMode } from "@/cytoscape/edge-handles";
+import { enableDrawMode } from "@/cytoscape/plugins";
 import { deleteArtifactHandler } from "@/api";
 
 export const artifactTreeContextMenuOptions = {

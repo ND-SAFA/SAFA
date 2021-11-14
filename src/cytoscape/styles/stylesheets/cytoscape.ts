@@ -11,7 +11,7 @@ import {
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_COLOR,
   ARTIFACT_SELECTED_BORDER_WIDTH,
-} from "@/cytoscape/styles/config/artifact";
+} from "@/cytoscape/styles/config/artifact-tree-config";
 import {
   TRACE_COLOR,
   TRACE_STYLE,
@@ -35,12 +35,16 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "curve-style": TRACE_STYLE,
       width: TRACE_WIDTH,
       "line-color": TRACE_COLOR,
+      "source-arrow-shape": "chevron",
+      "source-arrow-color": TRACE_COLOR,
+      "arrow-scale": 2,
     },
   },
   {
     selector: GENERATED_LINK_SELECTOR,
     style: {
       "line-color": GENERATED_TRACE_COLOR,
+      "source-arrow-color": GENERATED_TRACE_COLOR,
     },
   },
   {

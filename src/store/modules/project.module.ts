@@ -48,13 +48,8 @@ export default class ProjectModule extends VuexModule {
     res: ProjectCreationResponse
   ): Promise<void> {
     await this.setProject(res.project);
-
     errorModule.setArtifactWarnings(res.warnings);
-
-    await navigateTo(Routes.ARTIFACT_TREE);
-
-    await viewportModule.setGraphLayout();
-
+    await viewportModule.setArtifactTreeLayout();
     deltaModule.setIsDeltaViewEnabled(false);
   }
 
@@ -171,7 +166,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Deletes given artifact.
    *
-   * @param artifact - The artifact to remove.
+   * @param artifactName - The artifact to remove.
    */
   DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
     this.project.artifacts = this.project.artifacts.filter(

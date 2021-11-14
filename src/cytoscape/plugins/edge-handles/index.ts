@@ -1,6 +1,6 @@
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types/cytoscape";
 import { NodeSingular, CollectionReturnValue } from "cytoscape";
-import { onArtifactTreeEdgeComplete } from "@/cytoscape/edge-handles/onComplete";
+import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/onComplete";
 
 export * from "./options";
 

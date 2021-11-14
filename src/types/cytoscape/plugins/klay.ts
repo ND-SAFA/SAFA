@@ -96,15 +96,15 @@ export enum NodePlacement {
  * Defines the klay layout settings.
  */
 export interface KlayLayoutSettings {
-  spacing: number;
-  direction: LayoutDirection;
-  fixedAlignment: FixedAlignment;
-  layoutHierarchy: boolean;
-  nodeLayering: NodeLayering;
-  nodePlacement: NodePlacement;
-  inLayerSpacingFactor: number;
-  thoroughness: number;
-  randomizationSeed: number;
+  spacing?: number;
+  direction?: LayoutDirection;
+  fixedAlignment?: FixedAlignment;
+  layoutHierarchy?: boolean;
+  nodeLayering?: NodeLayering;
+  nodePlacement?: NodePlacement;
+  inLayerSpacingFactor?: number;
+  thoroughness?: number;
+  randomizationSeed?: number;
 }
 
 /**

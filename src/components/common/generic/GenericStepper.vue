@@ -29,7 +29,7 @@
                 :disabled="!isStepDone"
                 @click="onStepForward"
               >
-                {{ currentStep === numberOfSteps ? "Submit" : "Continue" }}
+                {{ currentStep === numberOfSteps ? submitText : "Continue" }}
               </v-btn>
               <v-btn
                 text
@@ -68,6 +68,10 @@ export default Vue.extend({
       type: Array as PropType<Array<[string, boolean]>>,
       required: true,
       default: () => [] as [string, boolean][],
+    },
+    submitText: {
+      type: String,
+      default: "Submit",
     },
   },
   methods: {

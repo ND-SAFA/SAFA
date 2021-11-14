@@ -1,5 +1,5 @@
 <template>
-  <v-container class="elevation-3" style="width: 500px; height: 300px">
+  <v-container class="elevation-3">
     <generic-cytoscape-controller :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
         <artifact-type-node
@@ -11,6 +11,7 @@
           v-for="tracePanel in tracePanels"
           :key="getTraceId(tracePanel)"
           :trace-definition="tracePanel.projectFile"
+          :count="tracePanel.projectFile.traces.length"
         />
       </template>
     </generic-cytoscape-controller>
@@ -19,10 +20,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TracePanel } from "@/types";
+import { TracePanel, CytoCoreGraph } from "@/types";
 import { ArtifactPanel } from "@/components";
-import { timTreeDefinition } from "@/cytoscape";
-import { CytoCoreGraph } from "@/types/cytoscape";
+import { timGraph } from "@/cytoscape/graphs";
+import { viewportModule } from "@/store";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 import {
   GenericGraphLink,
@@ -48,6 +49,10 @@ export default Vue.extend({
       type: Array as PropType<ArtifactPanel[]>,
       required: true,
     },
+    inView: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     getTraceId(tracePanel: TracePanel): string {
@@ -57,7 +62,14 @@ export default Vue.extend({
   },
   computed: {
     cytoCoreGraph(): CytoCoreGraph {
-      return timTreeDefinition;
+      return timGraph;
+    },
+  },
+  watch: {
+    async inView(inView: boolean): Promise<void> {
+      if (inView) {
+        await viewportModule.setTimTreeLayout();
+      }
     },
   },
 });

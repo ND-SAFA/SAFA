@@ -18,6 +18,11 @@ import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
+/**
+ * Stepper for setting the current project and version.
+ *
+ * @emits `onClose` - Emitted when modal is exited or project + version set.
+ */
 export default Vue.extend({
   name: "baseline-version-modal",
   components: {

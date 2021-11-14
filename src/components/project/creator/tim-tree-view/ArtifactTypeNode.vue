@@ -4,8 +4,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, CytoCoreElementDefinition } from "@/types";
+import { Artifact } from "@/types";
 import { ArtifactPanel } from "@/components/project/creator/uploaders";
+import { TimNodeDefinition } from "@/types/components/tim-tree";
 
 /**
  * The node representing an artifact type in the tim tree.
@@ -28,11 +29,12 @@ export default Vue.extend({
     count(): number {
       return this.artifacts.length;
     },
-    definition(): CytoCoreElementDefinition {
+    definition(): TimNodeDefinition {
       return {
         data: {
           id: this.type,
           type: "node",
+          count: this.count,
         },
       };
     },

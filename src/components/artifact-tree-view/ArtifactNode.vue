@@ -3,12 +3,7 @@
 </template>
 
 <script lang="ts">
-import {
-  deltaModule,
-  errorModule,
-  artifactSelectionModule,
-  projectModule,
-} from "@/store";
+import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
 import {
   Artifact,
   ArtifactWarning,

@@ -12,7 +12,7 @@ import {
 } from "@/cytoscape/styles";
 
 // docs: https://github.com/cytoscape/cytoscape.js-klay
-export const DefaultKlayLayout: KlayLayoutSettings = {
+export const ArtifactKlaySettings: KlayLayoutSettings = {
   spacing: LAYOUT_NODE_SPACING,
   direction: LAYOUT_NODE_DIRECTION,
   fixedAlignment: LAYOUT_ALIGNMENT,

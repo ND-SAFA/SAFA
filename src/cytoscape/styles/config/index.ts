@@ -1,4 +1,5 @@
-export * from "./artifact";
+export * from "./artifact-tree-config";
 export * from "./edge-handles";
-export * from "./graph";
+export * from "./default-graph-config";
+export * from "./tim-tree-config";
 export * from "./trace";

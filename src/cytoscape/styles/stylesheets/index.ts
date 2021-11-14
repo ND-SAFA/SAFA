@@ -5,3 +5,4 @@ export const GraphStyle = CytoscapeStyle.concat(EdgeHandlesStyle);
 
 export * from "./cytoscape";
 export * from "./edge-handles";
+export * from "./tim-styles";

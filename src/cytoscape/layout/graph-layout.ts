@@ -1,11 +1,3 @@
-import { NodeCollection } from "cytoscape";
-import { DefaultKlayLayout } from "@/cytoscape/layout";
-import { ArtifactTreeAutoMoveHandlers } from "@/cytoscape/automove";
-import { DefaultCytoEventHandlers } from "@/cytoscape/events";
-import {
-  DefaultPostLayoutHooks,
-  DefaultPreLayoutHooks,
-} from "@/cytoscape/hooks";
 import {
   KlayLayoutSettings,
   LayoutHook,
@@ -15,7 +7,7 @@ import {
   CytoEventHandlers,
 } from "@/types";
 
-export default class ArtifactTreeGraphLayout implements IGraphLayout {
+export default class GraphLayout implements IGraphLayout {
   klaySettings: KlayLayoutSettings;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];
@@ -23,19 +15,12 @@ export default class ArtifactTreeGraphLayout implements IGraphLayout {
   autoMoveHandlers: AutoMoveEventHandlers;
   cytoEventHandlers: CytoEventHandlers;
 
-  peerNodes?: NodeCollection;
-  temporaryEdges?: NodeCollection;
-  packageNodes?: NodeCollection;
-  ancestorNodes?: NodeCollection;
-  codeNodes?: NodeCollection;
-  peerElements?: NodeCollection;
-
   constructor(
-    autoMoveHandlers: AutoMoveEventHandlers = ArtifactTreeAutoMoveHandlers,
-    cytoEventHandlers: CytoEventHandlers = DefaultCytoEventHandlers,
-    layoutTemplate: KlayLayoutSettings = DefaultKlayLayout,
-    preLayoutHooks: LayoutHook[] = DefaultPreLayoutHooks,
-    postLayoutHooks: LayoutHook[] = DefaultPostLayoutHooks
+    autoMoveHandlers: AutoMoveEventHandlers,
+    cytoEventHandlers: CytoEventHandlers,
+    layoutTemplate: KlayLayoutSettings,
+    preLayoutHooks: LayoutHook[],
+    postLayoutHooks: LayoutHook[]
   ) {
     this.klaySettings = layoutTemplate;
     this.preLayoutHooks = preLayoutHooks;

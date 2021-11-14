@@ -1,5 +1,10 @@
 <template>
-  <generic-stepper v-model="currentStep" :steps="steps">
+  <generic-stepper
+    v-model="currentStep"
+    :steps="steps"
+    submitText="Create Project"
+    @submit="saveProject()"
+  >
     <v-row>Create a new project</v-row>
     <template v-slot:items>
       <v-stepper-content step="1">
@@ -58,20 +63,17 @@
       </v-stepper-content>
 
       <v-stepper-content step="4">
-        <v-container class="pa-10">
-          <v-row justify="center" class="mb-2">
-            <h1 class="text-h6">Graph Preview</h1>
+        <v-container>
+          <v-row justify="center">
+            <v-col>
+              <h1 class="text-h6">Project TIM</h1>
+            </v-col>
           </v-row>
           <TimTree
             :artifact-panels="artifactUploader.panels"
             :trace-panels="traceUploader.panels"
+            :in-view="currentStep === 4"
           />
-          <v-divider class="my-5" />
-          <v-row v-if="currentStep === 4" justify="center">
-            <v-btn color="primary" @click="saveProject()">
-              Create Project
-            </v-btn>
-          </v-row>
         </v-container>
       </v-stepper-content>
     </template>
@@ -107,7 +109,7 @@ export default Vue.extend({
         [PROJECT_IDENTIFIER_STEP_NAME, false],
         ["Upload Artifacts", false],
         ["Upload Trace Links", true],
-        ["View TIM", false],
+        ["View TIM", true],
       ] as StepState[],
       name: "",
       description: "",

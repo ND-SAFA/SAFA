@@ -7,49 +7,49 @@
         :showDecline="true"
         :links="links"
         :artifacts="artifactHashmap"
-        @approveLink="onApproveLink"
-        @declineLink="onDeclineLink"
+        @approve-link="onApproveLink"
+        @decline-link="onDeclineLink"
       />
     </v-row>
     <v-row justify="center">
       <ApprovalSection
+        showApprove
         title="Declined Trace Links"
-        :showApprove="true"
         :showDecline="false"
+        :startOpen="false"
         :links="declinedLinks"
         :artifacts="artifactHashmap"
-        @approveLink="onApproveDeclinedLink"
-        :startOpen="false"
+        @approve-link="onApproveDeclinedLink"
       />
     </v-row>
     <v-row justify="center">
       <ApprovalSection
+        showDecline
         title="Approved Trace Links"
         :showApprove="false"
-        :showDecline="true"
+        :startOpen="false"
         :links="approvedLinks"
         :artifacts="artifactHashmap"
-        @declineLink="onDeclineApprovedLink"
-        :startOpen="false"
+        @decline-link="onDeclineApprovedLink"
       />
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import { getGeneratedLinks } from "@/api/link-api";
+import Vue from "vue";
 import {
   approveLinkAPIHandler,
   declineLinkAPIHandler,
-} from "@/api/handlers/trace-link-approval-handler";
-import ApprovalSection from "@/components/approve-links-view/ApprovalSection.vue";
-import { Artifact } from "@/types/domain/artifact";
-import { TraceApproval, TraceLink } from "@/types/domain/links";
-import Vue from "vue";
+  getGeneratedLinks,
+} from "@/api";
+import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
 import { appModule, projectModule } from "@/store";
+import { ApprovalSection } from "@/components/approve-links-view";
+
 export default Vue.extend({
+  name: "approval-links-view",
   components: { ApprovalSection },
-  name: "trace-link-approval",
   data() {
     return {
       links: [] as TraceLink[],

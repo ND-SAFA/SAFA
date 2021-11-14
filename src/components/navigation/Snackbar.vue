@@ -15,7 +15,7 @@
         <v-row justify="end" class="ma-0 pa-0">
           <v-btn
             v-if="hasErrors"
-            color="secondary"
+            :color="messageColor"
             @click="onSeeErrorClick"
             class="ma-0"
           >
@@ -35,10 +35,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import type { SnackbarMessage } from "@/types/store";
-import { MessageType, PanelType } from "@/types/store";
+import { MessageType, PanelType, SnackbarMessage } from "@/types";
 import { appModule } from "@/store";
-import ServerErrorModal from "@/components/common/modals/ServerErrorModal.vue";
+import { ServerErrorModal } from "@/components/common";
 
 export default Vue.extend({
   name: "snackbar",
@@ -51,7 +50,7 @@ export default Vue.extend({
   data: () => ({
     showSnackbar: false,
     snackbarMessage: "",
-    messageType: "info",
+    messageType: MessageType.CLEAR,
     errors: [] as string[],
   }),
   methods: {
@@ -105,8 +104,8 @@ export default Vue.extend({
     },
   },
   watch: {
-    message(newMessage: SnackbarMessage | undefined) {
-      if (newMessage !== undefined) {
+    message(newMessage: SnackbarMessage) {
+      if (newMessage.type !== MessageType.CLEAR) {
         this.showMessage(newMessage);
         appModule.CLEAR_MESSAGE();
       }

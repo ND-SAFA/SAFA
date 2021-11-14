@@ -1,4 +1,4 @@
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact } from "@/types";
 
 export const environementalAssumptions: Artifact[] = [
   {

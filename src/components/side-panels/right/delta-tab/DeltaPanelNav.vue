@@ -1,22 +1,21 @@
 <template>
   <v-container>
+    <h1 class="my-2">Delta View</h1>
     <v-row justify="center">
       <v-switch
         color="primary"
-        @click="onSwitchChange"
-        :value="isSwitchOn"
+        @click="onChange"
+        :value="isDeltaViewEnabled"
         :error-messages="errorMessage"
         readonly
       >
-        <template v-slot:label>
-          <span class="text-h5">Delta View Mode</span>
-        </template>
+        <template v-slot:label> Enable Delta View Mode </template>
       </v-switch>
     </v-row>
     <v-row justify="center" v-if="isDeltaViewEnabled">
       <v-btn
         v-if="isProjectDefined()"
-        color="secondary"
+        color="primary"
         @click="isModalOpen = true"
         class="pt-6 pb-6"
       >
@@ -26,7 +25,7 @@
       </v-btn>
       <p v-else>No project has been selected.</p>
     </v-row>
-    <DeltaVersionModal
+    <DeltaVersionsModal
       v-if="isProjectDefined()"
       :isOpen="isModalOpen"
       :project="project"
@@ -37,39 +36,34 @@
 
 <script lang="ts">
 import Vue from "vue";
-import DeltaVersionModal from "@/components/side-panels/right/delta-tab/DeltaVersionsModal.vue";
-import { Project } from "@/types/domain/project";
-import { versionToString } from "@/util/to-string";
+import { Project } from "@/types";
+import { versionToString } from "@/util";
 import { deltaModule, projectModule } from "@/store";
+import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 
 export default Vue.extend({
   name: "left-panel-nav",
   components: {
-    DeltaVersionModal,
+    DeltaVersionsModal,
   },
   data: () => ({
     isModalOpen: false,
-    isSwitchOn: false,
     errorMessage: undefined as string | undefined,
   }),
   methods: {
-    onSwitchChange() {
-      if (this.isSwitchOn) {
-        // always allow turn off
-        deltaModule.setIsDeltaViewEnabled(false);
-        this.isSwitchOn = false;
-      } else {
-        if (this.isProjectDefined()) {
-          deltaModule.setIsDeltaViewEnabled(true);
-          this.isSwitchOn = true;
-        } else {
-          this.errorMessage = "Please select a baseline project version";
-          this.isSwitchOn = false;
-        }
-      }
-    },
     isProjectDefined(): boolean {
       return this.project !== undefined && this.project.projectId !== "";
+    },
+    onChange(): void {
+      if (!this.isDeltaViewEnabled) {
+        if (this.isProjectDefined()) {
+          deltaModule.setIsDeltaViewEnabled(true);
+        } else {
+          this.errorMessage = "Please select a baseline project version";
+        }
+      } else {
+        deltaModule.setIsDeltaViewEnabled(false);
+      }
     },
   },
   computed: {

@@ -19,8 +19,8 @@
 
 <script lang="ts">
 import { projectModule } from "@/store";
-import { Artifact } from "@/types/domain/artifact";
-import { Project } from "@/types/domain/project";
+import { Artifact } from "@/types";
+import { Project } from "@/types";
 import Vue from "vue";
 export default Vue.extend({
   computed: {

@@ -10,25 +10,25 @@
 
     <v-expansion-panels multiple>
       <SubTreeSelectorTab v-if="selectedTab === 0" />
-      <DeltaPanel v-if="selectedTab === 1" @open="openDeltaPanel" />
-      <SafetyNotationPanel v-if="selectedTab === 2" />
+      <DeltaTab v-if="selectedTab === 1" @open="openDeltaPanel" />
+      <SafetyNotationTab v-if="selectedTab === 2" />
     </v-expansion-panels>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import SafetyNotationPanel from "@/components/side-panels/right/SafetyNotationTab.vue";
-import DeltaPanel from "@/components/side-panels/right/DeltaTab.vue";
-import SubTreeSelectorTab from "@/components/side-panels/right/SubTreeSelectorTab.vue";
+import SubTreeSelectorTab from "./SubTreeSelectorTab.vue";
+import DeltaTab from "./DeltaTab.vue";
+import SafetyNotationTab from "./SafetyNotationTab.vue";
 
 const DELTA_TREE_INDEX = 1;
 
 export default Vue.extend({
   name: "hazard-hierarchy-panel",
   components: {
-    SafetyNotationPanel,
-    DeltaPanel,
+    SafetyNotationTab,
+    DeltaTab,
     SubTreeSelectorTab,
   },
   data() {

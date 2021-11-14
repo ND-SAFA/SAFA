@@ -1,31 +1,25 @@
 <template>
-  <v-container>
-    <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
-      <DeltaStateNav />
-      <DeltaButtonGroup
-        v-if="isDeltaMode"
-        deltaType="added"
-        class="mt-10"
-        :artifacts="artifactsAdded"
-        @onArtifactClick="(name) => selectArtifact(name, artifactsAdded[name])"
-      />
-      <DeltaButtonGroup
-        v-if="isDeltaMode"
-        deltaType="removed"
-        :artifacts="artifactsRemoved"
-        @onArtifactClick="
-          (name) => selectArtifact(name, artifactsRemoved[name])
-        "
-      />
-      <DeltaButtonGroup
-        v-if="isDeltaMode"
-        deltaType="modified"
-        :artifacts="artifactsModified"
-        @onArtifactClick="
-          (name) => selectArtifact(name, artifactsModified[name])
-        "
-      />
-    </v-expansion-panels>
+  <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
+    <DeltaPanelNav />
+    <DeltaButtonGroup
+      v-if="isDeltaMode"
+      deltaType="added"
+      class="mt-10"
+      :artifacts="artifactsAdded"
+      @onArtifactClick="(name) => selectArtifact(name, artifactsAdded[name])"
+    />
+    <DeltaButtonGroup
+      v-if="isDeltaMode"
+      deltaType="removed"
+      :artifacts="artifactsRemoved"
+      @onArtifactClick="(name) => selectArtifact(name, artifactsRemoved[name])"
+    />
+    <DeltaButtonGroup
+      v-if="isDeltaMode"
+      deltaType="modified"
+      :artifacts="artifactsModified"
+      @onArtifactClick="(name) => selectArtifact(name, artifactsModified[name])"
+    />
     <ArtifactDeltaDiff
       v-if="selectedDeltaArtifact !== undefined"
       :isOpen="selectedDeltaArtifact !== undefined"
@@ -33,28 +27,30 @@
       :name="selectedDeltaArtifact[0]"
       @onClose="closeDeltaModal"
     />
-  </v-container>
+  </v-expansion-panels>
 </template>
 
 <script lang="ts">
 import {
   AddedArtifact,
-  DeltaArtifact,
+  ArtifactDelta,
   ModifiedArtifact,
   RemovedArtifact,
-} from "@/types/domain/delta";
-import { DeltaArtifacts } from "@/types/store";
-import ArtifactDeltaDiff from "@/components/side-panels/right/delta-tab/ArtifactDeltaDiff.vue";
-import DeltaButtonGroup from "@/components/side-panels/right/delta-tab/DeltaButtonGroup.vue";
-import DeltaStateNav from "@/components/side-panels/right/delta-tab/DeltaPanelNav.vue";
+  DeltaArtifacts,
+  Artifact,
+} from "@/types";
 import Vue from "vue";
-import { Artifact } from "@/types/domain/artifact";
 import { deltaModule, projectModule } from "@/store";
+import {
+  DeltaPanelNav,
+  DeltaButtonGroup,
+  ArtifactDeltaDiff,
+} from "./delta-tab";
 
-type OptionalDeltaArtifact = [string, DeltaArtifact] | undefined;
+type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
 
 export default Vue.extend({
-  components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaStateNav },
+  components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaPanelNav },
   data() {
     return {
       selectedDeltaArtifact: undefined as OptionalDeltaArtifact,
@@ -62,7 +58,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    selectArtifact(name: string, artifact: DeltaArtifact): void {
+    selectArtifact(name: string, artifact: ArtifactDelta): void {
       this.selectedDeltaArtifact = [name, artifact];
     },
     closeDeltaModal(): void {

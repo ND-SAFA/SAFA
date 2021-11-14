@@ -1,12 +1,10 @@
 <template>
   <v-container>
+    <h1 class="my-2">Artifact Hierarchy</h1>
     <v-col>
-      <v-row class="mb-2 mt-2">
-        <h3 class="text-center">Artifact Hierarchy</h3>
-      </v-row>
       <v-row>
         <v-text-field
-          label="search"
+          label="Search"
           solo
           rounded
           class="mt-5"
@@ -48,9 +46,9 @@
 </template>
 
 <script lang="ts">
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact } from "@/types";
 import Vue from "vue";
-import { getArtifactTypePrintName } from "@/util/string-helper";
+import { getArtifactTypePrintName } from "@/util";
 import { projectModule, viewportModule } from "@/store";
 
 export default Vue.extend({
@@ -61,9 +59,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    getTypePrintName(type: string): string {
-      return getArtifactTypePrintName(type);
-    },
+    getTypePrintName: getArtifactTypePrintName,
     getIconName(type: string): string {
       switch (type.toLowerCase()) {
         case "requirement":

@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
-    :isOpen="isOpen"
-    :isLoading="isLoading"
+  <generic-modal
     title="Delta View Target Version"
-    @onClose="$emit('onClose')"
+    :is-open="isOpen"
+    :is-loading="isLoading"
+    @close="$emit('onClose')"
   >
     <template v-slot:body>
       <v-row justify="center" class="mt-5">
@@ -33,17 +33,17 @@
         </v-row>
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">
-import VersionSelector from "@/components/common/modals/VersionSelector.vue";
-import { Project, ProjectVersion } from "@/types/domain/project";
 import Vue, { PropType } from "vue";
-import { getProjectDelta } from "@/api/project-api";
-import { DeltaPayload } from "@/types/store";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
-import { appModule, deltaModule } from "@/store";
+import { Project, ProjectVersion, DeltaPayload } from "@/types";
+import { getProjectDelta } from "@/api";
+import { appModule, deltaModule, viewportModule } from "@/store";
+import { GenericModal } from "@/components/common";
+import { VersionSelector } from "@/components/project/version-selector";
+
 export default Vue.extend({
   components: { VersionSelector, GenericModal },
   props: {
@@ -81,6 +81,7 @@ export default Vue.extend({
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("onClose");
             appModule.onSuccess("Delta state was updated successfully.");
+            viewportModule.setArtifactTreeLayout();
           });
         } else {
           appModule.onWarning("Project source version is not selected.");

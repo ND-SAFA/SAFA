@@ -3,7 +3,7 @@
     <v-row class="ma-0 pa-0">
       <v-col cols="1" class="ma-0 pa-0" align-self="center">
         <v-row class="ma-0 pa-0" justify="center">
-          <SAFAIcon />
+          <SafaIcon />
         </v-row>
       </v-col>
       <v-col cols="11" class="ma-0 pa-0">
@@ -12,36 +12,44 @@
         </v-row>
         <v-row class="ma-0 pa-0">
           <v-col cols="auto" class="ma-0 pa-0">
-            <button-row :definitions="definitions" justify="start" />
+            <ButtonRow :definitions="definitions" justify="start" />
           </v-col>
         </v-row>
       </v-col>
     </v-row>
-    <UploadNewVersionModal
+    <upload-new-version-modal
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
     />
-    <BaselineVersionModal
-      :isOpen="openProjectOpen"
+    <baseline-version-modal
+      :is-open="openProjectOpen"
       @onClose="openProjectOpen = false"
+    />
+    <baseline-version-modal
+      title="Change project version"
+      :is-open="changeVersionOpen"
+      :project="project"
+      @onClose="changeVersionOpen = false"
     />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import SAFAIcon from "@/components/navigation/SafaIcon.vue";
-import ProjectName from "@/components/navigation/ProjectName.vue";
-import ButtonRow from "@/components/common/ButtonRow.vue";
-import { ButtonDefinition, ButtonType } from "@/types/common-components";
-import UploadNewVersionModal from "@/components/common/modals/UploadNewVersionModal.vue";
-import router from "@/router";
-import { TRACE_LINK_ROUTE_NAME } from "@/router/routes";
-import BaselineVersionModal from "@/components/common/modals/BaselineVersionModal.vue";
+import { ButtonDefinition, ButtonType, Project } from "@/types";
+import { navigateTo, Routes } from "@/router";
+import {
+  BaselineVersionModal,
+  UploadNewVersionModal,
+  ButtonRow,
+} from "@/components/common";
+import ProjectName from "./ProjectName.vue";
+import SafaIcon from "./SafaIcon.vue";
+import { appModule, projectModule } from "@/store";
 
 export default Vue.extend({
   components: {
-    SAFAIcon,
+    SafaIcon,
     ProjectName,
     ButtonRow,
     UploadNewVersionModal,
@@ -51,40 +59,56 @@ export default Vue.extend({
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
+      changeVersionOpen: false,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
   methods: {
-    uploadVersionClick(): void {
-      this.uploadVersionOpen = true;
-    },
-    openProjectClick(): void {
+    onOpenProject(): void {
       this.openProjectOpen = true;
     },
+    onUploadVersion(): void {
+      this.uploadVersionOpen = true;
+    },
+    onChangeVersion(): void {
+      const versionId = this.project.projectVersion?.versionId;
+      if (versionId !== undefined && versionId !== "") {
+        this.changeVersionOpen = true;
+      } else {
+        appModule.onWarning("Please select a project.");
+      }
+    },
   },
-
+  computed: {
+    project(): Project {
+      return projectModule.getProject;
+    },
+  },
   created() {
     this.definitions = [
       {
         type: ButtonType.LIST_MENU,
         label: "Project",
-        menuItems: ["Select Project"],
-        menuHandlers: [this.openProjectClick],
+        buttonIsText: true,
+        menuItems: ["Open Project", "Create Project"],
+        menuHandlers: [
+          this.onOpenProject,
+          () => navigateTo(Routes.PROJECT_CREATOR),
+        ],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Version",
-        menuItems: ["Upload new version"],
-        menuHandlers: [this.uploadVersionClick],
+        buttonIsText: true,
+        menuItems: ["Change Version", "Upload new version"],
+        menuHandlers: [this.onChangeVersion, this.onUploadVersion],
       },
       {
         type: ButtonType.LIST_MENU,
         label: "Trace Links",
+        buttonIsText: true,
         menuItems: ["Approve Generated Trace Links"],
-        menuHandlers: [
-          () =>
-            router.push(TRACE_LINK_ROUTE_NAME).catch((e) => console.warn(e)),
-        ],
+        menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
       },
     ];
   },

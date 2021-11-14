@@ -1,12 +1,11 @@
-import { CytoCore } from "@/types/cytoscape";
-import { LayoutHook } from "@/types/cytoscape/klay";
+import { CytoCore, LayoutHook } from "@/types";
 import { EdgeSingular } from "cytoscape";
 import {
-  nodeHtml as nodeHTML,
+  artifactHtml as nodeHTML,
   nodeWarningHtml,
-} from "@/cytoscape/styles/html/node-html";
-import { GENERATED_LINK_SELECTOR } from "@/cytoscape/styles/stylesheets/cytoscape";
-import { GENERATED_TRACE_MAX_WIDTH } from "@/cytoscape/styles/config/trace";
+  GENERATED_LINK_SELECTOR,
+  GENERATED_TRACE_MAX_WIDTH,
+} from "@/cytoscape/styles";
 
 export const applyNodeHtml: LayoutHook = (cy: CytoCore): void => {
   cy.nodeHtmlLabel([nodeHTML, nodeWarningHtml]);

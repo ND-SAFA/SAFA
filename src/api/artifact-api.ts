@@ -1,24 +1,56 @@
-import { PROJECTS_API_PATH } from "@/api/project-api";
-import { ArtifactNameValidationResponse } from "@/types/api";
-import { Artifact } from "@/types/domain/artifact";
+import { Artifact, ArtifactNameValidationResponse } from "@/types";
 import httpClient from "@/api/http-client";
+import { Endpoint, fillEndpoint } from "@/api/endpoints";
 
+/**
+ * Returns whether the given artifact name already exists.
+ *
+ * @param projectId - The project to search within.
+ * @param artifactName - The artifact name to search for.
+ *
+ * @return Whether the artifact name is already taken.
+ */
 export async function isArtifactNameTaken(
   projectId: string,
   artifactName: string
 ): Promise<ArtifactNameValidationResponse> {
-  const url = `${PROJECTS_API_PATH}/${projectId}/artifacts/validate/${artifactName}`;
-  return httpClient<ArtifactNameValidationResponse>(url, {
-    method: "GET",
-  });
+  return httpClient<ArtifactNameValidationResponse>(
+    fillEndpoint(Endpoint.isArtifactNameTaken, { projectId, artifactName }),
+    { method: "GET" }
+  );
 }
 
-export async function createNewArtifact(
+/**
+ * Deletes artifact body in project version specified.
+ *
+ * @param versionId - The version belonging to the artifact being deleted.
+ * @param artifactName - The name of the artifact being deleted.
+ *
+ */
+export async function deleteArtifactBody(
+  versionId: string,
+  artifactName: string
+): Promise<void> {
+  return httpClient<void>(
+    fillEndpoint(Endpoint.deleteArtifact, { versionId, artifactName }),
+    { method: "DELETE" }
+  );
+}
+
+/**
+ * Creates a new artifact in the given version.
+ *
+ * @param versionId - The version that the artifact is stored within.
+ * @param artifact - The artifact to create.
+ *
+ * @return The created artifact.
+ */
+export async function createOrUpdateArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<Artifact> {
   return httpClient<Artifact>(
-    `${PROJECTS_API_PATH}/versions/${versionId}/artifacts`,
+    fillEndpoint(Endpoint.createOrUpdateArtifact, { versionId }),
     {
       method: "POST",
       body: JSON.stringify(artifact),

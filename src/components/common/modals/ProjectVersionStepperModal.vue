@@ -1,146 +1,193 @@
 <template>
-  <GenericModal
+  <generic-stepper-modal
+    v-model="currentStep"
+    :steps="steps"
+    :is-open="isOpen"
     :title="title"
-    :isOpen="isOpen"
-    :isLoading="isLoading"
-    @onClose="onClose"
+    :is-loading="isLoading"
     size="l"
+    @close="onClose"
+    @reset="clearData"
+    @submit="$emit('onSubmit')"
   >
-    <template v-slot:body>
-      <ProjectAndVersionStepper
-        v-model="currentStep"
-        v-bind:selectedProject.sync="selectedProject"
-        v-bind:selectedVersion.sync="selectedVersion"
-        :isOpen="isOpen"
-        :beforeSteps="beforeStepNames"
-        :afterSteps="afterStepNames"
-      >
-        <template v-slot:beforeItems>
-          <slot name="beforeItems" />
-        </template>
-        <template v-slot:afterItems>
-          <slot name="afterItems" />
-        </template>
-      </ProjectAndVersionStepper>
+    <template v-slot:items>
+      <slot name="beforeItems" />
+
+      <v-stepper-content :step="projectStep">
+        <project-selector
+          :is-open="projectSelectorIsOpen"
+          @onProjectSelected="selectProject"
+          @onProjectUnselected="unselectProject"
+        />
+      </v-stepper-content>
+
+      <v-stepper-content :step="versionStep">
+        <version-selector
+          :is-open="versionSelectorIsOpen"
+          :project="selectedProject"
+          @onVersionSelected="selectVersion"
+          @onVersionUnselected="unselectVersion"
+        />
+      </v-stepper-content>
+      <slot name="afterItems" />
     </template>
-    <template v-slot:actions>
-      <v-container class="ma-0 pa-0">
-        <v-row class="ma-0">
-          <v-col cols="4" align-self="center">
-            <v-btn v-if="currentStep > 1" @click="onStepBack" fab small>
-              <v-icon id="upload-button">mdi-arrow-left</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="4">
-            <slot name="action:main" />
-          </v-col>
-          <v-col cols="4" align-self="center">
-            <v-row justify="end">
-              <v-btn
-                v-if="isStepDone"
-                @click="onStepForward"
-                fab
-                small
-                :color="currentStep === numberOfSteps ? 'secondary' : undefined"
-              >
-                <v-icon id="upload-button">{{
-                  currentStep === numberOfSteps
-                    ? "mdi-check"
-                    : "mdi-arrow-right"
-                }}</v-icon>
-              </v-btn>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
-  </GenericModal>
+  </generic-stepper-modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import ProjectAndVersionStepper from "@/components/common/modals/ProjectAndVersionStepper.vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
 import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
-} from "@/types/common-components";
+  StepState,
+  ProjectIdentifier,
+  ProjectVersion,
+} from "@/types";
+import { versionToString } from "@/util";
+import { GenericStepperModal } from "@/components/common/generic";
+import { ProjectSelector } from "@/components/project/selector";
+import { VersionSelector } from "@/components/project/version-selector";
 
+const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
+const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
+
+/**
+ * Presents a stepper in a modal for selecting a project and version.
+ *
+ */
 export default Vue.extend({
-  name: "baseline-version-modal",
+  name: "project-version-stepper-modal",
   components: {
-    ProjectAndVersionStepper,
-    GenericModal,
+    GenericStepperModal,
+    ProjectSelector,
+    VersionSelector,
   },
   props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
+    /**
+     * The current step of the stepper, used as the v-model value.
+     * @model
+     */
+    value: {
+      type: Number,
+      default: 1,
     },
+    /**
+     * The title of the modal
+     */
     title: {
       type: String,
       required: true,
     },
-    beforeSteps: {
-      type: Array as PropType<Array<[string, boolean]>>,
-      required: false,
-      default: () => [] as [string, boolean][],
+    /**
+     *  Whether this current modal is open and in view.
+     */
+    isOpen: {
+      type: Boolean,
+      required: true,
     },
-    afterSteps: {
-      type: Array as PropType<Array<[string, boolean]>>,
-      required: false,
-      default: () => [] as [string, boolean][],
-    },
-    project: {
-      type: Object as PropType<OptionalProjectIdentifier>,
-      required: false,
-    },
-    version: {
-      type: Object as PropType<OptionalProjectVersion>,
-      required: false,
-    },
+    /**
+     * Whether the current modal is loading.
+     */
     isLoading: {
       type: Boolean,
       required: false,
       default: false,
     },
-    value: {
+    /**
+     * The project used to bind and synchronize with parent.
+     */
+    project: {
+      type: Object as PropType<OptionalProjectIdentifier>,
+      required: false,
+    },
+    /**
+     * The version used to bind and synchronize with parent.
+     */
+    version: {
+      type: Object as PropType<OptionalProjectVersion>,
+      required: false,
+    },
+    /**
+     * The StepStates of the steps coming before selection a project.
+     */
+    beforeSteps: {
+      type: Array as PropType<Array<StepState>>,
+      required: false,
+      default: () => [] as StepState[],
+    },
+    /**
+     * The StepStates of the steps coming after selecting a version.
+     */
+    afterSteps: {
+      type: Array as PropType<Array<StepState>>,
+      required: false,
+      default: () => [] as StepState[],
+    },
+    /**
+     * Defines the starting step in the stepper. Useful if project or versions is
+     * already selected.
+     */
+    startStep: {
       type: Number,
       default: 1,
+      required: false,
     },
   },
   data() {
     return {
-      currentStep: this.value,
+      localSteps: [
+        [SELECT_PROJECT_DEFAULT_NAME, false],
+        [SELECT_VERSION_DEFAULT_NAME, false],
+      ] as StepState[],
       fileSelectorOpen: false,
     };
   },
   methods: {
     clearData() {
-      this.selectedProject = undefined;
+      this.selectedProject = this.project;
       this.selectedVersion = undefined;
-      this.$emit("update:isLoading", false);
       this.fileSelectorOpen = false;
-      this.currentStep = 1;
+      this.currentStep = this.startStep;
+      this.$emit("update:isLoading", false);
     },
     onClose() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
       this.$emit("onClose");
     },
-
-    onStepBack(): void {
-      this.currentStep--;
+    selectProject(project: ProjectIdentifier) {
+      this.selectedProject = project;
+      this.currentStep++;
+      Vue.set(this.localSteps, 0, [project.name, true]);
     },
-    onStepForward(): void {
-      if (this.currentStep === this.numberOfSteps) {
-        this.$emit("onSubmit");
-      } else {
+    unselectProject() {
+      this.selectedProject = undefined;
+      Vue.set(this.localSteps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
+    },
+    selectVersion(version: ProjectVersion) {
+      this.selectedVersion = version;
+      Vue.set(this.localSteps, 1, [versionToString(version), true]);
+      if (this.versionStep < this.totalSteps) {
         this.currentStep++;
       }
     },
+    unselectVersion() {
+      this.selectedVersion = undefined;
+      Vue.set(this.localSteps, 1, [SELECT_VERSION_DEFAULT_NAME, false]);
+    },
   },
   computed: {
+    steps(): StepState[] {
+      return this.beforeSteps.concat(this.localSteps.concat(this.afterSteps));
+    },
+    currentStep: {
+      get(): number {
+        return this.value;
+      },
+      set(newStep: number): void {
+        this.$emit("input", newStep);
+      },
+    },
     selectedProject: {
       get(): OptionalProjectIdentifier {
         return this.project;
@@ -179,14 +226,18 @@ export default Vue.extend({
     versionStep(): number {
       return this.projectStep + 1;
     },
-    numberOfSteps(): number {
+    totalSteps(): number {
       return this.beforeSteps.length + 2 + this.afterSteps.length;
     },
-    beforeStepNames(): string[] {
-      return this.beforeSteps.map((step) => step[0]);
+    projectSelectorIsOpen(): boolean {
+      return this.isOpen && this.currentStep === this.projectStep;
     },
-    afterStepNames(): string[] {
-      return this.afterSteps.map((step) => step[0]);
+    versionSelectorIsOpen(): boolean {
+      return (
+        this.isOpen &&
+        this.selectedProject !== undefined &&
+        this.currentStep === this.versionStep
+      );
     },
   },
   watch: {
@@ -194,9 +245,6 @@ export default Vue.extend({
       if (isOpen) {
         this.clearData();
       }
-    },
-    currentStep(newStep: number): void {
-      this.$emit("input", newStep);
     },
   },
 });

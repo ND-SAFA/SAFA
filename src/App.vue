@@ -1,7 +1,7 @@
 <template>
   <v-app class="application">
     <v-main>
-      <v-container class="elevation-4">
+      <v-container>
         <transition name="fade" mode="out-in">
           <keep-alive>
             <router-view />
@@ -13,32 +13,36 @@
     <Snackbar :timeout="5000" />
     <LeftNavDrawer :isLeftOpen="isLeftOpen" :width="250" />
     <RightNavDrawer :isRightOpen="isRightOpen" :width="325" />
-    <ArtifactCreator
+    <ArtifactCreatorModal
       :isOpen="isArtifactCreatorOpen"
       @onClose="closeArtifactCreator"
     />
+    <AppConfirmModal :message="confirmationMessage" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Snackbar from "@/components/navigation/Snackbar.vue";
-import LeftNavDrawer from "@/components/side-panels/left/LeftNavDrawer.vue";
-import RightNavDrawer from "@/components/side-panels/right/RightNavDrawer.vue";
-import AppBar from "@/components/navigation/AppBar.vue";
-import ArtifactCreator from "@/components/common/modals/ArtifactCreator.vue";
-
-import { PanelType } from "@/types/store";
+import { ConfirmDialogueMessage, PanelType } from "@/types/store";
 import { appModule } from "@/store";
+import {
+  AppBar,
+  Snackbar,
+  LeftNavDrawer,
+  RightNavDrawer,
+  ArtifactCreatorModal,
+  AppConfirmModal,
+} from "@/components";
 
 export default Vue.extend({
   name: "App",
   components: {
+    AppConfirmModal,
     AppBar,
     Snackbar,
     LeftNavDrawer,
     RightNavDrawer,
-    ArtifactCreator,
+    ArtifactCreatorModal,
   },
   computed: {
     isLeftOpen(): boolean {
@@ -49,6 +53,9 @@ export default Vue.extend({
     },
     isArtifactCreatorOpen(): boolean {
       return appModule.getIsArtifactCreatorOpen;
+    },
+    confirmationMessage(): ConfirmDialogueMessage | undefined {
+      return appModule.getConfirmationMessage;
     },
   },
   methods: {
@@ -64,4 +71,5 @@ export default Vue.extend({
 @import "./assets/app-styles.css";
 @import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";
+@import "./assets/modal-sizes.css";
 </style>

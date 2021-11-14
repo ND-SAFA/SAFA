@@ -1,29 +1,30 @@
 <template>
-  <GenericModal
+  <generic-modal
     title="Server Errors"
     :isOpen="isOpen"
     :actionsHeight="0"
     :isLoading="isLoading"
-    @onClose="onClose"
+    @close="onClose"
   >
     <template v-slot:body>
-      <code
-        v-for="(error, errorIndex) in errors"
-        :key="errorIndex"
-        justify="left"
-      >
-        <b>{{ errorIndex }}:</b>
-        <p>{{ error }}</p>
-      </code>
+      <v-list disabled>
+        <v-list-item v-for="(error, errorIndex) in errors" :key="errorIndex">
+          <v-list-item-content class="pa-0">
+            <code class="word-break-all">
+              {{ error }}
+            </code>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
+import { PanelType } from "@/types";
 import { appModule } from "@/store";
-import { PanelType } from "@/types/store";
+import { GenericModal } from "@/components/common/generic";
 
 export default Vue.extend({
   components: {

@@ -11,14 +11,15 @@ import {
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_COLOR,
   ARTIFACT_SELECTED_BORDER_WIDTH,
-} from "@/cytoscape/styles/config/artifact";
+} from "@/cytoscape/styles/config/artifact-tree-config";
 import {
   TRACE_COLOR,
   TRACE_STYLE,
   TRACE_WIDTH,
   GENERATED_TRACE_COLOR,
 } from "@/cytoscape/styles/config/trace";
-import { ArtifactDeltaState } from "@/types/domain/delta";
+import { ArtifactDeltaState } from "@/types/domain";
+import { CytoStyleSheet } from "@/types/cytoscape";
 import { Stylesheet } from "cytoscape";
 
 export const GENERATED_LINK_SELECTOR = 'edge[traceType="GENERATED"]';
@@ -26,10 +27,7 @@ export const UNREVIEWED_LINK_SELECTOR = 'edge[approvalStatus="UNREVIEWED"]';
 export const DECLINED_LINK_SELECTOR = 'edge[approvalStatus="DECLINED"]';
 export const APPROVED_LINK_SELECTOR =
   'edge[traceType="GENERATED"][approvalStatus="APPROVED"]';
-export interface CytoStyleSheet {
-  selector: string;
-  style: Record<string, unknown>;
-}
+
 export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
     selector: "edge",
@@ -37,12 +35,16 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "curve-style": TRACE_STYLE,
       width: TRACE_WIDTH,
       "line-color": TRACE_COLOR,
+      "source-arrow-shape": "chevron",
+      "source-arrow-color": TRACE_COLOR,
+      "arrow-scale": 2,
     },
   },
   {
     selector: GENERATED_LINK_SELECTOR,
     style: {
       "line-color": GENERATED_TRACE_COLOR,
+      "source-arrow-color": GENERATED_TRACE_COLOR,
     },
   },
   {

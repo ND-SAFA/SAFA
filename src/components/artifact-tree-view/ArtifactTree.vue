@@ -1,51 +1,54 @@
 <template>
   <v-container class="elevation-3">
-    <CytoscapeController>
+    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
       <template v-slot:elements>
         <ArtifactNode
           v-for="artifact in artifacts"
           :key="artifact.name"
-          :artifactDefinition="artifact"
+          :artifact-definition="artifact"
           :opacity="getArtifactOpacity(artifact.name)"
         />
-        <TraceLinkEdge
+        <GenericGraphLink
           v-for="traceLink in traces"
           :key="`${traceLink.source}-${traceLink.target}`"
-          :traceDefinition="traceLink"
-          @onRightClick="onLinkRightClick"
+          :trace-definition="traceLink"
+          @right-click="onLinkRightClick"
         />
       </template>
-    </CytoscapeController>
+    </GenericCytoscapeController>
     <TraceLinkApprovalModal
       v-if="selectedLink !== undefined"
-      :isOpen="isTraceModalOpen"
+      :is-open="isTraceModalOpen"
       :link="selectedLink"
-      @onClose="onTraceModalClose"
+      @close="onTraceModalClose"
     />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData } from "@/types/domain/links";
-import { Artifact } from "@/types/domain/artifact";
-import ArtifactNode from "@/components/artifact-tree-view/ArtifactNode.vue";
-import TraceLinkEdge from "@/components/artifact-tree-view/TraceLinkEdge.vue";
-import TraceLinkApprovalModal from "@/components/approve-links-view/TraceLinkApprovalModal.vue";
-import CytoscapeController from "@/components/artifact-tree-view/CytoscapeController.vue";
+import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
+import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
   viewportModule,
 } from "@/store";
+import {
+  GenericGraphLink,
+  GenericCytoscapeController,
+} from "@/components/common";
+import { TraceLinkApprovalModal } from "@/components/approve-links-view";
+import ArtifactNode from "./ArtifactNode.vue";
+import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
   name: "artifact-view",
   components: {
     ArtifactNode,
-    TraceLinkEdge,
+    GenericGraphLink,
     TraceLinkApprovalModal,
-    CytoscapeController,
+    GenericCytoscapeController,
   },
   data: () => {
     return {
@@ -55,6 +58,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    cytoCoreGraph(): CytoCoreGraph {
+      return artifactTreeGraph;
+    },
     artifactHashMap(): Record<string, Artifact> {
       return projectModule.getArtifactHashmap;
     },
@@ -74,14 +80,22 @@ export default Vue.extend({
       return artifactSelectionModule.getUnselectedNodeOpacity;
     },
   },
+  mounted() {
+    this.nodesInView.then((artifactIds: string[]) => {
+      this.artifactsInView = artifactIds;
+    });
+  },
   watch: {
-    nodesInView(artifactIdsPromise: Promise<string[]>): void {
-      artifactIdsPromise.then((artifactIds: string[]) => {
-        this.artifactsInView = artifactIds;
-      });
+    nodesInView(): void {
+      this.setNodesInView();
     },
   },
   methods: {
+    setNodesInView(): void {
+      this.nodesInView.then((artifactIds: string[]) => {
+        this.artifactsInView = artifactIds;
+      });
+    },
     getArtifactOpacity(name: string): number {
       if (this.artifactsInView.includes(name)) {
         return 1;

@@ -1,7 +1,13 @@
 <template>
   <v-menu offset-y bottom :rounded="false">
     <template v-slot:activator="{ on }">
-      <v-btn :text="buttonIsText" small :color="buttonColor" dark v-on="on">
+      <v-btn
+        :outlined="!buttonIsText"
+        :text="buttonIsText"
+        :color="buttonColor"
+        v-on="on"
+        :disabled="disabled"
+      >
         {{ buttonLabel }}
       </v-btn>
     </template>
@@ -24,9 +30,9 @@
 </template>
 
 <script lang="ts">
-import { MENU_HIGHLIGHT_COLOR } from "@/cytoscape/styles/config/theme";
-import { ListMenuDefinition } from "@/types/common-components";
 import Vue, { PropType } from "vue";
+import { ListMenuDefinition } from "@/types";
+import { ThemeColors } from "@/util";
 
 const DEFAULT_BUTTON_COLOR = "secondary";
 const DEFAULT_ITEM_COLOR = "primary";
@@ -43,11 +49,16 @@ export default Vue.extend({
   data() {
     return {
       hover: true,
-      hoverColor: MENU_HIGHLIGHT_COLOR,
+      hoverColor: ThemeColors.menuHighlight,
       selectedValue: "",
     };
   },
   computed: {
+    disabled(): boolean {
+      return this.definition.isDisabled !== undefined
+        ? this.definition.isDisabled
+        : false;
+    },
     buttonColor(): string {
       const { buttonColor } = this.definition;
       return buttonColor === undefined ? DEFAULT_BUTTON_COLOR : buttonColor;

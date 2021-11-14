@@ -1,0 +1,111 @@
+import {
+  AddedArtifact,
+  ArtifactDelta,
+  DeltaType,
+  ModifiedArtifact,
+  RemovedArtifact,
+} from "@/types/domain";
+import { APIError, APIResponse } from "@/types/api";
+import {
+  IGenericFilePanel,
+  ProjectFile,
+  TraceFile,
+  TracePanel,
+} from "@/types/components";
+
+/**
+ * Returns whether the given APIResponse is an API error.
+ *
+ * @param blob - The response to check.
+ *
+ * @return Whether this item is an error.
+ */
+export function isAPIError<T>(
+  blob: APIResponse<T> | APIError
+): blob is APIError {
+  return blob.status > 0;
+}
+
+/**
+ * Returns whether the given ArtifactDelta is an added artifact.
+ *
+ * @param artifact - The artifact to check.
+ *
+ * @return Whether this item is an added artifact.
+ */
+export function isAddedArtifact(
+  artifact: ArtifactDelta
+): artifact is AddedArtifact {
+  return "after" in artifact && !("before" in artifact);
+}
+
+/**
+ * Returns whether the given ArtifactDelta is an removed artifact.
+ *
+ * @param artifact - The artifact to check.
+ *
+ * @return Whether this item is an removed artifact.
+ */
+export function isRemovedArtifact(
+  artifact: ArtifactDelta
+): artifact is RemovedArtifact {
+  return "before" in artifact && !("after" in artifact);
+}
+/**
+ * Returns whether the given ArtifactDelta is an modified artifact.
+ *
+ * @param artifact - The artifact to check.
+ *
+ * @return Whether this item is an modified artifact.
+ */
+export function isModifiedArtifact(
+  artifact: ArtifactDelta
+): artifact is ModifiedArtifact {
+  return "before" in artifact && "after" in artifact;
+}
+
+/**
+ * Returns the delta type of the given ArtifactDelta.
+ *
+ * @param artifact - The ArtifactDelta to check.
+ *
+ * @return The corresponding delta type (e.g. added, removed, modified).
+ */
+export function getDeltaType(artifact: ArtifactDelta): DeltaType {
+  if (isAddedArtifact(artifact)) return "added";
+  if (isModifiedArtifact(artifact)) return "modified";
+  if (isRemovedArtifact(artifact)) return "removed";
+  else
+    throw Error(
+      "Unrecognized artifact delta state: " + JSON.stringify(artifact)
+    );
+}
+
+/**
+ * Determines whether this project file is a trace file.
+ *
+ * @param file - The project file to check.
+ *
+ * @return Whether this file is a trace file.
+ */
+export function isTraceFile(file: ProjectFile): file is TraceFile {
+  return (
+    "source" in file &&
+    "target" in file &&
+    "isGenerated" in file &&
+    "traces" in file
+  );
+}
+
+/**
+ * Determines whether this panel is a trace panel.
+ *
+ * @param panel - The panel to check.
+ *
+ * @return Whether this panel is a trace panel.
+ */
+export function isTracePanel(
+  panel: IGenericFilePanel<any, any>
+): panel is TracePanel {
+  return isTraceFile(panel.projectFile);
+}

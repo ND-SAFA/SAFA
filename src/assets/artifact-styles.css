@@ -21,7 +21,7 @@
 }
 
 .artifact-warning {
-  background-color: #ffeb3b;
+  background-color: #EEBC3D;
   border: 1px solid black;
   text-align: center;
   display: flex;
@@ -29,8 +29,20 @@
   justify-content: center;
 }
 
-#cy-container,
-#cytoscape-div {
-  max-height: 400px !important;
-  min-height: 400px !important;
+@media screen and (min-height: 200px) {
+  #cy-container,
+  #cytoscape-div {
+    height: 400px !important;
+    max-height: 300px !important;
+    min-height: 200px !important;
+  }
+}
+
+@media screen and (min-height: 800px) {
+  #cy-container,
+  #cytoscape-div {
+    height: 600px !important;
+    max-height: 800px !important;
+    min-height: 400px !important;
+  }
 }

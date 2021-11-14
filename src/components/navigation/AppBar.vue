@@ -8,20 +8,26 @@
       <v-container fluid class="ma-0 pa-0">
         <v-row>
           <v-col cols="4">
-            <v-btn text small color="secondary" @click="onLeftPanelClick">
-              <v-icon v-if="isLeftOpen">mdi-arrow-left</v-icon>
-              <v-icon v-else>mdi-information-outline</v-icon>
-            </v-btn>
+            <GenericIconButton
+              color="secondary"
+              :tooltip="leftPanelTooltip"
+              :icon-id="
+                isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
+              "
+              @click="onLeftPanelClick"
+            />
           </v-col>
           <v-col cols="4">
             <GraphNavIcons />
           </v-col>
           <v-col cols="4">
             <v-row justify="end" class="ma-0 pa-0">
-              <v-btn text small color="secondary" @click="onRightPanelClick">
-                <v-icon v-if="isRightOpen">mdi-arrow-right</v-icon>
-                <v-icon v-else>mdi-family-tree</v-icon>
-              </v-btn>
+              <GenericIconButton
+                color="secondary"
+                :tooltip="rightPanelTooltip"
+                :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+                @click="onRightPanelClick"
+              />
             </v-row>
           </v-col>
         </v-row>
@@ -43,14 +49,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GraphNavIcons from "@/components/navigation/GraphNavIcons.vue";
-import AppBarHeader from "@/components/navigation//AppBarHeader.vue";
 import { appModule } from "@/store";
+import { GenericIconButton } from "@/components/common";
+import AppBarHeader from "./AppBarHeader.vue";
+import GraphNavIcons from "./GraphNavIcons.vue";
 
 export default Vue.extend({
   components: {
     GraphNavIcons,
     AppBarHeader,
+    GenericIconButton,
   },
   props: {
     isLeftOpen: Boolean,
@@ -58,7 +66,15 @@ export default Vue.extend({
   },
   computed: {
     isLoading(): boolean {
-      return appModule.isLoading;
+      return appModule.getIsLoading;
+    },
+    leftPanelTooltip(): string {
+      return this.isLeftOpen
+        ? "Close artifact details"
+        : "Open artifact details";
+    },
+    rightPanelTooltip(): string {
+      return this.isRightOpen ? "Close graph options" : "Open graph options";
     },
   },
   methods: {

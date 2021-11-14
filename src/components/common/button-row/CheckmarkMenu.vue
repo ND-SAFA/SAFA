@@ -1,9 +1,12 @@
 <template>
   <v-menu offset-y left :close-on-content-click="false">
     <template v-slot:activator="{ on }">
-      <v-btn icon small color="secondary" dark v-on="on">
-        <v-icon>{{ definition.icon }}</v-icon>
-      </v-btn>
+      <generic-icon-button
+        v-on="on"
+        color="secondary"
+        :tooltip="definition.label"
+        :icon-id="definition.icon"
+      />
     </template>
     <v-list>
       <v-hover
@@ -25,17 +28,21 @@
 </template>
 
 <script lang="ts">
-import { MENU_HIGHLIGHT_COLOR } from "@/cytoscape/styles/config/theme";
-import { ButtonDefinition } from "@/types/common-components";
+import { ButtonDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { ThemeColors } from "@/util";
+import { GenericIconButton } from "@/components/common/generic";
 
 export default Vue.extend({
+  components: {
+    GenericIconButton,
+  },
   props: {
     definition: Object as PropType<ButtonDefinition>,
   },
   data() {
     return {
-      hoverColor: MENU_HIGHLIGHT_COLOR,
+      hoverColor: ThemeColors.menuHighlight,
     };
   },
 });

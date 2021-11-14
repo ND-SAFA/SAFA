@@ -1,9 +1,9 @@
 <template>
-  <GenericModal
+  <generic-modal
     :title="`Artifact Changes: ${name}`"
-    :isOpen="isOpen"
-    @onClose="$emit('onClose')"
-    :actionsHeight="0"
+    :is-open="isOpen"
+    :actions-height="0"
+    @close="$emit('onClose')"
   >
     <template v-slot:body>
       <v-container class="mt-5">
@@ -33,15 +33,15 @@
         />
       </v-container>
     </template>
-  </GenericModal>
+  </generic-modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import GenericModal from "@/components/common/modals/GenericModal.vue";
 import CodeDiff from "vue-code-diff";
-import { DeltaArtifact, DeltaType, getDeltaType } from "@/types/domain/delta";
-import { splitIntoLines } from "@/util/string-helper";
+import { ArtifactDelta, DeltaType } from "@/types";
+import { getDeltaType, splitIntoLines } from "@/util";
+import { GenericModal } from "@/components/common";
 
 export default Vue.extend({
   components: { GenericModal, CodeDiff },
@@ -51,7 +51,7 @@ export default Vue.extend({
       required: true,
     },
     artifact: {
-      type: Object as PropType<DeltaArtifact>,
+      type: Object as PropType<ArtifactDelta>,
       required: true,
     },
     name: {

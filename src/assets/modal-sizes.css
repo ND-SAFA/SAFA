@@ -1,0 +1,35 @@
+@media screen and (min-height: 200px) {
+  .modal-xxs {
+    width: 250px;
+  }
+  .modal-xs {
+    width: 300px;
+  }
+  .modal-s {
+    width: 400px;
+  }
+  .modal-m {
+    width: 600px;
+  }
+  .modal-l {
+    width: 800px !important;
+  }
+}
+
+@media screen and (min-height: 800px) {
+  .modal-xxs {
+    width: 250px;
+  }
+  .modal-xs {
+    width: 300px;
+  }
+  .modal-s {
+    width: 400px;
+  }
+  .modal-m {
+    width: 600px;
+  }
+  .modal-l {
+    width: 800px !important;
+  }
+}

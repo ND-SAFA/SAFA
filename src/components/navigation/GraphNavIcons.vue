@@ -1,22 +1,39 @@
 <template>
-  <button-row :definitions="definitions" justify="center" />
+  <v-row class="ma-0 pa-0" justify="center">
+    <v-col
+      v-for="definition in definitions"
+      :key="definition.label"
+      :cols="12 / definitions.length"
+    >
+      <v-row justify="center">
+        <generic-icon-button
+          v-if="definition.handler"
+          color="secondary"
+          :tooltip="definition.label"
+          :icon-id="definition.icon"
+          @click="definition.handler"
+        />
+        <CheckmarkMenu v-else :definition="definition" />
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ButtonRow from "@/components/common/ButtonRow.vue";
-import { ButtonDefinition, ButtonType } from "@/types/common-components";
-import { Artifact } from "@/types/domain/artifact";
-import { capitalize } from "@/util/string-helper";
+import { ButtonDefinition, ButtonType, Artifact } from "@/types";
+import { capitalize } from "@/util";
 import {
   artifactSelectionModule,
   projectModule,
   viewportModule,
 } from "@/store";
+import { GenericIconButton, CheckmarkMenu } from "@/components/common";
 
 export default Vue.extend({
   components: {
-    ButtonRow,
+    GenericIconButton,
+    CheckmarkMenu,
   },
   data() {
     return {
@@ -78,7 +95,7 @@ export default Vue.extend({
               type: "subtree",
               artifactsInSubtree: [],
             });
-            await viewportModule.setGraphLayout();
+            await viewportModule.setArtifactTreeLayout();
           },
           label: "Center Graph",
           icon: "mdi-graphql",

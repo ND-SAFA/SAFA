@@ -1,28 +1,43 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
-import Home from "@/views/ArtifactTreeView.vue";
-import TraceLinks from "@/views/ApproveLinksView.vue";
-import { ERROR_ROUTE_NAME, TRACE_LINK_ROUTE_NAME } from "@/router/routes";
-import ErrorPage from "@/views/ErrorPageView.vue";
-import store, { appModule, projectModule } from "@/store";
+import { Routes } from "./routes";
+import { appModule, projectModule } from "@/store";
+import {
+  ErrorPageView,
+  ApproveLinksView,
+  ArtifactTreeView,
+  ProjectCreatorView,
+} from "@/views";
+
+export { Routes };
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
-    path: "/",
+    path: Routes.HOME,
     name: "Home",
-    component: Home,
+    component: ProjectCreatorView,
   },
   {
-    path: TRACE_LINK_ROUTE_NAME,
+    path: Routes.ARTIFACT_TREE,
+    name: "Artifact Tree",
+    component: ArtifactTreeView,
+  },
+  {
+    path: Routes.TRACE_LINK,
     name: "Trace Links",
-    component: TraceLinks,
+    component: ApproveLinksView,
   },
   {
-    path: ERROR_ROUTE_NAME,
+    path: Routes.PROJECT_CREATOR,
+    name: "Project Creator",
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.ERROR,
     name: "Error Page",
-    component: ErrorPage,
+    component: ErrorPageView,
   },
 ];
 
@@ -32,18 +47,31 @@ const router = new VueRouter({
   routes,
 });
 
-const routesWithRequiredProject = [TRACE_LINK_ROUTE_NAME];
+const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
 
 router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
   const isProjectDefined: boolean = projectModule.getProject.projectId !== "";
   if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
     appModule.onWarning(
-      "Project must be selected before approving trace links"
+      "Project must be selected before approving trace links."
     );
-    next("/");
+    next(Routes.HOME);
   } else {
     next();
   }
 });
 
+/**
+ * Navigates app to given route, if app is already on the route then
+ * does nothing. This wrapper stops DuplicateNavigation exceptions.
+ *
+ * @param route - The route to navigate to.
+ */
+export async function navigateTo(route: Routes): Promise<void> {
+  if (router.currentRoute.path === route) {
+    return;
+  } else {
+    await router.push(route);
+  }
+}
 export default router;

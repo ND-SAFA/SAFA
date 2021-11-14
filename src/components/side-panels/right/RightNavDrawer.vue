@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import SidePanel from "@/components/side-panels/right/SidePanel.vue";
+import SidePanel from "./SidePanel.vue";
 
 export default Vue.extend({
   components: {

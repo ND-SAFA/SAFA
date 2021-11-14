@@ -1,5 +1,5 @@
 import { Stylesheet } from "cytoscape";
-import { CytoStyleSheet } from "@/cytoscape/styles/stylesheets/cytoscape";
+import { CytoStyleSheet } from "@/types/cytoscape/core";
 import {
   LINE_GHOST_COLOR,
   LINE_PREVIEW_COLOR,

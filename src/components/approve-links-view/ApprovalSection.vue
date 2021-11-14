@@ -3,19 +3,19 @@
     <v-row justify="center">
       <h2>{{ title }}</h2>
     </v-row>
-    <SectionControls @openAll="openAll" @closeAll="closeAll" />
+    <section-controls @open-all="openAll" @close-all="closeAll" />
     <v-row class="pt-5">
       <v-expansion-panels multiple v-model="openLinks">
-        <TraceLinkExpansionPanel
+        <trace-link-expansion-panel
           v-for="link in links"
           :key="link.traceLinkId"
           :link="link"
-          :sourceBody="artifacts[link.source].body"
-          :targetBody="artifacts[link.target].body"
-          :showApprove="showApprove"
-          :showDecline="showDecline"
-          @approveLink="$emit('approveLink', $event)"
-          @declineLink="$emit('declineLink', $event)"
+          :source-body="artifacts[link.source].body"
+          :target-body="artifacts[link.target].body"
+          :show-approve="showApprove"
+          :show-decline="showDecline"
+          @approve-link="$emit('approve-link', $event)"
+          @decline-link="$emit('decline-link', $event)"
         />
       </v-expansion-panels>
     </v-row>
@@ -23,12 +23,19 @@
 </template>
 
 <script lang="ts">
-import TraceLinkExpansionPanel from "@/components/approve-links-view/TraceLinkExpansionPanel.vue";
-import SectionControls from "@/components/approve-links-view/SectionControls.vue";
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types/domain/links";
-import { Artifact } from "@/types/domain/artifact";
+import { TraceLink, Artifact } from "@/types";
+import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
+import SectionControls from "./SectionControls.vue";
+
+/**
+ * Displays link approvals.
+ *
+ * @emits-1 `approve-link` - On Link Approval.
+ * @emits-2 `decline-link` - On Link Decline.
+ */
 export default Vue.extend({
+  name: "approval-section",
   components: { TraceLinkExpansionPanel, SectionControls },
   props: {
     title: String,

@@ -6,13 +6,15 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for reading CSV files and validating them
@@ -27,15 +29,7 @@ public class FileUtilities {
                 throw new ServerError("CSV file does not exist: " + pathToFile);
             }
 
-            CSVFormat fileFormat = CSVFormat.DEFAULT
-                .withHeader() // only way to read headers without defining them.
-                .builder()
-                .setSkipHeaderRecord(false)
-                .setIgnoreEmptyLines(true)
-                .setAllowMissingColumnNames(true)
-                .setIgnoreHeaderCase(true)
-                .build();
-
+            CSVFormat fileFormat = getFormat();
             return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
             String error = String.format("Could not read CSV file at path: %s", pathToFile);
@@ -43,14 +37,42 @@ public class FileUtilities {
         }
     }
 
-    public static void assertHasColumns(CSVParser file, String[] names) throws ServerError {
+    public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
+        ServerError {
+        String requiredColumnsLabel = String.join(", ", requiredColumns);
+        if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
+            throw new ServerError("Expected a CSV file with columns: " + requiredColumnsLabel);
+        }
+        try {
+            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
+            assertHasColumns(parsedFile, requiredColumns);
+            return parsedFile;
+        } catch (IOException e) {
+            String error = "Unable to read csv file: " + file.getOriginalFilename();
+            throw new ServerError(error, e);
+        }
+    }
+
+    private static CSVFormat getFormat() {
+        return CSVFormat.DEFAULT
+            .withHeader() // only way to read headers without defining them.
+            .builder()
+            .setSkipHeaderRecord(false)
+            .setIgnoreEmptyLines(true)
+            .setAllowMissingColumnNames(true)
+            .setIgnoreHeaderCase(true)
+            .build();
+    }
+
+    public static void assertHasColumns(CSVParser file, String[] requiredColumns) throws ServerError {
         List<String> headerNames = file.getHeaderNames();
         List<String> headerNamesLower = toLowerCase(headerNames);
 
-        for (String n : names) {
-            if (!headerNamesLower.contains(n)) {
-                String error = "Expected file to have column [%s] but only saw %s";
-                throw new ServerError(String.format(error, n, file.getHeaderNames()));
+        for (String rColumn : requiredColumns) {
+            if (!headerNamesLower.contains(rColumn)) {
+                String requiredColumnsLabel = String.join(", ", requiredColumns);
+                String error = "Expected CSV to have column(s) [%s] but found: %s";
+                throw new ServerError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
             }
         }
     }

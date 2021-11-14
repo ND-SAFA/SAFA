@@ -5,21 +5,20 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.db.entities.app.AddedArtifact;
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.app.DeltaArtifact;
-import edu.nd.crc.safa.server.db.entities.app.ModifiedArtifact;
-import edu.nd.crc.safa.server.db.entities.app.ProjectDelta;
-import edu.nd.crc.safa.server.db.entities.app.RemovedArtifact;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ModificationType;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.app.AddedArtifact;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.DeltaArtifact;
+import edu.nd.crc.safa.server.entities.app.ModifiedArtifact;
+import edu.nd.crc.safa.server.entities.app.ProjectDelta;
+import edu.nd.crc.safa.server.entities.app.RemovedArtifact;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.utilities.ArtifactBodyFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,22 +40,29 @@ public class DeltaService {
         this.artifactBodyRepository = artifactBodyRepository;
     }
 
-    public ProjectDelta calculateDelta(ProjectVersion beforeVersion, ProjectVersion afterVersion) throws ServerError {
-        if (!beforeVersion.getProject().getProjectId().equals(afterVersion.getProject().getProjectId())) {
-            throw new ServerError("Expected versions to correspond to the same project");
-        }
+    /**
+     * Calculates artifacts removed, added, and modified between given versions.
+     *
+     * @param baselineVersion The version whose entities will be held as the baseline.
+     * @param targetVersion   The version whose entities will be compared to baseline entities.
+     * @return ProjectDelta summarizing changes between versions.
+     */
+    public ProjectDelta calculateProjectDelta(ProjectVersion baselineVersion, ProjectVersion targetVersion) {
 
-        Project project = beforeVersion.getProject();
+        Project project = baselineVersion.getProject();
 
         Hashtable<String, AddedArtifact> added = new Hashtable<>();
         Hashtable<String, ModifiedArtifact> modified = new Hashtable<>();
         Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
 
-        List<Artifact> projectArtifacts = this.artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = this.artifactRepository.getProjectArtifacts(project);
         List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : projectArtifacts) {
-            DeltaArtifact deltaArtifact = getModificationOverDelta(artifact, beforeVersion, afterVersion);
+            DeltaArtifact deltaArtifact = calcualteArtifactModificationBetweenVersions(
+                artifact,
+                baselineVersion,
+                targetVersion);
             if (deltaArtifact == null) {
                 continue;
             }
@@ -136,65 +142,75 @@ public class DeltaService {
         }
     }
 
-    public DeltaArtifact getModificationOverDelta(Artifact artifact,
-                                                  ProjectVersion beforeVersion,
-                                                  ProjectVersion afterVersion) {
+    private DeltaArtifact calcualteArtifactModificationBetweenVersions(Artifact artifact,
+                                                                       ProjectVersion beforeVersion,
+                                                                       ProjectVersion afterVersion) {
 
         String artifactName = artifact.getName();
         List<ArtifactBody> bodies = this.artifactBodyRepository.findByArtifact(artifact);
         ArtifactBody beforeBody = getArtifactBodyContentAtVersion(bodies, beforeVersion);
         ArtifactBody afterBody = getArtifactBodyContentAtVersion(bodies, afterVersion);
-        DeltaArtifact deltaArtifact;
 
+        ModificationType modificationType = calculateModificationTypeBetweenArtifactBodies(beforeBody, afterBody);
+
+        if (modificationType == null) {
+            return null;
+        }
+
+        switch (modificationType) {
+            case MODIFIED:
+                return new ModifiedArtifact(artifactName,
+                    beforeBody.getContent(),
+                    beforeBody.getSummary(),
+                    afterBody.getContent(),
+                    afterBody.getSummary());
+            case ADDED:
+                return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+            case REMOVED:
+                return new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
+            default:
+                return null;
+        }
+    }
+
+    private ModificationType calculateModificationTypeBetweenArtifactBodies(ArtifactBody beforeBody,
+                                                                            ArtifactBody afterBody) {
         if (beforeBody == null || afterBody == null) {
             if (beforeBody == afterBody) {
-                deltaArtifact = null;
+                return null;
             } else if (beforeBody == null) {
-                deltaArtifact = new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+                return ModificationType.ADDED;
             } else {
-                deltaArtifact = new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
+                return ModificationType.REMOVED;
             }
         } else {
             String beforeId = beforeBody.getContent() + beforeBody.getSummary();
             String afterId = afterBody.getContent() + afterBody.getSummary();
 
             if (beforeId.equals(afterId)) { // no change - same body
-                deltaArtifact = null;
+                return null;
             } else {
                 if (afterBody.getModificationType() == ModificationType.REMOVED) {
-                    deltaArtifact = new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
+                    return ModificationType.REMOVED;
                 } else if (beforeBody.getModificationType() == ModificationType.REMOVED) {
-                    deltaArtifact = new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+                    return ModificationType.ADDED;
                 } else {
-                    deltaArtifact = new ModifiedArtifact(artifactName,
-                        beforeBody.getContent(),
-                        beforeBody.getSummary(),
-                        afterBody.getContent(),
-                        afterBody.getSummary());
+                    return ModificationType.MODIFIED;
                 }
             }
         }
-
-        return deltaArtifact;
     }
 
     private ArtifactBody getArtifactBodyContentAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
-        return filterArtifactBodies(bodies, (target) -> target.isLessThanOrEqualTo(version));
+        return getMostUpToDateArtifactBodyThroughFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
     }
 
     private ArtifactBody getArtifactBodyContentBeforeVersion(List<ArtifactBody> bodies, ProjectVersion version) {
-        return filterArtifactBodies(bodies, (target) -> target.isLessThan(version));
+        return getMostUpToDateArtifactBodyThroughFilter(bodies, (target) -> target.isLessThan(version));
     }
 
-    /**
-     * Returns the ArtifactBody in given list whose version is greatest while passing given filter.
-     *
-     * @param bodies - List of ArtifactBodies
-     * @param filter - Filter which is passed version corresponding to each body, return true if valid version
-     * @return ArtifactBody nearest to given version or null if no ArtifactBody found in range.
-     */
-    private ArtifactBody filterArtifactBodies(List<ArtifactBody> bodies,
-                                              ArtifactBodyFilter filter) {
+    private ArtifactBody getMostUpToDateArtifactBodyThroughFilter(List<ArtifactBody> bodies,
+                                                                  ArtifactBodyFilter filter) {
         ArtifactBody closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
             ArtifactBody currentBody = bodies.get(i);

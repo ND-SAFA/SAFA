@@ -3,7 +3,7 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.WebSocketBaseTest;

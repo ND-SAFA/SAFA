@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
+import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.DeltaService;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;
@@ -23,6 +24,9 @@ public class TestDeltaController extends EntityBaseTest {
 
     @Autowired
     DeltaService deltaService;
+
+    @Autowired
+    ProjectRetrievalService projectRetrievalService;
 
     @Test
     public void testModificationDetected() throws Exception {
@@ -51,7 +55,7 @@ public class TestDeltaController extends EntityBaseTest {
         assertThat(response.getJSONObject("added").has("M1")).isTrue();
         assertThat(response.getJSONArray("missingArtifacts").length()).isEqualTo(1);
 
-        ProjectAppEntity beforeAppEntity = this.projectService.createApplicationEntity(beforeVersion);
+        ProjectAppEntity beforeAppEntity = this.projectRetrievalService.createApplicationEntity(beforeVersion);
         // assertThat(beforeAppEntity.getArtifacts().size()).isEqualTo(TestConstants.N_ARTIFACTS);
         List<String> beforeArtifactNames = beforeAppEntity
             .getArtifacts()
@@ -60,7 +64,7 @@ public class TestDeltaController extends EntityBaseTest {
         assertThat(beforeArtifactNames.contains("M1")).isFalse();
         assertThat(beforeArtifactNames.contains("D7")).isTrue();
         assertThat(beforeArtifactNames.size()).isEqualTo(TestConstants.N_ARTIFACTS);
-        ProjectAppEntity afterAppEntity = this.projectService.createApplicationEntity(afterVersion);
+        ProjectAppEntity afterAppEntity = this.projectRetrievalService.createApplicationEntity(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)

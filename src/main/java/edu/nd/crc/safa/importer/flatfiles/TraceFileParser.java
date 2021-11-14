@@ -4,21 +4,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.ParserError;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
+import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.TraceLinkFinder;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -26,6 +32,7 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for parsing, validating, and creating trace links.
@@ -86,7 +93,7 @@ public class TraceFileParser {
             && traceMatrixDefinition.getBoolean("generatelinks");
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-        List<TraceLink> manualLinks = parseTraceFile(projectVersion, matrixArtifactTypes, fileName);
+        List<TraceLink> manualLinks = readAndParseTraceFile(projectVersion, matrixArtifactTypes, fileName);
         this.traceLinkRepository.saveAll(manualLinks);
         List<TraceLink> generatedLinks = new ArrayList<>();
         if (isGenerated) {
@@ -113,36 +120,87 @@ public class TraceFileParser {
         return Pair.with(sourceType, targetType);
     }
 
-    public List<TraceLink> parseTraceFile(ProjectVersion projectVersion,
-                                          Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
-                                          String fileName) throws ServerError {
+    public List<TraceLink> readAndParseTraceFile(ProjectVersion projectVersion,
+                                                 Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
+                                                 String fileName) throws ServerError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
+
+        Pair<List<TraceLink>, List<Pair<String, Long>>> parseResponse =
+            parseTraceFile((a) -> artifactRepository.findByProjectAndName(project, a),
+                (s, t) -> traceLinkService.queryForLinkBetween(s, t),
+                traceFileParser);
+        List<ParserError> parserErrors = parseResponse.getValue1().stream().map(error -> {
+            ParserError parserError = new ParserError(projectVersion, error.getValue0(),
+                ApplicationActivity.PARSING_TRACES);
+            parserError.setFileSource(fileName, error.getValue1());
+            return parserError;
+        }).collect(Collectors.toList());
+        this.parserErrorRepository.saveAll(parserErrors);
+        return parseResponse.getValue0();
+    }
+
+    public Pair<List<TraceLink>, List<Pair<String, Long>>> parseTraceFile(ArtifactFinder artifactFinder,
+                                                                          TraceLinkFinder traceLinkFinder,
+                                                                          CSVParser traceFileParser)
+        throws ServerError {
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {
             records = traceFileParser.getRecords();
         } catch (IOException e) {
-            String error = String.format("Unable to read trace file: %s", fileName);
-            throw new ServerError(error, e);
+            String error = "Unable to read trace file.";
+            return new Pair<>(new ArrayList<>(), List.of(new Pair<>(error, (long) -1)));
         }
 
         List<TraceLink> traceLinks = new ArrayList<>();
-
+        List<Pair<String, Long>> errors = new ArrayList<>();
         for (CSVRecord record : records) {
             String sourceId = record.get(SOURCE_PARAM).trim();
             String targetId = record.get(TARGET_PARAM).trim();
-            Pair<TraceLink, ParserError> traceResult = traceLinkService.createTrace(projectVersion, sourceId,
+            Pair<TraceLink, String> traceResult = traceLinkService.parseTraceLink(artifactFinder,
+                traceLinkFinder,
+                sourceId,
                 targetId);
             if (traceResult.getValue0() != null) {
                 traceLinks.add(traceResult.getValue0());
-            } else {
-                traceResult.getValue1().setFileSource(fileName, traceFileParser.getCurrentLineNumber());
-                this.parserErrorRepository.save(traceResult.getValue1());
+            }
+            if (traceResult.getValue1() != null) {
+                errors.add(new Pair<>(traceResult.getValue1(), record.getRecordNumber()));
             }
         }
-        return traceLinks;
+        return new Pair<>(traceLinks, errors);
+    }
+
+    public Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> readTraceFile(ArtifactFinder artifactFinder,
+                                                                                      TraceLinkFinder traceLinkFinder,
+                                                                                      CSVParser traceFileParser)
+        throws ServerError {
+        FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
+        List<CSVRecord> records;
+        try {
+            records = traceFileParser.getRecords();
+        } catch (IOException e) {
+            String error = "Unable to read trace file.";
+            return new Pair<>(new ArrayList<>(), List.of(new Pair<>(error, (long) -1)));
+        }
+
+        List<TraceApplicationEntity> traceLinks = new ArrayList<>();
+        List<Pair<String, Long>> errors = new ArrayList<>();
+        for (CSVRecord record : records) {
+            String sourceId = record.get(SOURCE_PARAM).trim();
+            String targetId = record.get(TARGET_PARAM).trim();
+            TraceApplicationEntity trace = new TraceApplicationEntity();
+            trace.setSource(sourceId);
+            trace.setTarget(targetId);
+            traceLinks.add(trace);
+        }
+        return new Pair<>(traceLinks, errors);
+    }
+
+    public CSVParser readTraceFile(MultipartFile file) throws ServerError {
+        return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 
     private ArtifactType findArtifactType(Project project, String typeName) throws ServerError {

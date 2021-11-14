@@ -1,10 +1,6 @@
 package unit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,17 +9,17 @@ import edu.nd.crc.safa.builders.AppBuilder;
 import edu.nd.crc.safa.builders.EntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.db.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.db.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.services.FlatFileService;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.json.JSONObject;
@@ -59,7 +55,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
     protected TraceLinkRepository traceLinkRepository;
 
     @Autowired
-    protected FlatFileService flatFileService;
+    protected FileUploadService fileUploadService;
 
     @Autowired
     protected ParserErrorRepository parserErrorRepository;
@@ -97,10 +93,7 @@ public class EntityBaseTest extends SpringBootBaseTest {
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
             ProjectPaths.PATH_TO_BEFORE_FILES,
             "files");
-        List<String> uploadedFileNames = flatFileService.uploadFlatFiles(project, files);
-        assertThat(uploadedFileNames.size())
-            .as("test resources uploaded")
-            .isEqualTo(TestConstants.N_FILES);
+        fileUploadService.uploadFilesToServer(project, files);
         return projectVersion;
     }
 
@@ -129,6 +122,10 @@ public class EntityBaseTest extends SpringBootBaseTest {
         return sendRequest(get(routeName), test);
     }
 
+    public JSONObject sendDelete(String routeName, ResultMatcher test) throws Exception {
+        return sendRequest(delete(routeName), test);
+    }
+
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
                                   ResultMatcher test) throws Exception {
         MvcResult response = mockMvc
@@ -149,6 +146,17 @@ public class EntityBaseTest extends SpringBootBaseTest {
         for (MockMultipartFile file : files) {
             request.file(file);
         }
+
+        return request;
+    }
+
+    public MockMultipartHttpServletRequestBuilder createSingleFileRequest(String routeName, String pathToFile)
+        throws IOException {
+        String attributeName = "file";
+
+        MockMultipartFile file = MultipartHelper.createFile(pathToFile, attributeName);
+        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
+        request.file(file);
 
         return request;
     }

@@ -4,11 +4,11 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.importer.flatfiles.TraceLinkGenerator;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;

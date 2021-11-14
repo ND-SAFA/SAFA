@@ -13,15 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class MultipartHelper {
 
-    public static MockMultipartFile createFile(String pathToFile, String attrName) throws IOException {
-        File file = new File(pathToFile);
-        byte[] fileContent = FileUtils.readFileToByteArray(file);
-        return new MockMultipartFile(
-            attrName,
-            file.getName(),
-            Files.probeContentType(Paths.get(pathToFile)),
-            fileContent);
-    }
 
     public static List<MockMultipartFile> createMockMultipartFilesFromDirectory(String pathToDirectory,
                                                                                 String attributeName)
@@ -38,6 +29,16 @@ public class MultipartHelper {
             files.add(createFile(subFile.getAbsolutePath(), attributeName));
         }
         return files;
+    }
+
+    public static MockMultipartFile createFile(String pathToFile, String attributeName) throws IOException {
+        File file = new File(pathToFile);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        return new MockMultipartFile(
+            attributeName,
+            file.getName(),
+            Files.probeContentType(Paths.get(pathToFile)),
+            fileContent);
     }
 
     public static List<MultipartFile> createMultipartFilesFromDirectory(String pathToDirectory, String attributeName)

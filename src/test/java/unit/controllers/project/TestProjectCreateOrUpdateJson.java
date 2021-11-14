@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactBody;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.entities.sql.TraceLink;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -133,7 +133,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
             .as("designs created)")
             .isEqualTo(1);
 
-        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
         assertThat(projectArtifacts.size()).isEqualTo(N_ARTIFACTS);
 
         // VP - Artifact bodies

@@ -4,29 +4,35 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactFile;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactType;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.db.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactFileRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.db.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.db.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.messages.ServerError;
-import edu.nd.crc.safa.server.services.ArtifactService;
+import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.ArtifactFile;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactFileRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for parsing flat files including reading,
@@ -45,8 +51,9 @@ public class ArtifactFileParser {
     ArtifactBodyRepository artifactBodyRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ProjectVersionRepository projectVersionRepository;
+    ParserErrorRepository parserErrorRepository;
 
-    ArtifactService artifactService;
+    ArtifactVersionService artifactVersionService;
 
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
@@ -54,13 +61,15 @@ public class ArtifactFileParser {
                               ArtifactBodyRepository artifactBodyRepository,
                               ArtifactTypeRepository artifactTypeRepository,
                               ProjectVersionRepository projectVersionRepository,
-                              ArtifactService artifactService) {
+                              ArtifactVersionService artifactVersionService,
+                              ParserErrorRepository parserErrorRepository) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectVersionRepository = projectVersionRepository;
-        this.artifactService = artifactService;
+        this.artifactVersionService = artifactVersionService;
+        this.parserErrorRepository = parserErrorRepository;
     }
 
     public void parseArtifactFiles(ProjectVersion projectVersion,
@@ -87,35 +96,44 @@ public class ArtifactFileParser {
             ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
             this.artifactFileRepository.save(newFile);
 
-            List<ArtifactAppEntity> artifactsInFile = parseArtifactFile(projectVersion, artifactType, artifactFileName);
-            projectArtifacts.addAll(artifactsInFile);
+            Pair<List<ArtifactAppEntity>, List<ParserError>> parseResponse = parseArtifactFile(projectVersion,
+                artifactType,
+                artifactFileName);
+
+            projectArtifacts.addAll(parseResponse.getValue0());
+            this.parserErrorRepository.saveAll(parseResponse.getValue1());
         }
-        artifactService.setArtifactsAtVersion(projectVersion, projectArtifacts);
+        artifactVersionService.setArtifactsAtVersion(projectVersion, projectArtifacts);
     }
 
-    private List<ArtifactAppEntity> parseArtifactFile(ProjectVersion projectVersion,
-                                                      ArtifactType artifactType,
-                                                      String fileName) throws ServerError {
+    private Pair<List<ArtifactAppEntity>, List<ParserError>> parseArtifactFile(ProjectVersion projectVersion,
+                                                                               ArtifactType artifactType,
+                                                                               String fileName) throws ServerError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
-        FileUtilities.assertHasColumns(fileParser, REQUIRED_COLUMNS);
 
         ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
         this.artifactFileRepository.save(artifactFile);
+        //TODO: Remove artifact file repository;
 
-        return saveOrUpdateArtifactRecords(fileName, artifactType, fileParser);
+        Pair<List<ArtifactAppEntity>, List<String>> response = parseArtifactFileIntoApplicationEntities(fileName,
+            artifactType.getName(), fileParser);
+        List<ParserError> parserErrors = response.getValue1().stream().map(msg -> new ParserError(projectVersion,
+            msg, ApplicationActivity.PARSING_ARTIFACTS)).collect(Collectors.toList());
+        return new Pair<>(response.getValue0(), parserErrors);
     }
 
-    private List<ArtifactAppEntity> saveOrUpdateArtifactRecords(String fileName,
-                                                                ArtifactType artifactType,
-                                                                CSVParser parsedFile) throws ServerError {
-        List<CSVRecord> artifactRecords;
+    public Pair<List<ArtifactAppEntity>, List<String>> parseArtifactFileIntoApplicationEntities(String fileName,
+                                                                                                String artifactType,
+                                                                                                CSVParser parsedFile) {
+        List<CSVRecord> artifactRecords = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
         try {
             artifactRecords = parsedFile.getRecords();
         } catch (IOException e) {
             String error = String.format("Unable to read records in file: %s", fileName);
-            throw new ServerError(error, e);
+            errors.add(error);
         }
 
         List<ArtifactAppEntity> artifactAppEntities = new ArrayList<>();
@@ -128,7 +146,7 @@ public class ArtifactFileParser {
             artifactContent = artifactContent == null ? "" : artifactContent;
 
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
-                artifactType.getName(),
+                artifactType,
                 artifactId,
                 artifactSummary,
                 artifactContent
@@ -136,6 +154,10 @@ public class ArtifactFileParser {
             artifactAppEntities.add(artifactAppEntity);
         }
 
-        return artifactAppEntities;
+        return new Pair<>(artifactAppEntities, errors);
+    }
+
+    public CSVParser readArtifactFile(MultipartFile file) throws ServerError {
+        return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 }

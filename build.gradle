@@ -63,8 +63,10 @@ dependencies {
     implementation 'org.webjars:stomp-websocket:2.3.4'
 
     // automatic documentation
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.12.0'
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.11'
     implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.5.11'
+    implementation 'org.springdoc:springdoc-openapi-javadoc:1.5.12'
 
     // testing
     testImplementation 'com.h2database:h2:1.4.200'

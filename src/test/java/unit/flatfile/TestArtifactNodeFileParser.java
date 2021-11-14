@@ -6,11 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
-import edu.nd.crc.safa.server.db.entities.sql.ArtifactFile;
-import edu.nd.crc.safa.server.db.entities.sql.Project;
-import edu.nd.crc.safa.server.db.entities.sql.ProjectVersion;
-import edu.nd.crc.safa.server.messages.ServerError;
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ public class TestArtifactNodeFileParser extends EntityBaseTest {
         artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
 
         // VP - Verify that all design artifacts are created
-        List<Artifact> projectArtifacts = artifactRepository.findByProject(project);
+        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
         assertThat(projectArtifacts.size())
             .as("artifacts created")
             .isEqualTo(TestConstants.N_DESIGNS);

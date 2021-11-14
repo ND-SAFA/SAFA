@@ -4,9 +4,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.server.db.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.db.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.db.entities.sql.Artifact;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;

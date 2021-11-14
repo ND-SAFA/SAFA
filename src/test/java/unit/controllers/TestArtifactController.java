@@ -38,7 +38,7 @@ public class TestArtifactController extends EntityBaseTest {
         String versionId = projectVersion.getVersionId().toString();
         JSONObject artifactJson = response.getValue1();
 
-        verifyArtifactStatus(projectVersion, artifactName, true);
+        verifyArtifactStatus(projectVersion, artifactName);
 
         // Step - Modify artifact summary
         artifactJson.put("summary", modifiedSummary);
@@ -73,16 +73,19 @@ public class TestArtifactController extends EntityBaseTest {
         String versionId = projectVersion.getVersionId().toString();
 
         // VP - Verify that artifact exists
-        verifyArtifactStatus(projectVersion, artifactName, true);
-        verifyArtifactBodyStatus(projectVersion, artifactName, true);
+        verifyArtifactStatus(projectVersion, artifactName);
+        verifyArtifactBodyStatus(projectVersion, artifactName);
 
         // Step - Delete artifact
         String deleteUrl = String.format("/projects/versions/%s/artifacts/%s", versionId, artifactName);
         sendDelete(deleteUrl, status().is2xxSuccessful());
 
         // VP - Verify artifact does not exist
-        verifyArtifactStatus(projectVersion, artifactName, true);
-        verifyArtifactBodyStatus(projectVersion, artifactName, false);
+        Optional<ArtifactBody> artifactBody =
+            this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
+        assertThat(artifactBody.isPresent()).isTrue();
+        ModificationType modificationType = artifactBody.get().getModificationType();
+        assertThat(modificationType).isEqualTo(ModificationType.REMOVED);
     }
 
     private Pair<ProjectVersion, JSONObject> createArtifact(String projectName, String artifactName) throws Exception {
@@ -131,15 +134,15 @@ public class TestArtifactController extends EntityBaseTest {
         return String.format("/projects/versions/%s/artifacts", versionId);
     }
 
-    private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName, boolean exists) {
+    private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName) {
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
             artifactName);
-        assertThat(artifactQuery.isPresent()).isEqualTo(exists);
+        assertThat(artifactQuery.isPresent()).isEqualTo(true);
     }
 
-    private void verifyArtifactBodyStatus(ProjectVersion projectVersion, String artifactName, boolean exists) {
+    private void verifyArtifactBodyStatus(ProjectVersion projectVersion, String artifactName) {
         Optional<ArtifactBody> artifactBody =
             this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
-        assertThat(artifactBody.isPresent()).isEqualTo(exists);
+        assertThat(artifactBody.isPresent()).isEqualTo(true);
     }
 }

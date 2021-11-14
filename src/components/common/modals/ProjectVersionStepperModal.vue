@@ -15,7 +15,7 @@
 
       <v-stepper-content :step="projectStep">
         <project-selector
-          :is-open="isOpen"
+          :is-open="projectSelectorIsOpen"
           @onProjectSelected="selectProject"
           @onProjectUnselected="unselectProject"
         />
@@ -23,8 +23,7 @@
 
       <v-stepper-content :step="versionStep">
         <version-selector
-          v-if="selectedProject !== undefined"
-          :is-open="isOpen"
+          :is-open="versionSelectorIsOpen"
           :project="selectedProject"
           @onVersionSelected="selectVersion"
           @onVersionUnselected="unselectVersion"
@@ -95,6 +94,11 @@ export default Vue.extend({
       required: false,
       default: () => [] as StepState[],
     },
+    startStep: {
+      type: Number,
+      default: 1,
+      required: false,
+    },
   },
   data() {
     return {
@@ -107,10 +111,10 @@ export default Vue.extend({
   },
   methods: {
     clearData() {
-      this.selectedProject = undefined;
+      this.selectedProject = this.project;
       this.selectedVersion = undefined;
       this.fileSelectorOpen = false;
-      this.currentStep = 1;
+      this.currentStep = this.startStep;
       this.$emit("update:isLoading", false);
     },
     onClose() {
@@ -193,6 +197,15 @@ export default Vue.extend({
     totalSteps(): number {
       return this.beforeSteps.length + 2 + this.afterSteps.length;
     },
+    projectSelectorIsOpen(): boolean {
+      return this.isOpen && this.currentStep === this.projectStep;
+    },
+    versionSelectorIsOpen(): boolean {
+      return (
+        this.isOpen &&
+        this.selectedProject !== undefined &&
+        this.currentStep === this.versionStep
+      );
     },
   },
   watch: {

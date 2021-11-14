@@ -1,8 +1,9 @@
 <template>
   <project-version-stepper-modal
     v-model="currentStep"
-    title="Select Baseline Project Version"
+    :title="title"
     :isOpen="isOpen"
+    :startStep="startStep"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -12,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
@@ -33,21 +34,44 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    project: {
+      type: Object as PropType<ProjectIdentifier>,
+      required: false,
+    },
+    startStep: {
+      type: Number,
+      default: 1,
+      required: false,
+    },
+    title: {
+      type: String,
+      default: "Select Baseline Project Version",
+    },
   },
   data() {
     return {
       isLoading: false,
-      selectedProject: undefined as ProjectIdentifier | undefined,
       selectedVersion: undefined as ProjectVersion | undefined,
-      currentStep: 1,
+      currentStep: this.startStep,
+      selectedProject: this.project,
     };
+  },
+  watch: {
+    /**
+     * Overrides selectedProject with the project prop.
+     *
+     * @param newProject - The new project prop.
+     */
+    project(newProject: ProjectIdentifier): void {
+      this.selectedProject = newProject;
+    },
   },
   methods: {
     onSubmit() {
       if (this.selectedProject === undefined) {
-        appModule.onWarning("Please select a project to update");
+        appModule.onWarning("Please select a project to update.");
       } else if (this.selectedVersion === undefined) {
-        appModule.onWarning("Please select a baseline version");
+        appModule.onWarning("Please select a baseline version.");
       } else {
         this.isLoading = true;
 

@@ -58,6 +58,10 @@ export default Vue.extend({
     ConfirmProjectDelete,
   },
   props: {
+    /**
+     * Whether this component is currently in view. If within a stepper then
+     * this is true when the this component is within the current step.
+     */
     isOpen: {
       type: Boolean,
       required: true,

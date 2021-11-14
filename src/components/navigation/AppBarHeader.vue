@@ -25,6 +25,13 @@
       :is-open="openProjectOpen"
       @onClose="openProjectOpen = false"
     />
+    <baseline-version-modal
+      title="Change project version"
+      :is-open="changeVersionOpen"
+      :project="project"
+      :start-step="2"
+      @onClose="changeVersionOpen = false"
+    />
   </v-container>
 </template>
 
@@ -52,6 +59,7 @@ export default Vue.extend({
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
+      changeVersionOpen: false,
       definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },

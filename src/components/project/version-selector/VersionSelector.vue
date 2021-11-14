@@ -1,5 +1,6 @@
 <template>
   <generic-selector
+    v-if="this.isOpen"
     item-key="versionId"
     no-data-text="Project contains no versions"
     :headers="headers"
@@ -44,13 +45,18 @@ import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
 export default Vue.extend({
   components: { GenericSelector, VersionCreator, ConfirmVersionDelete },
   props: {
+    /**
+     * Whether this selector is currently open and in view. Note, if within
+     * a stepper modal, isOpen is true only when the this component is within
+     * the current step.
+     */
     isOpen: {
       type: Boolean,
       required: true,
     },
     project: {
       type: Object as PropType<ProjectIdentifier>,
-      required: true,
+      required: false,
     },
   },
   data() {

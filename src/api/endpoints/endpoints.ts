@@ -13,7 +13,7 @@ export enum Endpoint {
   createAccount = "accounts/create",
   logout = "accounts/logout",
   forgotPassword = "accounts/forgot",
-  changePassword = "accounts/change",
+  resetPassword = "accounts/reset",
   // Projects
   project = "projects",
   deleteArtifact = "projects/versions/:versionId/artifacts/:artifactName",

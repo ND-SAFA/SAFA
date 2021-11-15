@@ -86,8 +86,8 @@ export async function forgotPassword(user: UserResetModel): Promise<void> {
  *
  * @throws Error - The password change request was unsuccessful.
  */
-export async function changePassword(user: UserChangeModel): Promise<void> {
-  await httpClient(fillEndpoint(Endpoint.changePassword), {
+export async function resetPassword(user: UserChangeModel): Promise<void> {
+  await httpClient(fillEndpoint(Endpoint.resetPassword), {
     method: "PUT",
     body: JSON.stringify(user),
   });

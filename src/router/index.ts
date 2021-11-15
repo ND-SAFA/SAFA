@@ -7,6 +7,10 @@ import {
   ApproveLinksView,
   ArtifactTreeView,
   ProjectCreatorView,
+  LoginView,
+  CreateAccountView,
+  ForgotPasswordView,
+  ResetPasswordView,
 } from "@/views";
 
 export { Routes };
@@ -14,6 +18,27 @@ export { Routes };
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
+  {
+    path: Routes.LOGIN_ACCOUNT,
+    name: "Login",
+    component: LoginView,
+  },
+  {
+    path: Routes.CREATE_ACCOUNT,
+    name: "Create Account",
+    component: CreateAccountView,
+  },
+  {
+    path: Routes.FORGOT_PASSWORD,
+    name: "Forgot Password",
+    component: ForgotPasswordView,
+  },
+  {
+    path: Routes.RESET_PASSWORD,
+    name: "Reset Password",
+    component: ResetPasswordView,
+  },
+
   {
     path: Routes.HOME,
     name: "Home",

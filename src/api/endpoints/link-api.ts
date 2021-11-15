@@ -1,7 +1,7 @@
 import { TraceLink } from "@/types";
-import httpClient from "@/api/http-client";
+import httpClient from "@/api/endpoints/http-client";
 import { Artifact } from "@/types/domain/artifact";
-import { Endpoint, fillEndpoint } from "@/api/endpoints";
+import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
  * Returns all generated links for this project.

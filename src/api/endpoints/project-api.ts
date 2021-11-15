@@ -5,8 +5,8 @@ import {
   ProjectIdentifier,
   ProjectVersion,
 } from "@/types";
-import httpClient from "@/api/http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints";
+import httpClient from "@/api/endpoints/http-client";
+import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
  * Creates a new project from the given flat files.

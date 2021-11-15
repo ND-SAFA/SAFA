@@ -1,9 +1,9 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { getProjectVersion } from "@/api/project-api";
+import { getProjectVersion } from "@/api/endpoints/project-api";
 import { ProjectVersionUpdate } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { baseURL } from "@/api/endpoints";
+import { baseURL } from "@/api/endpoints/endpoints";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
 let sock: WebSocket;

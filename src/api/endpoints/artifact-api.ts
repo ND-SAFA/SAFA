@@ -1,6 +1,6 @@
 import { Artifact, ArtifactNameValidationResponse } from "@/types";
-import httpClient from "@/api/http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints";
+import httpClient from "@/api/endpoints/http-client";
+import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
  * Returns whether the given artifact name already exists.

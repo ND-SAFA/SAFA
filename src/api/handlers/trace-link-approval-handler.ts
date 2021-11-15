@@ -1,6 +1,6 @@
 import { TraceApproval, TraceLink } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { approveLink, declineLink } from "@/api/link-api";
+import { approveLink, declineLink } from "@/api/endpoints";
 
 /**
  * Processes link API functions, setting the app state to loading in between.

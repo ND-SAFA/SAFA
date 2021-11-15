@@ -1,4 +1,6 @@
-import { Module, VuexModule } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { SessionModel, UserModel } from "@/types";
+import { loginUser } from "@/api";
 
 @Module({ namespaced: true, name: "session" })
 /**
@@ -6,14 +8,34 @@ import { Module, VuexModule } from "vuex-module-decorators";
  */
 export default class SessionModule extends VuexModule {
   /**
-   * Whether there is currently an active session.
+   * The current active session, if one exists.
    */
-  private doesSessionExist = false;
+  private session?: SessionModel;
+
+  @Action
+  /**
+   * Attempts to log a user in.
+   *
+   * @throws Error - Login failed.
+   */
+  async login(user: UserModel): Promise<void> {
+    const session = await loginUser(user);
+
+    await this.SET_SESSION(session);
+  }
+
+  @Mutation
+  /**
+   * Sets the current session.
+   */
+  SET_SESSION(session: SessionModel): void {
+    this.session = session;
+  }
 
   /**
    * @return Whether there is a current session
    */
   get getDoesSessionExist(): boolean {
-    return this.doesSessionExist;
+    return !!this.session;
   }
 }

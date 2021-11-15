@@ -16,7 +16,6 @@ import {
   errorModule,
   viewportModule,
 } from "@/store";
-import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "project" })
 /**

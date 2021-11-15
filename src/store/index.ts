@@ -7,6 +7,7 @@ import {
   DeltaModule,
   ErrorModule,
   ProjectModule,
+  SessionModule,
   ViewportModule,
 } from "./modules";
 
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
+    session: SessionModule,
     app: AppModule,
     project: ProjectModule,
     delta: DeltaModule,
@@ -26,6 +28,7 @@ const store = new Vuex.Store({
   },
 });
 
+export const sessionModule = getModule(SessionModule, store);
 export const errorModule = getModule(ErrorModule, store);
 export const projectModule = getModule(ProjectModule, store);
 export const appModule = getModule(AppModule, store);

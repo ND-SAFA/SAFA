@@ -1,30 +1,42 @@
 <template>
   <v-app class="application">
     <v-main>
-      <v-container>
-        <transition name="fade" mode="out-in">
-          <keep-alive>
-            <router-view />
-          </keep-alive>
-        </transition>
-      </v-container>
+      <transition name="fade" mode="out-in">
+        <keep-alive>
+          <router-view />
+        </keep-alive>
+      </transition>
     </v-main>
-    <AppBar :isLeftOpen="isLeftOpen" :isRightOpen="isRightOpen" />
-    <Snackbar :timeout="5000" />
-    <LeftNavDrawer :isLeftOpen="isLeftOpen" :width="250" />
-    <RightNavDrawer :isRightOpen="isRightOpen" :width="325" />
+
+    <AppBar
+      v-if="doShowNavigation"
+      :isLeftOpen="isLeftOpen"
+      :isRightOpen="isRightOpen"
+    />
+    <LeftNavDrawer
+      v-if="doShowNavigation"
+      :isLeftOpen="isLeftOpen"
+      :width="250"
+    />
+    <RightNavDrawer
+      v-if="doShowNavigation"
+      :isRightOpen="isRightOpen"
+      :width="325"
+    />
+
     <ArtifactCreatorModal
       :isOpen="isArtifactCreatorOpen"
       @onClose="closeArtifactCreator"
     />
     <AppConfirmModal :message="confirmationMessage" />
+    <Snackbar :timeout="5000" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { ConfirmDialogueMessage, PanelType } from "@/types/store";
-import { appModule } from "@/store";
+import { appModule, sessionModule } from "@/store";
 import {
   AppBar,
   Snackbar,
@@ -45,18 +57,11 @@ export default Vue.extend({
     ArtifactCreatorModal,
   },
   computed: {
-    isLeftOpen(): boolean {
-      return appModule.getIsLeftOpen;
-    },
-    isRightOpen(): boolean {
-      return appModule.getIsRightOpen;
-    },
-    isArtifactCreatorOpen(): boolean {
-      return appModule.getIsArtifactCreatorOpen;
-    },
-    confirmationMessage(): ConfirmDialogueMessage | undefined {
-      return appModule.getConfirmationMessage;
-    },
+    isLeftOpen: () => appModule.getIsLeftOpen,
+    isRightOpen: () => appModule.getIsRightOpen,
+    isArtifactCreatorOpen: () => appModule.getIsArtifactCreatorOpen,
+    confirmationMessage: () => appModule.getConfirmationMessage,
+    doShowNavigation: () => sessionModule.getDoesSessionExist,
   },
   methods: {
     closeArtifactCreator(): void {

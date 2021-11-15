@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import { Routes } from "./routes";
-import { appModule, projectModule } from "@/store";
+import { appModule, projectModule, sessionModule } from "@/store";
 import {
   ErrorPageView,
   ApproveLinksView,
@@ -75,7 +75,13 @@ const router = new VueRouter({
 const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
 
 router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
+  if (to.path !== Routes.LOGIN_ACCOUNT && !sessionModule.getDoesSessionExist) {
+    next(Routes.LOGIN_ACCOUNT);
+    return;
+  }
+
   const isProjectDefined: boolean = projectModule.getProject.projectId !== "";
+
   if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
     appModule.onWarning(
       "Project must be selected before approving trace links."

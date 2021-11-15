@@ -35,16 +35,16 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @CrossOrigin
 @RestController
-public class ParseFileController extends BaseController {
+public class ParseDataFileController extends BaseController {
 
     private final ArtifactFileParser artifactFileParser;
     private final TraceFileParser traceFileParser;
 
     @Autowired
-    public ParseFileController(ProjectRepository projectRepository,
-                               ProjectVersionRepository projectVersionRepository,
-                               ArtifactFileParser artifactFileParser,
-                               TraceFileParser traceFileParser) {
+    public ParseDataFileController(ProjectRepository projectRepository,
+                                   ProjectVersionRepository projectVersionRepository,
+                                   ArtifactFileParser artifactFileParser,
+                                   TraceFileParser traceFileParser) {
         super(projectRepository, projectVersionRepository);
         this.artifactFileParser = artifactFileParser;
         this.traceFileParser = traceFileParser;

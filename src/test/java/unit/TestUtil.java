@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class TestUtil {
 
     public static JSONObject asJson(MvcResult result) throws UnsupportedEncodingException, JSONException {
-        return new JSONObject(result.getResponse().getContentAsString());
-    }
+        String content = result.getResponse().getContentAsString();
+        return content.equals("") ? new JSONObject() : new JSONObject(content);
     }
 }

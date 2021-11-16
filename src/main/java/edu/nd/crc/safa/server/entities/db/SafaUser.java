@@ -1,0 +1,47 @@
+package edu.nd.crc.safa.server.entities.db;
+
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
+
+@Entity()
+@Table(name = "safa_user")
+public class SafaUser {
+
+    @Id
+    @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "user_id")
+    UUID userId;
+
+    @Column(name = "email", nullable = false, unique = true)
+    String email;
+
+    @Column(name = "password", nullable = false)
+    String password;
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}

@@ -57,6 +57,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.5'
     implementation 'org.springframework:spring-websocket:5.3.11'
     implementation 'org.springframework:spring-messaging:5.3.11'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
 
     // websockets
     implementation 'org.webjars:sockjs-client:1.5.1'
@@ -72,6 +73,7 @@ dependencies {
     testImplementation 'com.h2database:h2:1.4.200'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.springframework.security:spring-security-test:5.6.0'
 }
 
 test {

@@ -14,8 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PanelType } from "@/types";
-import { appModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
 
@@ -23,11 +22,6 @@ export default Vue.extend({
   name: "app",
   components: {
     Snackbar,
-  },
-  methods: {
-    closeArtifactCreator(): void {
-      appModule.closePanel(PanelType.artifactCreator);
-    },
   },
   mounted() {
     sessionModule.getSession().then(() => navigateTo(Routes.HOME));

@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { SessionModel, UserModel } from "@/types";
-import { loginUser } from "@/api";
+import type { SessionModel, UserModel } from "@/types";
+import { getSession, loginUser } from "@/api";
 
 @Module({ namespaced: true, name: "session" })
 /**
@@ -12,7 +12,19 @@ export default class SessionModule extends VuexModule {
    */
   private session?: SessionModel;
 
-  @Action
+  @Action({ rawError: true })
+  /**
+   * Attempts to get an existing session.
+   *
+   * @throws Error - No session exists.
+   */
+  async getSession(): Promise<void> {
+    const session = await getSession();
+
+    this.SET_SESSION(session);
+  }
+
+  @Action({ rawError: true })
   /**
    * Attempts to log a user in.
    *

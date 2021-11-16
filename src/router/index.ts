@@ -75,7 +75,11 @@ const router = new VueRouter({
 const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
 
 router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
-  if (to.path !== Routes.LOGIN_ACCOUNT && !sessionModule.getDoesSessionExist) {
+  if (
+    to.path !== Routes.LOGIN_ACCOUNT &&
+    from.path !== Routes.LOGIN_ACCOUNT &&
+    !sessionModule.getDoesSessionExist
+  ) {
     next(Routes.LOGIN_ACCOUNT);
     return;
   }

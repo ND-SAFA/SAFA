@@ -8,65 +8,29 @@
       </transition>
     </v-main>
 
-    <AppBar
-      v-if="doShowNavigation"
-      :isLeftOpen="isLeftOpen"
-      :isRightOpen="isRightOpen"
-    />
-    <LeftNavDrawer
-      v-if="doShowNavigation"
-      :isLeftOpen="isLeftOpen"
-      :width="250"
-    />
-    <RightNavDrawer
-      v-if="doShowNavigation"
-      :isRightOpen="isRightOpen"
-      :width="325"
-    />
-
-    <ArtifactCreatorModal
-      :isOpen="isArtifactCreatorOpen"
-      @onClose="closeArtifactCreator"
-    />
-    <AppConfirmModal :message="confirmationMessage" />
-    <Snackbar :timeout="5000" />
+    <snackbar :timeout="5000" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ConfirmDialogueMessage, PanelType } from "@/types/store";
+import { PanelType } from "@/types";
 import { appModule, sessionModule } from "@/store";
-import {
-  AppBar,
-  Snackbar,
-  LeftNavDrawer,
-  RightNavDrawer,
-  ArtifactCreatorModal,
-  AppConfirmModal,
-} from "@/components";
+import { navigateTo, Routes } from "@/router";
+import { Snackbar } from "@/components";
 
 export default Vue.extend({
-  name: "App",
+  name: "app",
   components: {
-    AppConfirmModal,
-    AppBar,
     Snackbar,
-    LeftNavDrawer,
-    RightNavDrawer,
-    ArtifactCreatorModal,
-  },
-  computed: {
-    isLeftOpen: () => appModule.getIsLeftOpen,
-    isRightOpen: () => appModule.getIsRightOpen,
-    isArtifactCreatorOpen: () => appModule.getIsArtifactCreatorOpen,
-    confirmationMessage: () => appModule.getConfirmationMessage,
-    doShowNavigation: () => sessionModule.getDoesSessionExist,
   },
   methods: {
     closeArtifactCreator(): void {
       appModule.closePanel(PanelType.artifactCreator);
     },
+  },
+  mounted() {
+    sessionModule.getSession().then(() => navigateTo(Routes.HOME));
   },
 });
 </script>

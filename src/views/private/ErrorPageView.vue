@@ -1,21 +1,25 @@
 <template>
-  <v-container>
-    <v-row justify="center">
-      <v-col align-self="center">
-        <safa-icon />
-        Sorry, an error has occurred please refresh your browser and try again.
-      </v-col>
-    </v-row>
-  </v-container>
+  <private-page>
+    <template v-slot:page>
+      <v-row justify="center">
+        <v-col align-self="center">
+          <safa-icon />
+          Sorry, an error has occurred please refresh your browser and try
+          again.
+        </v-col>
+      </v-row>
+    </template>
+  </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import SafaIcon from "@/components/navigation/SafaIcon.vue";
+import { PrivatePage, SafaIcon } from "@/components";
 
 export default Vue.extend({
   components: {
     SafaIcon,
+    PrivatePage,
   },
 });
 </script>

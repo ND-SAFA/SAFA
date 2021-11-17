@@ -16,6 +16,9 @@
 import Vue from "vue";
 import { PrivatePage, SafaIcon } from "@/components";
 
+/**
+ * The default page displayed if an unknown error is encountered.
+ */
 export default Vue.extend({
   components: {
     SafaIcon,

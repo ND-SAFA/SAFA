@@ -6,7 +6,7 @@ import { appModule, projectModule } from "@/store/index";
 
 router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
   if (!routesPublic.includes(to.path) && !sessionIsLoaded) {
-    next(Routes.LOGIN_ACCOUNT);
+    next({ path: Routes.LOGIN_ACCOUNT, query: { to: to.path } });
     return;
   }
 

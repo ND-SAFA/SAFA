@@ -76,12 +76,16 @@ const router = new VueRouter({
  * does nothing. This wrapper stops DuplicateNavigation exceptions.
  *
  * @param route - The route to navigate to.
+ * @param query - Any query params to include.
  */
-export async function navigateTo(route: Routes): Promise<void> {
+export async function navigateTo(
+  route: Routes | string,
+  query?: Record<string, string>
+): Promise<void> {
   if (router.currentRoute.path === route) {
     return;
   } else {
-    await router.push(route);
+    await router.push({ path: route, query });
   }
 }
 export default router;

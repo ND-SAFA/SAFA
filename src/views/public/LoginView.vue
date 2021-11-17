@@ -46,7 +46,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
-import { navigateTo, Routes } from "@/router";
+import router, { navigateTo, Routes } from "@/router";
 import { sessionModule } from "@/store";
 
 /**
@@ -62,12 +62,15 @@ export default Vue.extend({
   }),
   methods: {
     handleLogin() {
+      const goToPage =
+        new URLSearchParams(window.location.search).get("to") || Routes.HOME;
+
       sessionModule
         .login({
           email: this.email,
           password: this.password,
         })
-        .then(() => navigateTo(Routes.HOME))
+        .then(() => navigateTo(goToPage))
         .catch(() => (this.isError = true));
     },
     handleSignUp() {

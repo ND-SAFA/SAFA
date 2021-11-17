@@ -25,9 +25,13 @@ export type UserResetModel = Omit<UserModel, "password">;
 /**
  * Defines a user model for password updating.
  */
-export interface UserChangeModel extends UserModel {
+export interface UserChangeModel {
   /**
    * The token generated and included by email as a query param to securely change a user's password.
    */
   token: string;
+  /**
+   * The new password to set.
+   */
+  password: string;
 }

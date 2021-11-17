@@ -2,6 +2,9 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
 import { getSession, loginUser } from "@/api";
 
+/**
+ * If you only knew how many things I tried to not have to resort to this...
+ */
 export let sessionIsLoaded = false;
 
 @Module({ namespaced: true, name: "session" })

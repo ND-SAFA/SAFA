@@ -1,7 +1,12 @@
 <template>
   <card-page>
     <template v-slot:form>
-      <v-text-field filled label="Email" v-model="email" />
+      <v-text-field
+        filled
+        label="Email"
+        v-model="email"
+        :error-messages="isError ? ['Invalid username or password'] : []"
+      />
       <password-field v-model="password" />
     </template>
 
@@ -53,6 +58,7 @@ export default Vue.extend({
   data: () => ({
     email: "",
     password: "",
+    isError: false,
   }),
   methods: {
     handleLogin() {
@@ -61,7 +67,8 @@ export default Vue.extend({
           email: this.email,
           password: this.password,
         })
-        .then(() => navigateTo(Routes.HOME));
+        .then(() => navigateTo(Routes.HOME))
+        .catch(() => (this.isError = true));
     },
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);

@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="d-flex flex-row">
+  <v-flex class="d-flex flex-row align-center">
     <v-flex class="d-flex flex-row align-center">
       <SafaIcon />
       <div>

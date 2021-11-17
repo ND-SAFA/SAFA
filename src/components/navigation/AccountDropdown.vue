@@ -3,12 +3,7 @@
     <template v-slot:activator="{ on: menuOn, attrs }">
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltipOn }">
-          <v-btn
-            icon
-            class="mt-3"
-            v-on="{ ...tooltipOn, ...menuOn }"
-            v-bind="attrs"
-          >
+          <v-btn icon v-on="{ ...tooltipOn, ...menuOn }" v-bind="attrs">
             <v-avatar>
               <v-icon color="secondary" style="font-size: 48px">
                 mdi-account-circle

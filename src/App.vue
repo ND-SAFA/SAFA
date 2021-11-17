@@ -35,5 +35,4 @@ export default Vue.extend({
 @import "./assets/app-styles.css";
 @import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";
-@import "./assets/modal-sizes.css";
 </style>

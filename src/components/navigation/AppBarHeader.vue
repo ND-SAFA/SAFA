@@ -1,14 +1,12 @@
 <template>
   <v-flex class="d-flex flex-row">
-    <v-row dense>
-      <v-col class="flex-grow-0 mt-2">
-        <SafaIcon />
-      </v-col>
-      <v-col cols="2">
+    <v-flex class="d-flex flex-row align-center">
+      <SafaIcon />
+      <div>
         <h1 class="text-h5 white--text pl-4">SAFA</h1>
         <ButtonRow :definitions="definitions" justify="start" />
-      </v-col>
-    </v-row>
+      </div>
+    </v-flex>
 
     <account-dropdown />
 

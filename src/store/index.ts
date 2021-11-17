@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { getModule } from "vuex-module-decorators";
+import { NavigationGuardNext, Route } from "vue-router";
 import {
   AppModule,
   ArtifactSelectionModule,
@@ -10,6 +11,13 @@ import {
   SessionModule,
   ViewportModule,
 } from "./modules";
+import {
+  Routes,
+  routesPublic,
+  routesWithRequiredProject,
+} from "@/router/routes";
+import router from "@/router";
+import { sessionIsLoaded } from "@/store/modules/session.module";
 
 Vue.use(Vuex);
 Vue.config.devtools = true;
@@ -38,5 +46,23 @@ export const artifactSelectionModule = getModule(
 );
 export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
+
+router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
+  if (!routesPublic.includes(to.path) && !sessionIsLoaded) {
+    next(Routes.LOGIN_ACCOUNT);
+    return;
+  }
+
+  const isProjectDefined = projectModule.getProject.projectId !== "";
+
+  if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
+    appModule.onWarning(
+      "Project must be selected before approving trace links."
+    );
+    next(Routes.HOME);
+  } else {
+    next();
+  }
+});
 
 export default store;

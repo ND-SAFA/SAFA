@@ -14,14 +14,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import store, { sessionModule } from "@/store";
-import router, { navigateTo, Routes } from "@/router";
+import { sessionModule } from "@/store";
+import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
 
 export default Vue.extend({
   name: "app",
-  router,
-  store,
   components: {
     Snackbar,
   },

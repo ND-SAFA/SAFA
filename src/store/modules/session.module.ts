@@ -2,6 +2,8 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
 import { getSession, loginUser } from "@/api";
 
+export let sessionIsLoaded = false;
+
 @Module({ namespaced: true, name: "session" })
 /**
  * This module defines the state of the current user session.
@@ -10,7 +12,7 @@ export default class SessionModule extends VuexModule {
   /**
    * The current active session, if one exists.
    */
-  session?: SessionModel;
+  private session?: SessionModel;
 
   @Action({ rawError: true })
   /**
@@ -42,12 +44,14 @@ export default class SessionModule extends VuexModule {
    */
   SET_SESSION(session: SessionModel): void {
     this.session = session;
+
+    sessionIsLoaded = true;
   }
 
   /**
    * @return The current session.
    */
-  get getCurrentSession(): SessionModel | undefined {
+  getCurrentSession(): SessionModel | undefined {
     return this.session;
   }
 

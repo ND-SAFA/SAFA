@@ -13,3 +13,12 @@ export enum Routes {
   ERROR = "/error",
   PROJECT_CREATOR = "/create",
 }
+
+export const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
+
+export const routesPublic: string[] = [
+  Routes.LOGIN_ACCOUNT,
+  Routes.CREATE_ACCOUNT,
+  Routes.FORGOT_PASSWORD,
+  Routes.RESET_PASSWORD,
+];

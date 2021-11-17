@@ -1,15 +1,14 @@
 import Vue from "vue";
-import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
+import VueRouter, { RouteConfig } from "vue-router";
 import { Routes } from "./routes";
-import { appModule, projectModule, sessionModule } from "@/store";
 import {
-  ErrorPageView,
   ApproveLinksView,
   ArtifactTreeView,
-  ProjectCreatorView,
-  LoginView,
   CreateAccountView,
+  ErrorPageView,
   ForgotPasswordView,
+  LoginView,
+  ProjectCreatorView,
   ResetPasswordView,
 } from "@/views";
 
@@ -70,32 +69,6 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
-});
-
-const routesWithRequiredProject: string[] = [Routes.TRACE_LINK];
-const routesPublic: string[] = [
-  Routes.LOGIN_ACCOUNT,
-  Routes.CREATE_ACCOUNT,
-  Routes.FORGOT_PASSWORD,
-  Routes.RESET_PASSWORD,
-];
-
-router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
-  if (!routesPublic.includes(to.path) && !sessionModule.getDoesSessionExist) {
-    next(Routes.LOGIN_ACCOUNT);
-    return;
-  }
-
-  const isProjectDefined = projectModule.getProject.projectId !== "";
-
-  if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
-    appModule.onWarning(
-      "Project must be selected before approving trace links."
-    );
-    next(Routes.HOME);
-  } else {
-    next();
-  }
 });
 
 /**

@@ -23,10 +23,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestProjectCreationFlatFiles extends EntityBaseTest {
+public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
 
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
@@ -35,7 +35,7 @@ public class TestProjectCreationFlatFiles extends EntityBaseTest {
         String routeName = "/projects/flat-files";
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
 
         // VP 1 - Server response is 200 - okay
         assertThat(responseContent.get("status")).as("status is set").isEqualTo(0);

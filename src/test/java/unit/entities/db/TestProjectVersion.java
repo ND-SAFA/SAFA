@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestProjectVersion extends EntityBaseTest {
+public class TestProjectVersion extends ApplicationBaseTest {
 
     @Test
     public void checkVersionIdIncremented() {

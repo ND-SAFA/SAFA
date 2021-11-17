@@ -8,12 +8,12 @@ import java.util.UUID;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Tests that ArtifactTypes can be created, retrieved, updated, and deleted.
  */
-public class TestArtifactType extends EntityBaseTest {
+public class TestArtifactType extends ApplicationBaseTest {
     @Test
     public void createRetrieveUpdateDeleteArtifactType() {
         String projectName = "test_project";

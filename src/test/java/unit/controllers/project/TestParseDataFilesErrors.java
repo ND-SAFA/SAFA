@@ -9,10 +9,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestParseDataFilesErrors extends EntityBaseTest {
+public class TestParseDataFilesErrors extends ApplicationBaseTest {
 
     @Test
     public void testDuplicateArtifact() throws Exception {
@@ -21,7 +21,7 @@ public class TestParseDataFilesErrors extends EntityBaseTest {
         String routeName = "/projects/parse/artifacts/designs";
         String pathToArtifactFile = ProjectPaths.PATH_TO_BEFORE_FILES + "/Design.csv";
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToArtifactFile);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
 
         // VP - Verify that no error occurred
         assertThat(responseContent.getInt("status")).isEqualTo(0);
@@ -41,7 +41,7 @@ public class TestParseDataFilesErrors extends EntityBaseTest {
         String routeName = "/projects/parse/traces";
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES + "/Design2Requirement.csv");
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
 
         // VP - Verify that error occurred.
         assertThat(responseContent.getInt("status")).isEqualTo(0);

@@ -9,10 +9,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestParseDataFiles extends EntityBaseTest {
+public class TestParseDataFiles extends ApplicationBaseTest {
 
     @Test
     public void testParseArtifactFile() throws Exception {
@@ -122,7 +122,7 @@ public class TestParseDataFiles extends EntityBaseTest {
         // Step - Upload flat files
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
 
         // VP - Verify that error occurred.
         assertThat(responseContent.getInt("status")).isEqualTo(0);

@@ -20,13 +20,13 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Tests that /projects/ is able to create new projects from the front-end
  * JSON representation as well as updates the elements if they already exists
  */
-public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
+public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     final int N_TYPES = 2;
     final int N_ARTIFACTS = 2;

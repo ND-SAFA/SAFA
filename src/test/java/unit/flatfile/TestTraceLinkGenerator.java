@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
@@ -13,15 +12,15 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestTraceLinkGenerator extends EntityBaseTest {
+public class TestTraceLinkGenerator extends ApplicationBaseTest {
 
     @Autowired
     TraceLinkGenerator traceLinkGenerator;
 
     @Test
-    public void testTraceLinkGeneration() throws ServerError {
+    public void testTraceLinkGeneration() {
         String sourceTypeName = "requirement";
         String targetTypeName = "design";
         String projectName = "test-project";

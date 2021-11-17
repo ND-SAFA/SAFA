@@ -7,9 +7,9 @@ import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestVersionCreation extends EntityBaseTest {
+public class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     public void attemptNewRevisionWithoutVersions() throws Exception {

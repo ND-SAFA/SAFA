@@ -17,10 +17,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestDeltaController extends EntityBaseTest {
+public class TestDeltaController extends ApplicationBaseTest {
 
     @Autowired
     DeltaService deltaService;

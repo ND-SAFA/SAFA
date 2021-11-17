@@ -19,9 +19,9 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestTraceLinkController extends EntityBaseTest {
+public class TestTraceLinkController extends ApplicationBaseTest {
 
     @Test
     public void testGetGeneratedLinks() throws Exception {

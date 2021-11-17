@@ -5,9 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestVersionRetrieval extends EntityBaseTest {
+public class TestVersionRetrieval extends ApplicationBaseTest {
     @Test
     public void getEmptyVersions() throws Exception {
         String projectId = entityBuilder

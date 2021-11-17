@@ -5,9 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestProjectRetrieval extends EntityBaseTest {
+public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {
         JSONObject response = sendGet("/projects/", status().isOk());

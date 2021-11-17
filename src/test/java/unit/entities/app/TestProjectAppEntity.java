@@ -9,12 +9,12 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Validates and verifies accuracy of methods adding functionality to ApplicationModel class.
  */
-public class TestProjectAppEntity extends EntityBaseTest {
+public class TestProjectAppEntity extends ApplicationBaseTest {
 
     @Test
     public void ableToDetectNewArtifacts() {

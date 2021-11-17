@@ -39,6 +39,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
+        System.out.println("METHOD: -----------------------------" + req.getMethod());
         try {
             SafaUser applicationUser = new ObjectMapper().readValue(req.getInputStream(), SafaUser.class);
             System.out.println("USER:" + applicationUser);
@@ -51,7 +52,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * Attaches a JWT token to response object when user is successfully authenticated. Token consists of the account

@@ -16,9 +16,9 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestArtifactController extends EntityBaseTest {
+public class TestArtifactController extends ApplicationBaseTest {
 
     @Autowired
     DeltaService deltaService;

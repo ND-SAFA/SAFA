@@ -7,14 +7,14 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Tests that server errors include a
  * - status (0 if success otherwise some error code > 0)
  * - body (contains error message and other information)
  */
-public class TestServerErrorMessage extends EntityBaseTest {
+public class TestServerErrorMessage extends ApplicationBaseTest {
 
     @Test
     public void testServerError() throws Exception {

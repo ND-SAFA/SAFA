@@ -111,11 +111,21 @@ public class EntityBaseTest extends SpringBootBaseTest {
             test);
     }
 
-    public JSONObject sendPost(String routeName, JSONObject body, ResultMatcher test) throws Exception {
+    public JSONObject sendPost(String routeName,
+                               JSONObject body,
+                               ResultMatcher test) throws Exception {
+        return sendPost(routeName, body, test, new String[]{});
+    }
+
+    public JSONObject sendPost(String routeName,
+                               JSONObject body,
+                               ResultMatcher test,
+                               String[] includeHeaders) throws Exception {
         return sendRequest(post(routeName)
                 .content(body.toString())
                 .contentType(MediaType.APPLICATION_JSON),
-            test);
+            test,
+            includeHeaders);
     }
 
     public JSONObject sendGet(String routeName, ResultMatcher test) throws Exception {
@@ -128,11 +138,32 @@ public class EntityBaseTest extends SpringBootBaseTest {
 
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
                                   ResultMatcher test) throws Exception {
+        return sendRequest(request, test, new String[]{});
+    }
+
+    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
+                                  ResultMatcher test,
+                                  String authorizationToken
+    ) throws Exception {
+        MockHttpServletRequestBuilder authorizedRequest = request.header("Authorization", authorizationToken);
+        MvcResult response = mockMvc
+            .perform(authorizedRequest)
+            .andExpect(test)
+            .andReturn();
+
+        return TestUtil.apiResponseAsJson(response, new String[]{});
+    }
+
+    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
+                                  ResultMatcher test,
+                                  String[] headerNames) throws Exception {
+
         MvcResult response = mockMvc
             .perform(request)
             .andExpect(test)
             .andReturn();
-        return TestUtil.asJson(response);
+
+        return TestUtil.apiResponseAsJson(response, headerNames);
     }
 
     public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)

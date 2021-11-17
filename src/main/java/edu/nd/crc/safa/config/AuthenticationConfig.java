@@ -1,14 +1,11 @@
 package edu.nd.crc.safa.config;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.server.services.SafaUserService;
 
-import org.apache.http.HttpStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,8 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,34 +31,14 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        http.cors().and().csrf().disable()
+            .authorizeRequests()
+            .antMatchers("/login", "/sign-up").permitAll()
+            .anyRequest().authenticated()
+            .and()
             .addFilter(new AuthenticationFilter(authenticationManager()))
             .addFilter(new AuthorizationFilter(authenticationManager()))
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-            .and()
-            .csrf().disable()
-            .formLogin()
-            .usernameParameter("email")
-            .loginProcessingUrl("/login/**")
-            .failureHandler((HttpServletRequest request,
-                             HttpServletResponse response,
-                             AuthenticationException exception) -> {
-                response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-            })
-            .successHandler((HttpServletRequest request,
-                             HttpServletResponse response,
-                             Authentication authentication) -> {
-                response.setStatus(HttpStatus.SC_OK);
-            })
-            .permitAll()
-            .and()
-            .authorizeRequests()
-            .antMatchers("/login", "/sign-up")
-            .permitAll()
-            .anyRequest()
-            .authenticated();
-
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean

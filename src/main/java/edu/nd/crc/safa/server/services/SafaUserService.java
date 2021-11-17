@@ -38,6 +38,7 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser createNewUser(SafaUser newUser) {
+
         newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
         this.safaUserRepository.save(newUser);
         return newUser;

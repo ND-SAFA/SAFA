@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -38,8 +40,13 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = authenticate(request);
-
+        UsernamePasswordAuthenticationToken authentication = null;
+        try {
+            authentication = authenticate(request);
+        } catch (ServerError e) {
+            e.printStackTrace();
+            return;
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
@@ -50,9 +57,10 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
      * @param request An incoming http request.
      * @return Successful authorization token if successful otherwise null.
      */
-    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) {
+    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws ServerError {
         String token = request.getHeader(HEADER_NAME);
         if (token != null) {
+            //TODO: revisit these generation methods
             Claims user = Jwts.parser()
                 .setSigningKey(Keys.hmacShaKeyFor(KEY.getBytes()))
                 .parseClaimsJws(token)
@@ -65,6 +73,6 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             }
 
         }
-        return null;
+        throw new ServerError("No token found.");
     }
 }

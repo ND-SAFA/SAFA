@@ -10,33 +10,7 @@
       </v-col>
     </v-row>
 
-    <v-menu>
-      <template v-slot:activator="{ on: menuOn, attrs }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on: tooltipOn }">
-            <v-btn
-              icon
-              class="mt-2"
-              v-on="{ ...tooltipOn, ...menuOn }"
-              v-bind="attrs"
-            >
-              <v-avatar color="white">
-                <v-icon color="primary" style="font-size: 48px">
-                  mdi-account-circle
-                </v-icon>
-              </v-avatar>
-            </v-btn>
-          </template>
-          <span>My Account</span>
-        </v-tooltip>
-      </template>
-
-      <v-list dense>
-        <v-list-item>
-          <v-btn text color="error" @click="handleLogout">Logout</v-btn>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+    <account-dropdown />
 
     <upload-new-version-modal
       :isOpen="uploadVersionOpen"
@@ -59,16 +33,18 @@
 import Vue from "vue";
 import { ButtonDefinition, ButtonType, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appModule, projectModule, sessionModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import {
   BaselineVersionModal,
   ButtonRow,
   UploadNewVersionModal,
 } from "@/components/common";
 import SafaIcon from "./SafaIcon.vue";
+import AccountDropdown from "./AccountDropdown.vue";
 
 export default Vue.extend({
   components: {
+    AccountDropdown,
     SafaIcon,
     ButtonRow,
     UploadNewVersionModal,
@@ -96,9 +72,6 @@ export default Vue.extend({
       } else {
         appModule.onWarning("Please select a project.");
       }
-    },
-    handleLogout(): void {
-      sessionModule.logout().then(() => navigateTo(Routes.LOGIN_ACCOUNT));
     },
   },
   computed: {

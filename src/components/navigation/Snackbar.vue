@@ -6,7 +6,7 @@
       </v-col>
       <v-col
         :cols="hasErrors ? 6 : 9"
-        class="ma-1 pa-0 text-center"
+        class="ma-1 pa-0 text-center white--text"
         align-self="center"
       >
         {{ snackbarMessage }}

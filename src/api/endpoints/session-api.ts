@@ -11,7 +11,7 @@ import { Endpoint, fillEndpoint } from "./endpoints";
  * TODO: remove once endpoints exist.
  */
 const TEST_ENDPOINTS = true;
-const TEST_SESSION_EXISTING = true;
+const TEST_SESSION_EXISTING = false;
 
 /**
  * Returns the current user's session.

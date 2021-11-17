@@ -49,13 +49,6 @@ export default class SessionModule extends VuexModule {
   }
 
   /**
-   * @return The current session.
-   */
-  getCurrentSession(): SessionModel | undefined {
-    return this.session;
-  }
-
-  /**
    * @return Whether there is a current session.
    */
   get getDoesSessionExist(): boolean {

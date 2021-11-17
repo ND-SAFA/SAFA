@@ -61,8 +61,7 @@ export default Vue.extend({
           email: this.email,
           password: this.password,
         })
-        .then(() => navigateTo(Routes.HOME))
-        .catch(() => console.log("Route blocked"));
+        .then(() => navigateTo(Routes.HOME));
     },
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);

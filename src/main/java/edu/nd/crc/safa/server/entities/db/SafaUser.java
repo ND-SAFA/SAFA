@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 @Entity()
 @Table(name = "safa_user")
@@ -43,5 +44,12 @@ public class SafaUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put("email", this.email);
+        json.put("password:", this.password);
+        return json.toString();
     }
 }

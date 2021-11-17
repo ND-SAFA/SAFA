@@ -1,7 +1,6 @@
 package unit.controllers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -10,7 +9,6 @@ import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 import unit.EntityBaseTest;
 
@@ -59,10 +57,9 @@ public class TestSafaSafaUserController extends EntityBaseTest {
     }
 
     private JSONObject loginUser(String email, String password, ResultMatcher test) throws Exception {
-        return sendRequest(post("/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .param("email", email)
-                .param("password", password),
-            test);
+        JSONObject user = new JSONObject();
+        user.put("email", email);
+        user.put("password", password);
+        return sendPost("/login", user, test);
     }
 }

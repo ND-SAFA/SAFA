@@ -4,6 +4,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
+import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.server.services.SafaUserService;
 
 import org.apache.http.HttpStatus;
@@ -35,6 +37,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+            .addFilter(new AuthenticationFilter(authenticationManager()))
+            .addFilter(new AuthorizationFilter(authenticationManager()))
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
             .and()

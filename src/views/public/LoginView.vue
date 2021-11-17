@@ -2,25 +2,37 @@
   <card-page>
     <template v-slot:form>
       <v-text-field filled label="Email" v-model="email" />
-      <v-text-field
-        filled
-        label="Password"
-        v-model="password"
-        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="showPassword ? 'text' : 'password'"
-        @click:append="showPassword = !showPassword"
-      />
+      <password-field v-model="password" />
     </template>
 
     <template v-slot:actions>
-      <v-btn color="primary" width="8em">Login</v-btn>
+      <v-btn
+        color="primary"
+        width="8em"
+        @click="handleLogin"
+        :disabled="password.length === 0"
+      >
+        Login
+      </v-btn>
 
-      <div class="text-body-1 ml-auto text-right">
-        <p class="mb-0">
+      <div class="ml-auto text-right">
+        <span class="text-body-1">
           Dont have an account yet?
-          <v-btn text small class="px-1" color="primary">Sign Up</v-btn>
-        </p>
-        <v-btn text small class="px-1" color="primary">Forgot Password</v-btn>
+
+          <v-btn text small class="px-1" color="primary" @click="handleSignUp">
+            Sign Up
+          </v-btn>
+        </span>
+
+        <v-btn
+          text
+          small
+          class="px-1"
+          color="primary"
+          @click="handleForgotPassword"
+        >
+          Forgot Password
+        </v-btn>
       </div>
     </template>
   </card-page>
@@ -28,28 +40,34 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage } from "@/components";
+import { CardPage, PasswordField } from "@/components";
+import { navigateTo, Routes } from "@/router";
+import { sessionModule } from "@/store";
 
 /**
  * Presents the login page.
  */
 export default Vue.extend({
   name: "login-view",
-  components: { CardPage },
+  components: { PasswordField, CardPage },
   data: () => ({
     email: "",
     password: "",
-    showPassword: false,
   }),
   methods: {
-    onLogin() {
-      console.log(this.email, this.password);
+    handleLogin() {
+      sessionModule
+        .login({
+          email: this.email,
+          password: this.password,
+        })
+        .then(() => navigateTo(Routes.HOME));
     },
-    onSignUp() {
-      console.log(this.email, this.password);
+    handleSignUp() {
+      navigateTo(Routes.CREATE_ACCOUNT);
     },
-    onForgotPassword() {
-      console.log(this.email, this.password);
+    handleForgotPassword() {
+      navigateTo(Routes.FORGOT_PASSWORD);
     },
   },
 });

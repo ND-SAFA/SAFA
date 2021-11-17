@@ -10,7 +10,7 @@ export default class SessionModule extends VuexModule {
   /**
    * The current active session, if one exists.
    */
-  private session?: SessionModel;
+  session?: SessionModel;
 
   @Action({ rawError: true })
   /**
@@ -18,7 +18,7 @@ export default class SessionModule extends VuexModule {
    *
    * @throws Error - No session exists.
    */
-  async getSession(): Promise<void> {
+  async loadSession(): Promise<void> {
     const session = await getSession();
 
     this.SET_SESSION(session);
@@ -33,7 +33,7 @@ export default class SessionModule extends VuexModule {
   async login(user: UserModel): Promise<void> {
     const session = await loginUser(user);
 
-    await this.SET_SESSION(session);
+    this.SET_SESSION(session);
   }
 
   @Mutation
@@ -45,7 +45,14 @@ export default class SessionModule extends VuexModule {
   }
 
   /**
-   * @return Whether there is a current session
+   * @return The current session.
+   */
+  get getCurrentSession(): SessionModel | undefined {
+    return this.session;
+  }
+
+  /**
+   * @return Whether there is a current session.
    */
   get getDoesSessionExist(): boolean {
     return !!this.session;

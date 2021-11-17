@@ -1,22 +1,43 @@
 <template>
-  <v-container class="ma-0 pa-0">
-    <v-row class="ma-0 pa-0">
-      <v-col cols="1" class="ma-0 pa-0" align-self="center">
-        <v-row class="ma-0 pa-0" justify="center">
-          <SafaIcon />
-        </v-row>
+  <v-flex class="d-flex flex-row">
+    <v-row dense>
+      <v-col class="flex-grow-0 mt-2">
+        <SafaIcon />
       </v-col>
-      <v-col cols="11" class="ma-0 pa-0">
-        <v-row class="ma-0 pa-0">
-          <ProjectName color="white" />
-        </v-row>
-        <v-row class="ma-0 pa-0">
-          <v-col cols="auto" class="ma-0 pa-0">
-            <ButtonRow :definitions="definitions" justify="start" />
-          </v-col>
-        </v-row>
+      <v-col cols="2">
+        <h1 class="text-h5 white--text pl-4">SAFA</h1>
+        <ButtonRow :definitions="definitions" justify="start" />
       </v-col>
     </v-row>
+
+    <v-menu>
+      <template v-slot:activator="{ on: menuOn, attrs }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on: tooltipOn }">
+            <v-btn
+              icon
+              class="mt-2"
+              v-on="{ ...tooltipOn, ...menuOn }"
+              v-bind="attrs"
+            >
+              <v-avatar color="white">
+                <v-icon color="primary" style="font-size: 48px">
+                  mdi-account-circle
+                </v-icon>
+              </v-avatar>
+            </v-btn>
+          </template>
+          <span>My Account</span>
+        </v-tooltip>
+      </template>
+
+      <v-list dense>
+        <v-list-item>
+          <v-btn text color="error" @click="handleLogout">Logout</v-btn>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
     <upload-new-version-modal
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
@@ -31,26 +52,24 @@
       :project="project"
       @onClose="changeVersionOpen = false"
     />
-  </v-container>
+  </v-flex>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
+import { appModule, projectModule, sessionModule } from "@/store";
 import {
   BaselineVersionModal,
-  UploadNewVersionModal,
   ButtonRow,
+  UploadNewVersionModal,
 } from "@/components/common";
-import ProjectName from "./ProjectName.vue";
 import SafaIcon from "./SafaIcon.vue";
-import { appModule, projectModule } from "@/store";
 
 export default Vue.extend({
   components: {
     SafaIcon,
-    ProjectName,
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
@@ -77,6 +96,9 @@ export default Vue.extend({
       } else {
         appModule.onWarning("Please select a project.");
       }
+    },
+    handleLogout(): void {
+      sessionModule.logout().then(() => navigateTo(Routes.LOGIN_ACCOUNT));
     },
   },
   computed: {

@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
-import { getSession, loginUser } from "@/api";
+import { getSession, loginUser, logoutUser } from "@/api";
 
 /**
  * If you only knew how many things I tried to not have to resort to this...
@@ -41,14 +41,24 @@ export default class SessionModule extends VuexModule {
     this.SET_SESSION(session);
   }
 
+  @Action({ rawError: true })
+  /**
+   * Attempts to log a user out.
+   */
+  async logout(): Promise<void> {
+    await logoutUser();
+
+    this.SET_SESSION();
+  }
+
   @Mutation
   /**
    * Sets the current session.
    */
-  SET_SESSION(session: SessionModel): void {
+  SET_SESSION(session?: SessionModel): void {
     this.session = session;
 
-    sessionIsLoaded = true;
+    sessionIsLoaded = !!session;
   }
 
   /**

@@ -70,11 +70,11 @@ export default Vue.extend({
     },
     leftPanelTooltip(): string {
       return this.isLeftOpen
-        ? "Close artifact details"
-        : "Open artifact details";
+        ? "Close Artifact Details"
+        : "Open Artifact Details";
     },
     rightPanelTooltip(): string {
-      return this.isRightOpen ? "Close graph options" : "Open graph options";
+      return this.isRightOpen ? "Close Graph Options" : "Open Graph Options";
     },
   },
   methods: {

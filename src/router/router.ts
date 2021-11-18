@@ -78,10 +78,12 @@ const router = new VueRouter({
  * uses the next function.
  */
 router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
+  let exit = false;
   for (const check of Object.values(routerChecks)) {
+    if (exit) return;
     check(to, from, (p: NextPayload) => {
       next(p);
-      return;
+      exit = true;
     });
   }
   next();

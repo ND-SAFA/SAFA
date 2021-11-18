@@ -2,6 +2,7 @@ import { APIOptions, APIResponse } from "@/types";
 import { isAPIError } from "@/util";
 import { appModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/endpoints/endpoints";
+import { localSession } from "@/store/modules/session.module";
 
 /**
  * Executes an http request with the given parameters.
@@ -29,7 +30,7 @@ export default async function httpClient<T>(
       };
     }
 
-    const token = sessionModule.getToken;
+    const token = localSession?.token;
     if (authenticate) {
       if (token === undefined) {
         const error = `${relativeUrl} is required token but non exists.`;
@@ -46,16 +47,7 @@ export default async function httpClient<T>(
     const URL = `${baseURL}/${relativeUrl}`;
 
     fetch(URL, options)
-      .then((res) => {
-        if (res.headers.has("token")) {
-          const token = res.headers.get("token");
-          sessionModule.SET_TOKEN(token === null ? undefined : token);
-        } else if (res.status === 403 || res.status === 401) {
-          appModule.onError("User is not authorized to perform this action.");
-        }
-        console.log("RESPONSE----------------------", res);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((responseJson: APIResponse<T>) => {
         if (isAPIError(responseJson)) {
           appModule.onServerError(responseJson.body);
@@ -65,8 +57,6 @@ export default async function httpClient<T>(
         }
       })
       .catch((e) => {
-        console.log("FAIL HERE-----------------------------");
-        console.error(e);
         const errorMessage =
           "Could not connect to backend due to a connection error, please verify that server is running.";
         appModule.onError(errorMessage);

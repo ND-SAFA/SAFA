@@ -5,6 +5,7 @@ export interface APIOptions {
   headers?: Record<string, string>;
   method: APIMethods;
   body?: string | FormData;
+  mode?: "no-cors";
 }
 
 type APIMethods = "GET" | "POST" | "PUT" | "DELETE";

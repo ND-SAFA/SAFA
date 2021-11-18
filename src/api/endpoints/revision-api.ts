@@ -164,5 +164,3 @@ function revisionMessageHandler(versionId: string, frame: Frame): void {
       );
   }
 }
-
-connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();

@@ -1,11 +1,13 @@
 import {
+  APIOptions,
   SessionModel,
   UserChangeModel,
   UserModel,
   UserResetModel,
 } from "@/types";
 import httpClient from "./http-client";
-import { Endpoint, fillEndpoint } from "./endpoints";
+import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
+import { sessionModule } from "@/store";
 
 /**
  * TODO: remove once endpoints exist.
@@ -56,7 +58,7 @@ export async function createUser(user: UserModel): Promise<SessionModel> {
 }
 
 /**
- * Logs the given user in.
+ * Logs the given user in and stores authorization token in the current session.
  *
  * @param user - The user to log in.
  *
@@ -65,15 +67,29 @@ export async function createUser(user: UserModel): Promise<SessionModel> {
  * @throws Error - If no session exists.
  */
 export async function loginUser(user: UserModel): Promise<SessionModel> {
-  return httpClient<SessionModel>(
-    fillEndpoint(Endpoint.login),
-    {
+  return new Promise((resolve, reject) => {
+    const endpoint = `${baseURL}/${fillEndpoint(Endpoint.login)}`;
+    const options: APIOptions = {
       method: "POST",
       body: JSON.stringify(user),
-    },
-    true,
-    false
-  );
+    };
+    fetch(endpoint, options)
+      .then((res) => {
+        if (res.status !== 200) return reject("Login failed.");
+        return res.json();
+      })
+      .then((resJson) => {
+        const token = resJson.token;
+        if (token === undefined)
+          return reject("Response does not include authorization token");
+        const session: SessionModel = {
+          email: user.email,
+          token: resJson.token,
+        };
+        resolve(session);
+      })
+      .catch(reject);
+  });
 }
 
 /**

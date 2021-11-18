@@ -61,13 +61,11 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     public WebSocketBaseTest createNewConnection(String id) throws Exception {
         assertTokenExists();
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        headers.add("Authorization", this.token);
         StompSession session = stompClient
             .connect(String.format(WEBSOCKET_URI, port),
-                headers,
                 new StompSessionHandlerAdapter() {
                 })
-            .get(2, SECONDS);
+            .get(1, SECONDS);
         idToSession.put(id, session);
         idToQueue.put(id, new LinkedBlockingDeque<>());
         return this;

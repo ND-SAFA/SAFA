@@ -16,6 +16,7 @@ export default class SessionModule extends VuexModule {
    * The current active session, if one exists.
    */
   private session?: SessionModel;
+  private token?: string;
 
   @Action({ rawError: true })
   /**
@@ -61,10 +62,25 @@ export default class SessionModule extends VuexModule {
     sessionIsLoaded = !!session;
   }
 
+  @Mutation
+  /**
+   * Sets the current authentication token
+   */
+  SET_TOKEN(token?: string): void {
+    this.token = token;
+  }
+
   /**
    * @return Whether there is a current session.
    */
   get getDoesSessionExist(): boolean {
     return !!this.session;
+  }
+
+  /**
+   * @return The current session token
+   */
+  get getToken(): string | undefined {
+    return this.token;
   }
 }

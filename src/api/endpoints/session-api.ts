@@ -44,14 +44,15 @@ export async function getSession(): Promise<SessionModel> {
  * @throws Error - If the account cannot be created.
  */
 export async function createUser(user: UserModel): Promise<SessionModel> {
-  if (TEST_ENDPOINTS) {
-    return { email: user.email };
-  }
-
-  return httpClient<SessionModel>(fillEndpoint(Endpoint.createAccount), {
-    method: "POST",
-    body: JSON.stringify(user),
-  });
+  return httpClient<SessionModel>(
+    fillEndpoint(Endpoint.createAccount),
+    {
+      method: "POST",
+      body: JSON.stringify(user),
+    },
+    true,
+    false
+  );
 }
 
 /**
@@ -64,14 +65,15 @@ export async function createUser(user: UserModel): Promise<SessionModel> {
  * @throws Error - If no session exists.
  */
 export async function loginUser(user: UserModel): Promise<SessionModel> {
-  if (TEST_ENDPOINTS) {
-    return { email: user.email };
-  }
-
-  return httpClient<SessionModel>(fillEndpoint(Endpoint.login), {
-    method: "PUT",
-    body: JSON.stringify(user),
-  });
+  return httpClient<SessionModel>(
+    fillEndpoint(Endpoint.login),
+    {
+      method: "POST",
+      body: JSON.stringify(user),
+    },
+    true,
+    false
+  );
 }
 
 /**

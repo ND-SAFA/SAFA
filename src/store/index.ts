@@ -11,8 +11,6 @@ import {
   ViewportModule,
 } from "./modules";
 
-import "./routerStore";
-
 Vue.use(Vuex);
 Vue.config.devtools = true;
 

@@ -46,7 +46,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
-import router, { navigateTo, Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 import { sessionModule } from "@/store";
 
 /**

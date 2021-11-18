@@ -84,11 +84,8 @@ function connect(
       },
       () => {
         appModule.onDevMessage("Re-connecting with WebSocket.");
-
-        if (!isReconnect) {
-          appModule.onError("Web Socket lost connection to server.");
-        }
         clearInterval(recInterval);
+        //TODO: Check if out of date during time disconnected.
         recInterval = setInterval(function () {
           if (currentReconnectAttempts < maxReconnectAttempts) {
             connect(maxReconnectAttempts, reconnectWaitTime, true)
@@ -97,7 +94,7 @@ function connect(
           } else {
             clearInterval(recInterval);
             const error =
-              "Reached max web socket reconnect attempts, please reload page.";
+              "Web Socket lost connection to server, please reload page.";
             appModule.onError(error);
             reject(error);
           }

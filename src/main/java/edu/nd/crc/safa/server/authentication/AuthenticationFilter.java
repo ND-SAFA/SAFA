@@ -39,10 +39,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
-        System.out.println("METHOD: -----------------------------" + req.getMethod());
         try {
             SafaUser applicationUser = new ObjectMapper().readValue(req.getInputStream(), SafaUser.class);
-            System.out.println("USER:" + applicationUser);
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 applicationUser.getEmail(),
                 applicationUser.getPassword(),

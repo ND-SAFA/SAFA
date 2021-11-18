@@ -100,6 +100,5 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         user.put("password", password);
         JSONObject response = sendRequest(addJsonBody(post("/login"), user), test, new String[]{"token"});
         this.token = response.getString("token");
-        System.out.println("SETTING TOKEN:" + this.token);
     }
 }

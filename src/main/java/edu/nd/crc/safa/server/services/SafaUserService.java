@@ -38,16 +38,8 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser createNewUser(SafaUser newUser) {
-
         newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
         this.safaUserRepository.save(newUser);
         return newUser;
-    }
-
-    public boolean loginUser(SafaUser user) {
-        SafaUser userFound = this.safaUserRepository.findByEmail(user.getEmail());
-        String encodedPassword = this.passwordEncoder.encode(user.getPassword());
-        System.out.println("Encoded Password: " + encodedPassword);
-        return userFound.getPassword().equals(encodedPassword);
     }
 }

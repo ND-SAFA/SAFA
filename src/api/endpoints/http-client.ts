@@ -1,7 +1,7 @@
 import { APIOptions, APIResponse } from "@/types";
 import { isAPIError } from "@/util";
 import { appModule } from "@/store";
-import { baseURL } from "@/api/endpoints";
+import { baseURL } from "@/api/endpoints/endpoints";
 
 /**
  * Executes an http request with the given parameters.

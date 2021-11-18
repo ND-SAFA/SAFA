@@ -1,10 +1,11 @@
 <template>
-  <v-app-bar app extended clipped-right clipped-left color="primary">
-    <v-container fluid class="ma-0 pa-0">
+  <v-app-bar app clipped-right clipped-left color="primary">
+    <v-flex>
       <AppBarHeader />
-      <v-divider light style="border-top: 1px solid grey" />
-    </v-container>
-    <template v-slot:extension class="ma-0 pa-0">
+      <v-divider class="blue-grey" v-if="doShowGraphButtons" />
+    </v-flex>
+
+    <template v-slot:extension v-if="doShowGraphButtons">
       <v-container fluid class="ma-0 pa-0">
         <v-row>
           <v-col cols="4">
@@ -53,6 +54,7 @@ import { appModule } from "@/store";
 import { GenericIconButton } from "@/components/common";
 import AppBarHeader from "./AppBarHeader.vue";
 import GraphNavIcons from "./GraphNavIcons.vue";
+import { Routes } from "@/router";
 
 export default Vue.extend({
   components: {
@@ -65,16 +67,19 @@ export default Vue.extend({
     isRightOpen: Boolean,
   },
   computed: {
+    doShowGraphButtons(): boolean {
+      return window.location.pathname.includes(Routes.ARTIFACT_TREE);
+    },
     isLoading(): boolean {
       return appModule.getIsLoading;
     },
     leftPanelTooltip(): string {
       return this.isLeftOpen
-        ? "Close artifact details"
-        : "Open artifact details";
+        ? "Close Artifact Details"
+        : "Open Artifact Details";
     },
     rightPanelTooltip(): string {
-      return this.isRightOpen ? "Close graph options" : "Open graph options";
+      return this.isRightOpen ? "Close Graph Options" : "Open Graph Options";
     },
   },
   methods: {

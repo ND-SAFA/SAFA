@@ -1,4 +1,4 @@
-import Home from "@/views/ArtifactTreeView.vue";
+import Home from "@/views/private/ArtifactTreeView.vue";
 import { shallowMount } from "@vue/test-utils";
 import { expect } from "chai";
 

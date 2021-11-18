@@ -1,10 +1,10 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <label v-if="containsProject" text outlined color="primary">
+      <h1 v-if="containsProject" class="text-h5">
         {{ projectName }}@{{ versionName }}
-      </label>
-      <label v-else text outlined color="primary"> No project selected. </label>
+      </h1>
+      <h1 v-else class="text-h5">No Project Selected</h1>
     </v-row>
   </v-container>
 </template>

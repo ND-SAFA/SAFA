@@ -1,6 +1,6 @@
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { updateProjectThroughFlatFiles } from "@/api/project-api";
+import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
 import { ProjectCreationResponse } from "@/types";
 import { navigateTo, Routes } from "@/router";
 

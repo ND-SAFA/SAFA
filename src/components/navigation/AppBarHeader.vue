@@ -1,22 +1,15 @@
 <template>
-  <v-container class="ma-0 pa-0">
-    <v-row class="ma-0 pa-0">
-      <v-col cols="1" class="ma-0 pa-0" align-self="center">
-        <v-row class="ma-0 pa-0" justify="center">
-          <SafaIcon />
-        </v-row>
-      </v-col>
-      <v-col cols="11" class="ma-0 pa-0">
-        <v-row class="ma-0 pa-0">
-          <ProjectName color="white" />
-        </v-row>
-        <v-row class="ma-0 pa-0">
-          <v-col cols="auto" class="ma-0 pa-0">
-            <ButtonRow :definitions="definitions" justify="start" />
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+  <v-flex class="d-flex flex-row align-center">
+    <v-flex class="d-flex flex-row align-center">
+      <SafaIcon />
+      <div>
+        <h1 class="text-h5 white--text pl-4">SAFA</h1>
+        <ButtonRow :definitions="definitions" justify="start" />
+      </div>
+    </v-flex>
+
+    <account-dropdown />
+
     <upload-new-version-modal
       :isOpen="uploadVersionOpen"
       @onClose="uploadVersionOpen = false"
@@ -31,26 +24,26 @@
       :project="project"
       @onClose="changeVersionOpen = false"
     />
-  </v-container>
+  </v-flex>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
+import { appModule, projectModule } from "@/store";
 import {
   BaselineVersionModal,
-  UploadNewVersionModal,
   ButtonRow,
+  UploadNewVersionModal,
 } from "@/components/common";
-import ProjectName from "./ProjectName.vue";
 import SafaIcon from "./SafaIcon.vue";
-import { appModule, projectModule } from "@/store";
+import AccountDropdown from "./AccountDropdown.vue";
 
 export default Vue.extend({
   components: {
+    AccountDropdown,
     SafaIcon,
-    ProjectName,
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,

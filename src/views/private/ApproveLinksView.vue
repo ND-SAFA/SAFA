@@ -1,39 +1,42 @@
 <template>
-  <v-container>
-    <v-row justify="center">
-      <ApprovalSection
+  <private-page>
+    <template v-slot:page>
+      <v-btn text @click="handleGoBack">
+        <v-icon left> mdi-arrow-left </v-icon>
+        Back To Tree View
+      </v-btn>
+      <approval-section
+        show-approve
+        show-decline
         title="Un-Reviewed Trace Links"
-        :showApprove="true"
-        :showDecline="true"
         :links="links"
         :artifacts="artifactHashmap"
         @approve-link="onApproveLink"
         @decline-link="onDeclineLink"
       />
-    </v-row>
-    <v-row justify="center">
-      <ApprovalSection
-        showApprove
+      <v-divider class="mt-5" />
+      <approval-section
+        show-approve
         title="Declined Trace Links"
-        :showDecline="false"
-        :startOpen="false"
+        :show-decline="false"
+        :start-open="false"
         :links="declinedLinks"
         :artifacts="artifactHashmap"
         @approve-link="onApproveDeclinedLink"
       />
-    </v-row>
-    <v-row justify="center">
-      <ApprovalSection
-        showDecline
+      <v-divider class="mt-5" />
+      <approval-section
+        show-decline
         title="Approved Trace Links"
-        :showApprove="false"
-        :startOpen="false"
+        :show-approve="false"
+        :start-open="false"
         :links="approvedLinks"
         :artifacts="artifactHashmap"
         @decline-link="onDeclineApprovedLink"
       />
-    </v-row>
-  </v-container>
+      <v-divider class="mt-5 mb-10" />
+    </template>
+  </private-page>
 </template>
 
 <script lang="ts">
@@ -45,11 +48,12 @@ import {
 } from "@/api";
 import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
 import { appModule, projectModule } from "@/store";
-import { ApprovalSection } from "@/components/approve-links-view";
+import { ApprovalSection, PrivatePage } from "@/components";
+import { navigateTo, Routes } from "@/router";
 
 export default Vue.extend({
   name: "approval-links-view",
-  components: { ApprovalSection },
+  components: { PrivatePage, ApprovalSection },
   data() {
     return {
       links: [] as TraceLink[],
@@ -66,6 +70,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    handleGoBack() {
+      navigateTo(Routes.ARTIFACT_TREE);
+    },
     loadGeneratedLinks() {
       if (this.projectId === "") {
         return appModule.onWarning("No project has been selected");

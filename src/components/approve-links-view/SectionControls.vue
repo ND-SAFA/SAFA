@@ -1,30 +1,23 @@
 <template>
-  <v-row justify="center">
-    <v-btn
-      small
-      text
+  <v-flex class="d-flex justify-center">
+    <generic-icon-button
       color="error"
-      outlined
+      tooltip="Collapse All"
+      icon-id="mdi-arrow-collapse-all"
       @click="$emit('close-all')"
-      class="ma-1"
-    >
-      <v-icon>mdi-arrow-collapse-all</v-icon>
-    </v-btn>
-    <v-btn
-      small
-      text
+    />
+    <generic-icon-button
       color="primary"
-      outlined
+      tooltip="Expand All"
+      icon-id="mdi-arrow-expand-all"
       @click="$emit('open-all')"
-      class="ma-1"
-    >
-      <v-icon>mdi-arrow-expand-all</v-icon>
-    </v-btn>
-  </v-row>
+    />
+  </v-flex>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
 
 /**
  * Displays section controls.
@@ -34,5 +27,6 @@ import Vue from "vue";
  */
 export default Vue.extend({
   name: "section-controls",
+  components: { GenericIconButton },
 });
 </script>

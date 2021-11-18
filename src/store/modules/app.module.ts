@@ -350,7 +350,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
-   * @return Whether the artifact creator is open.
+   * @return THe current confirmation message.
    */
   get getConfirmationMessage(): ConfirmDialogueMessage | undefined {
     return this.confirmationMessage;

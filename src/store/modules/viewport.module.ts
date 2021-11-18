@@ -72,7 +72,7 @@ export default class ViewportModule extends VuexModule {
 
   @Action
   /**
-   * Resets the graph layout of the artifact tree
+   * Resets the graph layout of the artifact tree.
    */
   async setArtifactTreeLayout(): Promise<void> {
     await navigateTo(Routes.ARTIFACT_TREE);

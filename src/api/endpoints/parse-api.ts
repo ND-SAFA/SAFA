@@ -1,6 +1,6 @@
-import httpClient from "@/api/http-client";
+import httpClient from "@/api/endpoints/http-client";
 import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
-import { Endpoint, fillEndpoint } from "@/api/endpoints";
+import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
  * Sends BEND an ArtifactDefinition file and returns parsed artifacts and errors.

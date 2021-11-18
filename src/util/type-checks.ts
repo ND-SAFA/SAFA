@@ -5,7 +5,7 @@ import {
   ModifiedArtifact,
   RemovedArtifact,
 } from "@/types/domain";
-import { APIError, APIResponse } from "@/types/api";
+import { APIError, APIResponse } from "@/types/api/base-api";
 import {
   IGenericFilePanel,
   ProjectFile,

@@ -11,10 +11,9 @@
         <p>{{ targetBody }}</p>
       </v-col>
     </v-row>
-    <v-row justify="center" class="pb-5">
+    <v-row justify="center" class="pt-5">
       <v-btn
         v-if="showDecline"
-        small
         color="error"
         class="ma-1"
         @click="$emit('decline-link', link)"
@@ -23,7 +22,6 @@
       </v-btn>
       <v-btn
         v-if="showApprove"
-        small
         color="primary"
         class="ma-1"
         @click="$emit('approve-link', link)"

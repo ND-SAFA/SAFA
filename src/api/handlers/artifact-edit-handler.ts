@@ -1,6 +1,6 @@
 import { Artifact, ConfirmationType } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { createOrUpdateArtifact, deleteArtifactBody } from "@/api";
+import { createOrUpdateArtifact, deleteArtifactBody } from "@/api/endpoints";
 
 /**
  * Creates or updates artifact in BEND then updates app state.

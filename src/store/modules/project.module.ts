@@ -16,7 +16,6 @@ import {
   errorModule,
   viewportModule,
 } from "@/store";
-import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -35,7 +34,7 @@ export default class ProjectModule extends VuexModule {
     projectVersion: undefined,
   };
 
-  @Action
+  @Action({ rawError: true })
   /**
    * 1. Sets the current project to the created project.
    * 2. Sets any warnings generated when loading the project.

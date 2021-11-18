@@ -1,9 +1,9 @@
 <template>
   <v-container>
-    <v-row justify="center">
-      <h2>{{ title }}</h2>
-    </v-row>
+    <h1 class="text-h4 text-center">{{ title }}</h1>
+
     <section-controls @open-all="openAll" @close-all="closeAll" />
+
     <v-row class="pt-5">
       <v-expansion-panels multiple v-model="openLinks">
         <trace-link-expansion-panel

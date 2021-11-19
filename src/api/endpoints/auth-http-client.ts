@@ -19,43 +19,34 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   setJsonContentType = true
 ): Promise<T> {
-  return new Promise((resolve, reject) => {
-    options = options || {};
-    if (setJsonContentType) {
-      options.headers = {
-        "Content-Type": "application/json",
-      };
-    }
+  const token = sessionModule.getToken;
+  const URL = `${baseURL}/${relativeUrl}`;
 
-    const token = sessionModule.getToken;
-    if (token === undefined) {
-      const error = `${relativeUrl} requires token.`;
-      appModule.onDevError(error);
-      return reject(error);
-    } else {
-      options.headers = {
-        ...options.headers,
-        Authorization: token,
-      };
-    }
+  if (setJsonContentType) {
+    options.headers = {
+      "Content-Type": "application/json",
+    };
+  }
 
-    const URL = `${baseURL}/${relativeUrl}`;
+  if (token === undefined) {
+    const error = `${relativeUrl} requires token.`;
+    appModule.onDevError(error);
+    throw Error(error);
+  } else {
+    options.headers = {
+      ...options.headers,
+      Authorization: token,
+    };
+  }
 
-    fetch(URL, options)
-      .then((res) => res.json())
-      .then((responseJson: APIResponse<T>) => {
-        if (isAPIError(responseJson)) {
-          appModule.onServerError(responseJson.body);
-          reject(responseJson.body.message);
-        } else {
-          resolve(responseJson.body);
-        }
-      })
-      .catch((e) => {
-        const errorMessage =
-          "Could not connect to backend due to a connection error, please verify that server is running.";
-        appModule.onError(errorMessage);
-        reject(e);
-      });
-  });
+  const res = await fetch(URL, options);
+  const resContent = await res.json();
+
+  if (!res.ok || isAPIError(resContent)) {
+    appModule.onServerError(resContent.body);
+
+    throw Error(resContent.body.message);
+  } else {
+    return resContent.body;
+  }
 }

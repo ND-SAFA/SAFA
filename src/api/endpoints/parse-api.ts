@@ -1,4 +1,4 @@
-import httpClient from "@/api/endpoints/http-client";
+import authHttpClient from "@/api/endpoints/auth-http-client";
 import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
@@ -18,7 +18,7 @@ export async function parseArtifactFile(
 
   formData.append("file", file);
 
-  return httpClient<ParseArtifactFileResponse>(
+  return authHttpClient<ParseArtifactFileResponse>(
     fillEndpoint(Endpoint.parseArtifactFile, { artifactType }),
     {
       method: "POST",
@@ -42,7 +42,7 @@ export async function parseTraceFile(
 
   formData.append("file", file);
 
-  return httpClient<ParseTraceFileResponse>(
+  return authHttpClient<ParseTraceFileResponse>(
     Endpoint.parseTraceFile,
     {
       method: "POST",

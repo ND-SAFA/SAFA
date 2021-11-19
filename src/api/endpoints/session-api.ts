@@ -5,7 +5,7 @@ import {
   UserModel,
   UserResetModel,
 } from "@/types";
-import httpClient from "./http-client";
+import authHttpClient from "./auth-http-client";
 import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
 
 /**
@@ -29,7 +29,7 @@ export async function getSession(): Promise<SessionModel> {
   if (TEST_ENDPOINTS) {
     return { email: "123@example.com" };
   }
-  return httpClient<SessionModel>(fillEndpoint(Endpoint.session), {
+  return authHttpClient<SessionModel>(fillEndpoint(Endpoint.session), {
     method: "GET",
   });
 }
@@ -44,15 +44,21 @@ export async function getSession(): Promise<SessionModel> {
  * @throws Error - If the account cannot be created.
  */
 export async function createUser(user: UserModel): Promise<SessionModel> {
-  return httpClient<SessionModel>(
-    fillEndpoint(Endpoint.createAccount),
-    {
+  return new Promise((resolve, reject) => {
+    const endpoint = `${baseURL}/${fillEndpoint(Endpoint.createAccount)}`;
+    fetch(endpoint, {
       method: "POST",
       body: JSON.stringify(user),
-    },
-    true,
-    false
-  );
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((user: UserModel) => {
+        resolve(user);
+      })
+      .catch(reject);
+  });
 }
 
 /**
@@ -100,7 +106,7 @@ export async function logoutUser(): Promise<void> {
     return;
   }
 
-  await httpClient(fillEndpoint(Endpoint.logout), {
+  await authHttpClient(fillEndpoint(Endpoint.logout), {
     method: "GET",
   });
 }
@@ -115,7 +121,7 @@ export async function forgotPassword(user: UserResetModel): Promise<void> {
     return;
   }
 
-  await httpClient(fillEndpoint(Endpoint.forgotPassword), {
+  await authHttpClient(fillEndpoint(Endpoint.forgotPassword), {
     method: "PUT",
     body: JSON.stringify(user),
   });
@@ -135,7 +141,7 @@ export async function resetPassword(user: UserChangeModel): Promise<void> {
     return;
   }
 
-  await httpClient<SessionModel>(fillEndpoint(Endpoint.resetPassword), {
+  await authHttpClient<SessionModel>(fillEndpoint(Endpoint.resetPassword), {
     method: "PUT",
     body: JSON.stringify(user),
   });

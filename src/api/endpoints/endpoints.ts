@@ -10,7 +10,7 @@ export enum Endpoint {
   // Accounts
   session = "accounts/session",
   login = "login",
-  createAccount = "sign-up",
+  createAccount = "accounts/create",
   logout = "accounts/logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",

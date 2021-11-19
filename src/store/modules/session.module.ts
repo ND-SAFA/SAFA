@@ -37,13 +37,9 @@ export default class SessionModule extends VuexModule {
    * @throws Error - Login failed.
    */
   async login(user: UserModel): Promise<void> {
-    console.log("STARTING LOGIN....");
     const session = await loginUser(user);
-
-    console.log("SESSION COMPLETE.", session);
     this.SET_SESSION(session);
     this.session = session;
-    console.log("SESSION");
   }
 
   @Action({ rawError: true })

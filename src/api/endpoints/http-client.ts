@@ -31,6 +31,7 @@ export default async function httpClient<T>(
     }
 
     const token = localSession?.token;
+
     if (authenticate) {
       if (token === undefined) {
         const error = `${relativeUrl} is required token but non exists.`;

@@ -7,13 +7,12 @@ import {
 } from "@/types";
 import httpClient from "./http-client";
 import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
-import { sessionModule } from "@/store";
 
 /**
  * TODO: remove once endpoints exist.
  */
+
 const TEST_ENDPOINTS = true;
-const TEST_SESSION_EXISTING = false;
 
 /**
  * Returns the current user's session.
@@ -23,14 +22,6 @@ const TEST_SESSION_EXISTING = false;
  * @throws Error - If no session exists.
  */
 export async function getSession(): Promise<SessionModel> {
-  if (!TEST_SESSION_EXISTING) {
-    throw Error("<No session should return a 400 which throws an error>");
-  }
-
-  if (TEST_ENDPOINTS) {
-    return { email: "123@example.com" };
-  }
-
   return httpClient<SessionModel>(fillEndpoint(Endpoint.session), {
     method: "GET",
   });

@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+/**
+ * Wraps each test with a test harness for creating a user account and logging in before each test.
+ * If a certain test needs to exclude this harness one needs to create a test rule that excludes the
+ * pre-test setup.
+ */
 public class AuthenticatedBaseTest extends EntityBaseTest {
 
     public static final String email = "abc123@gmail.com";

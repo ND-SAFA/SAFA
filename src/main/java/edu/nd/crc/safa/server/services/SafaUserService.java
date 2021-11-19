@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Creates an implementation of UserDetailService and provides services for creating, authenticating,
+ * and resetting users.
+ */
 @Service
 public class SafaUserService implements UserDetailsService {
 
@@ -24,6 +28,11 @@ public class SafaUserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+
+    /**
+     * The implementation for UserDetailService that bridges Spring's default authentication and our
+     * custom user entity class, SafaUser.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final SafaUser customer = safaUserRepository.findByEmail(username);

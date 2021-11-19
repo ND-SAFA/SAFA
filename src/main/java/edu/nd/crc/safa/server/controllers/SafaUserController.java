@@ -11,10 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller containing endpoints for:
+ * 1. Creating a new account
+ * 2. Resetting user password (TODO)
+ * 3. Confirming user account (TODO)
+ * Note, logging into system is handled by spring boot default configuration at /login.
+ */
 @RestController
 public class SafaUserController extends BaseController {
-
-    final String createAccountLink = "create-account";
 
     SafaUserService safaUserService;
 

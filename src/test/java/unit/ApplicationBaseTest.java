@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Provides the application specific operations to unit test.
+ * Testing layer for encapsulating application logic.
  */
 public class ApplicationBaseTest extends AuthenticatedBaseTest {
 

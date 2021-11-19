@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Generates a token that is sent in the headers when the login is correct.
+ * Authenticates user when sending credentials to login route. If successful, generates and returns JWT token.
  */
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -39,6 +39,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         this.securityConstants = securityConstants;
     }
 
+    /**
+     * Attempts to parse payload as a SafaUser entity and look up this user. CORS headers is set manually
+     *
+     * @param req The request made to the server.
+     * @param res The response object sent back to the client.
+     * @return Authentication object signally a successful user authentication.
+     * @throws AuthenticationException If given user is not found in database.
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
@@ -49,19 +57,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 applicationUser.getPassword(),
                 new ArrayList<>());
 
-            Authentication auth = authenticationManager.authenticate(token);
-            if (auth != null) {
-                res.setHeader("Access-Control-Allow-Origin", "*");
-            }
-            return auth;
+            return authenticationManager.authenticate(token);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Attaches a JWT token to response object when user is successfully authenticated. Token consists of the account
-     * username as claim with new expiration date.
+     * Creates a JSON response body containing authorization token.
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest req,
@@ -79,7 +82,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         JSONObject responseJson = new JSONObject();
-        responseJson.put("token", token);
+        responseJson.put(SecurityConstants.TOKEN_NAME, token);
         res.getWriter().write(responseJson.toString());
     }
 }

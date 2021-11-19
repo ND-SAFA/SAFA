@@ -3,6 +3,7 @@
     :value="isOpen"
     :width="`${getWidth()}px`"
     @click:outside="$emit('close')"
+    :retain-focus="false"
     persistent
   >
     <v-card :class="`modal-${size}`">

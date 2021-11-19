@@ -5,7 +5,7 @@ import {
   ProjectIdentifier,
   ProjectVersion,
 } from "@/types";
-import httpClient from "@/api/endpoints/http-client";
+import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
@@ -18,7 +18,7 @@ import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 export async function createProjectFromFlatFiles(
   formData: FormData
 ): Promise<ProjectCreationResponse> {
-  return httpClient<ProjectCreationResponse>(
+  return authHttpClient<ProjectCreationResponse>(
     Endpoint.createProjectFromFlatFiles,
     {
       method: "POST",
@@ -40,7 +40,7 @@ export async function updateProjectThroughFlatFiles(
   versionId: string,
   formData: FormData
 ): Promise<ProjectCreationResponse> {
-  return httpClient<ProjectCreationResponse>(
+  return authHttpClient<ProjectCreationResponse>(
     fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
     {
       method: "POST",
@@ -60,7 +60,7 @@ export async function updateProjectThroughFlatFiles(
 export async function saveOrUpdateProject(
   project: Project
 ): Promise<ProjectCreationResponse> {
-  return httpClient<ProjectCreationResponse>(Endpoint.project, {
+  return authHttpClient<ProjectCreationResponse>(Endpoint.project, {
     method: "POST",
     body: JSON.stringify(project),
   });
@@ -72,7 +72,7 @@ export async function saveOrUpdateProject(
  * @return All project identifiers.
  */
 export async function getProjects(): Promise<ProjectIdentifier[]> {
-  return httpClient<ProjectIdentifier[]>(Endpoint.project, {
+  return authHttpClient<ProjectIdentifier[]>(Endpoint.project, {
     method: "GET",
   });
 }
@@ -87,7 +87,7 @@ export async function getProjects(): Promise<ProjectIdentifier[]> {
 export async function getProjectVersion(
   versionId: string
 ): Promise<ProjectCreationResponse> {
-  return httpClient<ProjectCreationResponse>(
+  return authHttpClient<ProjectCreationResponse>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );
@@ -99,9 +99,12 @@ export async function getProjectVersion(
  * @param projectId - The project ID to delete.
  */
 export async function deleteProject(projectId: string): Promise<void> {
-  return httpClient<void>(fillEndpoint(Endpoint.updateProject, { projectId }), {
-    method: "DELETE",
-  });
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.updateProject, { projectId }),
+    {
+      method: "DELETE",
+    }
+  );
 }
 
 /**
@@ -116,7 +119,7 @@ export async function getProjectVersions(
     throw Error("Undefined project identifier");
   }
 
-  return httpClient<ProjectVersion[]>(
+  return authHttpClient<ProjectVersion[]>(
     fillEndpoint(Endpoint.getProjectVersions, { projectId }),
     { method: "GET" }
   );
@@ -134,7 +137,7 @@ export async function getCurrentVersion(
     throw Error("Undefined project identifier");
   }
 
-  return httpClient<ProjectVersion>(
+  return authHttpClient<ProjectVersion>(
     fillEndpoint(Endpoint.getCurrentVersion, { projectId }),
     { method: "GET" }
   );
@@ -150,7 +153,7 @@ export async function getCurrentVersion(
 export async function createNewMajorVersion(
   projectId: string
 ): Promise<ProjectVersion> {
-  return httpClient<ProjectVersion>(
+  return authHttpClient<ProjectVersion>(
     fillEndpoint(Endpoint.createNewMajorVersion, { projectId }),
     { method: "POST" }
   );
@@ -166,7 +169,7 @@ export async function createNewMajorVersion(
 export async function createNewMinorVersion(
   projectId: string
 ): Promise<ProjectVersion> {
-  return httpClient<ProjectVersion>(
+  return authHttpClient<ProjectVersion>(
     fillEndpoint(Endpoint.createNewMinorVersion, { projectId }),
     { method: "POST" }
   );
@@ -182,7 +185,7 @@ export async function createNewMinorVersion(
 export async function createNewRevisionVersion(
   projectId: string
 ): Promise<ProjectVersion> {
-  return httpClient<ProjectVersion>(
+  return authHttpClient<ProjectVersion>(
     fillEndpoint(Endpoint.createNewRevisionVersion, { projectId }),
     {
       method: "POST",
@@ -196,7 +199,7 @@ export async function createNewRevisionVersion(
  * @param versionId - The version ID to delete.
  */
 export async function deleteProjectVersion(versionId: string): Promise<void> {
-  return httpClient<void>(
+  return authHttpClient<void>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     {
       method: "DELETE",
@@ -216,7 +219,7 @@ export async function getProjectDelta(
   sourceVersionId: string,
   targetVersionId: string
 ): Promise<DeltaPayload> {
-  return httpClient<DeltaPayload>(
+  return authHttpClient<DeltaPayload>(
     fillEndpoint(Endpoint.getProjectDelta, {
       sourceVersionId,
       targetVersionId,

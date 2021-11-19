@@ -15,7 +15,12 @@ export interface UserModel {
 /**
  * Defines a session model.
  */
-export type SessionModel = Omit<UserModel, "password">;
+export interface SessionModel {
+  /**
+   * The JWT token authorizing current user.
+   */
+  token?: string;
+}
 
 /**
  * Defines a user model for password reset.

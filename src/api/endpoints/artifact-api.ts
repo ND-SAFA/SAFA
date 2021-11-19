@@ -1,5 +1,5 @@
 import { Artifact, ArtifactNameValidationResponse } from "@/types";
-import httpClient from "@/api/endpoints/http-client";
+import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 /**
@@ -14,7 +14,7 @@ export async function isArtifactNameTaken(
   projectId: string,
   artifactName: string
 ): Promise<ArtifactNameValidationResponse> {
-  return httpClient<ArtifactNameValidationResponse>(
+  return authHttpClient<ArtifactNameValidationResponse>(
     fillEndpoint(Endpoint.isArtifactNameTaken, { projectId, artifactName }),
     { method: "GET" }
   );
@@ -31,7 +31,7 @@ export async function deleteArtifactBody(
   versionId: string,
   artifactName: string
 ): Promise<void> {
-  return httpClient<void>(
+  return authHttpClient<void>(
     fillEndpoint(Endpoint.deleteArtifact, { versionId, artifactName }),
     { method: "DELETE" }
   );
@@ -49,7 +49,7 @@ export async function createOrUpdateArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<Artifact> {
-  return httpClient<Artifact>(
+  return authHttpClient<Artifact>(
     fillEndpoint(Endpoint.createOrUpdateArtifact, { versionId }),
     {
       method: "POST",

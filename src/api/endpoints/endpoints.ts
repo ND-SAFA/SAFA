@@ -9,7 +9,7 @@ export const baseURL = process.env.VUE_APP_API_ENDPOINT;
 export enum Endpoint {
   // Accounts
   session = "accounts/session",
-  login = "accounts/login",
+  login = "login",
   createAccount = "accounts/create",
   logout = "accounts/logout",
   forgotPassword = "accounts/forgot",

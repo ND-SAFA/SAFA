@@ -1,5 +1,5 @@
 import { TraceLink } from "@/types";
-import httpClient from "@/api/endpoints/http-client";
+import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Artifact } from "@/types/domain/artifact";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
@@ -13,7 +13,7 @@ import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 export async function getGeneratedLinks(
   projectId: string
 ): Promise<TraceLink[]> {
-  return httpClient<TraceLink[]>(
+  return authHttpClient<TraceLink[]>(
     fillEndpoint(Endpoint.getGeneratedLinks, { projectId }),
     { method: "GET" }
   );
@@ -33,7 +33,7 @@ export async function generateLinks(
 ): Promise<TraceLink[]> {
   const payload = { sourceArtifacts, targetArtifacts };
 
-  return httpClient<TraceLink[]>(fillEndpoint(Endpoint.generateLinks), {
+  return authHttpClient<TraceLink[]>(fillEndpoint(Endpoint.generateLinks), {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -45,9 +45,12 @@ export async function generateLinks(
  * @param traceLinkId - The trace link ID to approve.
  */
 export async function approveLink(traceLinkId: string): Promise<void> {
-  return httpClient<void>(fillEndpoint(Endpoint.approveLink, { traceLinkId }), {
-    method: "PUT",
-  });
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.approveLink, { traceLinkId }),
+    {
+      method: "PUT",
+    }
+  );
 }
 
 /**
@@ -56,9 +59,12 @@ export async function approveLink(traceLinkId: string): Promise<void> {
  * @param traceLinkId - The trace link ID to decline.
  */
 export async function declineLink(traceLinkId: string): Promise<void> {
-  return httpClient<void>(fillEndpoint(Endpoint.declineLink, { traceLinkId }), {
-    method: "PUT",
-  });
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.declineLink, { traceLinkId }),
+    {
+      method: "PUT",
+    }
+  );
 }
 
 /**
@@ -75,7 +81,7 @@ export async function createLink(
   sourceId: string,
   targetId: string
 ): Promise<TraceLink> {
-  return httpClient<TraceLink>(
+  return authHttpClient<TraceLink>(
     fillEndpoint(Endpoint.createLink, { versionId, sourceId, targetId }),
     { method: "POST" }
   );

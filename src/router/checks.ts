@@ -5,8 +5,7 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appModule, projectModule } from "@/store";
-import { sessionIsLoaded } from "@/store/modules/session.module";
+import { appModule, projectModule, sessionModule } from "@/store";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -23,7 +22,7 @@ export const routerChecks: Record<string, RouterCheck> = {
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (!routesPublic.includes(to.path) && !sessionIsLoaded) {
+    if (!routesPublic.includes(to.path) && !sessionModule.getDoesSessionExist) {
       next({ path: Routes.LOGIN_ACCOUNT, query: { to: to.path } });
       return;
     }

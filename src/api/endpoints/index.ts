@@ -1,5 +1,5 @@
 export * from "./artifact-api";
-export * from "./http-client";
+export * from "./auth-http-client";
 export * from "./link-api";
 export * from "./parse-api";
 export * from "./project-api";

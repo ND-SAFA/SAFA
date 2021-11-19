@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -36,7 +37,6 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
     final String a2Type = "design";
     final String a2Name = "DD-10";
     final String projectName = "test-project";
-    final String routeName = "/projects/";
 
     @Autowired
     ObjectMapper objectMapper;
@@ -202,7 +202,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     @Test
     public void testValidation() throws Exception {
-        String url = "/projects";
+        String url = Routes.projectJson;
         JSONObject projectJson = new JSONObject();
         projectJson.put("name", projectName);
         projectJson.put("artifacts", new ArrayList<String>());
@@ -220,7 +220,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     private JSONObject postProjectJson(JSONObject projectJson,
                                        ResultMatcher expectedStatus) throws Exception {
-        return sendPost(routeName, projectJson, expectedStatus);
+        return sendPost(Routes.projectJson, projectJson, expectedStatus);
     }
 
     private JSONObject createProjectJson() {

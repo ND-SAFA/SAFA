@@ -3,7 +3,9 @@ package unit;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -20,9 +22,11 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {
         assertTokenExists();
-        String beforeRouteName = String.format("/projects/versions/%s/flat-files",
-            projectVersion.getVersionId().toString());
-        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(beforeRouteName,
+        String path = RouteBuilder
+            .withRoute(Routes.updateProjectVersionFromFlatFiles)
+            .withVersion(projectVersion)
+            .get();
+        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
             pathToFileDir);
         sendRequest(beforeRequest, MockMvcResultMatchers.status().isCreated(), this.token);
     }

@@ -5,7 +5,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -44,9 +46,11 @@ public class TestDeltaController extends ApplicationBaseTest {
         assertThat(changedBodies.size()).isEqualTo(3);
 
         // Step - Calculate delta
-        String deltaRouteName = String.format("/projects/delta/%s/%s",
-            beforeVersion.getVersionId().toString(),
-            afterVersion.getVersionId().toString());
+        String deltaRouteName = RouteBuilder
+            .withRoute(Routes.calculateProjectDelta)
+            .withBaselineVersion(beforeVersion)
+            .withTargetVersion(afterVersion)
+            .get();
         JSONObject response = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
 
         // VP - Verify that changes are detected
@@ -82,9 +86,11 @@ public class TestDeltaController extends ApplicationBaseTest {
         ProjectVersion afterVersion = versionPair.getValue1();
 
         // Step - Calculate Delta in Backwards direction
-        String backwardRouteName = String.format("/projects/delta/%s/%s",
-            afterVersion.getVersionId().toString(),
-            beforeVersion.getVersionId().toString());
+        String backwardRouteName = RouteBuilder
+            .withRoute(Routes.calculateProjectDelta)
+            .withBaselineVersion(afterVersion)
+            .withTargetVersion(beforeVersion)
+            .get();
         JSONObject backwardResponse = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
             "body");
         assertThat(backwardResponse.getJSONObject("modified").has("F3")).isTrue();
@@ -111,9 +117,11 @@ public class TestDeltaController extends ApplicationBaseTest {
         entityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
-        String backwardRouteName = String.format("/projects/delta/%s/%s",
-            beforeVersion.getVersionId().toString(),
-            afterVersion.getVersionId().toString());
+        String backwardRouteName = RouteBuilder
+            .withRoute(Routes.calculateProjectDelta)
+            .withBaselineVersion(beforeVersion)
+            .withTargetVersion(afterVersion)
+            .get();
         JSONObject response = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
             "body");
         assertThat(response.getJSONObject("added").keySet().size()).isEqualTo(0);

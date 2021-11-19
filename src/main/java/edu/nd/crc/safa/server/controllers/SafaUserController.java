@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
+    final String createAccountLink = "create-account";
+
     SafaUserService safaUserService;
 
     @Autowired
@@ -25,7 +28,7 @@ public class SafaUserController extends BaseController {
         this.safaUserService = safaUserService;
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping(Routes.createAccountLink)
     public SafaUser createNewUser(@RequestBody SafaUser newUser) {
         return this.safaUserService.createNewUser(newUser);
     }

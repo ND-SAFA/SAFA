@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Arrays;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
@@ -56,7 +57,7 @@ public class FlatFileController extends BaseController {
      * @return ServerResponse whose body contains all entities in project created.
      * @throws ServerError - If no files are given.
      */
-    @PostMapping(value = "projects/versions/{versionId}/flat-files")
+    @PostMapping(value = Routes.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
@@ -81,7 +82,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = "projects/flat-files")
+    @PostMapping(value = Routes.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {

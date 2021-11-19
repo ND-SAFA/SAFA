@@ -19,6 +19,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,7 +46,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 applicationUser.getEmail(),
                 applicationUser.getPassword(),
                 new ArrayList<>());
-            return authenticationManager.authenticate(token);
+
+            Authentication auth = authenticationManager.authenticate(token);
+            if (auth != null) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+            }
+            return auth;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,6 +74,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             .setClaims(claims)
             .signWith(SignatureAlgorithm.HS512, key)
             .setExpiration(exp).compact();
-        res.addHeader("token", token);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        JSONObject responseJson = new JSONObject();
+        responseJson.put("token", token);
+        res.getWriter().write(responseJson.toString());
     }
 }

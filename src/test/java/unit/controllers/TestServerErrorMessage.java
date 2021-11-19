@@ -5,6 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.server.entities.db.Project;
+
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -18,8 +22,12 @@ public class TestServerErrorMessage extends ApplicationBaseTest {
 
     @Test
     public void testServerError() throws Exception {
-        String projectId = UUID.randomUUID().toString(); // not exist
-        String routeName = String.format("/projects/%s/versions", projectId);
+        Project project = new Project();
+        project.setProjectId(UUID.randomUUID());
+        String routeName = RouteBuilder
+            .withRoute(Routes.getVersions)
+            .withProject(project)
+            .get();
 
         JSONObject obj = sendGet(routeName, status().isBadRequest());
 

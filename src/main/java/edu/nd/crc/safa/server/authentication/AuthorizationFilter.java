@@ -60,7 +60,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws ServerError {
         String token = request.getHeader(HEADER_NAME);
         if (token != null) {
-            //TODO: revisit these generation methods
+            //TODO: replace these deprecated methods
             Claims user = Jwts.parser()
                 .setSigningKey(Keys.hmacShaKeyFor(KEY.getBytes()))
                 .parseClaimsJws(token)

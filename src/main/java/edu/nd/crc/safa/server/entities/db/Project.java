@@ -55,6 +55,10 @@ public class Project implements Serializable {
         return this.projectId;
     }
 
+    public void setProjectId(UUID projectId) {
+        this.projectId = projectId;
+    }
+
     public String getName() {
         return this.name;
     }

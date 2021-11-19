@@ -2,7 +2,9 @@ package unit.controllers.project;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +20,7 @@ public class TestParseDataFilesErrors extends ApplicationBaseTest {
     public void testDuplicateArtifact() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/parse/artifacts/designs";
+        String routeName = RouteBuilder.withRoute(Routes.parseArtifactFile).withArtifactType("designs").get();
         String pathToArtifactFile = ProjectPaths.PATH_TO_BEFORE_FILES + "/Design.csv";
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToArtifactFile);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
@@ -38,7 +40,7 @@ public class TestParseDataFilesErrors extends ApplicationBaseTest {
     public void testParseTraceFile() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/parse/traces";
+        String routeName = RouteBuilder.withRoute(Routes.parseTraceFile).get();
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES + "/Design2Requirement.csv");
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);

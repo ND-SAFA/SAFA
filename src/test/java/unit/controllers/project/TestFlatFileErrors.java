@@ -3,6 +3,7 @@ package unit.controllers.project;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,7 @@ public class TestFlatFileErrors extends ApplicationBaseTest {
     public void testArtifactTypeNotFound() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/flat-files";
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_2);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
@@ -34,8 +34,7 @@ public class TestFlatFileErrors extends ApplicationBaseTest {
     public void testDuplicateArtifactBody() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/flat-files";
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_3);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 

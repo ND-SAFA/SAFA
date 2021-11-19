@@ -38,6 +38,8 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     private static HashMap<String, BlockingQueue<String>> idToQueue;
     private static HashMap<String, StompSession> idToSession;
 
+    final int TIME_TO_POLL = 5; // seconds
+
     @LocalServerPort
     private Integer port;
 
@@ -91,7 +93,7 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     }
 
     public String getNextMessage(String id) throws InterruptedException {
-        return idToQueue.get(id).poll(3, SECONDS);
+        return idToQueue.get(id).poll(TIME_TO_POLL, SECONDS);
     }
 
     public int getQueueSize(String id) {

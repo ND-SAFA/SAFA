@@ -84,25 +84,18 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
                                   String authorizationToken
     ) throws Exception {
         MockHttpServletRequestBuilder authorizedRequest = request.header("Authorization", authorizationToken);
-        return sendRequest(authorizedRequest, test, new String[]{});
+        return sendRequest(authorizedRequest, test);
     }
 
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
                                   ResultMatcher test) throws Exception {
-
-        return sendRequest(request, test, new String[]{});
-    }
-
-    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
-                                  ResultMatcher test,
-                                  String[] headerNames) throws Exception {
 
         MvcResult response = mockMvc
             .perform(request)
             .andExpect(test)
             .andReturn();
 
-        return TestUtil.apiResponseAsJson(response, headerNames);
+        return TestUtil.apiResponseAsJson(response);
     }
 
     public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)

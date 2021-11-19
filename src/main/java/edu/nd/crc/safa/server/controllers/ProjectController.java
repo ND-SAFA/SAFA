@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -48,7 +49,7 @@ public class ProjectController extends BaseController {
      * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
      *                     payload.
      */
-    @PostMapping("projects")
+    @PostMapping(Routes.projectJson)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity project) throws ServerError {
         Project payloadProject = Project.fromAppEntity(project); // gets
@@ -69,7 +70,7 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping("projects")
+    @GetMapping(Routes.getProjects)
     public ServerResponse getProjects() {
         return new ServerResponse(this.projectRepository.findAll());
     }
@@ -81,7 +82,7 @@ public class ProjectController extends BaseController {
      * @return String with success message.
      * @throws ServerError Throws error if project with associated id is not found.
      */
-    @DeleteMapping("projects/{projectId}")
+    @DeleteMapping(Routes.deleteProject)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
         Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));

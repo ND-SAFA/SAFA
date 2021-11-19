@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
@@ -32,7 +33,6 @@ public class TestSafaUserController extends ApplicationBaseTest {
 
     @Test
     public void createAccount() throws Exception {
-
         createUser(email, password);
         SafaUser user = safaUserRepository.findByEmail(email);
         assertThat(user.getEmail()).isEqualTo(email);
@@ -51,12 +51,12 @@ public class TestSafaUserController extends ApplicationBaseTest {
         String password = "r{QjR3<Ec2eZV@?";
         createUser(email, password);
         loginUser(email, password, status().isOk());
-        sendGet("/projects", status().is2xxSuccessful());
+        sendGet(Routes.projectJson, status().is2xxSuccessful());
     }
 
     @Test
     public void invalidResourceRequest() throws Exception {
-        sendRequest(get("/projects"), status().is4xxClientError());
+        sendRequest(get(Routes.projectJson), status().is4xxClientError());
     }
 
     @Test

@@ -33,11 +33,11 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             // CORS
-            .cors().disable()
+            .cors().and()
             .csrf().disable()
             // Endpoint Settings
             .authorizeRequests()
-            .antMatchers("/login", "/sign-up", "/websocket/**").permitAll()
+            .antMatchers(Routes.loginLink, Routes.createAccountLink, "/websocket/**").permitAll()
             .anyRequest().authenticated()
             // Authentication Filters
             .and()

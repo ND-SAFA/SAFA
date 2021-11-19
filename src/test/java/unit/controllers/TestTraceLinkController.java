@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -64,26 +66,32 @@ public class TestTraceLinkController extends ApplicationBaseTest {
             .newGeneratedTraceLink(projectName, sourceName, targetName, score);
 
         TraceLink generatedLink = entityBuilder.getTraceLinks(projectName).get(0);
-        UUID traceLinkId = generatedLink.getTraceLinkId();
+        UUID generatedLinkId = generatedLink.getTraceLinkId();
 
         // VP - Verify that trace link is unreviewed
-        Optional<TraceLink> unreviewedLinkQuery = traceLinkRepository.findById(traceLinkId);
+        Optional<TraceLink> unreviewedLinkQuery = traceLinkRepository.findById(generatedLinkId);
         assertThat(unreviewedLinkQuery.isPresent()).isTrue();
         assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.UNREVIEWED);
 
         // Step - Approve generated trace link
-        String acceptUrl = String.format("/projects/links/%s/approve", traceLinkId);
+        String acceptUrl = RouteBuilder
+            .withRoute(Routes.approveTraceLink)
+            .withTraceLink(generatedLink)
+            .get();
         sendPut(acceptUrl, new JSONObject(), status().is2xxSuccessful());
 
         // VP - Verify that trace link is approved
-        Optional<TraceLink> approvedLinkQuery = traceLinkRepository.findById(traceLinkId);
+        Optional<TraceLink> approvedLinkQuery = traceLinkRepository.findById(generatedLinkId);
         assertThat(approvedLinkQuery.isPresent()).isTrue();
         assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
 
         // Step - Decline generated link
-        String declineUrl = String.format("/projects/links/%s/decline", traceLinkId);
+        String declineUrl = RouteBuilder
+            .withRoute(Routes.declineTraceLink)
+            .withTraceLink(generatedLink)
+            .get();
         sendPut(declineUrl, new JSONObject(), status().is2xxSuccessful());
-        Optional<TraceLink> declinedLinkQuery = traceLinkRepository.findById(traceLinkId);
+        Optional<TraceLink> declinedLinkQuery = traceLinkRepository.findById(generatedLinkId);
         assertThat(declinedLinkQuery.isPresent()).isTrue();
         assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.DECLINED);
     }
@@ -125,7 +133,8 @@ public class TestTraceLinkController extends ApplicationBaseTest {
         }
 
         // Send to generate route
-        String generateRoute = "/projects/links/generate";
+        String generateRoute = RouteBuilder.withRoute(Routes.generateTraceLinks).get();
+
         JSONObject body = new JSONObject();
         body.put("sourceArtifacts", sourceArtifacts);
         body.put("targetArtifacts", targetArtifacts);
@@ -155,8 +164,12 @@ public class TestTraceLinkController extends ApplicationBaseTest {
         assertTraceDoesNotExist(project, sourceName, targetName);
 
         // Step - POST trace links creation
-        String versionId = projectVersion.getVersionId().toString();
-        String url = String.format("/projects/versions/%s/links/create/%s/%s", versionId, sourceName, targetName);
+        String url = RouteBuilder
+            .withRoute(Routes.createNewTraceLInk)
+            .withVersion(projectVersion)
+            .withSourceName(sourceName)
+            .withTargetName(targetName)
+            .get();
         JSONObject response = sendPost(url, new JSONObject(), status().is2xxSuccessful());
 
         // VP - Verify that no error
@@ -184,6 +197,10 @@ public class TestTraceLinkController extends ApplicationBaseTest {
     }
 
     private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
-        return String.format("/projects/%s/links/generated", projectVersion.getProject().getProjectId().toString());
+        Project project = projectVersion.getProject();
+        return RouteBuilder
+            .withRoute(Routes.getGeneratedLinks)
+            .withProject(project)
+            .get();
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -65,14 +66,14 @@ public class TraceLinkController extends BaseController {
         this.traceLinkGenerator = traceLinkGenerator;
     }
 
-    @GetMapping("/projects/{projectId}/links/generated")
+    @GetMapping(value = Routes.getGeneratedLinks)
     public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
         Project project = this.projectRepository.findByProjectId(projectId);
         List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
         return new ServerResponse(TraceApplicationEntity.createEntities(projectLinks));
     }
 
-    @PostMapping("/projects/links/generate")
+    @PostMapping(value = Routes.generateTraceLinks)
     public ServerResponse generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();
@@ -80,9 +81,8 @@ public class TraceLinkController extends BaseController {
             targetArtifacts));
     }
 
-    @PutMapping("/projects/links/{traceLinkId}/approve")
+    @PutMapping(value = Routes.approveTraceLink)
     @ResponseStatus(HttpStatus.OK)
-
     public ServerResponse approveTraceLink(@PathVariable UUID traceLinkId) throws ServerError {
         return changeApprovedHandler(traceLinkId, TraceApproval.APPROVED);
     }
@@ -94,7 +94,7 @@ public class TraceLinkController extends BaseController {
      * @return String with generic success message.
      * @throws ServerError - Throws error if no trace with given id is found.
      */
-    @PutMapping("/projects/links/{traceLinkId}/decline")
+    @PutMapping(value = Routes.declineTraceLink)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse declineTraceLink(@PathVariable UUID traceLinkId) throws ServerError {
         return changeApprovedHandler(traceLinkId, TraceApproval.DECLINED);
@@ -109,7 +109,7 @@ public class TraceLinkController extends BaseController {
      * @return TraceApplicationEntity representing the created entity.
      * @throws ServerError Throws error if either project version, source, or target artifact not found.
      */
-    @PostMapping("/projects/versions/{versionId}/links/create/{sourceId}/{targetId}")
+    @PostMapping(value = Routes.createNewTraceLInk)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewTraceLInk(@PathVariable UUID versionId,
                                              @PathVariable String sourceId,

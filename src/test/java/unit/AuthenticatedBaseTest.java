@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
@@ -87,7 +88,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject payload = new JSONObject();
         payload.put("email", email);
         payload.put("password", password);
-        return sendPost("/sign-up", payload, status().is2xxSuccessful(), false);
+        return sendPost(Routes.createAccountLink, payload, status().is2xxSuccessful(), false);
     }
 
     public void loginUser(String email, String password) throws Exception {
@@ -98,7 +99,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject user = new JSONObject();
         user.put("email", email);
         user.put("password", password);
-        JSONObject response = sendRequest(addJsonBody(post("/login"), user), test, new String[]{"token"});
+        JSONObject response = sendRequest(addJsonBody(post(Routes.loginLink), user), test);
         this.token = response.getString("token");
     }
 }

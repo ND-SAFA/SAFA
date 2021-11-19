@@ -202,7 +202,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     @Test
     public void testValidation() throws Exception {
-        String url = Routes.projectJson;
+        String url = Routes.projects;
         JSONObject projectJson = new JSONObject();
         projectJson.put("name", projectName);
         projectJson.put("artifacts", new ArrayList<String>());
@@ -220,7 +220,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     private JSONObject postProjectJson(JSONObject projectJson,
                                        ResultMatcher expectedStatus) throws Exception {
-        return sendPost(Routes.projectJson, projectJson, expectedStatus);
+        return sendPost(Routes.projects, projectJson, expectedStatus);
     }
 
     private JSONObject createProjectJson() {

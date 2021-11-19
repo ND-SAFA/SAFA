@@ -18,7 +18,6 @@ import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 public class VersionController extends BaseController {
 
@@ -127,7 +125,7 @@ public class VersionController extends BaseController {
      * @return String representing success message.
      * @throws ServerError Throws error if not version is associated with given id.
      */
-    @DeleteMapping(Routes.deleteVersion)
+    @DeleteMapping(Routes.getVersionById)
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
         if (versionQuery.isPresent()) {
@@ -145,7 +143,7 @@ public class VersionController extends BaseController {
      * @return ProjectCreationResponse containing artifacts, traces, and warnings of project at version specified.
      * @throws ServerError Throws error if no version is associated with given id.
      */
-    @GetMapping(Routes.getProjectById)
+    @GetMapping(Routes.getVersionById)
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
 

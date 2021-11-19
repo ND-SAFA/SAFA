@@ -12,7 +12,7 @@ import unit.ApplicationBaseTest;
 public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {
-        JSONObject response = sendGet(Routes.getProjects, status().isOk());
+        JSONObject response = sendGet(Routes.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
@@ -21,7 +21,7 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
         entityBuilder
             .newProject("firstProject")
             .newProject("secondProject");
-        JSONObject response = sendGet(Routes.getProjects, status().isOk());
+        JSONObject response = sendGet(Routes.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }
 }

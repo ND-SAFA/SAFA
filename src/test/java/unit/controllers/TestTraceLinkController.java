@@ -75,7 +75,7 @@ public class TestTraceLinkController extends ApplicationBaseTest {
 
         // Step - Approve generated trace link
         String acceptUrl = RouteBuilder
-            .withRoute(Routes.approveTraceLink)
+            .withRoute(Routes.approveLinkById)
             .withTraceLink(generatedLink)
             .get();
         sendPut(acceptUrl, new JSONObject(), status().is2xxSuccessful());
@@ -87,7 +87,7 @@ public class TestTraceLinkController extends ApplicationBaseTest {
 
         // Step - Decline generated link
         String declineUrl = RouteBuilder
-            .withRoute(Routes.declineTraceLink)
+            .withRoute(Routes.declineLinkById)
             .withTraceLink(generatedLink)
             .get();
         sendPut(declineUrl, new JSONObject(), status().is2xxSuccessful());
@@ -133,7 +133,7 @@ public class TestTraceLinkController extends ApplicationBaseTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(Routes.generateTraceLinks).get();
+        String generateRoute = RouteBuilder.withRoute(Routes.generateLinks).get();
 
         JSONObject body = new JSONObject();
         body.put("sourceArtifacts", sourceArtifacts);
@@ -165,7 +165,7 @@ public class TestTraceLinkController extends ApplicationBaseTest {
 
         // Step - POST trace links creation
         String url = RouteBuilder
-            .withRoute(Routes.createNewTraceLInk)
+            .withRoute(Routes.createNewLink)
             .withVersion(projectVersion)
             .withSourceName(sourceName)
             .withTargetName(targetName)

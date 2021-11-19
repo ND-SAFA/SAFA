@@ -4,6 +4,9 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 
+/**
+ * Given a route template, allows the users to specify the needed parameters and validates the final path.
+ */
 public class RouteBuilder {
     String path;
 

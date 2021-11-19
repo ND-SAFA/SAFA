@@ -20,23 +20,21 @@ public class Routes {
     public static final String parseTraceFile = "/projects/parse/traces";
 
     // Project Controller
-    public static final String projectJson = "/projects";
-    public static final String getProjects = "/projects";
-    public static final String deleteProject = "/projects/{projectId}";
+    public static final String projects = "/projects";
+    public static final String projectById = "/projects/{projectId}";
 
     // Trace Link Controller
     public static final String getGeneratedLinks = "/projects/{projectId}/links/generated";
-    public static final String generateTraceLinks = "/projects/links/generate";
-    public static final String approveTraceLink = "/projects/links/{traceLinkId}/approve";
-    public static final String declineTraceLink = "/projects/links/{traceLinkId}/decline";
-    public static final String createNewTraceLInk = "/projects/versions/{versionId}/links/create/{sourceId}/{targetId}";
-    
+    public static final String generateLinks = "/projects/links/generate";
+    public static final String approveLinkById = "/projects/links/{traceLinkId}/approve";
+    public static final String declineLinkById = "/projects/links/{traceLinkId}/decline";
+    public static final String createNewLink = "/projects/versions/{versionId}/links/create/{sourceId}/{targetId}";
+
     // Version Controller
     public static final String getVersions = "/projects/{projectId}/versions";
+    public static final String getVersionById = "/projects/versions/{versionId}";
     public static final String getCurrentVersion = "/projects/{projectId}/versions/current";
     public static final String createNewMajorVersion = "/projects/{projectId}/versions/major";
     public static final String createNewMinorVersion = "/projects/{projectId}/versions/minor";
     public static final String createNewRevisionVersion = "/projects/{projectId}/versions/revision";
-    public static final String deleteVersion = "/projects/versions/{versionId}";
-    public static final String getProjectById = "/projects/versions/{versionId}";
 }

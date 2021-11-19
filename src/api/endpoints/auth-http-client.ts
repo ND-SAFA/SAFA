@@ -30,7 +30,9 @@ export default async function authHttpClient<T>(
 
   if (token === undefined) {
     const error = `${relativeUrl} requires token.`;
+
     appModule.onDevError(error);
+
     throw Error(error);
   } else {
     options.headers = {

@@ -1,5 +1,9 @@
 package edu.nd.crc.safa.config;
 
+/**
+ * The container centralizing all route names used within controllers and testing.
+ * See usages of class RouteBuilder within tests for example of how to construct paths.
+ */
 public class Routes {
     // SAFA User Controller
     public static final String createAccountLink = "/accounts/create";

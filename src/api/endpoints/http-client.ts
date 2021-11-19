@@ -28,8 +28,8 @@ export default async function httpClient<T>(
       };
     }
 
-    const token = sessionModule.getToken;
     if (authenticated) {
+      const token = sessionModule.getToken;
       if (token === undefined) {
         const error = `${relativeUrl} is required token but non exists.`;
         appModule.onDevError(error);

@@ -40,7 +40,6 @@ export default class SessionModule extends VuexModule {
    */
   async login(user: UserModel): Promise<void> {
     const session = await loginUser(user);
-    console.log("SETTING SESSION:", session);
     this.SET_SESSION(session);
   }
 

@@ -60,6 +60,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                 cors.setAllowedOrigins(allowedOrigins);
                 cors.setAllowedMethods(allowedMethods);
                 cors.setAllowedHeaders(List.of("*"));
+                cors.setAllowCredentials(true);
                 return cors;
             }).and()
             .csrf().disable()

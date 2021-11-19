@@ -4,9 +4,10 @@ import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.SafaUserService;
+import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,18 +22,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
-    SafaUserService safaUserService;
+    SafaUserRepository safaUserRepository;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     public SafaUserController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
-                              SafaUserService safaUserService) {
+                              SafaUserRepository safaUserRepository,
+                              PasswordEncoder passwordEncoder) {
         super(projectRepository, projectVersionRepository);
-        this.safaUserService = safaUserService;
+        this.safaUserRepository = safaUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping(Routes.createAccountLink)
     public SafaUser createNewUser(@RequestBody SafaUser newUser) {
-        return this.safaUserService.createNewUser(newUser);
+        newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
+        this.safaUserRepository.save(newUser);
+        return newUser;
     }
 }

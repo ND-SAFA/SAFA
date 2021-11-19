@@ -6,7 +6,7 @@ import javax.annotation.Resource;
 
 import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
-import edu.nd.crc.safa.server.services.SafaUserService;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

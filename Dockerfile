@@ -7,7 +7,7 @@ ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
 ARG DB_USER=root
 ARG DB_PASSWORD=secret2
 ARG DB_INSTANCE
-ARG JWT_KEY
+ARG JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"

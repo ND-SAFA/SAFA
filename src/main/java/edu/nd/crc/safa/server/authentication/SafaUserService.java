@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.services;
+package edu.nd.crc.safa.server.authentication;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,16 +18,13 @@ import org.springframework.stereotype.Service;
 public class SafaUserService implements UserDetailsService {
 
     SafaUserRepository safaUserRepository;
-    PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SafaUserService(SafaUserRepository safaUserRepository,
-                           PasswordEncoder passwordEncoder) {
+    public SafaUserService(SafaUserRepository safaUserRepository
+    ) {
         this.safaUserRepository = safaUserRepository;
-        this.passwordEncoder = passwordEncoder;
     }
-
-
+    
     /**
      * The implementation for UserDetailService that bridges Spring's default authentication and our
      * custom user entity class, SafaUser.
@@ -44,11 +40,5 @@ public class SafaUserService implements UserDetailsService {
             .password(customer.getPassword())
             .authorities("USER") // TODO: Replace with custom roles here
             .build();
-    }
-
-    public SafaUser createNewUser(SafaUser newUser) {
-        newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
-        this.safaUserRepository.save(newUser);
-        return newUser;
     }
 }

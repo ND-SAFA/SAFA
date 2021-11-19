@@ -2,7 +2,6 @@ import { APIOptions, APIResponse } from "@/types";
 import { isAPIError } from "@/util";
 import { appModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/endpoints/endpoints";
-import { localSession } from "@/store/modules/session.module";
 
 /**
  * Executes an http request with the given parameters.
@@ -10,8 +9,7 @@ import { localSession } from "@/store/modules/session.module";
  * @param relativeUrl The URL relative to the BEND API endpoint.
  * @param options Any options for this request, such as the method and any data.
  * @param setJsonContentType If true, sets the content type of the request.
- * @param authenticate Whether the request is authenticated or not. If so then
- * the current session token is included in header.
+ * @param authenticated Whether the request should include the session token.
  *
  * @return The request's response data.
  * @throws Any errors received from the request.
@@ -20,7 +18,7 @@ export default async function httpClient<T>(
   relativeUrl: string,
   options: APIOptions,
   setJsonContentType = true,
-  authenticate = true
+  authenticated = true
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     options = options || {};
@@ -30,9 +28,8 @@ export default async function httpClient<T>(
       };
     }
 
-    const token = localSession?.token;
-
-    if (authenticate) {
+    const token = sessionModule.getToken;
+    if (authenticated) {
       if (token === undefined) {
         const error = `${relativeUrl} is required token but non exists.`;
         appModule.onDevError(error);

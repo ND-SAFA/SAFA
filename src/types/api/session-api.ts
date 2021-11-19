@@ -16,6 +16,9 @@ export interface UserModel {
  * Defines a session model.
  */
 export interface SessionModel extends Omit<UserModel, "password"> {
+  /**
+   * The JWT token authorizing current user.
+   */
   token?: string;
 }
 

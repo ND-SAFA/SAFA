@@ -5,8 +5,10 @@ import { getSession, loginUser, logoutUser } from "@/api";
 /**
  * If you only knew how many things I tried to not have to resort to this...
  */
-export let sessionIsLoaded = false;
-export let localSession: SessionModel | undefined;
+const emptySessionModel: SessionModel = {
+  email: "",
+  token: "",
+};
 
 @Module({ namespaced: true, name: "session" })
 /**
@@ -16,7 +18,7 @@ export default class SessionModule extends VuexModule {
   /**
    * The current active session, if one exists.
    */
-  private session?: SessionModel;
+  private session: SessionModel = emptySessionModel;
 
   @Action({ rawError: true })
   /**
@@ -38,8 +40,8 @@ export default class SessionModule extends VuexModule {
    */
   async login(user: UserModel): Promise<void> {
     const session = await loginUser(user);
+    console.log("SETTING SESSION:", session);
     this.SET_SESSION(session);
-    this.session = session;
   }
 
   @Action({ rawError: true })
@@ -49,23 +51,29 @@ export default class SessionModule extends VuexModule {
   async logout(): Promise<void> {
     await logoutUser();
 
-    this.SET_SESSION();
+    this.SET_SESSION(emptySessionModel);
   }
 
   @Mutation
   /**
    * Sets the current session.
    */
-  SET_SESSION(session?: SessionModel): void {
+  SET_SESSION(session: SessionModel): void {
     this.session = session;
-    localSession = session;
-    sessionIsLoaded = !!session;
   }
 
   /**
    * @return Whether there is a current session.
    */
   get getDoesSessionExist(): boolean {
-    return !!this.session;
+    return this.session.token !== "";
+  }
+
+  /**
+   * @return The current authorization token if one exists.
+   */
+  get getToken(): string | undefined {
+    const token = this.session.token;
+    return token === "" ? undefined : token;
   }
 }

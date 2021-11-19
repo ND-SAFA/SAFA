@@ -71,7 +71,10 @@ export default Vue.extend({
           password: this.password,
         })
         .then(() => navigateTo(goToPage))
-        .catch(() => (this.isError = true));
+        .catch((e) => {
+          console.log("ERROR:", e);
+          this.isError = true;
+        });
     },
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);

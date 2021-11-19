@@ -13,6 +13,7 @@ import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
  */
 
 const TEST_ENDPOINTS = true;
+const TEST_SESSION_EXISTING = false;
 
 /**
  * Returns the current user's session.
@@ -22,6 +23,12 @@ const TEST_ENDPOINTS = true;
  * @throws Error - If no session exists.
  */
 export async function getSession(): Promise<SessionModel> {
+  if (!TEST_SESSION_EXISTING) {
+    throw Error("<No session should return a 400 which throws an error>");
+  }
+  if (TEST_ENDPOINTS) {
+    return { email: "123@example.com" };
+  }
   return httpClient<SessionModel>(fillEndpoint(Endpoint.session), {
     method: "GET",
   });
@@ -50,6 +57,8 @@ export async function createUser(user: UserModel): Promise<SessionModel> {
 
 /**
  * Logs the given user in and stores authorization token in the current session.
+ * This function uses the core fetch because it needs to intercept the HttpStatus
+ * to validate if the call failed or succeeded.
  *
  * @param user - The user to log in.
  *

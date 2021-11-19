@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.authentication;
 
 import static edu.nd.crc.safa.config.SecurityConstants.HEADER_NAME;
-import static edu.nd.crc.safa.config.SecurityConstants.KEY;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import io.jsonwebtoken.Claims;
@@ -25,8 +25,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-    public AuthorizationFilter(AuthenticationManager authManager) {
+    private final SecurityConstants securityConstants;
+
+    public AuthorizationFilter(AuthenticationManager authManager, SecurityConstants securityConstants) {
         super(authManager);
+        this.securityConstants = securityConstants;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (token != null) {
             //TODO: replace these deprecated methods
             Claims user = Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(KEY.getBytes()))
+                .setSigningKey(Keys.hmacShaKeyFor(securityConstants.key.getBytes()))
                 .parseClaimsJws(token)
                 .getBody();
 

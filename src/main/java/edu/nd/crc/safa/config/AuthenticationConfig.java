@@ -43,6 +43,9 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private SafaUserService userDetailsService;
 
+    @Resource
+    private SecurityConstants securityConstants;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authProvider());
@@ -66,8 +69,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().authenticated()
             // Authentication Filters
             .and()
-            .addFilter(new AuthenticationFilter(authenticationManager()))
-            .addFilter(new AuthorizationFilter(authenticationManager()))
+            .addFilter(new AuthenticationFilter(authenticationManager(), securityConstants))
+            .addFilter(new AuthorizationFilter(authenticationManager(), securityConstants))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
@@ -77,6 +80,11 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public SecurityConstants getSecurityConstants() {
+        return new SecurityConstants();
     }
 
     @Bean

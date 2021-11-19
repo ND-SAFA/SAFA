@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.server.authentication;
 
-import static edu.nd.crc.safa.config.SecurityConstants.KEY;
-
 import java.io.IOException;
 import java.security.Key;
 import java.util.ArrayList;
@@ -31,10 +29,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Generates a token that is sent in the headers when the login is correct.
  */
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager) {
+    private final AuthenticationManager authenticationManager;
+    private final SecurityConstants securityConstants;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) {
+        super(authenticationManager);
         this.authenticationManager = authenticationManager;
+        this.securityConstants = securityConstants;
     }
 
     @Override
@@ -67,7 +69,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
         Date exp = new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME);
-        Key key = Keys.hmacShaKeyFor(KEY.getBytes());
+        Key key = Keys.hmacShaKeyFor(securityConstants.key.getBytes());
         Claims claims = Jwts.claims().setSubject(((User) auth.getPrincipal()).getUsername());
         String token = Jwts
             .builder()

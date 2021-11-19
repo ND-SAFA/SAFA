@@ -29,7 +29,7 @@ export default async function authHttpClient<T>(
 
     const token = sessionModule.getToken;
     if (token === undefined) {
-      const error = `${relativeUrl} is required token but non exists.`;
+      const error = `${relativeUrl} requires token.`;
       appModule.onDevError(error);
       return reject(error);
     } else {

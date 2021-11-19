@@ -6,7 +6,6 @@ import { getSession, loginUser, logoutUser } from "@/api";
  * If you only knew how many things I tried to not have to resort to this...
  */
 const emptySessionModel: SessionModel = {
-  email: "",
   token: "",
 };
 

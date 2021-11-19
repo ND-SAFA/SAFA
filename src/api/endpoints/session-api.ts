@@ -1,5 +1,4 @@
 import {
-  APIOptions,
   SessionModel,
   UserChangeModel,
   UserModel,
@@ -16,6 +15,23 @@ const TEST_ENDPOINTS = true;
 const TEST_SESSION_EXISTING = false;
 
 /**
+ * Custom fetch call for session endpoints.
+ *
+ * @param args - Args to pass to fetch.
+ *
+ * @throws Error - Response status was not 200.
+ */
+async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
+  const response = await fetch(...args);
+
+  if (!response.ok) {
+    throw Error("Unable to find a session.");
+  }
+
+  return response.json();
+}
+
+/**
  * Returns the current user's session.
  *
  * @return SessionModel - The session for the previously logged in user.
@@ -27,7 +43,7 @@ export async function getSession(): Promise<SessionModel> {
     throw Error("<No session should return a 400 which throws an error>");
   }
   if (TEST_ENDPOINTS) {
-    return { email: "123@example.com" };
+    return { token: "123" };
   }
   return authHttpClient<SessionModel>(fillEndpoint(Endpoint.session), {
     method: "GET",
@@ -44,21 +60,16 @@ export async function getSession(): Promise<SessionModel> {
  * @throws Error - If the account cannot be created.
  */
 export async function createUser(user: UserModel): Promise<SessionModel> {
-  return new Promise((resolve, reject) => {
-    const endpoint = `${baseURL}/${fillEndpoint(Endpoint.createAccount)}`;
-    fetch(endpoint, {
+  return sessionFetch<SessionModel>(
+    `${baseURL}/${fillEndpoint(Endpoint.createAccount)}`,
+    {
       method: "POST",
       body: JSON.stringify(user),
       headers: {
         "Content-Type": "application/json",
       },
-    })
-      .then((res) => res.json())
-      .then((user: UserModel) => {
-        resolve(user);
-      })
-      .catch(reject);
-  });
+    }
+  );
 }
 
 /**
@@ -73,29 +84,13 @@ export async function createUser(user: UserModel): Promise<SessionModel> {
  * @throws Error - If no session exists.
  */
 export async function loginUser(user: UserModel): Promise<SessionModel> {
-  return new Promise((resolve, reject) => {
-    const endpoint = `${baseURL}/${fillEndpoint(Endpoint.login)}`;
-    const options: APIOptions = {
+  return sessionFetch<SessionModel>(
+    `${baseURL}/${fillEndpoint(Endpoint.login)}`,
+    {
       method: "POST",
       body: JSON.stringify(user),
-    };
-    fetch(endpoint, options)
-      .then((res) => {
-        if (res.status !== 200) return reject("Login failed.");
-        return res.json();
-      })
-      .then((resJson) => {
-        const token = resJson.token;
-        if (token === undefined)
-          return reject("Response does not include authorization token");
-        const session: SessionModel = {
-          email: user.email,
-          token: resJson.token,
-        };
-        resolve(session);
-      })
-      .catch(reject);
-  });
+    }
+  );
 }
 
 /**

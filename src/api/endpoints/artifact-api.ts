@@ -24,18 +24,13 @@ export async function isArtifactNameTaken(
 /**
  * Deletes artifact body in project version specified.
  *
- * @param versionId - The version belonging to the artifact being deleted.
- * @param artifactName - The name of the artifact being deleted.
+ * @param artifact - The artifact to delete.
  *
  */
-export async function deleteArtifactBody(
-  versionId: string,
-  artifactName: string
-): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.deleteArtifact, { versionId, artifactName }),
-    { method: "DELETE" }
-  );
+export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
+  return CommitBuilder.withCurrentVersion()
+    .withRemovedArtifact(artifact)
+    .save();
 }
 
 /**
@@ -50,15 +45,8 @@ export async function createOrUpdateArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<Artifact> {
-  const commit: Commit = CommitBuilder.withCurrentVersion()
+  return CommitBuilder.withCurrentVersion()
     .withNewArtifact(artifact)
-    .get();
-
-  return authHttpClient<Artifact>(
-    fillEndpoint(Endpoint.commit, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(commit),
-    }
-  );
+    .save()
+    .then(() => artifact);
 }

@@ -1,5 +1,7 @@
-import { Artifact, Commit, ProjectVersion } from "@/types";
+import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
 import { appModule, projectModule } from "@/store";
+import authHttpClient from "@/api/endpoints/auth-http-client";
+import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
 export class CommitBuilder {
   commit: Commit;
@@ -31,7 +33,23 @@ export class CommitBuilder {
     this.commit.artifacts.added.push(artifact);
     return this;
   }
-  get(): Commit {
-    return this.commit;
+  withRemovedArtifact(artifact: Artifact): CommitBuilder {
+    this.commit.artifacts.removed.push(artifact);
+    return this;
+  }
+  withNewTraceLink(traceLink: TraceLink): CommitBuilder {
+    this.commit.traces.added.push(traceLink);
+    return this;
+  }
+  withModifiedTraceLink(traceLink: TraceLink): CommitBuilder {
+    this.commit.traces.modified.push(traceLink);
+    return this;
+  }
+  save(): Promise<void> {
+    const versionId = this.commit.commitVersion.versionId;
+    return authHttpClient<void>(fillEndpoint(Endpoint.commit, { versionId }), {
+      method: "POST",
+      body: JSON.stringify(this.commit),
+    });
   }
 }

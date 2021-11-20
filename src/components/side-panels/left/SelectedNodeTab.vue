@@ -179,8 +179,7 @@ export default Vue.extend({
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
-        const artifactName = this.selectedArtifact.name;
-        deleteArtifactFromCurrentVersion(artifactName).then(() => {
+        deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
           artifactSelectionModule.UNSELECT_ARTIFACT();
           appModule.closePanel(PanelType.left);
         });

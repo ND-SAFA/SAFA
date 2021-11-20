@@ -26,10 +26,10 @@ export function createOrUpdateArtifactHandler(
  * Requests the deletion of artifact body in currently selected project version.
  * The artifact is removed from the store if the request is successful.
  *
- * @param artifactName - The name of the artifact to delete.
+ * @param artifact  - The artifact to delete.
  */
 export function deleteArtifactFromCurrentVersion(
-  artifactName: string
+  artifact: Artifact
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const versionId = projectModule.getProject.projectVersion?.versionId;
@@ -42,13 +42,13 @@ export function deleteArtifactFromCurrentVersion(
 
     appModule.SET_CONFIRMATION_MESSAGE({
       type: ConfirmationType.INFO,
-      title: `Delete ${artifactName}?`,
+      title: `Delete ${artifact.name}?`,
       body: `Deleting this artifact cannot be undone in this version of SAFA.`,
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
-          deleteArtifactBody(versionId, artifactName)
+          deleteArtifactBody(artifact)
             .then(() => {
-              projectModule.DELETE_ARTIFACT_BY_NAME(artifactName);
+              projectModule.DELETE_ARTIFACT_BY_NAME(artifact.name);
               resolve();
             })
             .catch(reject);

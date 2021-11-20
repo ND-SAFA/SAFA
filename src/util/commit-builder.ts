@@ -1,9 +1,15 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
 import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 
+/**
+ * Responsible for creating a commit and saving it to the database.
+ */
 export class CommitBuilder {
+  /**
+   * The commit being built
+   */
   commit: Commit;
 
   constructor(version: ProjectVersion) {
@@ -21,7 +27,6 @@ export class CommitBuilder {
       },
     };
   }
-
   static withCurrentVersion(): CommitBuilder {
     const version = projectModule.getProject.projectVersion;
     if (version === undefined) {

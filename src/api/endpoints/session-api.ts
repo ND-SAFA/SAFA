@@ -12,7 +12,7 @@ import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
  */
 
 const TEST_ENDPOINTS = true;
-const TEST_SESSION_EXISTING = false;
+const TEST_SESSION_EXISTING = false; // false required for API to work otherwise no token
 
 /**
  * Custom fetch call for session endpoints.

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.tracegenerator.vsm.Controller;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -69,11 +69,11 @@ public class TraceLinkGenerator {
         return generateLinksFromTokens(sTokens, tTokens, TraceLink::new);
     }
 
-    public List<TraceApplicationEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,
-                                                                                List<ArtifactAppEntity> targetDocs) {
+    public List<TraceAppEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,
+                                                                        List<ArtifactAppEntity> targetDocs) {
         Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(sourceDocs);
         Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(targetDocs);
-        return generateLinksFromTokens(sourceTokens, targetTokens, TraceApplicationEntity::new);
+        return generateLinksFromTokens(sourceTokens, targetTokens, TraceAppEntity::new);
     }
 
     private <Key, Link> List<Link> generateLinksFromTokens(Map<Key, Collection<String>> sTokens,

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.builders.ProjectCommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -21,6 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that the client is allowed to:
+ * 1. Add new artifacts
+ * 2. Modify existing artifacts
+ * 3. Delete existing artifacts
+ */
 public class TestArtifactController extends ApplicationBaseTest {
 
     @Autowired
@@ -35,18 +42,21 @@ public class TestArtifactController extends ApplicationBaseTest {
         String artifactName = "RE-10";
         String modifiedSummary = "this is a new summary";
 
-        // Step - POST artifact and return entities created
+        // Step - Create a new artifact
         Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
         ProjectVersion projectVersion = response.getValue0();
         JSONObject artifactJson = response.getValue1();
 
-        verifyArtifactStatus(projectVersion, artifactName);
+        // VP - Verify artifact exists
+        assertArtifactExists(projectVersion, artifactName);
 
         // Step - Modify artifact summary
         artifactJson.put("summary", modifiedSummary);
 
-        // VP - Submit modified artifact for saving
-        sendPost(getArtifactUrl(projectVersion), artifactJson, status().isCreated());
+        // VP - Commit modified artifact for saving
+        commit(ProjectCommitBuilder
+            .withVersion(projectVersion)
+            .withModifiedArtifact(artifactJson));
 
         // Step - Retrieve ArtifactBodies
         List<ArtifactBody> artifactBodies = artifactBodyRepository.getBodiesWithName(projectVersion.getProject(),
@@ -74,16 +84,14 @@ public class TestArtifactController extends ApplicationBaseTest {
         ProjectVersion projectVersion = response.getValue0();
 
         // VP - Verify that artifact exists
-        verifyArtifactStatus(projectVersion, artifactName);
+        assertArtifactExists(projectVersion, artifactName);
         verifyArtifactBodyStatus(projectVersion, artifactName);
 
         // Step - Delete artifact
-        String deleteUrl = RouteBuilder
-            .withRoute(Routes.deleteArtifact)
+        JSONObject artifactJson = response.getValue1();
+        commit(ProjectCommitBuilder
             .withVersion(projectVersion)
-            .withArtifactName(artifactName)
-            .get();
-        sendDelete(deleteUrl, status().is2xxSuccessful());
+            .withRemovedArtifact(artifactJson));
 
         // VP - Verify artifact does not exist
         Optional<ArtifactBody> artifactBody =
@@ -91,23 +99,6 @@ public class TestArtifactController extends ApplicationBaseTest {
         assertThat(artifactBody.isPresent()).isTrue();
         ModificationType modificationType = artifactBody.get().getModificationType();
         assertThat(modificationType).isEqualTo(ModificationType.REMOVED);
-    }
-
-    private Pair<ProjectVersion, JSONObject> createArtifact(String projectName, String artifactName) throws Exception {
-        // Step - Create project with single version
-        ProjectVersion projectVersion = entityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
-        // Step - Create Artifact JSON
-        JSONObject artifactJson = jsonBuilder
-            .withProject(projectName, projectName)
-            .withArtifactAndReturn(projectName, artifactName, "requirements", "this is a body");
-
-        // Step - Send request to create artifact
-        sendPost(getArtifactUrl(projectVersion), artifactJson, status().isCreated());
-
-        return new Pair<>(projectVersion, artifactJson);
     }
 
     @Test
@@ -138,14 +129,26 @@ public class TestArtifactController extends ApplicationBaseTest {
         assertThat(artifactExists).isTrue();
     }
 
-    private String getArtifactUrl(ProjectVersion projectVersion) {
-        return RouteBuilder
-            .withRoute(Routes.createArtifact)
+    private Pair<ProjectVersion, JSONObject> createArtifact(String projectName, String artifactName) throws Exception {
+        // Step - Create project with single version
+        ProjectVersion projectVersion = entityBuilder
+            .newProject(projectName)
+            .newVersionWithReturn(projectName);
+
+        // Step - Create Artifact JSON
+        JSONObject artifactJson = jsonBuilder
+            .withProject(projectName, projectName)
+            .withArtifactAndReturn(projectName, artifactName, "requirements", "this is a body");
+
+        // Step - Send request to create artifact
+        commit(ProjectCommitBuilder
             .withVersion(projectVersion)
-            .get();
+            .withAddedArtifact(artifactJson));
+
+        return new Pair<>(projectVersion, artifactJson);
     }
 
-    private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName) {
+    private void assertArtifactExists(ProjectVersion projectVersion, String artifactName) {
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
             artifactName);
         assertThat(artifactQuery.isPresent()).isEqualTo(true);

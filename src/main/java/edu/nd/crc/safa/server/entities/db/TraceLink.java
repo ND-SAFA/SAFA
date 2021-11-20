@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -70,12 +70,15 @@ public class TraceLink implements Serializable {
         this.score = 0;
     }
 
-    public TraceLink(TraceApplicationEntity traceLink) {
+    public TraceLink(TraceAppEntity traceLink) {
         this();
         this.traceType = traceLink.traceType == null ? TraceType.MANUAL : traceLink.traceType;
         this.approvalStatus = traceLink.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
             traceLink.approvalStatus;
         this.score = traceLink.score == 0 ? this.score : traceLink.score;
+        if (traceLink.getTraceLinkId() != null) {
+            this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
+        }
     }
 
     public TraceLink(Artifact sourceArtifact,

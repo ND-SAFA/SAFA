@@ -8,7 +8,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -74,10 +74,10 @@ public class ProjectRetrievalService {
                 .collect(Collectors.toList());
         List<TraceLink> traceLinks = this.traceLinkRepository
             .getUnDeclinedLinks(project);
-        List<TraceApplicationEntity> traces =
+        List<TraceAppEntity> traces =
             traceLinks
                 .stream()
-                .map(TraceApplicationEntity::new)
+                .map(TraceAppEntity::new)
                 .collect(Collectors.toList());
         return new ProjectAppEntity(projectVersion, artifacts, traces);
     }

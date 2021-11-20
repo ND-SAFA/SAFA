@@ -1,18 +1,18 @@
 package edu.nd.crc.safa.server.entities.api;
 
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 
 import org.json.JSONObject;
 
 public class TraceChange {
     ModificationType revisionType;
-    TraceApplicationEntity trace;
+    TraceAppEntity trace;
 
     public TraceChange() {
     }
 
-    public TraceChange(ModificationType revisionType, TraceApplicationEntity trace) {
+    public TraceChange(ModificationType revisionType, TraceAppEntity trace) {
         this.revisionType = revisionType;
         this.trace = trace;
     }
@@ -25,11 +25,11 @@ public class TraceChange {
         this.revisionType = revisionType;
     }
 
-    public TraceApplicationEntity getTrace() {
+    public TraceAppEntity getTrace() {
         return trace;
     }
 
-    public void setTrace(TraceApplicationEntity trace) {
+    public void setTrace(TraceAppEntity trace) {
         this.trace = trace;
     }
 

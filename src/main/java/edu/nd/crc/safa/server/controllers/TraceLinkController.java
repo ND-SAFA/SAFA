@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
@@ -68,7 +68,7 @@ public class TraceLinkController extends BaseController {
     public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
         Project project = this.projectRepository.findByProjectId(projectId);
         List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
-        return new ServerResponse(TraceApplicationEntity.createEntities(projectLinks));
+        return new ServerResponse(TraceAppEntity.createEntities(projectLinks));
     }
 
     @PostMapping(value = Routes.generateLinks)
@@ -101,7 +101,7 @@ public class TraceLinkController extends BaseController {
     /**
      * Creates a trace link between specified sourceId and target artifact ids at given version.
      *
-     * @param versionId UIUD of the project version that will be marked with the new trace link.
+     * @param versionId UUID of the project version that will be marked with the new trace link.
      * @param sourceId  UUID of source artifact.
      * @param targetId  UUID of target artifact.
      * @return TraceApplicationEntity representing the created entity.
@@ -122,8 +122,17 @@ public class TraceLinkController extends BaseController {
         TraceLink traceLink = creationResponse.getValue0();
         this.traceLinkRepository.saveAll(List.of(traceLink));
         this.revisionNotificationService.broadcastTrace(projectVersion.getProject(),
-            new TraceApplicationEntity(traceLink));
-        return new ServerResponse(new TraceApplicationEntity(traceLink));
+            new TraceAppEntity(traceLink));
+        return new ServerResponse(new TraceAppEntity(traceLink));
+    }
+
+    /**
+     * Retrieves the corresponding trace link in given version and updates information
+     * to given application state.
+     */
+    public void updateTraceLink(UUID versionId, TraceAppEntity traceAppEntity) {
+        TraceLink traceLink = new TraceLink(traceAppEntity);
+        this.traceLinkRepository.save(traceLink);
     }
 
     private ServerResponse changeApprovedHandler(UUID traceLinkId, TraceApproval approvalStatus) throws ServerError {
@@ -133,10 +142,12 @@ public class TraceLinkController extends BaseController {
             traceLink.setApprovalStatus(approvalStatus);
             this.traceLinkRepository.save(traceLink);
             Project project = traceLink.getSourceArtifact().getProject();
-            this.revisionNotificationService.broadcastTrace(project, new TraceApplicationEntity(traceLink));
+            this.revisionNotificationService.broadcastTrace(project, new TraceAppEntity(traceLink));
             return new ServerResponse("Trace link was successfully approved");
         } else {
             throw new ServerError("Could not find trace link with id:" + traceLinkId);
         }
     }
+
+
 }

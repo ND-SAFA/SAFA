@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ParserError;
@@ -40,7 +40,7 @@ public class TraceLinkService {
         this.parserErrorRepository = parserErrorRepository;
     }
 
-    public void createTraceLinks(ProjectVersion projectVersion, List<TraceApplicationEntity> traces) {
+    public void createTraceLinks(ProjectVersion projectVersion, List<TraceAppEntity> traces) {
         List<TraceLink> newLinks = new ArrayList<>();
         List<ParserError> newErrors = new ArrayList<>();
         traces.forEach(t -> {
@@ -57,7 +57,7 @@ public class TraceLinkService {
     }
 
     public Pair<TraceLink, ParserError> createTrace(ProjectVersion projectVersion,
-                                                    TraceApplicationEntity t) {
+                                                    TraceAppEntity t) {
         ArtifactFinder artifactFinder = (a) ->
             artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
         String sourceName = t.getSource();

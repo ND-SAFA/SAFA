@@ -42,6 +42,9 @@ export default async function authHttpClient<T>(
   }
 
   const res = await fetch(URL, options);
+  if (res.status === 204) {
+    return {} as T;
+  }
   const resContent = await res.json();
 
   if (!res.ok || isAPIError(resContent)) {

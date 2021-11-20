@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { sessionModule } from "@/store";
+import { appModule, sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
 
@@ -24,7 +24,12 @@ export default Vue.extend({
     Snackbar,
   },
   mounted() {
-    sessionModule.loadSession().then(() => navigateTo(Routes.HOME));
+    sessionModule
+      .loadSession()
+      .then(() => navigateTo(Routes.HOME))
+      .catch((e) => {
+        appModule.onDevWarning(e);
+      });
   },
 });
 </script>

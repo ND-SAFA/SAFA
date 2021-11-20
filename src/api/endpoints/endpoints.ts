@@ -15,10 +15,10 @@ export enum Endpoint {
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
   // Projects
+  commit = "projects/versions/:versionId/commit",
   project = "projects",
   deleteArtifact = "projects/versions/:versionId/artifacts/:artifactName",
   isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
-  createOrUpdateArtifact = "projects/versions/:versionId/artifacts",
   getGeneratedLinks = "projects/:projectId/links/generated",
   generateLinks = "projects/links/generate",
   approveLink = "projects/links/:traceLinkId/approve",

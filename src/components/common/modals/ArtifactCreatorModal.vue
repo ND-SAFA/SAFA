@@ -106,15 +106,17 @@ export default Vue.extend({
       }
     },
     name(newName: string): void {
-      isArtifactNameTaken(this.projectId, newName).then((res) => {
-        this.isNameValid = !res.artifactExists;
+      if (newName !== "") {
+        isArtifactNameTaken(this.projectId, newName).then((res) => {
+          this.isNameValid = !res.artifactExists;
 
-        if (this.isNameValid) {
-          this.nameError = "";
-        } else {
-          this.nameError = "Name is already used, please select another.";
-        }
-      });
+          if (this.isNameValid) {
+            this.nameError = "";
+          } else {
+            this.nameError = "Name is already used, please select another.";
+          }
+        });
+      }
     },
   },
   methods: {
@@ -153,7 +155,10 @@ export default Vue.extend({
         .then(() => {
           this.$emit("onClose");
         })
-        .catch(() => appModule.onWarning("Unable to create artifact."))
+        .catch((e) => {
+          appModule.onDevError(e);
+          appModule.onWarning("Unable to create artifact.");
+        })
         .finally(() => (this.isLoading = false));
     },
   },

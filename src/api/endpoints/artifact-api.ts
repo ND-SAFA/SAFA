@@ -1,6 +1,7 @@
-import { Artifact, ArtifactNameValidationResponse } from "@/types";
+import { Artifact, ArtifactNameValidationResponse, Commit } from "@/types";
 import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
+import { CommitBuilder } from "@/util/commit-builder";
 
 /**
  * Returns whether the given artifact name already exists.
@@ -49,11 +50,15 @@ export async function createOrUpdateArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<Artifact> {
+  const commit: Commit = CommitBuilder.withCurrentVersion()
+    .withNewArtifact(artifact)
+    .get();
+
   return authHttpClient<Artifact>(
-    fillEndpoint(Endpoint.createOrUpdateArtifact, { versionId }),
+    fillEndpoint(Endpoint.commit, { versionId }),
     {
       method: "POST",
-      body: JSON.stringify(artifact),
+      body: JSON.stringify(commit),
     }
   );
 }

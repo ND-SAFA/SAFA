@@ -31,20 +31,6 @@ export interface ProjectCreationResponse {
 }
 
 /**
- * Defines a toggleable item of data.
- */
-export interface DataItem<T> {
-  /**
-   * Whether this item is enabled.
-   */
-  value: boolean;
-  /**
-   * The item of data.
-   */
-  item: T;
-}
-
-/**
  * Defines the response from checking if an artifact exists.
  */
 export interface ArtifactNameValidationResponse {
@@ -130,4 +116,23 @@ export interface ParseTraceFileResponse extends ParseFileResponse {
    * The traces parsed.
    */
   traces: TraceLink[];
+}
+
+/**
+ * Represents a single commit containing one or more changes to
+ * either artifacts or trace links
+ */
+export interface Commit {
+  commitVersion: ProjectVersion;
+  artifacts: EntityCommit<Artifact>;
+  traces: EntityCommit<TraceLink>;
+}
+
+/**
+ * Encapsulates the changes for a generic type of project entity.
+ */
+export interface EntityCommit<T> {
+  added: T[];
+  removed: T[];
+  modified: T[];
 }

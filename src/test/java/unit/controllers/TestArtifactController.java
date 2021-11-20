@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.ProjectCommitBuilder;
+import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -54,7 +54,7 @@ public class TestArtifactController extends ApplicationBaseTest {
         artifactJson.put("summary", modifiedSummary);
 
         // VP - Commit modified artifact for saving
-        commit(ProjectCommitBuilder
+        commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedArtifact(artifactJson));
 
@@ -89,7 +89,7 @@ public class TestArtifactController extends ApplicationBaseTest {
 
         // Step - Delete artifact
         JSONObject artifactJson = response.getValue1();
-        commit(ProjectCommitBuilder
+        commit(CommitBuilder
             .withVersion(projectVersion)
             .withRemovedArtifact(artifactJson));
 
@@ -141,7 +141,7 @@ public class TestArtifactController extends ApplicationBaseTest {
             .withArtifactAndReturn(projectName, artifactName, "requirements", "this is a body");
 
         // Step - Send request to create artifact
-        commit(ProjectCommitBuilder
+        commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson));
 

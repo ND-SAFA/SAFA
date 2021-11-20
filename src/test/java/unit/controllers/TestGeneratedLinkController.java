@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.Routes;
@@ -23,7 +24,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
-public class TestTraceLinkController extends ApplicationBaseTest {
+public class TestGeneratedLinkController extends ApplicationBaseTest {
 
     @Test
     public void testGetGeneratedLinks() throws Exception {
@@ -65,37 +66,48 @@ public class TestTraceLinkController extends ApplicationBaseTest {
             .newArtifact(projectName, "B", targetName)
             .newGeneratedTraceLink(projectName, sourceName, targetName, score);
 
+        ProjectVersion projectVersion = entityBuilder.getProjectVersion(projectName, 0);
         TraceLink generatedLink = entityBuilder.getTraceLinks(projectName).get(0);
-        UUID generatedLinkId = generatedLink.getTraceLinkId();
 
         // VP - Verify that trace link is unreviewed
+        UUID generatedLinkId = generatedLink.getTraceLinkId();
         Optional<TraceLink> unreviewedLinkQuery = traceLinkRepository.findById(generatedLinkId);
         assertThat(unreviewedLinkQuery.isPresent()).isTrue();
         assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.UNREVIEWED);
 
+        // Step - Set trace link status to approved
+        generatedLink.setApprovalStatus(TraceApproval.APPROVED);
+
         // Step - Approve generated trace link
-        String acceptUrl = RouteBuilder
-            .withRoute(Routes.approveLinkById)
-            .withTraceLink(generatedLink)
-            .get();
-        sendPut(acceptUrl, new JSONObject(), status().is2xxSuccessful());
+        commit(CommitBuilder
+            .withVersion(projectVersion)
+            .withModifiedTrace(generatedLink));
 
         // VP - Verify that trace link is approved
         Optional<TraceLink> approvedLinkQuery = traceLinkRepository.findById(generatedLinkId);
         assertThat(approvedLinkQuery.isPresent()).isTrue();
         assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
 
-        // Step - Decline generated link
-        String declineUrl = RouteBuilder
-            .withRoute(Routes.declineLinkById)
-            .withTraceLink(generatedLink)
-            .get();
-        sendPut(declineUrl, new JSONObject(), status().is2xxSuccessful());
+        // Step - Set trace link status to decline d
+        generatedLink.setApprovalStatus(TraceApproval.DECLINED);
+
+        // Step - Commit changes
+        commit(CommitBuilder
+            .withVersion(projectVersion)
+            .withModifiedTrace(generatedLink));
+
+        // VP - Verify that link is saved.
         Optional<TraceLink> declinedLinkQuery = traceLinkRepository.findById(generatedLinkId);
+
         assertThat(declinedLinkQuery.isPresent()).isTrue();
         assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.DECLINED);
     }
 
+    /**
+     * Tests that client is able to generate trace links
+     *
+     * @throws Exception
+     */
     @Test
     public void testGenerateTraceLinks() throws Exception {
 
@@ -147,7 +159,10 @@ public class TestTraceLinkController extends ApplicationBaseTest {
     }
 
     /**
-     * The following test verifies that a trace link can be created.
+     * The following test verifies that a trace link can be created by:
+     * 1. Verify that some link does not exist.
+     * 2. Committing new trace link
+     * 3. Fetching link to verify it exists.
      */
     @Test
     public void testCreateTraceLink() throws Exception {
@@ -164,17 +179,12 @@ public class TestTraceLinkController extends ApplicationBaseTest {
         assertTraceDoesNotExist(project, sourceName, targetName);
 
         // Step - POST trace links creation
-        String url = RouteBuilder
-            .withRoute(Routes.createNewLink)
-            .withVersion(projectVersion)
-            .withSourceName(sourceName)
-            .withTargetName(targetName)
-            .get();
-        JSONObject response = sendPost(url, new JSONObject(), status().is2xxSuccessful());
-
-        // VP - Verify that no error
-        int status = response.getInt("status");
-        assertThat(status).isEqualTo(0);
+        JSONObject traceJson = jsonBuilder.createTrace(sourceName, targetName);
+        commit(
+            CommitBuilder
+                .withVersion(projectVersion)
+                .withAddedTrace(traceJson)
+        );
 
         // VP - Verify that link created
         assertTraceExists(project, sourceName, targetName);

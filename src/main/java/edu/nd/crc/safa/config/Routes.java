@@ -11,9 +11,6 @@ public class Routes {
 
     //Change Controller
     public static final String commitChange = "/project/versions/{versionId}/commit";
-    public static final String approveLinkById = "/projects/links/{traceLinkId}/approve";
-    public static final String declineLinkById = "/projects/links/{traceLinkId}/decline";
-    public static final String createNewLink = "/projects/versions/{versionId}/links/create/{sourceId}/{targetId}";
 
     // Artifact Controller
     public static final String checkIfArtifactExists = "/projects/{projectId}/artifacts/validate/{artifactName}";

@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.ProjectCommitBuilder;
+import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.Routes;
@@ -50,13 +50,13 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
             .getProjectVersion(projectName, 0);
     }
 
-    public void commit(ProjectCommitBuilder projectCommitBuilder) throws Exception {
-        ProjectVersion commitVersion = projectCommitBuilder.get().getCommitVersion();
+    public void commit(CommitBuilder commitBuilder) throws Exception {
+        ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
             .withRoute(Routes.commitChange)
             .withVersion(commitVersion)
             .get();
-        sendPost(route, projectCommitBuilder.asJson(), status().is2xxSuccessful());
+        sendPost(route, commitBuilder.asJson(), status().is2xxSuccessful());
     }
 
     /**

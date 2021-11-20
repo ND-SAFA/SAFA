@@ -9,14 +9,9 @@ import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
-import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
-import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,31 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtifactController extends BaseController {
 
     ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
-
-    ProjectService projectService;
-    ArtifactVersionService artifactVersionService;
-    VersionService versionService;
-    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ArtifactController(ProjectRepository projectRepository,
-                              ArtifactBodyRepository artifactBodyRepository,
                               ProjectVersionRepository projectVersionRepository,
-                              ProjectService projectService,
-                              ArtifactVersionService artifactVersionService,
-                              VersionService versionService,
-                              ArtifactRepository artifactRepository,
-                              RevisionNotificationService revisionNotificationService) {
+                              ArtifactRepository artifactRepository) {
         super(projectRepository, projectVersionRepository);
-        this.artifactBodyRepository = artifactBodyRepository;
-        this.projectService = projectService;
-        this.artifactVersionService = artifactVersionService;
-        this.versionService = versionService;
         this.artifactRepository = artifactRepository;
-        this.revisionNotificationService = revisionNotificationService;
     }
-    
+
     /**
      * Returns flag `artifactExists` indicating whether artifact exists in the project.
      *

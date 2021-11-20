@@ -20,7 +20,6 @@ import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -57,7 +56,6 @@ public class TraceFileParser {
     ParserErrorRepository parserErrorRepository;
     TraceLinkRepository traceLinkRepository;
     TraceLinkGenerator traceLinkGenerator;
-    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceFileParser(TraceLinkService traceLinkService,
@@ -65,15 +63,13 @@ public class TraceFileParser {
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkGenerator traceLinkGenerator,
-                           RevisionNotificationService revisionNotificationService) {
+                           TraceLinkGenerator traceLinkGenerator) {
         this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
-        this.revisionNotificationService = revisionNotificationService;
     }
 
     /**

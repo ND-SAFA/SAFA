@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
+import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommitController extends BaseController {
 
     ArtifactController artifactController;
-    TraceLinkController traceLinkController;
+    TraceLinkService traceLinkService;
 
     ArtifactVersionService artifactVersionService;
     RevisionNotificationService revisionNotificationService;
@@ -38,13 +39,13 @@ public class CommitController extends BaseController {
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
                             ArtifactController artifactController,
-                            TraceLinkController traceLinkController,
+                            TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository);
         this.artifactController = artifactController;
-        this.traceLinkController = traceLinkController;
+        this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;
     }
@@ -75,13 +76,13 @@ public class CommitController extends BaseController {
 
     private void commitTraces(UUID versionId, ProjectChange<TraceAppEntity> traces) throws ServerError {
         for (TraceAppEntity trace : traces.getAdded()) {
-            traceLinkController.createNewTraceLInk(versionId, trace.source, trace.target);
+            traceLinkService.createNewTraceLInk(versionId, trace.source, trace.target);
         }
         for (TraceAppEntity trace : traces.getModified()) {
-            traceLinkController.updateTraceLink(versionId, trace);
+            traceLinkService.updateTraceLink(versionId, trace);
         }
         for (TraceAppEntity trace : traces.getRemoved()) {
-            traceLinkController.declineTraceLink(UUID.fromString(trace.getTraceLinkId()));
+            traceLinkService.deleteTraceLink(trace);
         }
     }
 }

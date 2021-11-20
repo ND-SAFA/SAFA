@@ -107,6 +107,8 @@ export default Vue.extend({
     },
     name(newName: string): void {
       if (newName !== "") {
+        //TODO: Only send request after user has stopped typing for at least
+        // N milliseconds. See cytoscape rendering functions for timeout example.
         isArtifactNameTaken(this.projectId, newName).then((res) => {
           this.isNameValid = !res.artifactExists;
 

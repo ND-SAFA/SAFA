@@ -10,7 +10,7 @@ public class Routes {
     public static final String loginLink = "/login";
 
     //Change Controller
-    public static final String commitChange = "/project/versions/{versionId}/commit";
+    public static final String commitChange = "/projects/versions/{versionId}/commit";
 
     // Artifact Controller
     public static final String checkIfArtifactExists = "/projects/{projectId}/artifacts/validate/{artifactName}";

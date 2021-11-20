@@ -76,7 +76,8 @@ public class TraceLink implements Serializable {
         this.approvalStatus = traceLink.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
             traceLink.approvalStatus;
         this.score = traceLink.score == 0 ? this.score : traceLink.score;
-        if (traceLink.getTraceLinkId() != null) {
+        String traceLinkId = traceLink.getTraceLinkId();
+        if (traceLinkId != null && !traceLinkId.equals("")) {
             this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
         }
     }

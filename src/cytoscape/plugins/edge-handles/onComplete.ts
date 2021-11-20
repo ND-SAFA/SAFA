@@ -13,12 +13,12 @@ export function onArtifactTreeEdgeComplete(
   const sourceId = sourceNode.data().id;
   const targetId = targetNode.data().id;
   const traceLink: TraceLink = {
+    traceLinkId: "",
     source: sourceId,
     target: targetId,
-    approvalStatus: TraceApproval.APPROVED,
-    traceLinkId: "",
-    score: 1,
     traceType: TraceType.MANUAL,
+    approvalStatus: TraceApproval.APPROVED,
+    score: 1,
   };
 
   createLink(traceLink)

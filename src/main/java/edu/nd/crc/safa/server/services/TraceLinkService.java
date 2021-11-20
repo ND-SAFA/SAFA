@@ -171,8 +171,12 @@ public class TraceLinkService {
     /**
      * Retrieves the corresponding trace link in given version and updates information
      * to given application state.
+     *
+     * @param baselineVersionId The id of the version the change was made in.
+     * @param traceAppEntity    The trace being updated.
+     * @throws ServerError Throws error if version not found.
      */
-    public void updateTraceLink(UUID versionId, TraceAppEntity traceAppEntity) throws ServerError {
+    public void updateTraceLink(UUID baselineVersionId, TraceAppEntity traceAppEntity) throws ServerError {
         TraceLink traceLink = getEntity(traceAppEntity);
         traceLink.setApprovalStatus(traceAppEntity.approvalStatus);
         this.traceLinkRepository.save(traceLink);

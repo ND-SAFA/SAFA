@@ -30,17 +30,20 @@ public class EntityBuilder extends BaseBuilder {
 
     final int majorVersion = 1;
     final int minorVersion = 1;
+
     ProjectRepository projectRepository;
     ProjectVersionRepository projectVersionRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactRepository artifactRepository;
     ArtifactBodyRepository artifactBodyRepository;
     TraceLinkRepository traceLinkRepository;
+
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
     Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
     Hashtable<String, Hashtable<String, Artifact>> artifacts;
     Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactBody>>> bodies;
+
     int revisionNumber;
 
     @Autowired

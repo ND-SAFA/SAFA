@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -20,13 +21,13 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Tests that /projects/ is able to create new projects from the front-end
  * JSON representation as well as updates the elements if they already exists
  */
-public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
+public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
 
     final int N_TYPES = 2;
     final int N_ARTIFACTS = 2;
@@ -36,7 +37,6 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
     final String a2Type = "design";
     final String a2Name = "DD-10";
     final String projectName = "test-project";
-    final String routeName = "/projects/";
 
     @Autowired
     ObjectMapper objectMapper;
@@ -202,7 +202,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
 
     @Test
     public void testValidation() throws Exception {
-        String url = "/projects";
+        String url = Routes.projects;
         JSONObject projectJson = new JSONObject();
         projectJson.put("name", projectName);
         projectJson.put("artifacts", new ArrayList<String>());
@@ -220,7 +220,7 @@ public class TestProjectCreateOrUpdateJson extends EntityBaseTest {
 
     private JSONObject postProjectJson(JSONObject projectJson,
                                        ResultMatcher expectedStatus) throws Exception {
-        return sendPost(routeName, projectJson, expectedStatus);
+        return sendPost(Routes.projects, projectJson, expectedStatus);
     }
 
     private JSONObject createProjectJson() {

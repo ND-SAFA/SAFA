@@ -6,18 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestArtifactNodeFileParser extends EntityBaseTest {
+public class TestArtifactNodeFileParser extends ApplicationBaseTest {
 
     @Autowired
     ArtifactFileParser artifactFileParser;

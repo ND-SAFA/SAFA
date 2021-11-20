@@ -6,9 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.DeltaService;
 
@@ -16,9 +19,9 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestArtifactController extends EntityBaseTest {
+public class TestArtifactController extends ApplicationBaseTest {
 
     @Autowired
     DeltaService deltaService;
@@ -35,7 +38,6 @@ public class TestArtifactController extends EntityBaseTest {
         // Step - POST artifact and return entities created
         Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
         ProjectVersion projectVersion = response.getValue0();
-        String versionId = projectVersion.getVersionId().toString();
         JSONObject artifactJson = response.getValue1();
 
         verifyArtifactStatus(projectVersion, artifactName);
@@ -44,7 +46,7 @@ public class TestArtifactController extends EntityBaseTest {
         artifactJson.put("summary", modifiedSummary);
 
         // VP - Submit modified artifact for saving
-        sendPost(getArtifactUrl(versionId), artifactJson, status().isCreated());
+        sendPost(getArtifactUrl(projectVersion), artifactJson, status().isCreated());
 
         // Step - Retrieve ArtifactBodies
         List<ArtifactBody> artifactBodies = artifactBodyRepository.getBodiesWithName(projectVersion.getProject(),
@@ -70,14 +72,17 @@ public class TestArtifactController extends EntityBaseTest {
         // Step - Create artifact
         Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
         ProjectVersion projectVersion = response.getValue0();
-        String versionId = projectVersion.getVersionId().toString();
 
         // VP - Verify that artifact exists
         verifyArtifactStatus(projectVersion, artifactName);
         verifyArtifactBodyStatus(projectVersion, artifactName);
 
         // Step - Delete artifact
-        String deleteUrl = String.format("/projects/versions/%s/artifacts/%s", versionId, artifactName);
+        String deleteUrl = RouteBuilder
+            .withRoute(Routes.deleteArtifact)
+            .withVersion(projectVersion)
+            .withArtifactName(artifactName)
+            .get();
         sendDelete(deleteUrl, status().is2xxSuccessful());
 
         // VP - Verify artifact does not exist
@@ -100,8 +105,7 @@ public class TestArtifactController extends EntityBaseTest {
             .withArtifactAndReturn(projectName, artifactName, "requirements", "this is a body");
 
         // Step - Send request to create artifact
-        String versionId = projectVersion.getVersionId().toString();
-        sendPost(getArtifactUrl(versionId), artifactJson, status().isCreated());
+        sendPost(getArtifactUrl(projectVersion), artifactJson, status().isCreated());
 
         return new Pair<>(projectVersion, artifactJson);
     }
@@ -111,8 +115,12 @@ public class TestArtifactController extends EntityBaseTest {
         String projectName = "test-project";
         String artifactName = "RE-10";
         String artifactType = "requirement";
-        String projectId = entityBuilder.newProjectWithReturn(projectName).getProjectId().toString();
-        String url = String.format("/projects/%s/artifacts/validate/%s", projectId, artifactName);
+        Project project = entityBuilder.newProjectWithReturn(projectName);
+        String url = RouteBuilder
+            .withRoute(Routes.checkIfArtifactExists)
+            .withProject(project)
+            .withArtifactName(artifactName)
+            .get();
 
         // VP - Verify that status is okay and artifact does not exist
         JSONObject response = sendGet(url, status().isOk());
@@ -130,8 +138,11 @@ public class TestArtifactController extends EntityBaseTest {
         assertThat(artifactExists).isTrue();
     }
 
-    private String getArtifactUrl(String versionId) {
-        return String.format("/projects/versions/%s/artifacts", versionId);
+    private String getArtifactUrl(ProjectVersion projectVersion) {
+        return RouteBuilder
+            .withRoute(Routes.createArtifact)
+            .withVersion(projectVersion)
+            .get();
     }
 
     private void verifyArtifactStatus(ProjectVersion projectVersion, String artifactName) {

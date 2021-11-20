@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
@@ -23,19 +24,19 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 import unit.TestConstants;
 
-public class TestProjectCreationFlatFiles extends EntityBaseTest {
+public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
 
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/flat-files";
+        String routeName = Routes.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
 
         // VP 1 - Server response is 200 - okay
         assertThat(responseContent.get("status")).as("status is set").isEqualTo(0);

@@ -3,14 +3,16 @@ package unit.controllers.project;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.config.Routes;
+
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestProjectRetrieval extends EntityBaseTest {
+public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {
-        JSONObject response = sendGet("/projects/", status().isOk());
+        JSONObject response = sendGet(Routes.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
@@ -19,7 +21,7 @@ public class TestProjectRetrieval extends EntityBaseTest {
         entityBuilder
             .newProject("firstProject")
             .newProject("secondProject");
-        JSONObject response = sendGet("/projects/", status().isOk());
+        JSONObject response = sendGet(Routes.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }
 }

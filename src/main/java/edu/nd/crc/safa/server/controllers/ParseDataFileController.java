@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.api.FileParser;
@@ -22,7 +23,6 @@ import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Provides API for parsing ArtifactFiles and TraceFile.
  */
-@CrossOrigin
 @RestController
 public class ParseDataFileController extends BaseController {
 
@@ -58,7 +57,7 @@ public class ParseDataFileController extends BaseController {
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
-    @PostMapping(value = "projects/parse/artifacts/{artifactType}")
+    @PostMapping(value = Routes.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
                                             @RequestParam MultipartFile file) {
@@ -82,7 +81,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = "projects/parse/traces")
+    @PostMapping(value = Routes.parseTraceFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();

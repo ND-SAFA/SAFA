@@ -57,6 +57,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.5'
     implementation 'org.springframework:spring-websocket:5.3.11'
     implementation 'org.springframework:spring-messaging:5.3.11'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
+    implementation 'org.springframework.security:spring-security-messaging:5.6.0'
+
+    //authentication
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-orgjson:0.11.2'
 
     // websockets
     implementation 'org.webjars:sockjs-client:1.5.1'
@@ -72,6 +80,7 @@ dependencies {
     testImplementation 'com.h2database:h2:1.4.200'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.springframework.security:spring-security-test:5.6.0'
 }
 
 test {

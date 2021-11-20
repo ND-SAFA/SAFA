@@ -2,16 +2,16 @@ package unit.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestVersionService extends EntityBaseTest {
+public class TestVersionService extends ApplicationBaseTest {
     @Autowired
     VersionService versionService;
 

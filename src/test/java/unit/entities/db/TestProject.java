@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Responsible for testing that projects can be created, modified, deleted,
  * and retrieved.
  */
-public class TestProject extends EntityBaseTest {
+public class TestProject extends ApplicationBaseTest {
 
     @Test
     public void createRetrieveUpdateDeleteProject() {

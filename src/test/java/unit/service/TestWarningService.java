@@ -13,9 +13,9 @@ import edu.nd.crc.safa.warnings.RuleName;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestWarningService extends EntityBaseTest {
+public class TestWarningService extends ApplicationBaseTest {
 
     @Autowired
     WarningService warningService;

@@ -3,16 +3,19 @@ package unit.controllers.version;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.server.entities.db.Project;
+
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestVersionRetrieval extends EntityBaseTest {
+public class TestVersionRetrieval extends ApplicationBaseTest {
     @Test
     public void getEmptyVersions() throws Exception {
-        String projectId = entityBuilder
-            .newProjectWithReturn("test-project").getProjectId().toString();
-        JSONObject response = sendGet(createRouteName(projectId), status().isOk());
+        Project project = entityBuilder.newProjectWithReturn("test-project");
+        JSONObject response = sendGet(createRouteName(project), status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
@@ -23,15 +26,12 @@ public class TestVersionRetrieval extends EntityBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
-        String projectId = entityBuilder
-            .getProject("test-project")
-            .getProjectId()
-            .toString();
-        JSONObject response = sendGet(createRouteName(projectId), status().isOk());
+        Project project = entityBuilder.getProject("test-project");
+        JSONObject response = sendGet(createRouteName(project), status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }
 
-    private String createRouteName(String projectId) {
-        return String.format("/projects/%s/versions", projectId);
+    private String createRouteName(Project project) {
+        return RouteBuilder.withRoute(Routes.getVersions).withProject(project).get();
     }
 }

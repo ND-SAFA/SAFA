@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -29,13 +30,15 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * 1. connecting to server through websocket endpoint
  * 2. Reading messages in queue associated
  */
-public class WebSocketBaseTest extends EntityBaseTest {
+public class WebSocketBaseTest extends ApplicationBaseTest {
 
     static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
     private static ObjectMapper mapper;
     private static WebSocketStompClient stompClient;
     private static HashMap<String, BlockingQueue<String>> idToQueue;
     private static HashMap<String, StompSession> idToSession;
+
+    final int TIME_TO_POLL = 5; // seconds
 
     @LocalServerPort
     private Integer port;
@@ -58,9 +61,12 @@ public class WebSocketBaseTest extends EntityBaseTest {
     }
 
     public WebSocketBaseTest createNewConnection(String id) throws Exception {
+        assertTokenExists();
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         StompSession session = stompClient
-            .connect(String.format(WEBSOCKET_URI, port), new StompSessionHandlerAdapter() {
-            })
+            .connect(String.format(WEBSOCKET_URI, port),
+                new StompSessionHandlerAdapter() {
+                })
             .get(1, SECONDS);
         idToSession.put(id, session);
         idToQueue.put(id, new LinkedBlockingDeque<>());
@@ -87,7 +93,7 @@ public class WebSocketBaseTest extends EntityBaseTest {
     }
 
     public String getNextMessage(String id) throws InterruptedException {
-        return idToQueue.get(id).poll(3, SECONDS);
+        return idToQueue.get(id).poll(TIME_TO_POLL, SECONDS);
     }
 
     public int getQueueSize(String id) {

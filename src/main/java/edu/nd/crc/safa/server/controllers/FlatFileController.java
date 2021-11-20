@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Arrays;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
@@ -17,7 +18,6 @@ import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin
 @RestController
 public class FlatFileController extends BaseController {
 
@@ -56,7 +55,7 @@ public class FlatFileController extends BaseController {
      * @return ServerResponse whose body contains all entities in project created.
      * @throws ServerError - If no files are given.
      */
-    @PostMapping(value = "projects/versions/{versionId}/flat-files")
+    @PostMapping(value = Routes.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
@@ -81,7 +80,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = "projects/flat-files")
+    @PostMapping(value = Routes.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {

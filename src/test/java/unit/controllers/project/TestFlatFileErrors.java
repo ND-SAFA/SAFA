@@ -3,23 +3,23 @@ package unit.controllers.project;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.Routes;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestFlatFileErrors extends EntityBaseTest {
+public class TestFlatFileErrors extends ApplicationBaseTest {
 
     @Test
     public void testArtifactTypeNotFound() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/flat-files";
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_2);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
         // VP - Verify that error occurred.
         assertThat(responseContent.getInt("status")).isEqualTo(1);
@@ -34,10 +34,9 @@ public class TestFlatFileErrors extends EntityBaseTest {
     public void testDuplicateArtifactBody() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = "/projects/flat-files";
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_3);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest());
+        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
         // VP - Verify that error occurred.
         assertThat(responseContent.getInt("status")).isEqualTo(1);

@@ -40,25 +40,13 @@
 </template>
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ButtonDefinition,
-  ButtonType,
-  ListMenuDefinition,
-  Artifact,
-} from "@/types";
+import { ButtonDefinition, ButtonType, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
 import { appModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 import { ButtonRow } from "@/components/common/button-row";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
-
-const EMPTY_ARTIFACT: Artifact = {
-  type: "",
-  name: "",
-  summary: "",
-  body: "",
-};
 
 export default Vue.extend({
   components: { GenericModal, ButtonRow },
@@ -74,17 +62,16 @@ export default Vue.extend({
     artifact: {
       type: Object as PropType<Artifact>,
       required: false,
-      default: () => EMPTY_ARTIFACT,
     },
   },
   data() {
     return {
-      name: this.artifact.name,
-      summary: this.artifact.summary,
-      body: this.artifact.body,
-      type: this.artifact.type,
+      name: this.artifact?.name || "",
+      summary: this.artifact?.summary || "",
+      body: this.artifact?.body || "",
+      type: this.artifact?.type || "",
       isLoading: false,
-      isNameValid: this.artifact.name !== "",
+      isNameValid: !!this.artifact?.name,
       nameHint: DEFAULT_NAME_HINT,
       nameError: "",
       buttonDefinitions: [] as ButtonDefinition[],
@@ -111,11 +98,17 @@ export default Vue.extend({
     isOpen(isOpen: boolean): void {
       if (isOpen) {
         this.setButtonDefinitions();
+      } else {
+        this.name = this.artifact?.name || "";
+        this.summary = this.artifact?.summary || "";
+        this.body = this.artifact?.body || "";
+        this.type = this.artifact?.type || "";
       }
     },
     name(newName: string): void {
       isArtifactNameTaken(this.projectId, newName).then((res) => {
         this.isNameValid = !res.artifactExists;
+
         if (this.isNameValid) {
           this.nameError = "";
         } else {
@@ -126,19 +119,19 @@ export default Vue.extend({
   },
   methods: {
     setButtonDefinitions(): void {
-      const label = this.type !== "" ? this.type : "Artifact Type";
-      const menuItem: ListMenuDefinition = {
-        type: ButtonType.LIST_MENU,
-        label,
-        menuItems: this.artifactTypes,
-        menuHandlers: this.artifactTypes.map(
-          (type) => () => (this.type = type)
-        ),
-        buttonColor: "primary",
-        buttonIsText: false,
-        showSelectedValue: true,
-      };
-      this.buttonDefinitions = [menuItem];
+      this.buttonDefinitions = [
+        {
+          type: ButtonType.LIST_MENU,
+          label: this.type || "Artifact Type",
+          menuItems: this.artifactTypes,
+          menuHandlers: this.artifactTypes.map(
+            (type) => () => (this.type = type)
+          ),
+          buttonColor: "primary",
+          buttonIsText: false,
+          showSelectedValue: true,
+        },
+      ];
     },
     onSubmit(): void {
       // only called when isValid / button is enabled
@@ -148,16 +141,19 @@ export default Vue.extend({
         summary: this.summary,
         body: this.body,
       };
+
       this.isLoading = true;
+
       if (this.versionId === undefined) {
         appModule.onWarning("Please select a project version.");
         return;
       }
+
       createOrUpdateArtifactHandler(this.versionId, artifact)
         .then(() => {
           this.$emit("onClose");
         })
-        .catch((e) => console.error(e))
+        .catch(() => appModule.onWarning("Unable to create artifact."))
         .finally(() => (this.isLoading = false));
     },
   },

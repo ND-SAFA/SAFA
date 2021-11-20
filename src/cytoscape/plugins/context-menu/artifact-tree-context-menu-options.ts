@@ -22,7 +22,7 @@ export const artifactTreeContextMenuOptions = {
       tooltipText: "Create new artifact",
       selector: "node, edge",
       coreAsWell: true,
-      onClickFunction: () => {
+      onClickFunction: (): void => {
         if (projectModule.isProjectDefined) {
           appModule.openPanel(PanelType.artifactCreator);
         } else {

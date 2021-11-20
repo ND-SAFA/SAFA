@@ -158,7 +158,7 @@ export default class ProjectModule extends VuexModule {
     this.SET_PANEL_STATE({
       type: panel,
       isOpen: true,
-    } as PanelState);
+    });
   }
 
   @Action
@@ -171,7 +171,7 @@ export default class ProjectModule extends VuexModule {
     this.SET_PANEL_STATE({
       type: panel,
       isOpen: false,
-    } as PanelState);
+    });
   }
 
   @Action

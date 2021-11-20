@@ -43,6 +43,8 @@ export default async function authHttpClient<T>(
 
   const res = await fetch(URL, options);
   if (res.status === 204) {
+    // TODO: will be removed in the next PR
+    //containing the proper use of http codes.
     return {} as T;
   }
   const resContent = await res.json();

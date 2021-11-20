@@ -14,26 +14,33 @@ export enum Endpoint {
   logout = "accounts/logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
+
   // Projects
-  commit = "projects/versions/:versionId/commit",
   project = "projects",
-  deleteArtifact = "projects/versions/:versionId/artifacts/:artifactName",
-  isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
-  getGeneratedLinks = "projects/:projectId/links/generated",
-  generateLinks = "projects/links/generate",
-  approveLink = "projects/links/:traceLinkId/approve",
-  declineLink = "projects/links/:traceLinkId/decline",
-  createLink = "projects/versions/:versionId/links/create/:sourceId/:targetId",
+  updateProject = "projects/:projectId",
   createProjectFromFlatFiles = "projects/flat-files",
   updateProjectThroughFlatFiles = "projects/versions/:versionId/flat-files",
+
+  //Changes
+  commit = "projects/versions/:versionId/commit",
+  isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
+
+  //Links
+  getGeneratedLinks = "projects/:projectId/links/generated",
+  generateLinks = "projects/links/generate",
+
+  //Versions
   projectVersion = "projects/versions/:versionId",
-  updateProject = "projects/:projectId",
   getProjectVersions = "projects/:projectId/versions",
   getCurrentVersion = "projects/:projectId/versions/current",
   createNewMajorVersion = "projects/:projectId/versions/major",
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
+
+  //Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
+
+  //Parse Entities
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
 }

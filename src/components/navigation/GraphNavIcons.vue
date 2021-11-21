@@ -12,6 +12,7 @@
           :tooltip="definition.label"
           :icon-id="definition.icon"
           @click="definition.handler"
+          :is-disabled="definition.isDisabled"
         />
         <CheckmarkMenu v-else :definition="definition" />
       </v-row>
@@ -25,6 +26,7 @@ import { ButtonDefinition, ButtonType, Artifact } from "@/types";
 import { capitalize } from "@/util";
 import {
   artifactSelectionModule,
+  commitModule,
   projectModule,
   viewportModule,
 } from "@/store";
@@ -78,6 +80,15 @@ export default Vue.extend({
       return [
         {
           type: ButtonType.ICON,
+          handler: () => {
+            commitModule.undoCommit().then();
+          },
+          label: "Undo Commit",
+          icon: "mdi-undo",
+          isDisabled: !commitModule.canUndo,
+        },
+        {
+          type: ButtonType.ICON,
           handler: () => viewportModule.onZoomIn(),
           label: "Zoom In",
           icon: "mdi-magnify-plus-outline",
@@ -109,6 +120,13 @@ export default Vue.extend({
             (item, itemIndex) => () => this.filterTypeHandler(itemIndex)
           ),
           checkmarkValues: this.menuItems.map((i) => i[1]),
+        },
+        {
+          type: ButtonType.ICON,
+          handler: () => commitModule.redoCommit().then(),
+          label: "Redo Commit",
+          icon: "mdi-redo",
+          isDisabled: !commitModule.canRedo,
         },
       ];
     },

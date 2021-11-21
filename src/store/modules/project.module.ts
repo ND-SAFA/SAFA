@@ -7,6 +7,7 @@ import type {
   TraceLink,
   ChannelSubscriptionId,
   ArtifactQueryFunction,
+  ProjectVersion,
 } from "@/types";
 import { LinkValidator } from "@/types";
 import {
@@ -219,17 +220,21 @@ export default class ProjectModule extends VuexModule {
         (a) => a.name === artifactName
       );
       if (query.length === 0) {
-        appModule.onWarning(
-          `Could not find artifact with name: ${artifactName}`
-        );
+        const error = `Could not find artifact with name: ${artifactName}`;
+        appModule.onWarning(error);
+        throw Error(error);
       } else if (query.length > 1) {
-        appModule.onWarning(
-          `Found more than one artifact with name: ${artifactName}`
-        );
+        const error = `Found more than one artifact with name: ${artifactName}`;
+        appModule.onWarning(error);
+        throw Error(error);
       } else {
         return query[0];
       }
     };
+  }
+
+  get helloWorld(): string {
+    return "hell world";
   }
 
   /**

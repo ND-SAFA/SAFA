@@ -94,8 +94,6 @@ async function handleOnClick(
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
     const artifact = projectModule.getArtifactByName(artifactData.artifactName);
-    if (artifact !== undefined) {
-      await handler(artifact);
-    }
+    await handler(artifact);
   }
 }

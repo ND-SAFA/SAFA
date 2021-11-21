@@ -10,6 +10,7 @@ import {
   SessionModule,
   ViewportModule,
 } from "./modules";
+import CommitModule from "@/store/modules/commit.module";
 
 Vue.use(Vuex);
 Vue.config.devtools = true;
@@ -25,6 +26,7 @@ const store = new Vuex.Store({
     error: ErrorModule,
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,
+    commit: CommitModule,
   },
 });
 
@@ -38,5 +40,6 @@ export const artifactSelectionModule = getModule(
 );
 export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
+export const commitModule = getModule(CommitModule, store);
 
 export default store;

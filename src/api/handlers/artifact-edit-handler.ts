@@ -1,23 +1,31 @@
 import { Artifact, ConfirmationType } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { createOrUpdateArtifact, deleteArtifactBody } from "@/api/endpoints";
+import {
+  createArtifact,
+  updateArtifact,
+  deleteArtifactBody,
+} from "@/api/endpoints";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
  *
  * @param versionId - The version that the artifact is stored within.
  * @param artifact - The artifact to create.
+ * @param isUpdate - Whether this operation should label this commit as
+ * updating a previously existing artifact.
  */
 export function createOrUpdateArtifactHandler(
   versionId: string,
-  artifact: Artifact
+  artifact: Artifact,
+  isUpdate: boolean
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    createOrUpdateArtifact(versionId, artifact)
+    const artifactPromise = isUpdate ? updateArtifact : createArtifact;
+    artifactPromise(versionId, artifact)
       .then(() => {
         projectModule.addOrUpdateArtifacts([artifact]);
-        resolve();
       })
+      .then(resolve)
       .catch(reject);
   });
 }

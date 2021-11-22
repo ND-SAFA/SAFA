@@ -34,19 +34,19 @@ export class CommitBuilder {
     }
     return new CommitBuilder(version);
   }
-  withNewArtifact(artifact: Artifact): CommitBuilder {
+  withNewArtifact(artifact: Artifact): this {
     this.commit.artifacts.added.push(artifact);
     return this;
   }
-  withRemovedArtifact(artifact: Artifact): CommitBuilder {
+  withRemovedArtifact(artifact: Artifact): this {
     this.commit.artifacts.removed.push(artifact);
     return this;
   }
-  withNewTraceLink(traceLink: TraceLink): CommitBuilder {
+  withNewTraceLink(traceLink: TraceLink): this {
     this.commit.traces.added.push(traceLink);
     return this;
   }
-  withModifiedTraceLink(traceLink: TraceLink): CommitBuilder {
+  withModifiedTraceLink(traceLink: TraceLink): this {
     this.commit.traces.modified.push(traceLink);
     return this;
   }

@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import org.json.JSONObject;
 
-public class TraceApplicationEntity {
+public class TraceAppEntity {
     public String traceLinkId;
     public String source;
     public String target;
@@ -18,10 +18,10 @@ public class TraceApplicationEntity {
     public double score;
     public TraceType traceType;
 
-    public TraceApplicationEntity() {
+    public TraceAppEntity() {
     }
 
-    public TraceApplicationEntity(String source, String target, double score) {
+    public TraceAppEntity(String source, String target, double score) {
         this.traceLinkId = "";
         this.source = source;
         this.target = target;
@@ -30,7 +30,7 @@ public class TraceApplicationEntity {
         this.traceType = TraceType.GENERATED;
     }
 
-    public TraceApplicationEntity(TraceLink trace) {
+    public TraceAppEntity(TraceLink trace) {
         UUID traceLinkId = trace.getTraceLinkId();
         this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
         this.source = trace.getSourceName();
@@ -40,8 +40,8 @@ public class TraceApplicationEntity {
         this.traceType = trace.getTraceType();
     }
 
-    public static List<TraceApplicationEntity> createEntities(List<TraceLink> links) {
-        return links.stream().map(TraceApplicationEntity::new).collect(Collectors.toList());
+    public static List<TraceAppEntity> createEntities(List<TraceLink> links) {
+        return links.stream().map(TraceAppEntity::new).collect(Collectors.toList());
     }
 
     public String getSource() {

@@ -26,7 +26,7 @@ public class ProjectAppEntity {
     public List<ArtifactAppEntity> artifacts;
 
     @NotNull
-    public List<TraceApplicationEntity> traces;
+    public List<TraceAppEntity> traces;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -35,7 +35,7 @@ public class ProjectAppEntity {
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
-                            List<TraceApplicationEntity> traces) {
+                            List<TraceAppEntity> traces) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
@@ -88,11 +88,11 @@ public class ProjectAppEntity {
         this.artifacts.add(artifact);
     }
 
-    public List<TraceApplicationEntity> getTraces() {
+    public List<TraceAppEntity> getTraces() {
         return this.traces;
     }
 
-    public void setTraces(List<TraceApplicationEntity> traces) {
+    public void setTraces(List<TraceAppEntity> traces) {
         this.traces = traces;
     }
 

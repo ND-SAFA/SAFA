@@ -5,9 +5,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,7 @@ public class ArtifactVersionService {
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactBodyRepository artifactBodyRepository;
+    ProjectVersionRepository projectVersionRepository;
 
     DeltaService deltaService;
 
@@ -41,10 +45,12 @@ public class ArtifactVersionService {
     public ArtifactVersionService(ArtifactRepository artifactRepository,
                                   ArtifactTypeRepository artifactTypeRepository,
                                   ArtifactBodyRepository artifactBodyRepository,
+                                  ProjectVersionRepository projectVersionRepository,
                                   DeltaService deltaService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactBodyRepository = artifactBodyRepository;
+        this.projectVersionRepository = projectVersionRepository;
         this.deltaService = deltaService;
     }
 
@@ -94,6 +100,39 @@ public class ArtifactVersionService {
             return;
         }
         saveArtifactBody(artifactBody);
+    }
+
+    /**
+     * Deletes artifact with given name within given project.
+     *
+     * @param versionId    UUID of versionId of associated project version.
+     * @param artifactName The name of the artifact to be deleted.
+     * @return ServerResponse with success message.
+     */
+    public ServerResponse deleteArtifactBody(
+        UUID versionId,
+        String artifactName) {
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion,
+            artifactName);
+        bodyToRemove.ifPresentOrElse(artifactBody -> {
+            artifactBody.setModificationType(ModificationType.REMOVED);
+            artifactBody.setSummary("");
+            artifactBody.setContent("");
+            this.artifactBodyRepository.save(artifactBody);
+        }, () -> {
+            Project project = projectVersion.getProject();
+            Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+            artifactQuery.ifPresent((artifact -> {
+                ArtifactBody artifactBody = new ArtifactBody(
+                    projectVersion,
+                    ModificationType.REMOVED,
+                    artifact,
+                    "", "");
+                this.artifactBodyRepository.save(artifactBody);
+            }));
+        });
+        return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 
     private List<ArtifactBody> calculateArtifactBodiesAtProjectVersion(

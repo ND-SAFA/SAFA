@@ -103,4 +103,11 @@ public class JsonBuilder extends BaseBuilder {
         this.projects.get(projectName).getJSONArray("traces").put(trace);
         return this;
     }
+
+    public JSONObject createTrace(String source, String target) {
+        JSONObject trace = new JSONObject();
+        trace.put("source", source);
+        trace.put("target", target);
+        return trace;
+    }
 }

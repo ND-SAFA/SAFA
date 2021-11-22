@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
 public class Update {
 
     String type;
-    List<TraceApplicationEntity> traces;
+    List<TraceAppEntity> traces;
     List<ArtifactAppEntity> artifacts;
 
     public Update() {
@@ -30,11 +30,11 @@ public class Update {
         this.type = type;
     }
 
-    public List<TraceApplicationEntity> getTraces() {
+    public List<TraceAppEntity> getTraces() {
         return traces;
     }
 
-    public void setTraces(List<TraceApplicationEntity> traces) {
+    public void setTraces(List<TraceAppEntity> traces) {
         this.traces = traces;
     }
 

@@ -3,11 +3,11 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
 public class ParseTraceFileResponse implements ParseFileResponse {
 
-    List<TraceApplicationEntity> traces;
+    List<TraceAppEntity> traces;
     List<String> errors;
 
     public ParseTraceFileResponse() {
@@ -15,11 +15,11 @@ public class ParseTraceFileResponse implements ParseFileResponse {
         this.errors = new ArrayList<>();
     }
 
-    public List<TraceApplicationEntity> getTraces() {
+    public List<TraceAppEntity> getTraces() {
         return traces;
     }
 
-    public void setTraces(List<TraceApplicationEntity> traces) {
+    public void setTraces(List<TraceAppEntity> traces) {
         this.traces = traces;
     }
 

@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -87,7 +87,7 @@ public class ParseDataFileController extends BaseController {
         ParseTraceFileResponse response = new ParseTraceFileResponse();
         tryParseFile(response, () -> {
             CSVParser fileCSV = traceFileParser.readTraceFile(file);
-            Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> parseResponse =
+            Pair<List<TraceAppEntity>, List<Pair<String, Long>>> parseResponse =
                 traceFileParser.readTraceFile(
                     (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json
                     (s, t) -> Optional.empty(), // TODO: Replace with traces from json

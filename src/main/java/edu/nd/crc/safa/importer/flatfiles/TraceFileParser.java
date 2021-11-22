@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
@@ -20,7 +20,6 @@ import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -57,7 +56,6 @@ public class TraceFileParser {
     ParserErrorRepository parserErrorRepository;
     TraceLinkRepository traceLinkRepository;
     TraceLinkGenerator traceLinkGenerator;
-    RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public TraceFileParser(TraceLinkService traceLinkService,
@@ -65,15 +63,13 @@ public class TraceFileParser {
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkGenerator traceLinkGenerator,
-                           RevisionNotificationService revisionNotificationService) {
+                           TraceLinkGenerator traceLinkGenerator) {
         this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
-        this.revisionNotificationService = revisionNotificationService;
     }
 
     /**
@@ -173,9 +169,9 @@ public class TraceFileParser {
         return new Pair<>(traceLinks, errors);
     }
 
-    public Pair<List<TraceApplicationEntity>, List<Pair<String, Long>>> readTraceFile(ArtifactFinder artifactFinder,
-                                                                                      TraceLinkFinder traceLinkFinder,
-                                                                                      CSVParser traceFileParser)
+    public Pair<List<TraceAppEntity>, List<Pair<String, Long>>> readTraceFile(ArtifactFinder artifactFinder,
+                                                                              TraceLinkFinder traceLinkFinder,
+                                                                              CSVParser traceFileParser)
         throws ServerError {
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
@@ -186,12 +182,12 @@ public class TraceFileParser {
             return new Pair<>(new ArrayList<>(), List.of(new Pair<>(error, (long) -1)));
         }
 
-        List<TraceApplicationEntity> traceLinks = new ArrayList<>();
+        List<TraceAppEntity> traceLinks = new ArrayList<>();
         List<Pair<String, Long>> errors = new ArrayList<>();
         for (CSVRecord record : records) {
             String sourceId = record.get(SOURCE_PARAM).trim();
             String targetId = record.get(TARGET_PARAM).trim();
-            TraceApplicationEntity trace = new TraceApplicationEntity();
+            TraceAppEntity trace = new TraceAppEntity();
             trace.setSource(sourceId);
             trace.setTarget(targetId);
             traceLinks.add(trace);

@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.api.Update;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -48,7 +48,7 @@ public class RevisionNotificationService {
         messagingTemplate.convertAndSend(versionTopicDestination, update);
     }
 
-    public void broadcastTrace(Project project, TraceApplicationEntity trace) {
+    public void broadcastTrace(Project project, TraceAppEntity trace) {
         List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);
         Update update = new Update("included");
         update.setTraces(List.of(trace));

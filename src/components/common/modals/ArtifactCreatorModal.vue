@@ -106,15 +106,19 @@ export default Vue.extend({
       }
     },
     name(newName: string): void {
-      isArtifactNameTaken(this.projectId, newName).then((res) => {
-        this.isNameValid = !res.artifactExists;
+      if (newName !== "") {
+        //TODO: Only send request after user has stopped typing for at least
+        // N milliseconds. See cytoscape rendering functions for timeout example.
+        isArtifactNameTaken(this.projectId, newName).then((res) => {
+          this.isNameValid = !res.artifactExists;
 
-        if (this.isNameValid) {
-          this.nameError = "";
-        } else {
-          this.nameError = "Name is already used, please select another.";
-        }
-      });
+          if (this.isNameValid) {
+            this.nameError = "";
+          } else {
+            this.nameError = "Name is already used, please select another.";
+          }
+        });
+      }
     },
   },
   methods: {
@@ -153,7 +157,10 @@ export default Vue.extend({
         .then(() => {
           this.$emit("onClose");
         })
-        .catch(() => appModule.onWarning("Unable to create artifact."))
+        .catch((e) => {
+          appModule.onDevError(e);
+          appModule.onWarning("Unable to create artifact.");
+        })
         .finally(() => (this.isLoading = false));
     },
   },

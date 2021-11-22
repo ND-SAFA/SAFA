@@ -1,7 +1,8 @@
-import { TraceLink } from "@/types";
+import { TraceApproval, TraceLink } from "@/types";
 import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Artifact } from "@/types/domain/artifact";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
+import { CommitBuilder } from "@/util/commit-builder";
 
 /**
  * Returns all generated links for this project.
@@ -42,47 +43,35 @@ export async function generateLinks(
 /**
  * Approves the given trace link ID.
  *
- * @param traceLinkId - The trace link ID to approve.
+ * @param traceLink - The trace link to approve.
  */
-export async function approveLink(traceLinkId: string): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.approveLink, { traceLinkId }),
-    {
-      method: "PUT",
-    }
-  );
+export async function approveLink(traceLink: TraceLink): Promise<void> {
+  traceLink.approvalStatus = TraceApproval.APPROVED;
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLink(traceLink)
+    .save();
 }
 
 /**
  * Declines the given trace link ID.
  *
- * @param traceLinkId - The trace link ID to decline.
+ * @param traceLink - The trace link to decline.
  */
-export async function declineLink(traceLinkId: string): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.declineLink, { traceLinkId }),
-    {
-      method: "PUT",
-    }
-  );
+export async function declineLink(traceLink: TraceLink): Promise<void> {
+  traceLink.approvalStatus = TraceApproval.DECLINED;
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLink(traceLink)
+    .save();
 }
 
 /**
  * Creates a trace link from the source to the target ID for the given version ID.
  *
- * @param versionId - The version ID for this trace.
- * @param sourceId - The source ID to link from.
- * @param targetId - The target ID to link to.
+ * @param traceLink - The trace link to persist.
  *
  * @return The created trace link.
  */
-export async function createLink(
-  versionId: string,
-  sourceId: string,
-  targetId: string
-): Promise<TraceLink> {
-  return authHttpClient<TraceLink>(
-    fillEndpoint(Endpoint.createLink, { versionId, sourceId, targetId }),
-    { method: "POST" }
-  );
+export async function createLink(traceLink: TraceLink): Promise<void> {
+  traceLink.approvalStatus = TraceApproval.DECLINED;
+  return CommitBuilder.withCurrentVersion().withNewTraceLink(traceLink).save();
 }

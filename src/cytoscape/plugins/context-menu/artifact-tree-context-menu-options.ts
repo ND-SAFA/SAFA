@@ -64,7 +64,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          deleteArtifactFromCurrentVersion(artifact.name).then();
+          deleteArtifactFromCurrentVersion(artifact).then();
         }).then();
       },
     },

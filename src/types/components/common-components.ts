@@ -135,3 +135,17 @@ export interface TraceFile extends ProjectFile {
    */
   traces: TraceLink[];
 }
+
+/**
+ * Defines a toggleable item of data.
+ */
+export interface DataItem<T> {
+  /**
+   * Whether this item is enabled.
+   */
+  value: boolean;
+  /**
+   * The item of data.
+   */
+  item: T;
+}

@@ -256,6 +256,25 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * @return Returns a function to query a single trace link by the
+   * source and target artifact names.
+   */
+  get getTraceLinkByArtifacts(): (s: string, t: string) => TraceLink {
+    return (sourceName: string, targetName: string) => {
+      const traceQuery = this.project.traces.filter(
+        (t) => t.source === sourceName && t.target === targetName
+      );
+      if (traceQuery.length === 0) {
+        const traceId = `${sourceName}-${targetName}`;
+        const error = `Could not find trace link with id: ${traceId}`;
+        appModule.onDevError(error);
+        throw Error(error);
+      }
+      return traceQuery[0];
+    };
+  }
+
+  /**
    * @return A function that determines whether a link with the given source and target IDs exists.
    */
   get doesLinkExist(): LinkValidator {

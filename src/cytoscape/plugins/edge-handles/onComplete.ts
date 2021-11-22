@@ -1,7 +1,7 @@
-import { NodeSingular, EventObject, CollectionReturnValue } from "cytoscape";
-import { appModule, projectModule } from "@/store";
+import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 import { createLink } from "@/api";
 import { disableDrawMode } from "@/cytoscape/plugins/edge-handles/index";
+import { TraceApproval, TraceLink, TraceType } from "@/types";
 
 export function onArtifactTreeEdgeComplete(
   event: EventObject,
@@ -10,24 +10,20 @@ export function onArtifactTreeEdgeComplete(
   addedEdge: CollectionReturnValue
 ): void {
   disableDrawMode();
-  const versionId = getVersionId(() => addedEdge.remove());
   const sourceId = sourceNode.data().id;
   const targetId = targetNode.data().id;
+  const traceLink: TraceLink = {
+    traceLinkId: "",
+    source: sourceId,
+    target: targetId,
+    traceType: TraceType.MANUAL,
+    approvalStatus: TraceApproval.APPROVED,
+    score: 1,
+  };
 
-  createLink(versionId, sourceId, targetId)
+  createLink(traceLink)
     .then(() => {
       addedEdge.remove();
     })
     .catch((e) => console.error(e));
-}
-function getVersionId(beforeError: () => void): string {
-  const versionId = projectModule.getProject.projectVersion?.versionId;
-  if (versionId === undefined) {
-    const errorMessage =
-      "Please select a project version before creating trace links";
-    appModule.onWarning(errorMessage);
-    beforeError();
-    throw Error(errorMessage);
-  }
-  return versionId;
 }

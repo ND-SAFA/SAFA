@@ -233,10 +233,6 @@ export default class ProjectModule extends VuexModule {
     };
   }
 
-  get helloWorld(): string {
-    return "hell world";
-  }
-
   /**
    * @return A collection of artifacts, keyed by their name.
    */

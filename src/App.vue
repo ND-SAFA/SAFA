@@ -24,19 +24,17 @@ export default Vue.extend({
     Snackbar,
   },
   mounted() {
-    sessionModule
-      .loadSession()
-      .then(() => navigateTo(Routes.HOME))
-      .catch((e) => {
-        appModule.onDevWarning(e);
-      });
+    if (sessionModule.getDoesSessionExist) {
+      navigateTo(Routes.HOME);
+    } else {
+      appModule.onDevWarning("No session found, please log in.");
+    }
   },
 });
 </script>
 
 <style lang="scss">
 @import "./assets/main.scss";
-
 @import "./assets/app-styles.css";
 @import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";

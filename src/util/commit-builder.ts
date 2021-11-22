@@ -21,22 +21,23 @@ export class CommitBuilder {
     }
     return new CommitBuilder(version);
   }
+  withNewArtifact(artifact: Artifact): CommitBuilder {
     this.commit.artifacts.added.push(artifact);
     return this;
   }
   withModifiedArtifact(artifact: Artifact): CommitBuilder {
     this.commit.artifacts.modified.push(artifact);
-  }
     return this;
+  }
   withRemovedArtifact(artifact: Artifact): CommitBuilder {
     this.commit.artifacts.removed.push(artifact);
     return this;
   }
-  withNewTraceLink(traceLink: TraceLink): this {
+  withNewTraceLink(traceLink: TraceLink): CommitBuilder {
     this.commit.traces.added.push(traceLink);
     return this;
   }
-  withModifiedTraceLink(traceLink: TraceLink): this {
+  withModifiedTraceLink(traceLink: TraceLink): CommitBuilder {
     this.commit.traces.modified.push(traceLink);
     return this;
   }

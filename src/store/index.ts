@@ -11,6 +11,7 @@ import {
   ViewportModule,
 } from "./modules";
 import CommitModule from "@/store/modules/commit.module";
+import { vuexLocal } from "@/plugins/vuex-persist";
 
 Vue.use(Vuex);
 Vue.config.devtools = true;
@@ -28,6 +29,7 @@ const store = new Vuex.Store({
     viewport: ViewportModule,
     commit: CommitModule,
   },
+  plugins: [vuexLocal.plugin],
 });
 
 export const sessionModule = getModule(SessionModule, store);

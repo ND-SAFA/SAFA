@@ -23,12 +23,11 @@ export default Vue.extend({
   components: {
     Snackbar,
   },
-  mounted() {
-    sessionModule.hasAuthorization().then((isAuthorized) => {
-      if (!isAuthorized) {
-        navigateTo(Routes.LOGIN_ACCOUNT);
-      }
-    });
+  async mounted() {
+    const isAuthorized = await sessionModule.hasAuthorization();
+    if (!isAuthorized) {
+      await navigateTo(Routes.LOGIN_ACCOUNT);
+    }
   },
 });
 </script>

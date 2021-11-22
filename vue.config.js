@@ -1,5 +1,5 @@
 module.exports = {
-  transpileDependencies: ["vuetify", "vuex-module-decorators"],
+  transpileDependencies: ["vuetify", "vuex-module-decorators", "vuex-persist"],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,

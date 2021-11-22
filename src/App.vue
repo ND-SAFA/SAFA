@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
 
@@ -24,11 +24,11 @@ export default Vue.extend({
     Snackbar,
   },
   mounted() {
-    if (sessionModule.getDoesSessionExist) {
-      navigateTo(Routes.HOME);
-    } else {
-      appModule.onDevWarning("No session found, please log in.");
-    }
+    sessionModule.hasAuthorization().then((isAuthorized) => {
+      if (!isAuthorized) {
+        navigateTo(Routes.LOGIN_ACCOUNT);
+      }
+    });
   },
 });
 </script>

@@ -74,19 +74,6 @@ export async function loginUser(user: UserModel): Promise<SessionModel> {
 }
 
 /**
- * Logs the current user out.
- */
-export async function logoutUser(): Promise<void> {
-  if (TEST_ENDPOINTS) {
-    return;
-  }
-
-  await authHttpClient(fillEndpoint(Endpoint.logout), {
-    method: "GET",
-  });
-}
-
-/**
  * Requests to reset the password of the given user.
  *
  * @param user - The user to reset.

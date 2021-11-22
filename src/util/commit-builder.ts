@@ -1,7 +1,5 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
-import { projectModule } from "@/store";
-import authHttpClient from "@/api/endpoints/auth-http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
+import { commitModule, projectModule } from "@/store";
 
 /**
  * Responsible for creating a commit and saving it to the database.
@@ -13,20 +11,9 @@ export class CommitBuilder {
   commit: Commit;
 
   constructor(version: ProjectVersion) {
-    this.commit = {
-      commitVersion: version,
-      artifacts: {
-        added: [],
-        removed: [],
-        modified: [],
-      },
-      traces: {
-        added: [],
-        removed: [],
-        modified: [],
-      },
-    };
+    this.commit = commitModule.emptyCommit(version);
   }
+
   static withCurrentVersion(): CommitBuilder {
     const version = projectModule.getProject.projectVersion;
     if (version === undefined) {
@@ -36,6 +23,10 @@ export class CommitBuilder {
   }
   withNewArtifact(artifact: Artifact): this {
     this.commit.artifacts.added.push(artifact);
+    return this;
+  }
+  withModifiedArtifact(artifact: Artifact): this {
+    this.commit.artifacts.modified.push(artifact);
     return this;
   }
   withRemovedArtifact(artifact: Artifact): this {
@@ -51,10 +42,6 @@ export class CommitBuilder {
     return this;
   }
   save(): Promise<void> {
-    const versionId = this.commit.commitVersion.versionId;
-    return authHttpClient<void>(fillEndpoint(Endpoint.commit, { versionId }), {
-      method: "POST",
-      body: JSON.stringify(this.commit),
-    });
+    return commitModule.saveCommit(this.commit);
   }
 }

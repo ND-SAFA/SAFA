@@ -41,9 +41,26 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
  *
  * @return The created artifact.
  */
-export async function createOrUpdateArtifact(
+export async function createArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<void> {
   return CommitBuilder.withCurrentVersion().withNewArtifact(artifact).save();
+}
+
+/**
+ * Updates artifact to the given version.
+ *
+ * @param versionId - The version that the artifact is stored within.
+ * @param artifact - The artifact to create.
+ *
+ * @return The created artifact.
+ */
+export async function updateArtifact(
+  versionId: string,
+  artifact: Artifact
+): Promise<void> {
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedArtifact(artifact)
+    .save();
 }

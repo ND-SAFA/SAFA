@@ -173,9 +173,7 @@ export default Vue.extend({
     },
     onArtifactClick(artifactName: string): void {
       const artifactQuery = projectModule.getArtifactByName(artifactName);
-      if (artifactQuery !== undefined) {
-        artifactSelectionModule.selectArtifact(artifactQuery);
-      }
+      artifactSelectionModule.selectArtifact(artifactQuery);
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {

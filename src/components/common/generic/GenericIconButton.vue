@@ -8,6 +8,7 @@
         :icon="!fab"
         :fab="fab"
         @click="$emit('click')"
+        :disabled="disabled"
       >
         <v-icon>{{ iconId }}</v-icon>
       </v-btn>
@@ -37,6 +38,12 @@ export default Vue.extend({
     },
     color: String,
     fab: Boolean,
+    isDisabled: Boolean,
+  },
+  computed: {
+    disabled(): boolean {
+      return this.isDisabled === undefined ? false : this.isDisabled;
+    },
   },
 });
 </script>

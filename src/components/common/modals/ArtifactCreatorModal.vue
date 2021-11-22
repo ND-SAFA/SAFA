@@ -152,8 +152,8 @@ export default Vue.extend({
         appModule.onWarning("Please select a project version.");
         return;
       }
-
-      createOrUpdateArtifactHandler(this.versionId, artifact)
+      const isUpdate = this.artifact !== undefined;
+      createOrUpdateArtifactHandler(this.versionId, artifact, isUpdate)
         .then(() => {
           this.$emit("onClose");
         })

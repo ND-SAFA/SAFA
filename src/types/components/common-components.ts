@@ -26,23 +26,30 @@ export type ButtonDefinition =
   | CheckmarkMenuDefinition;
 
 /**
+ * BaseButtonDefinition
+ */
+
+export interface BaseButtonDefinition {
+  label: string;
+  isDisabled?: boolean;
+  buttonColor?: string;
+}
+
+/**
  * Defines an icon button.
  */
-export interface IconDefinition {
+export interface IconDefinition extends BaseButtonDefinition {
   type: ButtonType.ICON;
   handler?: EmptyHandler;
-  label: string;
   icon?: string;
 }
 
 /**
  * Defines an menu button.
  */
-interface MenuDefinition {
-  label: string;
+interface MenuDefinition extends BaseButtonDefinition {
   menuItems?: string[];
   menuHandlers?: EmptyHandler[];
-  buttonColor?: string;
   buttonIsText?: boolean;
   itemColor?: string;
   showSelectedValue?: boolean;
@@ -53,7 +60,6 @@ interface MenuDefinition {
  */
 export interface ListMenuDefinition extends MenuDefinition {
   type: ButtonType.LIST_MENU;
-  isDisabled?: boolean;
 }
 
 /**

@@ -6,6 +6,10 @@ import { CytoCoreElementData } from "@/types/cytoscape";
  */
 export interface Artifact {
   /**
+   * A unique UUID identifying an artifact across versions.
+   */
+  id: string;
+  /**
    * The name of the artifact.
    */
   name: string;

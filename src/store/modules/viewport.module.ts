@@ -215,7 +215,7 @@ export default class ViewportModule extends VuexModule {
     const unselectedNodeOpacity =
       artifactSelectionModule.getUnselectedNodeOpacity;
 
-    const filteredArtifactIds = artifacts
+    const filteredArtifactNames = artifacts
       .filter(
         (a) => isInSubtree(subtree, a) && doesNotContainType(ignoreTypes, a)
       )
@@ -226,9 +226,9 @@ export default class ViewportModule extends VuexModule {
         cyCore.elements().style("opacity", 1);
         cyCore
           .elements()
-          .filter((e) => !isRelatedToArtifacts(filteredArtifactIds, e))
+          .filter((e) => !isRelatedToArtifacts(filteredArtifactNames, e))
           .style("opacity", unselectedNodeOpacity);
-        resolve(filteredArtifactIds);
+        resolve(filteredArtifactNames);
       });
     });
   }

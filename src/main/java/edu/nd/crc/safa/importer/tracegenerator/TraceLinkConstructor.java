@@ -1,6 +1,12 @@
 package edu.nd.crc.safa.importer.tracegenerator;
 
+/**
+ * Defines an interface for a generic class able to create trace links.
+ *
+ * @param <Key>   The type used to identify each entity traced.
+ * @param <Value> The type of link returned.
+ */
 public interface TraceLinkConstructor<Key, Value> {
 
-    Value createTracelink(Key source, Key target, double score);
+    Value createTraceLink(Key source, Key target, double score);
 }

@@ -85,9 +85,9 @@ public class TraceLinkGenerator {
         List<Link> generatedLinks = new ArrayList<>();
         for (Key sourceKey : sTokens.keySet()) {
             for (Key targetKey : tTokens.keySet()) {
-                double score = vsm.getRelevance(sTokens.get(sourceKey), tTokens.get(targetKey));
+                double score = vsm.getSimilarityScore(sTokens.get(sourceKey), tTokens.get(targetKey));
                 if (score > ProjectVariables.TRACE_THRESHOLD) {
-                    Link value = traceLinkConstructor.createTracelink(sourceKey, targetKey, score);
+                    Link value = traceLinkConstructor.createTraceLink(sourceKey, targetKey, score);
                     generatedLinks.add(value);
                 }
             }

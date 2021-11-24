@@ -7,7 +7,7 @@ import java.util.Map;
  * Vector Space Model using TF-IDF scores for evaluating document relevance
  */
 
-public class Controller implements TraceInterface {
+public class Controller implements ISimilarScoreCalculator {
     private Map<String, Double> idf;
 
     public void buildIndex(Collection<Collection<String>> docTokens) {
@@ -16,7 +16,7 @@ public class Controller implements TraceInterface {
     }
 
     @Override
-    public double getRelevance(Collection<String> sTokens, Collection<String> tTokens) {
+    public double getSimilarityScore(Collection<String> sTokens, Collection<String> tTokens) {
         Map<String, Double> vec1 = TfIdf.tfIdf(TfIdf.tf(sTokens), idf);
         Map<String, Double> vec2 = TfIdf.tfIdf(TfIdf.tf(tTokens), idf);
         return cosineSim(vec1, vec2);

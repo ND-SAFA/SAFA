@@ -10,6 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
+/**
+ * Provides an API for building commits using the builder design pattern.
+ */
 public class CommitBuilder {
 
     ProjectCommit projectCommit;
@@ -39,11 +42,6 @@ public class CommitBuilder {
 
     public CommitBuilder withAddedTrace(JSONObject json) throws JsonProcessingException {
         this.projectCommit.getTraces().getAdded().add(asTraceAppEntity(json));
-        return this;
-    }
-
-    public CommitBuilder withRemovedTrace(JSONObject json) throws JsonProcessingException {
-        this.projectCommit.getTraces().getRemoved().add(asTraceAppEntity(json));
         return this;
     }
 

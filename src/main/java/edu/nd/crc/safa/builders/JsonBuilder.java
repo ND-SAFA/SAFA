@@ -8,6 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides an API for creating JSON types of application entities.
+ */
 @Component
 public class JsonBuilder extends BaseBuilder {
 

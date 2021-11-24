@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides an API for quickly creating entities in a project.
+ * Provides an API for quickly creating persistent entities in a project.
  */
 @Component
 public class DbEntityBuilder extends BaseBuilder {

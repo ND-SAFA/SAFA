@@ -7,6 +7,9 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides an API for creating application entities in a project.
+ */
 @Component
 public class AppEntityBuilder extends BaseBuilder {
 

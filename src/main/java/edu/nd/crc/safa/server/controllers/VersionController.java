@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Provides endpoints for retrieving, creating, and deleting project versions.
+ */
 @RestController
 public class VersionController extends BaseController {
 

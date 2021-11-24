@@ -24,6 +24,9 @@ import edu.nd.crc.safa.utilities.ArtifactBodyFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for calculating the delta between any two versions.
+ */
 @Service
 public class DeltaService {
 

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.entities.app;
 
 import edu.nd.crc.safa.server.entities.db.ParserError;
 
+//TODO: Can we replace with ParserError
 public class ErrorApplicationEntity {
     String errorId;
     String message;

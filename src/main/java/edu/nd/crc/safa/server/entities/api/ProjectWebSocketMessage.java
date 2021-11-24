@@ -6,18 +6,21 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
-public class Update {
+/**
+ * The message passed via websocket to client's subscribed for project changes.
+ */
+public class ProjectWebSocketMessage {
 
     String type;
     List<TraceAppEntity> traces;
     List<ArtifactAppEntity> artifacts;
 
-    public Update() {
+    public ProjectWebSocketMessage() {
         traces = new ArrayList<>();
         artifacts = new ArrayList<>();
     }
 
-    public Update(String type) {
+    public ProjectWebSocketMessage(String type) {
         this();
         this.type = type;
     }

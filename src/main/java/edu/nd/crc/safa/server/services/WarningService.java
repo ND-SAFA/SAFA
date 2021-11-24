@@ -19,6 +19,9 @@ import edu.nd.crc.safa.warnings.TreeVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for generating project warnings for a given project version.
+ */
 @Service
 public class WarningService {
 

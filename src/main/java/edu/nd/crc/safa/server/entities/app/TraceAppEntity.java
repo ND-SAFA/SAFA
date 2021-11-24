@@ -12,6 +12,9 @@ import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import org.json.JSONObject;
 
+/**
+ * Represents the front-end model of a trace link.
+ */
 public class TraceAppEntity {
     @NotNull
     public String traceLinkId;

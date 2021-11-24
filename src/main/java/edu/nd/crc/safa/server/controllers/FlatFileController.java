@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Provides endpoints for parsing a series of flat files into project entities.
+ */
 @RestController
 public class FlatFileController extends BaseController {
 

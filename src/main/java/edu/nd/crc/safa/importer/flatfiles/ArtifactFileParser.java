@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactFile;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactFileRepository;
@@ -125,7 +125,7 @@ public class ArtifactFileParser {
             artifactType.getName(),
             fileParser);
         List<ParserError> parserErrors = response.getValue1().stream().map(msg -> new ParserError(projectVersion,
-            msg, ApplicationActivity.PARSING_ARTIFACTS)).collect(Collectors.toList());
+            msg, ProjectParsingActivities.PARSING_ARTIFACTS)).collect(Collectors.toList());
         return new Pair<>(response.getValue0(), parserErrors);
     }
 

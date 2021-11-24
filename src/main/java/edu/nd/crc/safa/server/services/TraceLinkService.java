@@ -8,9 +8,9 @@ import java.util.UUID;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -74,7 +74,7 @@ public class TraceLinkService {
 
         if (error != null) {
             return new Pair<>(null, new ParserError(projectVersion, error,
-                ApplicationActivity.PARSING_TRACES));
+                ProjectParsingActivities.PARSING_TRACES));
         } else {
             Artifact sourceArtifact = artifactFinder.findArtifact(sourceName).get(); // TODO: Fix warning
             Artifact targetArtifact = artifactFinder.findArtifact(targetName).get();

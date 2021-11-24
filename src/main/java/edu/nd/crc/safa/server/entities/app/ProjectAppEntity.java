@@ -12,6 +12,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 
+/**
+ * Represents the front-end model of a project.
+ */
 public class ProjectAppEntity {
     @NotNull
     public String projectId;

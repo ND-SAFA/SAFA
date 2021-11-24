@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.entities.api;
 
+//TODO: Remove this and replace with actual http codes
 public class ServerResponse {
     private Object body;
     private int status;

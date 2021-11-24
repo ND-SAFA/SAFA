@@ -3,7 +3,7 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.Update;
+import edu.nd.crc.safa.server.entities.api.ProjectWebSocketMessage;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
@@ -32,7 +32,7 @@ public class TestFlatFileMessage extends WebSocketBaseTest {
 
         // VP - Verify that single message sent
         assertThat(getQueueSize(clientId)).isEqualTo(1);
-        Update response = getNextMessage(clientId, Update.class);
+        ProjectWebSocketMessage response = getNextMessage(clientId, ProjectWebSocketMessage.class);
         assertThat(response.getType()).isEqualTo("excluded");
     }
 }

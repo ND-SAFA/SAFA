@@ -4,14 +4,18 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
 
-public class ProjectErrors {
+/**
+ * Container for errors occurring while parsing a project organized by the
+ * activities they can occur in.
+ */
+public class ProjectParsingErrors {
     List<ErrorApplicationEntity> tim;
     List<ErrorApplicationEntity> artifacts;
     List<ErrorApplicationEntity> traces;
 
-    public ProjectErrors(List<ErrorApplicationEntity> tim,
-                         List<ErrorApplicationEntity> artifacts,
-                         List<ErrorApplicationEntity> traces) {
+    public ProjectParsingErrors(List<ErrorApplicationEntity> tim,
+                                List<ErrorApplicationEntity> artifacts,
+                                List<ErrorApplicationEntity> traces) {
         this.tim = tim;
         this.artifacts = artifacts;
         this.traces = traces;

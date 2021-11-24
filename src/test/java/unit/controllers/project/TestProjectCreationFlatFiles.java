@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
@@ -152,7 +152,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         List<ParserError> parserErrors = parserErrorRepository.findByProjectVersion(projectVersion);
         assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
         ParserError error = parserErrors.get(0);
-        assertThat(error.getApplicationActivity()).isEqualTo(ApplicationActivity.PARSING_TRACES);
+        assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
         List<TraceLink> traceLinks = traceLinkRepository

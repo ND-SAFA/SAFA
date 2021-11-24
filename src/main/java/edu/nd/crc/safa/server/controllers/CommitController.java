@@ -26,10 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Provides endpoints for commit a versioend change to a project's entities.
+ */
 @RestController
 public class CommitController extends BaseController {
 
-    ArtifactController artifactController;
     TraceLinkService traceLinkService;
 
     ArtifactVersionService artifactVersionService;
@@ -38,13 +40,11 @@ public class CommitController extends BaseController {
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
-                            ArtifactController artifactController,
                             TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository);
-        this.artifactController = artifactController;
         this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;

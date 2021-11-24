@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.server.entities.app;
 
+/**
+ * Represents an artifact that was removed between two versions.
+ */
 public class RemovedArtifact extends DeltaArtifact {
 
     String before;

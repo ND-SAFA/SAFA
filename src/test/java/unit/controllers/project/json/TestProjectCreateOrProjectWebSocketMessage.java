@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that user is able to create and update a project via JSON.
  */
-public class TestProjectCreateOrUpdate extends BaseProjectJsonTest {
+public class TestProjectCreateOrProjectWebSocketMessage extends BaseProjectJsonTest {
 
     @Autowired
     ObjectMapper objectMapper;

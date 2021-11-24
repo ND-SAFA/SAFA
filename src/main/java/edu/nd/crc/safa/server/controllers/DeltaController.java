@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Provides endpoints for calculating the changes between two project versions.
+ */
 @RestController
 public class DeltaController extends BaseController {
 

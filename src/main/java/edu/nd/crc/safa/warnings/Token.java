@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.warnings;
 
+/**
+ * A word in a rule definition. Serves as the base entity defines in rule definitions.
+ */
 public class Token {
 
     public final TokenType tokenType;

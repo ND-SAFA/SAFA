@@ -3,7 +3,10 @@ package edu.nd.crc.safa.warnings;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeRules {
+/**
+ * The default list of rules applied to projects when generating warnings.
+ */
+public class DefaultTreeRules {
     public static List<Rule> getDefaultRules() {
         List<Rule> defaultRules = new ArrayList<>();
         defaultRules.add(atLeastOneRequirementForHazard());

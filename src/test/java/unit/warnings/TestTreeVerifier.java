@@ -10,11 +10,11 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.warnings.ArtifactRelationship;
 import edu.nd.crc.safa.warnings.Condition;
+import edu.nd.crc.safa.warnings.DefaultTreeRules;
 import edu.nd.crc.safa.warnings.Function;
-import edu.nd.crc.safa.warnings.Relationship;
 import edu.nd.crc.safa.warnings.RuleName;
-import edu.nd.crc.safa.warnings.TreeRules;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class TestTreeVerifier extends EntityBaseTest {
         TreeVerifier verifier = new TreeVerifier();
 
         Function function = new Function();
-        function.relationship = Relationship.BIDIRECTIONAL_LINK;
+        function.artifactRelationship = ArtifactRelationship.BIDIRECTIONAL_LINK;
         function.targetArtifactType = "Requirement";
         function.sourceArtifactType = "Package";
         function.condition = Condition.EXACTLY;
@@ -65,7 +65,7 @@ public class TestTreeVerifier extends EntityBaseTest {
         TreeVerifier verifier = new TreeVerifier();
 
         Function function = new Function();
-        function.relationship = Relationship.CHILD;
+        function.artifactRelationship = ArtifactRelationship.CHILD;
         function.targetArtifactType = "Requirement";
         function.sourceArtifactType = "Package";
         function.condition = Condition.EXACTLY;
@@ -117,7 +117,7 @@ public class TestTreeVerifier extends EntityBaseTest {
         List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
         TreeVerifier verifier = new TreeVerifier();
         Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
-            TreeRules.getDefaultRules());
+            DefaultTreeRules.getDefaultRules());
 
         assertThat(violatedRules.size()).isEqualTo(1);
 

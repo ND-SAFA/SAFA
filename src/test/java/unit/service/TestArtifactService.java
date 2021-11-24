@@ -38,13 +38,13 @@ public class TestArtifactService extends EntityBaseTest {
         String projectName = "test-project";
 
         // Step - Create project, with type, artifact, and body.
-        Project project = entityBuilder.newProjectWithReturn(projectName);
-        entityBuilder
+        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
+        dbEntityBuilder
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName)
             .newArtifactBody(projectName, artifactName, summary, body);
-        Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
         //VP - Able to find first created body
         Optional<ArtifactBody> artifactBodyQuery = this.artifactBodyRepository.findLastArtifactBody(project, artifact);
@@ -55,10 +55,10 @@ public class TestArtifactService extends EntityBaseTest {
         assertThat(artifactBodyFound.getArtifact().getName()).isEqualTo(artifactName);
 
         //Step 2 - Simulate new version added but artifact experienced no change
-        entityBuilder.newVersion(projectName);
+        dbEntityBuilder.newVersion(projectName);
 
         //Step 3 - Create third version with modified body
-        entityBuilder
+        dbEntityBuilder
             .newVersion(projectName)
             .newArtifactBodyWithReturn(projectName,
                 2,
@@ -83,14 +83,14 @@ public class TestArtifactService extends EntityBaseTest {
         String artifactName = "RE-8";
         String artifactTypeName = "requirements";
         String projectName = "test-project";
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName);
 
         Optional<ArtifactBody> artifactBodyQuery = this.artifactBodyRepository
-            .findLastArtifactBody(entityBuilder.getProject(projectName),
-                entityBuilder.getArtifact(projectName, artifactName));
+            .findLastArtifactBody(dbEntityBuilder.getProject(projectName),
+                dbEntityBuilder.getArtifact(projectName, artifactName));
         assertThat(artifactBodyQuery.isPresent()).isFalse();
     }
 
@@ -103,7 +103,7 @@ public class TestArtifactService extends EntityBaseTest {
         String artifactSummary = "this is a summary";
 
         // Step - Create project with: v1, type, artifact, body
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
@@ -111,12 +111,12 @@ public class TestArtifactService extends EntityBaseTest {
             .newArtifactBody(projectName, artifactName, artifactSummary, artifactContent);
 
         // Step - Create new version + update artifact with same artifact (no change)
-        ArtifactBody artifactBody = entityBuilder.getArtifactBody(projectName, artifactName, 0);
+        ArtifactBody artifactBody = dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
         ArtifactAppEntity artifactApp = new ArtifactAppEntity(artifactBody);
 
         // VP - Verify that no new entry has been created
-        ProjectVersion newVersion = entityBuilder.newVersionWithReturn(projectName);
-        Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
+        ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
         artifactVersionService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
         List<ArtifactBody> artifactBodies = this.artifactBodyRepository.findByArtifact(artifact);
@@ -132,7 +132,7 @@ public class TestArtifactService extends EntityBaseTest {
         String newContent = "this is a new content text";
 
         // Step - Create project with: version, type, artifact, body
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, typeName)
@@ -140,8 +140,8 @@ public class TestArtifactService extends EntityBaseTest {
             .newArtifactBody(projectName, artifactName, "", "");
 
         // Step - Create new version and updated artifact
-        ProjectVersion projectVersion = entityBuilder.newVersionWithReturn(projectName);
-        Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
+        ProjectVersion projectVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
         String artifactId = artifact.getArtifactId().toString();
         ArtifactAppEntity appEntity = new ArtifactAppEntity(
             artifactId,

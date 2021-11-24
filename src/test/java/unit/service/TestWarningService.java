@@ -28,7 +28,7 @@ public class TestWarningService extends ApplicationBaseTest {
         String sourceType = "Package";
         String sourceName = "entities";
 
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, targetType)
@@ -39,9 +39,9 @@ public class TestWarningService extends ApplicationBaseTest {
             .newArtifactBody(projectName, sourceName, "", "")
             .newTraceLink(projectName, sourceName, targetName);
 
-        ProjectVersion projectVersion = entityBuilder.getProjectVersion(projectName, 0);
-        List<ArtifactBody> projectBodies = entityBuilder.getArtifactBodies(projectName);
-        List<TraceLink> traceLinks = entityBuilder.getTraceLinks(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        List<ArtifactBody> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
+        List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
         Map<String, List<RuleName>> violations = warningService.findViolationsInArtifactTree(projectVersion,
             projectBodies,
             traceLinks);

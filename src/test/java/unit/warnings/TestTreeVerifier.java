@@ -102,7 +102,7 @@ public class TestTreeVerifier extends EntityBaseTest {
         String sourceType = "Package";
         String sourceName = "entities";
 
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, targetType)
@@ -113,8 +113,8 @@ public class TestTreeVerifier extends EntityBaseTest {
             .newArtifactBody(projectName, sourceName, "", "")
             .newTraceLink(projectName, sourceName, targetName);
 
-        List<ArtifactBody> projectBodies = entityBuilder.getArtifactBodies(projectName);
-        List<TraceLink> traceLinks = entityBuilder.getTraceLinks(projectName);
+        List<ArtifactBody> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
+        List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
         TreeVerifier verifier = new TreeVerifier();
         Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
             TreeRules.getDefaultRules());

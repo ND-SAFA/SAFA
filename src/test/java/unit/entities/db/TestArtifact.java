@@ -24,9 +24,9 @@ public class TestArtifact extends EntityBaseTest {
         String newArtifactName = "RE-10";
 
         // Step - Create project with artifact
-        this.entityBuilder.newProject(projectName);
-        ArtifactType artifactType = entityBuilder.newTypeAndReturn(projectName, artifactTypeName);
-        Artifact artifact = entityBuilder.newArtifactWithReturn(projectName, artifactTypeName, artifactName);
+        this.dbEntityBuilder.newProject(projectName);
+        ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, artifactTypeName);
+        Artifact artifact = dbEntityBuilder.newArtifactWithReturn(projectName, artifactTypeName, artifactName);
 
         //VP 2 - Retrieve artifact
         Optional<Artifact> queriedArtifact = this.artifactRepository.findById(artifact.getArtifactId());
@@ -37,7 +37,7 @@ public class TestArtifact extends EntityBaseTest {
         assertThat(artifactFound.getType().getTypeId()).isEqualTo(artifactType.getTypeId());
 
         // VP - Update artifact name and confirm update
-        entityBuilder.updateArtifactName(projectName, artifactName, newArtifactName);
+        dbEntityBuilder.updateArtifactName(projectName, artifactName, newArtifactName);
 
         queriedArtifact = this.artifactRepository.findById(artifact.getArtifactId());
         assertThat(queriedArtifact.isPresent()).isTrue();

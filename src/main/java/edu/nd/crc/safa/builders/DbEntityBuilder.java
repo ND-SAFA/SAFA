@@ -22,11 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * The following class is a helper for the unit tests so that entities
- * and verifications can be human readable and repeatable
+ * Provides an API for quickly creating entities in a project.
  */
 @Component
-public class EntityBuilder extends BaseBuilder {
+public class DbEntityBuilder extends BaseBuilder {
 
     final int majorVersion = 1;
     final int minorVersion = 1;
@@ -47,12 +46,12 @@ public class EntityBuilder extends BaseBuilder {
     int revisionNumber;
 
     @Autowired
-    public EntityBuilder(ProjectRepository projectRepository,
-                         ProjectVersionRepository projectVersionRepository,
-                         ArtifactTypeRepository artifactTypeRepository,
-                         ArtifactRepository artifactRepository,
-                         ArtifactBodyRepository artifactBodyRepository,
-                         TraceLinkRepository traceLinkRepository) {
+    public DbEntityBuilder(ProjectRepository projectRepository,
+                           ProjectVersionRepository projectVersionRepository,
+                           ArtifactTypeRepository artifactTypeRepository,
+                           ArtifactRepository artifactRepository,
+                           ArtifactBodyRepository artifactBodyRepository,
+                           TraceLinkRepository traceLinkRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
@@ -79,7 +78,7 @@ public class EntityBuilder extends BaseBuilder {
         return this.newProject(name).getProject(name);
     }
 
-    public EntityBuilder newProject(String name) {
+    public DbEntityBuilder newProject(String name) {
         Project project = new Project(name, "");
         this.projectRepository.save(project);
         this.projects.put(name, project);
@@ -96,7 +95,7 @@ public class EntityBuilder extends BaseBuilder {
         return this.getProjectVersion(projectName, versionIndex);
     }
 
-    public EntityBuilder newVersion(String projectName) {
+    public DbEntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
         ProjectVersion projectVersion = new ProjectVersion(project,
             this.majorVersion,
@@ -111,7 +110,7 @@ public class EntityBuilder extends BaseBuilder {
         return this.newType(projectName, typeName).getType(projectName, typeName);
     }
 
-    public EntityBuilder newType(String projectName, String typeName) {
+    public DbEntityBuilder newType(String projectName, String typeName) {
         Project project = getProject(projectName);
         ArtifactType artifactType = new ArtifactType(project, typeName);
         this.artifactTypeRepository.save(artifactType);
@@ -123,7 +122,7 @@ public class EntityBuilder extends BaseBuilder {
         return this.newArtifact(projectName, typeName, artifactName).getArtifact(projectName, artifactName);
     }
 
-    public EntityBuilder newArtifact(String projectName, String typeName, String artifactName) {
+    public DbEntityBuilder newArtifact(String projectName, String typeName, String artifactName) {
         Project project = getProject(projectName);
         ArtifactType artifactType = getType(projectName, typeName);
         Artifact artifact = new Artifact(project, artifactType, artifactName);
@@ -132,20 +131,20 @@ public class EntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public EntityBuilder newArtifactAndBody(String projectName,
-                                            String typeName,
-                                            String artifactName,
-                                            String summary,
-                                            String content) {
+    public DbEntityBuilder newArtifactAndBody(String projectName,
+                                              String typeName,
+                                              String artifactName,
+                                              String summary,
+                                              String content) {
         return newArtifactAndBody(projectName, 0, typeName, artifactName, summary, content);
     }
 
-    public EntityBuilder newArtifactAndBody(String projectName,
-                                            int versionIndex,
-                                            String typeName,
-                                            String artifactName,
-                                            String summary,
-                                            String content) {
+    public DbEntityBuilder newArtifactAndBody(String projectName,
+                                              int versionIndex,
+                                              String typeName,
+                                              String artifactName,
+                                              String summary,
+                                              String content) {
         newArtifact(projectName, typeName, artifactName)
             .getArtifact(projectName, artifactName);
         return this.newArtifactBody(projectName, versionIndex, artifactName, summary, content);
@@ -161,27 +160,27 @@ public class EntityBuilder extends BaseBuilder {
         return getArtifactBody(projectName, artifactName, versionIndex);
     }
 
-    public EntityBuilder newArtifactBody(String projectName,
-                                         String artifactName,
-                                         String summary,
-                                         String content) {
+    public DbEntityBuilder newArtifactBody(String projectName,
+                                           String artifactName,
+                                           String summary,
+                                           String content) {
         return newArtifactBody(projectName, 0, artifactName, summary, content);
     }
 
-    public EntityBuilder newArtifactBody(String projectName,
-                                         int versionIndex,
-                                         String artifactName,
-                                         String summary,
-                                         String content) {
+    public DbEntityBuilder newArtifactBody(String projectName,
+                                           int versionIndex,
+                                           String artifactName,
+                                           String summary,
+                                           String content) {
         return newArtifactBody(projectName, versionIndex, ModificationType.ADDED, artifactName, summary, content);
     }
 
-    public EntityBuilder newArtifactBody(String projectName,
-                                         int versionIndex,
-                                         ModificationType modificationType,
-                                         String artifactName,
-                                         String summary,
-                                         String content) {
+    public DbEntityBuilder newArtifactBody(String projectName,
+                                           int versionIndex,
+                                           ModificationType modificationType,
+                                           String artifactName,
+                                           String summary,
+                                           String content) {
         ProjectVersion projectVersion = this.getProjectVersion(projectName, versionIndex);
         Artifact artifact = this.getArtifact(projectName, artifactName);
         ArtifactBody artifactBody = new ArtifactBody(projectVersion,
@@ -194,7 +193,7 @@ public class EntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public EntityBuilder newTraceLink(String projectName, String sourceName, String targetName) {
+    public DbEntityBuilder newTraceLink(String projectName, String sourceName, String targetName) {
         Artifact source = this.getArtifact(projectName, sourceName);
         Artifact target = this.getArtifact(projectName, targetName);
         TraceLink traceLink = new TraceLink(source, target);
@@ -202,10 +201,10 @@ public class EntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public EntityBuilder newGeneratedTraceLink(String projectName,
-                                               String sourceName,
-                                               String targetName,
-                                               double score) {
+    public DbEntityBuilder newGeneratedTraceLink(String projectName,
+                                                 String sourceName,
+                                                 String targetName,
+                                                 double score) {
         Artifact source = this.getArtifact(projectName, sourceName);
         Artifact target = this.getArtifact(projectName, targetName);
         TraceLink traceLink = new TraceLink(source, target, 0.5);
@@ -213,21 +212,21 @@ public class EntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public EntityBuilder updateProjectName(String currentName, String newName) {
+    public DbEntityBuilder updateProjectName(String currentName, String newName) {
         Project project = getProject(currentName);
         project.setName(newName);
         this.projectRepository.save(project);
         return this;
     }
 
-    public EntityBuilder updateTypeName(String projectName, String currentName, String newName) {
+    public DbEntityBuilder updateTypeName(String projectName, String currentName, String newName) {
         ArtifactType artifactType = getType(projectName, currentName);
         artifactType.setName(newName);
         this.artifactTypeRepository.save(artifactType);
         return this;
     }
 
-    public EntityBuilder updateArtifactName(String projectName, String artifactName, String newName) {
+    public DbEntityBuilder updateArtifactName(String projectName, String artifactName, String newName) {
         Artifact artifact = getArtifact(projectName, artifactName);
         artifact.setName(newName);
         this.artifactRepository.save(artifact);

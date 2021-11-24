@@ -18,7 +18,7 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
 
     @Test
     public void getProjectsMultiple() throws Exception {
-        entityBuilder
+        dbEntityBuilder
             .newProject("firstProject")
             .newProject("secondProject");
         JSONObject response = sendGet(AppRoutes.projects, status().isOk());

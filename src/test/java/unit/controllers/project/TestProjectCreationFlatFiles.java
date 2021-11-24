@@ -166,16 +166,16 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
     public void testUpdateProjectViaFlatFiles() throws Exception {
         String projectName = "test-project";
 
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
 
-        Project project = entityBuilder.getProject(projectName);
-        ProjectVersion emptyVersion = entityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion updateVersion = entityBuilder.getProjectVersion(projectName, 1);
-        ProjectVersion noChangeVersion = entityBuilder.getProjectVersion(projectName, 2);
+        Project project = dbEntityBuilder.getProject(projectName);
+        ProjectVersion emptyVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion updateVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
+        ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
         uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_BEFORE_FILES);

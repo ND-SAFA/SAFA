@@ -41,7 +41,7 @@ public class TestValidation extends BaseProjectJsonTest {
     @Test
     public void attemptUpdateWithoutVersionId() throws Exception {
         // Step - Create an empty project and version.
-        ProjectVersion projectVersion = entityBuilder
+        ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         String projectId = projectVersion.getProject().getProjectId().toString();
@@ -72,7 +72,7 @@ public class TestValidation extends BaseProjectJsonTest {
     @Test
     public void testProjectVersionValidation() throws Exception {
         // Step - Create project and version.
-        ProjectVersion projectVersion = entityBuilder
+        ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         String projectId = projectVersion.getProject().getProjectId().toString();

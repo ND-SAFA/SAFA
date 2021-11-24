@@ -21,8 +21,8 @@ public class TestArtifactType extends ApplicationBaseTest {
         String altArtifactTypeName = "Requirements";
 
         // Step - Create project with new artifact type
-        this.entityBuilder.newProject(projectName);
-        ArtifactType artifactType = entityBuilder.newTypeAndReturn(projectName, artifactTypeName);
+        this.dbEntityBuilder.newProject(projectName);
+        ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, artifactTypeName);
 
         // VP - Artifact type created
         UUID artifactTypeId = artifactType.getTypeId();
@@ -33,7 +33,7 @@ public class TestArtifactType extends ApplicationBaseTest {
         assertThat(queriedArtifactType.getName()).isEqualTo(artifactTypeName.toLowerCase());
 
         // VP 3 - Update type name
-        entityBuilder.updateTypeName(projectName, artifactTypeName, altArtifactTypeName);
+        dbEntityBuilder.updateTypeName(projectName, artifactTypeName, altArtifactTypeName);
         queriedArtifactType = artifactTypeRepository.findByTypeId(artifactTypeId);
         assertThat(queriedArtifactType.getName()).isEqualTo(altArtifactTypeName.toLowerCase());
 

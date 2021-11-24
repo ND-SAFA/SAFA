@@ -24,7 +24,7 @@ public class TestProjectAppEntity extends ApplicationBaseTest {
         String existingArtifactName = "RE-10";
 
         // Step - Create project containing single artifact
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, existingArtifactName);
@@ -36,7 +36,7 @@ public class TestProjectAppEntity extends ApplicationBaseTest {
             .withArtifact(projectName, existingArtifactName);
 
         // VP - ProjectAppEntity is able to detect the new artifacts
-        List<Artifact> existingArtifacts = entityBuilder.getArtifacts(projectName);
+        List<Artifact> existingArtifacts = dbEntityBuilder.getArtifacts(projectName);
         ProjectAppEntity appEntity = appBuilder.getProject(projectName);
         List<ArtifactAppEntity> newArtifacts = appEntity.findNewArtifacts(existingArtifacts);
 

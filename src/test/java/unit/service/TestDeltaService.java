@@ -27,7 +27,7 @@ public class TestDeltaService extends EntityBaseTest {
         String newArtifactBody = "this is a different body";
 
         // Step - Create project with: type, artifact, and body
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newType(projectName, artifactType)
             .newVersion(projectName)
@@ -35,15 +35,15 @@ public class TestDeltaService extends EntityBaseTest {
             .newArtifactBody(projectName, artifactName, artifactSummary, artifactBody); // first body
 
         // VP - Delta against same version is empty
-        ProjectVersion firstVersion = entityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion firstVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         ProjectDelta deltaZero = deltaService.calculateProjectDelta(firstVersion, firstVersion);
         assertThat(deltaZero.getModified().size()).isEqualTo(0);
         assertThat(deltaZero.getRemoved().size()).isEqualTo(0);
         assertThat(deltaZero.getAdded().size()).isEqualTo(0);
 
         // Step - Create second version with modified artifacts
-        ProjectVersion secondVersion = entityBuilder.newVersionWithReturn(projectName);
-        entityBuilder
+        ProjectVersion secondVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        dbEntityBuilder
             .newArtifactBody(projectName, 1, ModificationType.MODIFIED, artifactName, artifactSummary, newArtifactBody);
 
         // VP - Verify that system able to detect if modified
@@ -53,8 +53,8 @@ public class TestDeltaService extends EntityBaseTest {
         assertThat(deltaOne.getAdded().size()).isEqualTo(0);
 
         // VP - Remove artifact
-        ProjectVersion thirdVersion = entityBuilder.newVersionWithReturn(projectName);
-        entityBuilder
+        ProjectVersion thirdVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        dbEntityBuilder
             .newArtifactBody(projectName, 2, ModificationType.REMOVED, artifactName, "", "");
         ProjectDelta deltaTwo = deltaService.calculateProjectDelta(secondVersion, thirdVersion);
         assertThat(deltaTwo.getModified().size()).isEqualTo(0);
@@ -62,8 +62,8 @@ public class TestDeltaService extends EntityBaseTest {
         assertThat(deltaTwo.getAdded().size()).isEqualTo(0);
 
         // VP - Remove artifact
-        ProjectVersion fourthVersion = entityBuilder.newVersionWithReturn(projectName);
-        entityBuilder
+        ProjectVersion fourthVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        dbEntityBuilder
             .newArtifactBody(projectName, 3, artifactName, artifactSummary, artifactBody);
         ProjectDelta deltaThree = deltaService.calculateProjectDelta(thirdVersion, fourthVersion);
         assertThat(deltaThree.getModified().size()).isEqualTo(0);

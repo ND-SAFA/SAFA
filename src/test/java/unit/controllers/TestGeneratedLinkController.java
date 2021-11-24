@@ -33,7 +33,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
         String targetName = "DD-10";
         double score = 0.2;
 
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
@@ -42,7 +42,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
             .newArtifact(projectName, "B", targetName)
             .newGeneratedTraceLink(projectName, sourceName, targetName, score);
 
-        String url = getGeneratedLinkEndpoint(entityBuilder.getProjectVersion(projectName, 0));
+        String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
         JSONObject response = sendGet(url, status().isOk());
         JSONArray links = response.getJSONArray("body");
         assertThat(links.length()).isEqualTo(1);
@@ -57,7 +57,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
         String targetName = "DD-10";
         double score = 0.2;
 
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
@@ -66,8 +66,8 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
             .newArtifact(projectName, "B", targetName)
             .newGeneratedTraceLink(projectName, sourceName, targetName, score);
 
-        ProjectVersion projectVersion = entityBuilder.getProjectVersion(projectName, 0);
-        TraceLink generatedLink = entityBuilder.getTraceLinks(projectName).get(0);
+        ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        TraceLink generatedLink = dbEntityBuilder.getTraceLinks(projectName).get(0);
 
         // VP - Verify that trace link is unreviewed
         UUID generatedLinkId = generatedLink.getTraceLinkId();
@@ -113,7 +113,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
 
         // Step - Create project and version
         String projectName = "test-project";
-        ProjectVersion projectVersion = entityBuilder
+        ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         Project project = projectVersion.getProject();
@@ -171,7 +171,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
         String targetName = "F21";
 
         // Step - Create project with artifacts.
-        ProjectVersion projectVersion = entityBuilder.newProject(projectName).newVersionWithReturn(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
         uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that trace does not exist

@@ -108,13 +108,13 @@ public class TestDeltaController extends ApplicationBaseTest {
         ProjectVersion afterVersion = versionPair.getValue1();
 
         // Step - Create future version with single change (artifact addition)
-        ProjectVersion trivialVersion = entityBuilder.newVersionWithReturn(projectName);
+        ProjectVersion trivialVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         String dummySummary = "this is a summary";
         String dummyContent = "this is a content";
-        entityBuilder
+        dbEntityBuilder
             .newType(projectName, "requirement")
             .newArtifact(projectName, "requirement", "RE-NA");
-        entityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
+        dbEntityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
         String backwardRouteName = RouteBuilder
@@ -134,13 +134,13 @@ public class TestDeltaController extends ApplicationBaseTest {
     }
 
     private Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName, boolean uploadFiles) throws Exception {
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
 
-        ProjectVersion beforeVersion = entityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion afterVersion = entityBuilder.getProjectVersion(projectName, 1);
+        ProjectVersion beforeVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
 
         if (uploadFiles) {
             uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);

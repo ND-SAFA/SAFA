@@ -18,11 +18,11 @@ public class TestVersionService extends ApplicationBaseTest {
     @Test
     public void createNextVersion() throws ServerError {
         String projectName = "test-project";
-        entityBuilder
+        dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName);
 
-        Project project = entityBuilder.getProject(projectName);
+        Project project = dbEntityBuilder.getProject(projectName);
         ProjectVersion nextVersion = versionService.createNextRevision(project);
         assertThat(nextVersion.getMajorVersion()).isEqualTo(1);
         assertThat(nextVersion.getMinorVersion()).isEqualTo(1);

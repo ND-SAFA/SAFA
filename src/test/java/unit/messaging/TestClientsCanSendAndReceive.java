@@ -17,7 +17,7 @@ public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
         String clientTwo = "user-2";
 
         // Step - Create project version to collaborate on
-        ProjectVersion projectVersion = entityBuilder
+        ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         String versionId = projectVersion.getVersionId().toString();

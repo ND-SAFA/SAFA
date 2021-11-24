@@ -33,10 +33,10 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
         String contentTwo = "no words in common";
 
         // Step - Create project with source and target types
-        entityBuilder.newProject(projectName);
-        ProjectVersion projectVersion = entityBuilder.newVersionWithReturn(projectName);
-        ArtifactType sourceType = entityBuilder.newTypeAndReturn(projectName, sourceTypeName);
-        ArtifactType targetType = entityBuilder.newTypeAndReturn(projectName, targetTypeName);
+        dbEntityBuilder.newProject(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        ArtifactType sourceType = dbEntityBuilder.newTypeAndReturn(projectName, sourceTypeName);
+        ArtifactType targetType = dbEntityBuilder.newTypeAndReturn(projectName, targetTypeName);
 
         // VP - no error when generating between no artifacts
         Pair<ArtifactType, ArtifactType> artifactTypes = new Pair<>(sourceType, targetType);
@@ -44,7 +44,7 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
         assertThat(newLinks.size()).as("empty links works").isEqualTo(0);
 
         // VP - able to generate artifacts between similar artifacts
-        entityBuilder
+        dbEntityBuilder
             .newArtifactAndBody(projectName, sourceTypeName, sourceOneName, "", content)
             .newArtifactAndBody(projectName, sourceTypeName, sourceTwoName, "", contentTwo)
             .newArtifactAndBody(projectName, targetTypeName, targetOneName, "", content)

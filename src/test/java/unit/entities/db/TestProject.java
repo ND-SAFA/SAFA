@@ -19,8 +19,8 @@ public class TestProject extends ApplicationBaseTest {
         String altProjectName = "some_other_project";
 
         // Step - Create Project
-        entityBuilder.newProject(projectName);
-        Project project = entityBuilder.getProject(projectName);
+        dbEntityBuilder.newProject(projectName);
+        Project project = dbEntityBuilder.getProject(projectName);
 
         // VP - Retrieve project and verify name
         Project queryProject = projectRepository.findByProjectId(project.getProjectId());
@@ -28,7 +28,7 @@ public class TestProject extends ApplicationBaseTest {
         assertThat(queryProject.getName()).isEqualTo(projectName);
 
         // VP - Update project name and verify change
-        entityBuilder.updateProjectName(projectName, altProjectName);
+        dbEntityBuilder.updateProjectName(projectName, altProjectName);
         queryProject = projectRepository.findByProjectId(project.getProjectId());
         assertThat(queryProject.getName()).isEqualTo(altProjectName);
 

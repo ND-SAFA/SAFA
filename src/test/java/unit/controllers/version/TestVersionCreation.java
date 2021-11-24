@@ -16,7 +16,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     @Test
     public void attemptNewRevisionWithoutVersions() throws Exception {
         String projectName = "test-project";
-        Project project = entityBuilder
+        Project project = dbEntityBuilder
             .newProjectWithReturn(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
@@ -26,7 +26,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     @Test
     public void createFirstVersionThroughRevision() throws Exception {
         String projectName = "test-project";
-        Project project = entityBuilder
+        Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
@@ -46,7 +46,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     @Test
     public void createNewMinorVersion() throws Exception {
         String projectName = "test-project";
-        Project project = entityBuilder
+        Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
@@ -66,7 +66,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     @Test
     public void createNewMajorVersion() throws Exception {
         String projectName = "test-project";
-        Project project = entityBuilder
+        Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);

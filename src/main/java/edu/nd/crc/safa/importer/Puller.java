@@ -103,8 +103,7 @@ public class Puller {
                 String artifactName = issue.key;
                 String typeName = issue.key;
                 String artifactContent = JsonStream.serialize(data);
-
-                artifactsToUpdate.add(new ArtifactAppEntity(typeName, artifactName, "", artifactContent));
+                artifactsToUpdate.add(new ArtifactAppEntity(null, typeName, artifactName, "", artifactContent));
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {

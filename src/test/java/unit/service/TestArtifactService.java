@@ -6,13 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
 
 import org.junit.jupiter.api.Test;
@@ -141,7 +141,12 @@ public class TestArtifactService extends EntityBaseTest {
         // Step - Create new version and updated artifact
         ProjectVersion projectVersion = entityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = entityBuilder.getArtifact(projectName, artifactName);
-        ArtifactAppEntity appEntity = new ArtifactAppEntity(typeName, artifactName, "", newContent);
+        String artifactId = artifact.getArtifactId().toString();
+        ArtifactAppEntity appEntity = new ArtifactAppEntity(
+            artifactId,
+            typeName, artifactName,
+            "",
+            newContent);
 
         // VP - Verify that artifact body is detected to be modified
         this.artifactVersionService.setArtifactsAtVersion(projectVersion,

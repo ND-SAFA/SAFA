@@ -8,21 +8,26 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,6 +43,7 @@ public class ArtifactVersionService {
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactBodyRepository artifactBodyRepository;
     ProjectVersionRepository projectVersionRepository;
+    ParserErrorRepository parserErrorRepository;
 
     DeltaService deltaService;
 
@@ -46,11 +52,13 @@ public class ArtifactVersionService {
                                   ArtifactTypeRepository artifactTypeRepository,
                                   ArtifactBodyRepository artifactBodyRepository,
                                   ProjectVersionRepository projectVersionRepository,
+                                  ParserErrorRepository parserErrorRepository,
                                   DeltaService deltaService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.projectVersionRepository = projectVersionRepository;
+        this.parserErrorRepository = parserErrorRepository;
         this.deltaService = deltaService;
     }
 
@@ -92,6 +100,7 @@ public class ArtifactVersionService {
     public void setArtifactAtProjectVersion(ProjectVersion projectVersion, ArtifactAppEntity artifact)
         throws ServerError {
         ArtifactBody artifactBody = calculateArtifactBodyAtVersion(projectVersion,
+            artifact.id,
             artifact.name,
             artifact.type,
             artifact.summary,
@@ -159,18 +168,30 @@ public class ArtifactVersionService {
 
     private List<ArtifactBody> calculateArtifactBodiesAtVersion(
         ProjectVersion projectVersion,
-        List<ArtifactAppEntity> projectArtifacts) {
+        List<ArtifactAppEntity> projectArtifacts) throws ServerError {
         Hashtable<String, ArtifactAppEntity> artifactsUpdated = new Hashtable<>();
-        List<ArtifactBody> updatedArtifactBodies = projectArtifacts
-            .stream()
-            .map(a -> {
-                artifactsUpdated.put(a.getName(), a);
-                return calculateArtifactBodyAtVersion(projectVersion,
+        List<ArtifactBody> updatedArtifactBodies = new ArrayList<>();
+        for (ArtifactAppEntity a : projectArtifacts) {
+            artifactsUpdated.put(a.getName(), a);
+            try {
+                ArtifactBody artifactBody = calculateArtifactBodyAtVersion(projectVersion,
+                    a.getId(),
                     a.name,
                     a.type,
                     a.summary,
                     a.body);
-            })
+                updatedArtifactBodies.add(artifactBody);
+            } catch (DataIntegrityViolationException e) {
+                ParserError parserError = new ParserError(
+                    projectVersion,
+                    "Could not parse artifact " + a.getName() + ": " + AppConstraints.getConstraintError(e),
+                    ApplicationActivity.PARSING_ARTIFACTS);
+                this.parserErrorRepository.save(parserError);
+
+            }
+        }
+        updatedArtifactBodies = updatedArtifactBodies
+            .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -189,24 +210,38 @@ public class ArtifactVersionService {
 
     private ArtifactBody calculateArtifactBodyAtVersion(
         ProjectVersion projectVersion,
+        String artifactId,
         String artifactName,
         String typeName,
         String summary,
-        String content) {
+        String content) throws ServerError {
 
         Project project = projectVersion.getProject();
         Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, typeName);
         ArtifactType artifactType = artifactTypeQuery.orElseGet(() -> new ArtifactType(project, typeName));
         this.artifactTypeRepository.save(artifactType);
+        Artifact artifact;
 
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
-        Artifact artifact = artifactQuery.orElseGet(() -> new Artifact(project, artifactType, artifactName));
+        if (artifactId == null || artifactId.equals("")) {
+            artifact = new Artifact(project, artifactType, artifactName);
+        } else {
+            Optional<Artifact> artifactQuery = this.artifactRepository.findById(UUID.fromString(artifactId));
+            if (artifactQuery.isPresent()) {
+                artifact = artifactQuery.get();
+                artifact.setType(artifactType);
+                artifact.setName(artifactName);
+            } else {
+                throw new RuntimeException("Could not find artifact with id:" + artifactId);
+            }
+        }
         this.artifactRepository.save(artifact);
 
         return deltaService.calculateArtifactChange(projectVersion,
             artifact,
-            new ArtifactAppEntity(typeName,
+            new ArtifactAppEntity(
+                artifactId,
+                typeName,
                 artifactName,
                 summary,
                 content));

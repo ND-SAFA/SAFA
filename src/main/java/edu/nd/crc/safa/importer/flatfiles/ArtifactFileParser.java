@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactFile;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
@@ -41,10 +43,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class ArtifactFileParser {
 
-    private final String ID_PARAM = "id";
+    private final String NAME_PARAM = "id";
     private final String SUMMARY_PARAM = "summary";
     private final String CONTENT_PARAM = "content";
-    private final String[] REQUIRED_COLUMNS = new String[]{ID_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
+    private final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
 
     ArtifactFileRepository artifactFileRepository;
     ArtifactRepository artifactRepository;
@@ -117,16 +119,21 @@ public class ArtifactFileParser {
         this.artifactFileRepository.save(artifactFile);
         //TODO: Remove artifact file repository;
 
-        Pair<List<ArtifactAppEntity>, List<String>> response = parseArtifactFileIntoApplicationEntities(fileName,
-            artifactType.getName(), fileParser);
+        Pair<List<ArtifactAppEntity>, List<String>> response = parseArtifactFileIntoApplicationEntities(
+            projectVersion.getProject(),
+            fileName,
+            artifactType.getName(),
+            fileParser);
         List<ParserError> parserErrors = response.getValue1().stream().map(msg -> new ParserError(projectVersion,
             msg, ApplicationActivity.PARSING_ARTIFACTS)).collect(Collectors.toList());
         return new Pair<>(response.getValue0(), parserErrors);
     }
 
-    public Pair<List<ArtifactAppEntity>, List<String>> parseArtifactFileIntoApplicationEntities(String fileName,
-                                                                                                String artifactType,
-                                                                                                CSVParser parsedFile) {
+    public Pair<List<ArtifactAppEntity>, List<String>> parseArtifactFileIntoApplicationEntities(
+        Project project,
+        String fileName,
+        String artifactType,
+        CSVParser parsedFile) {
         List<CSVRecord> artifactRecords = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         try {
@@ -138,16 +145,25 @@ public class ArtifactFileParser {
 
         List<ArtifactAppEntity> artifactAppEntities = new ArrayList<>();
         for (CSVRecord artifactRecord : artifactRecords) {
-            String artifactId = artifactRecord.get(ID_PARAM);
+            String artifactName = artifactRecord.get(NAME_PARAM);
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
+            String artifactId = "";
+
+            if (project != null) {
+                Optional<Artifact> artifactQuery = artifactRepository.findByProjectAndName(project, artifactName);
+                if (artifactQuery.isPresent()) {
+                    artifactId = artifactQuery.get().getArtifactId().toString();
+                }
+            }
 
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
 
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
-                artifactType,
                 artifactId,
+                artifactType,
+                artifactName,
                 artifactSummary,
                 artifactContent
             );

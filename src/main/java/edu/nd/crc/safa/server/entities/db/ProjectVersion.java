@@ -10,6 +10,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
+import edu.nd.crc.safa.config.AppConstraints;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -24,7 +28,7 @@ import org.json.JSONObject;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "project_id", "major_version", "minor_version", "revision"
-        }, name = "UNIQUE_VERSION_ID_PER_PROJECT")
+        }, name = AppConstraints.UNIQUE_VERSION_ID_PER_PROJECT)
     }
 )
 public class ProjectVersion implements Serializable {
@@ -33,6 +37,7 @@ public class ProjectVersion implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "version_id")
+    @NotNull
     UUID versionId;
 
     @ManyToOne
@@ -40,12 +45,18 @@ public class ProjectVersion implements Serializable {
     @JoinColumn(name = "project_id", nullable = false)
     Project project;
 
+    @NotNull
+    @Positive
     @Column(name = "major_version", nullable = false)
     int majorVersion;
 
+    @NotNull
+    @Positive
     @Column(name = "minor_version", nullable = false)
     int minorVersion;
 
+    @NotNull
+    @Positive
     @Column(name = "revision", nullable = false)
     int revision;
 

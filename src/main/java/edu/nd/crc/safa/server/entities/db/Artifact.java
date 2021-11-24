@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.config.AppConstraints;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -26,7 +28,7 @@ import org.hibernate.annotations.Type;
             columnNames = {
                 "project_id",
                 "name"
-            }, name = "UNIQUE_ARTIFACT_NAME_PER_PROJECT")
+            }, name = AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT)
     })
 public class Artifact implements Serializable {
 

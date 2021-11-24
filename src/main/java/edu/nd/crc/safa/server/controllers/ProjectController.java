@@ -49,8 +49,8 @@ public class ProjectController extends BaseController {
      */
     @PostMapping(Routes.projects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity project) throws ServerError {
-        Project payloadProject = Project.fromAppEntity(project); // gets
+    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws ServerError {
+        Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
         ProjectEntities response;

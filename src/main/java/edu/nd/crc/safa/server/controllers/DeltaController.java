@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -37,7 +37,7 @@ public class DeltaController extends BaseController {
      * @return ProjectDelta with artifacts that were added, removed, and modified between versions.
      * @throws ServerError Throws error if baseline or target version is not found.
      */
-    @GetMapping(Routes.calculateProjectDelta)
+    @GetMapping(AppRoutes.calculateProjectDelta)
     public ServerResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                                 @PathVariable UUID targetVersionId) throws ServerError {
 

@@ -11,7 +11,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -145,7 +145,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(Routes.generateLinks).get();
+        String generateRoute = RouteBuilder.withRoute(AppRoutes.generateLinks).get();
 
         JSONObject body = new JSONObject();
         body.put("sourceArtifacts", sourceArtifacts);
@@ -209,7 +209,7 @@ public class TestGeneratedLinkController extends ApplicationBaseTest {
     private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
         return RouteBuilder
-            .withRoute(Routes.getGeneratedLinks)
+            .withRoute(AppRoutes.getGeneratedLinks)
             .withProject(project)
             .get();
     }

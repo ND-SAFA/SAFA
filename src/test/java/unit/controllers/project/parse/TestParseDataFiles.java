@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +18,7 @@ public class TestParseDataFiles extends ApplicationBaseTest {
 
     @Test
     public void testParseArtifactFile() throws Exception {
-        String routeName = RouteBuilder.withRoute(Routes.parseArtifactFile).withArtifactType("Designs").get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.parseArtifactFile).withArtifactType("Designs").get();
         String fileName = "Design.csv";
 
         //Step - Upload file, parse artifacts, and collect them
@@ -30,7 +30,7 @@ public class TestParseDataFiles extends ApplicationBaseTest {
 
     @Test
     public void errorForWrongColumnsInArtifactFile() throws Exception {
-        String routeName = RouteBuilder.withRoute(Routes.parseArtifactFile).withArtifactType("Designs").get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.parseArtifactFile).withArtifactType("Designs").get();
         String fileName = "Design2Requirement.csv";
 
         // VP - Verify error message informs that columns are wrong
@@ -43,13 +43,13 @@ public class TestParseDataFiles extends ApplicationBaseTest {
         String fileName = "Design.csv";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadTraceFileAndGetError(Routes.parseTraceFile, fileName);
+        String c = uploadTraceFileAndGetError(AppRoutes.parseTraceFile, fileName);
         assertThat(c).contains("source, target");
     }
 
     @Test
     public void errorForWrongFileToArtifactParser() throws Exception {
-        String routeName = RouteBuilder.withRoute(Routes.parseArtifactFile).withArtifactType("Designs").get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.parseArtifactFile).withArtifactType("Designs").get();
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
@@ -62,7 +62,7 @@ public class TestParseDataFiles extends ApplicationBaseTest {
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadTraceFileAndGetError(Routes.parseTraceFile, fileName);
+        String c = uploadTraceFileAndGetError(AppRoutes.parseTraceFile, fileName);
         assertThat(c).contains("Expected a CSV file");
     }
 
@@ -71,7 +71,7 @@ public class TestParseDataFiles extends ApplicationBaseTest {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
-        JSONObject responseBody = uploadFileAndGetBody(Routes.parseTraceFile, fileName);
+        JSONObject responseBody = uploadFileAndGetBody(AppRoutes.parseTraceFile, fileName);
 
         // VP - Verify that message contains constraint
         JSONArray traces = responseBody.getJSONArray("traces");

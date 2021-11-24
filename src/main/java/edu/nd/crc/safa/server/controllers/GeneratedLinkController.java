@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
@@ -42,14 +42,14 @@ public class GeneratedLinkController extends BaseController {
         this.traceLinkGenerator = traceLinkGenerator;
     }
 
-    @GetMapping(value = Routes.getGeneratedLinks)
+    @GetMapping(value = AppRoutes.getGeneratedLinks)
     public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
         Project project = this.projectRepository.findByProjectId(projectId);
         List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
         return new ServerResponse(TraceAppEntity.createEntities(projectLinks));
     }
 
-    @PostMapping(value = Routes.generateLinks)
+    @PostMapping(value = AppRoutes.generateLinks)
     public ServerResponse generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();

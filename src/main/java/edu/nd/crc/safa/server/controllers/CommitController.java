@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.ServerError;
@@ -50,7 +50,7 @@ public class CommitController extends BaseController {
         this.revisionNotificationService = revisionNotificationService;
     }
 
-    @PostMapping(Routes.commitChange)
+    @PostMapping(AppRoutes.commitChange)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {

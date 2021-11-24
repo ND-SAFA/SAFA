@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONObject;
@@ -18,7 +18,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
         String projectName = "test-project";
         Project project = entityBuilder
             .newProjectWithReturn(projectName);
-        String routeName = RouteBuilder.withRoute(Routes.createNewRevisionVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
         assertThat(response.getJSONObject("body").getString("message")).contains("initial version");
     }
@@ -30,7 +30,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(Routes.createNewRevisionVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");
 
@@ -50,7 +50,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(Routes.createNewMinorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.createNewMinorVersion).withProject(project).get();
 
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");
@@ -70,7 +70,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(Routes.createNewMajorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.createNewMajorVersion).withProject(project).get();
 
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");

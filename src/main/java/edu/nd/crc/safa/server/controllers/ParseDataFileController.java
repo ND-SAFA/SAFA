@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.api.FileParser;
@@ -57,7 +57,7 @@ public class ParseDataFileController extends BaseController {
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
-    @PostMapping(value = Routes.parseArtifactFile)
+    @PostMapping(value = AppRoutes.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
                                             @RequestParam MultipartFile file) {
@@ -82,7 +82,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = Routes.parseTraceFile)
+    @PostMapping(value = AppRoutes.parseTraceFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();

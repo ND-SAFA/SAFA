@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
@@ -33,7 +33,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
     public void testMultipleFilesUploadRestController() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = Routes.projectFlatFiles;
+        String routeName = AppRoutes.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);

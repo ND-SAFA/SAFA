@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -38,7 +38,7 @@ public class ArtifactController extends BaseController {
      * @param artifactName The name / identifier of the artifact.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
-    @GetMapping(Routes.checkIfArtifactExists)
+    @GetMapping(AppRoutes.checkIfArtifactExists)
     public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) {
         Project project = this.projectRepository.findByProjectId(projectId);
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);

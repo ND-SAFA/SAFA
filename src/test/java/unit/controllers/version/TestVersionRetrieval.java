@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONObject;
@@ -32,6 +32,6 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private String createRouteName(Project project) {
-        return RouteBuilder.withRoute(Routes.getVersions).withProject(project).get();
+        return RouteBuilder.withRoute(AppRoutes.getVersions).withProject(project).get();
     }
 }

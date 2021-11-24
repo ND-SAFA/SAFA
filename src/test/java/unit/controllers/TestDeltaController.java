@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -47,7 +47,7 @@ public class TestDeltaController extends ApplicationBaseTest {
 
         // Step - Calculate delta
         String deltaRouteName = RouteBuilder
-            .withRoute(Routes.calculateProjectDelta)
+            .withRoute(AppRoutes.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
@@ -87,7 +87,7 @@ public class TestDeltaController extends ApplicationBaseTest {
 
         // Step - Calculate Delta in Backwards direction
         String backwardRouteName = RouteBuilder
-            .withRoute(Routes.calculateProjectDelta)
+            .withRoute(AppRoutes.calculateProjectDelta)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .get();
@@ -118,7 +118,7 @@ public class TestDeltaController extends ApplicationBaseTest {
 
         // Step - Send Delta Request
         String backwardRouteName = RouteBuilder
-            .withRoute(Routes.calculateProjectDelta)
+            .withRoute(AppRoutes.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();

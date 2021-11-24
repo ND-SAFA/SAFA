@@ -3,7 +3,7 @@ package unit.controllers.project;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +18,7 @@ public class TestFlatFileErrors extends ApplicationBaseTest {
     public void testArtifactTypeNotFound() throws Exception {
 
         // Step 1 - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_2);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
@@ -35,7 +35,7 @@ public class TestFlatFileErrors extends ApplicationBaseTest {
     public void testDuplicateArtifactBody() throws Exception {
 
         // Step 1 - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(Routes.projectFlatFiles,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_3);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
 

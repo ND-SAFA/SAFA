@@ -2,7 +2,7 @@ package unit.controllers.project.json;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -29,7 +29,7 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
 
     protected JSONObject postProjectJson(JSONObject projectJson,
                                          ResultMatcher expectedStatus) throws Exception {
-        return sendPost(Routes.projects, projectJson, expectedStatus);
+        return sendPost(AppRoutes.projects, projectJson, expectedStatus);
     }
 
     /**

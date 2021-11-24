@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
@@ -115,7 +115,7 @@ public class TestArtifactController extends ApplicationBaseTest {
         String artifactType = "requirement";
         Project project = entityBuilder.newProjectWithReturn(projectName);
         String url = RouteBuilder
-            .withRoute(Routes.checkIfArtifactExists)
+            .withRoute(AppRoutes.checkIfArtifactExists)
             .withProject(project)
             .withArtifactName(artifactName)
             .get();

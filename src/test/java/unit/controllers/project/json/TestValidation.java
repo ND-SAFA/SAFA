@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
@@ -183,7 +183,7 @@ public class TestValidation extends BaseProjectJsonTest {
         List<JSONObject> artifacts,
         List<JSONObject> traces) throws Exception {
         // Step - Setup constants
-        String url = Routes.projects;
+        String url = AppRoutes.projects;
         JSONObject projectJson = new JSONObject();
 
         // Step - Create project payload

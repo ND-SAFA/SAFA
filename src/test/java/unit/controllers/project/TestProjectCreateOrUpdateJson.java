@@ -256,7 +256,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
         // VP - Assert that message indicates that artifact validation was triggered.
         JSONObject body = response.getJSONObject("body");
         assertThat(response.getNumber("status")).isEqualTo(1);
-        assertThat(body.getString("message")).contains("artifacts"); // TODO: add more checks
+        assertThat(body.getString("message")).contains("artifacts").contains("type");
     }
 
     /**

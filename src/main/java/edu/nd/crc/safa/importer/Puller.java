@@ -197,7 +197,6 @@ public class Puller {
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
                                         if (foundNodes.stream().anyMatch(id::equals)) {
-                                            //TODO: mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
                                             throw new RuntimeException("Adding source in puller has not been restored");
                                         }
                                         commitFiles.add(entry.getNewPath());

@@ -16,7 +16,6 @@ export function getSingleQueryResult(
     appModule.onWarning(error);
     throw Error(error);
   } else if (query.length > 1) {
-    console.log("RESULTS:", query);
     const error = `Found more than one result in query: ${queryName}`;
     appModule.onWarning(error);
     throw Error(error);

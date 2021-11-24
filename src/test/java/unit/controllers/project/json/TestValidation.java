@@ -13,9 +13,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests that each entity present in ProjectAppEntity is validated upon parsing.
+ */
 public class TestValidation extends BaseProjectJsonTest {
-
-
     @Test
     public void attemptToUpdateProjectWithEmptyProjectId() throws Exception {
         String mockVersionId = UUID.randomUUID().toString();

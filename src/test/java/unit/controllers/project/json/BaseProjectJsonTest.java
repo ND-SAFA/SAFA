@@ -8,6 +8,10 @@ import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 import unit.ApplicationBaseTest;
 
+/**
+ * Creates a constant environment and functions for creating or updating projects
+ * via the JSON route.
+ */
 public class BaseProjectJsonTest extends ApplicationBaseTest {
     protected final int N_TYPES = 2;
     protected final int N_ARTIFACTS = 2;

@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
 import org.hibernate.annotations.OnDelete;
@@ -28,7 +29,7 @@ import org.json.JSONObject;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "source_artifact_id", "target_artifact_id"
-        }, name = "SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET")
+        }, name = AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET)
     }
 )
 public class TraceLink implements Serializable {

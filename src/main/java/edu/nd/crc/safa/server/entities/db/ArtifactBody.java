@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.config.ProjectVariables;
 
 import org.hibernate.annotations.OnDelete;
@@ -29,7 +30,7 @@ import org.json.JSONObject;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "artifact_id", "version_id"
-        }, name = "UNIQUE_ARTIFACT_BODY_PER_VERSION")
+        }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
 public class ArtifactBody implements Serializable {

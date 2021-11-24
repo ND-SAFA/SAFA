@@ -66,6 +66,7 @@ public class ParseDataFileController extends BaseController {
             CSVParser fileCSV = artifactFileParser.readArtifactFile(file);
             Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
                 artifactFileParser.parseArtifactFileIntoApplicationEntities(
+                    null,
                     file.getOriginalFilename(),
                     artifactType,
                     fileCSV);

@@ -70,6 +70,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     public void createNewBuilders() {
         entityBuilder.createEmptyData();
         appBuilder.createEmptyData();
+        jsonBuilder.createEmptyData();
     }
 
     protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request, JSONObject body) {

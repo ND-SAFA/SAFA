@@ -41,16 +41,21 @@ public class TestArtifactController extends ApplicationBaseTest {
         String projectName = "test-project";
         String artifactName = "RE-10";
         String modifiedSummary = "this is a new summary";
+        String modifiedName = "RE-42";
 
         // Step - Create a new artifact
         Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
         ProjectVersion projectVersion = response.getValue0();
+        Project project = projectVersion.getProject();
         JSONObject artifactJson = response.getValue1();
 
         // VP - Verify artifact exists
+        int numberOfArtifacts = this.artifactRepository.findByProject(project).size();
         assertArtifactExists(projectVersion, artifactName);
+        assertThat(numberOfArtifacts).isEqualTo(1);
 
         // Step - Modify artifact summary
+        artifactJson.put("name", modifiedName);
         artifactJson.put("summary", modifiedSummary);
 
         // VP - Commit modified artifact for saving
@@ -59,10 +64,12 @@ public class TestArtifactController extends ApplicationBaseTest {
             .withModifiedArtifact(artifactJson));
 
         // Step - Retrieve ArtifactBodies
-        List<ArtifactBody> artifactBodies = artifactBodyRepository.getBodiesWithName(projectVersion.getProject(),
-            artifactName);
+        List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProject(project);
 
         // VP - Verify one single artifact body
+        List<Artifact> artifactInProject = this.artifactRepository.findByProject(project);
+        numberOfArtifacts = artifactInProject.size();
+        assertThat(numberOfArtifacts).isEqualTo(1);
         assertThat(artifactBodies.size()).isEqualTo(1);
 
         // VP - Verify body contains modification
@@ -129,7 +136,8 @@ public class TestArtifactController extends ApplicationBaseTest {
         assertThat(artifactExists).isTrue();
     }
 
-    private Pair<ProjectVersion, JSONObject> createArtifact(String projectName, String artifactName) throws Exception {
+    private Pair<ProjectVersion, JSONObject> createArtifact(String projectName,
+                                                            String artifactName) throws Exception {
         // Step - Create project with single version
         ProjectVersion projectVersion = entityBuilder
             .newProject(projectName)
@@ -137,13 +145,20 @@ public class TestArtifactController extends ApplicationBaseTest {
 
         // Step - Create Artifact JSON
         JSONObject artifactJson = jsonBuilder
-            .withProject(projectName, projectName)
-            .withArtifactAndReturn(projectName, artifactName, "requirements", "this is a body");
+            .withProject(projectName, projectName, "")
+            .withArtifactAndReturn(projectName, "", artifactName, "requirements", "this is a body");
 
         // Step - Send request to create artifact
         commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson));
+        String artifactId =
+            this.artifactRepository
+                .findByProjectAndName(projectVersion.getProject(), artifactName)
+                .get()
+                .getArtifactId()
+                .toString();
+        artifactJson.put("id", artifactId);
 
         return new Pair<>(projectVersion, artifactJson);
     }

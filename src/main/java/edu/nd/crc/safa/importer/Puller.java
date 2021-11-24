@@ -103,8 +103,7 @@ public class Puller {
                 String artifactName = issue.key;
                 String typeName = issue.key;
                 String artifactContent = JsonStream.serialize(data);
-
-                artifactsToUpdate.add(new ArtifactAppEntity(typeName, artifactName, "", artifactContent));
+                artifactsToUpdate.add(new ArtifactAppEntity(null, typeName, artifactName, "", artifactContent));
 
                 // Check that the link is only an inward link to this node
                 if (issue.links.size() > 0) {
@@ -198,7 +197,6 @@ public class Puller {
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
                                         if (foundNodes.stream().anyMatch(id::equals)) {
-                                            //TODO: mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
                                             throw new RuntimeException("Adding source in puller has not been restored");
                                         }
                                         commitFiles.add(entry.getNewPath());

@@ -66,16 +66,24 @@ public class DeltaService {
             if (deltaArtifact == null) {
                 continue;
             }
-            String artifactName = deltaArtifact.getArtifactId();
+            String deltaArtifactId = deltaArtifact.getArtifactId();
             if (deltaArtifact instanceof ModifiedArtifact) {
-                modified.put(artifactName, (ModifiedArtifact) deltaArtifact);
+                modified.put(deltaArtifactId, (ModifiedArtifact) deltaArtifact);
             } else if (deltaArtifact instanceof RemovedArtifact) {
-                removed.put(artifactName, (RemovedArtifact) deltaArtifact);
+                removed.put(deltaArtifactId, (RemovedArtifact) deltaArtifact);
             } else if (deltaArtifact instanceof AddedArtifact) {
-                added.put(artifactName, (AddedArtifact) deltaArtifact);
-                ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(artifact.getType().getName(),
-                    artifact.getName(), ((AddedArtifact) deltaArtifact).getAfterSummary(),
-                    ((AddedArtifact) deltaArtifact).getAfter());
+                added.put(deltaArtifactId, (AddedArtifact) deltaArtifact);
+                String typeName = artifact.getType().getName();
+                String artifactId = artifact.getArtifactId().toString();
+                String artifactName = artifact.getName();
+                String summary = ((AddedArtifact) deltaArtifact).getAfterSummary();
+                String body = ((AddedArtifact) deltaArtifact).getAfter();
+                ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(
+                    artifactId,
+                    typeName,
+                    artifactName,
+                    summary,
+                    body);
                 missingArtifacts.add(addedArtifactBody);
             }
         }
@@ -111,8 +119,10 @@ public class DeltaService {
                     artifact,
                     appEntity.summary,
                     appEntity.body);
-            } else if (!previousBody.getContent().equals(appEntity.body)
-                || !previousBody.getSummary().equals(appEntity.summary)) {
+            } else if (
+                !previousBody.getContent().equals(appEntity.body)
+                    || !previousBody.getSummary().equals(appEntity.summary)
+                    || !previousBody.getName().equals(appEntity.name)) {
                 artifactBody = new ArtifactBody(projectVersion,
                     ModificationType.MODIFIED,
                     artifact,

@@ -1,14 +1,11 @@
-package unit.controllers.project;
+package unit.controllers.project.json;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.Routes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -20,23 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultMatcher;
-import unit.ApplicationBaseTest;
 
 /**
- * Tests that /projects/ is able to create new projects from the front-end
- * JSON representation as well as updates the elements if they already exists
+ * Tests that user is able to create and update a project via JSON.
  */
-public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
-
-    final int N_TYPES = 2;
-    final int N_ARTIFACTS = 2;
-    final int N_TRACES = 1;
-    final String a1Type = "requirement";
-    final String a1Name = "RE-8";
-    final String a2Type = "design";
-    final String a2Name = "DD-10";
-    final String projectName = "test-project";
+public class TestProjectCreateOrUpdate extends BaseProjectJsonTest {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -49,7 +34,7 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
      */
     @Test
     public void createEntitiesFromJson() throws Exception {
-        JSONObject projectJson = createProjectJson();
+        JSONObject projectJson = createBaseProjectJson();
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
             .getJSONObject("body")
@@ -61,14 +46,12 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
     }
 
     /**
-     * Sends a request to the same api with a new project name and
-     * an updated artifact body. Expects all entities to remain in
-     * the database and have only updated the entities given.
+     * Test that user is able to update project with checks for:
      */
     @Test
     public void updateEntities() throws Exception {
-        // Step - Create Basic Project (repeat of createEntitiesFromJson)
-        JSONObject projectJson = createProjectJson();
+        // Step - Create Project containing:
+        JSONObject projectJson = createBaseProjectJson();
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
             .getJSONObject("body")
@@ -87,10 +70,11 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
         // Step - Create Updated Request and Send
         String newProjectName = "new-project-name";
         String newArtifactBody = "new-artifact-body";
+        String artifactId = artifactBodiesQuery.get(0).getArtifact().getArtifactId().toString();
         JSONObject updateRequestJson = jsonBuilder
-            .withProject(projectId, newProjectName)
+            .withProject(projectId, newProjectName, projectDescription)
             .withProjectVersion(newProjectName, versionId, 1, 1, 2)
-            .withArtifact(newProjectName, a1Name, a1Type, newArtifactBody)
+            .withArtifact(newProjectName, artifactId, a1Name, a1Type, newArtifactBody)
             .getPayload(newProjectName);
         postProjectJson(updateRequestJson);
 
@@ -143,93 +127,5 @@ public class TestProjectCreateOrUpdateJson extends ApplicationBaseTest {
             .isEqualTo(N_ARTIFACTS);
         List<TraceLink> traceLinks = traceLinkRepository.getApprovedLinks(project);
         assertThat(traceLinks.size()).isEqualTo(N_TRACES);
-    }
-
-    @Test
-    public void attemptToUpdateProjectWithoutProjectId() throws Exception {
-        String mockVersionId = UUID.randomUUID().toString();
-        JSONObject payload = jsonBuilder
-            .withProject("", projectName)
-            .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, a2Name, a2Type, "this is a design")
-            .withTrace(projectName, a1Name, a2Name)
-            .withProjectVersion(projectName, mockVersionId, 1, 1, 1)
-            .getPayload(projectName);
-
-        JSONObject response = postProjectJson(payload, status().is4xxClientError());
-        String errorMessage = response.getJSONObject("body").getString("message");
-        assertThat(errorMessage).contains("Invalid ProjectVersion");
-    }
-
-    @Test
-    public void attemptUpdateWithoutVersionId() throws Exception {
-        ProjectVersion projectVersion = entityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-        String projectId = projectVersion.getProject().getProjectId().toString();
-        JSONObject payload = jsonBuilder
-            .withProject(projectId, projectName)
-            .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, a2Name, a2Type, "this is a design")
-            .withTrace(projectName, a1Name, a2Name)
-            .withProjectVersion(projectName, "", 1, 1, 1)
-            .getPayload(projectName);
-
-        JSONObject response = postProjectJson(payload, status().is4xxClientError());
-        String errorMessage = response.getJSONObject("body").getString("message");
-        assertThat(errorMessage).contains("valid ID");
-    }
-
-    @Test
-    public void attemptUpdateWithoutValidVersionNumber() throws Exception {
-        ProjectVersion projectVersion = entityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-        String projectId = projectVersion.getProject().getProjectId().toString();
-        String mockVersionId = UUID.randomUUID().toString();
-        JSONObject payload = jsonBuilder
-            .withProject(projectId, projectName)
-            .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, a2Name, a2Type, "this is a design")
-            .withTrace(projectName, a1Name, a2Name)
-            .withProjectVersion(projectName, mockVersionId, 0, 0, 0)
-            .getPayload(projectName);
-
-        JSONObject response = postProjectJson(payload, status().is4xxClientError());
-        String errorMessage = response.getJSONObject("body").getString("message");
-        assertThat(errorMessage).contains("positive major");
-    }
-
-    @Test
-    public void testValidation() throws Exception {
-        String url = Routes.projects;
-        JSONObject projectJson = new JSONObject();
-        projectJson.put("name", projectName);
-        projectJson.put("artifacts", new ArrayList<String>());
-        projectJson.put("traces", new ArrayList<String>());
-
-        JSONObject response = sendPost(url, projectJson, status().isBadRequest());
-        JSONObject body = response.getJSONObject("body");
-        assertThat(response.getNumber("status")).isEqualTo(1);
-        assertThat(body.getString("message")).contains("description").contains("null");
-    }
-
-    private JSONObject postProjectJson(JSONObject projectJson) throws Exception {
-        return postProjectJson(projectJson, status().isCreated());
-    }
-
-    private JSONObject postProjectJson(JSONObject projectJson,
-                                       ResultMatcher expectedStatus) throws Exception {
-        return sendPost(Routes.projects, projectJson, expectedStatus);
-    }
-
-    private JSONObject createProjectJson() {
-        return jsonBuilder
-            .withProject("", projectName)
-            .withArtifact(projectName, a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, a2Name, a2Type, "this is a design")
-            .withTrace(projectName, a1Name, a2Name)
-            .withProjectVersion(projectName, "", 1, 1, 1)
-            .getPayload(projectName);
     }
 }

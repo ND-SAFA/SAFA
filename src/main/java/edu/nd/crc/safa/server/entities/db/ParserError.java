@@ -46,7 +46,7 @@ public class ParserError implements Serializable {
     @Column(name = "line_number")
     Long lineNumber;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 500)
     String description;
 
     public ParserError() {

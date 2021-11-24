@@ -3,6 +3,8 @@ package edu.nd.crc.safa.server.entities.app;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
@@ -11,11 +13,19 @@ import edu.nd.crc.safa.server.entities.db.TraceType;
 import org.json.JSONObject;
 
 public class TraceAppEntity {
+    @NotNull
     public String traceLinkId;
+
+    @NotEmpty
     public String source;
+
+    @NotEmpty
     public String target;
+
     public TraceApproval approvalStatus;
+
     public double score;
+
     public TraceType traceType;
 
     public TraceAppEntity() {

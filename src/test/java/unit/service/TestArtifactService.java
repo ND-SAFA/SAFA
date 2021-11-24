@@ -128,6 +128,7 @@ public class TestArtifactService extends EntityBaseTest {
         String projectName = "test-project";
         String typeName = "requirements";
         String artifactName = "RE-8";
+        String artifactSummary = "this is a summary";
         String newContent = "this is a new content text";
 
         // Step - Create project with: version, type, artifact, body
@@ -144,8 +145,9 @@ public class TestArtifactService extends EntityBaseTest {
         String artifactId = artifact.getArtifactId().toString();
         ArtifactAppEntity appEntity = new ArtifactAppEntity(
             artifactId,
-            typeName, artifactName,
-            "",
+            typeName,
+            artifactName,
+            artifactSummary,
             newContent);
 
         // VP - Verify that artifact body is detected to be modified

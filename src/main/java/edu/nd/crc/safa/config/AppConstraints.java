@@ -27,13 +27,13 @@ public class AppConstraints {
 
         for (String constraintId : registeredConstraints) {
             if (cause.contains(constraintId)) {
-                return getFriendlyMessage(constraintId);
+                return getErrorMessage(constraintId);
             }
         }
         throw e;
     }
 
-    private static String getFriendlyMessage(String constraintId) {
+    private static String getErrorMessage(String constraintId) {
         switch (constraintId) {
             case UNIQUE_ARTIFACT_NAME_PER_PROJECT:
                 return "artifact with given name already exists.";

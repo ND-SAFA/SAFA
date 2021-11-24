@@ -148,14 +148,7 @@ public class ArtifactFileParser {
             String artifactName = artifactRecord.get(NAME_PARAM);
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
-            String artifactId = "";
-
-            if (project != null) {
-                Optional<Artifact> artifactQuery = artifactRepository.findByProjectAndName(project, artifactName);
-                if (artifactQuery.isPresent()) {
-                    artifactId = artifactQuery.get().getArtifactId().toString();
-                }
-            }
+            String artifactId = getArtifactIdIfExists(project, artifactName);
 
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
@@ -171,6 +164,18 @@ public class ArtifactFileParser {
         }
 
         return new Pair<>(artifactAppEntities, errors);
+    }
+
+    private String getArtifactIdIfExists(Project project, String artifactName) {
+        String artifactId = "";
+
+        if (project != null) {
+            Optional<Artifact> artifactQuery = artifactRepository.findByProjectAndName(project, artifactName);
+            if (artifactQuery.isPresent()) {
+                artifactId = artifactQuery.get().getArtifactId().toString();
+            }
+        }
+        return artifactId;
     }
 
     public CSVParser readArtifactFile(MultipartFile file) throws ServerError {

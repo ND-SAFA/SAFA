@@ -19,7 +19,7 @@ export interface SessionModel {
   /**
    * The JWT token authorizing current user.
    */
-  token?: string;
+  token: string;
 }
 
 /**
@@ -39,4 +39,18 @@ export interface UserChangeModel {
    * The new password to set.
    */
   password: string;
+}
+
+/**
+ * Defines the decoded object of an authorization JWT token
+ */
+export interface AuthToken {
+  /**
+   * The identifier (email) of the subscriber.
+   */
+  sub: string;
+  /**
+   * Expiration date in number of seconds since epoch.
+   */
+  exp: number;
 }

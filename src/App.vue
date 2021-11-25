@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
 
@@ -23,20 +23,17 @@ export default Vue.extend({
   components: {
     Snackbar,
   },
-  mounted() {
-    sessionModule
-      .loadSession()
-      .then(() => navigateTo(Routes.HOME))
-      .catch((e) => {
-        appModule.onDevWarning(e);
-      });
+  async mounted() {
+    const isAuthorized = await sessionModule.hasAuthorization();
+    if (!isAuthorized) {
+      await navigateTo(Routes.LOGIN_ACCOUNT);
+    }
   },
 });
 </script>
 
 <style lang="scss">
 @import "./assets/main.scss";
-
 @import "./assets/app-styles.css";
 @import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";

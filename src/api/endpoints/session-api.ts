@@ -12,7 +12,6 @@ import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
  */
 
 const TEST_ENDPOINTS = true;
-const TEST_SESSION_EXISTING = false; // false required for API to work otherwise no token
 
 /**
  * Custom fetch call for session endpoints.
@@ -29,25 +28,6 @@ async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
   }
 
   return response.json();
-}
-
-/**
- * Returns the current user's session.
- *
- * @return SessionModel - The session for the previously logged in user.
- *
- * @throws Error - If no session exists.
- */
-export async function getSession(): Promise<SessionModel> {
-  if (!TEST_SESSION_EXISTING) {
-    throw Error("<No session should return a 400 which throws an error>");
-  }
-  if (TEST_ENDPOINTS) {
-    return { token: "123" };
-  }
-  return authHttpClient<SessionModel>(fillEndpoint(Endpoint.session), {
-    method: "GET",
-  });
 }
 
 /**
@@ -91,19 +71,6 @@ export async function loginUser(user: UserModel): Promise<SessionModel> {
       body: JSON.stringify(user),
     }
   );
-}
-
-/**
- * Logs the current user out.
- */
-export async function logoutUser(): Promise<void> {
-  if (TEST_ENDPOINTS) {
-    return;
-  }
-
-  await authHttpClient(fillEndpoint(Endpoint.logout), {
-    method: "GET",
-  });
 }
 
 /**

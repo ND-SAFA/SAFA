@@ -1,6 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
-import { getSession, loginUser, logoutUser } from "@/api";
+import { loginUser } from "@/api";
+import { navigateTo, Routes } from "@/router";
+import { AuthToken } from "@/types";
+import { appModule } from "@/store";
+import jwt_decode from "jwt-decode";
 
 /**
  * If you only knew how many things I tried to not have to resort to this...
@@ -21,18 +25,6 @@ export default class SessionModule extends VuexModule {
 
   @Action({ rawError: true })
   /**
-   * Attempts to get an existing session.
-   *
-   * @throws Error - No session exists.
-   */
-  async loadSession(): Promise<void> {
-    const session = await getSession();
-
-    this.SET_SESSION(session);
-  }
-
-  @Action({ rawError: true })
-  /**
    * Attempts to log a user in.
    *
    * @throws Error - Login failed.
@@ -47,9 +39,25 @@ export default class SessionModule extends VuexModule {
    * Attempts to log a user out.
    */
   async logout(): Promise<void> {
-    await logoutUser();
-
     this.SET_SESSION(emptySessionModel);
+    await navigateTo(Routes.LOGIN_ACCOUNT);
+  }
+
+  @Action({ rawError: true })
+  /**
+   * Checks is a token is in the store and
+   */
+  async hasAuthorization(): Promise<boolean> {
+    let error;
+    if (this.isTokenEmpty) {
+      return false;
+    } else if (this.isTokenExpired) {
+      error = "Your session has expired, please log back in.";
+      appModule.onWarning(error);
+      await this.logout();
+      return false;
+    }
+    return true;
   }
 
   @Mutation
@@ -70,8 +78,33 @@ export default class SessionModule extends VuexModule {
   /**
    * @return The current authorization token if one exists.
    */
-  get getToken(): string | undefined {
+  get getToken(): string {
     const token = this.session.token;
-    return token === "" ? undefined : token;
+    if (token === "") {
+      throw Error("No authorization token exists in store.");
+    }
+    return token;
+  }
+
+  /**
+   * Returns the decoded authentication token is one exists.
+   */
+  get decodedToken(): AuthToken {
+    return jwt_decode(this.getToken) as AuthToken;
+  }
+
+  /**
+   * @return Whether a valid Authorization token is stored in module
+   */
+  get isTokenEmpty(): boolean {
+    return this.session.token === "";
+  }
+
+  /**
+   * @returns Whether the current JWT token is empty or has passed its
+   * expiration date.
+   */
+  get isTokenExpired(): boolean {
+    return this.isTokenEmpty || Date.now() >= this.decodedToken.exp * 1000;
   }
 }

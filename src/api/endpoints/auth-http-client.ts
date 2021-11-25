@@ -19,6 +19,10 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   setJsonContentType = true
 ): Promise<T> {
+  const isAuthorized = await sessionModule.hasAuthorization();
+  if (!isAuthorized) {
+    throw Error(`${relativeUrl} aborted due to authorization failure.`);
+  }
   const token = sessionModule.getToken;
   const URL = `${baseURL}/${relativeUrl}`;
 

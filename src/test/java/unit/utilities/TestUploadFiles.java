@@ -6,14 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
 
-public class TestOSHelper extends EntityBaseTest {
+/**
+ * Test that user is able to create new directory and upload files.
+ */
+public class TestUploadFiles extends EntityBaseTest {
 
     @Test
     public void smokeTest() throws ServerError {

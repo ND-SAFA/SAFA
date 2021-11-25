@@ -1,4 +1,4 @@
-package unit.flatfile;
+package unit.project.links;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that the system is able to generate trace links between two sets of artifacts.
+ */
 public class TestTraceLinkGenerator extends ApplicationBaseTest {
 
     @Autowired

@@ -1,4 +1,4 @@
-package unit.controllers;
+package unit.project.links;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,8 +10,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -24,7 +24,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
-public class TestGeneratedLinkController extends ApplicationBaseTest {
+/**
+ * Tests that generated trace links are able to be reviewed.
+ */
+public class TestLinkApproval extends ApplicationBaseTest {
 
     @Test
     public void testGetGeneratedLinks() throws Exception {

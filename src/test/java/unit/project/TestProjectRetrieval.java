@@ -1,4 +1,4 @@
-package unit.controllers.project;
+package unit.project;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,6 +9,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that projects defined in database are able to be retrieved by user.
+ */
 public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {

@@ -20,7 +20,11 @@ import edu.nd.crc.safa.warnings.TreeVerifier;
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
 
-public class TestTreeVerifier extends EntityBaseTest {
+/**
+ * Provides a smoke test for various types of rules that are used
+ * to generated project warnings.
+ */
+public class SmokeTests extends EntityBaseTest {
 
     @Test
     public void testLinkNodesFunction() {

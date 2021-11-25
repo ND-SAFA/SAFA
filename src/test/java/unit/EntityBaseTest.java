@@ -28,6 +28,9 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
+/**
+ * Provides layer of access to entities in database.
+ */
 public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired

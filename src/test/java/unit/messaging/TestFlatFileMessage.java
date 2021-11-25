@@ -10,6 +10,9 @@ import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import org.junit.jupiter.api.Test;
 import unit.WebSocketBaseTest;
 
+/**
+ * Tests that uploading flat files incurs a single update message.
+ */
 public class TestFlatFileMessage extends WebSocketBaseTest {
     @Test
     public void singleMessageOnFlatFileUpload() throws Exception {

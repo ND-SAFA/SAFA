@@ -1,4 +1,4 @@
-package unit.controllers.project.json;
+package unit.project.json;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

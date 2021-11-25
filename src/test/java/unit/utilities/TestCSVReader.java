@@ -13,9 +13,12 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
 import unit.EntityBaseTest;
-import unit.TestConstants;
+import unit.SampleProjectConstants;
 
-public class TestFileUtilities extends EntityBaseTest {
+/**
+ * Tests that we are able to read a CSV file containing headers.
+ */
+public class TestCSVReader extends EntityBaseTest {
     @Test
     public void readCSVFile() throws Exception {
         String pathToFile = ProjectPaths.getPathToTestResources("Design.csv");
@@ -26,7 +29,7 @@ public class TestFileUtilities extends EntityBaseTest {
         String testArtifactId = "D1";
         String testSummaryQuery = "warning";
         String testContentQuery = "RPIC";
-        int nTotalRecords = TestConstants.N_DESIGNS;
+        int nTotalRecords = SampleProjectConstants.N_DESIGNS;
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();

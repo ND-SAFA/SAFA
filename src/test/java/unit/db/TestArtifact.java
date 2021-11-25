@@ -1,4 +1,4 @@
-package unit.entities.db;
+package unit.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

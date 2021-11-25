@@ -1,4 +1,4 @@
-package unit.project;
+package unit.flatfile;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
-import unit.TestConstants;
+import unit.SampleProjectConstants;
 
-public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
+public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
 
     @Test
     public void testMultipleFilesUploadRestController() throws Exception {
@@ -57,12 +57,12 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         // VP - Artifacts present in response
         assertThat(projectJson.getJSONArray("artifacts").length())
             .as("all artifacts confirmed")
-            .isEqualTo(TestConstants.N_ARTIFACTS);
+            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // VP - Traces present in response
         assertThat(projectJson.getJSONArray("traces").length())
             .as("all traces confirmed")
-            .isGreaterThanOrEqualTo(TestConstants.N_LINKS);
+            .isGreaterThanOrEqualTo(SampleProjectConstants.N_LINKS);
         int nManual = (int) projectJson.getJSONArray("traces")
             .toList()
             .stream()
@@ -71,7 +71,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
             ).count();
         assertThat(nManual)
             .as("manual traced confirmed")
-            .isEqualTo(TestConstants.N_LINKS);
+            .isEqualTo(SampleProjectConstants.N_LINKS);
 
         // VP - Errors are present in response
         JSONObject errors = responseBody.getJSONObject("errors");
@@ -103,14 +103,14 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
 
         // VP - Project types
         List<ArtifactType> projectTypes = artifactTypeRepository.findByProject(project);
-        assertThat(projectTypes.size()).as("all types created").isEqualTo(TestConstants.N_TYPES);
+        assertThat(projectTypes.size()).as("all types created").isEqualTo(SampleProjectConstants.N_TYPES);
 
         // VP - requirements created
         Optional<ArtifactType> requirementType = artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, "requirement");
         assertThat(requirementType.isPresent()).as("requirement type created").isTrue();
         List<Artifact> requirements = artifactRepository.findByProjectAndType(project, requirementType.get());
-        assertThat(requirements.size()).as("requirements created").isEqualTo(TestConstants.N_REQUIREMENTS);
+        assertThat(requirements.size()).as("requirements created").isEqualTo(SampleProjectConstants.N_REQUIREMENTS);
 
         // VP - design definitions created
         Optional<ArtifactType> designType = artifactTypeRepository
@@ -119,7 +119,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         List<Artifact> designs = artifactRepository.findByProjectAndType(project, designType.get());
         assertThat(designs.size())
             .as("designs created)")
-            .isEqualTo(TestConstants.N_DESIGNS);
+            .isEqualTo(SampleProjectConstants.N_DESIGNS);
 
         // VP - hazards created
         Optional<ArtifactType> hazardType = artifactTypeRepository
@@ -128,7 +128,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         List<Artifact> hazards = artifactRepository.findByProjectAndType(project, hazardType.get());
         assertThat(hazards.size())
             .as("hazards created")
-            .isEqualTo(TestConstants.N_HAZARDS);
+            .isEqualTo(SampleProjectConstants.N_HAZARDS);
 
         // VP - environment assumption artifacts created
         Optional<ArtifactType> envAssumptionType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project,
@@ -138,16 +138,16 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         List<Artifact> envAssumptions = artifactRepository.findByProjectAndType(project, envAssumptionType.get());
         assertThat(envAssumptions.size())
             .as("env assumptions created")
-            .isEqualTo(TestConstants.N_ENV_ASSUMPTIONS);
+            .isEqualTo(SampleProjectConstants.N_ENV_ASSUMPTIONS);
 
         List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
-        assertThat(projectArtifacts.size()).isEqualTo(TestConstants.N_ARTIFACTS);
+        assertThat(projectArtifacts.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // VP - Artifact bodies
         List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProjectVersion(projectVersion);
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
-            .isEqualTo(TestConstants.N_ARTIFACTS);
+            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         List<ParserError> parserErrors = parserErrorRepository.findByProjectVersion(projectVersion);
         assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
@@ -157,7 +157,7 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
 
         List<TraceLink> traceLinks = traceLinkRepository
             .findBySourceArtifactProjectAndApprovalStatus(project, TraceApproval.APPROVED);
-        assertThat(traceLinks.size()).isEqualTo(TestConstants.N_LINKS);
+        assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         projectService.deleteProject(project);
     }
@@ -190,9 +190,9 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
         List<ArtifactBody> updateBodies = this.artifactBodyRepository.findByProjectVersion(updateVersion);
         assertThat(updateBodies.size())
             .as("bodies created in later version")
-            .isEqualTo(TestConstants.N_ARTIFACTS);
+            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
         List<TraceLink> updateTraces = this.traceLinkRepository.getApprovedLinks(project);
-        assertThat(updateTraces.size()).isEqualTo(TestConstants.N_LINKS);
+        assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
         uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
@@ -205,6 +205,6 @@ public class TestProjectCreationFlatFiles extends ApplicationBaseTest {
 
         // VP - No new trace links were created
         List<TraceLink> noChangeTraces = this.traceLinkRepository.getApprovedLinks(project);
-        assertThat(noChangeTraces.size()).isEqualTo(TestConstants.N_LINKS);
+        assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
     }
 }

@@ -10,6 +10,9 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
+/**
+ * Provides a base of functions for testing the parsing of data files.
+ */
 public class ParseBaseTest extends ApplicationBaseTest {
 
     protected String uploadArtifactFileAndGetError(String routeName, String fileName) throws Exception {
@@ -22,7 +25,7 @@ public class ParseBaseTest extends ApplicationBaseTest {
 
     protected String uploadEntityFileAndGetError(String routeName, String fileName, String entityName) throws Exception {
         // Step - Upload file and get response body
-        JSONObject body = uploadFileAndGetBody(routeName, fileName);
+        JSONObject body = parseFileAndReturnBody(routeName, fileName);
 
         // Step - Extract artifact and errors from body
         JSONArray entities = body.getJSONArray(entityName);
@@ -37,7 +40,7 @@ public class ParseBaseTest extends ApplicationBaseTest {
 
     protected JSONArray uploadArtifactFileAndGetArtifacts(String routeName, String fileName) throws Exception {
         // Step - Upload file and get response body
-        JSONObject body = uploadFileAndGetBody(routeName, fileName);
+        JSONObject body = parseFileAndReturnBody(routeName, fileName);
 
         // Step - Extract artifact and errors from body
         JSONArray artifacts = body.getJSONArray("artifacts");
@@ -49,7 +52,7 @@ public class ParseBaseTest extends ApplicationBaseTest {
         return artifacts;
     }
 
-    protected JSONObject uploadFileAndGetBody(String routeName, String fileName) throws Exception {
+    protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName);

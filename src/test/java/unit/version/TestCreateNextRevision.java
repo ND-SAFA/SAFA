@@ -1,4 +1,4 @@
-package unit.service;
+package unit.version;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
-public class TestVersionService extends ApplicationBaseTest {
+/**
+ * Tests that system able to calculate and create the next version in a project.
+ */
+public class TestCreateNextRevision extends ApplicationBaseTest {
     @Autowired
     VersionService versionService;
 

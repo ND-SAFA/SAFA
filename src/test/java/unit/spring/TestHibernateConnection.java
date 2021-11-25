@@ -1,4 +1,4 @@
-package unit.entities;
+package unit.spring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

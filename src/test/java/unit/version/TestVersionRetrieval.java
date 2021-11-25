@@ -1,4 +1,4 @@
-package unit.controllers.version;
+package unit.version;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,6 +11,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that users are able to retrieve a project versions.
+ */
 public class TestVersionRetrieval extends ApplicationBaseTest {
     @Test
     public void getEmptyVersions() throws Exception {

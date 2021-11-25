@@ -1,4 +1,4 @@
-package unit.service;
+package unit.project.artifacts;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

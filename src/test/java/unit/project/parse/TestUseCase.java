@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.TestConstants;
+import unit.SampleProjectConstants;
 
 /**
  * Tests that system is able to parse artifact and trace files containing no errors.
@@ -29,7 +29,7 @@ public class TestUseCase extends ParseBaseTest {
         JSONArray artifacts = uploadArtifactFileAndGetArtifacts(routeName, fileName);
 
         //VP - Verify that all artifacts were parsed
-        assertThat(artifacts.length()).isEqualTo(TestConstants.N_DESIGNS);
+        assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
     }
 
     /**
@@ -42,7 +42,7 @@ public class TestUseCase extends ParseBaseTest {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
-        JSONObject responseBody = uploadFileAndGetBody(AppRoutes.parseTraceFile, fileName);
+        JSONObject responseBody = parseFileAndReturnBody(AppRoutes.parseTraceFile, fileName);
 
         // VP - Verify that message contains constraint
         JSONArray traces = responseBody.getJSONArray("traces");

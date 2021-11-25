@@ -1,6 +1,9 @@
 package unit;
 
-public class TestConstants {
+/**
+ * The testing constants for the "before" test project.
+ */
+public class SampleProjectConstants {
     public static final int N_TYPES = 4;
     public static final int N_DESIGNS = 14;
     public static final int N_REQUIREMENTS = 5;

@@ -1,4 +1,4 @@
-package unit.service;
+package unit.flatfile;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -15,7 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
-public class TestUploadFlatFiles extends ApplicationBaseTest {
+/**
+ * Provides a smoke test for verifying that files can be uploaded and stored.
+ */
+public class TestUploadFiles extends ApplicationBaseTest {
 
     @Autowired
     FileUploadService fileUploadService;

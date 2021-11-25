@@ -1,4 +1,4 @@
-package unit.entities.app;
+package unit.project;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

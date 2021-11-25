@@ -17,6 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
+/**
+ * Provides a smoke test for testing the TraceFileParser is able to create trace links.
+ */
 public class TestTraceFileParser extends ApplicationBaseTest {
 
     @Autowired

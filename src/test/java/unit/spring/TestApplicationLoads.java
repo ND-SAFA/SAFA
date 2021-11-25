@@ -1,4 +1,4 @@
-package unit.controllers;
+package unit.spring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

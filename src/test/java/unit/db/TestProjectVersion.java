@@ -7,6 +7,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that project versions can be created, retrieved, deleted, and upated.
+ */
 public class TestProjectVersion extends ApplicationBaseTest {
 
     @Test

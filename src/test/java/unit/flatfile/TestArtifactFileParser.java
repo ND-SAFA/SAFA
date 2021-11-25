@@ -15,9 +15,12 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
-import unit.TestConstants;
+import unit.SampleProjectConstants;
 
-public class TestArtifactNodeFileParser extends ApplicationBaseTest {
+/**
+ * Provides smoke tests for testing the ArtifactFileParser
+ */
+public class TestArtifactFileParser extends ApplicationBaseTest {
 
     @Autowired
     ArtifactFileParser artifactFileParser;
@@ -39,7 +42,7 @@ public class TestArtifactNodeFileParser extends ApplicationBaseTest {
         List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
         assertThat(projectArtifacts.size())
             .as("artifacts created")
-            .isEqualTo(TestConstants.N_DESIGNS);
+            .isEqualTo(SampleProjectConstants.N_DESIGNS);
         projectService.deleteProject(project);
     }
 

@@ -2,8 +2,8 @@ package unit.flatfile;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,7 +12,11 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
-public class TestFlatFileErrors extends ApplicationBaseTest {
+/**
+ * Responsible for purposely occurring parsing errors and verifying that the correct
+ * message is sent back.
+ */
+public class TestParsingErrors extends ApplicationBaseTest {
 
     @Test
     public void testArtifactTypeNotFound() throws Exception {

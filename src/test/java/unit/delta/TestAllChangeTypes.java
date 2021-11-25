@@ -1,24 +1,28 @@
-package unit.service;
+package unit.delta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.services.DeltaService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.EntityBaseTest;
 
-public class TestDeltaService extends EntityBaseTest {
+/**
+ * Responsible for testing incurring and validating each type of change is detected
+ * and returned the delta calculation.
+ */
+public class TestAllChangeTypes extends EntityBaseTest {
 
     @Autowired
     DeltaService deltaService;
 
     @Test
-    public void calculateModifiedSingleArtifact() throws ServerError {
+    public void testAllChangeTypes() throws ServerError {
         String projectName = "test-project";
         String artifactType = "requirement";
         String artifactName = "RE-8";

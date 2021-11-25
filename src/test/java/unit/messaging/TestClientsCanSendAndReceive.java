@@ -8,6 +8,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.junit.jupiter.api.Test;
 import unit.WebSocketBaseTest;
 
+/**
+ * Provides a smoke test verifying that two users subscribed to the same version channel
+ * are able to receive updates when the other commits them.
+ */
 public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
 
     @Test

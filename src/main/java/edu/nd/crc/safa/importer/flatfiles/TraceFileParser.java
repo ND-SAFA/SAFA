@@ -10,10 +10,10 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -129,7 +129,7 @@ public class TraceFileParser {
                 traceFileParser);
         List<ParserError> parserErrors = parseResponse.getValue1().stream().map(error -> {
             ParserError parserError = new ParserError(projectVersion, error.getValue0(),
-                ApplicationActivity.PARSING_TRACES);
+                ProjectParsingActivities.PARSING_TRACES);
             parserError.setFileSource(fileName, error.getValue1());
             return parserError;
         }).collect(Collectors.toList());

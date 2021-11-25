@@ -10,6 +10,10 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 
+/**
+ * Responsible for applying a set of rules to a set of artifacts and links between them
+ * generating warnings if the rules are not met.
+ */
 public class TreeVerifier {
 
     /**
@@ -62,7 +66,7 @@ public class TreeVerifier {
     private boolean isRuleSatisfied(final Function ruleToApply,
                                     Artifact targetArtifact,
                                     final List<TraceLink> traceLinks) {
-        switch (ruleToApply.relationship) {
+        switch (ruleToApply.artifactRelationship) {
             case BIDIRECTIONAL_LINK:
                 return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
             case CHILD:

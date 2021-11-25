@@ -10,6 +10,9 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.json.JSONObject;
 
+/**
+ * The model for our users.
+ */
 @Entity()
 @Table(name = "safa_user")
 public class SafaUser {

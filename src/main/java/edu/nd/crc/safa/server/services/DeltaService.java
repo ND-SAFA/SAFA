@@ -19,11 +19,14 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.utilities.ArtifactBodyFilter;
+import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for calculating the delta between any two versions.
+ */
 @Service
 public class DeltaService {
 
@@ -220,12 +223,12 @@ public class DeltaService {
     }
 
     private ArtifactBody getMostUpToDateArtifactBodyThroughFilter(List<ArtifactBody> bodies,
-                                                                  ArtifactBodyFilter filter) {
+                                                                  ProjectVersionFilter filter) {
         ArtifactBody closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
             ArtifactBody currentBody = bodies.get(i);
             ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
-            if (filter.compareTo(currentBodyVersion)) {
+            if (filter.shouldKeep(currentBodyVersion)) {
                 if (closestBodyToVersion == null) {
                     closestBodyToVersion = currentBody;
                 } else if (currentBodyVersion.isGreaterThan(closestBodyToVersion.getProjectVersion())

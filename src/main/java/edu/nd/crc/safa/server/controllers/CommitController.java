@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.ServerError;
@@ -26,10 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Provides endpoints for commit a versioend change to a project's entities.
+ */
 @RestController
 public class CommitController extends BaseController {
 
-    ArtifactController artifactController;
     TraceLinkService traceLinkService;
 
     ArtifactVersionService artifactVersionService;
@@ -38,19 +40,17 @@ public class CommitController extends BaseController {
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
-                            ArtifactController artifactController,
                             TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository);
-        this.artifactController = artifactController;
         this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;
     }
 
-    @PostMapping(Routes.commitChange)
+    @PostMapping(AppRoutes.commitChange)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {

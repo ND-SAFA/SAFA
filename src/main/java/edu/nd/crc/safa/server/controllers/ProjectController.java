@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Provides endpoints for creating and updating project entities via JSON.
+ */
 @RestController
 public class ProjectController extends BaseController {
 
@@ -47,7 +50,7 @@ public class ProjectController extends BaseController {
      * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
      *                     payload.
      */
-    @PostMapping(Routes.projects)
+    @PostMapping(AppRoutes.projects)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws ServerError {
         Project payloadProject = Project.fromAppEntity(project);
@@ -68,7 +71,7 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping(Routes.projects)
+    @GetMapping(AppRoutes.projects)
     public ServerResponse getProjects() {
         return new ServerResponse(this.projectRepository.findAll());
     }
@@ -80,7 +83,7 @@ public class ProjectController extends BaseController {
      * @return String with success message.
      * @throws ServerError Throws error if project with associated id is not found.
      */
-    @DeleteMapping(Routes.projectById)
+    @DeleteMapping(AppRoutes.projectById)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
         Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));

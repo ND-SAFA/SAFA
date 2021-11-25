@@ -13,6 +13,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
+/**
+ * A generated warning about a project version's artifact tree.
+ */
 @Entity
 @Table(name = "warning")
 public class Warning {

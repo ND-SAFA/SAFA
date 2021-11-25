@@ -12,13 +12,13 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.ApplicationActivity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -185,7 +185,7 @@ public class ArtifactVersionService {
                 ParserError parserError = new ParserError(
                     projectVersion,
                     "Could not parse artifact " + a.getName() + ": " + AppConstraints.getConstraintError(e),
-                    ApplicationActivity.PARSING_ARTIFACTS);
+                    ProjectParsingActivities.PARSING_ARTIFACTS);
                 this.parserErrorRepository.save(parserError);
 
             }

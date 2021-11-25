@@ -3,6 +3,9 @@ package edu.nd.crc.safa.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Container for JWT token secrets.
+ */
 @Component
 public class SecurityConstants {
     public static final String TOKEN_NAME = "token";

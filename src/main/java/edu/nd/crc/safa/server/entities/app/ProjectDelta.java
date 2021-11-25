@@ -3,6 +3,9 @@ package edu.nd.crc.safa.server.entities.app;
 import java.util.Hashtable;
 import java.util.List;
 
+/**
+ * Contains the changes that can occur between two projects versions.
+ */
 public class ProjectDelta {
     Hashtable<String, AddedArtifact> added;
     Hashtable<String, ModifiedArtifact> modified;

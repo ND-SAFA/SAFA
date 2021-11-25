@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ProjectErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -51,9 +51,9 @@ public class ProjectRetrievalService {
      */
     public ProjectEntities retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        ProjectParsingErrors projectParsingErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectErrors, projectWarnings);
+        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
     }
 
     /**

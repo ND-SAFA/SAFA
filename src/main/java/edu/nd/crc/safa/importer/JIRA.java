@@ -20,28 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Container encapsulated a JIRA project.
+ *
+ * <p>Note, this code is a legacy artifact of the previous development team.
+ */
 @Component
 public class JIRA {
-    public class Issue {
-        String source;
-        String key;
-        String href;
-        boolean isDelegated;
-        String status;
-        String name;
-        String description;
-        String type;
-        String issuetype;
-        List<IssueLink> links;
-    }
-
-    public class IssueLink {
-        String Type;
-        String InwardKey;
-        String InwardType;
-    }
-
-    private String uri;
+    private final String uri;
     @Autowired
     @Value("${jira.username:}")
     String mUsername;
@@ -115,10 +101,7 @@ public class JIRA {
                 issue.href = uri + "browse/" + issue.key;
 
                 Any fields = i.get("fields");
-                issue.isDelegated = false;
-                if (fields.get("assignee").valueType() != ValueType.INVALID) {
-                    issue.isDelegated = true;
-                }
+                issue.isDelegated = fields.get("assignee").valueType() != ValueType.INVALID;
 
                 issue.status = fields.get("status").get("name").toString();
                 issue.name = fields.get("summary").toString();
@@ -163,5 +146,24 @@ public class JIRA {
 
     public void setUri(String uri) {
         return;
+    }
+
+    public class Issue {
+        String source;
+        String key;
+        String href;
+        boolean isDelegated;
+        String status;
+        String name;
+        String description;
+        String type;
+        String issuetype;
+        List<IssueLink> links;
+    }
+
+    public class IssueLink {
+        String Type;
+        String InwardKey;
+        String InwardType;
     }
 }

@@ -21,7 +21,7 @@ import org.hibernate.annotations.Type;
 import org.json.JSONObject;
 
 /**
- * Responsible for identifying each project's version.
+ * Identifies each project's version.
  */
 @Entity
 @Table(name = "project_version",

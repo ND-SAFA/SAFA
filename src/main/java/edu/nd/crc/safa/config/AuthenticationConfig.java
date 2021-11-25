@@ -66,7 +66,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             // Endpoint Settings
             .authorizeRequests()
-            .antMatchers(Routes.loginLink, Routes.createAccountLink, "/websocket/**").permitAll()
+            .antMatchers(AppRoutes.loginLink, AppRoutes.createAccountLink, "/websocket/**").permitAll()
             .anyRequest().authenticated()
             // Authentication Filters
             .and()

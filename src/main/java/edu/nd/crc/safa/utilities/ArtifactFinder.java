@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
 
+/**
+ * Defines an interface for a lambda defining a search strategy for artifacts by name.
+ */
 public interface ArtifactFinder {
     Optional<Artifact> findArtifact(String artifactName);
 }

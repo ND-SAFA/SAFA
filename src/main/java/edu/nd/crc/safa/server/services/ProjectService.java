@@ -5,7 +5,7 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ProjectErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -71,8 +71,8 @@ public class ProjectService {
 
         //TODO: Update trace links
         Map<String, List<RuleName>> projectWarnings = warningService.findViolationsInArtifactTree(projectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
-        return new ProjectEntities(appEntity, projectVersion, projectErrors, projectWarnings); // TODO:
+        ProjectParsingErrors projectParsingErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        return new ProjectEntities(appEntity, projectVersion, projectParsingErrors, projectWarnings); // TODO:
         // Actually retrieve new
     }
 

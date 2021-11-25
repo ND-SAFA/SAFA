@@ -1,5 +1,10 @@
 package edu.nd.crc.safa.server.entities.app;
 
+/**
+ * Represents the addition of an artifact between two project versions.
+ * Namely, `after` is used to mean the target version in a delta comparison
+ * although not necessarily having to occur later in time.
+ */
 public class AddedArtifact extends DeltaArtifact {
 
     String after;

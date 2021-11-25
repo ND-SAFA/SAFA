@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -35,7 +35,7 @@ public class SafaUserController extends BaseController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping(Routes.createAccountLink)
+    @PostMapping(AppRoutes.createAccountLink)
     public SafaUser createNewUser(@RequestBody SafaUser newUser) {
         newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
         this.safaUserRepository.save(newUser);

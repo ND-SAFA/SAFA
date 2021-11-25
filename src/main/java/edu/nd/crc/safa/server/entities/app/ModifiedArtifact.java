@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.server.entities.app;
 
+/**
+ * Represents an artifact modification between two project versions.
+ */
 public class ModifiedArtifact extends DeltaArtifact {
 
     String before;

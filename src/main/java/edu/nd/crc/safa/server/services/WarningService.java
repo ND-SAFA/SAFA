@@ -11,14 +11,17 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.Warning;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
+import edu.nd.crc.safa.warnings.DefaultTreeRules;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.RuleName;
-import edu.nd.crc.safa.warnings.TreeRules;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for generating project warnings for a given project version.
+ */
 @Service
 public class WarningService {
 
@@ -54,7 +57,7 @@ public class WarningService {
         Project project = projectVersion.getProject();
         TreeVerifier verifier = new TreeVerifier();
         List<Rule> rulesToApply = new ArrayList<>();
-        rulesToApply.addAll(TreeRules.getDefaultRules());
+        rulesToApply.addAll(DefaultTreeRules.getDefaultRules());
         rulesToApply.addAll(this.getProjectRules(project));
 
         return verifier.findRuleViolations(artifacts, traceLinks, rulesToApply);

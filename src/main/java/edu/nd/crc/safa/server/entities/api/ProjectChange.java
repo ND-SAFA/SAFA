@@ -3,6 +3,12 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Container for the possible changes that an entity could have
+ * between two versions.
+ *
+ * @param <T> The type of entity that is changing.
+ */
 public class ProjectChange<T> {
     List<T> added;
     List<T> removed;

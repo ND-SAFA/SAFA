@@ -5,8 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.AppBuilder;
-import edu.nd.crc.safa.builders.EntityBuilder;
+import edu.nd.crc.safa.builders.AppEntityBuilder;
+import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -28,6 +28,9 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
+/**
+ * Provides layer of access to entities in database.
+ */
 public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
@@ -58,17 +61,17 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ProjectService projectService;
 
     @Autowired
-    protected EntityBuilder entityBuilder;
+    protected DbEntityBuilder dbEntityBuilder;
 
     @Autowired
-    protected AppBuilder appBuilder;
+    protected AppEntityBuilder appBuilder;
 
     @Autowired
     protected JsonBuilder jsonBuilder;
 
     @BeforeEach
     public void createNewBuilders() {
-        entityBuilder.createEmptyData();
+        dbEntityBuilder.createEmptyData();
         appBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
     }

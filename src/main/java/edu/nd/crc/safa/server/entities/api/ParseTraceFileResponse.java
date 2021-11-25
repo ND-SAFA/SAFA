@@ -5,6 +5,10 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
+/**
+ * The response object for parsing traces containing the traces themselves
+ * and any errors that occurred during process.
+ */
 public class ParseTraceFileResponse implements ParseFileResponse {
 
     List<TraceAppEntity> traces;

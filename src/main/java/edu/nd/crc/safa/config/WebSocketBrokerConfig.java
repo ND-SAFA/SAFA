@@ -10,6 +10,12 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
+/**
+ * Configures the general WebSocket configurations including:
+ * - endpoint for initial connects to websockets
+ * - setting message size
+ * - setting the topic and individual message endpoints.
+ */
 @Configuration
 @EnableWebSocket
 @EnableWebSocketMessageBroker

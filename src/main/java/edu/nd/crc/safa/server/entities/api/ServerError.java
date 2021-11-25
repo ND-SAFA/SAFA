@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/* Responsible for identifying error that were accounted
+/**
+ * Responsible for identifying error that were accounted
  * for in the execution of our application. Other error are
  * regarded as unaccounted for.
  */

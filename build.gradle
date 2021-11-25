@@ -114,6 +114,8 @@ jacocoTestCoverageVerification {
             fileTree(dir: it, exclude: [
                     "edu/**/importer/JIRA.class",
                     "edu/**/importer/Puller.class",
+                    "edu/**/builders/AppEntityBuilder.class",
+                    "edu/**/importer/DbEntityBuilder.class",
             ])
         }))
     }

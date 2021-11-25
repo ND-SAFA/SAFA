@@ -8,7 +8,7 @@ import java.util.List;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.Routes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -25,7 +25,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
                                          String pathToFileDir) throws Exception {
         assertTokenExists();
         String path = RouteBuilder
-            .withRoute(Routes.updateProjectVersionFromFlatFiles)
+            .withRoute(AppRoutes.updateProjectVersionFromFlatFiles)
             .withVersion(projectVersion)
             .get();
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
@@ -44,7 +44,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     }
 
     public ProjectVersion createProjectWithNewVersion(String projectName) {
-        return entityBuilder
+        return dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
@@ -53,7 +53,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     public void commit(CommitBuilder commitBuilder) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
-            .withRoute(Routes.commitChange)
+            .withRoute(AppRoutes.commitChange)
             .withVersion(commitVersion)
             .get();
         sendPost(route, commitBuilder.asJson(), status().is2xxSuccessful());
@@ -67,7 +67,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
      */
     protected String getCommitRoute(ProjectVersion projectVersion) {
         return RouteBuilder
-            .withRoute(Routes.commitChange)
+            .withRoute(AppRoutes.commitChange)
             .withVersion(projectVersion)
             .get();
     }

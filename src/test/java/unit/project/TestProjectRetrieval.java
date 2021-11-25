@@ -1,0 +1,30 @@
+package unit.project;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import edu.nd.crc.safa.config.AppRoutes;
+
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
+import unit.ApplicationBaseTest;
+
+/**
+ * Tests that projects defined in database are able to be retrieved by user.
+ */
+public class TestProjectRetrieval extends ApplicationBaseTest {
+    @Test
+    public void getProjectsEmpty() throws Exception {
+        JSONObject response = sendGet(AppRoutes.projects, status().isOk());
+        assertThat(response.getJSONArray("body").length()).isEqualTo(0);
+    }
+
+    @Test
+    public void getProjectsMultiple() throws Exception {
+        dbEntityBuilder
+            .newProject("firstProject")
+            .newProject("secondProject");
+        JSONObject response = sendGet(AppRoutes.projects, status().isOk());
+        assertThat(response.getJSONArray("body").length()).isEqualTo(2);
+    }
+}

@@ -1,4 +1,4 @@
-package unit.controllers.project.parse;
+package unit.project.parse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

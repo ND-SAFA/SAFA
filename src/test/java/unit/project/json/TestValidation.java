@@ -17,6 +17,12 @@ import org.junit.jupiter.api.Test;
  * Tests that each entity present in ProjectAppEntity is validated upon parsing.
  */
 public class TestValidation extends BaseProjectJsonTest {
+    /**
+     * Tests that a project containing a project version but no project id is rejected.
+     * TODO: Reconsider this test as we can just use the project associated with the given version.
+     *
+     * @throws Exception Throws exception is http request fails.
+     */
     @Test
     public void attemptToUpdateProjectWithEmptyProjectId() throws Exception {
         String mockVersionId = UUID.randomUUID().toString();
@@ -34,7 +40,7 @@ public class TestValidation extends BaseProjectJsonTest {
     }
 
     /**
-     * Creates a project and attempts to update it without including a project version.
+     * Attempts to update it without including a project version.
      *
      * @throws Exception Throws exception is update request fails.
      */

@@ -1,4 +1,4 @@
-package unit.controllers.project;
+package unit.project;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

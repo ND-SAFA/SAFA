@@ -1,7 +1,9 @@
-import { appModule, viewportModule } from "@/store";
+import { appModule, projectModule, viewportModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, FilterAction } from "@/types";
 import { PanelType } from "@/types";
+import { SubtreeMap } from "@/types/store/artifact-selection";
+import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**
@@ -24,6 +26,11 @@ export default class ArtifactSelectionModule extends VuexModule {
    * Types to ignore.
    */
   private ignoreTypes: string[] = [];
+
+  /**
+   * A map containing root artifact names as keys and children names are values.
+   */
+  private subtreeMap: SubtreeMap = {};
 
   @Action
   /**
@@ -77,6 +84,15 @@ export default class ArtifactSelectionModule extends VuexModule {
     this.SET_SELECTED_SUBTREE([]);
   }
 
+  @Action
+  async updateSubtreeMap(): Promise<void> {
+    const subtreeMap: SubtreeMap = await createSubtreeMap(
+      artifactTreeCyPromise,
+      projectModule.getArtifacts
+    );
+    this.SET_SUBTREE_MAP(subtreeMap);
+  }
+
   @Mutation
   /**
    * Sets a subtree of artifacts as selected.
@@ -126,6 +142,14 @@ export default class ArtifactSelectionModule extends VuexModule {
     this.selectedArtifact = undefined;
   }
 
+  @Mutation
+  /**
+   * Sets current subtree map.
+   */
+  SET_SUBTREE_MAP(subtreeMap: SubtreeMap): void {
+    this.subtreeMap = subtreeMap;
+  }
+
   /**
    * @return The currently selected artifact.
    */
@@ -152,5 +176,21 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   get getIgnoreTypes(): string[] {
     return this.ignoreTypes;
+  }
+
+  /**
+    * A map between a root node id and it's children.
+\   */
+  get getSubtreeMap(): SubtreeMap {
+    return this.subtreeMap;
+  }
+
+  /**
+   * Returns the artifacts in the subtree of artifact with given name
+   */
+  get getSubtreeByArtifactName(): (n: string) => string[] {
+    return (artifactName: string) => {
+      return this.getSubtreeMap[artifactName];
+    };
   }
 }

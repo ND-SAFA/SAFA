@@ -1,57 +1,62 @@
-import { CytoCore, CyPromise, Artifact } from "@/types";
-import {
-  SingularElementArgument,
-  CollectionReturnValue,
-  EdgeCollection,
-} from "cytoscape";
+import { Artifact, CyPromise, CytoCore } from "@/types";
+import { SingularElementArgument, EdgeCollection } from "cytoscape";
+import { SubtreeMap } from "@/types/store/artifact-selection";
 
-export function getArtifactSubTree(
+/**
+ * Computes the subtree map of given artifacts.
+ *
+ * @return Promise containing SubtreeMap
+ */
+export function createSubtreeMap(
   cyPromise: CyPromise,
-  artifact: Artifact
-): Promise<string[]> {
-  return cyPromise.then((cyCore: CytoCore) => {
-    const artifactNode = cyCore
-      .elements(`node[id = "${artifact.name}"]`)
-      .first();
-    const subTree = getSubTree(cyCore, artifactNode);
-    return subTree.map((a) => a.data().id);
+  artifacts: Artifact[]
+): Promise<SubtreeMap> {
+  return cyPromise.then((cy) => {
+    const subtreeMap: SubtreeMap = {};
+    for (const artifact of artifacts) {
+      subtreeMap[artifact.name] = getSubtree(cy, artifact.name, subtreeMap);
+    }
+
+    return subtreeMap;
   });
 }
 
-const typeHierarchy = [
-  // todo: Move into more specific file
-  "hazard",
-  "requirement",
-  "design",
-  "environmentalassumption",
-];
+/**
+ * Returns list of children names for artifact specified.
+ * @param cy
+ * @param artifactName
+ * @param subtreeMap
+ */
+function getSubtree(
+  cy: CytoCore,
+  artifactName: string,
+  subtreeMap: SubtreeMap
+): string[] {
+  if (artifactName in subtreeMap) {
+    return subtreeMap[artifactName];
+  }
+  let currentSubtree: string[] = [];
+  for (const childName of getChildren(cy, artifactName)) {
+    if (!(childName in subtreeMap)) {
+      subtreeMap[childName] = getSubtree(cy, childName, subtreeMap);
+    }
+    const uniqueElements = subtreeMap[childName]
+      .concat([childName])
+      .filter((t) => !currentSubtree.includes(t));
+    currentSubtree = currentSubtree.concat(uniqueElements);
+  }
+  return currentSubtree;
+}
 
-function getSubTree(
-  cyCore: CytoCore,
-  root: SingularElementArgument,
-  artifactsSeen: string[] = []
-): CollectionReturnValue {
-  let subTree = cyCore.collection();
-  subTree = subTree.union(root);
-  artifactsSeen.push(root.data().id);
-  cyCore
-    .edges()
-    .filter((e) => e.source() === root)
-    .forEach((e) => {
-      const node = e.target();
-      const nodeType = node.data().artifactType;
-      const rootType = root.data().artifactType;
-      const nodeLevel = typeHierarchy.indexOf(nodeType);
-      const rootLevel = typeHierarchy.indexOf(rootType);
-      if (nodeLevel === -1 || rootLevel === -1) {
-        throw Error("undefined types:" + rootType + ":" + nodeType);
-      }
-      if (nodeLevel >= rootLevel) {
-        subTree = subTree.union(getSubTree(cyCore, node, artifactsSeen));
-      }
-    });
-
-  return subTree;
+/**
+ * Returns list of artifact names corresponding to children of artifact.
+ * @param cytoCore
+ * @param artifactName
+ */
+function getChildren(cytoCore: CytoCore, artifactName: string): string[] {
+  const nodeEdges = cytoCore.edges(`edge[source="${artifactName}"]`);
+  const children = nodeEdges.targets();
+  return children.map((child) => child.data().id);
 }
 
 /**

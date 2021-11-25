@@ -7,7 +7,6 @@ import type {
   TraceLink,
   ChannelSubscriptionId,
   ArtifactQueryFunction,
-  ProjectVersion,
 } from "@/types";
 import { LinkValidator } from "@/types";
 import {
@@ -51,6 +50,7 @@ export default class ProjectModule extends VuexModule {
     errorModule.setArtifactWarnings(res.warnings);
     await viewportModule.setArtifactTreeLayout();
     deltaModule.setIsDeltaViewEnabled(false);
+    await artifactSelectionModule.updateSubtreeMap();
   }
 
   @Action
@@ -66,9 +66,7 @@ export default class ProjectModule extends VuexModule {
     const versionId = newProject.projectVersion?.versionId;
 
     this.SAVE_PROJECT(newProject);
-
     await this.subscribeToVersion({ projectId, versionId });
-
     deltaModule.clearDelta();
   }
 
@@ -94,8 +92,9 @@ export default class ProjectModule extends VuexModule {
    *
    * @param traceLinks - The trace links to set.
    */
-  addOrUpdateTraceLinks(traceLinks: TraceLink[]): void {
+  async addOrUpdateTraceLinks(traceLinks: TraceLink[]): Promise<void> {
     this.ADD_OR_UPDATE_TRACE_LINKS(traceLinks);
+    await artifactSelectionModule.updateSubtreeMap();
   }
 
   @Action
@@ -104,7 +103,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param artifacts - The artifacts to set.
    */
-  addOrUpdateArtifacts(artifacts: Artifact[]): void {
+  async addOrUpdateArtifacts(artifacts: Artifact[]): Promise<void> {
     this.ADD_OR_UPDATE_ARTIFACTS(artifacts);
     const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
 
@@ -114,6 +113,7 @@ export default class ProjectModule extends VuexModule {
         artifactSelectionModule.selectArtifact(query[0]);
       }
     }
+    await artifactSelectionModule.updateSubtreeMap();
   }
 
   @Action
@@ -122,8 +122,18 @@ export default class ProjectModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  removeTraceLink(traceLink: TraceLink): void {
+  async removeTraceLink(traceLink: TraceLink): Promise<void> {
     this.REMOVE_TRACE_LINK(traceLink);
+    await artifactSelectionModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
+   * Deletes artifact and updates subtree map.
+   */
+  async deleteArtifactByName(artifactName: string): Promise<void> {
+    this.DELETE_ARTIFACT_BY_NAME(artifactName);
+    await artifactSelectionModule.updateSubtreeMap();
   }
 
   @Mutation

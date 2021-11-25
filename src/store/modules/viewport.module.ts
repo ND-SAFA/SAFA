@@ -1,7 +1,6 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import {
   artifactTreeCyPromise,
-  getArtifactSubTree,
   getRootNode,
   isInSubtree,
   doesNotContainType,
@@ -44,13 +43,11 @@ export default class ViewportModule extends VuexModule {
    *
    * @param artifact - The artifact to select and view.
    */
-  async viewArtifactSubtree(
-    artifact: Artifact,
-    cyPromise: CyPromise = artifactTreeCyPromise
-  ): Promise<void> {
-    const artifactsInSubtree = await getArtifactSubTree(cyPromise, artifact);
+  async viewArtifactSubtree(artifact: Artifact): Promise<void> {
+    const artifactsInSubtree = artifactSelectionModule
+      .getSubtreeByArtifactName(artifact.name)
+      .concat([artifact.name]);
     artifactSelectionModule.selectArtifact(artifact);
-
     await artifactSelectionModule.filterGraph({
       type: "subtree",
       artifactsInSubtree,

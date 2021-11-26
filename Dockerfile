@@ -11,6 +11,7 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 COPY src /app/src
+COPY public /app/public
 COPY tsconfig.json ./
 COPY .eslintrc.js ./
 COPY vue.config.js ./

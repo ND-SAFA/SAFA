@@ -11,15 +11,17 @@ export function getSingleQueryResult(
   query: Artifact[],
   queryName: string
 ): Artifact {
-  if (query.length === 0) {
-    const error = `Query resulted in empty results: ${queryName}`;
-    appModule.onWarning(error);
-    throw Error(error);
-  } else if (query.length > 1) {
-    const error = `Found more than one result in query: ${queryName}`;
-    appModule.onWarning(error);
-    throw Error(error);
-  } else {
-    return query[0];
+  let error;
+  switch (query.length) {
+    case 1:
+      return query[0];
+    case 0:
+      error = `Query resulted in empty results: ${queryName}`;
+      appModule.onWarning(error);
+      throw Error(error);
+    default:
+      error = `Found more than one result in query: ${queryName}`;
+      appModule.onWarning(error);
+      throw Error(error);
   }
 }

@@ -69,13 +69,33 @@ export const artifactTreeContextMenuOptions = {
       },
     },
     {
-      id: "view-artifact-subtree",
+      id: "highlight-artifact-subtree",
       content: "Highlight Subtree",
-      tooltipText: "View Subtree",
+      tooltipText: "Highlight Subtree",
       selector: "node",
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, viewportModule.viewArtifactSubtree).then();
+      },
+    },
+    {
+      id: "hide-artifact-subtree",
+      content: "Hide Subtree",
+      tooltipText: "Hide all child artifacts.",
+      selector: "node",
+      onClickFunction: (event: EventObject): void => {
+        const artifactName: string = event.target.data().id;
+        artifactSelectionModule.hideSubtree(artifactName);
+      },
+    },
+    {
+      id: "show-artifact-subtree",
+      content: "Shoe Subtree",
+      tooltipText: "Show all hidden children..",
+      selector: "node",
+      onClickFunction: (event: EventObject): void => {
+        const artifactName: string = event.target.data().id;
+        artifactSelectionModule.hideSubtree(artifactName);
       },
     },
   ],

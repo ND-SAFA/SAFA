@@ -97,6 +97,22 @@ export default class ArtifactSelectionModule extends VuexModule {
     this.SET_SUBTREE_MAP(subtreeMap);
   }
 
+  @Action
+  /**
+   * Hides the given artifact's subtree
+   */
+  hideSubtree(artifactName: string): void {
+    console.log("SUBTREE:", this.getSubtreeByArtifactName(artifactName));
+  }
+
+  @Action
+  /**
+   * Un-hides the given artifact's subtree if hidden.
+   */
+  showSubtree(artifactName: string): void {
+    console.log("SUBTREE:", this.getSubtreeByArtifactName(artifactName));
+  }
+
   @Mutation
   /**
    * Sets a subtree of artifacts as selected.

@@ -64,3 +64,12 @@ export interface TraceLinkDisplayData extends TraceLink {
    */
   targetBody: string;
 }
+
+/**
+ * Link used when hiding subtrees to summarize the links of the children
+ * of some root node.
+ */
+export interface SubtreeLink extends TraceLink {
+  type: "SUBTREE";
+  rootNode: string;
+}

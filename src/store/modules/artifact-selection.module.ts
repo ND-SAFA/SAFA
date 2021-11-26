@@ -1,6 +1,6 @@
 import { appModule, projectModule, viewportModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, FilterAction } from "@/types";
+import type { Artifact, CytoCore, FilterAction } from "@/types";
 import { PanelType } from "@/types";
 import { SubtreeMap } from "@/types/store/artifact-selection";
 import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
@@ -85,9 +85,13 @@ export default class ArtifactSelectionModule extends VuexModule {
   }
 
   @Action
+  /**
+   * Recalculates the subtree map of project artifacts and updates store.
+   */
   async updateSubtreeMap(): Promise<void> {
+    const cy = await artifactTreeCyPromise;
     const subtreeMap: SubtreeMap = await createSubtreeMap(
-      artifactTreeCyPromise,
+      cy,
       projectModule.getArtifacts
     );
     this.SET_SUBTREE_MAP(subtreeMap);

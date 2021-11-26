@@ -8,17 +8,15 @@ import { SubtreeMap } from "@/types/store/artifact-selection";
  * @return Promise containing SubtreeMap
  */
 export function createSubtreeMap(
-  cyPromise: CyPromise,
+  cy: CytoCore,
   artifacts: Artifact[]
-): Promise<SubtreeMap> {
-  return cyPromise.then((cy) => {
-    const subtreeMap = {}; //hash table of previously computed subtrees
-    return artifacts
-      .map((artifact) => ({
-        [artifact.name]: getSubtree(cy, artifact.name, subtreeMap),
-      }))
-      .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-  });
+): SubtreeMap {
+  const subtreeMap = {}; //hash table of previously computed subtrees
+  return artifacts
+    .map((artifact) => ({
+      [artifact.name]: getSubtree(cy, artifact.name, subtreeMap),
+    }))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {});
 }
 
 /**

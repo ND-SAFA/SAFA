@@ -130,12 +130,12 @@ export function connectAndSubscribeToVersion(
         clearSubscriptions();
         const projectSubscription = `/topic/projects/${projectId}`;
         const versionSubscription = `/topic/revisions/${versionId}`;
-        stompClient.subscribe(projectSubscription, (frame) =>
-          revisionMessageHandler(versionId, frame)
-        );
-        stompClient.subscribe(versionSubscription, (frame) =>
-          revisionMessageHandler(versionId, frame)
-        );
+        stompClient.subscribe(projectSubscription, async (frame) => {
+          await revisionMessageHandler(versionId, frame).then();
+        });
+        stompClient.subscribe(versionSubscription, async (frame) => {
+          await revisionMessageHandler(versionId, frame);
+        });
         resolve();
       })
       .catch(reject);
@@ -148,15 +148,18 @@ export function connectAndSubscribeToVersion(
  * @param versionId - The project version ID of the revision.
  * @param frame - The frame of the revision.
  */
-function revisionMessageHandler(versionId: string, frame: Frame): void {
+async function revisionMessageHandler(
+  versionId: string,
+  frame: Frame
+): Promise<void> {
   const revision: ProjectVersionUpdate = JSON.parse(
     frame.body
   ) as ProjectVersionUpdate;
 
   switch (revision.type) {
     case "included":
-      projectModule.addOrUpdateArtifacts(revision.artifacts);
-      projectModule.addOrUpdateTraceLinks(revision.traces);
+      await projectModule.addOrUpdateArtifacts(revision.artifacts);
+      await projectModule.addOrUpdateTraceLinks(revision.traces);
       break;
     case "excluded":
       getProjectVersion(versionId).then(

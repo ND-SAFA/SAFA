@@ -8,18 +8,18 @@ import { approveLink, declineLink } from "@/api/endpoints";
  * @param link - The trace link to process.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export function approveLinkAPIHandler(
+export async function approveLinkAPIHandler(
   link: TraceLink,
   onSuccess?: () => void
-): void {
+): Promise<void> {
   link.approvalStatus = TraceApproval.APPROVED;
 
-  linkAPIHandler(link, approveLink, () => {
+  linkAPIHandler(link, approveLink, async () => {
     if (onSuccess !== undefined) {
       onSuccess();
     }
 
-    projectModule.addOrUpdateTraceLinks([link]);
+    await projectModule.addOrUpdateTraceLinks([link]);
   });
 }
 
@@ -35,11 +35,10 @@ export function declineLinkAPIHandler(
 ): void {
   link.approvalStatus = TraceApproval.DECLINED;
 
-  linkAPIHandler(link, declineLink, () => {
+  linkAPIHandler(link, declineLink, async () => {
     if (onSuccess !== undefined) {
       onSuccess();
     }
-
     projectModule.removeTraceLink(link);
   });
 }
@@ -54,7 +53,7 @@ export function declineLinkAPIHandler(
 export function linkAPIHandler(
   link: TraceLink,
   linkAPI: (traceLink: TraceLink) => Promise<void>,
-  onSuccess: () => void
+  onSuccess: () => Promise<void>
 ): void {
   appModule.onLoadStart();
   linkAPI(link).then(onSuccess).finally(appModule.onLoadEnd);

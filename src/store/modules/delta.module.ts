@@ -51,9 +51,9 @@ export default class ErrorModule extends VuexModule {
    *
    * @param payload - All artifact deltas.
    */
-  setDeltaPayload(payload: DeltaPayload): void {
+  async setDeltaPayload(payload: DeltaPayload): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    projectModule.ADD_OR_UPDATE_ARTIFACTS(payload.missingArtifacts);
+    await projectModule.addOrUpdateArtifacts(payload.missingArtifacts);
   }
 
   @Action

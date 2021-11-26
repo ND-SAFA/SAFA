@@ -76,12 +76,12 @@ export default Vue.extend({
           getProjectDelta(
             sourceVersion.versionId,
             this.selectedVersion.versionId
-          ).then((deltaPayload: DeltaPayload) => {
-            deltaModule.setDeltaPayload(deltaPayload);
+          ).then(async (deltaPayload: DeltaPayload) => {
+            await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("onClose");
             appModule.onSuccess("Delta state was updated successfully.");
-            viewportModule.setArtifactTreeLayout();
+            await viewportModule.setArtifactTreeLayout();
           });
         } else {
           appModule.onWarning("Project source version is not selected.");

@@ -70,8 +70,8 @@ export default Vue.extend({
     },
   },
   methods: {
-    onApproveLink(traceLink: TraceLink): void {
-      approveLinkAPIHandler(traceLink, undefined);
+    async onApproveLink(traceLink: TraceLink): Promise<void> {
+      await approveLinkAPIHandler(traceLink, undefined);
       this.$emit("close");
     },
     onDeclineLink(traceLink: TraceLink): void {

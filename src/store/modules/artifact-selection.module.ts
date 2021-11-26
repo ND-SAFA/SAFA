@@ -190,7 +190,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   }
 
   /**
-   * Returns the artifacts in the subtree of artifact with given name
+   * Returns the pre-computed artifacts in the subtree of root specified.
    */
   get getSubtreeByArtifactName(): (n: string) => string[] {
     return (artifactName: string) => {

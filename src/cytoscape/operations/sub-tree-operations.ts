@@ -53,11 +53,12 @@ function getSubtree(
 
 /**
  * Returns list of artifact names corresponding to children of artifact.
- * @param cytoCore
- * @param artifactName
+ * @param cy The Cytoscape instance to retrieve elements from.
+ * @param artifactName The name of the artifact whose children are being
+ * retrieved.
  */
-function getChildren(cytoCore: CytoCore, artifactName: string): string[] {
-  const nodeEdges = cytoCore.edges(`edge[source="${artifactName}"]`);
+function getChildren(cy: CytoCore, artifactName: string): string[] {
+  const nodeEdges = cy.edges(`edge[source="${artifactName}"]`);
   const children = nodeEdges.targets();
   return children.map((child) => child.data().id);
 }

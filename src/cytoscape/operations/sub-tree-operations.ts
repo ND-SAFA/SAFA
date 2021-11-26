@@ -12,12 +12,12 @@ export function createSubtreeMap(
   artifacts: Artifact[]
 ): Promise<SubtreeMap> {
   return cyPromise.then((cy) => {
-    const subtreeMap: SubtreeMap = {};
-    for (const artifact of artifacts) {
-      subtreeMap[artifact.name] = getSubtree(cy, artifact.name, subtreeMap);
-    }
-
-    return subtreeMap;
+    const subtreeMap = {}; //hash table of previously computed subtrees
+    return artifacts
+      .map((artifact) => ({
+        [artifact.name]: getSubtree(cy, artifact.name, subtreeMap),
+      }))
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {});
   });
 }
 

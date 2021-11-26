@@ -22,9 +22,7 @@ export function createOrUpdateArtifactHandler(
   return new Promise((resolve, reject) => {
     const artifactPromise = isUpdate ? updateArtifact : createArtifact;
     artifactPromise(versionId, artifact)
-      .then(() => {
-        return projectModule.addOrUpdateArtifacts([artifact]);
-      })
+      .then(() => projectModule.addOrUpdateArtifacts([artifact]))
       .then(resolve)
       .catch(reject);
   });
@@ -55,10 +53,8 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(async () => {
-              await projectModule.deleteArtifactByName(artifact.name);
-              resolve();
-            })
+            .then(() => projectModule.deleteArtifactByName(artifact.name))
+            .then(resolve)
             .catch(reject);
         }
       },

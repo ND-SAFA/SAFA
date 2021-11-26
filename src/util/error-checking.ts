@@ -2,10 +2,10 @@ import { Artifact } from "@/types";
 import { appModule } from "@/store";
 
 /**
- * Returns the only result in query and throws error if fails.
- * @throws Error if query contains no results or more than a single result.
- * @param query
- * @param queryName
+ * Returns the artifact in list if single item exists.
+ * @throws Error if query contains no or multiple results.
+ * @param query List of artifacts representing some query for an artifact.
+ * @param queryName The name of the operation to log if operation fails.
  */
 export function getSingleQueryResult(
   query: Artifact[],

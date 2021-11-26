@@ -228,9 +228,11 @@ export default class ProjectModule extends VuexModule {
    * @return A function for finding an artifact by name.
    */
   get getArtifactById(): ArtifactQueryFunction {
-    return (artifactId) => {
-      const query = this.project.artifacts.filter((a) => a.id === artifactId);
-      return getSingleQueryResult(query, `Find by id: ${artifactId}`);
+    return (targetArtifactId) => {
+      const query = this.project.artifacts.filter(
+        (a) => a.id === targetArtifactId
+      );
+      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
     };
   }
 

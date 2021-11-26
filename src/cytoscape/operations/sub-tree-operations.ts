@@ -23,9 +23,11 @@ export function createSubtreeMap(
 
 /**
  * Returns list of children names for artifact specified.
- * @param cy
- * @param artifactName
- * @param subtreeMap
+ * @param cy The cytoscape instance to operate on
+ * @param artifactName The name of the root artifacts whose subtree is being
+ * calculated.
+ * @param subtreeMap Map of previously calculated subtrees used to look up
+ * previous calculations.
  */
 function getSubtree(
   cy: CytoCore,
@@ -40,10 +42,11 @@ function getSubtree(
     if (!(childName in subtreeMap)) {
       subtreeMap[childName] = getSubtree(cy, childName, subtreeMap);
     }
-    const uniqueElements = subtreeMap[childName]
-      .concat([childName])
-      .filter((t) => !currentSubtree.includes(t));
-    currentSubtree = currentSubtree.concat(uniqueElements);
+    const childSubtree = subtreeMap[childName].concat([childName]);
+    const newSubtreeArtifacts = childSubtree.filter(
+      (t) => !currentSubtree.includes(t)
+    );
+    currentSubtree = currentSubtree.concat(newSubtreeArtifacts);
   }
   return currentSubtree;
 }

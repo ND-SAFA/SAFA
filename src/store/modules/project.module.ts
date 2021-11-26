@@ -17,6 +17,7 @@ import {
   errorModule,
   viewportModule,
 } from "@/store";
+import { getSingleQueryResult } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -181,9 +182,9 @@ export default class ProjectModule extends VuexModule {
    * @param artifacts - The artifacts to set.
    */
   ADD_OR_UPDATE_ARTIFACTS(artifacts: Artifact[]): void {
-    const newArtifactIds = artifacts.map((a) => a.name);
+    const newArtifactIds = artifacts.map((a) => a.id);
     const unaffected = this.project.artifacts.filter(
-      (a) => !newArtifactIds.includes(a.name)
+      (a) => !newArtifactIds.includes(a.id)
     );
     this.project.artifacts = unaffected.concat(artifacts);
   }
@@ -219,17 +220,19 @@ export default class ProjectModule extends VuexModule {
       const query = this.project.artifacts.filter(
         (a) => a.name === artifactName
       );
-      if (query.length === 0) {
-        const error = `Could not find artifact with name: ${artifactName}`;
-        appModule.onWarning(error);
-        throw Error(error);
-      } else if (query.length > 1) {
-        const error = `Found more than one artifact with name: ${artifactName}`;
-        appModule.onWarning(error);
-        throw Error(error);
-      } else {
-        return query[0];
-      }
+      return getSingleQueryResult(query, `Find by name: ${artifactName}`);
+    };
+  }
+
+  /**
+   * @return A function for finding an artifact by name.
+   */
+  get getArtifactById(): ArtifactQueryFunction {
+    return (targetArtifactId) => {
+      const query = this.project.artifacts.filter(
+        (a) => a.id === targetArtifactId
+      );
+      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
     };
   }
 

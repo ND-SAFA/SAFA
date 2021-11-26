@@ -140,6 +140,7 @@ export default Vue.extend({
     onSubmit(): void {
       // only called when isValid / button is enabled
       const artifact: Artifact = {
+        id: this.artifact?.id || "",
         name: this.name,
         type: this.type,
         summary: this.summary,

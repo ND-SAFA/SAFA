@@ -151,7 +151,7 @@ export default class CommitModule extends VuexModule {
   get createRevert(): (c: Commit) => Commit {
     return (commit: Commit) => {
       const originalArtifacts: Artifact[] = commit.artifacts.modified.map(
-        (a: Artifact) => projectModule.getArtifactByName(a.name)
+        (a: Artifact) => projectModule.getArtifactById(a.id)
       );
       const originalTraces = commit.traces.modified.map((t) =>
         projectModule.getTraceLinkByArtifacts(t.source, t.target)

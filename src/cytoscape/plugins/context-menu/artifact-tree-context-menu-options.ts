@@ -82,8 +82,8 @@ export const artifactTreeContextMenuOptions = {
     {
       id: "hide-artifact-subtree",
       content: "Hide Subtree",
-      tooltipText: "Hide all child artifacts.",
-      selector: "node",
+      tooltipText: "Hide all children.",
+      selector: "node", //TODO: disable this option if already hidden
       onClickFunction: async (event: EventObject): Promise<void> => {
         const artifactName: string = event.target.data().id;
         await subtreeModule.hideSubtree(artifactName).then();
@@ -93,7 +93,7 @@ export const artifactTreeContextMenuOptions = {
       id: "show-artifact-subtree",
       content: "Show Subtree",
       tooltipText: "Show all hidden children.",
-      selector: "node",
+      selector: "node", //TODO: disable this option if already hidden
       onClickFunction: async (event: EventObject): Promise<void> => {
         const artifactName: string = event.target.data().id;
         await subtreeModule.showSubtree(artifactName);

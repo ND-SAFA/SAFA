@@ -44,6 +44,8 @@ export default class SubtreeModule extends VuexModule {
    * phantom links. For any child link leaving a node, a phantom link is added
    * between the target and root node. Similarly, for any linking incoming to a
    * child node, a phantom link is added from the link source to the root node.
+   *
+   * @param rootName Name of the root artifact whose subtree is being hidden.
    */
   async hideSubtree(rootName: string): Promise<void> {
     const childrenInSubtree: string[] = this.getSubtreeByArtifactName(rootName);
@@ -68,6 +70,8 @@ export default class SubtreeModule extends VuexModule {
   @Action
   /**
    * Un-hides the given artifact's subtree if hidden.
+   *
+   * @param rootName The name of artifact whose subtree showed by un-hidden.
    */
   async showSubtree(rootName: string): Promise<void> {
     this.SET_SUBTREE_LINKS(
@@ -89,6 +93,9 @@ export default class SubtreeModule extends VuexModule {
    * A node is related if it represents one of the target artifacts.
    * An edge is related if either source or target is an artifact in target
    * list.
+   *
+   * @param request Contains the target set of artifact names and opacity to
+   * set impacted entities to.
    */
   async setProjectEntityOpacity(request: SetOpacityRequest): Promise<void> {
     const { targetArtifactNames, opacity } = request;
@@ -110,6 +117,8 @@ export default class SubtreeModule extends VuexModule {
   @Mutation
   /**
    * Sets current subtree map.
+   *
+   * @param subtreeMap The map of all the subtrees in project.
    */
   SET_SUBTREE_MAP(subtreeMap: SubtreeMap): void {
     this.subtreeMap = subtreeMap;
@@ -118,6 +127,8 @@ export default class SubtreeModule extends VuexModule {
   @Mutation
   /**
    * Sets the current subtree links.
+   *
+   * @param subtreeLinks The list of phantom links used for hiding subtrees.
    */
   SET_SUBTREE_LINKS(subtreeLinks: SubtreeLink[]): void {
     this.subtreeLinks = subtreeLinks;
@@ -126,6 +137,8 @@ export default class SubtreeModule extends VuexModule {
   @Mutation
   /**
    * Sets the current nodes hidden by subtrees.
+   *
+   * @param hiddenSubtreeNodes The list of nodes currently being hidden in a subtree.
    */
   SET_HIDDEN_SUBTREE_NODES(hiddenSubtreeNodes: string[]): void {
     this.hiddenSubtreeNodes = hiddenSubtreeNodes;
@@ -139,7 +152,7 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
-   * Returns the pre-computed artifacts in the subtree of root specified.
+   * @returns the pre-computed artifacts in the subtree of root specified.
    */
   get getSubtreeByArtifactName(): (n: string) => string[] {
     return (artifactName: string) => {
@@ -148,21 +161,21 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
-   * Returns list of phantom links used for hiding subtrees.
+   * @returns list of phantom links used for hiding subtrees.
    */
   get getSubtreeLinks(): SubtreeLink[] {
     return this.subtreeLinks;
   }
 
   /**
-   * Returns list of artifact names currently hidden in a subtree
+   * @returns list of artifact names currently hidden in a subtree
    */
   get getHiddenSubtreeNodes(): string[] {
     return this.hiddenSubtreeNodes;
   }
 
   /**
-   * Returns a constructor for creating phantom links from artifacts.
+   * @returns a constructor for creating phantom links from artifacts.
    */
   get createSubtreeLinks(): (
     n: string[],
@@ -171,7 +184,7 @@ export default class SubtreeModule extends VuexModule {
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootName: string, childName: string) => {
       const traceLinks = projectModule.getTraceLinks;
-      const linkFilter: (f: boolean) => SubtreeLink[] = (
+      const subtreeLinkCreator: (f: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
         return traceLinks
@@ -192,8 +205,8 @@ export default class SubtreeModule extends VuexModule {
               : { ...base, source: rootName };
           });
       };
-      const incomingPhantom: SubtreeLink[] = linkFilter(true);
-      const outgoingPhantom: SubtreeLink[] = linkFilter(false);
+      const incomingPhantom: SubtreeLink[] = subtreeLinkCreator(true);
+      const outgoingPhantom: SubtreeLink[] = subtreeLinkCreator(false);
       return this.subtreeLinks.concat(incomingPhantom).concat(outgoingPhantom);
     };
   }

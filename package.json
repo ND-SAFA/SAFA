@@ -28,7 +28,7 @@
     "cytoscape-node-html-label": "^1.2.2",
     "jwt-decode": "^3.1.2",
     "register-service-worker": "^1.7.1",
-    "sockjs-client": "^1.5.2",
+    "sockjs-client": "^1.5.0",
     "vue": "^2.6.11",
     "vue-code-diff": "^1.2.0",
     "vue-cytoscape": "^1.0.8",

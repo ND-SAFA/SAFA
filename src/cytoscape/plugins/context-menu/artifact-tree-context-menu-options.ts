@@ -3,6 +3,7 @@ import {
   appModule,
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
@@ -83,19 +84,19 @@ export const artifactTreeContextMenuOptions = {
       content: "Hide Subtree",
       tooltipText: "Hide all child artifacts.",
       selector: "node",
-      onClickFunction: (event: EventObject): void => {
+      onClickFunction: async (event: EventObject): Promise<void> => {
         const artifactName: string = event.target.data().id;
-        artifactSelectionModule.hideSubtree(artifactName);
+        await subtreeModule.hideSubtree(artifactName).then();
       },
     },
     {
       id: "show-artifact-subtree",
-      content: "Shoe Subtree",
-      tooltipText: "Show all hidden children..",
+      content: "Show Subtree",
+      tooltipText: "Show all hidden children.",
       selector: "node",
-      onClickFunction: (event: EventObject): void => {
+      onClickFunction: async (event: EventObject): Promise<void> => {
         const artifactName: string = event.target.data().id;
-        artifactSelectionModule.hideSubtree(artifactName);
+        await subtreeModule.showSubtree(artifactName);
       },
     },
   ],

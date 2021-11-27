@@ -14,6 +14,7 @@ import {
   artifactSelectionModule,
   deltaModule,
   errorModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import { getSingleQueryResult } from "@/util";
@@ -51,7 +52,7 @@ export default class ProjectModule extends VuexModule {
     errorModule.setArtifactWarnings(res.warnings);
     await viewportModule.setArtifactTreeLayout();
     deltaModule.setIsDeltaViewEnabled(false);
-    await artifactSelectionModule.updateSubtreeMap();
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -73,29 +74,13 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Subscribes to a new project version.
-   *
-   * @param subscriptionId - The project and version ID to subscribe to.
-   */
-  async subscribeToVersion(
-    subscriptionId: ChannelSubscriptionId
-  ): Promise<void> {
-    const { projectId, versionId } = subscriptionId;
-
-    if (projectId !== undefined && versionId !== undefined) {
-      await connectAndSubscribeToVersion(projectId, versionId);
-    }
-  }
-
-  @Action
-  /**
    * Updates the current trace links in the project, preserving any that already existed.
    *
    * @param traceLinks - The trace links to set.
    */
   async addOrUpdateTraceLinks(traceLinks: TraceLink[]): Promise<void> {
     this.ADD_OR_UPDATE_TRACE_LINKS(traceLinks);
-    await artifactSelectionModule.updateSubtreeMap();
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -114,7 +99,7 @@ export default class ProjectModule extends VuexModule {
         artifactSelectionModule.selectArtifact(query[0]);
       }
     }
-    await artifactSelectionModule.updateSubtreeMap();
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -125,7 +110,7 @@ export default class ProjectModule extends VuexModule {
    */
   async removeTraceLink(traceLink: TraceLink): Promise<void> {
     this.REMOVE_TRACE_LINK(traceLink);
-    await artifactSelectionModule.updateSubtreeMap();
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -134,7 +119,23 @@ export default class ProjectModule extends VuexModule {
    */
   async deleteArtifactByName(artifactName: string): Promise<void> {
     this.DELETE_ARTIFACT_BY_NAME(artifactName);
-    await artifactSelectionModule.updateSubtreeMap();
+    await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
+   * Subscribes to a new project version.
+   *
+   * @param subscriptionId - The project and version ID to subscribe to.
+   */
+  async subscribeToVersion(
+    subscriptionId: ChannelSubscriptionId
+  ): Promise<void> {
+    const { projectId, versionId } = subscriptionId;
+
+    if (projectId !== undefined && versionId !== undefined) {
+      await connectAndSubscribeToVersion(projectId, versionId);
+    }
   }
 
   @Mutation

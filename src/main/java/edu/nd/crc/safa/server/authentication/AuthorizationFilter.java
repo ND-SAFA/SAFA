@@ -71,10 +71,8 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
             if (user != null) {
                 return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-            } else {
-                return null;
             }
-
+            return null;
         }
         throw new ServerError("No token found.");
     }

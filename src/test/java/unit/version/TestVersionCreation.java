@@ -20,7 +20,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void attemptNewRevisionWithoutVersions() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProjectWithReturn(projectName);
+            .newProjectWithReturn(user, projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
         assertThat(response.getJSONObject("body").getString("message")).contains("initial version");
@@ -30,7 +30,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createFirstVersionThroughRevision() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
@@ -50,7 +50,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMinorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.createNewMinorVersion).withProject(project).get();
@@ -70,7 +70,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMajorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.createNewMajorVersion).withProject(project).get();

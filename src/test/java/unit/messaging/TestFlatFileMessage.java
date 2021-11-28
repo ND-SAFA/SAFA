@@ -20,7 +20,7 @@ public class TestFlatFileMessage extends WebSocketBaseTest {
 
         // Step - Create project and version id
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersionWithReturn(projectName);
 
         // Step - Connect to websocket listener

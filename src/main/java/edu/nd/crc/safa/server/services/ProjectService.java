@@ -2,12 +2,15 @@ package edu.nd.crc.safa.server.services;
 
 import java.util.List;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -49,17 +52,12 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectEntities saveProjectAppEntity(ProjectVersion projectVersion,
-                                                ProjectAppEntity appEntity) throws ServerError {
+    public ProjectEntities saveProjectEntitiesToVersion(ProjectVersion projectVersion,
+                                                        @NotNull List<ArtifactAppEntity> artifacts,
+                                                        @NotNull List<TraceAppEntity> traces) throws ServerError {
 
-        if (appEntity.artifacts != null) {
-            artifactVersionService.setArtifactsAtVersion(projectVersion, appEntity.getArtifacts());
-        }
-
-        if (appEntity.traces != null) {
-            traceLinkService.createTraceLinks(projectVersion, appEntity.getTraces());
-        }
-
+        artifactVersionService.setArtifactsAtVersion(projectVersion, artifacts);
+        traceLinkService.createTraceLinks(projectVersion, traces);
         return projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
     }
 

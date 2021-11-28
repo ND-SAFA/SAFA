@@ -10,13 +10,13 @@ import edu.nd.crc.safa.server.services.DeltaService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Responsible for testing incurring and validating each type of change is detected
  * and returned the delta calculation.
  */
-public class TestAllChangeTypes extends EntityBaseTest {
+public class TestAllChangeTypes extends ApplicationBaseTest {
 
     @Autowired
     DeltaService deltaService;
@@ -32,7 +32,7 @@ public class TestAllChangeTypes extends EntityBaseTest {
 
         // Step - Create project with: type, artifact, and body
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newType(projectName, artifactType)
             .newVersion(projectName)
             .newArtifact(projectName, artifactType, artifactName)

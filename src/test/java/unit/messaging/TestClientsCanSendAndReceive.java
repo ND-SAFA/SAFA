@@ -22,7 +22,7 @@ public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
 
         // Step - Create project version to collaborate on
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersionWithReturn(projectName);
         String versionId = projectVersion.getVersionId().toString();
         String projectId = projectVersion.getProject().getProjectId().toString();

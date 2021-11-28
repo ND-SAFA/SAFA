@@ -37,7 +37,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         double score = 0.2;
 
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
             .newType(projectName, "B")
@@ -61,7 +61,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         double score = 0.2;
 
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
             .newType(projectName, "B")
@@ -117,7 +117,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         // Step - Create project and version
         String projectName = "test-project";
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersionWithReturn(projectName);
         Project project = projectVersion.getProject();
 
@@ -174,7 +174,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         String targetName = "F21";
 
         // Step - Create project with artifacts.
-        ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.newProject(user, projectName).newVersionWithReturn(projectName);
         uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that trace does not exist

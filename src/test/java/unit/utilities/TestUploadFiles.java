@@ -11,17 +11,17 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Test that user is able to create new directory and upload files.
  */
-public class TestUploadFiles extends EntityBaseTest {
+public class TestUploadFiles extends ApplicationBaseTest {
 
     @Test
     public void smokeTest() throws ServerError {
         String testName = "hellWorld";
-        Project project = dbEntityBuilder.newProject(testName).getProject(testName);
+        Project project = dbEntityBuilder.newProject(user, testName).getProject(testName);
         String pathToTestProject = ProjectPaths.getPathToStorage(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();

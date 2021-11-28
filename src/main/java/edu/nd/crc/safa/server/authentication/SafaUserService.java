@@ -4,6 +4,7 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,21 +25,35 @@ public class SafaUserService implements UserDetailsService {
     ) {
         this.safaUserRepository = safaUserRepository;
     }
-    
+
     /**
      * The implementation for UserDetailService that bridges Spring's default authentication and our
      * custom user entity class, SafaUser.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final SafaUser customer = safaUserRepository.findByEmail(username);
-        if (customer == null) {
-            throw new UsernameNotFoundException(username);
-        }
+        final SafaUser customer = getUserFromUsername(username);
         return User
             .withUsername(customer.getEmail())
             .password(customer.getPassword())
             .authorities("USER") // TODO: Replace with custom roles here
             .build();
+    }
+
+    public SafaUser getUserFromUsername(String userName) {
+        final SafaUser user = safaUserRepository.findByEmail(userName);
+        if (user == null) {
+            throw new UsernameNotFoundException(userName);
+        }
+        return user;
+    }
+
+    public SafaUser getuserFromAuthentication(Authentication user) {
+        String userName = user.getName()
+            .replace("{", "")
+            .replace("}", "")
+            .split(",")[0].split("sub=")[1]; // TODO: Why can't I get the username!!
+
+        return this.getUserFromUsername(userName);
     }
 }

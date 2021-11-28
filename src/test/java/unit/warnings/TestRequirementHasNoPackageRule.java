@@ -29,7 +29,7 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
         String sourceName = "entities";
 
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, targetType)
             .newArtifact(projectName, targetType, targetName)

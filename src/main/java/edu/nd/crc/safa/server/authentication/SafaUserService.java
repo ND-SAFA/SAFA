@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.authentication;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -48,12 +49,8 @@ public class SafaUserService implements UserDetailsService {
         return user;
     }
 
-        String userName = user.getName()
-            .replace("{", "")
-            .replace("}", "")
-            .split(",")[0].split("sub=")[1]; // TODO: Why can't I get the username!!
-
     public SafaUser getUserFromAuthentication(Authentication user) {
+        String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);
     }
 }

@@ -5,11 +5,13 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +38,7 @@ public class FlatFileController extends BaseController {
     private final RevisionNotificationService revisionNotificationService;
     private final FlatFileService flatFileService;
     private final ProjectRetrievalService projectRetrievalService;
+    private final SafaUserService safaUserService;
 
     @Autowired
     public FlatFileController(ProjectRepository projectRepository,
@@ -42,12 +46,14 @@ public class FlatFileController extends BaseController {
                               FileUploadService fileUploadService,
                               RevisionNotificationService revisionNotificationService,
                               FlatFileService flatFileParser,
-                              ProjectRetrievalService projectRetrievalService) {
+                              ProjectRetrievalService projectRetrievalService,
+                              SafaUserService safaUserService) {
         super(projectRepository, projectVersionRepository);
         this.revisionNotificationService = revisionNotificationService;
         this.fileUploadService = fileUploadService;
         this.flatFileService = flatFileParser;
         this.projectRetrievalService = projectRetrievalService;
+        this.safaUserService = safaUserService;
     }
 
     /**
@@ -79,18 +85,22 @@ public class FlatFileController extends BaseController {
     /**
      * Creates a new project using the given flat files to create the project arifacts, traces, and artifact types.
      *
-     * @param files Files including artifact and traces files and requiring at minimum a Tim.json file.
+     * @param files             Files including artifact and traces files and requiring at minimum a Tim.json file.
+     * @param authenticatedUser The authorized user used as the owner of the project.
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
     @PostMapping(value = AppRoutes.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
+    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files,
+                                                        Authentication authenticatedUser) throws ServerError {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        Project project = createProjectIdentifier(null, null);
+        SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
+        Project project = new Project(owner, "", "");
+        this.projectRepository.save(project);
         ProjectVersion projectVersion = createProjectVersion(project);
 
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,

@@ -10,6 +10,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -74,12 +75,12 @@ public class DbEntityBuilder extends BaseBuilder {
         this.revisionNumber = 1;
     }
 
-    public Project newProjectWithReturn(String name) {
-        return this.newProject(name).getProject(name);
+    public Project newProjectWithReturn(SafaUser owner, String name) {
+        return this.newProject(owner, name).getProject(name);
     }
 
-    public DbEntityBuilder newProject(String name) {
-        Project project = new Project(name, "");
+    public DbEntityBuilder newProject(SafaUser owner, String name) {
+        Project project = new Project(owner, name, "");
         this.projectRepository.save(project);
         this.projects.put(name, project);
         this.projectVersions.put(name, new Hashtable<>());

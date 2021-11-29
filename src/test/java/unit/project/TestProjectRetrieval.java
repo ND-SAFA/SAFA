@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -19,11 +20,22 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
+    /**
+     * Tests that a user is able to retrieve all the projects they own.
+     *
+     * @throws Exception Throws exception if http fails when sending get request.
+     */
     @Test
     public void getProjectsMultiple() throws Exception {
+        SafaUser otherUser = new SafaUser();
+        otherUser.setEmail("doesNotExist@gmail.com");
+        otherUser.setPassword("somePassword");
+        this.safaUserRepository.save(otherUser);
+
         dbEntityBuilder
-            .newProject("firstProject")
-            .newProject("secondProject");
+            .newProject(user, "firstProject")
+            .newProject(user, "secondProject")
+            .newProject(otherUser, "other project");
         JSONObject response = sendGet(AppRoutes.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }

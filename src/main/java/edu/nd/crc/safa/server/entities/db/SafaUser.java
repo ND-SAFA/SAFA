@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,9 +14,9 @@ import org.json.JSONObject;
 /**
  * The model for our users.
  */
-@Entity()
+@Entity
 @Table(name = "safa_user")
-public class SafaUser {
+public class SafaUser implements Serializable {
 
     @Id
     @GeneratedValue

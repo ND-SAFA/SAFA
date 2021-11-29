@@ -113,7 +113,7 @@ public class TestArtifactController extends ApplicationBaseTest {
         String projectName = "test-project";
         String artifactName = "RE-10";
         String artifactType = "requirement";
-        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
+        Project project = dbEntityBuilder.newProjectWithReturn(user, projectName);
         String url = RouteBuilder
             .withRoute(AppRoutes.checkIfArtifactExists)
             .withProject(project)
@@ -140,7 +140,7 @@ public class TestArtifactController extends ApplicationBaseTest {
                                                             String artifactName) throws Exception {
         // Step - Create project with single version
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersionWithReturn(projectName);
 
         // Step - Create Artifact JSON

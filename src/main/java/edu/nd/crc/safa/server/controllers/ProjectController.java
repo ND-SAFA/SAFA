@@ -5,18 +5,21 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,13 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController extends BaseController {
 
+    private final SafaUserService safaUserService;
     private final ProjectService projectService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
+                             SafaUserService safaUserService,
                              ProjectService projectService) {
         super(projectRepository, projectVersionRepository);
+        this.safaUserService = safaUserService;
         this.projectService = projectService;
     }
 
@@ -45,19 +51,23 @@ public class ProjectController extends BaseController {
      * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
      * not specified are assumed to be removed if version is specified..
      *
-     * @param project The project entity containing artifacts, traces, name, and decriptions.
+     * @param project           The project entity containing artifacts, traces, name, and decriptions.
+     * @param authenticatedUser The authorized user accessing this endpoint.
      * @return The project and associated entities created.
      * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
      *                     payload.
      */
     @PostMapping(AppRoutes.projects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws ServerError {
+    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project,
+                                                Authentication authenticatedUser) throws ServerError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
         ProjectEntities response;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
+            SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
+            payloadProject.setOwner(owner);
             response = createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
             response = updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
@@ -69,11 +79,13 @@ public class ProjectController extends BaseController {
     /**
      * Returns list of all project identifiers present in the database.
      *
+     * @param authenticatedUser The authorized user accessing this endpoint.
      * @return List of project identifiers.
      */
     @GetMapping(AppRoutes.projects)
-    public ServerResponse getProjects() {
-        return new ServerResponse(this.projectRepository.findAll());
+    public ServerResponse getProjects(Authentication authenticatedUser) {
+        SafaUser user = safaUserService.getUserFromAuthentication(authenticatedUser);
+        return new ServerResponse(this.projectRepository.findByOwner(user));
     }
 
     /**
@@ -99,7 +111,11 @@ public class ProjectController extends BaseController {
                                                    ProjectVersion projectVersion,
                                                    ProjectAppEntity payload) throws ServerError {
         ProjectEntities response;
-        this.projectRepository.save(project);
+        Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
+        persistentProject.setName(project.getName());
+        persistentProject.setDescription(project.getDescription());
+        //TODO: Update owner here.
+        this.projectRepository.save(persistentProject);
         //TODO: Update traces
         if (projectVersion == null) {
             if ((payload.artifacts != null
@@ -124,15 +140,18 @@ public class ProjectController extends BaseController {
         Project project,
         ProjectVersion projectVersion,
         ProjectAppEntity payload) throws ServerError {
-        ProjectEntities response;
+        ProjectEntities entityCreationResponse;
         if (projectVersion != null
             && projectVersion.hasValidVersion()
             && projectVersion.hasValidId()) {
             throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
         }
-        project = createProjectIdentifier(project.getName(), project.getDescription());
+        this.projectRepository.save(project);
         projectVersion = createProjectVersion(project);
-        response = this.projectService.saveProjectAppEntity(projectVersion, payload);
-        return response;
+        entityCreationResponse = this.projectService.saveProjectEntitiesToVersion(
+            projectVersion,
+            payload.getArtifacts(),
+            payload.getTraces());
+        return entityCreationResponse;
     }
 }

@@ -8,13 +8,13 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Verifies that an artifact is able to be created, retrieved, updated,
  * and deleted.
  */
-public class TestArtifact extends EntityBaseTest {
+public class TestArtifact extends ApplicationBaseTest {
 
     @Test
     public void createRetrieveUpdateDeleteArtifact() {
@@ -24,7 +24,7 @@ public class TestArtifact extends EntityBaseTest {
         String newArtifactName = "RE-10";
 
         // Step - Create project with artifact
-        this.dbEntityBuilder.newProject(projectName);
+        this.dbEntityBuilder.newProject(user, projectName);
         ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, artifactTypeName);
         Artifact artifact = dbEntityBuilder.newArtifactWithReturn(projectName, artifactTypeName, artifactName);
 

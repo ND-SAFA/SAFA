@@ -18,13 +18,13 @@ import edu.nd.crc.safa.warnings.RuleName;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
 import org.junit.jupiter.api.Test;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Provides a smoke test for various types of rules that are used
  * to generated project warnings.
  */
-public class SmokeTests extends EntityBaseTest {
+public class SmokeTests extends ApplicationBaseTest {
 
     @Test
     public void testLinkNodesFunction() {
@@ -107,7 +107,7 @@ public class SmokeTests extends EntityBaseTest {
         String sourceName = "entities";
 
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, targetType)
             .newArtifact(projectName, targetType, targetName)

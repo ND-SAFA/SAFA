@@ -22,7 +22,7 @@ public class TestCreateNextRevision extends ApplicationBaseTest {
     public void createNextVersion() throws ServerError {
         String projectName = "test-project";
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName);
 
         Project project = dbEntityBuilder.getProject(projectName);

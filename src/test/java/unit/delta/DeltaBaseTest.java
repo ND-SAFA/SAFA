@@ -24,7 +24,7 @@ public class DeltaBaseTest extends ApplicationBaseTest {
 
     protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName, boolean uploadFiles) throws Exception {
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newVersion(projectName);
 

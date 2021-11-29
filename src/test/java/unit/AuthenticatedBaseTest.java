@@ -8,11 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -25,10 +24,8 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
 
     public static final String email = "abc123@gmail.com";
     public static final String password = "r{QjR3<Ec2eZV@?";
+    public static SafaUser user;
     protected String token;
-
-    @Autowired
-    SafaUserRepository safaUserRepository;
 
     @BeforeEach
     public void createData() throws Exception {
@@ -40,6 +37,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     public void defaultLogin() throws Exception {
         createUser(email, password);
         loginUser(email, password);
+        user = safaUserService.getUserFromUsername(email);
     }
 
     public JSONObject sendGet(String routeName,

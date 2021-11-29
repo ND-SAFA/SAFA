@@ -17,13 +17,13 @@ import edu.nd.crc.safa.server.services.ArtifactVersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Verifies that:
  * 1. We are able to find the last inputted artifact body.
  */
-public class TestArtifactService extends EntityBaseTest {
+public class TestArtifactService extends ApplicationBaseTest {
 
 
     @Autowired
@@ -38,7 +38,7 @@ public class TestArtifactService extends EntityBaseTest {
         String projectName = "test-project";
 
         // Step - Create project, with type, artifact, and body.
-        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
+        Project project = dbEntityBuilder.newProjectWithReturn(user, projectName);
         dbEntityBuilder
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
@@ -84,7 +84,7 @@ public class TestArtifactService extends EntityBaseTest {
         String artifactTypeName = "requirements";
         String projectName = "test-project";
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName);
 
@@ -104,7 +104,7 @@ public class TestArtifactService extends EntityBaseTest {
 
         // Step - Create project with: v1, type, artifact, body
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName)
@@ -133,7 +133,7 @@ public class TestArtifactService extends EntityBaseTest {
 
         // Step - Create project with: version, type, artifact, body
         dbEntityBuilder
-            .newProject(projectName)
+            .newProject(user, projectName)
             .newVersion(projectName)
             .newType(projectName, typeName)
             .newArtifact(projectName, typeName, artifactName)

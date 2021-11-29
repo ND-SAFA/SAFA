@@ -6,10 +6,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.json.JSONObject;
 
@@ -27,28 +31,43 @@ public class Project implements Serializable {
     @Column(name = "project_id")
     UUID projectId;
 
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false)
+    SafaUser owner;
+
     @Column(name = "name")
     String name;
-
     @Column(name = "description")
     String description;
 
     public Project() {
     }
 
-    public Project(String name, String description) {
+    public Project(SafaUser owner, String name, String description) {
+        this.owner = owner;
         this.setName(name);
         this.setDescription(description);
     }
 
     public static Project fromAppEntity(ProjectAppEntity appEntity) {
         Project project = new Project();
-        if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
+        if (!appEntity.getProjectId().equals("")) {
             project.projectId = UUID.fromString(appEntity.getProjectId());
         }
         project.name = appEntity.getName();
         project.description = appEntity.getDescription();
         return project;
+    }
+
+    public SafaUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(SafaUser owner) {
+        this.owner = owner;
     }
 
     public UUID getProjectId() {

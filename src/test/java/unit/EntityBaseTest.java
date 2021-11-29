@@ -8,12 +8,14 @@ import java.util.List;
 import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -58,7 +60,13 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ParserErrorRepository parserErrorRepository;
 
     @Autowired
+    protected SafaUserRepository safaUserRepository;
+
+    @Autowired
     protected ProjectService projectService;
+
+    @Autowired
+    protected SafaUserService safaUserService;
 
     @Autowired
     protected DbEntityBuilder dbEntityBuilder;

@@ -93,12 +93,6 @@ public abstract class BaseController {
         }
     }
 
-    protected Project createProjectIdentifier(String name, String description) {
-        Project project = new Project(name, description); // TODO: extract name from TIM file
-        this.projectRepository.save(project);
-        return project;
-    }
-
     protected ProjectVersion createProjectVersion(Project project) {
         ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
         this.projectVersionRepository.save(projectVersion);

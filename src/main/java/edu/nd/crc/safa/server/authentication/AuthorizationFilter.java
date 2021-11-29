@@ -43,14 +43,14 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = null;
+        UsernamePasswordAuthenticationToken authenticationToken = null;
         try {
-            authentication = authenticate(request);
+            authenticationToken = authenticate(request);
         } catch (ServerError e) {
             e.printStackTrace();
             return;
         }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }
 

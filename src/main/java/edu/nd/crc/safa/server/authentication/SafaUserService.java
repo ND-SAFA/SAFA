@@ -48,12 +48,12 @@ public class SafaUserService implements UserDetailsService {
         return user;
     }
 
-    public SafaUser getuserFromAuthentication(Authentication user) {
         String userName = user.getName()
             .replace("{", "")
             .replace("}", "")
             .split(",")[0].split("sub=")[1]; // TODO: Why can't I get the username!!
 
+    public SafaUser getUserFromAuthentication(Authentication user) {
         return this.getUserFromUsername(userName);
     }
 }

@@ -98,7 +98,7 @@ public class FlatFileController extends BaseController {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        SafaUser owner = safaUserService.getuserFromAuthentication(authenticatedUser);
+        SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
         Project project = new Project(owner, "", "");
         this.projectRepository.save(project);
         ProjectVersion projectVersion = createProjectVersion(project);

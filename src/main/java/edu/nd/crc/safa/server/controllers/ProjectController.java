@@ -66,7 +66,7 @@ public class ProjectController extends BaseController {
 
         ProjectEntities response;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            SafaUser owner = safaUserService.getuserFromAuthentication(authenticatedUser);
+            SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
             payloadProject.setOwner(owner);
             response = createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
@@ -84,7 +84,7 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.projects)
     public ServerResponse getProjects(Authentication authenticatedUser) {
-        SafaUser user = safaUserService.getuserFromAuthentication(authenticatedUser);
+        SafaUser user = safaUserService.getUserFromAuthentication(authenticatedUser);
         return new ServerResponse(this.projectRepository.findByOwner(user));
     }
 

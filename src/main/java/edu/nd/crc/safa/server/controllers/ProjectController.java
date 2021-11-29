@@ -148,7 +148,10 @@ public class ProjectController extends BaseController {
         }
         this.projectRepository.save(project);
         projectVersion = createProjectVersion(project);
-        entityCreationResponse = this.projectService.saveProjectEntitiesToVersion(projectVersion, payload.getArtifacts(), payload.getTraces());
+        entityCreationResponse = this.projectService.saveProjectEntitiesToVersion(
+            projectVersion,
+            payload.getArtifacts(),
+            payload.getTraces());
         return entityCreationResponse;
     }
 }

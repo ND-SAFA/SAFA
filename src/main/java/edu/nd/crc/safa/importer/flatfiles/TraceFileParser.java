@@ -111,8 +111,8 @@ public class TraceFileParser {
         throws ServerError {
         String sourceTypeName = traceMatrixDefinition.getString(SOURCE_PARAM);
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
-        ArtifactType sourceType = findArtifactType(project, sourceTypeName);
-        ArtifactType targetType = findArtifactType(project, targetTypeName);
+        ArtifactType sourceType = findArtifactTypeFromTraceMatrixDefinition(project, sourceTypeName);
+        ArtifactType targetType = findArtifactTypeFromTraceMatrixDefinition(project, targetTypeName);
         return Pair.with(sourceType, targetType);
     }
 
@@ -199,13 +199,15 @@ public class TraceFileParser {
         return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 
-    private ArtifactType findArtifactType(Project project, String typeName) throws ServerError {
+    private ArtifactType findArtifactTypeFromTraceMatrixDefinition(Project project, String typeName)
+        throws ServerError {
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, typeName);
 
         if (sourceTypeQuery.isEmpty()) {
             List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
-            String errorMessage = String.format("Unexpected artifact type: %s. Expected one of: %s",
+            String errorMessage = String.format(
+                "Trace matrix definition references unknown type: %s. Defined types include: %s",
                 typeName,
                 artifactTypes);
             throw new ServerError(errorMessage);

@@ -32,7 +32,7 @@ public class TestParsingErrors extends ApplicationBaseTest {
         // VP - Verify that message contains constraint
         JSONObject body = responseContent.getJSONObject("body");
         String message = body.getString("message");
-        assertThat(message).contains("Unexpected artifact type: Requirements");
+        assertThat(message).matches(".*unknown type.*Requirements.*[\\s\\S]");
     }
 
     @Test

@@ -32,10 +32,11 @@ public class TraceAppEntity {
     public TraceType traceType;
 
     public TraceAppEntity() {
+        this.traceLinkId = "";
     }
 
     public TraceAppEntity(String source, String target, double score) {
-        this.traceLinkId = "";
+        this();
         this.source = source;
         this.target = target;
         this.approvalStatus = TraceApproval.UNREVIEWED;

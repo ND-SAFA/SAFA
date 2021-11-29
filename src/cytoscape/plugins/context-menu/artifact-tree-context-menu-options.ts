@@ -3,6 +3,7 @@ import {
   appModule,
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
@@ -69,13 +70,33 @@ export const artifactTreeContextMenuOptions = {
       },
     },
     {
-      id: "view-artifact-subtree",
+      id: "highlight-artifact-subtree",
       content: "Highlight Subtree",
-      tooltipText: "View Subtree",
+      tooltipText: "Highlight Subtree",
       selector: "node",
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, viewportModule.viewArtifactSubtree).then();
+      },
+    },
+    {
+      id: "hide-artifact-subtree",
+      content: "Hide Subtree",
+      tooltipText: "Hide all children.",
+      selector: "node", //TODO: disable this option if already hidden
+      onClickFunction: async (event: EventObject): Promise<void> => {
+        const artifactName: string = event.target.data().id;
+        await subtreeModule.hideSubtree(artifactName).then();
+      },
+    },
+    {
+      id: "show-artifact-subtree",
+      content: "Show Subtree",
+      tooltipText: "Show all hidden children.",
+      selector: "node", //TODO: disable this option if already hidden
+      onClickFunction: async (event: EventObject): Promise<void> => {
+        const artifactName: string = event.target.data().id;
+        await subtreeModule.showSubtree(artifactName);
       },
     },
   ],

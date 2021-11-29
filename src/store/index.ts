@@ -8,6 +8,7 @@ import {
   ErrorModule,
   ProjectModule,
   SessionModule,
+  SubtreeModule,
   ViewportModule,
 } from "./modules";
 import CommitModule from "@/store/modules/commit.module";
@@ -28,6 +29,7 @@ const store = new Vuex.Store({
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,
     commit: CommitModule,
+    subtree: SubtreeModule,
   },
   plugins: [vuexLocal.plugin],
 });
@@ -43,5 +45,6 @@ export const artifactSelectionModule = getModule(
 export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
 export const commitModule = getModule(CommitModule, store);
+export const subtreeModule = getModule(SubtreeModule, store);
 
 export default store;

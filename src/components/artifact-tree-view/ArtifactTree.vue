@@ -14,6 +14,11 @@
           :trace-definition="traceLink"
           @right-click="onLinkRightClick"
         />
+        <GenericGraphLink
+          v-for="traceLink in subtreeLinks"
+          :key="`${traceLink.source}-${traceLink.target}`"
+          :trace-definition="traceLink"
+        />
       </template>
     </GenericCytoscapeController>
     <TraceLinkApprovalModal
@@ -32,6 +37,7 @@ import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import {
@@ -70,6 +76,9 @@ export default Vue.extend({
     traces() {
       return projectModule.getProject.traces;
     },
+    subtreeLinks() {
+      return subtreeModule.getSubtreeLinks;
+    },
     project() {
       return projectModule.getProject;
     },
@@ -78,6 +87,9 @@ export default Vue.extend({
     },
     unselectedNodeOpacity(): number {
       return artifactSelectionModule.getUnselectedNodeOpacity;
+    },
+    hiddenSubtreeNodes(): string[] {
+      return subtreeModule.getHiddenSubtreeNodes;
     },
   },
   mounted() {
@@ -97,7 +109,9 @@ export default Vue.extend({
       });
     },
     getArtifactOpacity(name: string): number {
-      if (this.artifactsInView.includes(name)) {
+      if (this.hiddenSubtreeNodes.includes(name)) {
+        return 0;
+      } else if (this.artifactsInView.includes(name)) {
         return 1;
       } else {
         return this.unselectedNodeOpacity;

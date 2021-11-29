@@ -13,7 +13,7 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
-import type { CytoCore, Artifact, CyPromise, LayoutPayload } from "@/types";
+import type { CytoCore, Artifact, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
 import {
   appModule,

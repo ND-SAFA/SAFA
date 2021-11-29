@@ -41,6 +41,7 @@ public class Project implements Serializable {
 
     @Column(name = "name")
     String name;
+    
     @Column(name = "description")
     String description;
 

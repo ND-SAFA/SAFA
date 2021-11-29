@@ -34,7 +34,8 @@ public class Project implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
-        name = "user_id",
+        referencedColumnName = "user_id",
+        name = "owner_user_id",
         nullable = false)
     SafaUser owner;
 

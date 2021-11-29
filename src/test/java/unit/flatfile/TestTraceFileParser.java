@@ -43,7 +43,7 @@ public class TestTraceFileParser extends ApplicationBaseTest {
         Exception sourceException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(sourceException.getMessage()).contains("Unexpected artifact type: Requirement");
+        assertThat(sourceException.getMessage()).matches(".*unknown type.*Requirement.*[\\s\\S]");
 
         // VP - verify that source type is found but not target
         ArtifactType sourceType = new ArtifactType(project, sourceTypeName);
@@ -51,7 +51,7 @@ public class TestTraceFileParser extends ApplicationBaseTest {
         Exception targetException = assertThrows(ServerError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(targetException.getMessage()).contains("Unexpected artifact type: Design");
+        assertThat(targetException.getMessage()).matches(".*unknown type.*Design.*[\\s\\S]");
 
         // VP - verify that source and target types found
         ArtifactType targetType = new ArtifactType(project, targetTypeName);

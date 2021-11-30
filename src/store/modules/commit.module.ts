@@ -3,7 +3,7 @@ import type { Artifact, Commit, ProjectVersion } from "@/types";
 import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 import { appModule, projectModule } from "@/store";
-import { CommitHistory } from "@/types";
+import type { CommitHistory } from "@/types";
 
 type CommitFromVersionBuilder = (v: ProjectVersion) => Commit;
 

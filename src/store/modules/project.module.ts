@@ -52,7 +52,6 @@ export default class ProjectModule extends VuexModule {
     errorModule.setArtifactWarnings(res.warnings);
     await viewportModule.setArtifactTreeLayout();
     deltaModule.setIsDeltaViewEnabled(false);
-    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -70,6 +69,7 @@ export default class ProjectModule extends VuexModule {
     this.SAVE_PROJECT(newProject);
     await this.subscribeToVersion({ projectId, versionId });
     deltaModule.clearDelta();
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action

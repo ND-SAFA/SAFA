@@ -1,8 +1,8 @@
-import { appModule, viewportModule } from "@/store";
+import { appModule, projectModule, viewportModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, FilterAction } from "@/types";
 import { PanelType } from "@/types";
-import { SubtreeMap } from "@/types/store/artifact-selection";
+import type { SubtreeMap } from "@/types/store/artifact-selection";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**
@@ -12,7 +12,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * The currently selected artifact.
    */
-  private selectedArtifact?: Artifact = undefined;
+  private selectedArtifactName = "";
   /**
    * The currently selected subtree.
    */
@@ -60,7 +60,7 @@ export default class ArtifactSelectionModule extends VuexModule {
    * @param artifact - The artifact to select.
    */
   selectArtifact(artifact: Artifact): void {
-    this.SELECT_ARTIFACT(artifact);
+    this.SELECT_ARTIFACT(artifact.name);
     appModule.openPanel(PanelType.left);
     viewportModule.centerOnArtifacts([artifact.name]).then();
   }
@@ -118,10 +118,10 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * Sets the given artifact as selected.
    *
-   * @param artifact - The artifact to select.
+   * @param artifactName - The name of the artifact to select.
    */
-  SELECT_ARTIFACT(artifact: Artifact): void {
-    this.selectedArtifact = artifact;
+  SELECT_ARTIFACT(artifactName: string): void {
+    this.selectedArtifactName = artifactName;
   }
 
   @Mutation
@@ -129,7 +129,7 @@ export default class ArtifactSelectionModule extends VuexModule {
    * Unselects any selected artifact and closes the left app panel.
    */
   UNSELECT_ARTIFACT(): void {
-    this.selectedArtifact = undefined;
+    this.selectedArtifactName = "";
   }
 
   @Mutation
@@ -144,7 +144,10 @@ export default class ArtifactSelectionModule extends VuexModule {
    * @return The currently selected artifact.
    */
   get getSelectedArtifact(): Artifact | undefined {
-    return this.selectedArtifact;
+    if (this.selectedArtifactName === "") {
+      return undefined;
+    }
+    return projectModule.getArtifactByName(this.selectedArtifactName);
   }
 
   /**

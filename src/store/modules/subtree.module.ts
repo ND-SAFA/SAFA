@@ -1,9 +1,9 @@
 import { projectModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink } from "@/types";
-import { SubtreeMap } from "@/types/store/artifact-selection";
+import type { SubtreeMap } from "@/types/store/artifact-selection";
 import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
-import { SetOpacityRequest } from "@/types/store/subtree";
+import type { SetOpacityRequest } from "@/types/store/subtree";
 
 @Module({ namespaced: true, name: "subtree" })
 /**

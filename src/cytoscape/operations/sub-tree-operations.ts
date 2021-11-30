@@ -1,6 +1,6 @@
-import { Artifact, CyPromise, CytoCore } from "@/types";
+import { Artifact, CytoCore } from "@/types";
 import { SingularElementArgument, EdgeCollection } from "cytoscape";
-import { SubtreeMap } from "@/types/store/artifact-selection";
+import type { SubtreeMap } from "@/types/store/artifact-selection";
 
 /**
  * Computes the subtree map of given artifacts.

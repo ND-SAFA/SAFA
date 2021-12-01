@@ -7,7 +7,6 @@ import edu.nd.crc.safa.server.entities.api.ResponseCodes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -91,11 +90,5 @@ public abstract class BaseController {
         } else {
             return objectName + message;
         }
-    }
-
-    protected ProjectVersion createProjectVersion(Project project) {
-        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
-        this.projectVersionRepository.save(projectVersion);
-        return projectVersion;
     }
 }

@@ -18,6 +18,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
+import { navigateTo, Routes } from "@/router";
 
 const PROJECT_SELECTION_STEP = 1;
 const VERSION_SELECTION_STEP = 2;
@@ -98,7 +99,10 @@ export default Vue.extend({
         this.isLoading = true;
 
         getProjectVersion(this.selectedVersion.versionId)
-          .then(projectModule.setProjectCreationResponse)
+          .then(async (res) => {
+            await navigateTo(Routes.ARTIFACT_TREE);
+            await projectModule.setProjectCreationResponse(res);
+          })
           .finally(() => {
             this.isLoading = false;
             this.$emit("onClose");

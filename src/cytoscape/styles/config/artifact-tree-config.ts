@@ -32,7 +32,6 @@ export const ARTIFACT_MODIFIED_COLOR = ThemeColors.artifactModified;
  * Graph specific values
  */
 export const CENTER_GRAPH_PADDING = 10;
-export const TRUNCATE_LENGTH = 75;
 export const DEFAULT_ARTIFACT_TREE_ZOOM = 0.75;
 
 /**

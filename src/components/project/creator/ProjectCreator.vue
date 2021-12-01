@@ -91,6 +91,7 @@ import { createTraceUploader, createArtifactUploader } from "./uploaders";
 import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
+import { navigateTo, Routes } from "@/router";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -134,7 +135,10 @@ export default Vue.extend({
     saveProject(): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
-        .then(projectModule.setProjectCreationResponse)
+        .then(async (res) => {
+          await navigateTo(Routes.ARTIFACT_TREE);
+          await projectModule.setProjectCreationResponse(res);
+        })
         .then(() => this.clearData())
         .finally(() => {
           appModule.SET_IS_LOADING(false);

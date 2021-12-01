@@ -35,6 +35,5 @@ export default Vue.extend({
 <style lang="scss">
 @import "./assets/main.scss";
 @import "./assets/app-styles.css";
-@import "./assets/artifact-styles.css";
 @import "./assets/context-menu.css";
 </style>

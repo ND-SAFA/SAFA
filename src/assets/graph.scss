@@ -14,19 +14,54 @@
 }
 
 .artifact-body {
-  padding: 5px;
+  padding: 0px 5px 5px 5px;
   text-align: center;
   white-space: initial;
   flex-grow: 1;
+  line-height: 1;
 }
 
-.artifact-warning {
-  background-color: #EEBC3D;
-  border: 1px solid black;
+.artifact-footer {
+  height:25px;
   text-align: center;
   display: flex;
   align-items: center;
-  justify-content: center;
+  width: 100%;
+
+  & > * {
+    border: 1px solid black;
+  }
+
+  & > div > span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .warning-text {
+    border: 1px solid black;
+    overflow: hidden;
+    background-color: #EEBC3D;
+  }
+}
+
+.artifact-stoplight {
+  height: 10px;
+
+  & > * {
+    border: 1px solid black;
+  }
+
+  .artifact-added {
+    background: #81c784;
+  }
+
+  .artifact-removed {
+    background: #e57373;
+  }
+
+  .artifact-modified {
+    background: #64b5f6;
+  }
 }
 
 @media screen and (min-height: 200px) {

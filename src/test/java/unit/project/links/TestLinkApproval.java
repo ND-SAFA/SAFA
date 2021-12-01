@@ -37,7 +37,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         double score = 0.2;
 
         dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
             .newType(projectName, "B")
@@ -61,7 +61,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         double score = 0.2;
 
         dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
             .newType(projectName, "B")
@@ -117,7 +117,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         // Step - Create project and version
         String projectName = "test-project";
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersionWithReturn(projectName);
         Project project = projectVersion.getProject();
 
@@ -148,7 +148,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(AppRoutes.generateLinks).get();
+        String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.generateLinks).get();
 
         JSONObject body = new JSONObject();
         body.put("sourceArtifacts", sourceArtifacts);
@@ -174,7 +174,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
         String targetName = "F21";
 
         // Step - Create project with artifacts.
-        ProjectVersion projectVersion = dbEntityBuilder.newProject(user, projectName).newVersionWithReturn(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.newProject(currentUser, projectName).newVersionWithReturn(projectName);
         uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that trace does not exist
@@ -212,7 +212,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
     private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
         return RouteBuilder
-            .withRoute(AppRoutes.getGeneratedLinks)
+            .withRoute(AppRoutes.Projects.getGeneratedLinks)
             .withProject(project)
             .get();
     }

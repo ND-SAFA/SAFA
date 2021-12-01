@@ -40,7 +40,7 @@ public class DeltaController extends BaseController {
      * @return ProjectDelta with artifacts that were added, removed, and modified between versions.
      * @throws ServerError Throws error if baseline or target version is not found.
      */
-    @GetMapping(AppRoutes.calculateProjectDelta)
+    @GetMapping(AppRoutes.Projects.calculateProjectDelta)
     public ServerResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                                 @PathVariable UUID targetVersionId) throws ServerError {
 

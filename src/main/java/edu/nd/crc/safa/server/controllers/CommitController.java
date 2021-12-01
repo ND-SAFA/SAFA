@@ -50,7 +50,7 @@ public class CommitController extends BaseController {
         this.revisionNotificationService = revisionNotificationService;
     }
 
-    @PostMapping(AppRoutes.commitChange)
+    @PostMapping(AppRoutes.Projects.commitChange)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {

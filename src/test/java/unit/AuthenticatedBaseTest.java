@@ -24,7 +24,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
 
     public static final String email = "abc123@gmail.com";
     public static final String password = "r{QjR3<Ec2eZV@?";
-    public static SafaUser user;
+    public static SafaUser currentUser;
     protected String token;
 
     @BeforeEach
@@ -37,7 +37,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     public void defaultLogin() throws Exception {
         createUser(email, password);
         loginUser(email, password);
-        user = safaUserService.getUserFromUsername(email);
+        currentUser = safaUserService.getUserFromUsername(email);
     }
 
     public JSONObject sendGet(String routeName,
@@ -91,7 +91,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject payload = new JSONObject();
         payload.put("email", email);
         payload.put("password", password);
-        return sendPost(AppRoutes.createAccountLink, payload, status().is2xxSuccessful(), false);
+        return sendPost(AppRoutes.Accounts.createNewUser, payload, status().is2xxSuccessful(), false);
     }
 
     public void loginUser(String email, String password) throws Exception {
@@ -102,7 +102,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject user = new JSONObject();
         user.put("email", email);
         user.put("password", password);
-        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.loginLink), user), test);
+        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user), test);
         this.token = response.getString("token");
     }
 }

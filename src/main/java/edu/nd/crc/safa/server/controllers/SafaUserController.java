@@ -37,7 +37,7 @@ public class SafaUserController extends BaseController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping(AppRoutes.createAccountLink)
+    @PostMapping(AppRoutes.Accounts.createNewUser)
     public SafaUser createNewUser(@RequestBody SafaUser newUser) {
         newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
         this.safaUserRepository.save(newUser);

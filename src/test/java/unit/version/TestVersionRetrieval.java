@@ -17,7 +17,7 @@ import unit.ApplicationBaseTest;
 public class TestVersionRetrieval extends ApplicationBaseTest {
     @Test
     public void getEmptyVersions() throws Exception {
-        Project project = dbEntityBuilder.newProjectWithReturn(user, "test-project");
+        Project project = dbEntityBuilder.newProjectWithReturn(currentUser, "test-project");
         JSONObject response = sendGet(createRouteName(project), status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
@@ -26,7 +26,7 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
     public void getMultipleVersions() throws Exception {
         String projectName = "test-project";
         dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .newVersion(projectName);
         Project project = dbEntityBuilder.getProject("test-project");
@@ -35,6 +35,6 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private String createRouteName(Project project) {
-        return RouteBuilder.withRoute(AppRoutes.getVersions).withProject(project).get();
+        return RouteBuilder.withRoute(AppRoutes.Projects.getVersions).withProject(project).get();
     }
 }

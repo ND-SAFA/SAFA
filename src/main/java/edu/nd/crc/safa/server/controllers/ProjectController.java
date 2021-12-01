@@ -57,7 +57,7 @@ public class ProjectController extends BaseController {
      * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
      *                     payload.
      */
-    @PostMapping(AppRoutes.projects)
+    @PostMapping(AppRoutes.Projects.projects)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project,
                                                 Authentication authenticatedUser) throws ServerError {
@@ -82,10 +82,10 @@ public class ProjectController extends BaseController {
      * @param authenticatedUser The authorized user accessing this endpoint.
      * @return List of project identifiers.
      */
-    @GetMapping(AppRoutes.projects)
     public ServerResponse getProjects(Authentication authenticatedUser) {
         SafaUser user = safaUserService.getUserFromAuthentication(authenticatedUser);
         return new ServerResponse(this.projectRepository.findByOwner(user));
+    @GetMapping(AppRoutes.Projects.projects)
     }
 
     /**

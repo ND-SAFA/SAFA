@@ -25,7 +25,7 @@ public class TestServerErrorMessage extends ApplicationBaseTest {
         Project project = new Project();
         project.setProjectId(UUID.randomUUID());
         String routeName = RouteBuilder
-            .withRoute(AppRoutes.getVersions)
+            .withRoute(AppRoutes.Projects.getVersions)
             .withProject(project)
             .get();
 

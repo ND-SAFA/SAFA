@@ -57,7 +57,7 @@ public class VersionController extends BaseController {
      * @return List of project versions associated with project.
      * @throws ServerError Throws error if project with ID is not found.
      */
-    @GetMapping(AppRoutes.getVersions)
+    @GetMapping(AppRoutes.Projects.getVersions)
     public ServerResponse getVersions(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getProjectVersions(project));
@@ -70,7 +70,7 @@ public class VersionController extends BaseController {
      * @return Most up-to-date project version.
      * @throws ServerError Throws error if not project if found with associated id.
      */
-    @GetMapping(AppRoutes.getCurrentVersion)
+    @GetMapping(AppRoutes.Projects.getCurrentVersion)
     public ServerResponse getCurrentVersion(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
         return new ServerResponse(versionService.getCurrentVersion(project));
@@ -83,7 +83,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws ServerError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.createNewMajorVersion)
+    @PostMapping(AppRoutes.Projects.createNewMajorVersion)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewMajorVersion(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
@@ -98,7 +98,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws ServerError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.createNewMinorVersion)
+    @PostMapping(AppRoutes.Projects.createNewMinorVersion)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewMinorVersion(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
@@ -113,7 +113,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws ServerError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.createNewRevisionVersion)
+    @PostMapping(AppRoutes.Projects.createNewRevisionVersion)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createNewRevisionVersion(@PathVariable String projectId) throws ServerError {
         Project project = getProject(projectId);
@@ -128,7 +128,7 @@ public class VersionController extends BaseController {
      * @return String representing success message.
      * @throws ServerError Throws error if not version is associated with given id.
      */
-    @DeleteMapping(AppRoutes.getVersionById)
+    @DeleteMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
         if (versionQuery.isPresent()) {
@@ -146,7 +146,7 @@ public class VersionController extends BaseController {
      * @return ProjectCreationResponse containing artifacts, traces, and warnings of project at version specified.
      * @throws ServerError Throws error if no version is associated with given id.
      */
-    @GetMapping(AppRoutes.getVersionById)
+    @GetMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
         Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
 

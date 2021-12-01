@@ -39,7 +39,7 @@ public class TestModificationDetected extends DeltaBaseTest {
 
         // Step - Calculate delta
         String deltaRouteName = RouteBuilder
-            .withRoute(AppRoutes.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();

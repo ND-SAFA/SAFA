@@ -88,10 +88,8 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     }
 
     public JSONObject createUser(String email, String password) throws Exception {
-        JSONObject payload = new JSONObject();
-        payload.put("email", email);
-        payload.put("password", password);
-        return sendPost(AppRoutes.Accounts.createNewUser, payload, status().is2xxSuccessful(), false);
+        SafaUser user = new SafaUser(email, password);
+        return sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(), false);
     }
 
     public void loginUser(String email, String password) throws Exception {

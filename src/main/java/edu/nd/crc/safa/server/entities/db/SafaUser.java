@@ -30,6 +30,14 @@ public class SafaUser implements Serializable {
     @Column(name = "password", nullable = false)
     String password;
 
+    public SafaUser() {
+    }
+
+    public SafaUser(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public UUID getUserId() {
         return userId;
     }

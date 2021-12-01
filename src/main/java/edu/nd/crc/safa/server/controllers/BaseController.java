@@ -9,6 +9,7 @@ import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.PermissionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,12 +27,15 @@ public abstract class BaseController {
 
     protected ProjectVersionRepository projectVersionRepository;
     protected ProjectRepository projectRepository;
+    protected PermissionService permissionService;
 
     @Autowired
     public BaseController(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository) {
+                          ProjectVersionRepository projectVersionRepository,
+                          PermissionService permissionService) {
         this.projectVersionRepository = projectVersionRepository;
         this.projectRepository = projectRepository;
+        this.permissionService = permissionService;
     }
 
     @ExceptionHandler(ServerError.class)

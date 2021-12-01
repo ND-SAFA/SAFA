@@ -119,9 +119,8 @@ public class ArtifactVersionService {
      * @return ServerResponse with success message.
      */
     public ServerResponse deleteArtifactBody(
-        UUID versionId,
+        ProjectVersion projectVersion,
         String artifactName) {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion,
             artifactName);
         bodyToRemove.ifPresentOrElse(artifactBody -> {

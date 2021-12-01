@@ -15,9 +15,9 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.ProjectMemberRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +38,18 @@ public class ProjectController extends BaseController {
 
     private final SafaUserService safaUserService;
     private final ProjectService projectService;
+    private final PermissionService permissionService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
-                             ProjectMemberRepository projectMemberRepository,
+                             PermissionService permissionService,
                              SafaUserService safaUserService,
                              ProjectService projectService) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, permissionService);
         this.safaUserService = safaUserService;
         this.projectService = projectService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -71,6 +73,8 @@ public class ProjectController extends BaseController {
             payloadProject.setOwner(currentUser);
             response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
+            Project persistedProject = this.projectRepository.findByProjectId(payloadProject.getProjectId());
+            this.permissionService.requireEditPermission(persistedProject);
             response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
@@ -101,6 +105,8 @@ public class ProjectController extends BaseController {
     public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
         Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
         if (projectQuery.isPresent()) {
+            Project project = projectQuery.get();
+            this.permissionService.requireEditPermission(project);
             this.projectRepository.delete(projectQuery.get());
             return new ServerResponse("Project deleted successfully");
         } else {
@@ -115,7 +121,7 @@ public class ProjectController extends BaseController {
      * @param request The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.addProjectMember)
-    public void addProjectMember(@RequestBody ProjectMembershipRequest request) {
+    public void addProjectMember(@RequestBody ProjectMembershipRequest request) throws ServerError {
         this.projectService.addMemberToProject(request.getProjectId(),
             request.getMemberEmail(),
             request.getProjectRole());

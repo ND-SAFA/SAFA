@@ -15,6 +15,7 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
+import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
@@ -44,13 +45,14 @@ public class FlatFileController extends BaseController {
     @Autowired
     public FlatFileController(ProjectService projectService,
                               ProjectRepository projectRepository,
+                              PermissionService permissionService,
                               ProjectVersionRepository projectVersionRepository,
                               FileUploadService fileUploadService,
                               RevisionNotificationService revisionNotificationService,
                               FlatFileService flatFileParser,
                               ProjectRetrievalService projectRetrievalService,
                               SafaUserService safaUserService) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, permissionService);
         this.projectService = projectService;
         this.revisionNotificationService = revisionNotificationService;
         this.fileUploadService = fileUploadService;
@@ -77,6 +79,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         Project project = projectVersion.getProject();
+        this.permissionService.requireEditPermission(project);
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,

@@ -23,7 +23,6 @@ import edu.nd.crc.safa.utilities.TraceLinkFinder;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Provides interface to validating and creating trace links.
@@ -153,10 +152,9 @@ public class TraceLinkService {
      * @return TraceApplicationEntity representing the created entity.
      * @throws ServerError Throws error if either project version, source, or target artifact not found.
      */
-    public ServerResponse createNewTraceLInk(@PathVariable UUID versionId,
-                                             @PathVariable String sourceId,
-                                             @PathVariable String targetId) throws ServerError {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+    public ServerResponse createNewTraceLInk(ProjectVersion projectVersion,
+                                             String sourceId,
+                                             String targetId) throws ServerError {
         Pair<TraceLink, String> creationResponse = this.createTrace(projectVersion, sourceId,
             targetId);
         if (creationResponse.getValue1() != null) {
@@ -176,7 +174,7 @@ public class TraceLinkService {
      * @param traceAppEntity    The trace being updated.
      * @throws ServerError Throws error if version not found.
      */
-    public void updateTraceLink(UUID baselineVersionId, TraceAppEntity traceAppEntity) throws ServerError {
+    public void updateTraceLink(TraceAppEntity traceAppEntity) throws ServerError {
         TraceLink traceLink = getEntity(traceAppEntity);
         traceLink.setApprovalStatus(traceAppEntity.approvalStatus);
         this.traceLinkRepository.save(traceLink);

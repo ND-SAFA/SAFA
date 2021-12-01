@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.authentication.TokenService;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
+import edu.nd.crc.safa.server.services.PermissionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,10 +29,10 @@ public class SafaUserController extends BaseController {
     @Autowired
     public SafaUserController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
+                              PermissionService permissionService,
                               SafaUserRepository safaUserRepository,
-                              PasswordEncoder passwordEncoder,
-                              TokenService tokenService) {
-        super(projectRepository, projectVersionRepository);
+                              PasswordEncoder passwordEncoder) {
+        super(projectRepository, projectVersionRepository, permissionService);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;
     }

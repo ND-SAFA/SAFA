@@ -1,11 +1,13 @@
 package edu.nd.crc.safa.server.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -16,7 +18,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.ProjectMemberRepository;
+import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
@@ -34,34 +36,40 @@ public class ProjectService {
 
     ProjectRepository projectRepository;
     ProjectVersionRepository projectVersionRepository;
-    ProjectMemberRepository projectMemberRepository;
+    ProjectMembershipRepository projectMembershipRepository;
     SafaUserRepository safaUserRepository;
 
+    SafaUserService safaUserService;
     TraceLinkService traceLinkService;
     ProjectRetrievalService projectRetrievalService;
     ParserErrorService parserErrorService;
     ArtifactVersionService artifactVersionService;
     WarningService warningService;
+    PermissionService permissionService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
                           ProjectVersionRepository projectVersionRepository,
-                          ProjectMemberRepository projectMemberRepository,
+                          ProjectMembershipRepository projectMembershipRepository,
                           SafaUserRepository safaUserRepository,
+                          SafaUserService safaUserService,
                           ParserErrorService parserErrorService,
                           ArtifactVersionService artifactVersionService,
                           TraceLinkService traceLinkService,
                           WarningService warningService,
-                          ProjectRetrievalService projectRetrievalService) {
+                          ProjectRetrievalService projectRetrievalService,
+                          PermissionService permissionService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
-        this.projectMemberRepository = projectMemberRepository;
+        this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserRepository = safaUserRepository;
+        this.safaUserService = safaUserService;
         this.parserErrorService = parserErrorService;
         this.artifactVersionService = artifactVersionService;
         this.traceLinkService = traceLinkService;
         this.warningService = warningService;
         this.projectRetrievalService = projectRetrievalService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -104,7 +112,7 @@ public class ProjectService {
     public List<Project> getUserProjects(SafaUser user) {
         List<Project> ownerProjects = this.projectRepository.findByOwner(user);
         List<Project> sharedProjects =
-            this.projectMemberRepository
+            this.projectMembershipRepository
                 .findByMember(user)
                 .stream()
                 .map(ProjectMembership::getProject)
@@ -169,10 +177,34 @@ public class ProjectService {
         return projectVersion;
     }
 
-    public void addMemberToProject(UUID projectId, String memberEmail, ProjectRole role) {
+    /**
+     * Finds and adds given member to project with specified role.
+     *
+     * @param projectId      The project the member is being added to.
+     * @param newMemberEmail The email of the member being added.
+     * @param newMemberRole  The role to give the member in the project.
+     * @throws ServerError Throws error if given role is greater than the role
+     *                     of the user issuing this request.
+     */
+    public void addMemberToProject(UUID projectId,
+                                   String newMemberEmail,
+                                   ProjectRole newMemberRole) throws ServerError {
         Project project = this.projectRepository.findByProjectId(projectId);
-        SafaUser member = this.safaUserRepository.findByEmail(memberEmail);
-        ProjectMembership projectMembership = new ProjectMembership(project, member, role);
-        this.projectMemberRepository.save(projectMembership);
+        SafaUser newMember = this.safaUserRepository.findByEmail(newMemberEmail);
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+
+        Optional<ProjectMembership> pmQuery = this.projectMembershipRepository
+            .findByProjectAndMember(project, currentUser);
+
+        if (pmQuery.isPresent()) {
+            if (newMemberRole.compareTo(pmQuery.get().getRole()) >= 0) {
+                throw new ServerError("Cannot add member with authorization greater that current user.");
+            }
+        } else if (!this.permissionService.isOwner(project, currentUser)) {
+            throw new ServerError("Cannot add member to project which current user is not apart of.");
+        }
+
+        ProjectMembership projectMembership = new ProjectMembership(project, newMember, newMemberRole);
+        this.projectMembershipRepository.save(projectMembership);
     }
 }

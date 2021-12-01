@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -14,6 +15,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.services.PermissionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,16 +37,18 @@ public class GeneratedLinkController extends BaseController {
     @Autowired
     public GeneratedLinkController(ProjectRepository projectRepository,
                                    ProjectVersionRepository projectVersionRepository,
+                                   PermissionService permissionService,
                                    TraceLinkRepository traceLinkRepository,
                                    TraceLinkGenerator traceLinkGenerator) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, permissionService);
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
     }
 
     @GetMapping(value = AppRoutes.Projects.getGeneratedLinks)
-    public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
+    public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) throws ServerError {
         Project project = this.projectRepository.findByProjectId(projectId);
+        this.permissionService.requireViewPermission(project);
         List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
         return new ServerResponse(TraceAppEntity.createEntities(projectLinks));
     }

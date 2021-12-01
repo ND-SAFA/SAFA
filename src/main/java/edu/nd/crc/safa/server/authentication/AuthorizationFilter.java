@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.authentication;
 
-import static edu.nd.crc.safa.config.SecurityConstants.HEADER_NAME;
+import static edu.nd.crc.safa.config.SecurityConstants.AUTHORIZATION_HEADER;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,12 +9,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,18 +22,19 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-    private final SecurityConstants securityConstants;
+    private final TokenService tokenService;
 
-    public AuthorizationFilter(AuthenticationManager authManager, SecurityConstants securityConstants) {
+    public AuthorizationFilter(AuthenticationManager authManager,
+                               TokenService tokenService) {
         super(authManager);
-        this.securityConstants = securityConstants;
+        this.tokenService = tokenService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(HEADER_NAME);
+        String header = request.getHeader(AUTHORIZATION_HEADER);
 
         if (header == null) {
             chain.doFilter(request, response);
@@ -61,18 +59,10 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
      * @return Successful authorization token if successful otherwise null.
      */
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws ServerError {
-        String token = request.getHeader(HEADER_NAME);
+        String token = request.getHeader(AUTHORIZATION_HEADER);
         if (token != null) {
-            //TODO: replace these deprecated methods
-            Claims user = Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(securityConstants.key.getBytes()))
-                .parseClaimsJws(token)
-                .getBody();
-
-            if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-            }
-            return null;
+            Claims userClaims = this.tokenService.getTokenClaims(token);
+            return new UsernamePasswordAuthenticationToken(userClaims, null, new ArrayList<>());
         }
         throw new ServerError("No token found.");
     }

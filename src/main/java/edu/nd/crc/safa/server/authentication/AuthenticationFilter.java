@@ -1,11 +1,8 @@
 package edu.nd.crc.safa.server.authentication;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,10 +10,6 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,12 +24,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final SecurityConstants securityConstants;
+    private final TokenService tokenService;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) {
+    public AuthenticationFilter(
+        AuthenticationManager authenticationManager,
+        TokenService tokenService) {
         super(authenticationManager);
         this.authenticationManager = authenticationManager;
-        this.securityConstants = securityConstants;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -70,15 +65,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest req,
                                             HttpServletResponse res,
                                             FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException {
-        Date exp = new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME);
-        Key key = Keys.hmacShaKeyFor(securityConstants.key.getBytes());
-        Claims claims = Jwts.claims().setSubject(((User) auth.getPrincipal()).getUsername());
-        String token = Jwts
-            .builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS512, key)
-            .setExpiration(exp).compact();
+                                            Authentication auth) throws IOException {
+        String username = ((User) auth.getPrincipal()).getUsername();
+        String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
+
+        // Create response
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         JSONObject responseJson = new JSONObject();

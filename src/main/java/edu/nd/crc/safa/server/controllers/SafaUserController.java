@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.authentication.TokenService;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -29,7 +30,8 @@ public class SafaUserController extends BaseController {
     public SafaUserController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
                               SafaUserRepository safaUserRepository,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder,
+                              TokenService tokenService) {
         super(projectRepository, projectVersionRepository);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;

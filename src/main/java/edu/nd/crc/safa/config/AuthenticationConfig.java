@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.authentication.TokenService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +45,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     private SafaUserService userDetailsService;
 
     @Resource
-    private SecurityConstants securityConstants;
+    private TokenService tokenService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
@@ -70,8 +71,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().authenticated()
             // Authentication Filters
             .and()
-            .addFilter(new AuthenticationFilter(authenticationManager(), securityConstants))
-            .addFilter(new AuthorizationFilter(authenticationManager(), securityConstants))
+            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

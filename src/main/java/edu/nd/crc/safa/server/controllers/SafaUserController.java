@@ -25,18 +25,16 @@ public class SafaUserController extends BaseController {
 
     SafaUserRepository safaUserRepository;
     PasswordEncoder passwordEncoder;
-    TokenService tokenService;
 
     @Autowired
     public SafaUserController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
                               SafaUserRepository safaUserRepository,
-                              PasswordEncoder passwordEncoder) {
-                              TokenService tokenService,
+                              PasswordEncoder passwordEncoder,
+                              TokenService tokenService) {
         super(projectRepository, projectVersionRepository);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;
-        this.tokenService = tokenService;
     }
 
     @PostMapping(AppRoutes.createAccountLink)

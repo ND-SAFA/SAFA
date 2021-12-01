@@ -8,14 +8,11 @@ ARG DB_USER=root
 ARG DB_PASSWORD=secret2
 ARG DB_INSTANCE
 ARG JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
-ARG EMAIL_PASSWORD
-
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
 RUN test -n "$JWT_KEY"
-RUN test -n "$EMAIL_PASSWORD"
 
 ARG PathToProperties="/app/src/main/resources/application-prod.properties"
 
@@ -25,7 +22,6 @@ RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
 RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
-RUN sed -i -e "s,spring.mail.password=,spring.mail.password=$EMAIL_PASSWORD,g" $PathToProperties
 
 RUN if [ ! -z "$DB_INSTANCE" ] ; \
     then \

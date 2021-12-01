@@ -111,6 +111,8 @@ public class ProjectController extends BaseController {
     /**
      * Adds specified user account with given email to project assigned with
      * given role.
+     *
+     * @param request The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.addProjectMember)
     public void addProjectMember(@RequestBody ProjectMembershipRequest request) {

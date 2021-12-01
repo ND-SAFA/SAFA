@@ -31,10 +31,13 @@ public class AppRoutes {
         //Change Controller
         public static final String commitChange = projectPrefix + "/versions/{versionId}/commit";
         // Artifact Controller
-        public static final String checkIfArtifactExists = projectPrefix + "/{projectId}/artifacts/validate/{artifactName}";
-        public static final String calculateProjectDelta = projectPrefix + "/delta/{baselineVersionId}/{targetVersionId}";
+        public static final String checkIfArtifactExists = projectPrefix
+            + "/{projectId}/artifacts/validate/{artifactName}";
+        public static final String calculateProjectDelta = projectPrefix
+            + "/delta/{baselineVersionId}/{targetVersionId}";
         // Flat file Controller
-        public static final String updateProjectVersionFromFlatFiles = projectPrefix + "/versions/{versionId}/flat-files";
+        public static final String updateProjectVersionFromFlatFiles = projectPrefix
+            + "/versions/{versionId}/flat-files";
         public static final String projectFlatFiles = projectPrefix + "/flat-files";
         // Parse Data File controller
         public static final String parseArtifactFile = projectPrefix + "/parse/artifacts/{artifactType}";

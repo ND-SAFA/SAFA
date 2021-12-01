@@ -6,6 +6,7 @@ import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -49,7 +50,8 @@ public class SafaUserService implements UserDetailsService {
         return user;
     }
 
-    public SafaUser getUserFromAuthentication(Authentication user) {
+    public SafaUser getCurrentUser() {
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
         String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);
     }

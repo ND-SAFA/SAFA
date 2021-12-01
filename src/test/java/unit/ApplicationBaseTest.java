@@ -25,7 +25,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
                                          String pathToFileDir) throws Exception {
         assertTokenExists();
         String path = RouteBuilder
-            .withRoute(AppRoutes.updateProjectVersionFromFlatFiles)
+            .withRoute(AppRoutes.Projects.updateProjectVersionFromFlatFiles)
             .withVersion(projectVersion)
             .get();
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
@@ -45,7 +45,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
 
     public ProjectVersion createProjectWithNewVersion(String projectName) {
         return dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
     }
@@ -53,7 +53,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     public void commit(CommitBuilder commitBuilder) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
-            .withRoute(AppRoutes.commitChange)
+            .withRoute(AppRoutes.Projects.commitChange)
             .withVersion(commitVersion)
             .get();
         sendPost(route, commitBuilder.asJson(), status().is2xxSuccessful());
@@ -67,7 +67,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
      */
     protected String getCommitRoute(ProjectVersion projectVersion) {
         return RouteBuilder
-            .withRoute(AppRoutes.commitChange)
+            .withRoute(AppRoutes.Projects.commitChange)
             .withVersion(projectVersion)
             .get();
     }

@@ -16,11 +16,11 @@ import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FlatFileController extends BaseController {
 
+    private final ProjectService projectService;
     private final FileUploadService fileUploadService;
     private final RevisionNotificationService revisionNotificationService;
     private final FlatFileService flatFileService;
@@ -41,7 +42,8 @@ public class FlatFileController extends BaseController {
     private final SafaUserService safaUserService;
 
     @Autowired
-    public FlatFileController(ProjectRepository projectRepository,
+    public FlatFileController(ProjectService projectService,
+                              ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
                               FileUploadService fileUploadService,
                               RevisionNotificationService revisionNotificationService,
@@ -49,6 +51,7 @@ public class FlatFileController extends BaseController {
                               ProjectRetrievalService projectRetrievalService,
                               SafaUserService safaUserService) {
         super(projectRepository, projectVersionRepository);
+        this.projectService = projectService;
         this.revisionNotificationService = revisionNotificationService;
         this.fileUploadService = fileUploadService;
         this.flatFileService = flatFileParser;
@@ -64,7 +67,7 @@ public class FlatFileController extends BaseController {
      * @return ServerResponse whose body contains all entities in project created.
      * @throws ServerError - If no files are given.
      */
-    @PostMapping(value = AppRoutes.updateProjectVersionFromFlatFiles)
+    @PostMapping(value = AppRoutes.Projects.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
@@ -85,23 +88,21 @@ public class FlatFileController extends BaseController {
     /**
      * Creates a new project using the given flat files to create the project arifacts, traces, and artifact types.
      *
-     * @param files             Files including artifact and traces files and requiring at minimum a Tim.json file.
-     * @param authenticatedUser The authorized user used as the owner of the project.
+     * @param files Files including artifact and traces files and requiring at minimum a Tim.json file.
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = AppRoutes.projectFlatFiles)
+    @PostMapping(value = AppRoutes.Projects.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files,
-                                                        Authentication authenticatedUser) throws ServerError {
+    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
+        SafaUser owner = safaUserService.getCurrentUser();
         Project project = new Project(owner, "", "");
         this.projectRepository.save(project);
-        ProjectVersion projectVersion = createProjectVersion(project);
+        ProjectVersion projectVersion = projectService.createBaseProjectVersion(project);
 
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,

@@ -32,7 +32,7 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
 
         // Step - Create project with: type, artifact, and body
         dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newType(projectName, artifactType)
             .newVersion(projectName)
             .newArtifact(projectName, artifactType, artifactName)

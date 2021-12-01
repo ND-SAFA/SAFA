@@ -38,7 +38,8 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     private static HashMap<String, BlockingQueue<String>> idToQueue;
     private static HashMap<String, StompSession> idToSession;
 
-    final int TIME_TO_POLL = 5; // seconds
+    final int TIME_TO_POLL_SECONDS = 5; // seconds
+    final int TIME_TO_POLL_MS = TIME_TO_POLL_SECONDS * 1000;
 
     @LocalServerPort
     private Integer port;
@@ -73,7 +74,6 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
         return this;
     }
 
-
     public WebSocketBaseTest subscribe(String id, String topic) {
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
@@ -93,10 +93,10 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     }
 
     public String getNextMessage(String id) throws InterruptedException {
-        return idToQueue.get(id).poll(TIME_TO_POLL, SECONDS);
+        return idToQueue.get(id).poll(TIME_TO_POLL_SECONDS, SECONDS);
     }
 
-    public int getQueueSize(String id) {
+    public int getQueueSize(String id) throws InterruptedException {
         return idToQueue.get(id).size();
     }
 }

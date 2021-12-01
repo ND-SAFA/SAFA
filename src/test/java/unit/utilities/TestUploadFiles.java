@@ -21,7 +21,7 @@ public class TestUploadFiles extends ApplicationBaseTest {
     @Test
     public void smokeTest() throws ServerError {
         String testName = "hellWorld";
-        Project project = dbEntityBuilder.newProject(user, testName).getProject(testName);
+        Project project = dbEntityBuilder.newProject(currentUser, testName).getProject(testName);
         String pathToTestProject = ProjectPaths.getPathToStorage(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();

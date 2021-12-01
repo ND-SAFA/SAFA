@@ -20,7 +20,7 @@ public class TestFlatFileMessage extends WebSocketBaseTest {
 
         // Step - Create project and version id
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersionWithReturn(projectName);
 
         // Step - Connect to websocket listener
@@ -34,6 +34,7 @@ public class TestFlatFileMessage extends WebSocketBaseTest {
         uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that single message sent
+        Thread.sleep(500);
         assertThat(getQueueSize(clientId)).isEqualTo(1);
         ProjectWebSocketMessage response = getNextMessage(clientId, ProjectWebSocketMessage.class);
         assertThat(response.getType()).isEqualTo("excluded");

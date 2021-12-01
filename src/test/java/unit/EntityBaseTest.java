@@ -20,6 +20,8 @@ import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +78,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected JsonBuilder jsonBuilder;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @BeforeEach
     public void createNewBuilders() {
@@ -134,5 +139,10 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
         request.file(file);
 
         return request;
+    }
+
+    public JSONObject toJson(Object object) throws JsonProcessingException {
+        String objectJsonString = objectMapper.writeValueAsString(object);
+        return new JSONObject(objectJsonString);
     }
 }

@@ -48,7 +48,7 @@ public class TestValidation extends BaseProjectJsonTest {
     public void attemptUpdateWithoutVersionId() throws Exception {
         // Step - Create an empty project and version.
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersionWithReturn(projectName);
         String projectId = projectVersion.getProject().getProjectId().toString();
 
@@ -79,7 +79,7 @@ public class TestValidation extends BaseProjectJsonTest {
     public void testProjectVersionValidation() throws Exception {
         // Step - Create project and version.
         ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersionWithReturn(projectName);
         String projectId = projectVersion.getProject().getProjectId().toString();
         String mockVersionId = UUID.randomUUID().toString();
@@ -189,7 +189,7 @@ public class TestValidation extends BaseProjectJsonTest {
         List<JSONObject> artifacts,
         List<JSONObject> traces) throws Exception {
         // Step - Setup constants
-        String url = AppRoutes.projects;
+        String url = AppRoutes.Projects.projects;
         JSONObject projectJson = new JSONObject();
 
         // Step - Create project payload

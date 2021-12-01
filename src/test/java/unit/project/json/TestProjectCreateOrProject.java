@@ -13,18 +13,14 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Tests that user is able to create and update a project via JSON.
  */
 public class TestProjectCreateOrProject extends BaseProjectJsonTest {
 
-    @Autowired
-    ObjectMapper objectMapper;
 
     /**
      * Tests that all entities in the given request created. Namely,

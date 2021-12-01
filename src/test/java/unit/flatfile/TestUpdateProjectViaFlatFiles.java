@@ -33,7 +33,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
     public void testMultipleFilesUploadRestController() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = AppRoutes.projectFlatFiles;
+        String routeName = AppRoutes.Projects.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
@@ -167,7 +167,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         String projectName = "test-project";
 
         dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .newVersion(projectName)
             .newVersion(projectName);

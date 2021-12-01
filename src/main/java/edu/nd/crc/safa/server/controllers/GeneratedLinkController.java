@@ -42,14 +42,14 @@ public class GeneratedLinkController extends BaseController {
         this.traceLinkGenerator = traceLinkGenerator;
     }
 
-    @GetMapping(value = AppRoutes.getGeneratedLinks)
+    @GetMapping(value = AppRoutes.Projects.getGeneratedLinks)
     public ServerResponse getGeneratedLinks(@PathVariable UUID projectId) {
         Project project = this.projectRepository.findByProjectId(projectId);
         List<TraceLink> projectLinks = this.traceLinkRepository.getGeneratedLinks(project);
         return new ServerResponse(TraceAppEntity.createEntities(projectLinks));
     }
 
-    @PostMapping(value = AppRoutes.generateLinks)
+    @PostMapping(value = AppRoutes.Projects.generateLinks)
     public ServerResponse generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();

@@ -20,8 +20,9 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void attemptNewRevisionWithoutVersions() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProjectWithReturn(user, projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
+            .newProjectWithReturn(currentUser, projectName);
+        String routeName =
+            RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
         assertThat(response.getJSONObject("body").getString("message")).contains("initial version");
     }
@@ -30,10 +31,11 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createFirstVersionThroughRevision() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.createNewRevisionVersion).withProject(project).get();
+        String routeName =
+            RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");
 
@@ -50,10 +52,10 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMinorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.createNewMinorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMinorVersion).withProject(project).get();
 
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");
@@ -70,10 +72,10 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMajorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(user, projectName)
+            .newProject(currentUser, projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.createNewMajorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMajorVersion).withProject(project).get();
 
         JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
         JSONObject projectVersionJson = response.getJSONObject("body");

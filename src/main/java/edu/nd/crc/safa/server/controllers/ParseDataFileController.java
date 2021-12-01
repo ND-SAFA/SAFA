@@ -68,7 +68,7 @@ public class ParseDataFileController extends BaseController {
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
-    @PostMapping(value = AppRoutes.parseArtifactFile)
+    @PostMapping(value = AppRoutes.Projects.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseArtifactFile(@PathVariable String artifactType,
                                             @RequestParam MultipartFile file) {
@@ -94,7 +94,7 @@ public class ParseDataFileController extends BaseController {
      * @param artifactName The name / identifier of the artifact.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
-    @GetMapping(AppRoutes.checkIfArtifactExists)
+    @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
     public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) {
         Project project = this.projectRepository.findByProjectId(projectId);
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
@@ -109,7 +109,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.parseTraceFile)
+    @PostMapping(value = AppRoutes.Projects.parseTraceFile)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();

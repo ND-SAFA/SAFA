@@ -16,7 +16,7 @@ import unit.ApplicationBaseTest;
 public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void getProjectsEmpty() throws Exception {
-        JSONObject response = sendGet(AppRoutes.projects, status().isOk());
+        JSONObject response = sendGet(AppRoutes.Projects.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
@@ -33,10 +33,10 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
         this.safaUserRepository.save(otherUser);
 
         dbEntityBuilder
-            .newProject(user, "firstProject")
-            .newProject(user, "secondProject")
+            .newProject(currentUser, "firstProject")
+            .newProject(currentUser, "secondProject")
             .newProject(otherUser, "other project");
-        JSONObject response = sendGet(AppRoutes.projects, status().isOk());
+        JSONObject response = sendGet(AppRoutes.Projects.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }
 }

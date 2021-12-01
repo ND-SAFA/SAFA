@@ -68,8 +68,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Endpoint Settings
             .authorizeRequests()
             .antMatchers(
-                AppRoutes.loginLink,
-                AppRoutes.createAccountLink,
+                AppRoutes.Accounts.loginLink,
+                AppRoutes.Accounts.createNewUser,
                 "/websocket/**").permitAll()
             .anyRequest().authenticated()
             // Authentication Filters

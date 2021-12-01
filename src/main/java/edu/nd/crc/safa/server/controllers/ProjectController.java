@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -7,19 +8,20 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.repositories.ProjectMemberRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +42,7 @@ public class ProjectController extends BaseController {
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
+                             ProjectMemberRepository projectMemberRepository,
                              SafaUserService safaUserService,
                              ProjectService projectService) {
         super(projectRepository, projectVersionRepository);
@@ -51,26 +54,24 @@ public class ProjectController extends BaseController {
      * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
      * not specified are assumed to be removed if version is specified..
      *
-     * @param project           The project entity containing artifacts, traces, name, and decriptions.
-     * @param authenticatedUser The authorized user accessing this endpoint.
+     * @param project The project entity containing artifacts, traces, name, and decriptions.
      * @return The project and associated entities created.
      * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
      *                     payload.
      */
-    @PostMapping(AppRoutes.projects)
+    @PostMapping(AppRoutes.Projects.projects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project,
-                                                Authentication authenticatedUser) throws ServerError {
+    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws ServerError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
         ProjectEntities response;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            SafaUser owner = safaUserService.getUserFromAuthentication(authenticatedUser);
-            payloadProject.setOwner(owner);
-            response = createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
+            SafaUser currentUser = safaUserService.getCurrentUser();
+            payloadProject.setOwner(currentUser);
+            response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
-            response = updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
+            response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
         return new ServerResponse(response);
@@ -79,13 +80,13 @@ public class ProjectController extends BaseController {
     /**
      * Returns list of all project identifiers present in the database.
      *
-     * @param authenticatedUser The authorized user accessing this endpoint.
      * @return List of project identifiers.
      */
-    @GetMapping(AppRoutes.projects)
-    public ServerResponse getProjects(Authentication authenticatedUser) {
-        SafaUser user = safaUserService.getUserFromAuthentication(authenticatedUser);
-        return new ServerResponse(this.projectRepository.findByOwner(user));
+    @GetMapping(AppRoutes.Projects.projects)
+    public ServerResponse getProjects() {
+        SafaUser currentUser = safaUserService.getCurrentUser();
+        List<Project> userProjects = projectService.getUserProjects(currentUser);
+        return new ServerResponse(userProjects);
     }
 
     /**
@@ -95,7 +96,7 @@ public class ProjectController extends BaseController {
      * @return String with success message.
      * @throws ServerError Throws error if project with associated id is not found.
      */
-    @DeleteMapping(AppRoutes.projectById)
+    @DeleteMapping(AppRoutes.Projects.projectById)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
         Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
@@ -107,51 +108,16 @@ public class ProjectController extends BaseController {
         }
     }
 
-    private ProjectEntities updateProjectAtVersion(Project project,
-                                                   ProjectVersion projectVersion,
-                                                   ProjectAppEntity payload) throws ServerError {
-        ProjectEntities response;
-        Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
-        persistentProject.setName(project.getName());
-        persistentProject.setDescription(project.getDescription());
-        //TODO: Update owner here.
-        this.projectRepository.save(persistentProject);
-        //TODO: Update traces
-        if (projectVersion == null) {
-            if ((payload.artifacts != null
-                && payload.artifacts.size() > 0)) {
-                throw new ServerError("Cannot update artifacts because project version not defined");
-            }
-            response = new ProjectEntities(payload, null, null, null);
-        } else if (!projectVersion.hasValidId()) {
-            throw new ServerError("Invalid Project version: must have a valid ID.");
-        } else if (!projectVersion.hasValidVersion()) {
-            throw new ServerError("Invalid Project version: must contain positive major, minor, and revision "
-                + "numbers.");
-        } else {
-            projectVersion.setProject(project);
-            this.projectVersionRepository.save(projectVersion);
-            response = this.projectService.updateProject(projectVersion, payload);
-        }
-        return response;
-    }
-
-    private ProjectEntities createNewProjectWithVersion(
-        Project project,
-        ProjectVersion projectVersion,
-        ProjectAppEntity payload) throws ServerError {
-        ProjectEntities entityCreationResponse;
-        if (projectVersion != null
-            && projectVersion.hasValidVersion()
-            && projectVersion.hasValidId()) {
-            throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
-        }
-        this.projectRepository.save(project);
-        projectVersion = createProjectVersion(project);
-        entityCreationResponse = this.projectService.saveProjectEntitiesToVersion(
-            projectVersion,
-            payload.getArtifacts(),
-            payload.getTraces());
-        return entityCreationResponse;
+    /**
+     * Adds specified user account with given email to project assigned with
+     * given role.
+     *
+     * @param request The request containing project, member to add, and their given role.
+     */
+    @PostMapping(AppRoutes.Projects.addProjectMember)
+    public void addProjectMember(@RequestBody ProjectMembershipRequest request) {
+        this.projectService.addMemberToProject(request.getProjectId(),
+            request.getMemberEmail(),
+            request.getProjectRole());
     }
 }

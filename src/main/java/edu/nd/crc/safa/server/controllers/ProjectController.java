@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -7,19 +8,20 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.repositories.ProjectMemberRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +42,7 @@ public class ProjectController extends BaseController {
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
+                             ProjectMemberRepository projectMemberRepository,
                              SafaUserService safaUserService,
                              ProjectService projectService) {
         super(projectRepository, projectVersionRepository);
@@ -79,10 +82,11 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    public ServerResponse getProjects(Authentication authenticatedUser) {
-        SafaUser user = safaUserService.getUserFromAuthentication(authenticatedUser);
-        return new ServerResponse(this.projectRepository.findByOwner(user));
     @GetMapping(AppRoutes.Projects.projects)
+    public ServerResponse getProjects() {
+        SafaUser currentUser = safaUserService.getCurrentUser();
+        List<Project> userProjects = projectService.getUserProjects(currentUser);
+        return new ServerResponse(userProjects);
     }
 
     /**
@@ -104,5 +108,14 @@ public class ProjectController extends BaseController {
         }
     }
 
+    /**
+     * Adds specified user account with given email to project assigned with
+     * given role.
+     */
+    @PostMapping(AppRoutes.Projects.addProjectMember)
+    public void addProjectMember(@RequestBody ProjectMembershipRequest request) {
+        this.projectService.addMemberToProject(request.getProjectId(),
+            request.getMemberEmail(),
+            request.getProjectRole());
     }
 }

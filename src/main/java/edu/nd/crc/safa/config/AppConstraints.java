@@ -8,18 +8,23 @@ import org.springframework.dao.DataIntegrityViolationException;
  */
 public class AppConstraints {
 
+    // Project Entities
     public static final String UNIQUE_ARTIFACT_NAME_PER_PROJECT = "UNIQUE_ARTIFACT_NAME_PER_PROJECT";
     public static final String UNIQUE_ARTIFACT_TYPE_PER_PROJECT = "UNIQUE_ARTIFACT_TYPE_PER_PROJECT";
     public static final String SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET = "SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET";
     public static final String UNIQUE_ARTIFACT_BODY_PER_VERSION = "UNIQUE_ARTIFACT_BODY_PER_VERSION";
     public static final String UNIQUE_VERSION_ID_PER_PROJECT = "UNIQUE_VERSION_ID_PER_PROJECT";
 
+    //Permissions
+    public static final String SINGLE_ROLE_PER_PROJECT = "SINGLE_ROLE_PER_PROJECT";
+
     public static final String[] registeredConstraints = new String[]{
         UNIQUE_ARTIFACT_NAME_PER_PROJECT,
         UNIQUE_ARTIFACT_TYPE_PER_PROJECT,
         SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET,
         UNIQUE_ARTIFACT_BODY_PER_VERSION,
-        UNIQUE_VERSION_ID_PER_PROJECT
+        UNIQUE_VERSION_ID_PER_PROJECT,
+        SINGLE_ROLE_PER_PROJECT
     };
 
     public static String getConstraintError(DataIntegrityViolationException e) {
@@ -45,6 +50,8 @@ public class AppConstraints {
                 return "found duplicate version of artifact.";
             case UNIQUE_VERSION_ID_PER_PROJECT:
                 return "version already exists in project.";
+            case SINGLE_ROLE_PER_PROJECT:
+                return "User already is already a member in project.";
             default:
                 throw new RuntimeException("Constrain friendly name is not defined.");
         }

@@ -16,7 +16,7 @@ public class TestProjectVersion extends ApplicationBaseTest {
     public void checkVersionIdIncremented() {
         // Step - Create project with two versions
         String projectName = "test-project";
-        dbEntityBuilder.newProject(currentUser, projectName);
+        dbEntityBuilder.newProject(projectName);
         ProjectVersion sourceVersion1 = dbEntityBuilder.newVersionWithReturn(projectName);
         ProjectVersion sourceVersion2 = dbEntityBuilder.newVersionWithReturn(projectName);
 
@@ -25,7 +25,7 @@ public class TestProjectVersion extends ApplicationBaseTest {
 
         // Step - Create another project
         String otherProjectName = "other-project";
-        dbEntityBuilder.newProject(currentUser, otherProjectName);
+        dbEntityBuilder.newProject(otherProjectName);
         ProjectVersion targetVersion1 = dbEntityBuilder.newVersionWithReturn(otherProjectName);
         ProjectVersion targetVersion2 = dbEntityBuilder.newVersionWithReturn(otherProjectName);
 

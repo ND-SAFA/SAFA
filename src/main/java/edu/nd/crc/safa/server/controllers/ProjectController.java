@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
@@ -12,9 +13,9 @@ import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -66,8 +67,6 @@ public class ProjectController extends BaseController {
 
         ProjectEntities response;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            SafaUser currentUser = safaUserService.getCurrentUser();
-            payloadProject.setOwner(currentUser);
             response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
             this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
@@ -84,8 +83,7 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.projects)
     public ServerResponse getProjects() {
-        SafaUser currentUser = safaUserService.getCurrentUser();
-        List<Project> userProjects = projectService.getUserProjects(currentUser);
+        List<Project> userProjects = projectService.getCurrentUserProjects();
         return new ServerResponse(userProjects);
     }
 
@@ -115,5 +113,21 @@ public class ProjectController extends BaseController {
         this.projectService.addMemberToProject(request.getProjectId(),
             request.getMemberEmail(),
             request.getProjectRole());
+    }
+
+    /**
+     * Returns all members belonging to given project.
+     *
+     * @param projectId The project whose members are being retrieved.
+     * @return ServerResponse containing list of project members ships
+     */
+    @GetMapping(AppRoutes.Projects.getProjectMembers)
+    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
+            .stream()
+            .map(ProjectMemberAppEntity::new)
+            .collect(Collectors.toList());
+        return new ServerResponse(projectMemberships);
     }
 }

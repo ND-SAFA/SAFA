@@ -57,6 +57,9 @@ public class ProjectMembership implements Serializable {
     @Enumerated(EnumType.STRING)
     ProjectRole role;
 
+    public ProjectMembership() {
+    }
+
     public ProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;
         this.member = member;

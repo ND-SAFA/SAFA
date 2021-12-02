@@ -107,7 +107,7 @@ public class SmokeTests extends ApplicationBaseTest {
         String sourceName = "entities";
 
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, targetType)
             .newArtifact(projectName, targetType, targetName)

@@ -32,6 +32,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         token = null;
         this.safaUserRepository.deleteAll();
         this.defaultLogin();
+        this.dbEntityBuilder.setCurrentUser(currentUser);
     }
 
     public void defaultLogin() throws Exception {

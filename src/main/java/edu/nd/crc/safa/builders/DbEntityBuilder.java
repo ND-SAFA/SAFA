@@ -9,12 +9,15 @@ import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectMembership;
+import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
@@ -37,6 +40,7 @@ public class DbEntityBuilder extends BaseBuilder {
     ArtifactRepository artifactRepository;
     ArtifactBodyRepository artifactBodyRepository;
     TraceLinkRepository traceLinkRepository;
+    ProjectMembershipRepository projectMembershipRepository;
 
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
@@ -46,19 +50,23 @@ public class DbEntityBuilder extends BaseBuilder {
 
     int revisionNumber;
 
+    SafaUser currentUser;
+
     @Autowired
     public DbEntityBuilder(ProjectRepository projectRepository,
                            ProjectVersionRepository projectVersionRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactRepository artifactRepository,
                            ArtifactBodyRepository artifactBodyRepository,
-                           TraceLinkRepository traceLinkRepository) {
+                           TraceLinkRepository traceLinkRepository,
+                           ProjectMembershipRepository projectMembershipRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.artifactBodyRepository = artifactBodyRepository;
         this.traceLinkRepository = traceLinkRepository;
+        this.projectMembershipRepository = projectMembershipRepository;
     }
 
     public void createEmptyData() {
@@ -75,13 +83,22 @@ public class DbEntityBuilder extends BaseBuilder {
         this.revisionNumber = 1;
     }
 
-    public Project newProjectWithReturn(SafaUser owner, String name) {
-        return this.newProject(owner, name).getProject(name);
+    public void setCurrentUser(SafaUser user) {
+        this.currentUser = user;
     }
 
-    public DbEntityBuilder newProject(SafaUser owner, String name) {
-        Project project = new Project(owner, name, "");
+    public Project newProjectWithReturn(String name) {
+        return this.newProject(name).getProject(name);
+    }
+
+    public DbEntityBuilder newProject(String name) {
+        return newProject(name, currentUser);
+    }
+
+    public DbEntityBuilder newProject(String name, SafaUser owner) {
+        Project project = new Project(name, "");
         this.projectRepository.save(project);
+        this.projectMembershipRepository.save(new ProjectMembership(project, owner, ProjectRole.OWNER));
         this.projects.put(name, project);
         this.projectVersions.put(name, new Hashtable<>());
         this.artifactTypes.put(name, new Hashtable<>());

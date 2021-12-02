@@ -33,9 +33,9 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
         this.safaUserRepository.save(otherUser);
 
         dbEntityBuilder
-            .newProject(currentUser, "firstProject")
-            .newProject(currentUser, "secondProject")
-            .newProject(otherUser, "other project");
+            .newProject("firstProject")
+            .newProject("secondProject")
+            .newProject("other project", otherUser);
         JSONObject response = sendGet(AppRoutes.Projects.projects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }

@@ -24,7 +24,7 @@ public class TestArtifact extends ApplicationBaseTest {
         String newArtifactName = "RE-10";
 
         // Step - Create project with artifact
-        this.dbEntityBuilder.newProject(currentUser, projectName);
+        this.dbEntityBuilder.newProject(projectName);
         ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, artifactTypeName);
         Artifact artifact = dbEntityBuilder.newArtifactWithReturn(projectName, artifactTypeName, artifactName);
 

@@ -21,7 +21,7 @@ public class TestArtifactType extends ApplicationBaseTest {
         String altArtifactTypeName = "Requirements";
 
         // Step - Create project with new artifact type
-        this.dbEntityBuilder.newProject(currentUser, projectName);
+        this.dbEntityBuilder.newProject(projectName);
         ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, artifactTypeName);
 
         // VP - Artifact type created

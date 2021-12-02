@@ -123,16 +123,24 @@ function createNodeFooter(data: ArtifactData): string {
     data.warnings = [
       { ruleName: "Very Long Rule Name", ruleMessage: "message" },
     ];
+    data.childWarnings = [{ ruleName: "Child Rule", ruleMessage: "message" }];
   }
 
-  const displayWarning = !!data.warnings?.length;
   const displayChildren = !!data.hiddenChildren;
-  const message = data.warnings?.[0]?.ruleName || "Warning";
+  let displayWarning = !!data.warnings?.length;
+  let message = data.warnings?.[0]?.ruleName || "Warning";
+  let warningCount = data.warnings?.length || 0;
+
+  if (displayChildren) {
+    displayWarning ||= !!data.childWarnings?.length;
+    message = data.childWarnings?.[0]?.ruleName || message;
+    warningCount += data.childWarnings?.length || 0;
+  }
 
   const warning = `
     <div class="d-flex flex-grow-1 px-1 warning-text">
       <span class="material-icons md-18 pr-1">warning</span>
-      <span class="artifact-footer-text">${message}</span>
+      <span class="artifact-footer-text">(${warningCount}) ${message}</span>
     </div>
   `;
 
@@ -160,24 +168,20 @@ function createNodeFooter(data: ArtifactData): string {
  */
 function createNodeStoplight(data: ArtifactData): string {
   if (TEST_MODE) {
-    data.childrenDeltaStates = [
+    data.childDeltaStates = [
       ArtifactDeltaState.ADDED,
       ArtifactDeltaState.REMOVED,
       ArtifactDeltaState.MODIFIED,
     ];
   }
 
-  if (!data.childrenDeltaStates?.length) return "";
+  if (!data.childDeltaStates?.length) return "";
 
-  const renderAdded = data.childrenDeltaStates.includes(
-    ArtifactDeltaState.ADDED
-  );
-  const renderRemoved = data.childrenDeltaStates.includes(
+  const renderAdded = data.childDeltaStates.includes(ArtifactDeltaState.ADDED);
+  const renderRemoved = data.childDeltaStates.includes(
     ArtifactDeltaState.REMOVED
   );
-  const renderMod = data.childrenDeltaStates.includes(
-    ArtifactDeltaState.MODIFIED
-  );
+  const renderMod = data.childDeltaStates.includes(ArtifactDeltaState.MODIFIED);
 
   return `
     <div class="d-flex artifact-stoplight">

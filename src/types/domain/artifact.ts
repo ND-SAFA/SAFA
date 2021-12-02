@@ -67,7 +67,11 @@ export interface ArtifactData extends CytoCoreElementData {
   /**
    * TODO: The delta states of any hidden children.
    */
-  childrenDeltaStates?: ArtifactDeltaState[];
+  childDeltaStates?: ArtifactDeltaState[];
+  /**
+   * TODO: any warnings in child elements.
+   */
+  childWarnings?: ArtifactWarning[];
 }
 
 /**

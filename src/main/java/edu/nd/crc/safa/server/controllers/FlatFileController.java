@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.Arrays;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
@@ -15,7 +16,6 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
-import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
@@ -45,14 +45,14 @@ public class FlatFileController extends BaseController {
     @Autowired
     public FlatFileController(ProjectService projectService,
                               ProjectRepository projectRepository,
-                              PermissionService permissionService,
                               ProjectVersionRepository projectVersionRepository,
+                              ResourceBuilder resourceBuilder,
                               FileUploadService fileUploadService,
                               RevisionNotificationService revisionNotificationService,
                               FlatFileService flatFileParser,
                               ProjectRetrievalService projectRetrievalService,
                               SafaUserService safaUserService) {
-        super(projectRepository, projectVersionRepository, permissionService);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
         this.revisionNotificationService = revisionNotificationService;
         this.fileUploadService = fileUploadService;
@@ -77,9 +77,8 @@ public class FlatFileController extends BaseController {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        this.permissionService.requireEditPermission(project);
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,

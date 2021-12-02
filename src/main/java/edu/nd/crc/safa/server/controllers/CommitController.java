@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
@@ -15,7 +16,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
-import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
@@ -41,12 +41,12 @@ public class CommitController extends BaseController {
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
-                            PermissionService permissionService,
+                            ResourceBuilder resourceBuilder,
                             TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
-        super(projectRepository, projectVersionRepository, permissionService);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;
@@ -63,8 +63,7 @@ public class CommitController extends BaseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        this.permissionService.requireEditPermission(projectVersion.getProject());
+        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
         commitArtifacts(projectVersion, projectCommit.getArtifacts());
         commitTraces(projectVersion, projectCommit.getTraces());
     }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
@@ -24,7 +25,6 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.PermissionService;
 
 import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
@@ -53,11 +53,11 @@ public class ParseDataFileController extends BaseController {
     @Autowired
     public ParseDataFileController(ProjectRepository projectRepository,
                                    ProjectVersionRepository projectVersionRepository,
-                                   PermissionService permissionService,
+                                   ResourceBuilder resourceBuilder,
                                    ArtifactRepository artifactRepository,
                                    ArtifactFileParser artifactFileParser,
                                    TraceFileParser traceFileParser) {
-        super(projectRepository, projectVersionRepository, permissionService);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.artifactRepository = artifactRepository;
         this.artifactFileParser = artifactFileParser;
         this.traceFileParser = traceFileParser;
@@ -99,8 +99,7 @@ public class ParseDataFileController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
     public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) throws ServerError {
-        Project project = this.projectRepository.findByProjectId(projectId);
-        this.permissionService.requireViewPermission(project);
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
         Map<String, Boolean> response = new HashMap<>();
         response.put("artifactExists", artifactQuery.isPresent());

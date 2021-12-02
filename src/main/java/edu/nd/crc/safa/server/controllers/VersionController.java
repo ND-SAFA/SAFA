@@ -1,8 +1,9 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -12,7 +13,6 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
@@ -36,22 +36,20 @@ public class VersionController extends BaseController {
     VersionService versionService;
     ProjectService projectService;
     ProjectRetrievalService projectRetrievalService;
-    PermissionService permissionService;
 
     @Autowired
     public VersionController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
-                             PermissionService permissionService,
+                             ResourceBuilder resourceBuilder,
                              Puller mPuller,
                              VersionService versionService,
                              ProjectService projectService,
                              ProjectRetrievalService projectRetrievalService) {
-        super(projectRepository, projectVersionRepository, permissionService);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.mPuller = mPuller;
         this.versionService = versionService;
         this.projectService = projectService;
         this.projectRetrievalService = projectRetrievalService;
-        this.permissionService = permissionService;
     }
 
     /**
@@ -62,10 +60,10 @@ public class VersionController extends BaseController {
      * @throws ServerError Throws error if project with ID is not found.
      */
     @GetMapping(AppRoutes.Projects.getVersions)
-    public ServerResponse getVersions(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        this.permissionService.requireViewPermission(project);
-        return new ServerResponse(versionService.getProjectVersions(project));
+    public ServerResponse getVersions(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        List<ProjectVersion> projectVersionList = versionService.getProjectVersions(project);
+        return new ServerResponse(projectVersionList);
     }
 
     /**
@@ -76,10 +74,10 @@ public class VersionController extends BaseController {
      * @throws ServerError Throws error if not project if found with associated id.
      */
     @GetMapping(AppRoutes.Projects.getCurrentVersion)
-    public ServerResponse getCurrentVersion(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        this.permissionService.requireViewPermission(project);
-        return new ServerResponse(versionService.getCurrentVersion(project));
+    public ServerResponse getCurrentVersion(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        ProjectVersion projectVersion = versionService.getCurrentVersion(project);
+        return new ServerResponse(projectVersion);
     }
 
     /**
@@ -91,9 +89,8 @@ public class VersionController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createNewMajorVersion)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewMajorVersion(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        this.permissionService.requireEditPermission(project);
+    public ServerResponse createNewMajorVersion(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         ProjectVersion nextVersion = versionService.createNewMajorVersion(project);
         return new ServerResponse(nextVersion);
     }
@@ -107,9 +104,8 @@ public class VersionController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createNewMinorVersion)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewMinorVersion(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        this.permissionService.requireEditPermission(project);
+    public ServerResponse createNewMinorVersion(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         ProjectVersion nextVersion = versionService.createNewMinorVersion(project);
         return new ServerResponse(nextVersion);
     }
@@ -123,9 +119,8 @@ public class VersionController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createNewRevisionVersion)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewRevisionVersion(@PathVariable String projectId) throws ServerError {
-        Project project = getProject(projectId);
-        this.permissionService.requireEditPermission(project);
+    public ServerResponse createNewRevisionVersion(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         ProjectVersion nextVersion = versionService.createNextRevision(project);
         return new ServerResponse(nextVersion);
     }
@@ -139,15 +134,9 @@ public class VersionController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws ServerError {
-        Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
-        if (versionQuery.isPresent()) {
-            ProjectVersion projectVersion = versionQuery.get();
-            this.permissionService.requireEditPermission(projectVersion.getProject());
-            this.projectVersionRepository.delete(projectVersion);
-            return new ServerResponse("Project version deleted successfully");
-        } else {
-            throw new ServerError("Could not find version with id:" + versionId);
-        }
+        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
+        this.projectVersionRepository.delete(projectVersion);
+        return new ServerResponse("Project version deleted successfully");
     }
 
     /**
@@ -159,16 +148,9 @@ public class VersionController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
-        Optional<ProjectVersion> versionQuery = this.projectVersionRepository.findById(versionId);
-
-        if (versionQuery.isPresent()) {
-            ProjectVersion projectVersion = versionQuery.get();
-            this.permissionService.requireViewPermission(projectVersion.getProject());
-            ProjectEntities response = this.projectRetrievalService
-                .retrieveAndCreateProjectResponse(projectVersion);
-            return new ServerResponse(response);
-        } else {
-            throw new ServerError("Could not find version with id: " + versionId);
-        }
+        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withViewVersion();
+        ProjectEntities response = this.projectRetrievalService
+            .retrieveAndCreateProjectResponse(projectVersion);
+        return new ServerResponse(response);
     }
 }

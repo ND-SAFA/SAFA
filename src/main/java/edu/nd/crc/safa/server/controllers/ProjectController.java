@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -17,7 +17,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.PermissionService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +37,16 @@ public class ProjectController extends BaseController {
 
     private final SafaUserService safaUserService;
     private final ProjectService projectService;
-    private final PermissionService permissionService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
-                             PermissionService permissionService,
+                             ResourceBuilder resourceBuilder,
                              SafaUserService safaUserService,
                              ProjectService projectService) {
-        super(projectRepository, projectVersionRepository, permissionService);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.safaUserService = safaUserService;
         this.projectService = projectService;
-        this.permissionService = permissionService;
     }
 
     /**
@@ -73,8 +70,7 @@ public class ProjectController extends BaseController {
             payloadProject.setOwner(currentUser);
             response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
-            Project persistedProject = this.projectRepository.findByProjectId(payloadProject.getProjectId());
-            this.permissionService.requireEditPermission(persistedProject);
+            this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
             response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
@@ -102,16 +98,10 @@ public class ProjectController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.projectById)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
-        Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
-        if (projectQuery.isPresent()) {
-            Project project = projectQuery.get();
-            this.permissionService.requireEditPermission(project);
-            this.projectRepository.delete(projectQuery.get());
-            return new ServerResponse("Project deleted successfully");
-        } else {
-            throw new ServerError("Could not find project with id" + projectId);
-        }
+    public ServerResponse deleteProject(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        this.projectRepository.delete(project);
+        return new ServerResponse("Project deleted successfully");
     }
 
     /**

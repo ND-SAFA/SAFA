@@ -2,7 +2,6 @@ package edu.nd.crc.safa.server.services;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
@@ -176,16 +175,15 @@ public class ProjectService {
     /**
      * Finds and adds given member to project with specified role.
      *
-     * @param projectId      The project the member is being added to.
+     * @param project        The project to add the member to.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
      * @throws ServerError Throws error if given role is greater than the role
      *                     of the user issuing this request.
      */
-    public void addMemberToProject(UUID projectId,
+    public void addMemberToProject(Project project,
                                    String newMemberEmail,
                                    ProjectRole newMemberRole) throws ServerError {
-        Project project = this.projectRepository.findByProjectId(projectId);
         SafaUser newMember = this.safaUserRepository.findByEmail(newMemberEmail);
         SafaUser currentUser = this.safaUserService.getCurrentUser();
 

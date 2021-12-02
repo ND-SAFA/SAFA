@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
+import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -51,10 +53,11 @@ public class ParseDataFileController extends BaseController {
     @Autowired
     public ParseDataFileController(ProjectRepository projectRepository,
                                    ProjectVersionRepository projectVersionRepository,
+                                   ResourceBuilder resourceBuilder,
                                    ArtifactRepository artifactRepository,
                                    ArtifactFileParser artifactFileParser,
                                    TraceFileParser traceFileParser) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.artifactRepository = artifactRepository;
         this.artifactFileParser = artifactFileParser;
         this.traceFileParser = traceFileParser;
@@ -95,8 +98,9 @@ public class ParseDataFileController extends BaseController {
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
-    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) {
-        Project project = this.projectRepository.findByProjectId(projectId);
+    public ServerResponse checkIfNameExists(@PathVariable UUID projectId,
+                                            @PathVariable String artifactName) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
         Map<String, Boolean> response = new HashMap<>();
         response.put("artifactExists", artifactQuery.isPresent());

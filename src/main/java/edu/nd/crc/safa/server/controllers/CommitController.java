@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
@@ -40,27 +41,35 @@ public class CommitController extends BaseController {
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
+                            ResourceBuilder resourceBuilder,
                             TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;
     }
 
+    /**
+     * Saves given entities to specified project version.
+     *
+     * @param versionId     The id of the version to commit to.
+     * @param projectCommit The entities to commit.
+     * @throws ServerError Throws error if user does not have edit permissions on project.
+     */
     @PostMapping(AppRoutes.Projects.commitChange)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {
-        commitArtifacts(versionId, projectCommit.getArtifacts());
-        commitTraces(versionId, projectCommit.getTraces());
+        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
+        commitArtifacts(projectVersion, projectCommit.getArtifacts());
+        commitTraces(projectVersion, projectCommit.getTraces());
     }
 
-    private void commitArtifacts(UUID versionId, ProjectChange<ArtifactAppEntity> artifacts) throws ServerError {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-
+    private void commitArtifacts(ProjectVersion projectVersion,
+                                 ProjectChange<ArtifactAppEntity> artifacts) throws ServerError {
         List<ArtifactAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
@@ -69,17 +78,17 @@ public class CommitController extends BaseController {
             this.artifactVersionService.setArtifactAtProjectVersion(projectVersion, artifact);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
-            this.artifactVersionService.deleteArtifactBody(versionId, artifact.name);
+            this.artifactVersionService.deleteArtifactBody(projectVersion, artifact.name);
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
     }
 
-    private void commitTraces(UUID versionId, ProjectChange<TraceAppEntity> traces) throws ServerError {
+    private void commitTraces(ProjectVersion projectVersion, ProjectChange<TraceAppEntity> traces) throws ServerError {
         for (TraceAppEntity trace : traces.getAdded()) {
-            traceLinkService.createNewTraceLInk(versionId, trace.source, trace.target);
+            traceLinkService.createNewTraceLInk(projectVersion, trace.source, trace.target);
         }
         for (TraceAppEntity trace : traces.getModified()) {
-            traceLinkService.updateTraceLink(versionId, trace);
+            traceLinkService.updateTraceLink(trace);
         }
         for (TraceAppEntity trace : traces.getRemoved()) {
             traceLinkService.deleteTraceLink(trace);

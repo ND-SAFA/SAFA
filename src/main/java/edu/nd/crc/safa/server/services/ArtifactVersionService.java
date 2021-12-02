@@ -114,14 +114,13 @@ public class ArtifactVersionService {
     /**
      * Deletes artifact with given name within given project.
      *
-     * @param versionId    UUID of versionId of associated project version.
-     * @param artifactName The name of the artifact to be deleted.
+     * @param projectVersion The version to record the deletion happening in.
+     * @param artifactName   The name of the artifact to be deleted.
      * @return ServerResponse with success message.
      */
     public ServerResponse deleteArtifactBody(
-        UUID versionId,
+        ProjectVersion projectVersion,
         String artifactName) {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion,
             artifactName);
         bodyToRemove.ifPresentOrElse(artifactBody -> {

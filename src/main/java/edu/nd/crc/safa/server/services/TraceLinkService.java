@@ -23,7 +23,6 @@ import edu.nd.crc.safa.utilities.TraceLinkFinder;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Provides interface to validating and creating trace links.
@@ -147,16 +146,15 @@ public class TraceLinkService {
     /**
      * Creates a trace link between specified sourceId and target artifact ids at given version.
      *
-     * @param versionId UUID of the project version that will be marked with the new trace link.
-     * @param sourceId  UUID of source artifact.
-     * @param targetId  UUID of target artifact.
+     * @param projectVersion ProjectVersion that will be marked with the new trace link.
+     * @param sourceId       UUID of source artifact.
+     * @param targetId       UUID of target artifact.
      * @return TraceApplicationEntity representing the created entity.
      * @throws ServerError Throws error if either project version, source, or target artifact not found.
      */
-    public ServerResponse createNewTraceLInk(@PathVariable UUID versionId,
-                                             @PathVariable String sourceId,
-                                             @PathVariable String targetId) throws ServerError {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+    public ServerResponse createNewTraceLInk(ProjectVersion projectVersion,
+                                             String sourceId,
+                                             String targetId) throws ServerError {
         Pair<TraceLink, String> creationResponse = this.createTrace(projectVersion, sourceId,
             targetId);
         if (creationResponse.getValue1() != null) {
@@ -172,11 +170,10 @@ public class TraceLinkService {
      * Retrieves the corresponding trace link in given version and updates information
      * to given application state.
      *
-     * @param baselineVersionId The id of the version the change was made in.
-     * @param traceAppEntity    The trace being updated.
+     * @param traceAppEntity The trace being updated.
      * @throws ServerError Throws error if version not found.
      */
-    public void updateTraceLink(UUID baselineVersionId, TraceAppEntity traceAppEntity) throws ServerError {
+    public void updateTraceLink(TraceAppEntity traceAppEntity) throws ServerError {
         TraceLink traceLink = getEntity(traceAppEntity);
         traceLink.setApprovalStatus(traceAppEntity.approvalStatus);
         this.traceLinkRepository.save(traceLink);

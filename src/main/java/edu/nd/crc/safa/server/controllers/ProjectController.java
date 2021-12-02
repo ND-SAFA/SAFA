@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -15,7 +15,6 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.ProjectMemberRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -42,10 +41,10 @@ public class ProjectController extends BaseController {
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
-                             ProjectMemberRepository projectMemberRepository,
+                             ResourceBuilder resourceBuilder,
                              SafaUserService safaUserService,
                              ProjectService projectService) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.safaUserService = safaUserService;
         this.projectService = projectService;
     }
@@ -71,6 +70,7 @@ public class ProjectController extends BaseController {
             payloadProject.setOwner(currentUser);
             response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
+            this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
             response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
@@ -98,14 +98,10 @@ public class ProjectController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.projectById)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
-        Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
-        if (projectQuery.isPresent()) {
-            this.projectRepository.delete(projectQuery.get());
-            return new ServerResponse("Project deleted successfully");
-        } else {
-            throw new ServerError("Could not find project with id" + projectId);
-        }
+    public ServerResponse deleteProject(@PathVariable UUID projectId) throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        this.projectRepository.delete(project);
+        return new ServerResponse("Project deleted successfully");
     }
 
     /**
@@ -115,7 +111,7 @@ public class ProjectController extends BaseController {
      * @param request The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.addProjectMember)
-    public void addProjectMember(@RequestBody ProjectMembershipRequest request) {
+    public void addProjectMember(@RequestBody ProjectMembershipRequest request) throws ServerError {
         this.projectService.addMemberToProject(request.getProjectId(),
             request.getMemberEmail(),
             request.getProjectRole());

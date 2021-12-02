@@ -1,12 +1,9 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -26,12 +23,15 @@ public abstract class BaseController {
 
     protected ProjectVersionRepository projectVersionRepository;
     protected ProjectRepository projectRepository;
+    protected ResourceBuilder resourceBuilder;
 
     @Autowired
     public BaseController(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository) {
+                          ProjectVersionRepository projectVersionRepository,
+                          ResourceBuilder resourceBuilder) {
         this.projectVersionRepository = projectVersionRepository;
         this.projectRepository = projectRepository;
+        this.resourceBuilder = resourceBuilder;
     }
 
     @ExceptionHandler(ServerError.class)
@@ -71,14 +71,6 @@ public abstract class BaseController {
         ex.printStackTrace();
         ServerError wrapper = new ServerError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
-    }
-
-    protected Project getProject(String projectId) throws ServerError {
-        Optional<Project> queriedProject = this.projectRepository.findById(UUID.fromString(projectId));
-        if (queriedProject.isEmpty()) {
-            throw new ServerError("Could not find project with id:" + projectId);
-        }
-        return queriedProject.get();
     }
 
     private String createValidationMessage(ObjectError error) {

@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -27,8 +27,9 @@ public class DeltaController extends BaseController {
     @Autowired
     public DeltaController(ProjectRepository projectRepository,
                            ProjectVersionRepository projectVersionRepository,
+                           ResourceBuilder resourceBuilder,
                            DeltaService deltaService) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.deltaService = deltaService;
     }
 
@@ -43,15 +44,8 @@ public class DeltaController extends BaseController {
     @GetMapping(AppRoutes.Projects.calculateProjectDelta)
     public ServerResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                                 @PathVariable UUID targetVersionId) throws ServerError {
-
-        Optional<ProjectVersion> sourceQuery = this.projectVersionRepository.findById(baselineVersionId);
-        if (!sourceQuery.isPresent()) {
-            throw new ServerError("Source version with id not found: " + baselineVersionId);
-        }
-        Optional<ProjectVersion> targetQuery = this.projectVersionRepository.findById(targetVersionId);
-        if (!targetQuery.isPresent()) {
-            throw new ServerError("Target version with id not found: " + targetVersionId);
-        }
-        return new ServerResponse(this.deltaService.calculateProjectDelta(sourceQuery.get(), targetQuery.get()));
+        ProjectVersion baselineVersion = this.resourceBuilder.getProjectVersion(baselineVersionId).withViewVersion();
+        ProjectVersion targetVersion = this.resourceBuilder.getProjectVersion(targetVersionId).withViewVersion();
+        return new ServerResponse(this.deltaService.calculateProjectDelta(baselineVersion, targetVersion));
     }
 }

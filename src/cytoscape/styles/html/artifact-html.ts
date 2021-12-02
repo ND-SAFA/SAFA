@@ -1,6 +1,10 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import {
+  ARTIFACT_ADDED_COLOR,
+  ARTIFACT_BACKGROUND_COLOR,
   ARTIFACT_HEIGHT,
+  ARTIFACT_MODIFIED_COLOR,
+  ARTIFACT_REMOVED_COLOR,
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { capitalize } from "@/util";
@@ -208,12 +212,27 @@ function wrapInNodeContainer(
   width: number,
   height: number
 ): string {
+  const backgroundColor = getBackgroundColor(data.artifactDeltaState);
+  const style = `width:${width}px;height:${height}px;opacity:${data.opacity};background-color: ${backgroundColor}`;
   return `
     <div 
       class="artifact-container" 
-      style="width:${width}px;height:${height}px;opacity:${data.opacity}"
+      style="${style}"
     >
       ${elements.join("\n")}
     </div>
   `;
+}
+
+function getBackgroundColor(deltaState: ArtifactDeltaState): string {
+  switch (deltaState) {
+    case ArtifactDeltaState.ADDED:
+      return ARTIFACT_ADDED_COLOR;
+    case ArtifactDeltaState.REMOVED:
+      return ARTIFACT_REMOVED_COLOR;
+    case ArtifactDeltaState.MODIFIED:
+      return ARTIFACT_MODIFIED_COLOR;
+    default:
+      return ARTIFACT_BACKGROUND_COLOR;
+  }
 }

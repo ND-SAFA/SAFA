@@ -6,7 +6,7 @@ import {
   ARTIFACT_HEIGHT,
   ARTIFACT_MODIFIED_COLOR,
   ARTIFACT_PADDING,
-  ARTIFACT_REMOVED_COLOR as NODE_REMOVED_COLOR,
+  ARTIFACT_REMOVED_COLOR,
   ARTIFACT_SHAPE,
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_COLOR,
@@ -18,7 +18,6 @@ import {
   TRACE_WIDTH,
   GENERATED_TRACE_COLOR,
 } from "@/cytoscape/styles/config/trace";
-import { ArtifactDeltaState } from "@/types/domain";
 import { CytoStyleSheet } from "@/types/cytoscape";
 import { Stylesheet } from "cytoscape";
 
@@ -78,24 +77,6 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     style: {
       "border-color": ARTIFACT_SELECTED_COLOR,
       "border-width": ARTIFACT_SELECTED_BORDER_WIDTH,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.ADDED}"]`,
-    style: {
-      "background-color": ARTIFACT_ADDED_COLOR,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.REMOVED}"]`,
-    style: {
-      "background-color": NODE_REMOVED_COLOR,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.MODIFIED}"]`,
-    style: {
-      "background-color": ARTIFACT_MODIFIED_COLOR,
     },
   },
   {

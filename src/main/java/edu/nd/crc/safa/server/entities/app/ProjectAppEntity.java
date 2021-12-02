@@ -46,6 +46,7 @@ public class ProjectAppEntity {
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
         this.name = project.getName();
+        this.description = project.getDescription();
         this.artifacts = artifacts;
         this.traces = traces;
     }

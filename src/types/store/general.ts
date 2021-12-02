@@ -55,3 +55,8 @@ export enum ConfirmationType {
   INFO = "info",
   CLEAR = "clear",
 }
+
+/**
+ * General type for representing an empty callback
+ */
+export type EmptyLambda = () => void;

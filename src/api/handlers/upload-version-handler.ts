@@ -1,4 +1,4 @@
-import { ProjectIdentifier, ProjectVersion } from "@/types";
+import { EmptyLambda, ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
 import { ProjectCreationResponse } from "@/types";
@@ -20,9 +20,9 @@ export async function uploadNewProjectVersion(
   selectedVersion: ProjectVersion | undefined,
   selectedFiles: File[],
   setVersionIfSuccessful: boolean,
-  onLoadStart: () => void,
-  onLoadEnd: () => void,
-  onFinally: () => void
+  onLoadStart: EmptyLambda,
+  onLoadEnd: EmptyLambda,
+  onFinally: EmptyLambda
 ): Promise<void> {
   if (selectedProject === undefined) {
     appModule.onWarning("Please select a project to update");

@@ -1,5 +1,6 @@
 import { NodeSingular, NodeCollection, EventObject } from "cytoscape";
 import { CytoEvent } from "@/types/cytoscape";
+import { EmptyLambda } from "@/types";
 
 /**
  * Types were manually constructed from: https://github.com/cytoscape/cytoscape.js-automove
@@ -54,7 +55,7 @@ type NodePositioningFunction = (node: NodeSingular) => NodePosition;
 /**
  * Run when an update is made.
  */
-type UpdateHandler = (update: () => void) => void;
+type UpdateHandler = (update: EmptyLambda) => void;
 
 /**
  * Defines the options for auto moving a node.

@@ -1,4 +1,4 @@
-import { Artifact } from "@/types";
+import { Artifact, EmptyLambda } from "@/types";
 import { TraceLink } from "@/types";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 
@@ -11,11 +11,6 @@ export enum ButtonType {
   CHECKMARK_MENU = "checkmarkmenu",
   LIST_MENU = "listmenu",
 }
-
-/**
- * Defines an empty handler.
- */
-type EmptyHandler = () => void;
 
 /**
  * Defines a general button definition.
@@ -40,7 +35,7 @@ export interface BaseButtonDefinition {
  */
 export interface IconDefinition extends BaseButtonDefinition {
   type: ButtonType.ICON;
-  handler?: EmptyHandler;
+  handler?: EmptyLambda;
   icon?: string;
 }
 
@@ -49,7 +44,7 @@ export interface IconDefinition extends BaseButtonDefinition {
  */
 interface MenuDefinition extends BaseButtonDefinition {
   menuItems?: string[];
-  menuHandlers?: EmptyHandler[];
+  menuHandlers?: EmptyLambda[];
   buttonIsText?: boolean;
   itemColor?: string;
   showSelectedValue?: boolean;

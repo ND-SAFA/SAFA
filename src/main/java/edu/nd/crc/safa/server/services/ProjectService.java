@@ -210,7 +210,7 @@ public class ProjectService {
 
     public void setCurrentUserAsOwner(Project project) {
         SafaUser user = this.safaUserService.getCurrentUser();
-        ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.ADMIN);
+        ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);
         this.projectMembershipRepository.save(projectMembership);
     }
 }

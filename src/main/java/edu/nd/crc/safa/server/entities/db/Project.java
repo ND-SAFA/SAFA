@@ -27,10 +27,10 @@ public class Project implements Serializable {
     @Column(name = "project_id")
     UUID projectId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     String name;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     String description;
 
     public Project() {

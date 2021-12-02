@@ -1,15 +1,11 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import {
-  ARTIFACT_ADDED_COLOR,
-  ARTIFACT_BACKGROUND_COLOR,
   ARTIFACT_HEIGHT,
-  ARTIFACT_MODIFIED_COLOR,
-  ARTIFACT_REMOVED_COLOR,
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact-tree-config";
-import { capitalize } from "@/util";
+import { capitalize, ThemeColors } from "@/util";
 
-const TEST_MODE = false;
+const TEST_MODE = true;
 
 export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",
@@ -72,7 +68,7 @@ function createNodeHtml(
  */
 function createNodeHeader(data: ArtifactData, height: number): string {
   return `
-    <strong class="artifact-header" style="height:${height}px">
+    <strong class="artifact-header text-body-1" style="height:${height}px">
       ${capitalize(data.artifactType)}
     </strong>
   `;
@@ -88,7 +84,7 @@ function createNodeHeader(data: ArtifactData, height: number): string {
  */
 function createNodeSubHeader(data: ArtifactData, height: number): string {
   return `
-    <span class="artifact-sub-header" style="height:${height}px">
+    <span class="artifact-sub-header text-body-1" style="height:${height}px">
       ${data.id}
     </span>
   `;
@@ -104,14 +100,14 @@ function createNodeSubHeader(data: ArtifactData, height: number): string {
  */
 function createNodeBody(data: ArtifactData, height: number): string {
   const hasFooter = !!(data.warnings?.length || data.hiddenChildren);
-  const truncateLength = hasFooter ? 90 : 145;
+  const truncateLength = hasFooter ? 100 : 150;
 
   const body =
     data.body.length > truncateLength
       ? data.body.slice(0, truncateLength) + "..."
       : data.body;
 
-  return `<span class="artifact-body" style="height:${height}px">${body}</span>`;
+  return `<span class="text-body-2 artifact-body" style="height:${height}px">${body}</span>`;
 }
 
 /**
@@ -142,16 +138,18 @@ function createNodeFooter(data: ArtifactData): string {
   }
 
   const warning = `
-    <div class="d-flex flex-grow-1 px-1 warning-text">
+    <div class="d-flex flex-grow-1 px-1 warning-text text-body-1">
       <span class="material-icons md-18 pr-1">warning</span>
       <span class="artifact-footer-text">(${warningCount}) ${message}</span>
     </div>
   `;
 
   const hiddenChildren = `
-    <div class="d-flex flex-grow-1 pr-1">
+    <div class="d-flex flex-grow-1 pr-1 text-body-1">
       <span class="material-icons md-18">expand_more</span>
-      <span>${data.hiddenChildren} ${displayWarning ? "" : "Hidden"}</span>
+      <span>
+        ${data.hiddenChildren} ${displayWarning ? "" : "Hidden"}
+      </span>
     </div>
   `;
 
@@ -227,12 +225,12 @@ function wrapInNodeContainer(
 function getBackgroundColor(deltaState: ArtifactDeltaState): string {
   switch (deltaState) {
     case ArtifactDeltaState.ADDED:
-      return ARTIFACT_ADDED_COLOR;
+      return ThemeColors.artifactAdded;
     case ArtifactDeltaState.REMOVED:
-      return ARTIFACT_REMOVED_COLOR;
+      return ThemeColors.artifactRemoved;
     case ArtifactDeltaState.MODIFIED:
-      return ARTIFACT_MODIFIED_COLOR;
+      return ThemeColors.artifactModified;
     default:
-      return ARTIFACT_BACKGROUND_COLOR;
+      return ThemeColors.artifactDefault;
   }
 }

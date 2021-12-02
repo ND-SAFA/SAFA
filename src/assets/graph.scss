@@ -1,24 +1,34 @@
+$color-warning: #EEBC3D;
+$color-added: #81c784;
+$color-removed: #e57373;
+$color-modified: #64b5f6;
+$color-border: #888888;
+$border-radius: 8px;
+
 .artifact-container {
   display: flex;
   flex-direction: column;
   white-space: nowrap;
   overflow: hidden;
+  border-radius: $border-radius;
 }
 
 .artifact-header {
   text-align: center;
-  border-bottom: 2px solid black;
+  border-bottom: 1px solid $color-border;
+  margin: 0 5px;
 }
+
 .artifact-sub-header {
   text-align: center;
 }
 
 .artifact-body {
-  padding: 0px 5px 5px 5px;
+  padding: 0 5px 5px 5px;
   text-align: center;
   white-space: initial;
   flex-grow: 1;
-  line-height: 1;
+  line-height: 1 !important;
 }
 
 .artifact-footer {
@@ -29,8 +39,12 @@
   width: 100%;
 
   & > * {
-    border: 1px solid black;
     justify-content: center;
+  }
+
+  & > :nth-child(2) {
+    border-top-left-radius: $border-radius;
+
   }
 
   & > div > span {
@@ -39,29 +53,40 @@
   }
 
   .warning-text {
-    border: 1px solid black;
     overflow: hidden;
-    background-color: #EEBC3D;
+    background-color: $color-warning;
   }
 }
 
 .artifact-stoplight {
   height: 10px;
+  //padding: 0.5px;
 
   & > * {
-    border: 1px solid black;
+    border-bottom: 1px solid $color-border;
+    border-top: 1px solid $color-border;
+  }
+
+  & > :first-child {
+    border-left: 1px solid $color-border;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  & > :last-child {
+    border-right: 1px solid $color-border;
+    border-bottom-right-radius: $border-radius;
   }
 
   .artifact-added {
-    background: #81c784;
+    background: $color-added;
   }
 
   .artifact-removed {
-    background: #e57373;
+    background: $color-removed;
   }
 
   .artifact-modified {
-    background: #64b5f6;
+    background: $color-modified;
   }
 }
 

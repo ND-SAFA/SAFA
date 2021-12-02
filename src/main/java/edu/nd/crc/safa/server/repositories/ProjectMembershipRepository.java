@@ -15,5 +15,7 @@ import org.springframework.stereotype.Repository;
 public interface ProjectMembershipRepository extends CrudRepository<ProjectMembership, UUID> {
     List<ProjectMembership> findByMember(SafaUser user);
 
+    List<ProjectMembership> findByProject(Project project);
+
     Optional<ProjectMembership> findByProjectAndMember(Project project, SafaUser user);
 }

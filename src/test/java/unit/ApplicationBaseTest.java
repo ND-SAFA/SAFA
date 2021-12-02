@@ -45,7 +45,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
 
     public ProjectVersion createProjectWithNewVersion(String projectName) {
         return dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject( projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
     }

@@ -19,7 +19,7 @@ public class TestProject extends ApplicationBaseTest {
         String altProjectName = "some_other_project";
 
         // Step - Create Project
-        dbEntityBuilder.newProject(currentUser, projectName);
+        dbEntityBuilder.newProject(projectName);
         Project project = dbEntityBuilder.getProject(projectName);
 
         // VP - Retrieve project and verify name

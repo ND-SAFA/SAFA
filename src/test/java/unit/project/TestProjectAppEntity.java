@@ -25,7 +25,7 @@ public class TestProjectAppEntity extends ApplicationBaseTest {
 
         // Step - Create project containing single artifact
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, existingArtifactName);
 

@@ -36,7 +36,7 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
         String contentTwo = "no words in common";
 
         // Step - Create project with source and target types
-        dbEntityBuilder.newProject(currentUser, projectName);
+        dbEntityBuilder.newProject(projectName);
         ProjectVersion projectVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         ArtifactType sourceType = dbEntityBuilder.newTypeAndReturn(projectName, sourceTypeName);
         ArtifactType targetType = dbEntityBuilder.newTypeAndReturn(projectName, targetTypeName);

@@ -20,7 +20,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void attemptNewRevisionWithoutVersions() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProjectWithReturn(currentUser, projectName);
+            .newProjectWithReturn(projectName);
         String routeName =
             RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
@@ -31,7 +31,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createFirstVersionThroughRevision() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName =
@@ -52,7 +52,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMinorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMinorVersion).withProject(project).get();
@@ -72,7 +72,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
     public void createNewMajorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMajorVersion).withProject(project).get();

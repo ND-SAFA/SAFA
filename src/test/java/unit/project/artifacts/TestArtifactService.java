@@ -38,7 +38,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         String projectName = "test-project";
 
         // Step - Create project, with type, artifact, and body.
-        Project project = dbEntityBuilder.newProjectWithReturn(currentUser, projectName);
+        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
         dbEntityBuilder
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
@@ -84,7 +84,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         String artifactTypeName = "requirements";
         String projectName = "test-project";
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName);
 
@@ -104,7 +104,7 @@ public class TestArtifactService extends ApplicationBaseTest {
 
         // Step - Create project with: v1, type, artifact, body
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, artifactTypeName)
             .newArtifact(projectName, artifactTypeName, artifactName)
@@ -133,7 +133,7 @@ public class TestArtifactService extends ApplicationBaseTest {
 
         // Step - Create project with: version, type, artifact, body
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, typeName)
             .newArtifact(projectName, typeName, artifactName)

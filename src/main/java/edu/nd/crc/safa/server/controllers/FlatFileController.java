@@ -12,7 +12,6 @@ import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
@@ -101,9 +100,9 @@ public class FlatFileController extends BaseController {
             throw new ServerError("Could not create project because no files were received.");
         }
 
-        SafaUser owner = safaUserService.getCurrentUser();
-        Project project = new Project(owner, "", "");
+        Project project = new Project("", "");
         this.projectRepository.save(project);
+        this.projectService.setCurrentUserAsOwner(project);
         ProjectVersion projectVersion = projectService.createBaseProjectVersion(project);
 
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,

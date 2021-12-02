@@ -104,21 +104,17 @@ public class ProjectService {
     }
 
     /**
-     * Returns the projects owned by user or projects in which they are members.
+     * Returns list of projects owned or shared with current user.
      *
-     * @param user The user whose projects are being retrieved.
      * @return List of projects where given user has access to.
      */
-    public List<Project> getUserProjects(SafaUser user) {
-        List<Project> ownerProjects = this.projectRepository.findByOwner(user);
-        List<Project> sharedProjects =
-            this.projectMembershipRepository
-                .findByMember(user)
-                .stream()
-                .map(ProjectMembership::getProject)
-                .collect(Collectors.toList());
-        ownerProjects.addAll(sharedProjects);
-        return ownerProjects;
+    public List<Project> getCurrentUserProjects() {
+        SafaUser user = this.safaUserService.getCurrentUser();
+        return this.projectMembershipRepository
+            .findByMember(user)
+            .stream()
+            .map(ProjectMembership::getProject)
+            .collect(Collectors.toList());
     }
 
     public ProjectEntities updateProjectAtVersion(Project project,
@@ -128,7 +124,6 @@ public class ProjectService {
         Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
         persistentProject.setName(project.getName());
         persistentProject.setDescription(project.getDescription());
-        //TODO: Update owner here.
         this.projectRepository.save(persistentProject);
         //TODO: Update traces
         if (projectVersion == null) {
@@ -163,6 +158,7 @@ public class ProjectService {
             throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
         }
         this.projectRepository.save(project);
+        this.setCurrentUserAsOwner(project);
         projectVersion = this.createBaseProjectVersion(project);
         entityCreationResponse = this.saveProjectEntitiesToVersion(
             projectVersion,
@@ -200,11 +196,21 @@ public class ProjectService {
             if (newMemberRole.compareTo(pmQuery.get().getRole()) >= 0) {
                 throw new ServerError("Cannot add member with authorization greater that current user.");
             }
-        } else if (!this.permissionService.isOwner(project, currentUser)) {
+        } else {
             throw new ServerError("Cannot add member to project which current user is not apart of.");
         }
 
         ProjectMembership projectMembership = new ProjectMembership(project, newMember, newMemberRole);
+        this.projectMembershipRepository.save(projectMembership);
+    }
+
+    public List<ProjectMembership> getProjectMembers(Project project) {
+        return this.projectMembershipRepository.findByProject(project);
+    }
+
+    public void setCurrentUserAsOwner(Project project) {
+        SafaUser user = this.safaUserService.getCurrentUser();
+        ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.ADMIN);
         this.projectMembershipRepository.save(projectMembership);
     }
 }

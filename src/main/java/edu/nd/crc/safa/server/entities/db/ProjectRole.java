@@ -7,4 +7,5 @@ public enum ProjectRole {
     VIEWER,
     EDITOR,
     ADMIN,
+    OWNER,
 }

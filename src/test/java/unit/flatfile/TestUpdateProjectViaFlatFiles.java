@@ -167,7 +167,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         String projectName = "test-project";
 
         dbEntityBuilder
-            .newProject(currentUser, projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName)
             .newVersion(projectName);

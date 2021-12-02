@@ -37,13 +37,6 @@ public class PermissionService {
         this.safaUserService = safaUserService;
     }
 
-    public void requireEditPermission(Project project) throws ServerError {
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
-        if (!hasEditPermission(project, currentUser)) {
-            throw new ServerError("User does not have edit permissions on project.");
-        }
-    }
-
     public void requireViewPermission(Project project) throws ServerError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasViewingPermission(project, currentUser)) {
@@ -51,25 +44,33 @@ public class PermissionService {
         }
     }
 
+    public void requireEditPermission(Project project) throws ServerError {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        if (!hasEditPermission(project, currentUser)) {
+            throw new ServerError("User does not have edit permissions on project.");
+        }
+    }
+
     private boolean hasViewingPermission(Project project, SafaUser user) {
-        Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
-        return roleQuery.isPresent() || isOwner(project, user);
+        return hasPermissionOrGreater(project, user, ProjectRole.VIEWER);
     }
 
     private boolean hasEditPermission(Project project, SafaUser user) {
-        Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
-        return roleQuery.filter(projectMembership -> projectMembership.getRole() != ProjectRole.VIEWER).isPresent()
-            || isOwner(project, user);
+        return hasPermissionOrGreater(project, user, ProjectRole.EDITOR);
     }
 
     private boolean hasAdminPermission(Project project, SafaUser user) {
-        Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
-        boolean isAdmin =
-            roleQuery.filter(projectMembership -> projectMembership.getRole() == ProjectRole.ADMIN).isPresent();
-        return isAdmin || isOwner(project, user);
+        return hasPermissionOrGreater(project, user, ProjectRole.ADMIN);
     }
 
-    public boolean isOwner(Project project, SafaUser user) {
-        return project.getOwner().getUserId().equals(user.getUserId());
+    private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {
+        Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
+        System.out.println("PRESENT" + roleQuery.isPresent());
+        if (roleQuery.isPresent()) {
+            System.out.println("ROLE:" + roleQuery.get());
+        }
+        boolean isAdmin =
+            roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
+        return isAdmin;
     }
 }

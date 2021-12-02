@@ -98,7 +98,8 @@ public class ParseDataFileController extends BaseController {
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
-    public ServerResponse checkIfNameExists(@PathVariable UUID projectId, @PathVariable String artifactName) throws ServerError {
+    public ServerResponse checkIfNameExists(@PathVariable UUID projectId,
+                                            @PathVariable String artifactName) throws ServerError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
         Map<String, Boolean> response = new HashMap<>();

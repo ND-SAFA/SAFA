@@ -63,7 +63,7 @@ public class CommitController extends BaseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws ServerError {
-        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         commitArtifacts(projectVersion, projectCommit.getArtifacts());
         commitTraces(projectVersion, projectCommit.getTraces());
     }

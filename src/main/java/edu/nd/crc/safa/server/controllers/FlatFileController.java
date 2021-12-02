@@ -76,7 +76,7 @@ public class FlatFileController extends BaseController {
         if (files.length == 0) {
             throw new ServerError("Could not create project because no files were received.");
         }
-        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(
             project,

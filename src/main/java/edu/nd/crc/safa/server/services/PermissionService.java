@@ -65,12 +65,8 @@ public class PermissionService {
 
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {
         Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
-        System.out.println("PRESENT" + roleQuery.isPresent());
-        if (roleQuery.isPresent()) {
-            System.out.println("ROLE:" + roleQuery.get());
-        }
-        boolean isAdmin =
-            roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
-        return isAdmin;
+        roleQuery.ifPresent(projectMembership -> {
+        });
+        return roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
     }
 }

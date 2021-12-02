@@ -18,6 +18,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { getProjectVersion } from "@/api";
 import { appModule, projectModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
+import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
 const PROJECT_SELECTION_STEP = 1;
 const VERSION_SELECTION_STEP = 2;
@@ -89,7 +90,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    onSubmit() {
+    async onSubmit() {
       if (this.selectedProject === undefined) {
         appModule.onWarning("Please select a project to update.");
       } else if (this.selectedVersion === undefined) {
@@ -97,12 +98,9 @@ export default Vue.extend({
       } else {
         this.isLoading = true;
 
-        getProjectVersion(this.selectedVersion.versionId)
-          .then(projectModule.setProjectCreationResponse)
-          .finally(() => {
-            this.isLoading = false;
-            this.$emit("onClose");
-          });
+        await loadVersionIfExistsHandler(this.selectedVersion.versionId);
+        this.isLoading = false;
+        this.$emit("onClose");
       }
     },
   },

@@ -76,8 +76,9 @@ public class TestProjectRetrievalWithSharing extends ApplicationBaseTest {
             .newProjectWithReturn(projectName);
 
         // Step - Share project
-        ProjectMembershipRequest request = new ProjectMembershipRequest(project, otherUser, ProjectRole.VIEWER);
-        sendPost(AppRoutes.Projects.addProjectMember, toJson(request), status().is2xxSuccessful());
+        ProjectMembershipRequest request = new ProjectMembershipRequest(otherUser, ProjectRole.VIEWER);
+        String url = RouteBuilder.withRoute(AppRoutes.Projects.addProjectMember).withProject(project).get();
+        sendPost(url, toJson(request), status().is2xxSuccessful());
         return project;
     }
 }

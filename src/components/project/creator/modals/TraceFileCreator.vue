@@ -3,9 +3,9 @@
     v-if="isOpen"
     align="center"
     class="mx-auto my-3"
-    style="max-width: 30em"
+    style="max-width: 35em"
   >
-    <v-row>
+    <v-row align="start">
       <v-col align-self="center">
         <ButtonRow :definitions="[sourceDefinition]"
       /></v-col>

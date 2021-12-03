@@ -6,15 +6,15 @@
       :cols="12 / definitions.length"
     >
       <v-row :justify="justify">
-        <IconButton
+        <icon-button
           v-if="definition.type === iconType"
           :definition="definition"
         />
-        <CheckmarkMenu
+        <checkmark-menu
           v-else-if="definition.type === checkmarkMenuType"
           :definition="definition"
         />
-        <ListMenu
+        <list-menu
           v-else-if="definition.type === listMenuType"
           :definition="definition"
         />

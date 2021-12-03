@@ -8,6 +8,7 @@
         v-on="on"
         :disabled="disabled"
       >
+        <v-icon>mdi-chevron-down</v-icon>
         {{ buttonLabel }}
       </v-btn>
     </template>

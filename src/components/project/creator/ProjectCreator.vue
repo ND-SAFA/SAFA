@@ -132,7 +132,7 @@ export default Vue.extend({
       this.traceUploader = createTraceUploader();
     },
 
-    saveProject(): void {
+    saveProject: function (): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
         .then(async (res) => {

@@ -1,23 +1,23 @@
 <template>
-  <generic-modal size="xs" :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal :is-open="isOpen" :title="title" @close="onCancel">
     <template v-slot:body>
-      <v-container>
-        <v-row justify="center">
-          <v-col align-self="center">
-            <v-text-field
-              v-model="newUserEmail"
-              label="User Email"
-              class="ma-3"
-              rounded
-              solo
-              dense
-              :rules="emailRules"
-              @update:error="onErrorUpdate"
-            />
-            <button-row :definitions="buttonDefinition" />
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-row dense class="mt-4">
+        <v-col>
+          <v-text-field
+            v-model="newUserEmail"
+            label="User Email"
+            rounded
+            solo
+            dense
+            style="min-width: 300px"
+            :rules="emailRules"
+            @update:error="onErrorUpdate"
+          />
+        </v-col>
+        <v-col>
+          <button-row :definitions="buttonDefinition" />
+        </v-col>
+      </v-row>
     </template>
     <template v-slot:actions>
       <v-container>

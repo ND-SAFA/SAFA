@@ -66,10 +66,8 @@ export default Vue.extend({
   },
   watch: {
     isOpen(isOpen: boolean) {
-      if (isOpen) {
-        if (!isOpen) {
-          this.clearData();
-        }
+      if (!isOpen) {
+        this.clearData();
       }
     },
     project(project: ProjectIdentifier | undefined): void {

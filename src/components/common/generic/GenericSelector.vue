@@ -1,6 +1,6 @@
 <template>
   <v-data-table
-    show-select
+    :show-select="hasSelect"
     dense
     single-select
     v-model="selected"
@@ -102,11 +102,13 @@ export default Vue.extend({
     },
     noDataText: {
       type: String,
-      required: true,
+      required: false,
+      default: "No items exists.",
     },
     isLoading: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     hasEdit: {
       type: Boolean,
@@ -114,6 +116,11 @@ export default Vue.extend({
       default: true,
     },
     hasDelete: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    hasSelect: {
       type: Boolean,
       required: false,
       default: true,

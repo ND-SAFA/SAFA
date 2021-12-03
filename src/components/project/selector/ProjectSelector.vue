@@ -16,7 +16,7 @@
       <project-identifier-modal
         title="Edit Project"
         :is-open="editProjectDialogue"
-        :project="projectToEdit"
+        v-bind:project.sync="projectToEdit"
         @onSave="onUpdateProject"
         @onClose="onCloseProjectEdit"
       />
@@ -42,11 +42,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, ProjectCreationResponse, ProjectIdentifier } from "@/types";
+import {
+  DataItem,
+  Project,
+  ProjectCreationResponse,
+  ProjectIdentifier,
+} from "@/types";
 import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
-import { appModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
-import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
+import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "./headers";
 
@@ -82,7 +87,7 @@ export default Vue.extend({
       deleteProjectDialogue: false,
       addProjectDialogue: false,
       isLoading: false,
-      projectToEdit: undefined as ProjectIdentifier | undefined,
+      projectToEdit: { name: "", description: "" } as ProjectIdentifier,
       projectToDelete: undefined as ProjectIdentifier | undefined,
     };
   },
@@ -99,17 +104,15 @@ export default Vue.extend({
   methods: {
     onUpdateProject(project: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(project, "updated");
+      this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
       this.selected = project;
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject, "created").then(
-        (projectCreated: ProjectCreationResponse) => {
-          this.$emit("onProjectSelected", projectCreated.project);
-        }
-      );
+      this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
+        this.$emit("onProjectSelected", project);
+      });
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
@@ -163,37 +166,27 @@ export default Vue.extend({
         })
         .finally(() => (this.isLoading = false));
     },
-    saveOrUpdateProjectHandler(
-      project: ProjectIdentifier,
-      operation: "updated" | "created"
-    ): Promise<ProjectCreationResponse> {
-      return new Promise<ProjectCreationResponse>((resolve, reject) => {
-        saveOrUpdateProject({
-          projectId: project.projectId,
-          description: project.description,
-          name: project.name,
-          artifacts: [],
-          traces: [],
-        })
-          .then((res: ProjectCreationResponse) => {
-            appModule.onSuccess(
-              `${res.project.name} was successfully ${operation}.`
-            );
-            this.isLoading = false;
-            const projectRemoved = this.projects.filter(
-              (p) => res.project.projectId !== p.projectId
-            );
+    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<Project> {
+      return saveOrUpdateProject({
+        projectId: project.projectId,
+        description: project.description,
+        name: project.name,
+        artifacts: [],
+        traces: [],
+      })
+        .then((res: ProjectCreationResponse) => {
+          const project = res.project;
+          projectModule.SAVE_PROJECT_IDENTIFIER(project);
+          const projectRemoved = this.projects.filter(
+            (p) => project.projectId !== p.projectId
+          );
 
-            this.projects = [res.project as ProjectIdentifier].concat(
-              projectRemoved
-            );
-            resolve(res);
-          })
-          .catch(reject)
-          .finally(() => {
-            this.isLoading = false;
-          });
-      });
+          this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          return project;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
 });

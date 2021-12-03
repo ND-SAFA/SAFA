@@ -154,3 +154,30 @@ export interface EntityCommit<T> {
    */
   modified: T[];
 }
+
+/**
+ * Represents a member in a given project
+ */
+export interface ProjectMember {
+  email: string;
+  role: ProjectRole;
+}
+
+/**
+ * Represents a role with certain authorization constraints
+ * within a given project.
+ */
+export enum ProjectRole {
+  VIEWER,
+  EDITOR,
+  ADMIN,
+  OWNER,
+}
+
+/**
+ * Represents a request for adding a member to a project.
+ */
+export interface MemberRequest {
+  memberEmail: string;
+  projectRole: ProjectRole;
+}

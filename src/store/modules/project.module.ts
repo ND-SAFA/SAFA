@@ -7,6 +7,7 @@ import type {
   TraceLink,
   ChannelSubscriptionId,
   ArtifactQueryFunction,
+  ProjectIdentifier,
 } from "@/types";
 import { LinkValidator } from "@/types";
 import {
@@ -136,6 +137,20 @@ export default class ProjectModule extends VuexModule {
     if (projectId !== undefined && versionId !== undefined) {
       await connectAndSubscribeToVersion(projectId, versionId);
     }
+  }
+
+  @Mutation
+  /**
+   * Sets a new project.
+   *
+   * @param project - The new project to track.
+   */
+  SAVE_PROJECT_IDENTIFIER(project: ProjectIdentifier): void {
+    this.project = {
+      ...this.project,
+      name: project.name,
+      description: project.description,
+    };
   }
 
   @Mutation

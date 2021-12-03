@@ -6,11 +6,8 @@
         Back To Tree View
       </v-btn>
       <v-container>
-        <v-row>
-          <h1>{{ project.name }}</h1>
-          <p>{{ project.description }}</p>
-        </v-row>
-        <v-row> Project members </v-row>
+        <settings-general-section :project="project" />
+        <settings-member-section :project="project" />
       </v-container>
     </template>
   </private-page>
@@ -18,17 +15,41 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PrivatePage } from "@/components";
+import {
+  PrivatePage,
+  SettingsGeneralSection,
+  SettingsMemberSection,
+} from "@/components";
 import { Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { projectModule } from "@/store";
 
 export default Vue.extend({
   name: "approval-links-view",
-  components: { PrivatePage },
+  components: {
+    PrivatePage,
+    SettingsGeneralSection,
+    SettingsMemberSection,
+  },
+
   computed: {
     project(): Project {
       return projectModule.getProject;
+    },
+    hasDescription(): boolean {
+      const description = this.project.description;
+      return description !== "";
+    },
+    headers() {
+      return [
+        { text: "Email", value: "email", sortable: false, isSelectable: false },
+        {
+          text: "Role",
+          value: "role",
+          sortable: true,
+          isSelectable: false,
+        },
+      ];
     },
   },
   methods: {

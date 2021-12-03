@@ -186,14 +186,20 @@ public class ProjectService {
                                    String newMemberEmail,
                                    ProjectRole newMemberRole) throws ServerError {
         Project project = this.projectRepository.findByProjectId(projectId);
-        SafaUser newMember = this.safaUserRepository.findByEmail(newMemberEmail);
+
+        // Step - Find member being added and the current member.
+        Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
+        if (newMemberQuery.isEmpty()) {
+            throw new ServerError("No user exists with given email: " + newMemberEmail);
+        }
+        SafaUser newMember = newMemberQuery.get();
         SafaUser currentUser = this.safaUserService.getCurrentUser();
 
-        Optional<ProjectMembership> pmQuery = this.projectMembershipRepository
+        // Step - Assert that member being added has fewer permissions than current user.
+        Optional<ProjectMembership> currentUserMembershipQuery = this.projectMembershipRepository
             .findByProjectAndMember(project, currentUser);
-
-        if (pmQuery.isPresent()) {
-            if (newMemberRole.compareTo(pmQuery.get().getRole()) >= 0) {
+        if (currentUserMembershipQuery.isPresent()) {
+            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) >= 0) {
                 throw new ServerError("Cannot add member with authorization greater that current user.");
             }
         } else {

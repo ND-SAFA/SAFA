@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.server.authentication;
 
+import java.util.Optional;
+
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
@@ -43,11 +45,11 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser getUserFromUsername(String userName) {
-        final SafaUser user = safaUserRepository.findByEmail(userName);
-        if (user == null) {
+        final Optional<SafaUser> userQuery = safaUserRepository.findByEmail(userName);
+        if (userQuery.isEmpty()) {
             throw new UsernameNotFoundException(userName);
         }
-        return user;
+        return userQuery.get();
     }
 
     public SafaUser getCurrentUser() {

@@ -156,7 +156,7 @@ export default class SubtreeModule extends VuexModule {
    */
   get getSubtreeByArtifactName(): (n: string) => string[] {
     return (artifactName: string) => {
-      return this.getSubtreeMap[artifactName];
+      return this.getSubtreeMap[artifactName] || [];
     };
   }
 
@@ -208,6 +208,18 @@ export default class SubtreeModule extends VuexModule {
       const incomingPhantom: SubtreeLink[] = subtreeLinkCreator(true);
       const outgoingPhantom: SubtreeLink[] = subtreeLinkCreator(false);
       return this.subtreeLinks.concat(incomingPhantom).concat(outgoingPhantom);
+    };
+  }
+
+  /**
+   * @return The names of all hidden children below the given node.
+   */
+  get hiddenChildrenForNode(): (name: string) => string[] {
+    return (name) => {
+      const childNodes = this.getSubtreeByArtifactName(name);
+      const hiddenNodes = this.getHiddenSubtreeNodes;
+
+      return childNodes.filter((id) => hiddenNodes.includes(id));
     };
   }
 }

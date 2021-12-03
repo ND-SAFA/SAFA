@@ -5,7 +5,7 @@ import {
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { capitalize, ThemeColors } from "@/util";
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",

@@ -3,7 +3,12 @@
 </template>
 
 <script lang="ts">
-import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
+import {
+  deltaModule,
+  errorModule,
+  artifactSelectionModule,
+  subtreeModule,
+} from "@/store";
 import {
   Artifact,
   ArtifactWarning,
@@ -112,6 +117,10 @@ export default Vue.extend({
       const body = this.artifactDefinition.body;
       const artifactType = this.artifactDefinition.type;
       const isSelected = this.isSelected;
+      const hiddenChildren = subtreeModule.hiddenChildrenForNode(id);
+      const hiddenChildWarnings =
+        errorModule.allArtifactWarnings(hiddenChildren);
+      const hiddenChildDeltaStates = deltaModule.allDeltaStates(hiddenChildren);
 
       return {
         data: {
@@ -124,6 +133,9 @@ export default Vue.extend({
           artifactDeltaState: this.artifactDeltaState,
           isSelected,
           opacity: this.opacity,
+          hiddenChildren: hiddenChildren.length,
+          childWarnings: hiddenChildWarnings,
+          childDeltaStates: hiddenChildDeltaStates,
         },
       };
     },

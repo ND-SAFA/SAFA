@@ -1,12 +1,12 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type {
   AddedArtifact,
-  RemovedArtifact,
+  DeltaPayload,
   ModifiedArtifact,
   ProjectVersion,
-  DeltaPayload,
+  RemovedArtifact,
 } from "@/types";
-import { PanelType } from "@/types";
+import { ArtifactDeltaState, PanelType } from "@/types";
 import { appModule, projectModule } from "..";
 
 @Module({ namespaced: true, name: "delta" })
@@ -146,5 +146,26 @@ export default class ErrorModule extends VuexModule {
    */
   get getIsDeltaViewEnabled(): boolean {
     return this.isDeltaViewEnabled;
+  }
+
+  /**
+   * @return All delta states for all given nodes.
+   */
+  get allDeltaStates(): (names: string[]) => ArtifactDeltaState[] {
+    return (names) => {
+      const deltaStates = new Set<ArtifactDeltaState>();
+
+      for (const name of names) {
+        if (name in this.added) {
+          deltaStates.add(ArtifactDeltaState.ADDED);
+        } else if (name in this.modified) {
+          deltaStates.add(ArtifactDeltaState.MODIFIED);
+        } else if (name in this.removed) {
+          deltaStates.add(ArtifactDeltaState.REMOVED);
+        }
+      }
+
+      return Array.from(deltaStates);
+    };
   }
 }

@@ -1,4 +1,4 @@
-import type { ProjectWarnings, ProjectErrors } from "@/types";
+import type { ProjectWarnings, ProjectErrors, ArtifactWarning } from "@/types";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 @Module({ namespaced: true, name: "error" })
@@ -56,5 +56,16 @@ export default class ErrorModule extends VuexModule {
    */
   get getProjectErrors(): ProjectErrors {
     return this.projectErrors;
+  }
+
+  /**
+   * @return All artifact warnings across all given nodes.
+   */
+  get allArtifactWarnings(): (names: string[]) => ArtifactWarning[] {
+    return (names) => {
+      return names
+        .map((name) => this.artifactWarnings[name] || [])
+        .reduce((acc, cur) => [...acc, ...cur], []);
+    };
   }
 }

@@ -68,8 +68,12 @@ export default class ProjectModule extends VuexModule {
     const versionId = newProject.projectVersion?.versionId;
 
     this.SAVE_PROJECT(newProject);
+
     await this.subscribeToVersion({ projectId, versionId });
+
     deltaModule.clearDelta();
+    subtreeModule.resetHiddenNodes();
+
     await subtreeModule.updateSubtreeMap();
   }
 

@@ -42,7 +42,7 @@ import {
 import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import { capitalize } from "@/util";
+import { capitalize, getEnumKeys } from "@/util";
 import { addProjectMember } from "@/api";
 import { appModule } from "@/store";
 
@@ -88,7 +88,7 @@ export default Vue.extend({
       );
     },
     projectRoles(): string[] {
-      return Object.keys(ProjectRole).map(capitalize);
+      return getEnumKeys(ProjectRole);
     },
     itemLambdas(): EmptyLambda[] {
       return this.projectRoles.map((role) => {
@@ -127,8 +127,9 @@ export default Vue.extend({
         projectId !== undefined &&
         projectRole !== undefined
       ) {
-        await addProjectMember(projectId, this.newUserEmail, projectRole);
-        this.$emit("onConfirm", project);
+        addProjectMember(projectId, this.newUserEmail, projectRole)
+          .then(() => this.$emit("onConfirm", project))
+          .catch();
       } else {
         appModule.onWarning("Please define project role.");
       }

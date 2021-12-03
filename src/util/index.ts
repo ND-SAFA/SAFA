@@ -5,3 +5,4 @@ export * from "./to-string";
 export * from "./trace-helper";
 export * from "./type-checks";
 export * from "./theme";
+export * from "./enum-helper";

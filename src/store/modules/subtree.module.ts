@@ -25,6 +25,11 @@ export default class SubtreeModule extends VuexModule {
    */
   private hiddenSubtreeNodes: string[] = [];
 
+  /**
+   * List of nodes with their children currently hidden.
+   */
+  private collapsedParentNodes: string[] = [];
+
   @Action
   /**
    * Recalculates the subtree map of project artifacts and updates store.
@@ -60,6 +65,7 @@ export default class SubtreeModule extends VuexModule {
       this.SET_HIDDEN_SUBTREE_NODES(
         this.hiddenSubtreeNodes.concat(childrenInSubtree)
       );
+      this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootName]);
       await this.setProjectEntityOpacity({
         targetArtifactNames: this.hiddenSubtreeNodes,
         opacity: 0,
@@ -80,6 +86,9 @@ export default class SubtreeModule extends VuexModule {
     const subtreeNodes = this.getSubtreeByArtifactName(rootName);
     this.SET_HIDDEN_SUBTREE_NODES(
       this.hiddenSubtreeNodes.filter((n) => !subtreeNodes.includes(n))
+    );
+    this.SET_COLLAPSED_PARENT_NODES(
+      this.collapsedParentNodes.filter((n) => n !== rootName)
     );
     await this.setProjectEntityOpacity({
       targetArtifactNames: subtreeNodes,
@@ -142,6 +151,16 @@ export default class SubtreeModule extends VuexModule {
    */
   SET_HIDDEN_SUBTREE_NODES(hiddenSubtreeNodes: string[]): void {
     this.hiddenSubtreeNodes = hiddenSubtreeNodes;
+  }
+
+  @Mutation
+  /**
+   * Sets the current nodes with hidden subtrees.
+   *
+   * @param collapsedParentNodes The list of nodes currently having their children hidden.
+   */
+  SET_COLLAPSED_PARENT_NODES(collapsedParentNodes: string[]): void {
+    this.collapsedParentNodes = collapsedParentNodes;
   }
 
   /**
@@ -216,6 +235,10 @@ export default class SubtreeModule extends VuexModule {
    */
   get hiddenChildrenForNode(): (name: string) => string[] {
     return (name) => {
+      if (!this.collapsedParentNodes.includes(name)) {
+        return [];
+      }
+
       const childNodes = this.getSubtreeByArtifactName(name);
       const hiddenNodes = this.getHiddenSubtreeNodes;
 

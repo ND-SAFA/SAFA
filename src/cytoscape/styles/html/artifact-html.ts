@@ -5,8 +5,6 @@ import {
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { capitalize, ThemeColors } from "@/util";
 
-const TEST_MODE = false;
-
 export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",
   halign: "center",
@@ -118,14 +116,6 @@ function createNodeBody(data: ArtifactData, height: number): string {
  * @return stringified HTML for the node.
  */
 function createNodeFooter(data: ArtifactData): string {
-  if (TEST_MODE) {
-    data.hiddenChildren = 3;
-    data.warnings = [
-      { ruleName: "Very Long Rule Name", ruleMessage: "message" },
-    ];
-    data.childWarnings = [{ ruleName: "Child Rule", ruleMessage: "message" }];
-  }
-
   const displayChildren = !!data.hiddenChildren;
   let displayWarning = !!data.warnings?.length;
   let message = data.warnings?.[0]?.ruleName || "Warning";
@@ -169,14 +159,6 @@ function createNodeFooter(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function createNodeStoplight(data: ArtifactData): string {
-  if (TEST_MODE) {
-    data.childDeltaStates = [
-      ArtifactDeltaState.ADDED,
-      ArtifactDeltaState.REMOVED,
-      ArtifactDeltaState.MODIFIED,
-    ];
-  }
-
   if (!data.childDeltaStates?.length) return "";
 
   const renderAdded = data.childDeltaStates.includes(ArtifactDeltaState.ADDED);

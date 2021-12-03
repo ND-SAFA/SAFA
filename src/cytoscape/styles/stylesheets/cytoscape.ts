@@ -65,7 +65,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       height: ARTIFACT_HEIGHT + "px",
       "border-style": ARTIFACT_BORDER_STYLE,
       "border-width": ARTIFACT_BORDER_WIDTH,
-      "border-color": ThemeColors.artifactBorder,
+      "border-color": "white", // ThemeColors.artifactBorder,
       "text-wrap": "ellipsis",
     },
   } as CytoStyleSheet,

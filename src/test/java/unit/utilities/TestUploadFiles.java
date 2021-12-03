@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
@@ -19,9 +19,9 @@ import unit.ApplicationBaseTest;
 public class TestUploadFiles extends ApplicationBaseTest {
 
     @Test
-    public void smokeTest() throws ServerError {
+    public void smokeTest() throws SafaError {
         String testName = "hellWorld";
-        Project project = dbEntityBuilder.newProject( testName).getProject(testName);
+        Project project = dbEntityBuilder.newProject(testName).getProject(testName);
         String pathToTestProject = ProjectPaths.getPathToStorage(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactBody;
@@ -95,7 +95,7 @@ public class TestArtifactService extends ApplicationBaseTest {
     }
 
     @Test
-    public void testNoChangeDetected() throws ServerError {
+    public void testNoChangeDetected() throws SafaError {
         String projectName = "test-project";
         String artifactTypeName = "requirement";
         String artifactName = "RE-8";
@@ -124,7 +124,7 @@ public class TestArtifactService extends ApplicationBaseTest {
     }
 
     @Test
-    public void artifactModificationDetected() throws ServerError {
+    public void artifactModificationDetected() throws SafaError {
         String projectName = "test-project";
         String typeName = "requirements";
         String artifactName = "RE-8";

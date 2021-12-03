@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.json.JSONObject;
@@ -82,9 +82,9 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         sendRequest(delete(routeName), test, this.token);
     }
 
-    public void assertTokenExists() throws ServerError {
+    public void assertTokenExists() throws SafaError {
         if (this.token == null || this.token.equals("")) {
-            throw new ServerError("Authorization token not set.");
+            throw new SafaError("Authorization token not set.");
         }
     }
 

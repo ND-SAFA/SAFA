@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -22,26 +22,26 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class FileUtilities {
 
-    public static CSVParser readCSVFile(String pathToFile) throws ServerError {
+    public static CSVParser readCSVFile(String pathToFile) throws SafaError {
         try {
             File csvData = new File(pathToFile);
             if (!csvData.exists()) {
-                throw new ServerError("CSV file does not exist: " + pathToFile);
+                throw new SafaError("CSV file does not exist: " + pathToFile);
             }
 
             CSVFormat fileFormat = getFormat();
             return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
             String error = String.format("Could not read CSV file at path: %s", pathToFile);
-            throw new ServerError(error, e);
+            throw new SafaError(error, e);
         }
     }
 
     public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
-        ServerError {
+        SafaError {
         String requiredColumnsLabel = String.join(", ", requiredColumns);
         if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
-            throw new ServerError("Expected a CSV file with columns: " + requiredColumnsLabel);
+            throw new SafaError("Expected a CSV file with columns: " + requiredColumnsLabel);
         }
         try {
             CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
@@ -49,7 +49,7 @@ public class FileUtilities {
             return parsedFile;
         } catch (IOException e) {
             String error = "Unable to read csv file: " + file.getOriginalFilename();
-            throw new ServerError(error, e);
+            throw new SafaError(error, e);
         }
     }
 
@@ -64,7 +64,7 @@ public class FileUtilities {
             .build();
     }
 
-    public static void assertHasColumns(CSVParser file, String[] requiredColumns) throws ServerError {
+    public static void assertHasColumns(CSVParser file, String[] requiredColumns) throws SafaError {
         List<String> headerNames = file.getHeaderNames();
         List<String> headerNamesLower = toLowerCase(headerNames);
 
@@ -72,7 +72,7 @@ public class FileUtilities {
             if (!headerNamesLower.contains(rColumn)) {
                 String requiredColumnsLabel = String.join(", ", requiredColumns);
                 String error = "Expected CSV to have column(s) [%s] but found: %s";
-                throw new ServerError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
+                throw new SafaError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
             }
         }
     }

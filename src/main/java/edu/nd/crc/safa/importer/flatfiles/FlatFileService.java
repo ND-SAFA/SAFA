@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -34,11 +34,11 @@ public class FlatFileService {
         this.traceFileParser = traceFileParser;
     }
 
-    public void parseProjectFilesFromTIM(ProjectVersion projectVersion) throws ServerError {
+    public void parseProjectFilesFromTIM(ProjectVersion projectVersion) throws SafaError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
         if (!Files.exists(Paths.get(pathToFile))) {
-            throw new ServerError("TIM.json file was not uploaded for this project");
+            throw new SafaError("TIM.json file was not uploaded for this project");
         }
         this.parseProject(projectVersion, pathToFile);
     }
@@ -50,10 +50,10 @@ public class FlatFileService {
      *
      * @param projectVersion the project version to be associated with the files specified.
      * @param pathToTIMFile  path to the TIM.json file in local storage (see ProjectPaths.java)
-     * @throws ServerError any error occurring while parsing TIM.json or associated files.
+     * @throws SafaError any error occurring while parsing TIM.json or associated files.
      */
     public void parseProject(ProjectVersion projectVersion,
-                             String pathToTIMFile) throws ServerError {
+                             String pathToTIMFile) throws SafaError {
         try {
             String TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
             JSONObject timFileJson = FileUtilities.toLowerCase(new JSONObject(TIMFileContent));
@@ -69,7 +69,7 @@ public class FlatFileService {
                     timFileJson.getJSONObject(traceMatrixKey));
             }
         } catch (IOException | JSONException e) {
-            throw new ServerError("An error occurred while parsing TIM file.", e);
+            throw new SafaError("An error occurred while parsing TIM file.", e);
         }
     }
 }

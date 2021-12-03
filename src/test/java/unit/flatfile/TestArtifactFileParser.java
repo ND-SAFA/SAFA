@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -53,7 +53,7 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
         JSONObject jsonSpec = new JSONObject("{\n"
             + "    \"Design\": {}\n"
             + "  }");
-        Exception exception = assertThrows(ServerError.class, () -> {
+        Exception exception = assertThrows(SafaError.class, () -> {
             artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
         });
         assertThat(exception.getMessage()).contains("file");

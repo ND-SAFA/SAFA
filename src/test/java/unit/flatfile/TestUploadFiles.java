@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.FileUploadService;
@@ -24,7 +24,7 @@ public class TestUploadFiles extends ApplicationBaseTest {
     FileUploadService fileUploadService;
 
     @Test
-    public void uploadTestResources() throws IOException, ServerError {
+    public void uploadTestResources() throws IOException, SafaError {
         String testProjectName = "testProject";
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles(testProjectName);
         Project project = projectVersion.getProject();

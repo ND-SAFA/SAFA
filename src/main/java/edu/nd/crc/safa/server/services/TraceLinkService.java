@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -150,16 +150,16 @@ public class TraceLinkService {
      * @param sourceId       UUID of source artifact.
      * @param targetId       UUID of target artifact.
      * @return TraceApplicationEntity representing the created entity.
-     * @throws ServerError Throws error if either project version, source, or target artifact not found.
+     * @throws SafaError Throws error if either project version, source, or target artifact not found.
      */
     public ServerResponse createNewTraceLInk(ProjectVersion projectVersion,
                                              String sourceId,
-                                             String targetId) throws ServerError {
+                                             String targetId) throws SafaError {
         Pair<TraceLink, String> creationResponse = this.createTrace(projectVersion, sourceId,
             targetId);
         if (creationResponse.getValue1() != null) {
             String errorMessage = creationResponse.getValue1();
-            throw new ServerError(errorMessage);
+            throw new SafaError(errorMessage);
         }
         TraceLink traceLink = creationResponse.getValue0();
         this.traceLinkRepository.saveAll(List.of(traceLink));
@@ -171,9 +171,9 @@ public class TraceLinkService {
      * to given application state.
      *
      * @param traceAppEntity The trace being updated.
-     * @throws ServerError Throws error if version not found.
+     * @throws SafaError Throws error if version not found.
      */
-    public void updateTraceLink(TraceAppEntity traceAppEntity) throws ServerError {
+    public void updateTraceLink(TraceAppEntity traceAppEntity) throws SafaError {
         TraceLink traceLink = getEntity(traceAppEntity);
         traceLink.setApprovalStatus(traceAppEntity.approvalStatus);
         this.traceLinkRepository.save(traceLink);
@@ -183,19 +183,19 @@ public class TraceLinkService {
      * Deletes trace link containing the same traceLinkID as given entity
      *
      * @param traceAppEntity The trace link deleted in application.
-     * @throws ServerError Throws error is trace link with id not found.
+     * @throws SafaError Throws error is trace link with id not found.
      */
-    public void deleteTraceLink(TraceAppEntity traceAppEntity) throws ServerError {
+    public void deleteTraceLink(TraceAppEntity traceAppEntity) throws SafaError {
         TraceLink traceLink = getEntity(traceAppEntity);
         this.traceLinkRepository.delete(traceLink);
     }
 
-    private TraceLink getEntity(TraceAppEntity traceAppEntity) throws ServerError {
+    private TraceLink getEntity(TraceAppEntity traceAppEntity) throws SafaError {
         UUID traceLinkId = UUID.fromString(traceAppEntity.getTraceLinkId());
         Optional<TraceLink> traceLinkQuery =
             this.traceLinkRepository.findById(traceLinkId);
         if (traceLinkQuery.isEmpty()) {
-            throw new ServerError("Could not find trace link with id:" + traceLinkId);
+            throw new SafaError("Could not find trace link with id:" + traceLinkId);
         }
         return traceLinkQuery.get();
     }

@@ -9,7 +9,7 @@ import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -33,7 +33,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
         sendRequest(beforeRequest, status().isCreated(), this.token);
     }
 
-    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws ServerError, IOException {
+    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws SafaError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
@@ -45,7 +45,7 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
 
     public ProjectVersion createProjectWithNewVersion(String projectName) {
         return dbEntityBuilder
-            .newProject( projectName)
+            .newProject(projectName)
             .newVersion(projectName)
             .getProjectVersion(projectName, 0);
     }

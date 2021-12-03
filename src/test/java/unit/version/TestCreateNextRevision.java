@@ -2,7 +2,7 @@ package unit.version;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.VersionService;
@@ -19,7 +19,7 @@ public class TestCreateNextRevision extends ApplicationBaseTest {
     VersionService versionService;
 
     @Test
-    public void createNextVersion() throws ServerError {
+    public void createNextVersion() throws SafaError {
         String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)

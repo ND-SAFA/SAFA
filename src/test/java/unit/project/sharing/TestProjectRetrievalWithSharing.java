@@ -3,7 +3,6 @@ package unit.project.sharing;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -48,11 +47,7 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.getProjectMembers)
-            .withProject(project)
-            .get();
-        JSONObject response = sendGet(url, status().is2xxSuccessful());
+        JSONObject response = getProjectMembers(project);
 
         // VP - Verify that shared project is visible
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);

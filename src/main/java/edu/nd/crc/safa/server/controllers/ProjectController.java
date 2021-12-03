@@ -9,7 +9,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
@@ -52,12 +52,12 @@ public class ProjectController extends BaseController {
      *
      * @param project The project entity containing artifacts, traces, name, and decriptions.
      * @return The project and associated entities created.
-     * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
-     *                     payload.
+     * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
+     *                   payload.
      */
     @PostMapping(AppRoutes.Projects.projects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws ServerError {
+    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
@@ -88,11 +88,11 @@ public class ProjectController extends BaseController {
      *
      * @param projectId UUID of project to delete.
      * @return String with success message.
-     * @throws ServerError Throws error if project with associated id is not found.
+     * @throws SafaError Throws error if project with associated id is not found.
      */
     @DeleteMapping(AppRoutes.Projects.projectById)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteProject(@PathVariable UUID projectId) throws ServerError {
+    public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         this.projectRepository.delete(project);
         return new ServerResponse("Project deleted successfully");
@@ -106,10 +106,11 @@ public class ProjectController extends BaseController {
      * @param request   The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.addProjectMember)
-    public void addProjectMember(@PathVariable UUID projectId, @RequestBody ProjectMembershipRequest request)
-        throws ServerError {
+    public void addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                             @RequestBody ProjectMembershipRequest request)
+        throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        this.projectService.addMemberToProject(project,
+        this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
     }
@@ -121,12 +122,24 @@ public class ProjectController extends BaseController {
      * @return ServerResponse containing list of project members ships
      */
     @GetMapping(AppRoutes.Projects.getProjectMembers)
-    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws ServerError {
+    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
             .stream()
             .map(ProjectMemberAppEntity::new)
             .collect(Collectors.toList());
         return new ServerResponse(projectMemberships);
+    }
+
+    /**
+     * Deletes project membership effectively removing user from
+     * associated project
+     *
+     * @param projectMembershipId ID of the membership linking user and project.
+     */
+    @DeleteMapping(AppRoutes.Projects.deleteProjectMember)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
+        this.projectService.deleteProjectMemberById(projectMembershipId);
     }
 }

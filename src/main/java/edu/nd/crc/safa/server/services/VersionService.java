@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -32,7 +32,7 @@ public class VersionService {
         return this.projectVersionRepository.findByProject(project);
     }
 
-    public ProjectVersion createNewMajorVersion(Project project) throws ServerError {
+    public ProjectVersion createNewMajorVersion(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
         ProjectVersion newVersion = new ProjectVersion(project,
             projectVersion.getMajorVersion() + 1,
@@ -42,7 +42,7 @@ public class VersionService {
         return newVersion;
     }
 
-    public ProjectVersion createNewMinorVersion(Project project) throws ServerError {
+    public ProjectVersion createNewMinorVersion(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
         ProjectVersion newVersion = new ProjectVersion(project,
             projectVersion.getMajorVersion(),
@@ -52,7 +52,7 @@ public class VersionService {
         return newVersion;
     }
 
-    public ProjectVersion createNextRevision(Project project) throws ServerError {
+    public ProjectVersion createNextRevision(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
         ProjectVersion newVersion = new ProjectVersion(project,
             projectVersion.getMajorVersion(),
@@ -62,12 +62,12 @@ public class VersionService {
         return newVersion;
     }
 
-    public ProjectVersion getCurrentVersion(Project project) throws ServerError {
+    public ProjectVersion getCurrentVersion(Project project) throws SafaError {
         Optional<ProjectVersion> projectVersionQuery = this.projectVersionRepository.getCurrentVersion(project);
         if (projectVersionQuery.isPresent()) {
             return projectVersionQuery.get();
         } else {
-            throw new ServerError("Expected given project to contain an initial version");
+            throw new SafaError("Expected given project to contain an initial version");
         }
     }
 }

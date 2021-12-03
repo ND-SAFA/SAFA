@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -80,10 +80,10 @@ public class ArtifactVersionService {
      *
      * @param projectVersion   The ProjectVersion associated with calculated artifact changes.
      * @param projectArtifacts List of artifact's in a project whose version will be stored.
-     * @throws ServerError Throws error if any database related errors arise during saving the new artifacts/
+     * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
     public void setArtifactsAtVersion(ProjectVersion projectVersion,
-                                      List<ArtifactAppEntity> projectArtifacts) throws ServerError {
+                                      List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         List<ArtifactBody> allArtifactBodies = calculateArtifactBodiesAtVersion(projectVersion, projectArtifacts);
         for (ArtifactBody body : allArtifactBodies) {
             saveArtifactBody(body);
@@ -95,10 +95,10 @@ public class ArtifactVersionService {
      *
      * @param projectVersion The ProjectVersion containing given version of artifact.
      * @param artifact       The artifact at a given versions which is being stored.
-     * @throws ServerError Throws an error is saving entity violates any Database Constraints
+     * @throws SafaError Throws an error is saving entity violates any Database Constraints
      */
     public void setArtifactAtProjectVersion(ProjectVersion projectVersion, ArtifactAppEntity artifact)
-        throws ServerError {
+        throws SafaError {
         ArtifactBody artifactBody = calculateArtifactBodyAtVersion(projectVersion,
             artifact.id,
             artifact.name,
@@ -167,7 +167,7 @@ public class ArtifactVersionService {
 
     private List<ArtifactBody> calculateArtifactBodiesAtVersion(
         ProjectVersion projectVersion,
-        List<ArtifactAppEntity> projectArtifacts) throws ServerError {
+        List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         Hashtable<String, ArtifactAppEntity> artifactsUpdated = new Hashtable<>();
         List<ArtifactBody> updatedArtifactBodies = new ArrayList<>();
         for (ArtifactAppEntity a : projectArtifacts) {
@@ -213,7 +213,7 @@ public class ArtifactVersionService {
         String artifactName,
         String typeName,
         String summary,
-        String content) throws ServerError {
+        String content) throws SafaError {
 
         Project project = projectVersion.getProject();
         Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository
@@ -263,12 +263,12 @@ public class ArtifactVersionService {
         return artifactBodyTable;
     }
 
-    private void saveArtifactBody(ArtifactBody artifactBody) throws ServerError {
+    private void saveArtifactBody(ArtifactBody artifactBody) throws SafaError {
         try {
             this.artifactBodyRepository.save(artifactBody);
         } catch (Exception e) {
             String error = String.format("An error occurred while saving artifact: %s", artifactBody.getName());
-            throw new ServerError(error, e);
+            throw new SafaError(error, e);
         }
     }
 }

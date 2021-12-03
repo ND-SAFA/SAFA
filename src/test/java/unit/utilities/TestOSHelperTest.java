@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class TestOSHelperTest {
 
     @Test
-    public void canCreateAndDeleteFolder() throws ServerError {
+    public void canCreateAndDeleteFolder() throws SafaError {
         String pathToDummyFolder = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
@@ -29,7 +29,7 @@ public class TestOSHelperTest {
     }
 
     @Test
-    public void deleteNestedDirectories() throws ServerError {
+    public void deleteNestedDirectories() throws SafaError {
         String pathToParent = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         String pathToChild = pathToParent + "/pathToChild";
 

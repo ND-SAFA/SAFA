@@ -13,18 +13,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * regarded as unaccounted for.
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
-public class ServerError extends Exception {
+public class SafaError extends Exception {
     Exception exception;
     List<String> errors;
     String details;
     String message;
 
-    public ServerError(String message) {
+    public SafaError(String message) {
         this.message = message;
         this.errors = new ArrayList<>();
     }
 
-    public ServerError(Exception e) {
+    public SafaError(Exception e) {
         this.exception = e;
         this.errors =
             Arrays
@@ -33,7 +33,7 @@ public class ServerError extends Exception {
                 .collect(Collectors.toList());
     }
 
-    public ServerError(String message, Exception e) {
+    public SafaError(String message, Exception e) {
         this(e);
         this.message = message;
         this.errors.add(0, e.getLocalizedMessage());

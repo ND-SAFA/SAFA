@@ -2,13 +2,14 @@ package edu.nd.crc.safa.server.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -26,6 +27,7 @@ import edu.nd.crc.safa.utilities.OSHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Responsible for updating, deleting, and retrieving projects.
@@ -79,12 +81,12 @@ public class ProjectService {
      * @param artifacts      The artifacts to store to version.
      * @param traces         The traces to store to version.
      * @return ProjectEntities representing current state of project version after modification.
-     * @throws ServerError Throws error is a problem occurs while saving artifacts or traces.
+     * @throws SafaError Throws error is a problem occurs while saving artifacts or traces.
      */
     @Transactional
     public ProjectEntities saveProjectEntitiesToVersion(ProjectVersion projectVersion,
                                                         @NotNull List<ArtifactAppEntity> artifacts,
-                                                        @NotNull List<TraceAppEntity> traces) throws ServerError {
+                                                        @NotNull List<TraceAppEntity> traces) throws SafaError {
 
         artifactVersionService.setArtifactsAtVersion(projectVersion, artifacts);
         traceLinkService.createTraceLinks(projectVersion, traces);
@@ -95,9 +97,9 @@ public class ProjectService {
      * Deletes given project and all related entities through cascade property.
      *
      * @param project The project to delete.
-     * @throws ServerError Throws error if error occurs while deleting flat files.
+     * @throws SafaError Throws error if error occurs while deleting flat files.
      */
-    public void deleteProject(Project project) throws ServerError {
+    public void deleteProject(Project project) throws SafaError {
         this.projectRepository.delete(project);
         OSHelper.deletePath(ProjectPaths.getPathToStorage(project));
     }
@@ -118,7 +120,7 @@ public class ProjectService {
 
     public ProjectEntities updateProjectAtVersion(Project project,
                                                   ProjectVersion projectVersion,
-                                                  ProjectAppEntity payload) throws ServerError {
+                                                  ProjectAppEntity payload) throws SafaError {
         ProjectEntities response;
         Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
         persistentProject.setName(project.getName());
@@ -128,13 +130,13 @@ public class ProjectService {
         if (projectVersion == null) {
             if ((payload.artifacts != null
                 && payload.artifacts.size() > 0)) {
-                throw new ServerError("Cannot update artifacts because project version not defined");
+                throw new SafaError("Cannot update artifacts because project version not defined");
             }
             response = new ProjectEntities(payload, null, null, null);
         } else if (!projectVersion.hasValidId()) {
-            throw new ServerError("Invalid Project version: must have a valid ID.");
+            throw new SafaError("Invalid Project version: must have a valid ID.");
         } else if (!projectVersion.hasValidVersion()) {
-            throw new ServerError("Invalid Project version: must contain positive major, minor, and revision "
+            throw new SafaError("Invalid Project version: must contain positive major, minor, and revision "
                 + "numbers.");
         } else {
             projectVersion.setProject(project);
@@ -149,12 +151,12 @@ public class ProjectService {
     public ProjectEntities createNewProjectWithVersion(
         Project project,
         ProjectVersion projectVersion,
-        ProjectAppEntity payload) throws ServerError {
+        ProjectAppEntity payload) throws SafaError {
         ProjectEntities entityCreationResponse;
         if (projectVersion != null
             && projectVersion.hasValidVersion()
             && projectVersion.hasValidId()) {
-            throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
+            throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
         }
         this.projectRepository.save(project);
         this.setCurrentUserAsOwner(project);
@@ -178,16 +180,16 @@ public class ProjectService {
      * @param project        The project to add the member to.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
-     * @throws ServerError Throws error if given role is greater than the role
-     *                     of the user issuing this request.
+     * @throws SafaError Throws error if given role is greater than the role
+     *                   of the user issuing this request.
      */
-    public void addMemberToProject(Project project,
-                                   String newMemberEmail,
-                                   ProjectRole newMemberRole) throws ServerError {
+    public void addOrUpdateProjectMembership(Project project,
+                                             String newMemberEmail,
+                                             ProjectRole newMemberRole) throws SafaError {
         // Step - Find member being added and the current member.
         Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
         if (newMemberQuery.isEmpty()) {
-            throw new ServerError("No user exists with given email: " + newMemberEmail);
+            throw new SafaError("No user exists with given email: " + newMemberEmail);
         }
         SafaUser newMember = newMemberQuery.get();
         SafaUser currentUser = this.safaUserService.getCurrentUser();
@@ -197,23 +199,56 @@ public class ProjectService {
             .findByProjectAndMember(project, currentUser);
         if (currentUserMembershipQuery.isPresent()) {
             if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) >= 0) {
-                throw new ServerError("Cannot add member with authorization greater that current user.");
+                throw new SafaError("Cannot add member with authorization greater that current user.");
             }
         } else {
-            throw new ServerError("Cannot add member to project which current user is not apart of.");
+            throw new SafaError("Cannot add member to project which current user is not apart of.");
         }
 
-        ProjectMembership projectMembership = new ProjectMembership(project, newMember, newMemberRole);
-        this.projectMembershipRepository.save(projectMembership);
+        Optional<ProjectMembership> projectMembershipQuery =
+            this.projectMembershipRepository.findByProjectAndMember(project, newMember);
+        if (projectMembershipQuery.isPresent()) {
+            ProjectMembership existingProjectMembership = projectMembershipQuery.get();
+            existingProjectMembership.setRole(newMemberRole);
+            this.projectMembershipRepository.save(existingProjectMembership);
+        } else {
+            ProjectMembership newProjectMembership = new ProjectMembership(project, newMember, newMemberRole);
+            this.projectMembershipRepository.save(newProjectMembership);
+        }
     }
 
+    /**
+     * Returns list of members in given project.
+     *
+     * @param project The project whose members are retrieved.
+     * @return List of project memberships relating members to projects.
+     */
     public List<ProjectMembership> getProjectMembers(Project project) {
         return this.projectMembershipRepository.findByProject(project);
     }
 
+    /**
+     * The current authorized user to be an owner to given project.
+     *
+     * @param project The project the current user will be owner in.
+     */
     public void setCurrentUserAsOwner(Project project) {
         SafaUser user = this.safaUserService.getCurrentUser();
         ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);
         this.projectMembershipRepository.save(projectMembership);
+    }
+
+    /**
+     * Deletes project membership effectively removing user from
+     * associated project
+     *
+     * @param projectMembershipId ID of the membership linking user and project.
+     */
+    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
+        Optional<ProjectMembership> projectMembershipQuery =
+            this.projectMembershipRepository.findById(projectMembershipId);
+        if (projectMembershipQuery.isPresent()) {
+            this.projectMembershipRepository.delete(projectMembershipQuery.get());
+        }
     }
 }

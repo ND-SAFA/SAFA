@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -32,7 +32,7 @@ public class TestTraceFileParser extends ApplicationBaseTest {
         + "  }";
 
     @Test
-    public void testSourceTypeNotFound() throws IOException, ServerError {
+    public void testSourceTypeNotFound() throws IOException, SafaError {
         String sourceTypeName = "requirement";
         String targetTypeName = "design";
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
@@ -40,7 +40,7 @@ public class TestTraceFileParser extends ApplicationBaseTest {
         JSONObject traceMatrixDefinition = new JSONObject(jsonString);
 
         // VP - verify that source type not found
-        Exception sourceException = assertThrows(ServerError.class, () -> {
+        Exception sourceException = assertThrows(SafaError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
         assertThat(sourceException.getMessage()).matches(".*unknown type.*Requirement.*[\\s\\S]");
@@ -48,7 +48,7 @@ public class TestTraceFileParser extends ApplicationBaseTest {
         // VP - verify that source type is found but not target
         ArtifactType sourceType = new ArtifactType(project, sourceTypeName);
         this.artifactTypeRepository.save(sourceType);
-        Exception targetException = assertThrows(ServerError.class, () -> {
+        Exception targetException = assertThrows(SafaError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
         assertThat(targetException.getMessage()).matches(".*unknown type.*Design.*[\\s\\S]");

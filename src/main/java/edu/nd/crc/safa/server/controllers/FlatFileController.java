@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -66,15 +66,15 @@ public class FlatFileController extends BaseController {
      * @param versionId - The id of the version that will be modified by given files.
      * @param files     - The flat files containing tim.json, artifact files, and trace link files.
      * @return ServerResponse whose body contains all entities in project created.
-     * @throws ServerError - If no files are given.
+     * @throws SafaError - If no files are given.
      */
     @PostMapping(value = AppRoutes.Projects.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
-        @RequestParam MultipartFile[] files) throws ServerError {
+        @RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
-            throw new ServerError("Could not create project because no files were received.");
+            throw new SafaError("Could not create project because no files were received.");
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
@@ -91,13 +91,13 @@ public class FlatFileController extends BaseController {
      *
      * @param files Files including artifact and traces files and requiring at minimum a Tim.json file.
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
-     * @throws ServerError Throws errors if tim.json file does not exist or an error occurred while parsing it.
+     * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
     @PostMapping(value = AppRoutes.Projects.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws ServerError {
+    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
-            throw new ServerError("Could not create project because no files were received.");
+            throw new SafaError("Could not create project because no files were received.");
         }
 
         Project project = new Project("", "");
@@ -120,12 +120,12 @@ public class FlatFileController extends BaseController {
      * @param projectVersion The version that the artifacts and errors will be associated with.
      * @param files          the flat files defining the project
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
-     * @throws ServerError on any parsing error of tim.json, artifacts, or trace links
+     * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
     private ProjectEntities uploadAndCreateProjectFromFlatFiles(Project project,
                                                                 ProjectVersion projectVersion,
                                                                 MultipartFile[] files)
-        throws ServerError {
+        throws SafaError {
 
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.flatFileService.parseProjectFilesFromTIM(projectVersion);

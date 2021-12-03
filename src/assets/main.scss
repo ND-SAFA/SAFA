@@ -1,2 +1,7 @@
 @import "./typography.scss";
 @import "./graph.scss";
+
+// Fixes code-diff's broken styling
+code.hljs {
+  min-height: 26px;
+}

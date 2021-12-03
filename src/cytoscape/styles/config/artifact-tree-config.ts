@@ -15,7 +15,10 @@ export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
 
 export const ARTIFACT_SHAPE = "roundrectangle";
 export const ARTIFACT_BORDER_STYLE = "solid";
-export const ARTIFACT_BORDER_WIDTH = 1.5;
+export const ARTIFACT_BORDER_WIDTH = 1;
+
+export const ARTIFACT_TRUNCATE_LENGTH = 150;
+export const ARTIFACT_REDUCED_TRUNCATE_LENGTH = 100;
 
 export const ARTIFACT_SELECTED_BORDER_WIDTH = 6;
 

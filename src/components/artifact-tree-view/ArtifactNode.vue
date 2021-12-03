@@ -70,6 +70,7 @@ export default Vue.extend({
     },
     isSelected(): boolean {
       const selectedArtifact = this.selectedArtifact;
+
       return (
         selectedArtifact !== undefined &&
         selectedArtifact.name === this.artifactDefinition.name
@@ -81,9 +82,11 @@ export default Vue.extend({
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
       const artifactName = this.artifactDefinition.name;
+
       if (artifactName in artifactWarnings) {
         return artifactWarnings[artifactName];
       }
+
       return undefined;
     },
     artifactDeltaState(): ArtifactDeltaState {
@@ -91,6 +94,7 @@ export default Vue.extend({
         this.clearData();
         return ArtifactDeltaState.NO_CHANGE;
       }
+
       const name: string = this.artifactDefinition.name;
       const addedArtifacts: Record<string, AddedArtifact> =
         deltaModule.getAdded;

@@ -1,6 +1,8 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import {
   ARTIFACT_HEIGHT,
+  ARTIFACT_REDUCED_TRUNCATE_LENGTH,
+  ARTIFACT_TRUNCATE_LENGTH,
   ARTIFACT_WIDTH,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { capitalize, ThemeColors } from "@/util";
@@ -98,7 +100,9 @@ function createNodeSubHeader(data: ArtifactData, height: number): string {
  */
 function createNodeBody(data: ArtifactData, height: number): string {
   const hasFooter = !!(data.warnings?.length || data.hiddenChildren);
-  const truncateLength = hasFooter ? 100 : 150;
+  const truncateLength = hasFooter
+    ? ARTIFACT_REDUCED_TRUNCATE_LENGTH
+    : ARTIFACT_TRUNCATE_LENGTH;
 
   const body =
     data.body.length > truncateLength

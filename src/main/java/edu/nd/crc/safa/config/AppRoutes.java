@@ -15,7 +15,7 @@ public class AppRoutes {
         //PREFIXES
         private static final String projectPrefix = "/projects";
         public static final String projectById = projectPrefix + "/{projectId}";
-        public static final String addProjectMember = projectPrefix + "/members/add";
+        public static final String addProjectMember = projectPrefix + "/{projectId}/members";
         public static final String getProjectMembers = projectPrefix + "/{projectId}/members";
         // Project Controller
         public static final String projects = projectPrefix;

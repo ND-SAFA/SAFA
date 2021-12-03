@@ -134,7 +134,7 @@ public class VersionController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws ServerError {
-        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withEditVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         this.projectVersionRepository.delete(projectVersion);
         return new ServerResponse("Project version deleted successfully");
     }
@@ -148,7 +148,7 @@ public class VersionController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.getVersionById)
     public ServerResponse getProjectById(@PathVariable UUID versionId) throws ServerError {
-        ProjectVersion projectVersion = this.resourceBuilder.getProjectVersion(versionId).withViewVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         ProjectEntities response = this.projectRetrievalService
             .retrieveAndCreateProjectResponse(projectVersion);
         return new ServerResponse(response);

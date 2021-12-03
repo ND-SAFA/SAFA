@@ -44,8 +44,8 @@ public class DeltaController extends BaseController {
     @GetMapping(AppRoutes.Projects.calculateProjectDelta)
     public ServerResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                                 @PathVariable UUID targetVersionId) throws ServerError {
-        ProjectVersion baselineVersion = this.resourceBuilder.getProjectVersion(baselineVersionId).withViewVersion();
-        ProjectVersion targetVersion = this.resourceBuilder.getProjectVersion(targetVersionId).withViewVersion();
+        ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId).withViewVersion();
+        ProjectVersion targetVersion = this.resourceBuilder.fetchVersion(targetVersionId).withViewVersion();
         return new ServerResponse(this.deltaService.calculateProjectDelta(baselineVersion, targetVersion));
     }
 }

@@ -106,11 +106,14 @@ public class ProjectController extends BaseController {
      * Adds specified user account with given email to project assigned with
      * given role.
      *
-     * @param request The request containing project, member to add, and their given role.
+     * @param projectId The UUID of the project which the member is being added to.
+     * @param request   The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.addProjectMember)
-    public void addProjectMember(@RequestBody ProjectMembershipRequest request) throws ServerError {
-        this.projectService.addMemberToProject(request.getProjectId(),
+    public void addProjectMember(@PathVariable UUID projectId, @RequestBody ProjectMembershipRequest request)
+        throws ServerError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        this.projectService.addMemberToProject(project,
             request.getMemberEmail(),
             request.getProjectRole());
     }

@@ -41,7 +41,7 @@ public class ResourceBuilder {
         return this;
     }
 
-    public ResourceBuilder getProjectVersion(UUID versionId) {
+    public ResourceBuilder fetchVersion(UUID versionId) {
         this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         return this;
     }

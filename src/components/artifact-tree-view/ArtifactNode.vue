@@ -121,10 +121,11 @@ export default Vue.extend({
       const body = this.artifactDefinition.body;
       const artifactType = this.artifactDefinition.type;
       const isSelected = this.isSelected;
-      const hiddenChildren = subtreeModule.hiddenChildrenForNode(id);
+      const hiddenChildren = subtreeModule.getHiddenChildrenByParentName(id);
       const hiddenChildWarnings =
-        errorModule.allArtifactWarnings(hiddenChildren);
-      const hiddenChildDeltaStates = deltaModule.allDeltaStates(hiddenChildren);
+        errorModule.getWarningsByArtifactNames(hiddenChildren);
+      const hiddenChildDeltaStates =
+        deltaModule.getDeltaStatesByArtifactNames(hiddenChildren);
 
       return {
         data: {

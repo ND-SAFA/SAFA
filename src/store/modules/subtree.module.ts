@@ -26,7 +26,7 @@ export default class SubtreeModule extends VuexModule {
   private hiddenSubtreeNodes: string[] = [];
 
   /**
-   * List of nodes with their children currently hidden.
+   * List of nodes whose children are currently hidden.
    */
   private collapsedParentNodes: string[] = [];
 
@@ -233,13 +233,13 @@ export default class SubtreeModule extends VuexModule {
   /**
    * @return The names of all hidden children below the given node.
    */
-  get hiddenChildrenForNode(): (name: string) => string[] {
-    return (name) => {
-      if (!this.collapsedParentNodes.includes(name)) {
+  get getHiddenChildrenByParentName(): (name: string) => string[] {
+    return (parentName) => {
+      if (!this.collapsedParentNodes.includes(parentName)) {
         return [];
       }
 
-      const childNodes = this.getSubtreeByArtifactName(name);
+      const childNodes = this.getSubtreeByArtifactName(parentName);
       const hiddenNodes = this.getHiddenSubtreeNodes;
 
       return childNodes.filter((id) => hiddenNodes.includes(id));

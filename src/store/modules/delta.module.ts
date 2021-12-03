@@ -149,9 +149,11 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return All delta states for all given nodes.
+   * @return Delta states associated with artifacts with given names.
    */
-  get allDeltaStates(): (names: string[]) => ArtifactDeltaState[] {
+  get getDeltaStatesByArtifactNames(): (
+    names: string[]
+  ) => ArtifactDeltaState[] {
     return (names) => {
       const deltaStates = new Set<ArtifactDeltaState>();
 

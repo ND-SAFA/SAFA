@@ -59,9 +59,9 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return All artifact warnings across all given nodes.
+   * @return Warnings associated with artifacts of given names.
    */
-  get allArtifactWarnings(): (names: string[]) => ArtifactWarning[] {
+  get getWarningsByArtifactNames(): (names: string[]) => ArtifactWarning[] {
     return (names) => {
       return names
         .map((name) => this.artifactWarnings[name] || [])

@@ -79,8 +79,8 @@ export default Vue.extend({
   },
   methods: {
     clearData() {
-      this.name = "";
-      this.description = "";
+      this.name = this.project?.name || "";
+      this.description = this.project?.description || "";
     },
     onClose() {
       this.$emit("onClose");

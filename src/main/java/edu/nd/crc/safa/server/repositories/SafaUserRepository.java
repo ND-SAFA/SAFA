@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -10,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SafaUserRepository extends CrudRepository<SafaUser, UUID> {
 
-    SafaUser findByEmail(String email);
+    Optional<SafaUser> findByEmail(String email);
 }

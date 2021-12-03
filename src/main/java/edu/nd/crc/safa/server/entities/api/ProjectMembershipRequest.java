@@ -4,7 +4,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 /**
  * The request sent from FEND to request a project membership be added or updated.
@@ -20,8 +19,8 @@ public class ProjectMembershipRequest {
     public ProjectMembershipRequest() {
     }
 
-    public ProjectMembershipRequest(SafaUser member, ProjectRole role) {
-        this.memberEmail = member.getEmail();
+    public ProjectMembershipRequest(String email, ProjectRole role) {
+        this.memberEmail = email;
         this.projectRole = role;
     }
 

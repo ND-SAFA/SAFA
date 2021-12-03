@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
 import edu.nd.crc.safa.server.entities.api.ServerError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -58,8 +59,7 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         exception.printStackTrace();
-        String causeName = exception.getMostSpecificCause().toString();
-        String errorMessage = String.format("Data integrity violation: %s", causeName);
+        String errorMessage = AppConstraints.getConstraintError(exception);
         ServerError error = new ServerError(errorMessage, exception);
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);

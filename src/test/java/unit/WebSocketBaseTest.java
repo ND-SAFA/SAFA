@@ -97,6 +97,7 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
     }
 
     public int getQueueSize(String id) throws InterruptedException {
+        Thread.sleep(750);
         return idToQueue.get(id).size();
     }
 }

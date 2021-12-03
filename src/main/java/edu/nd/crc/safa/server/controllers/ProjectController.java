@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.ServerError;
@@ -36,17 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController extends BaseController {
 
-    private final SafaUserService safaUserService;
     private final ProjectService projectService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
-                             SafaUserService safaUserService,
                              ProjectService projectService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
-        this.safaUserService = safaUserService;
         this.projectService = projectService;
     }
 

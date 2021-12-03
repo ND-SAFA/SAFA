@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Optional;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
@@ -34,7 +36,10 @@ public class TestSafaUserController extends ApplicationBaseTest {
     @Test
     public void createAccount() throws Exception {
         createUser(email, password);
-        SafaUser user = safaUserRepository.findByEmail(email);
+        Optional<SafaUser> userQuery = safaUserRepository.findByEmail(email);
+        assertThat(userQuery.isPresent()).isTrue();
+
+        SafaUser user = userQuery.get();
         assertThat(user.getEmail()).isEqualTo(email);
     }
 

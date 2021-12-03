@@ -15,7 +15,7 @@
       </v-row>
       <v-divider />
       <p>
-        {{ hasDescription ? project.description : emptyDescriptionMessage }}
+        {{ project.description }}
       </p>
     </v-col>
     <project-identifier-modal
@@ -37,7 +37,6 @@ import { ProjectIdentifierModal } from "@/components/project/shared";
 import { saveOrUpdateProject } from "@/api";
 import { projectModule } from "@/store";
 
-const EMPTY_DESCRIPTION_MESSAGE = "Project contains empty description";
 /**
  * Represents the section describing the project name and descriptions
  * within the settings.
@@ -49,11 +48,6 @@ export default Vue.extend({
       type: Object as PropType<Project>,
       required: true,
     },
-    emptyDescriptionMessage: {
-      type: String,
-      required: false,
-      default: EMPTY_DESCRIPTION_MESSAGE,
-    },
   },
   data() {
     return {
@@ -61,12 +55,6 @@ export default Vue.extend({
       isEditOpen: false,
       projectToEdit: this.project,
     };
-  },
-  computed: {
-    hasDescription(): boolean {
-      const description = this.project.description;
-      return description !== "";
-    },
   },
   methods: {
     onEdit(): void {

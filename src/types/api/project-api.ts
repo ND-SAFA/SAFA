@@ -158,8 +158,8 @@ export interface EntityCommit<T> {
 /**
  * Represents a member in a given project
  */
-export interface ProjectMember {
-  projectMemberId: string;
+export interface ProjectMembership {
+  projectMembershipId: string;
   email: string;
   role: ProjectRole;
 }

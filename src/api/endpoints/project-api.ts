@@ -4,7 +4,7 @@ import {
   Project,
   ProjectCreationResponse,
   ProjectIdentifier,
-  ProjectMember,
+  ProjectMembership,
   ProjectRole,
 } from "@/types";
 import authHttpClient from "@/api/endpoints/auth-http-client";
@@ -121,8 +121,8 @@ export async function getProjectDelta(
  */
 export async function getProjectMembers(
   projectId: string
-): Promise<ProjectMember[]> {
-  return authHttpClient<ProjectMember[]>(
+): Promise<ProjectMembership[]> {
+  return authHttpClient<ProjectMembership[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -140,12 +140,12 @@ export async function addOrUpdateProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
-): Promise<ProjectMember[]> {
+): Promise<ProjectMembership[]> {
   const payload: MemberRequest = {
     memberEmail,
     projectRole,
   };
-  return authHttpClient<ProjectMember[]>(
+  return authHttpClient<ProjectMembership[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -161,10 +161,10 @@ export async function addOrUpdateProjectMember(
  */
 
 export async function deleteProjectMember(
-  projectMember: ProjectMember
-): Promise<ProjectMember[]> {
-  const projectMemberId = projectMember.projectMemberId;
-  return authHttpClient<ProjectMember[]>(
+  projectMember: ProjectMembership
+): Promise<ProjectMembership[]> {
+  const projectMemberId = projectMember.projectMembershipId;
+  return authHttpClient<ProjectMembership[]>(
     fillEndpoint(Endpoint.deleteProjectMember, {
       projectMemberId,
     }),

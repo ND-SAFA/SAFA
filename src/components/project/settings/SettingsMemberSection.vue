@@ -23,7 +23,7 @@
             :is-open="isNewOpen"
             :project="project"
             @onCancel="isNewOpen = false"
-            @onConfirm="onConfirm"
+            @onConfirm="onConfirmAdd"
           />
         </template>
         <template v-slot:editItemDialogue>
@@ -33,7 +33,7 @@
             :project="project"
             :member="memberToEdit"
             @onCancel="isEditOpen = false"
-            @onConfirm="onConfirm"
+            @onConfirm="onConfirmEdit"
           />
         </template>
       </generic-selector>
@@ -43,7 +43,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ConfirmationType, Project, ProjectMember, ProjectRole } from "@/types";
+import {
+  ConfirmationType,
+  Project,
+  ProjectMembership,
+  ProjectRole,
+} from "@/types";
 import { GenericSelector } from "@/components";
 import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -62,8 +67,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      members: [] as ProjectMember[],
-      memberToEdit: undefined as ProjectMember | undefined,
+      members: [] as ProjectMembership[],
+      memberToEdit: undefined as ProjectMembership | undefined,
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
@@ -116,11 +121,11 @@ export default Vue.extend({
     onAddMember(): void {
       this.isNewOpen = true;
     },
-    onEditMember(member: ProjectMember): void {
+    onEditMember(member: ProjectMembership): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
-    onDeleteMember(member: ProjectMember): void {
+    onDeleteMember(member: ProjectMembership): void {
       appModule.SET_CONFIRMATION_MESSAGE({
         type: ConfirmationType.INFO,
         title: "Remove User from Project",
@@ -128,12 +133,17 @@ export default Vue.extend({
         statusCallback: async (isConfirmed: boolean) => {
           if (isConfirmed) {
             await deleteProjectMember(member);
+            await this.retrieveMembers();
           }
         },
       });
     },
-    async onConfirm(): Promise<void> {
-      this.isNewOpen = true;
+    async onConfirmAdd(): Promise<void> {
+      this.isNewOpen = false;
+      await this.retrieveMembers();
+    },
+    async onConfirmEdit(): Promise<void> {
+      this.isEditOpen = false;
       await this.retrieveMembers();
     },
   },

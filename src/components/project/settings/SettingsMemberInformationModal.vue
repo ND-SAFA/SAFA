@@ -38,7 +38,7 @@ import {
   ButtonType,
   EmptyLambda,
   ProjectIdentifier,
-  ProjectMember,
+  ProjectMembership,
   ProjectRole,
 } from "@/types";
 import Vue, { PropType } from "vue";
@@ -67,7 +67,7 @@ export default Vue.extend({
       default: "Share Project",
     },
     member: {
-      type: Object as PropType<ProjectMember>,
+      type: Object as PropType<ProjectMembership>,
       required: false,
     },
     clearOnClose: {
@@ -160,7 +160,7 @@ export default Vue.extend({
         this.clearData();
       }
     },
-    member(newMember: ProjectMember | undefined): void {
+    member(newMember: ProjectMembership | undefined): void {
       if (newMember !== undefined) {
         this.userRole = newMember.role;
         this.userEmail = newMember.email;

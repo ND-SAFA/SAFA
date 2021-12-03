@@ -13,14 +13,26 @@
         :is-loading="isLoading"
         item-key="email"
         @add-item="onAddMember"
+        @edit-item="onEditMember"
+        @delete-item="onDeleteMember"
         @refresh="retrieveMembers"
         class="mt-5"
       >
         <template v-slot:addItemDialogue>
-          <settings-add-member-modal
-            :is-open="isOpen"
+          <settings-member-information-modal
+            :is-open="isNewOpen"
             :project="project"
-            @onCancel="isOpen = false"
+            @onCancel="isNewOpen = false"
+            @onConfirm="onConfirm"
+          />
+        </template>
+        <template v-slot:editItemDialogue>
+          <settings-member-information-modal
+            :is-open="isEditOpen"
+            :clear-on-close="false"
+            :project="project"
+            :member="memberToEdit"
+            @onCancel="isEditOpen = false"
             @onConfirm="onConfirm"
           />
         </template>
@@ -31,18 +43,17 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectMember, ProjectRole } from "@/types";
+import { ConfirmationType, Project, ProjectMember, ProjectRole } from "@/types";
 import { GenericSelector } from "@/components";
-import { getProjectMembers } from "@/api";
-import SettingsAddMemberModal from "./SettingsAddMemberModal.vue";
-import { sessionModule } from "@/store";
+import { deleteProjectMember, getProjectMembers } from "@/api";
+import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
+import { appModule, sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
- * TODO: Show delete and other admin operations if admin or above
  */
 export default Vue.extend({
-  components: { GenericSelector, SettingsAddMemberModal },
+  components: { GenericSelector, SettingsMemberInformationModal },
   props: {
     project: {
       type: Object as PropType<Project>,
@@ -52,8 +63,10 @@ export default Vue.extend({
   data() {
     return {
       members: [] as ProjectMember[],
+      memberToEdit: undefined as ProjectMember | undefined,
       isLoading: false,
-      isOpen: false,
+      isNewOpen: false,
+      isEditOpen: false,
     };
   },
   computed: {
@@ -100,11 +113,27 @@ export default Vue.extend({
         this.isLoading = false;
       }
     },
-    onAddMember() {
-      this.isOpen = true;
+    onAddMember(): void {
+      this.isNewOpen = true;
+    },
+    onEditMember(member: ProjectMember): void {
+      this.memberToEdit = member;
+      this.isEditOpen = true;
+    },
+    onDeleteMember(member: ProjectMember): void {
+      appModule.SET_CONFIRMATION_MESSAGE({
+        type: ConfirmationType.INFO,
+        title: "Remove User from Project",
+        body: `Are you sure you want to remove ${member.email} from project?`,
+        statusCallback: async (isConfirmed: boolean) => {
+          if (isConfirmed) {
+            await deleteProjectMember(member);
+          }
+        },
+      });
     },
     async onConfirm(): Promise<void> {
-      this.isOpen = true;
+      this.isNewOpen = true;
       await this.retrieveMembers();
     },
   },

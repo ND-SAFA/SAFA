@@ -50,7 +50,7 @@ export default Vue.extend({
     return {
       hover: true,
       hoverColor: ThemeColors.menuHighlight,
-      selectedValue: "",
+      selectedValue: this.definition.selectedItem || "",
     };
   },
   computed: {

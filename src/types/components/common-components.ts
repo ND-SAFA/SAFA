@@ -55,6 +55,7 @@ interface MenuDefinition extends BaseButtonDefinition {
  */
 export interface ListMenuDefinition extends MenuDefinition {
   type: ButtonType.LIST_MENU;
+  selectedItem?: string;
 }
 
 /**

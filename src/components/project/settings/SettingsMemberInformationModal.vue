@@ -1,16 +1,17 @@
 <template>
-  <generic-modal size="xs" :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal size="s" :is-open="isOpen" :title="title" @close="onCancel">
     <template v-slot:body>
       <v-container>
         <v-row justify="center">
           <v-col align-self="center">
             <v-text-field
-              v-model="newUserEmail"
+              v-model="userEmail"
               label="User Email"
               class="ma-3"
               rounded
               solo
               dense
+              :readonly="member !== undefined"
               :rules="emailRules"
               @update:error="onErrorUpdate"
             />
@@ -37,13 +38,14 @@ import {
   ButtonType,
   EmptyLambda,
   ProjectIdentifier,
+  ProjectMember,
   ProjectRole,
 } from "@/types";
 import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import { capitalize, getEnumKeys } from "@/util";
-import { addProjectMember } from "@/api";
+import { getEnumKeys } from "@/util";
+import { addOrUpdateProjectMember } from "@/api";
 import { appModule } from "@/store";
 
 /**
@@ -64,11 +66,20 @@ export default Vue.extend({
       type: String,
       default: "Share Project",
     },
+    member: {
+      type: Object as PropType<ProjectMember>,
+      required: false,
+    },
+    clearOnClose: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
-      newUserEmail: "",
-      newUserRole: undefined as ProjectRole | undefined,
+      userEmail: "",
+      userRole: undefined as ProjectRole | undefined,
       submitButtonLabel: "",
       hasErrors: false,
       emailRules: [
@@ -83,8 +94,8 @@ export default Vue.extend({
     validated(): boolean {
       return (
         !this.hasErrors &&
-        this.newUserEmail.length > 0 &&
-        this.newUserRole !== undefined
+        this.userEmail.length > 0 &&
+        this.userRole !== undefined
       );
     },
     projectRoles(): string[] {
@@ -93,7 +104,7 @@ export default Vue.extend({
     itemLambdas(): EmptyLambda[] {
       return this.projectRoles.map((role) => {
         return () => {
-          this.newUserRole = this.getProjectRole(role);
+          this.userRole = this.getProjectRole(role);
         };
       });
     },
@@ -107,6 +118,7 @@ export default Vue.extend({
           buttonColor: "primary",
           buttonIsText: false,
           showSelectedValue: true,
+          selectedItem: this.member?.role,
         },
       ];
     },
@@ -116,18 +128,19 @@ export default Vue.extend({
       this.hasErrors = hasErrors;
     },
     clearData(): void {
-      this.newUserEmail = "";
+      this.userEmail = "";
+      this.userRole = undefined;
     },
     async onConfirm() {
       const project = this.$props.project;
       const projectId = this.project?.projectId;
-      const projectRole = this.newUserRole;
+      const projectRole = this.userRole;
       if (
         this.validated &&
         projectId !== undefined &&
         projectRole !== undefined
       ) {
-        addProjectMember(projectId, this.newUserEmail, projectRole)
+        addOrUpdateProjectMember(projectId, this.userEmail, projectRole)
           .then(() => this.$emit("onConfirm", project))
           .catch();
       } else {
@@ -143,8 +156,14 @@ export default Vue.extend({
   },
   watch: {
     isOpen(isOpen: boolean) {
-      if (isOpen) {
+      if (isOpen && this.clearOnClose) {
         this.clearData();
+      }
+    },
+    member(newMember: ProjectMember | undefined): void {
+      if (newMember !== undefined) {
+        this.userRole = newMember.role;
+        this.userEmail = newMember.email;
       }
     },
   },

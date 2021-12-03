@@ -136,7 +136,7 @@ export async function getProjectMembers(
  * Shares project with given user containing email at set role.
  */
 
-export async function addProjectMember(
+export async function addOrUpdateProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
@@ -152,6 +152,24 @@ export async function addProjectMember(
     {
       method: "POST",
       body: JSON.stringify(payload),
+    }
+  );
+}
+
+/**
+ * Shares project with given user containing email at set role.
+ */
+
+export async function deleteProjectMember(
+  projectMember: ProjectMember
+): Promise<ProjectMember[]> {
+  const projectMemberId = projectMember.projectMemberId;
+  return authHttpClient<ProjectMember[]>(
+    fillEndpoint(Endpoint.deleteProjectMember, {
+      projectMemberId,
+    }),
+    {
+      method: "DELETE",
     }
   );
 }

@@ -159,6 +159,7 @@ export interface EntityCommit<T> {
  * Represents a member in a given project
  */
 export interface ProjectMember {
+  projectMemberId: string;
   email: string;
   role: ProjectRole;
 }

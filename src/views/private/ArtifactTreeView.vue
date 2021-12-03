@@ -1,14 +1,7 @@
 <template>
-  <private-page>
+  <private-page full-window>
     <template v-slot:page>
-      <v-container fluid>
-        <v-row justify="center" class="ma-1">
-          <VersionLabel />
-        </v-row>
-        <v-row class="ma-1">
-          <ArtifactTree />
-        </v-row>
-      </v-container>
+      <ArtifactTree />
     </template>
   </private-page>
 </template>
@@ -22,7 +15,7 @@ import { ArtifactTree, VersionLabel, PrivatePage } from "@/components";
  * above it containing the current project and version.
  */
 export default Vue.extend({
-  name: "Home",
+  name: "artifact-tree-view",
   components: {
     PrivatePage,
     ArtifactTree,

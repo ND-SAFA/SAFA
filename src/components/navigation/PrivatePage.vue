@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container :class="fullWindow ? 'full-window-page' : ''">
     <slot name="page" />
     <app-bar :is-left-open="isLeftOpen" :is-right-open="isRightOpen" />
     <left-nav-drawer :is-left-open="isLeftOpen" :width="250" />
@@ -28,6 +28,9 @@ export default Vue.extend({
     RightNavDrawer,
     ArtifactCreatorModal,
     AppConfirmModal,
+  },
+  props: {
+    fullWindow: Boolean,
   },
   computed: {
     isLeftOpen: () => appModule.getIsLeftOpen,

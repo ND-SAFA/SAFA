@@ -36,13 +36,19 @@ public class ResourceBuilder {
         this.permissionService = permissionService;
     }
 
-    public ResourceBuilder fetchProject(UUID projectId) {
+    public ResourceBuilder fetchProject(UUID projectId) throws ServerError {
         this.project = this.projectRepository.findByProjectId(projectId);
+        if (this.project == null) {
+            throw new ServerError("Unable to find project with id:" + projectId);
+        }
         return this;
     }
 
-    public ResourceBuilder fetchVersion(UUID versionId) {
+    public ResourceBuilder fetchVersion(UUID versionId) throws ServerError {
         this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        if (this.projectVersion == null) {
+            throw new ServerError("Unable to find project version with id:" + versionId);
+        }
         return this;
     }
 

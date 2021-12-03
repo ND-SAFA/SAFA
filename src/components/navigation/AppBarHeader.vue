@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType, Project } from "@/types";
+import { ButtonDefinition, ButtonType, EmptyLambda, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { appModule, projectModule } from "@/store";
 import {
@@ -44,6 +44,11 @@ import {
 import SafaIcon from "./SafaIcon.vue";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "@/components/artifact-tree-view/VersionLabel.vue";
+
+/**
+ * Local representation of generated menu items.
+ */
+type CondensedMenuItem = [string, EmptyLambda];
 
 export default Vue.extend({
   components: {
@@ -59,7 +64,6 @@ export default Vue.extend({
       openProjectOpen: false,
       uploadVersionOpen: false,
       changeVersionOpen: false,
-      definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
   methods: {
@@ -82,34 +86,40 @@ export default Vue.extend({
     project(): Project {
       return projectModule.getProject;
     },
-  },
-  created() {
-    this.definitions = [
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Project",
-        buttonIsText: true,
-        menuItems: ["Open Project", "Create Project"],
-        menuHandlers: [
-          this.onOpenProject,
-          () => navigateTo(Routes.PROJECT_CREATOR),
-        ],
-      },
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Version",
-        buttonIsText: true,
-        menuItems: ["Change Version", "Upload new version"],
-        menuHandlers: [this.onChangeVersion, this.onUploadVersion],
-      },
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Trace Links",
-        buttonIsText: true,
-        menuItems: ["Approve Generated Trace Links"],
-        menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
-      },
-    ];
+    projectMenuItems(): CondensedMenuItem[] {
+      const isProjectDefined = this.project.projectId !== "";
+      const options: CondensedMenuItem[] = [
+        ["Open", this.onOpenProject],
+        ["Create", () => navigateTo(Routes.PROJECT_CREATOR)],
+        ["Settings", () => navigateTo(Routes.PROJECT_SETTINGS)],
+      ];
+      return isProjectDefined ? options : options.slice(0, -1);
+    },
+    definitions(): ButtonDefinition[] {
+      return [
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Project",
+          buttonIsText: true,
+          menuItems: this.projectMenuItems.map((i) => i[0]),
+          menuHandlers: this.projectMenuItems.map((i) => i[1]),
+        },
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Version",
+          buttonIsText: true,
+          menuItems: ["Change Version", "Upload new version"],
+          menuHandlers: [this.onChangeVersion, this.onUploadVersion],
+        },
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Trace Links",
+          buttonIsText: true,
+          menuItems: ["Approve Generated Trace Links"],
+          menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
+        },
+      ];
+    },
   },
 });
 </script>

@@ -41,9 +41,6 @@ export default Vue.extend({
       },
     },
   },
-  mounted() {
-    this.clearData();
-  },
   methods: {
     clearData() {
       this.currentName = "";
@@ -51,6 +48,7 @@ export default Vue.extend({
     },
     onClose() {
       this.$emit("onClose");
+      this.clearData();
     },
   },
 });

@@ -50,6 +50,7 @@ import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
 import { appModule, projectModule } from "@/store";
 import { ApprovalSection, PrivatePage } from "@/components";
 import { navigateTo, Routes } from "@/router";
+import { EmptyLambda } from "@/types";
 
 export default Vue.extend({
   name: "approval-links-view",
@@ -93,13 +94,13 @@ export default Vue.extend({
         });
       });
     },
-    approveLinkHandler(link: TraceLink, filterCallback: () => void) {
+    approveLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
       approveLinkAPIHandler(link, () => {
         filterCallback();
         this.approvedLinks = this.approvedLinks.concat([link]);
       });
     },
-    declineLinkHandler(link: TraceLink, filterCallback: () => void) {
+    declineLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
       declineLinkAPIHandler(link, () => {
         filterCallback();
         this.declinedLinks = this.declinedLinks.concat([link]);

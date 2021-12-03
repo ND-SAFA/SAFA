@@ -1,9 +1,11 @@
 import {
   DeltaPayload,
+  MemberRequest,
   Project,
   ProjectCreationResponse,
   ProjectIdentifier,
-  ProjectVersion,
+  ProjectMembership,
+  ProjectRole,
 } from "@/types";
 import authHttpClient from "@/api/endpoints/auth-http-client";
 import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
@@ -78,22 +80,6 @@ export async function getProjects(): Promise<ProjectIdentifier[]> {
 }
 
 /**
- * Gets a specific version of a project.
- *
- * @param versionId - The project version ID to get.
- *
- * @return The matching project.
- */
-export async function getProjectVersion(
-  versionId: string
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    fillEndpoint(Endpoint.projectVersion, { versionId }),
-    { method: "GET" }
-  );
-}
-
-/**
  * Deletes a project.
  *
  * @param projectId - The project ID to delete.
@@ -101,106 +87,6 @@ export async function getProjectVersion(
 export async function deleteProject(projectId: string): Promise<void> {
   return authHttpClient<void>(
     fillEndpoint(Endpoint.updateProject, { projectId }),
-    {
-      method: "DELETE",
-    }
-  );
-}
-
-/**
- * Gets all versions of the given project.
- *
- * @param projectId - The project ID to return versions of.
- */
-export async function getProjectVersions(
-  projectId?: string
-): Promise<ProjectVersion[]> {
-  if (!projectId) {
-    throw Error("Undefined project identifier");
-  }
-
-  return authHttpClient<ProjectVersion[]>(
-    fillEndpoint(Endpoint.getProjectVersions, { projectId }),
-    { method: "GET" }
-  );
-}
-
-/**
- * Returns the current version of the given project.
- *
- * @param projectId - The project ID to return the current version of.
- */
-export async function getCurrentVersion(
-  projectId?: string
-): Promise<ProjectVersion> {
-  if (!projectId) {
-    throw Error("Undefined project identifier");
-  }
-
-  return authHttpClient<ProjectVersion>(
-    fillEndpoint(Endpoint.getCurrentVersion, { projectId }),
-    { method: "GET" }
-  );
-}
-
-/**
- * Creates a new major version of the project.
- *
- * @param projectId - The project ID to create a new version of.
- *
- * @return The new project version.
- */
-export async function createNewMajorVersion(
-  projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
-    fillEndpoint(Endpoint.createNewMajorVersion, { projectId }),
-    { method: "POST" }
-  );
-}
-
-/**
- * Creates a new minor version of the project.
- *
- * @param projectId - The project ID to create a new version of.
- *
- * @return The new project version.
- */
-export async function createNewMinorVersion(
-  projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
-    fillEndpoint(Endpoint.createNewMinorVersion, { projectId }),
-    { method: "POST" }
-  );
-}
-
-/**
- * Creates a new revision version of the project.
- *
- * @param projectId - The project ID to create a new version of.
- *
- * @return The new project version.
- */
-export async function createNewRevisionVersion(
-  projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
-    fillEndpoint(Endpoint.createNewRevisionVersion, { projectId }),
-    {
-      method: "POST",
-    }
-  );
-}
-
-/**
- * Deletes a version of the project.
- *
- * @param versionId - The version ID to delete.
- */
-export async function deleteProjectVersion(versionId: string): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.projectVersion, { versionId }),
     {
       method: "DELETE",
     }
@@ -226,6 +112,64 @@ export async function getProjectDelta(
     }),
     {
       method: "GET",
+    }
+  );
+}
+
+/**
+ * Returns the list of project members in given project.
+ */
+export async function getProjectMembers(
+  projectId: string
+): Promise<ProjectMembership[]> {
+  return authHttpClient<ProjectMembership[]>(
+    fillEndpoint(Endpoint.getProjectMembers, {
+      projectId,
+    }),
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Shares project with given user containing email at set role.
+ */
+
+export async function addOrUpdateProjectMember(
+  projectId: string,
+  memberEmail: string,
+  projectRole: ProjectRole
+): Promise<ProjectMembership[]> {
+  const payload: MemberRequest = {
+    memberEmail,
+    projectRole,
+  };
+  return authHttpClient<ProjectMembership[]>(
+    fillEndpoint(Endpoint.getProjectMembers, {
+      projectId,
+    }),
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+/**
+ * Shares project with given user containing email at set role.
+ */
+
+export async function deleteProjectMember(
+  projectMember: ProjectMembership
+): Promise<ProjectMembership[]> {
+  const projectMemberId = projectMember.projectMembershipId;
+  return authHttpClient<ProjectMembership[]>(
+    fillEndpoint(Endpoint.deleteProjectMember, {
+      projectMemberId,
+    }),
+    {
+      method: "DELETE",
     }
   );
 }

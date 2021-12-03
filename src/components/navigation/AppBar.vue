@@ -54,7 +54,7 @@ import { appModule } from "@/store";
 import { GenericIconButton } from "@/components/common";
 import AppBarHeader from "./AppBarHeader.vue";
 import GraphNavIcons from "./GraphNavIcons.vue";
-import { Routes } from "@/router";
+import { router, Routes } from "@/router";
 
 export default Vue.extend({
   components: {
@@ -68,7 +68,7 @@ export default Vue.extend({
   },
   computed: {
     doShowGraphButtons(): boolean {
-      return window.location.pathname.includes(Routes.ARTIFACT_TREE);
+      return router.currentRoute.path === Routes.ARTIFACT_TREE;
     },
     isLoading(): boolean {
       return appModule.getIsLoading;

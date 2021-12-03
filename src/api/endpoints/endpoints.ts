@@ -20,6 +20,8 @@ export enum Endpoint {
   updateProject = "projects/:projectId",
   createProjectFromFlatFiles = "projects/flat-files",
   updateProjectThroughFlatFiles = "projects/versions/:versionId/flat-files",
+  getProjectMembers = "projects/:projectId/members",
+  deleteProjectMember = "projects/members/:projectMemberId",
 
   //Changes
   commit = "projects/versions/:versionId/commit",

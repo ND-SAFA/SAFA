@@ -51,13 +51,17 @@ export default async function authHttpClient<T>(
     //containing the proper use of http codes.
     return {} as T;
   }
-  const resContent = await res.json();
+  const resContent = await res.text();
+  if (resContent === "") {
+    return {} as T;
+  }
+  const resJson = JSON.parse(resContent);
 
-  if (!res.ok || isAPIError(resContent)) {
-    appModule.onServerError(resContent.body);
+  if (!res.ok || isAPIError(resJson)) {
+    appModule.onServerError(resJson.body);
 
-    throw Error(resContent.body.message);
+    throw Error(resJson.body.message);
   } else {
-    return resContent.body;
+    return resJson.body;
   }
 }

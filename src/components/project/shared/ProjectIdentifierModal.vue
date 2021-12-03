@@ -3,7 +3,8 @@
     :is-open="isOpen"
     :title="title"
     size="s"
-    :actionsHeight="50"
+    :actions-height="50"
+    :is-loading="isLoading"
     @close="onClose"
   >
     <template v-slot:body>
@@ -48,6 +49,11 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -60,28 +66,27 @@ export default Vue.extend({
   },
   watch: {
     isOpen(isOpen: boolean) {
-      if (isOpen) {
-        if (this.project !== undefined) {
-          this.name = this.project.name;
-          this.description = this.project.description;
-        } else {
-          this.clearData();
-        }
+      if (!isOpen) {
+        this.clearData();
+      }
+    },
+    project(project: ProjectIdentifier | undefined): void {
+      if (project !== undefined) {
+        this.name = project.name;
+        this.description = project.description;
       }
     },
   },
   methods: {
     clearData() {
-      this.name = "";
-      this.description = "";
+      this.name = this.project?.name || "";
+      this.description = this.project?.description || "";
     },
     onClose() {
       this.$emit("onClose");
     },
     onSave() {
-      const project: ProjectIdentifier | undefined = this.$props.project;
-      const projectId = project === undefined ? "" : project.projectId;
-
+      const projectId = this.project?.projectId || "";
       this.$emit("onSave", {
         projectId: projectId,
         name: this.name,

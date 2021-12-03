@@ -1,4 +1,4 @@
-import { TraceApproval, TraceLink } from "@/types";
+import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
 import { appModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/endpoints";
 
@@ -10,7 +10,7 @@ import { approveLink, declineLink } from "@/api/endpoints";
  */
 export async function approveLinkAPIHandler(
   link: TraceLink,
-  onSuccess?: () => void
+  onSuccess?: EmptyLambda
 ): Promise<void> {
   link.approvalStatus = TraceApproval.APPROVED;
 
@@ -31,7 +31,7 @@ export async function approveLinkAPIHandler(
  */
 export function declineLinkAPIHandler(
   link: TraceLink,
-  onSuccess?: () => void
+  onSuccess?: EmptyLambda
 ): void {
   link.approvalStatus = TraceApproval.DECLINED;
 

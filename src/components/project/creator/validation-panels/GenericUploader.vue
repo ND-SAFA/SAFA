@@ -6,9 +6,9 @@
       :isValidStates="isValidStates"
       :isButtonDisabled="isCreatorOpen"
       :defaultValidState="defaultValidState"
-      @onAdd="isCreatorOpen = true"
-      @onIsValid="$emit('onIsValid')"
-      @onIsInvalid="$emit('onIsInvalid')"
+      @add="isCreatorOpen = true"
+      @upload:valid="$emit('upload:valid')"
+      @upload:invalid="$emit('upload:invalid')"
     >
       <template v-slot:panels>
         <v-expansion-panels multiple v-model="openPanelIndexes">
@@ -17,8 +17,8 @@
             :key="panel.title"
             :panel="panel"
             :artifactMap="artifactMap"
-            @onChange="onChange(i, $event)"
-            @onDelete="deleteFile(i)"
+            @change="onChange(i, $event)"
+            @delete="deleteFile(i)"
           />
         </v-expansion-panels>
         <slot
@@ -46,6 +46,13 @@ import {
 import FilePanelController from "./FilePanelController.vue";
 import ValidatedPanels from "./ValidatedPanels.vue";
 
+/**
+ * A generic file uploader.
+ *
+ * @emits-1 `upload:valid` - On upload is valid.
+ * @emits-2 `upload:invalid` - On upload is invalid.
+ * @emits-3 `change` - On change.
+ */
 export default Vue.extend({
   components: {
     ValidatedPanels,
@@ -95,7 +102,7 @@ export default Vue.extend({
       panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
     ): void {
       this.$emit(
-        "onChange",
+        "change",
         this.panels.map((a, currentIndex) => {
           if (currentIndex === i) return panel;
           return a;
@@ -104,16 +111,16 @@ export default Vue.extend({
     },
     deleteFile(i: number): void {
       this.$emit(
-        "onChange",
+        "change",
         this.panels.filter((f, index) => index !== i)
       );
       if (this.panels.length === 0) {
-        this.$emit("onIsInvalid");
+        this.$emit("upload:invalid");
       }
     },
     addFile(payload: string | TraceLink): void {
       const newPanel = this.uploader.createNewPanel(payload);
-      this.$emit("onChange", this.panels.concat([newPanel]));
+      this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);
     },
   },

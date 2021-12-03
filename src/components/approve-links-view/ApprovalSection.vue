@@ -2,7 +2,7 @@
   <v-container>
     <h1 class="text-h4 text-center">{{ title }}</h1>
 
-    <section-controls @open-all="openAll" @close-all="closeAll" />
+    <section-controls @open:all="openAll" @close:all="closeAll" />
 
     <v-row class="pt-5">
       <v-expansion-panels multiple v-model="openLinks">
@@ -14,8 +14,8 @@
           :target-body="artifacts[link.target].body"
           :show-approve="showApprove"
           :show-decline="showDecline"
-          @approve-link="$emit('approve-link', $event)"
-          @decline-link="$emit('decline-link', $event)"
+          @link:approve="$emit('link:approve', $event)"
+          @link:decline="$emit('link:decline', $event)"
         />
       </v-expansion-panels>
     </v-row>
@@ -31,8 +31,8 @@ import SectionControls from "./SectionControls.vue";
 /**
  * Displays link approvals.
  *
- * @emits-1 `approve-link` - On Link Approval.
- * @emits-2 `decline-link` - On Link Decline.
+ * @emits-1 `link:approve` - On Link Approval.
+ * @emits-2 `link:decline` - On Link Decline.
  */
 export default Vue.extend({
   name: "approval-section",

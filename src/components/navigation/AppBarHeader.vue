@@ -1,10 +1,10 @@
 <template>
   <v-flex class="d-flex flex-row align-center">
     <v-flex class="d-flex flex-row align-center">
-      <SafaIcon />
+      <safa-icon />
       <div>
         <h1 class="text-h5 white--text pl-4">SAFA</h1>
-        <ButtonRow :definitions="definitions" justify="start" />
+        <button-row :definitions="definitions" justify="start" />
       </div>
     </v-flex>
 
@@ -15,18 +15,18 @@
     <account-dropdown />
 
     <upload-new-version-modal
-      :isOpen="uploadVersionOpen"
-      @onClose="uploadVersionOpen = false"
+      :is-open="uploadVersionOpen"
+      @close="uploadVersionOpen = false"
     />
     <baseline-version-modal
       :is-open="openProjectOpen"
-      @onClose="openProjectOpen = false"
+      @close="openProjectOpen = false"
     />
     <baseline-version-modal
       title="Change project version"
       :is-open="changeVersionOpen"
       :project="project"
-      @onClose="changeVersionOpen = false"
+      @close="changeVersionOpen = false"
     />
   </v-flex>
 </template>

@@ -25,11 +25,11 @@
       </v-btn>
       <p v-else>No project has been selected.</p>
     </v-row>
-    <DeltaVersionsModal
+    <delta-versions-modal
       v-if="isProjectDefined()"
-      :isOpen="isModalOpen"
+      :is-open="isModalOpen"
       :project="project"
-      @onClose="isModalOpen = false"
+      @close="isModalOpen = false"
     />
   </v-container>
 </template>

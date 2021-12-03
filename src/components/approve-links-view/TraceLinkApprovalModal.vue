@@ -12,8 +12,8 @@
         :target-body="link.targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
-        @approve-link="onApproveLink"
-        @decline-link="onDeclineLink"
+        @link:approve="onApproveLink"
+        @link:decline="onDeclineLink"
       />
     </template>
   </generic-modal>

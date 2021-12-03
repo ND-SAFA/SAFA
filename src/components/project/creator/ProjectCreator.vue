@@ -9,7 +9,7 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <v-container>
-          <ProjectIdentifierInput
+          <project-identifier-input
             v-bind:name.sync="name"
             v-bind:description.sync="description"
           />
@@ -22,16 +22,16 @@
             item-name="artifact"
             :uploader="artifactUploader"
             :artifact-map="artifactMap"
-            @onChange="artifactUploader.panels = $event"
-            @onIsValid="setStepIsValid(1, true)"
-            @onIsInvalid="setStepIsValid(1, false)"
+            @change="artifactUploader.panels = $event"
+            @upload:valid="setStepIsValid(1, true)"
+            @upload:invalid="setStepIsValid(1, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
               <artifact-type-creator-modal
                 :is-open="isCreatorOpen"
                 :artifact-types="artifactTypes"
-                @onSubmit="onAddFile"
-                @onClose="onClose"
+                @submit="onAddFile"
+                @close="onClose"
               />
             </template>
           </generic-uploader>
@@ -45,17 +45,17 @@
             :uploader="traceUploader"
             :artifact-map="artifactMap"
             :default-valid-state="true"
-            @onChange="traceUploader.panels = $event"
-            @onIsValid="setStepIsValid(2, true)"
-            @onIsInvalid="setStepIsValid(2, false)"
+            @change="traceUploader.panels = $event"
+            @upload:valid="setStepIsValid(2, true)"
+            @upload:invalid="setStepIsValid(2, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
               <trace-file-creator
                 :is-open="isCreatorOpen"
                 :trace-files="traceFiles"
                 :artifact-types="artifactTypes"
-                @onSubmit="onAddFile"
-                @onClose="onClose"
+                @submit="onAddFile"
+                @close="onClose"
               />
             </template>
           </generic-uploader>
@@ -69,7 +69,7 @@
               <h1 class="text-h6">Project TIM</h1>
             </v-col>
           </v-row>
-          <TimTree
+          <tim-tree
             :artifact-panels="artifactUploader.panels"
             :trace-panels="traceUploader.panels"
             :in-view="currentStep === 4"

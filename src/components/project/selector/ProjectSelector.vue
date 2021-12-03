@@ -6,35 +6,35 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    @edit-item="onEditProject"
-    @select-item="onSelectProject"
-    @delete-item="onDeleteProject"
-    @add-item="onAddItem"
+    @item:edit="onEditProject"
+    @item:select="onSelectProject"
+    @item:delete="onDeleteProject"
+    @item:add="onAddItem"
     @refresh="fetchProjects"
   >
     <template v-slot:editItemDialogue>
       <project-identifier-modal
         title="Edit Project"
         :is-open="editProjectDialogue"
-        v-bind:project.sync="projectToEdit"
-        @onSave="onUpdateProject"
-        @onClose="onCloseProjectEdit"
+        :project="projectToEdit"
+        @save="onUpdateProject"
+        @close="onCloseProjectEdit"
       />
     </template>
     <template v-slot:addItemDialogue>
       <project-identifier-modal
         title="Create New Project"
         :is-open="addProjectDialogue"
-        @onSave="onSaveNewProject"
-        @onClose="onCloseAddProject"
+        @save="onSaveNewProject"
+        @close="onCloseAddProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
         :is-open="deleteProjectDialogue"
         :project="projectToDelete"
-        @onConfirmDelete="onConfirmDeleteProject"
-        @onCancelDelete="onCancelDeleteProject"
+        @confirm="onConfirmDeleteProject"
+        @cancel="onCancelDeleteProject"
       />
     </template>
   </generic-selector>
@@ -60,6 +60,8 @@ import { projectSelectorHeaders } from "./headers";
  * select, edit, delete, or create projects. Project list is refreshed whenever
  * mounted or isOpen is changed to true.
  *
+ * @emits-1 `selected` (ProjectIdentifier) - On project selected.
+ * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
   name: "ProjectSelector",
@@ -111,7 +113,7 @@ export default Vue.extend({
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
       this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
-        this.$emit("onProjectSelected", project);
+        this.$emit("selected", project);
       });
       this.addProjectDialogue = false;
       this.selected = newProject;
@@ -121,9 +123,9 @@ export default Vue.extend({
     },
     onSelectProject(item: DataItem<ProjectIdentifier>) {
       if (item.value) {
-        this.$emit("onProjectSelected", item.item);
+        this.$emit("selected", item.item);
       } else {
-        this.$emit("onProjectUnselected");
+        this.$emit("unselected");
       }
     },
     onAddItem() {

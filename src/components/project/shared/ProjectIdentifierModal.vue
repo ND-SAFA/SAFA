@@ -31,6 +31,12 @@ import { ProjectIdentifier } from "@/types";
 import { GenericModal } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 
+/**
+ * A modal for renaming a project.
+ *
+ * @emits-1 `close` - On close.
+ * @emits-2 `save` (ProjectIdentifier) - On project save.
+ */
 export default Vue.extend({
   components: {
     GenericModal,
@@ -83,11 +89,11 @@ export default Vue.extend({
       this.description = this.project?.description || "";
     },
     onClose() {
-      this.$emit("onClose");
+      this.$emit("close");
     },
     onSave() {
       const projectId = this.project?.projectId || "";
-      this.$emit("onSave", {
+      this.$emit("save", {
         projectId: projectId,
         name: this.name,
         description: this.description,

@@ -12,9 +12,9 @@
         :has-select="false"
         :is-loading="isLoading"
         item-key="email"
-        @add-item="onAddMember"
-        @edit-item="onEditMember"
-        @delete-item="onDeleteMember"
+        @item:add="onAddMember"
+        @item:edit="onEditMember"
+        @item:delete="onDeleteMember"
         @refresh="retrieveMembers"
         class="mt-5"
       >
@@ -22,8 +22,8 @@
           <settings-member-information-modal
             :is-open="isNewOpen"
             :project="project"
-            @onCancel="isNewOpen = false"
-            @onConfirm="onConfirmAdd"
+            @cancel="isNewOpen = false"
+            @confirm="onConfirmAdd"
           />
         </template>
         <template v-slot:editItemDialogue>
@@ -32,8 +32,8 @@
             :clear-on-close="false"
             :project="project"
             :member="memberToEdit"
-            @onCancel="isEditOpen = false"
-            @onConfirm="onConfirmEdit"
+            @cancel="isEditOpen = false"
+            @confirm="onConfirmEdit"
           />
         </template>
       </generic-selector>

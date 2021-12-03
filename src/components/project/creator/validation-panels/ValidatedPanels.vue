@@ -8,7 +8,7 @@
         <v-btn
           color="primary"
           :disabled="isButtonDisabled"
-          @click="$emit('onAdd')"
+          @click="$emit('add')"
         >
           Create new {{ itemName }}</v-btn
         >
@@ -24,6 +24,13 @@
 import Vue, { PropType } from "vue";
 import { ThemeColors } from "@/util";
 
+/**
+ * Validated upload panels.
+ *
+ * @emits-1 `upload:valid` - On upload is valid.
+ * @emits-2 `upload:invalid` - On upload is invalid.
+ * @emits-3 `add` - On add.
+ */
 export default Vue.extend({
   props: {
     itemName: {
@@ -59,9 +66,9 @@ export default Vue.extend({
   watch: {
     isValid(isValid: boolean): void {
       if (isValid) {
-        this.$emit("onIsValid");
+        this.$emit("upload:valid");
       } else {
-        this.$emit("onIsInvalid");
+        this.$emit("upload:invalid");
       }
     },
   },

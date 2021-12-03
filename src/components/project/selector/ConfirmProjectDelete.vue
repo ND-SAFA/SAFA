@@ -33,6 +33,12 @@ import { ProjectIdentifier } from "@/types";
 import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 
+/**
+ * A modal for confirming project deletion.
+ *
+ * @emits-1 `confirm` (string) - On delete confirm.
+ * @emits-2 `cancel` - On delete cancel.
+ */
 export default Vue.extend({
   components: { GenericModal },
   props: {
@@ -62,11 +68,11 @@ export default Vue.extend({
     onConfirm() {
       const project = this.$props.project;
       if (this.validated) {
-        this.$emit("onConfirmDelete", project);
+        this.$emit("confirm", project);
       }
     },
     onCancel() {
-      this.$emit("onCancelDelete");
+      this.$emit("cancel");
     },
   },
   watch: {

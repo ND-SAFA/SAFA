@@ -12,7 +12,7 @@
     :loading="isLoading"
     :search="search"
     :no-data-text="noDataText"
-    @item-selected="$emit('select-item', $event)"
+    @item-selected="$emit('item:select', $event)"
   >
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
@@ -45,13 +45,13 @@
         v-if="hasEdit"
         icon-id="mdi-pencil"
         tooltip="Edit"
-        @click="$emit('edit-item', item)"
+        @click="$emit('item:edit', item)"
       />
       <generic-icon-button
         v-if="hasDelete"
         icon-id="mdi-delete"
         tooltip="Delete"
-        @click="$emit('delete-item', item)"
+        @click="$emit('item:delete', item)"
       />
     </template>
     <template v-slot:footer>
@@ -61,7 +61,7 @@
           color="primary"
           icon-id="mdi-plus"
           tooltip="Create"
-          @click="$emit('add-item')"
+          @click="$emit('item:add')"
         />
       </v-row>
     </template>
@@ -79,10 +79,10 @@ import GenericIconButton from "@/components/common/generic/GenericIconButton.vue
  * Displays a generic selector.
  *
  * @emits-1 `refresh` - On refresh.
- * @emits-2 `select-item` - On select item.
- * @emits-3 `edit-item` - On edit item.
- * @emits-4 `delete-item` - On delete item.
- * @emits-5 `add-item` - On add item.
+ * @emits-2 `item:select` - On select item.
+ * @emits-3 `item:edit` - On edit item.
+ * @emits-4 `item:delete` - On delete item.
+ * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
   name: "generic-selector",

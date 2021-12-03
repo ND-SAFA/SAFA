@@ -3,7 +3,7 @@
     :title="title"
     :isOpen="isOpen"
     :isLoading="isLoading"
-    @close="$emit('onClose')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <v-container>
@@ -48,6 +48,11 @@ import { ButtonRow } from "@/components/common/button-row";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
 
+/**
+ * Modal for artifact creation.
+ *
+ * @emits `close` - Emitted when modal is exited or artifact is created.
+ */
 export default Vue.extend({
   components: { GenericModal, ButtonRow },
   props: {
@@ -156,7 +161,7 @@ export default Vue.extend({
       const isUpdate = this.artifact !== undefined;
       createOrUpdateArtifactHandler(this.versionId, artifact, isUpdate)
         .then(() => {
-          this.$emit("onClose");
+          this.$emit("close");
         })
         .catch((e) => {
           appModule.onDevError(e);

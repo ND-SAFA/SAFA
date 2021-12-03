@@ -1,13 +1,13 @@
 <template>
   <file-panel
-    :showFileUploader="!isGeneratedToggle"
-    @onChange="onChange"
-    @onDelete="$emit('onDelete')"
-    @onValidate="setValidationState"
+    :show-file-uploader="!isGeneratedToggle"
+    @change="onChange"
+    @delete="$emit('delete')"
+    @validate="setValidationState"
     :errors="errors"
-    :entityNames="entityNames"
+    :entity-names="entityNames"
     :entities-are-fab="!isTracePanel"
-    v-bind:ignoreErrorsFlag.sync="ignoreErrors"
+    v-bind:ignore-errors-flag.sync="ignoreErrors"
   >
     <template v-slot:title>
       <h3>{{ title }}</h3>
@@ -29,6 +29,11 @@ import { isTracePanel } from "@/util";
 import { GenericSwitch } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
+/**
+ * Controls a file panel.
+ *
+ * @emits `delete` - On delete.
+ */
 export default Vue.extend({
   components: {
     GenericSwitch,

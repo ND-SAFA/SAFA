@@ -1,31 +1,31 @@
 <template>
-  <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
+  <generic-cytoscape-controller :cytoCoreGraph="cytoCoreGraph">
     <template v-slot:elements>
-      <ArtifactNode
+      <artifact-node
         v-for="artifact in artifacts"
         :key="artifact.name"
         :artifact-definition="artifact"
         :opacity="getArtifactOpacity(artifact.name)"
       />
-      <GenericGraphLink
+      <generic-graph-link
         v-for="traceLink in traces"
         :key="`${traceLink.source}-${traceLink.target}`"
         :trace-definition="traceLink"
-        @right-click="onLinkRightClick"
+        @click:right="onLinkRightClick"
       />
-      <GenericGraphLink
+      <generic-graph-link
         v-for="traceLink in subtreeLinks"
         :key="`${traceLink.source}-${traceLink.target}`"
         :trace-definition="traceLink"
       />
     </template>
-    <TraceLinkApprovalModal
+    <trace-link-approval-modal
       v-if="selectedLink !== undefined"
       :is-open="isTraceModalOpen"
       :link="selectedLink"
       @close="onTraceModalClose"
     />
-  </GenericCytoscapeController>
+  </generic-cytoscape-controller>
 </template>
 
 <script lang="ts">

@@ -1,33 +1,31 @@
 <template>
-  <v-container class="elevation-3">
-    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
-      <template v-slot:elements>
-        <ArtifactNode
-          v-for="artifact in artifacts"
-          :key="artifact.name"
-          :artifact-definition="artifact"
-          :opacity="getArtifactOpacity(artifact.name)"
-        />
-        <GenericGraphLink
-          v-for="traceLink in traces"
-          :key="`${traceLink.source}-${traceLink.target}`"
-          :trace-definition="traceLink"
-          @right-click="onLinkRightClick"
-        />
-        <GenericGraphLink
-          v-for="traceLink in subtreeLinks"
-          :key="`${traceLink.source}-${traceLink.target}`"
-          :trace-definition="traceLink"
-        />
-      </template>
-    </GenericCytoscapeController>
+  <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
+    <template v-slot:elements>
+      <ArtifactNode
+        v-for="artifact in artifacts"
+        :key="artifact.name"
+        :artifact-definition="artifact"
+        :opacity="getArtifactOpacity(artifact.name)"
+      />
+      <GenericGraphLink
+        v-for="traceLink in traces"
+        :key="`${traceLink.source}-${traceLink.target}`"
+        :trace-definition="traceLink"
+        @right-click="onLinkRightClick"
+      />
+      <GenericGraphLink
+        v-for="traceLink in subtreeLinks"
+        :key="`${traceLink.source}-${traceLink.target}`"
+        :trace-definition="traceLink"
+      />
+    </template>
     <TraceLinkApprovalModal
       v-if="selectedLink !== undefined"
       :is-open="isTraceModalOpen"
       :link="selectedLink"
       @close="onTraceModalClose"
     />
-  </v-container>
+  </GenericCytoscapeController>
 </template>
 
 <script lang="ts">
@@ -49,7 +47,7 @@ import ArtifactNode from "./ArtifactNode.vue";
 import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
-  name: "artifact-view",
+  name: "artifact-tree",
   components: {
     ArtifactNode,
     GenericGraphLink,

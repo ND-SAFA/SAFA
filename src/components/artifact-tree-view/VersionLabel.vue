@@ -1,12 +1,10 @@
 <template>
-  <v-container>
-    <v-row justify="center">
-      <h1 v-if="containsProject" class="text-h5">
-        {{ projectName }}@{{ versionName }}
-      </h1>
-      <h1 v-else class="text-h5">No Project Selected</h1>
-    </v-row>
-  </v-container>
+  <v-row justify="end">
+    <h1 v-if="containsProject" class="text-h5 white--text">
+      {{ projectName }}@{{ versionName }}
+    </h1>
+    <h1 v-else class="text-h5">No Project Selected</h1>
+  </v-row>
 </template>
 <script lang="ts">
 import Vue from "vue";

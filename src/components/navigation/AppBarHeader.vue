@@ -8,6 +8,10 @@
       </div>
     </v-flex>
 
+    <div class="mr-5">
+      <version-label />
+    </div>
+
     <account-dropdown />
 
     <upload-new-version-modal
@@ -39,9 +43,11 @@ import {
 } from "@/components/common";
 import SafaIcon from "./SafaIcon.vue";
 import AccountDropdown from "./AccountDropdown.vue";
+import VersionLabel from "@/components/artifact-tree-view/VersionLabel.vue";
 
 export default Vue.extend({
   components: {
+    VersionLabel,
     AccountDropdown,
     SafaIcon,
     ButtonRow,

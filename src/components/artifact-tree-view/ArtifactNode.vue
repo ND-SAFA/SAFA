@@ -3,7 +3,12 @@
 </template>
 
 <script lang="ts">
-import { deltaModule, errorModule, artifactSelectionModule } from "@/store";
+import {
+  deltaModule,
+  errorModule,
+  artifactSelectionModule,
+  subtreeModule,
+} from "@/store";
 import {
   Artifact,
   ArtifactWarning,
@@ -65,6 +70,7 @@ export default Vue.extend({
     },
     isSelected(): boolean {
       const selectedArtifact = this.selectedArtifact;
+
       return (
         selectedArtifact !== undefined &&
         selectedArtifact.name === this.artifactDefinition.name
@@ -76,9 +82,11 @@ export default Vue.extend({
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
       const artifactName = this.artifactDefinition.name;
+
       if (artifactName in artifactWarnings) {
         return artifactWarnings[artifactName];
       }
+
       return undefined;
     },
     artifactDeltaState(): ArtifactDeltaState {
@@ -86,6 +94,7 @@ export default Vue.extend({
         this.clearData();
         return ArtifactDeltaState.NO_CHANGE;
       }
+
       const name: string = this.artifactDefinition.name;
       const addedArtifacts: Record<string, AddedArtifact> =
         deltaModule.getAdded;
@@ -112,6 +121,11 @@ export default Vue.extend({
       const body = this.artifactDefinition.body;
       const artifactType = this.artifactDefinition.type;
       const isSelected = this.isSelected;
+      const hiddenChildren = subtreeModule.getHiddenChildrenByParentName(id);
+      const hiddenChildWarnings =
+        errorModule.getWarningsByArtifactNames(hiddenChildren);
+      const hiddenChildDeltaStates =
+        deltaModule.getDeltaStatesByArtifactNames(hiddenChildren);
 
       return {
         data: {
@@ -124,6 +138,9 @@ export default Vue.extend({
           artifactDeltaState: this.artifactDeltaState,
           isSelected,
           opacity: this.opacity,
+          hiddenChildren: hiddenChildren.length,
+          childWarnings: hiddenChildWarnings,
+          childDeltaStates: hiddenChildDeltaStates,
         },
       };
     },

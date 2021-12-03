@@ -1,0 +1,84 @@
+$color-warning: #EEBC3D;
+$color-added: #81c784;
+$color-removed: #e57373;
+$color-modified: #64b5f6;
+$color-border: #888888;
+$border-radius: 8px;
+
+.artifact-container {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+  border-radius: $border-radius;
+  border: 1px solid $color-border;
+}
+
+.artifact-header {
+  text-align: center;
+  border-bottom: 1px solid $color-border;
+  margin: 0 5px;
+}
+
+.artifact-sub-header {
+  text-align: center;
+}
+
+.artifact-body {
+  padding: 0 5px 5px 5px;
+  text-align: center;
+  white-space: initial;
+  flex-grow: 1;
+  line-height: 1 !important;
+}
+
+.artifact-footer {
+  height:25px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  & > * {
+    justify-content: center;
+  }
+
+  & > :nth-child(2) {
+    border-top-left-radius: $border-radius;
+
+  }
+
+  & > div > span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .warning-text {
+    overflow: hidden;
+    background-color: $color-warning;
+    height: 110%;
+  }
+}
+
+.artifact-stoplight {
+  height: 10px;
+  border-top: 1px solid $color-border;
+
+  .artifact-added {
+    background: $color-added;
+  }
+
+  .artifact-removed {
+    background: $color-removed;
+  }
+
+  .artifact-modified {
+    background: $color-modified;
+  }
+}
+
+#cy-container,
+#cytoscape-div {
+  height: 100% !important;
+  max-height: 100% !important;
+}

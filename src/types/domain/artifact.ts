@@ -59,6 +59,19 @@ export interface ArtifactData extends CytoCoreElementData {
    * The opacity of this artifact.
    */
   opacity: number;
+
+  /**
+   * The number of hidden child elements.
+   */
+  hiddenChildren?: number;
+  /**
+   * The delta states of any hidden children.
+   */
+  childDeltaStates?: ArtifactDeltaState[];
+  /**
+   * Any warnings in child elements.
+   */
+  childWarnings?: ArtifactWarning[];
 }
 
 /**

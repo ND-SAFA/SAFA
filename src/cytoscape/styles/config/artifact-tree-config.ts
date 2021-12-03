@@ -13,26 +13,19 @@ export const ARTIFACT_PADDING = 50;
 export const ARTIFACT_WIDTH = 105;
 export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
 
-export const ARTIFACT_SHAPE = "rectangle";
+export const ARTIFACT_SHAPE = "roundrectangle";
 export const ARTIFACT_BORDER_STYLE = "solid";
-export const ARTIFACT_BORDER_WIDTH = 1.5;
+export const ARTIFACT_BORDER_WIDTH = 1;
 
-export const ARTIFACT_BACKGROUND_COLOR = ThemeColors.artifactDefault;
-export const ARTIFACT_SELECTED_COLOR = ThemeColors.primary;
+export const ARTIFACT_TRUNCATE_LENGTH = 150;
+export const ARTIFACT_REDUCED_TRUNCATE_LENGTH = 100;
+
 export const ARTIFACT_SELECTED_BORDER_WIDTH = 6;
-
-/**
- * Delta State.
- */
-export const ARTIFACT_ADDED_COLOR = ThemeColors.artifactAdded;
-export const ARTIFACT_REMOVED_COLOR = ThemeColors.artifactRemoved;
-export const ARTIFACT_MODIFIED_COLOR = ThemeColors.artifactModified;
 
 /**
  * Graph specific values
  */
 export const CENTER_GRAPH_PADDING = 10;
-export const TRUNCATE_LENGTH = 75;
 export const DEFAULT_ARTIFACT_TREE_ZOOM = 0.75;
 
 /**

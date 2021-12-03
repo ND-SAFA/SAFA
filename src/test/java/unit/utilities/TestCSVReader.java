@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
@@ -48,7 +48,7 @@ public class TestCSVReader extends EntityBaseTest {
 
     @Test
     public void csvFileNotFound() {
-        Exception exception = assertThrows(ServerError.class, () -> {
+        Exception exception = assertThrows(SafaError.class, () -> {
             FileUtilities.readCSVFile("/abc/123");
         });
         assertThat(exception.getMessage()).contains("not exist");

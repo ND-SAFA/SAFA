@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
@@ -79,10 +79,10 @@ public class TraceFileParser {
      *
      * @param projectVersion        the project associated with trace matrix file
      * @param traceMatrixDefinition the JSON object containing the specification
-     * @throws ServerError thrown on any parsing error of tim.json or its subsequent files
+     * @throws SafaError thrown on any parsing error of tim.json or its subsequent files
      */
     public void parseTraceMatrixDefinition(ProjectVersion projectVersion,
-                                           JSONObject traceMatrixDefinition) throws ServerError {
+                                           JSONObject traceMatrixDefinition) throws SafaError {
         Project project = projectVersion.getProject();
         String fileName = traceMatrixDefinition.getString("file"); // TODO: Make constants and perform validation
         boolean isGenerated = traceMatrixDefinition.has("generatelinks")
@@ -104,11 +104,11 @@ public class TraceFileParser {
      * @param project               the project whose types are being queried.
      * @param traceMatrixDefinition the json defining the source and target types.
      * @return Pair containing source and target types respectively
-     * @throws ServerError throws error when either source or target types are not found
+     * @throws SafaError throws error when either source or target types are not found
      */
     public Pair<ArtifactType, ArtifactType> findMatrixArtifactTypes(Project project,
                                                                     JSONObject traceMatrixDefinition)
-        throws ServerError {
+        throws SafaError {
         String sourceTypeName = traceMatrixDefinition.getString(SOURCE_PARAM);
         String targetTypeName = traceMatrixDefinition.getString(TARGET_PARAM);
         ArtifactType sourceType = findArtifactTypeFromTraceMatrixDefinition(project, sourceTypeName);
@@ -118,7 +118,7 @@ public class TraceFileParser {
 
     public List<TraceLink> readAndParseTraceFile(ProjectVersion projectVersion,
                                                  Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
-                                                 String fileName) throws ServerError {
+                                                 String fileName) throws SafaError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
@@ -140,7 +140,7 @@ public class TraceFileParser {
     public Pair<List<TraceLink>, List<Pair<String, Long>>> parseTraceFile(ArtifactFinder artifactFinder,
                                                                           TraceLinkFinder traceLinkFinder,
                                                                           CSVParser traceFileParser)
-        throws ServerError {
+        throws SafaError {
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {
@@ -172,7 +172,7 @@ public class TraceFileParser {
     public Pair<List<TraceAppEntity>, List<Pair<String, Long>>> readTraceFile(ArtifactFinder artifactFinder,
                                                                               TraceLinkFinder traceLinkFinder,
                                                                               CSVParser traceFileParser)
-        throws ServerError {
+        throws SafaError {
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
         try {
@@ -195,12 +195,12 @@ public class TraceFileParser {
         return new Pair<>(traceLinks, errors);
     }
 
-    public CSVParser readTraceFile(MultipartFile file) throws ServerError {
+    public CSVParser readTraceFile(MultipartFile file) throws SafaError {
         return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 
     private ArtifactType findArtifactTypeFromTraceMatrixDefinition(Project project, String typeName)
-        throws ServerError {
+        throws SafaError {
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, typeName);
 
@@ -210,7 +210,7 @@ public class TraceFileParser {
                 "Trace matrix definition references unknown type: %s. Defined types include: %s",
                 typeName,
                 artifactTypes);
-            throw new ServerError(errorMessage);
+            throw new SafaError(errorMessage);
         }
         return sourceTypeQuery.get();
     }

@@ -38,29 +38,4 @@ public class TestSharingErrors extends BaseSharingTest {
         String error = response.getJSONObject("body").getString("message");
         assertThat(error).matches(".*user.*exists.*email.*[\\s\\S]");
     }
-
-    /**
-     * Tests that user is notified that added email is already in the project.
-     *
-     * @throws Exception Throws exception if http fails when sending get request.
-     */
-    @Test
-    public void userAlreadyInProjectError() throws Exception {
-        String projectName = "test-project";
-
-        // Step - Create a project
-        Project project = createAndShareProject(projectName);
-
-        // Step - Share project with same user again.
-        JSONObject response = shareProject(
-            project,
-            otherUserEmail,
-            ProjectRole.VIEWER,
-            status().is4xxClientError()
-        );
-
-        // VP - Verify that error message informs user that added email is already in the project
-        String errorMessage = response.getJSONObject("body").getString("message");
-        assertThat(errorMessage).matches(".*user.*project.*[\\s\\S]");
-    }
 }

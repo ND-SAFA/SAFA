@@ -2,7 +2,7 @@ package unit.delta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -22,7 +22,7 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
     DeltaService deltaService;
 
     @Test
-    public void testAllChangeTypes() throws ServerError {
+    public void testAllChangeTypes() throws SafaError {
         String projectName = "test-project";
         String artifactType = "requirement";
         String artifactName = "RE-8";

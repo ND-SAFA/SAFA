@@ -2,7 +2,7 @@ package edu.nd.crc.safa.builders;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -36,38 +36,38 @@ public class ResourceBuilder {
         this.permissionService = permissionService;
     }
 
-    public ResourceBuilder fetchProject(UUID projectId) throws ServerError {
+    public ResourceBuilder fetchProject(UUID projectId) throws SafaError {
         this.project = this.projectRepository.findByProjectId(projectId);
         if (this.project == null) {
-            throw new ServerError("Unable to find project with id:" + projectId);
+            throw new SafaError("Unable to find project with id:" + projectId);
         }
         return this;
     }
 
-    public ResourceBuilder fetchVersion(UUID versionId) throws ServerError {
+    public ResourceBuilder fetchVersion(UUID versionId) throws SafaError {
         this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         if (this.projectVersion == null) {
-            throw new ServerError("Unable to find project version with id:" + versionId);
+            throw new SafaError("Unable to find project version with id:" + versionId);
         }
         return this;
     }
 
-    public Project withViewProject() throws ServerError {
+    public Project withViewProject() throws SafaError {
         this.permissionService.requireViewPermission(project);
         return this.project;
     }
 
-    public Project withEditProject() throws ServerError {
-        this.permissionService.requireViewPermission(project);
+    public Project withEditProject() throws SafaError {
+        this.permissionService.requireEditPermission(project);
         return this.project;
     }
 
-    public ProjectVersion withViewVersion() throws ServerError {
+    public ProjectVersion withViewVersion() throws SafaError {
         this.permissionService.requireViewPermission(projectVersion.getProject());
         return projectVersion;
     }
 
-    public ProjectVersion withEditVersion() throws ServerError {
+    public ProjectVersion withEditVersion() throws SafaError {
         this.permissionService.requireEditPermission(projectVersion.getProject());
         return projectVersion;
     }

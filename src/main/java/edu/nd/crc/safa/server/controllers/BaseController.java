@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -35,9 +35,9 @@ public abstract class BaseController {
         this.resourceBuilder = resourceBuilder;
     }
 
-    @ExceptionHandler(ServerError.class)
+    @ExceptionHandler(SafaError.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleServerError(ServerError exception) {
+    public ServerResponse handleServerError(SafaError exception) {
         exception.printError();
         return new ServerResponse(exception, ResponseCodes.FAILURE);
     }
@@ -50,7 +50,7 @@ public abstract class BaseController {
         for (ObjectError error : bindingResult.getAllErrors()) {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
-        ServerError error = new ServerError(errorMessage.toString());
+        SafaError error = new SafaError(errorMessage.toString());
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }
@@ -60,7 +60,7 @@ public abstract class BaseController {
     public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
-        ServerError error = new ServerError(errorMessage, exception);
+        SafaError error = new SafaError(errorMessage, exception);
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }
@@ -69,7 +69,7 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(Exception ex) {
         ex.printStackTrace();
-        ServerError wrapper = new ServerError("An unexpected server error occurred.", ex);
+        SafaError wrapper = new SafaError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
     }
 

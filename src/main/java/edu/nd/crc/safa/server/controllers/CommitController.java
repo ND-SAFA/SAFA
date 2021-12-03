@@ -9,7 +9,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -57,19 +57,19 @@ public class CommitController extends BaseController {
      *
      * @param versionId     The id of the version to commit to.
      * @param projectCommit The entities to commit.
-     * @throws ServerError Throws error if user does not have edit permissions on project.
+     * @throws SafaError Throws error if user does not have edit permissions on project.
      */
     @PostMapping(AppRoutes.Projects.commitChange)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void commitChange(@PathVariable UUID versionId,
-                             @RequestBody ProjectCommit projectCommit) throws ServerError {
+                             @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         commitArtifacts(projectVersion, projectCommit.getArtifacts());
         commitTraces(projectVersion, projectCommit.getTraces());
     }
 
     private void commitArtifacts(ProjectVersion projectVersion,
-                                 ProjectChange<ArtifactAppEntity> artifacts) throws ServerError {
+                                 ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
         List<ArtifactAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
@@ -83,7 +83,7 @@ public class CommitController extends BaseController {
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
     }
 
-    private void commitTraces(ProjectVersion projectVersion, ProjectChange<TraceAppEntity> traces) throws ServerError {
+    private void commitTraces(ProjectVersion projectVersion, ProjectChange<TraceAppEntity> traces) throws SafaError {
         for (TraceAppEntity trace : traces.getAdded()) {
             traceLinkService.createNewTraceLInk(projectVersion, trace.source, trace.target);
         }

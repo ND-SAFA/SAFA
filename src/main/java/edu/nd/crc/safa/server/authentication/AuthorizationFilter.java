@@ -9,7 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,7 +44,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         UsernamePasswordAuthenticationToken authenticationToken = null;
         try {
             authenticationToken = authenticate(request);
-        } catch (ServerError e) {
+        } catch (SafaError e) {
             e.printStackTrace();
             return;
         }
@@ -58,12 +58,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
      * @param request An incoming http request.
      * @return Successful authorization token if successful otherwise null.
      */
-    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws ServerError {
+    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws SafaError {
         String token = request.getHeader(AUTHORIZATION_HEADER);
         if (token != null) {
             Claims userClaims = this.tokenService.getTokenClaims(token);
             return new UsernamePasswordAuthenticationToken(userClaims, null, new ArrayList<>());
         }
-        throw new ServerError("No token found.");
+        throw new SafaError("No token found.");
     }
 }

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
@@ -37,17 +37,17 @@ public class PermissionService {
         this.safaUserService = safaUserService;
     }
 
-    public void requireViewPermission(Project project) throws ServerError {
+    public void requireViewPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasViewingPermission(project, currentUser)) {
-            throw new ServerError("User does not have edit permissions on project.");
+            throw new SafaError("User does not have edit permissions on project.");
         }
     }
 
-    public void requireEditPermission(Project project) throws ServerError {
+    public void requireEditPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasEditPermission(project, currentUser)) {
-            throw new ServerError("User does not have edit permissions on project.");
+            throw new SafaError("User does not have edit permissions on project.");
         }
     }
 

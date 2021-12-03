@@ -7,6 +7,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectRole;
  * Represents the FEND version of a project member
  */
 public class ProjectMemberAppEntity {
+    String projectMembershipId;
     String email;
     ProjectRole role;
 
@@ -15,8 +16,17 @@ public class ProjectMemberAppEntity {
     }
 
     public ProjectMemberAppEntity(ProjectMembership projectMembership) {
+        this.projectMembershipId = projectMembership.getMembershipId().toString();
         this.email = projectMembership.getMember().getEmail();
         this.role = projectMembership.getRole();
+    }
+
+    public String getProjectMembershipId() {
+        return projectMembershipId;
+    }
+
+    public void setProjectMembershipId(String projectMembershipId) {
+        this.projectMembershipId = projectMembershipId;
     }
 
     public String getEmail() {

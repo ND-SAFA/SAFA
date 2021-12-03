@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactFile;
@@ -76,7 +76,7 @@ public class ArtifactFileParser {
 
     public void parseArtifactFiles(ProjectVersion projectVersion,
                                    JSONObject dataFilesJson)
-        throws JSONException, ServerError, JsonProcessingException {
+        throws JSONException, SafaError, JsonProcessingException {
         Project project = projectVersion.getProject();
 
         List<ArtifactAppEntity> projectArtifacts = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ArtifactFileParser {
 
             JSONObject artifactDefinitionJson = dataFilesJson.getJSONObject(artifactTypeName);
             if (!artifactDefinitionJson.has("file")) {
-                throw new ServerError("Could not find key [file] in json: " + artifactDefinitionJson);
+                throw new SafaError("Could not find key [file] in json: " + artifactDefinitionJson);
             }
 
             String artifactFileName = artifactDefinitionJson.getString("file");
@@ -110,7 +110,7 @@ public class ArtifactFileParser {
 
     private Pair<List<ArtifactAppEntity>, List<ParserError>> parseArtifactFile(ProjectVersion projectVersion,
                                                                                ArtifactType artifactType,
-                                                                               String fileName) throws ServerError {
+                                                                               String fileName) throws SafaError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
@@ -178,7 +178,7 @@ public class ArtifactFileParser {
         return artifactId;
     }
 
-    public CSVParser readArtifactFile(MultipartFile file) throws ServerError {
+    public CSVParser readArtifactFile(MultipartFile file) throws SafaError {
         return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
     }
 }

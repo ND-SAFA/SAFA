@@ -10,6 +10,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.web.servlet.ResultMatcher;
 import unit.ApplicationBaseTest;
 
@@ -20,12 +21,19 @@ public class BaseSharingTest extends ApplicationBaseTest {
 
     protected final String otherUserEmail = "doesNotExist@gmail.com";
     protected final String otherUserPassword = "somePassword";
+    protected SafaUser otherUser = null;
+
+    @BeforeEach
+    public void clearData() {
+        this.otherUser = null;
+    }
 
     protected Project createAndShareProject(String projectName) throws Exception {
         // Step - Create other user to share project with.
         SafaUser otherUser = new SafaUser();
         otherUser.setEmail(this.otherUserEmail);
         otherUser.setPassword(this.otherUserPassword);
+        this.otherUser = otherUser;
         this.safaUserRepository.save(otherUser);
 
         // Step - Create project to share
@@ -45,5 +53,13 @@ public class BaseSharingTest extends ApplicationBaseTest {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
         String url = RouteBuilder.withRoute(AppRoutes.Projects.addProjectMember).withProject(project).get();
         return sendPost(url, toJson(request), httpResult);
+    }
+
+    protected JSONObject getProjectMembers(Project project) throws Exception {
+        String url = RouteBuilder
+            .withRoute(AppRoutes.Projects.getProjectMembers)
+            .withProject(project)
+            .get();
+        return sendGet(url, status().is2xxSuccessful());
     }
 }

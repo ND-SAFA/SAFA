@@ -16,7 +16,7 @@ import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -99,7 +99,7 @@ public class ParseDataFileController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
     public ServerResponse checkIfNameExists(@PathVariable UUID projectId,
-                                            @PathVariable String artifactName) throws ServerError {
+                                            @PathVariable String artifactName) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
         Map<String, Boolean> response = new HashMap<>();

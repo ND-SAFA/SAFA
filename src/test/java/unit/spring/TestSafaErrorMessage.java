@@ -18,7 +18,7 @@ import unit.ApplicationBaseTest;
  * - status (0 if success otherwise some error code > 0)
  * - body (contains error message and other information)
  */
-public class TestServerErrorMessage extends ApplicationBaseTest {
+public class TestSafaErrorMessage extends ApplicationBaseTest {
 
     @Test
     public void testServerError() throws Exception {

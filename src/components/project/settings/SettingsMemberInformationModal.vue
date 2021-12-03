@@ -44,9 +44,9 @@ import {
 import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import { getEnumKeys } from "@/util";
 import { addOrUpdateProjectMember } from "@/api";
 import { appModule } from "@/store";
+import { getEnumKeys } from "@/util/enum-helper";
 
 /**
  * The modal for sharing a project with a user.
@@ -141,14 +141,14 @@ export default Vue.extend({
         projectRole !== undefined
       ) {
         addOrUpdateProjectMember(projectId, this.userEmail, projectRole)
-          .then(() => this.$emit("onConfirm", project))
+          .then(() => this.$emit("confirm", project))
           .catch();
       } else {
         appModule.onWarning("Please define project role.");
       }
     },
     onCancel() {
-      this.$emit("onCancel");
+      this.$emit("cancel");
     },
     getProjectRole(role: string): ProjectRole {
       return ProjectRole[role.toUpperCase() as keyof typeof ProjectRole];

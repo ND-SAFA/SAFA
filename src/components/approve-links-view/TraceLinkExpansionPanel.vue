@@ -10,8 +10,8 @@
         :target-body="targetBody"
         :show-decline="showDecline"
         :show-approve="showApprove"
-        @approve-link="$emit('approve-link', $event)"
-        @decline-link="$emit('decline-link', $event)"
+        @link:approve="$emit('link:approve', $event)"
+        @link:decline="$emit('link:decline', $event)"
       />
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -25,8 +25,8 @@ import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 /**
  * Displays trace links on a panel.
  *
- * @emits-1 `approve-link` - On Link Approval.
- * @emits-2 `decline-link` - On Link Decline.
+ * @emits-1 `link:approve` - On Link Approval.
+ * @emits-2 `link:decline` - On Link Decline.
  */
 export default Vue.extend({
   name: "trace-link-expansion-panel",

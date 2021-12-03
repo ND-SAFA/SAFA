@@ -7,14 +7,14 @@
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
-    @onSubmit="onSubmit"
-    @onClose="onClose"
+    @submit="onSubmit"
+    @close="onClose"
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
         <generic-file-selector
           v-if="selectedVersion !== undefined"
-          @change-files="onChangeFiles"
+          @change:files="onChangeFiles"
         />
       </v-stepper-content>
     </template>
@@ -42,6 +42,11 @@ import { uploadNewProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common/generic";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
+/**
+ * Modal for uploading a new version.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   name: "upload-new-version-modal",
   components: {
@@ -69,7 +74,7 @@ export default Vue.extend({
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
       this.filesSelected = [];
-      this.$emit("onClose");
+      this.$emit("close");
     },
     onChangeFiles(files: File[]) {
       this.filesSelected = files;

@@ -20,7 +20,9 @@
       </v-card-text>
 
       <v-divider />
+
       <v-progress-linear v-if="isLoading" indeterminate color="secondary" />
+
       <v-card-actions
         v-if="actionsHeight > 0"
         class="grey lighten-1"

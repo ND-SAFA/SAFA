@@ -14,6 +14,8 @@ import Vue from "vue";
 
 /**
  * A generic password input.
+ *
+ * @emits `input` (string) - On input change.
  */
 export default Vue.extend({
   name: "password-field",

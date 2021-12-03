@@ -7,7 +7,7 @@
   >
     <v-row align="start">
       <v-col align-self="center">
-        <ButtonRow :definitions="[sourceDefinition]"
+        <button-row :definitions="[sourceDefinition]"
       /></v-col>
       <v-col align-self="center">
         <v-row justify="center">
@@ -15,7 +15,7 @@
         </v-row>
       </v-col>
       <v-col align-self="center">
-        <ButtonRow :definitions="[targetDefinition]" />
+        <button-row :definitions="[targetDefinition]" />
       </v-col>
     </v-row>
     <v-btn @click="onSubmit" color="primary" class="ml-10"> Create </v-btn>
@@ -28,6 +28,12 @@ import { ButtonDefinition, ButtonType, TraceFile } from "@/types";
 import { appModule } from "@/store";
 import { ButtonRow } from "@/components/common";
 
+/**
+ * Trace file creator.
+ *
+ * @emits-1 `close` - On close.
+ * @emits-2 `submit` ({ source: string, target: string }) - On submit.
+ */
 export default Vue.extend({
   components: {
     ButtonRow,
@@ -55,8 +61,8 @@ export default Vue.extend({
   methods: {
     onSubmit(): void {
       if (this.source !== "" && this.target !== "") {
-        this.$emit("onSubmit", { source: this.source, target: this.target });
-        this.$emit("onClose");
+        this.$emit("submit", { source: this.source, target: this.target });
+        this.$emit("close");
       } else {
         appModule.onWarning(
           "Please select valid source and target artifact types."

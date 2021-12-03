@@ -3,7 +3,7 @@
     :title="`Artifact Changes: ${name}`"
     :is-open="isOpen"
     :actions-height="0"
-    @close="$emit('onClose')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <v-container class="mt-5">
@@ -43,6 +43,11 @@ import { ArtifactDelta, DeltaType } from "@/types";
 import { getDeltaType, splitIntoLines } from "@/util";
 import { GenericModal } from "@/components/common";
 
+/**
+ * Displays artifact delta code diffs.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   components: { GenericModal, CodeDiff },
   props: {

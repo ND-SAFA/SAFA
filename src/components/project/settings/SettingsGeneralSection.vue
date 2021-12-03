@@ -23,8 +23,8 @@
       :is-open="isEditOpen"
       v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
-      @onClose="isEditOpen = false"
-      @onSave="onSave"
+      @close="isEditOpen = false"
+      @save="onSave"
     />
   </v-row>
 </template>

@@ -6,7 +6,7 @@
     <right-nav-drawer :is-right-open="isRightOpen" :width="325" />
     <artifact-creator-modal
       :is-open="isArtifactCreatorOpen"
-      @onClose="closeArtifactCreator"
+      @close="closeArtifactCreator"
     />
     <AppConfirmModal :message="confirmationMessage" />
   </v-container>

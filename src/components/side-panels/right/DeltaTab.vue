@@ -1,31 +1,31 @@
 <template>
   <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
-    <DeltaPanelNav />
-    <DeltaButtonGroup
+    <delta-panel-nav />
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="added"
       class="mt-10"
       :artifacts="artifactsAdded"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsAdded[name])"
+      @click="(name) => selectArtifact(name, artifactsAdded[name])"
     />
-    <DeltaButtonGroup
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
       :artifacts="artifactsRemoved"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsRemoved[name])"
+      @click="(name) => selectArtifact(name, artifactsRemoved[name])"
     />
-    <DeltaButtonGroup
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
       :artifacts="artifactsModified"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsModified[name])"
+      @click="(name) => selectArtifact(name, artifactsModified[name])"
     />
-    <ArtifactDeltaDiff
+    <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
       :isOpen="selectedDeltaArtifact !== undefined"
       :artifact="selectedDeltaArtifact[1]"
       :name="selectedDeltaArtifact[0]"
-      @onClose="closeDeltaModal"
+      @close="closeDeltaModal"
     />
   </v-expansion-panels>
 </template>
@@ -49,6 +49,11 @@ import {
 
 type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
 
+/**
+ * Displays delta information.
+ *
+ * @emits `open` - On open.
+ */
 export default Vue.extend({
   components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaPanelNav },
   data() {

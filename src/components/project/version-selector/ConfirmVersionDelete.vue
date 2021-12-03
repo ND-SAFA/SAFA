@@ -22,6 +22,12 @@ import { ProjectVersion } from "@/types";
 import { versionToString } from "@/util";
 import { GenericModal } from "@/components/common";
 
+/**
+ * A modal for confirming version deletion.
+ *
+ * @emits-1 `confirm` (ProjectVersion) - On delete confirm.
+ * @emits-2 `cancel` - On delete cancel.
+ */
 export default Vue.extend({
   components: { GenericModal },
   props: {
@@ -41,10 +47,10 @@ export default Vue.extend({
   },
   methods: {
     onConfirm() {
-      this.$emit("onConfirmDelete", this.$props.version);
+      this.$emit("confirm", this.$props.version);
     },
     onCancel() {
-      this.$emit("onCancelDelete");
+      this.$emit("cancel");
     },
   },
   watch: {

@@ -1,7 +1,7 @@
 <template>
   <cy-element
     :definition="definition"
-    v-on:click="$emit('right-click', traceDefinition)"
+    v-on:click="$emit('click:right', traceDefinition)"
   />
 </template>
 
@@ -12,7 +12,7 @@ import Vue, { PropType } from "vue";
 /**
  * Displays trace link edge.
  *
- * @emits `right-click` - On right click.
+ * @emits `click:right` - On right click.
  */
 export default Vue.extend({
   name: "trace-link",

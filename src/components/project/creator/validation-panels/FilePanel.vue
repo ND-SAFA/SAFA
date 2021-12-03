@@ -26,7 +26,7 @@
         <v-row v-if="showFileUploader">
           <generic-file-selector
             :multiple="false"
-            @change-files="emitChangeFiles"
+            @change:files="emitChangeFiles"
           />
         </v-row>
 
@@ -95,7 +95,7 @@
         </v-row>
 
         <v-row class="mt-5" justify="end">
-          <v-btn @click="$emit('onDelete')" color="error"> Delete </v-btn>
+          <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
         </v-row>
       </v-container>
     </v-expansion-panel-content>
@@ -109,6 +109,14 @@ import { GenericSwitch, GenericFileSelector } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
+/**
+ * Displays a file panel.
+ *
+ * @emits-1 `delete` - On delete.
+ * @emits-2 `update:ignore` (ignoreErrors: boolean) - On update ignore errors.
+ * @emits-3 `validate` (isValid: boolean) - On validate.
+ * @emits-4 `change` (file?: File) - On change.
+ */
 export default Vue.extend({
   name: "file-panel",
   components: {
@@ -152,7 +160,7 @@ export default Vue.extend({
         return this.ignoreErrorsFlag;
       },
       set(ignoreErrors: boolean): void {
-        this.$emit("update:ignoreErrorsFlag", ignoreErrors);
+        this.$emit("update:ignore", ignoreErrors);
       },
     },
     isValid(): boolean {
@@ -171,7 +179,7 @@ export default Vue.extend({
   },
   watch: {
     isValid(): void {
-      this.$emit("onValidate", this.isValid);
+      this.$emit("validate", this.isValid);
     },
   },
   methods: {
@@ -186,7 +194,7 @@ export default Vue.extend({
       }
     },
     onClear(): void {
-      this.$emit("onChange", undefined);
+      this.$emit("change", undefined);
     },
     emitChangeFiles(file: File): void {
       const fileIsEmpty = file === null;
@@ -196,7 +204,7 @@ export default Vue.extend({
       if (fileIsEmpty) {
         this.onClear();
       } else {
-        this.$emit("onChange", file);
+        this.$emit("change", file);
       }
     },
     underDevelopmentError(): void {

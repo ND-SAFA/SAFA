@@ -3,7 +3,7 @@
     title="Delta View Target Version"
     :is-open="isOpen"
     :is-loading="isLoading"
-    @close="$emit('onClose')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <v-row justify="center" class="mt-5">
@@ -14,11 +14,11 @@
             </h3>
           </v-row>
           <v-row justify="center">
-            <VersionSelector
+            <version-selector
               :project="project"
-              :isOpen="isOpen"
-              @onVersionSelected="selectVersion"
-              @onVersionUnselected="unselectVersion"
+              :is-open="isOpen"
+              @selected="selectVersion"
+              @unselected="unselectVersion"
             />
           </v-row>
         </v-container>
@@ -44,6 +44,11 @@ import { appModule, deltaModule, viewportModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project/version-selector";
 
+/**
+ * A modal for displaying delta versions.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   components: { VersionSelector, GenericModal },
   props: {
@@ -79,7 +84,7 @@ export default Vue.extend({
           ).then(async (deltaPayload: DeltaPayload) => {
             await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
-            this.$emit("onClose");
+            this.$emit("close");
             appModule.onSuccess("Delta state was updated successfully.");
             await viewportModule.setArtifactTreeLayout();
           });

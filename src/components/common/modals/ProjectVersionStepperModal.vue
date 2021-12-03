@@ -8,7 +8,7 @@
     size="l"
     @close="onClose"
     @reset="clearData"
-    @submit="$emit('onSubmit')"
+    @submit="$emit('submit')"
   >
     <template v-slot:items>
       <slot name="beforeItems" />
@@ -16,8 +16,8 @@
       <v-stepper-content :step="projectStep">
         <project-selector
           :is-open="projectSelectorIsOpen"
-          @onProjectSelected="selectProject"
-          @onProjectUnselected="unselectProject"
+          @selected="selectProject"
+          @unselected="unselectProject"
         />
       </v-stepper-content>
 
@@ -25,8 +25,8 @@
         <version-selector
           :is-open="versionSelectorIsOpen"
           :project="selectedProject"
-          @onVersionSelected="selectVersion"
-          @onVersionUnselected="unselectVersion"
+          @selected="selectVersion"
+          @unselected="unselectVersion"
         />
       </v-stepper-content>
       <slot name="afterItems" />
@@ -54,6 +54,12 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 /**
  * Presents a stepper in a modal for selecting a project and version.
  *
+ * @emits-1 `submit` - On submit.
+ * @emits-2 `update:loading` (boolean) - On loading update.
+ * @emits-3 `close` - On close.
+ * @emits-4 `input` (number) - On step change.
+ * @emits-5 `update:project` (string) - On project update.
+ * @emits-6 `update:version` (string) - On version update.
  */
 export default Vue.extend({
   name: "project-version-stepper-modal",
@@ -148,12 +154,12 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.fileSelectorOpen = false;
       this.currentStep = this.startStep;
-      this.$emit("update:isLoading", false);
+      this.$emit("update:loading", false);
     },
     onClose() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
-      this.$emit("onClose");
+      this.$emit("close");
     },
     selectProject(project: ProjectIdentifier) {
       this.selectedProject = project;

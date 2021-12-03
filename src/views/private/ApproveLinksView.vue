@@ -11,8 +11,8 @@
         title="Un-Reviewed Trace Links"
         :links="links"
         :artifacts="artifactHashmap"
-        @approve-link="onApproveLink"
-        @decline-link="onDeclineLink"
+        @link:approve="onApproveLink"
+        @link:decline="onDeclineLink"
       />
       <v-divider class="mt-5" />
       <approval-section
@@ -22,7 +22,7 @@
         :start-open="false"
         :links="declinedLinks"
         :artifacts="artifactHashmap"
-        @approve-link="onApproveDeclinedLink"
+        @link:approve="onApproveDeclinedLink"
       />
       <v-divider class="mt-5" />
       <approval-section
@@ -32,7 +32,7 @@
         :start-open="false"
         :links="approvedLinks"
         :artifacts="artifactHashmap"
-        @decline-link="onDeclineApprovedLink"
+        @link:decline="onDeclineApprovedLink"
       />
       <v-divider class="mt-5 mb-10" />
     </template>

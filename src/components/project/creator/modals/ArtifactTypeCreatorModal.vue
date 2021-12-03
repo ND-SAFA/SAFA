@@ -19,6 +19,12 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 
+/**
+ * Modal for creating new artifact types.
+ *
+ * @emits-1 `close` - On close.
+ * @emits-2 `submit` (artifactName: string) - On submit.
+ */
 export default Vue.extend({
   props: {
     isOpen: {
@@ -44,8 +50,8 @@ export default Vue.extend({
         this.errors = [`Artifact type has already been created.`];
       else this.errors = [];
       if (this.errors.length === 0) {
-        this.$emit("onSubmit", this.artifactName);
-        this.$emit("onClose");
+        this.$emit("submit", this.artifactName);
+        this.$emit("close");
       }
     },
     onEnterPress(event: Event): void {

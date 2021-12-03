@@ -89,11 +89,11 @@
         {{ selectedArtifactWarnings }}
       </p>
 
-      <ArtifactCreatorModal
+      <artifact-creator-modal
         title="Edit Artifact Contents"
         :is-open="isArtifactCreatorOpen"
         :artifact="selectedArtifact"
-        @onClose="isArtifactCreatorOpen = false"
+        @close="isArtifactCreatorOpen = false"
       />
     </v-container>
 

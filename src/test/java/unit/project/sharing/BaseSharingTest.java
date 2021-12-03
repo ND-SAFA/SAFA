@@ -2,8 +2,7 @@ package unit.project.sharing;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.UUID;
-
+import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -34,17 +33,17 @@ public class BaseSharingTest extends ApplicationBaseTest {
             .newProjectWithReturn(projectName);
 
         // Step - Share project
-        shareProject(project.getProjectId(), otherUser.getEmail(), ProjectRole.VIEWER, status().is2xxSuccessful());
+        shareProject(project, otherUser.getEmail(), ProjectRole.VIEWER, status().is2xxSuccessful());
 
         return project;
     }
 
-    protected JSONObject shareProject(UUID projectId,
+    protected JSONObject shareProject(Project project,
                                       String email,
                                       ProjectRole role,
                                       ResultMatcher httpResult) throws Exception {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(projectId, email, role);
-        return sendPost(AppRoutes.Projects.addProjectMember, toJson(request),
-            httpResult);
+        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
+        String url = RouteBuilder.withRoute(AppRoutes.Projects.addProjectMember).withProject(project).get();
+        return sendPost(url, toJson(request), httpResult);
     }
 }

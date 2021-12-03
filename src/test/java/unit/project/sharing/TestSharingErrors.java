@@ -3,8 +3,6 @@ package unit.project.sharing;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.UUID;
-
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 
@@ -33,9 +31,8 @@ public class TestSharingErrors extends BaseSharingTest {
             .newProjectWithReturn(projectName);
 
         // Step - Share with non-existent user
-        UUID projectId = project.getProjectId();
         String nonUserEmail = "non-existing@email.com";
-        JSONObject response = shareProject(projectId, nonUserEmail, ProjectRole.VIEWER, status().is4xxClientError());
+        JSONObject response = shareProject(project, nonUserEmail, ProjectRole.VIEWER, status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account
         String error = response.getJSONObject("body").getString("message");
@@ -56,7 +53,7 @@ public class TestSharingErrors extends BaseSharingTest {
 
         // Step - Share project with same user again.
         JSONObject response = shareProject(
-            project.getProjectId(),
+            project,
             otherUserEmail,
             ProjectRole.VIEWER,
             status().is4xxClientError()

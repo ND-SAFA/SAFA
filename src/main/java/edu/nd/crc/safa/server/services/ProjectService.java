@@ -184,8 +184,6 @@ public class ProjectService {
     public void addMemberToProject(Project project,
                                    String newMemberEmail,
                                    ProjectRole newMemberRole) throws ServerError {
-        Project project = this.projectRepository.findByProjectId(projectId);
-
         // Step - Find member being added and the current member.
         Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
         if (newMemberQuery.isEmpty()) {

@@ -19,8 +19,7 @@ public class ProjectMembershipRequest {
     public ProjectMembershipRequest() {
     }
 
-    public ProjectMembershipRequest(UUID projectId, String email, ProjectRole role) {
-        this.projectId = projectId;
+    public ProjectMembershipRequest(String email, ProjectRole role) {
         this.memberEmail = email;
         this.projectRole = role;
     }

@@ -4,15 +4,15 @@
       <v-row dense class="mt-4">
         <v-col>
           <v-text-field
-            v-model="newUserEmail"
+            v-model="userEmail"
             label="User Email"
             rounded
             solo
             dense
             style="min-width: 300px"
-              :readonly="member !== undefined"
-              :rules="emailRules"
-              @update:error="onErrorUpdate"
+            :readonly="member !== undefined"
+            :rules="emailRules"
+            @update:error="onErrorUpdate"
           />
         </v-col>
         <v-col>

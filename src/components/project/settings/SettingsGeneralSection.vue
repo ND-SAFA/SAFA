@@ -2,10 +2,10 @@
   <v-row>
     <v-col>
       <v-row>
-        <v-col cols="9">
+        <v-col cols="11">
           <h1>{{ project.name }}</h1></v-col
         >
-        <v-col cols="3">
+        <v-col cols="1">
           <generic-icon-button
             tooltip="Edit title"
             icon-id="mdi-pencil"

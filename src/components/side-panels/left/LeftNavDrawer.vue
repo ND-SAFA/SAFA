@@ -10,7 +10,7 @@
     :width="width"
     height="100%"
   >
-    <SelectedNodeTab />
+    <selected-node-tab />
   </v-navigation-drawer>
 </template>
 <script lang="ts">

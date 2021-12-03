@@ -1,7 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <ProjectCreator />
+      <project-creator />
     </template>
   </private-page>
 </template>

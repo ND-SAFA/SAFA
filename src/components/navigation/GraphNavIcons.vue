@@ -14,7 +14,7 @@
           @click="definition.handler"
           :is-disabled="definition.isDisabled"
         />
-        <CheckmarkMenu v-else :definition="definition" />
+        <checkmark-menu v-else :definition="definition" />
       </v-row>
     </v-col>
   </v-row>

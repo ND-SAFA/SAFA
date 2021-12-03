@@ -10,7 +10,7 @@
     :width="width"
     height="100%"
   >
-    <SidePanel />
+    <side-panel />
   </v-navigation-drawer>
 </template>
 

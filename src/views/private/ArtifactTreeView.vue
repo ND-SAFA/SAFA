@@ -1,7 +1,7 @@
 <template>
   <private-page full-window>
     <template v-slot:page>
-      <ArtifactTree />
+      <artifact-tree />
     </template>
   </private-page>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <generic-cytoscape-controller :cytoCoreGraph="cytoCoreGraph">
+  <generic-cytoscape-controller :cyto-core-graph="cytoCoreGraph">
     <template v-slot:elements>
       <artifact-node
         v-for="artifact in artifacts"

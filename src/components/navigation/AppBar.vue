@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
-      <AppBarHeader />
+      <app-bar-header />
       <v-divider class="blue-grey" v-if="doShowGraphButtons" />
     </v-flex>
 
@@ -9,7 +9,7 @@
       <v-container fluid class="ma-0 pa-0">
         <v-row>
           <v-col cols="4">
-            <GenericIconButton
+            <generic-icon-button
               color="secondary"
               :tooltip="leftPanelTooltip"
               :icon-id="
@@ -19,11 +19,11 @@
             />
           </v-col>
           <v-col cols="4">
-            <GraphNavIcons />
+            <graph-nav-icons />
           </v-col>
           <v-col cols="4">
             <v-row justify="end" class="ma-0 pa-0">
-              <GenericIconButton
+              <generic-icon-button
                 color="secondary"
                 :tooltip="rightPanelTooltip"
                 :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"

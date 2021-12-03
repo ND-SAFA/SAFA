@@ -7,8 +7,8 @@
         :headers="headers"
         :items="members"
         :is-open="true"
-        :has-delete="false"
-        :has-edit="false"
+        :has-delete="isAdmin"
+        :has-edit="isAdmin"
         :has-select="false"
         :is-loading="isLoading"
         item-key="email"
@@ -31,17 +31,17 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectMember } from "@/types";
+import { Project, ProjectMember, ProjectRole } from "@/types";
 import { GenericSelector } from "@/components";
 import { getProjectMembers } from "@/api";
 import SettingsAddMemberModal from "./SettingsAddMemberModal.vue";
+import { sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
  * TODO: Show delete and other admin operations if admin or above
  */
 export default Vue.extend({
-  name: "approval-links-view",
   components: { GenericSelector, SettingsAddMemberModal },
   props: {
     project: {
@@ -57,6 +57,16 @@ export default Vue.extend({
     };
   },
   computed: {
+    isAdmin(): boolean {
+      const userEmail = sessionModule.authenticationToken.sub;
+      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
+
+      return (
+        this.members.filter(
+          (m) => m.email === userEmail && allowedRoles.includes(m.role)
+        ).length > 0
+      );
+    },
     hasDescription(): boolean {
       const description = this.project.description;
       return description !== "";
@@ -70,6 +80,7 @@ export default Vue.extend({
           sortable: true,
           isSelectable: true,
         },
+        { text: "Actions", value: "actions", sortable: false },
       ];
     },
   },

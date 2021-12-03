@@ -89,7 +89,7 @@ export default class SessionModule extends VuexModule {
   /**
    * Returns the decoded authentication token is one exists.
    */
-  get decodedToken(): AuthToken {
+  get authenticationToken(): AuthToken {
     return jwt_decode(this.getToken) as AuthToken;
   }
 
@@ -105,6 +105,8 @@ export default class SessionModule extends VuexModule {
    * expiration date.
    */
   get isTokenExpired(): boolean {
-    return this.isTokenEmpty || Date.now() >= this.decodedToken.exp * 1000;
+    return (
+      this.isTokenEmpty || Date.now() >= this.authenticationToken.exp * 1000
+    );
   }
 }

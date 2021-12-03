@@ -168,10 +168,10 @@ export interface ProjectMember {
  * within a given project.
  */
 export enum ProjectRole {
-  VIEWER,
-  EDITOR,
-  ADMIN,
-  OWNER,
+  VIEWER = "VIEWER",
+  EDITOR = "EDITOR",
+  ADMIN = "ADMIN",
+  OWNER = "OWNER",
 }
 
 /**

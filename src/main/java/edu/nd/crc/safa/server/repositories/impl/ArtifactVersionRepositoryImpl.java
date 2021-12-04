@@ -1,9 +1,10 @@
-package edu.nd.crc.safa.server.repositories;
+package edu.nd.crc.safa.server.repositories.impl;
 
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

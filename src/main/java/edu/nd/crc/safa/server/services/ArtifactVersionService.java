@@ -212,8 +212,7 @@ public class ArtifactVersionService {
                 summary,
                 content));
     }
-
-
+    
     private void saveArtifactBody(ArtifactVersion artifactVersion) throws SafaError {
         try {
             this.artifactVersionRepository.save(artifactVersion);

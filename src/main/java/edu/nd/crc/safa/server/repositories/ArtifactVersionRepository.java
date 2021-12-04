@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArtifactVersionRepository extends CrudRepository<ArtifactVersion, UUID>,
-    IVersionRepository<ArtifactVersion> {
+    IVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
 
     List<ArtifactVersion> findByArtifact(Artifact artifact);
 

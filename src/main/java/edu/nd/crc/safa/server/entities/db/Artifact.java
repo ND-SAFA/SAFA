@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type;
                 "name"
             }, name = AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT)
     })
-public class Artifact implements Serializable {
+public class Artifact implements Serializable, IEntity {
 
     @Id
     @GeneratedValue

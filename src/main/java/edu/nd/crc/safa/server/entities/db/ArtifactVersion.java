@@ -15,6 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -33,7 +34,7 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
-public class ArtifactVersion implements Serializable, IEntityVersion {
+public class ArtifactVersion implements Serializable, IEntityVersion<ArtifactAppEntity> {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -163,9 +164,20 @@ public class ArtifactVersion implements Serializable, IEntityVersion {
     public boolean hasSameContent(IEntityVersion entityVersion) {
         if (entityVersion instanceof ArtifactVersion) {
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
-            return this.summary.equals(artifactVersion.summary)
-                && this.content.equals(artifactVersion.content);
+            return hasSameContent(artifactVersion.getName(),
+                artifactVersion.getSummary(),
+                artifactVersion.getContent());
         }
         return false;
+    }
+
+    public boolean hasSameContent(ArtifactAppEntity a) {
+        return hasSameContent(a.name, a.summary, a.body);
+    }
+
+    private boolean hasSameContent(String name, String summary, String content) {
+        return this.artifact.getName().equals(name)
+            && this.summary.equals(summary)
+            && this.content.equals(content);
     }
 }

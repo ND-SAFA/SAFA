@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.app.AddedArtifact;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -105,63 +104,35 @@ public class DeltaService {
     public ArtifactVersion calculateArtifactVersion(ProjectVersion projectVersion,
                                                     Artifact artifact,
                                                     ArtifactAppEntity appEntity) {
-        ArtifactVersion artifactVersion = null;
-        ArtifactVersion previousBody =
-            getArtifactBodyContentBeforeVersion(this.artifactVersionRepository.findByArtifact(artifact), projectVersion);
-        if (previousBody != null) {
-            if (appEntity == null) {
-                artifactVersion = new ArtifactVersion(projectVersion,
-                    ModificationType.REMOVED,
-                    artifact,
-                    "",
-                    "");
-            } else if (previousBody.getModificationType() == ModificationType.REMOVED) {
-                artifactVersion = new ArtifactVersion(projectVersion,
-                    ModificationType.ADDED,
-                    artifact,
-                    appEntity.summary,
-                    appEntity.body);
-            } else if (
-                !previousBody.getContent().equals(appEntity.body)
-                    || !previousBody.getSummary().equals(appEntity.summary)
-                    || !previousBody.getName().equals(appEntity.name)) {
-                artifactVersion = new ArtifactVersion(projectVersion,
-                    ModificationType.MODIFIED,
-                    artifact,
-                    appEntity.summary,
-                    appEntity.body);
-            }
-        } else {
-            if (appEntity == null) {
-                return null;
-            }
-            artifactVersion = new ArtifactVersion(projectVersion,
-                ModificationType.ADDED,
-                artifact,
-                appEntity.summary,
-                appEntity.body);
+        ModificationType modificationType = artifactVersionRepository
+            .calculateModificationTypeForAppEntity(projectVersion, artifact, appEntity);
+
+        if (modificationType == null) {
+            return null;
         }
 
-        if (artifactVersion == null) {
-            return null;
-        } else {
-            Optional<ArtifactVersion> bodyQuery =
-                this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
-            if (bodyQuery.isPresent()) {
-                artifactVersion.setArtifactBodyId(bodyQuery.get().getArtifactBodyId());
-            }
-            return artifactVersion;
-        }
+        ArtifactVersion artifactVersion = createArtifactVersionFromModification(
+            projectVersion,
+            modificationType,
+            artifact,
+            appEntity);
+
+        this.artifactVersionRepository
+            .findByProjectVersionAndArtifact(projectVersion, artifact)
+            .ifPresent(version -> artifactVersion.setArtifactBodyId(version.getArtifactBodyId()));
+        return artifactVersion;
     }
 
     private DeltaArtifact calculateArtifactModificationBetweenVersions(Artifact artifact,
                                                                        ProjectVersion beforeVersion,
                                                                        ProjectVersion afterVersion) {
-
         String artifactName = artifact.getName();
         List<ArtifactVersion> bodies = this.artifactVersionRepository.findByArtifact(artifact);
-        ArtifactVersion beforeBody = getArtifactBodyContentAtVersion(bodies, beforeVersion);
-        ArtifactVersion afterBody = getArtifactBodyContentAtVersion(bodies, afterVersion);
+
+        ArtifactVersion beforeBody = this.artifactVersionRepository.getEntityAtVersion(bodies,
+            beforeVersion);
+        ArtifactVersion afterBody = this.artifactVersionRepository.getEntityAtVersion(bodies,
+            afterVersion);
 
         ModificationType modificationType = this.artifactVersionRepository
             .calculateModificationType(beforeBody, afterBody);
@@ -170,6 +141,43 @@ public class DeltaService {
             return null;
         }
 
+        return createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
+    }
+
+    private ArtifactVersion createArtifactVersionFromModification(
+        ProjectVersion projectVersion,
+        ModificationType modificationType,
+        Artifact artifact,
+        ArtifactAppEntity artifactAppEntity
+    ) {
+        switch (modificationType) {
+            case ADDED:
+                return new ArtifactVersion(projectVersion,
+                    ModificationType.ADDED,
+                    artifact,
+                    artifactAppEntity.summary,
+                    artifactAppEntity.body);
+            case MODIFIED:
+                return new ArtifactVersion(projectVersion,
+                    ModificationType.MODIFIED,
+                    artifact,
+                    artifactAppEntity.summary,
+                    artifactAppEntity.body);
+            case REMOVED:
+                return new ArtifactVersion(projectVersion,
+                    ModificationType.REMOVED,
+                    artifact,
+                    "",
+                    "");
+            default:
+                throw new RuntimeException("Missing case in delta service.");
+        }
+    }
+
+    private DeltaArtifact createDeltaArtifactFrom(ModificationType modificationType,
+                                                  String artifactName,
+                                                  ArtifactVersion beforeBody,
+                                                  ArtifactVersion afterBody) {
         switch (modificationType) {
             case MODIFIED:
                 return new ModifiedArtifact(artifactName,
@@ -185,14 +193,6 @@ public class DeltaService {
                 return null;
         }
     }
-
-    private ArtifactVersion getArtifactBodyContentAtVersion(List<ArtifactVersion> bodies, ProjectVersion version) {
-        return artifactVersionRepository
-            .getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
-    }
-
-    private ArtifactVersion getArtifactBodyContentBeforeVersion(List<ArtifactVersion> bodies, ProjectVersion version) {
-        return artifactVersionRepository
-            .getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
-    }
 }
+
+

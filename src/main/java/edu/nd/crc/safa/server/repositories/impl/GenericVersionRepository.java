@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.entities.app.IAppEntity;
+import edu.nd.crc.safa.server.entities.db.IEntity;
 import edu.nd.crc.safa.server.entities.db.IEntityVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -12,9 +14,13 @@ import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 /**
  * Implements the generic logic for retrieving, creating, and modifying versioned entities.
  *
- * @param <T> The versioned entity.
+ * @param <VersionType> The versioned entity.
  */
-public abstract class GenericVersionRepository<T extends IEntityVersion> implements IVersionRepository<T> {
+public abstract class GenericVersionRepository<
+    EntityType extends IEntity,
+    VersionType extends IEntityVersion<AppType>,
+    AppType extends IAppEntity>
+    implements IVersionRepository<EntityType, VersionType, AppType> {
 
 
     /**
@@ -24,8 +30,8 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public List<T> getEntitiesAtVersion(ProjectVersion projectVersion) {
-        Hashtable<String, List<T>> artifactBodyTable =
+    public List<VersionType> getEntitiesAtVersion(ProjectVersion projectVersion) {
+        Hashtable<String, List<VersionType>> artifactBodyTable =
             this.groupEntityVersionsByEntityId(projectVersion);
         return this.retrieveEntitiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
@@ -37,11 +43,11 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
      * @param filter The filter deciding whether an entity's version is valid.
      * @return The latest entity version passing given filter.
      */
-    public T getLatestEntityVersionWithFilter(List<T> bodies,
-                                              ProjectVersionFilter filter) {
-        T closestBodyToVersion = null;
+    public VersionType getLatestEntityVersionWithFilter(List<VersionType> bodies,
+                                                        ProjectVersionFilter filter) {
+        VersionType closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
-            T currentBody = bodies.get(i);
+            VersionType currentBody = bodies.get(i);
             ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
             if (filter.shouldKeep(currentBodyVersion)) {
                 if (closestBodyToVersion == null) {
@@ -60,10 +66,10 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
      *
      * @param baseEntity   The original entity whose content is the base for calculating changes.
      * @param targetEntity The entity whose changes are compared against the base content.
-     * @return
+     * @return The type of change occurring to base in order to reach target entity.
      */
-    public ModificationType calculateModificationType(T baseEntity,
-                                                      T targetEntity) {
+    public ModificationType calculateModificationType(VersionType baseEntity,
+                                                      VersionType targetEntity) {
         if (baseEntity == null || targetEntity == null) {
             if (baseEntity == targetEntity) {
                 return null;
@@ -87,14 +93,14 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
         }
     }
 
-    private List<T> retrieveEntitiesAtProjectVersion(
+    private List<VersionType> retrieveEntitiesAtProjectVersion(
         ProjectVersion projectVersion,
-        Hashtable<String, List<T>> artifactBodiesByArtifactName) {
-        List<T> artifacts = new ArrayList<>();
+        Hashtable<String, List<VersionType>> artifactBodiesByArtifactName) {
+        List<VersionType> artifacts = new ArrayList<>();
         for (String key : artifactBodiesByArtifactName.keySet()) {
-            List<T> bodyVersions = artifactBodiesByArtifactName.get(key);
-            T latest = null;
-            for (T body : bodyVersions) {
+            List<VersionType> bodyVersions = artifactBodiesByArtifactName.get(key);
+            VersionType latest = null;
+            for (VersionType body : bodyVersions) {
                 if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
                     if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
                         latest = body;
@@ -109,19 +115,51 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
         return artifacts;
     }
 
-    private Hashtable<String, List<T>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
-        Hashtable<String, List<T>> entityHashtable = new Hashtable<>();
-        List<T> entityVersions = this.getEntitiesInProject(projectVersion.getProject());
-        for (T entityVersion : entityVersions) {
+    private Hashtable<String, List<VersionType>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
+        Hashtable<String, List<VersionType>> entityHashtable = new Hashtable<>();
+        List<VersionType> entityVersions = this.getEntitiesInProject(projectVersion.getProject());
+        for (VersionType entityVersion : entityVersions) {
             String entityId = entityVersion.getEntityId();
             if (entityHashtable.containsKey(entityId)) {
                 entityHashtable.get(entityId).add(entityVersion);
             } else {
-                List<T> newList = new ArrayList<>();
+                List<VersionType> newList = new ArrayList<>();
                 newList.add(entityVersion);
                 entityHashtable.put(entityId, newList);
             }
         }
         return entityHashtable;
+    }
+
+    public ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
+                                                                  EntityType baseEntity,
+                                                                  AppType appEntity) {
+        VersionType previousBody =
+            getEntityBeforeVersion(this.findByEntity(baseEntity), projectVersion);
+        if (previousBody == null) {
+            return appEntity == null ? null : ModificationType.ADDED;
+        } else {
+            if (appEntity == null) {
+                boolean previouslyRemoved = previousBody.getModificationType() == ModificationType.REMOVED;
+                return previouslyRemoved ? null : ModificationType.REMOVED;
+            } else { // app entity is not null
+                if (previousBody.getModificationType() == ModificationType.REMOVED) {
+                    return ModificationType.ADDED;
+                }
+                boolean hasSameContent = previousBody.hasSameContent(appEntity);
+                return hasSameContent ? null : ModificationType.MODIFIED;
+            }
+        }
+    }
+
+    @Override
+    public VersionType getEntityAtVersion(List<VersionType> bodies, ProjectVersion version) {
+        return this
+            .getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
+    }
+
+    @Override
+    public VersionType getEntityBeforeVersion(List<VersionType> bodies, ProjectVersion version) {
+        return this.getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
     }
 }

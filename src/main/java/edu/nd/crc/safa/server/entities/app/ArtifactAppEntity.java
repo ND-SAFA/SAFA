@@ -10,7 +10,7 @@ import org.json.JSONObject;
 /**
  * Represents the JSON model that is used on the front-end application.
  */
-public class ArtifactAppEntity {
+public class ArtifactAppEntity implements IAppEntity {
     @NotNull
     public String id;
     @NotNull

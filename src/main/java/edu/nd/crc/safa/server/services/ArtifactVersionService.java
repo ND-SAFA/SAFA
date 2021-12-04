@@ -131,7 +131,6 @@ public class ArtifactVersionService {
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 
-
     private List<ArtifactVersion> calculateArtifactBodiesAtVersion(
         ProjectVersion projectVersion,
         List<ArtifactAppEntity> projectArtifacts) throws SafaError {

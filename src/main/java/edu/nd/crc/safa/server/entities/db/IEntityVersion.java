@@ -10,4 +10,6 @@ public interface IEntityVersion {
     ModificationType getModificationType();
 
     String getEntityId();
+
+    boolean hasSameContent(IEntityVersion e);
 }

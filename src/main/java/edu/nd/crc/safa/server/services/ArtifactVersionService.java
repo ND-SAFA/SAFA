@@ -87,7 +87,7 @@ public class ArtifactVersionService {
      */
     public void setArtifactAtProjectVersion(ProjectVersion projectVersion, ArtifactAppEntity artifact)
         throws SafaError {
-        ArtifactVersion artifactVersion = calculateArtifactBodyAtVersion(projectVersion,
+        ArtifactVersion artifactVersion = createNewArtifactVersion(projectVersion,
             artifact.id,
             artifact.name,
             artifact.type,
@@ -140,7 +140,7 @@ public class ArtifactVersionService {
         for (ArtifactAppEntity a : projectArtifacts) {
             artifactsUpdated.put(a.getName(), a);
             try {
-                ArtifactVersion artifactVersion = calculateArtifactBodyAtVersion(projectVersion,
+                ArtifactVersion artifactVersion = createNewArtifactVersion(projectVersion,
                     a.getId(),
                     a.name,
                     a.type,
@@ -165,7 +165,7 @@ public class ArtifactVersionService {
             .getProjectArtifacts(projectVersion.getProject())
             .stream()
             .filter(a -> !artifactsUpdated.containsKey(a.getName()))
-            .map(a -> deltaService.calculateArtifactChange(projectVersion, a, null))
+            .map(a -> deltaService.calculateArtifactVersion(projectVersion, a, null))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -174,7 +174,7 @@ public class ArtifactVersionService {
         return allArtifactBodies;
     }
 
-    private ArtifactVersion calculateArtifactBodyAtVersion(
+    private ArtifactVersion createNewArtifactVersion(
         ProjectVersion projectVersion,
         String artifactId,
         String artifactName,
@@ -203,7 +203,7 @@ public class ArtifactVersionService {
         }
         this.artifactRepository.save(artifact);
 
-        return deltaService.calculateArtifactChange(projectVersion,
+        return deltaService.calculateArtifactVersion(projectVersion,
             artifact,
             new ArtifactAppEntity(
                 artifactId,
@@ -212,7 +212,7 @@ public class ArtifactVersionService {
                 summary,
                 content));
     }
-    
+
     private void saveArtifactBody(ArtifactVersion artifactVersion) throws SafaError {
         try {
             this.artifactVersionRepository.save(artifactVersion);

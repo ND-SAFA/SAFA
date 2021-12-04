@@ -159,4 +159,13 @@ public class ArtifactVersion implements Serializable, IEntityVersion {
         json.put("modificationType", modificationType);
         return json.toString();
     }
+
+    public boolean hasSameContent(IEntityVersion entityVersion) {
+        if (entityVersion instanceof ArtifactVersion) {
+            ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
+            return this.summary.equals(artifactVersion.summary)
+                && this.content.equals(artifactVersion.content);
+        }
+        return false;
+    }
 }

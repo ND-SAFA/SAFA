@@ -1,12 +1,22 @@
 package edu.nd.crc.safa.server.repositories;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import java.util.List;
 
-import org.springframework.stereotype.Repository;
+import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.Project;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements custom any custom artifact repository logic.
  */
-@Repository
 public class ArtifactBodyRepositoryImpl extends GenericVersionRepository<ArtifactBody> {
+
+    @Autowired
+    ArtifactBodyRepository artifactBodyRepository;
+
+    @Override
+    public List<ArtifactBody> getEntitiesInProject(Project project) {
+        return artifactBodyRepository.findByProjectVersionProject(project);
+    }
 }

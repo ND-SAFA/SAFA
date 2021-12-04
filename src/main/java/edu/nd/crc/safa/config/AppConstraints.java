@@ -40,7 +40,6 @@ public class AppConstraints {
             }
         }
 
-        System.out.println("Could not find error message for cause:" + cause);
         throw e;
     }
 

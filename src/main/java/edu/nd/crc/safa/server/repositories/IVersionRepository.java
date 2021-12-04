@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.server.repositories;
 
-import java.util.Hashtable;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.IEntityVersion;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 /**
@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  * @param <T> The type of versioned entity.
  */
 public interface IVersionRepository<T extends IEntityVersion> {
-    List<T> retrieveEntitiesAtProjectVersion(ProjectVersion projectVersion,
-                                             Hashtable<String, List<T>> entitiesById);
+    List<T> getEntitiesAtVersion(ProjectVersion projectVersion);
 
+    List<T> getEntitiesInProject(Project project);
 }

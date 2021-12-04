@@ -64,7 +64,7 @@ public class TestArtifactController extends ApplicationBaseTest {
             .withModifiedArtifact(artifactJson));
 
         // Step - Retrieve ArtifactBodies
-        List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProject(project);
+        List<ArtifactBody> artifactBodies = artifactBodyRepository.getEntitiesInProject(project);
 
         // VP - Verify one single artifact body
         List<Artifact> artifactInProject = this.artifactRepository.findByProject(project);

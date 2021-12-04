@@ -39,7 +39,7 @@ public class ArtifactBody implements Serializable, IEntityVersion {
     @Type(type = "uuid-char")
     @Column
     UUID artifactBodyId;
-    
+
     @Column(name = "modification_type")
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
@@ -93,6 +93,10 @@ public class ArtifactBody implements Serializable, IEntityVersion {
 
     public void setArtifactBodyId(UUID artifactBodyId) {
         this.artifactBodyId = artifactBodyId;
+    }
+
+    public String getEntityId() {
+        return this.artifact.getArtifactId().toString();
     }
 
     public String getName() {

@@ -15,8 +15,21 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  */
 public abstract class GenericVersionRepository<T extends IEntityVersion> implements IVersionRepository<T> {
 
+
+    /**
+     * Calculates contents of each artifact at given version and returns bodies at version.
+     *
+     * @param projectVersion - The version of the artifact bodies that are returned
+     * @return list of artifact bodies in project at given version
+     */
     @Override
-    public List<T> retrieveEntitiesAtProjectVersion(
+    public List<T> getEntitiesAtVersion(ProjectVersion projectVersion) {
+        Hashtable<String, List<T>> artifactBodyTable =
+            this.groupEntityVersionsByEntityId(projectVersion);
+        return this.retrieveEntitiesAtProjectVersion(projectVersion, artifactBodyTable);
+    }
+
+    private List<T> retrieveEntitiesAtProjectVersion(
         ProjectVersion projectVersion,
         Hashtable<String, List<T>> artifactBodiesByArtifactName) {
         List<T> artifacts = new ArrayList<>();
@@ -36,5 +49,21 @@ public abstract class GenericVersionRepository<T extends IEntityVersion> impleme
             }
         }
         return artifacts;
+    }
+
+    private Hashtable<String, List<T>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
+        Hashtable<String, List<T>> entityHashtable = new Hashtable<>();
+        List<T> entityVersions = this.getEntitiesInProject(projectVersion.getProject());
+        for (T entityVersion : entityVersions) {
+            String entityId = entityVersion.getEntityId();
+            if (entityHashtable.containsKey(entityId)) {
+                entityHashtable.get(entityId).add(entityVersion);
+            } else {
+                List<T> newList = new ArrayList<>();
+                newList.add(entityVersion);
+                entityHashtable.put(entityId, newList);
+            }
+        }
+        return entityHashtable;
     }
 }

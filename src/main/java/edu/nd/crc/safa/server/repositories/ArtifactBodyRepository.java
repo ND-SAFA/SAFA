@@ -37,10 +37,6 @@ public interface ArtifactBodyRepository extends CrudRepository<ArtifactBody, UUI
             artifact);
     }
 
-    default List<ArtifactBody> findByProject(Project project) {
-        return findByProjectVersionProject(project);
-    }
-
     List<ArtifactBody> findByProjectVersionProjectAndArtifactName(Project project, String name);
 
     Optional<ArtifactBody> findTopByProjectVersionProjectAndArtifactOrderByProjectVersionMajorVersionDescProjectVersionMinorVersionDescProjectVersionRevisionDesc(

@@ -63,18 +63,6 @@ public class ArtifactVersionService {
     }
 
     /**
-     * Calculates contents of each artifact at given version and returns bodies at version.
-     *
-     * @param projectVersion - The version of the artifact bodies that are returned
-     * @return list of artifact bodies in project at given version
-     */
-    public List<ArtifactBody> getArtifactBodiesAtVersion(ProjectVersion projectVersion) {
-        Hashtable<String, List<ArtifactBody>> artifactBodyTable =
-            groupProjectArtifactBodiesByArtifactName(projectVersion);
-        return this.artifactBodyRepository.retrieveEntitiesAtProjectVersion(projectVersion, artifactBodyTable);
-    }
-
-    /**
      * Calculates the changes in each artifact body from the previous versions and stores
      * changes at given ProjectVersion.
      *
@@ -225,22 +213,6 @@ public class ArtifactVersionService {
                 content));
     }
 
-    private Hashtable<String, List<ArtifactBody>> groupProjectArtifactBodiesByArtifactName(
-        ProjectVersion projectVersion) {
-        Hashtable<String, List<ArtifactBody>> artifactBodyTable = new Hashtable<>();
-        List<ArtifactBody> projectBodies = this.artifactBodyRepository.findByProject(projectVersion.getProject());
-        for (ArtifactBody body : projectBodies) {
-            String artifactId = body.getArtifact().getArtifactId().toString();
-            if (artifactBodyTable.containsKey(artifactId)) {
-                artifactBodyTable.get(artifactId).add(body);
-            } else {
-                List<ArtifactBody> newList = new ArrayList<>();
-                newList.add(body);
-                artifactBodyTable.put(artifactId, newList);
-            }
-        }
-        return artifactBodyTable;
-    }
 
     private void saveArtifactBody(ArtifactBody artifactBody) throws SafaError {
         try {

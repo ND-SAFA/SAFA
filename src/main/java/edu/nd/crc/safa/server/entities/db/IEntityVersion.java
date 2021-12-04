@@ -8,4 +8,6 @@ public interface IEntityVersion {
     ProjectVersion getProjectVersion();
 
     ModificationType getModificationType();
+
+    String getEntityId();
 }

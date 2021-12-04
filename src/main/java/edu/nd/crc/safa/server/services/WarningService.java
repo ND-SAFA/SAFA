@@ -9,6 +9,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.Warning;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
@@ -26,16 +27,16 @@ import org.springframework.stereotype.Service;
 public class WarningService {
 
     WarningRepository warningRepository;
-    ArtifactVersionService artifactVersionService;
     TraceLinkRepository traceLinkRepository;
+    ArtifactBodyRepository artifactBodyRepository;
 
     @Autowired
     public WarningService(WarningRepository warningRepository,
-                          ArtifactVersionService artifactVersionService,
-                          TraceLinkRepository traceLinkRepository) {
+                          TraceLinkRepository traceLinkRepository,
+                          ArtifactBodyRepository artifactBodyRepository) {
         this.warningRepository = warningRepository;
-        this.artifactVersionService = artifactVersionService;
         this.traceLinkRepository = traceLinkRepository;
+        this.artifactBodyRepository = artifactBodyRepository;
     }
 
     /**
@@ -46,7 +47,7 @@ public class WarningService {
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactBody> artifacts = artifactVersionService.getArtifactBodiesAtVersion(projectVersion);
+        List<ArtifactBody> artifacts = artifactBodyRepository.getEntitiesAtVersion(projectVersion);
         List<TraceLink> traceLinks = this.traceLinkRepository.getApprovedLinks(project);
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);
     }

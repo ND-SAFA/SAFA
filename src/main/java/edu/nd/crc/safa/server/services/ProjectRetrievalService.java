@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.warnings.RuleName;
 
@@ -28,18 +29,18 @@ import org.springframework.stereotype.Service;
 public class ProjectRetrievalService {
 
     TraceLinkRepository traceLinkRepository;
-    ArtifactVersionService artifactVersionService;
+    ArtifactBodyRepository artifactBodyRepository;
     ParserErrorService parserErrorService;
     WarningService warningService;
 
     @Autowired
     public ProjectRetrievalService(TraceLinkRepository traceLinkRepository,
                                    ParserErrorService parserErrorService,
-                                   ArtifactVersionService artifactVersionService,
+                                   ArtifactBodyRepository artifactBodyRepository,
                                    WarningService warningService) {
         this.traceLinkRepository = traceLinkRepository;
         this.parserErrorService = parserErrorService;
-        this.artifactVersionService = artifactVersionService;
+        this.artifactBodyRepository = artifactBodyRepository;
         this.warningService = warningService;
     }
 
@@ -64,8 +65,7 @@ public class ProjectRetrievalService {
      */
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactBody> artifactBodies = artifactVersionService
-            .getArtifactBodiesAtVersion(projectVersion);
+        List<ArtifactBody> artifactBodies = artifactBodyRepository.getEntitiesAtVersion(projectVersion);
 
         List<ArtifactAppEntity> artifacts =
             artifactBodies

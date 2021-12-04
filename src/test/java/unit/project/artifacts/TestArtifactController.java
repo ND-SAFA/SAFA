@@ -10,7 +10,7 @@ import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -64,7 +64,7 @@ public class TestArtifactController extends ApplicationBaseTest {
             .withModifiedArtifact(artifactJson));
 
         // Step - Retrieve ArtifactBodies
-        List<ArtifactBody> artifactBodies = artifactBodyRepository.getEntitiesInProject(project);
+        List<ArtifactVersion> artifactBodies = artifactVersionRepository.getEntitiesInProject(project);
 
         // VP - Verify one single artifact body
         List<Artifact> artifactInProject = this.artifactRepository.findByProject(project);
@@ -73,7 +73,7 @@ public class TestArtifactController extends ApplicationBaseTest {
         assertThat(artifactBodies.size()).isEqualTo(1);
 
         // VP - Verify body contains modification
-        ArtifactBody body = artifactBodies.get(0);
+        ArtifactVersion body = artifactBodies.get(0);
         assertThat(body.getModificationType()).isEqualTo(ModificationType.ADDED);
         assertThat(body.getSummary()).isEqualTo(modifiedSummary);
     }
@@ -101,8 +101,8 @@ public class TestArtifactController extends ApplicationBaseTest {
             .withRemovedArtifact(artifactJson));
 
         // VP - Verify artifact does not exist
-        Optional<ArtifactBody> artifactBody =
-            this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
+        Optional<ArtifactVersion> artifactBody =
+            this.artifactVersionRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
         assertThat(artifactBody.isPresent()).isTrue();
         ModificationType modificationType = artifactBody.get().getModificationType();
         assertThat(modificationType).isEqualTo(ModificationType.REMOVED);
@@ -170,8 +170,8 @@ public class TestArtifactController extends ApplicationBaseTest {
     }
 
     private void verifyArtifactBodyStatus(ProjectVersion projectVersion, String artifactName) {
-        Optional<ArtifactBody> artifactBody =
-            this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
+        Optional<ArtifactVersion> artifactBody =
+            this.artifactVersionRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
         assertThat(artifactBody.isPresent()).isEqualTo(true);
     }
 }

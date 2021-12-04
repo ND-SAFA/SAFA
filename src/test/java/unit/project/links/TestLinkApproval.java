@@ -13,7 +13,7 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
@@ -140,8 +140,8 @@ public class TestLinkApproval extends ApplicationBaseTest {
             String target = link.getString("target");
 
 
-            ArtifactBody sourceBody = artifactBodyRepository.getBodiesWithName(project, source).get(0);
-            ArtifactBody targetBody = artifactBodyRepository.getBodiesWithName(project, target).get(0);
+            ArtifactVersion sourceBody = artifactVersionRepository.getBodiesWithName(project, source).get(0);
+            ArtifactVersion targetBody = artifactVersionRepository.getBodiesWithName(project, target).get(0);
 
             sourceArtifacts.add(new ArtifactAppEntity(sourceBody));
             targetArtifacts.add(new ArtifactAppEntity(targetBody));

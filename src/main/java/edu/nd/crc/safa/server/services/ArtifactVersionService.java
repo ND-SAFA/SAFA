@@ -13,16 +13,16 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -41,7 +41,7 @@ public class ArtifactVersionService {
 
     ArtifactRepository artifactRepository;
     ArtifactTypeRepository artifactTypeRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
 
@@ -50,13 +50,13 @@ public class ArtifactVersionService {
     @Autowired
     public ArtifactVersionService(ArtifactRepository artifactRepository,
                                   ArtifactTypeRepository artifactTypeRepository,
-                                  ArtifactBodyRepository artifactBodyRepository,
+                                  ArtifactVersionRepository artifactVersionRepository,
                                   ProjectVersionRepository projectVersionRepository,
                                   ParserErrorRepository parserErrorRepository,
                                   DeltaService deltaService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.deltaService = deltaService;
@@ -72,8 +72,8 @@ public class ArtifactVersionService {
      */
     public void setArtifactsAtVersion(ProjectVersion projectVersion,
                                       List<ArtifactAppEntity> projectArtifacts) throws SafaError {
-        List<ArtifactBody> allArtifactBodies = calculateArtifactBodiesAtVersion(projectVersion, projectArtifacts);
-        for (ArtifactBody body : allArtifactBodies) {
+        List<ArtifactVersion> allArtifactBodies = calculateArtifactBodiesAtVersion(projectVersion, projectArtifacts);
+        for (ArtifactVersion body : allArtifactBodies) {
             saveArtifactBody(body);
         }
     }
@@ -87,16 +87,16 @@ public class ArtifactVersionService {
      */
     public void setArtifactAtProjectVersion(ProjectVersion projectVersion, ArtifactAppEntity artifact)
         throws SafaError {
-        ArtifactBody artifactBody = calculateArtifactBodyAtVersion(projectVersion,
+        ArtifactVersion artifactVersion = calculateArtifactBodyAtVersion(projectVersion,
             artifact.id,
             artifact.name,
             artifact.type,
             artifact.summary,
             artifact.body);
-        if (artifactBody == null) {
+        if (artifactVersion == null) {
             return;
         }
-        saveArtifactBody(artifactBody);
+        saveArtifactBody(artifactVersion);
     }
 
     /**
@@ -109,44 +109,44 @@ public class ArtifactVersionService {
     public ServerResponse deleteArtifactBody(
         ProjectVersion projectVersion,
         String artifactName) {
-        Optional<ArtifactBody> bodyToRemove = this.artifactBodyRepository.findByProjectVersionAndArtifactName(projectVersion,
+        Optional<ArtifactVersion> bodyToRemove = this.artifactVersionRepository.findByProjectVersionAndArtifactName(projectVersion,
             artifactName);
         bodyToRemove.ifPresentOrElse(artifactBody -> {
             artifactBody.setModificationType(ModificationType.REMOVED);
             artifactBody.setSummary("");
             artifactBody.setContent("");
-            this.artifactBodyRepository.save(artifactBody);
+            this.artifactVersionRepository.save(artifactBody);
         }, () -> {
             Project project = projectVersion.getProject();
             Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
             artifactQuery.ifPresent((artifact -> {
-                ArtifactBody artifactBody = new ArtifactBody(
+                ArtifactVersion artifactVersion = new ArtifactVersion(
                     projectVersion,
                     ModificationType.REMOVED,
                     artifact,
                     "", "");
-                this.artifactBodyRepository.save(artifactBody);
+                this.artifactVersionRepository.save(artifactVersion);
             }));
         });
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 
 
-    private List<ArtifactBody> calculateArtifactBodiesAtVersion(
+    private List<ArtifactVersion> calculateArtifactBodiesAtVersion(
         ProjectVersion projectVersion,
         List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         Hashtable<String, ArtifactAppEntity> artifactsUpdated = new Hashtable<>();
-        List<ArtifactBody> updatedArtifactBodies = new ArrayList<>();
+        List<ArtifactVersion> updatedArtifactBodies = new ArrayList<>();
         for (ArtifactAppEntity a : projectArtifacts) {
             artifactsUpdated.put(a.getName(), a);
             try {
-                ArtifactBody artifactBody = calculateArtifactBodyAtVersion(projectVersion,
+                ArtifactVersion artifactVersion = calculateArtifactBodyAtVersion(projectVersion,
                     a.getId(),
                     a.name,
                     a.type,
                     a.summary,
                     a.body);
-                updatedArtifactBodies.add(artifactBody);
+                updatedArtifactBodies.add(artifactVersion);
             } catch (DataIntegrityViolationException e) {
                 ParserError parserError = new ParserError(
                     projectVersion,
@@ -161,7 +161,7 @@ public class ArtifactVersionService {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-        List<ArtifactBody> removedArtifactBodies = this.artifactRepository
+        List<ArtifactVersion> removedArtifactBodies = this.artifactRepository
             .getProjectArtifacts(projectVersion.getProject())
             .stream()
             .filter(a -> !artifactsUpdated.containsKey(a.getName()))
@@ -169,12 +169,12 @@ public class ArtifactVersionService {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-        List<ArtifactBody> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
+        List<ArtifactVersion> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
         allArtifactBodies.addAll(removedArtifactBodies);
         return allArtifactBodies;
     }
 
-    private ArtifactBody calculateArtifactBodyAtVersion(
+    private ArtifactVersion calculateArtifactBodyAtVersion(
         ProjectVersion projectVersion,
         String artifactId,
         String artifactName,
@@ -214,11 +214,11 @@ public class ArtifactVersionService {
     }
 
 
-    private void saveArtifactBody(ArtifactBody artifactBody) throws SafaError {
+    private void saveArtifactBody(ArtifactVersion artifactVersion) throws SafaError {
         try {
-            this.artifactBodyRepository.save(artifactBody);
+            this.artifactVersionRepository.save(artifactVersion);
         } catch (Exception e) {
-            String error = String.format("An error occurred while saving artifact: %s", artifactBody.getName());
+            String error = String.format("An error occurred while saving artifact: %s", artifactVersion.getName());
             throw new SafaError(error, e);
         }
     }

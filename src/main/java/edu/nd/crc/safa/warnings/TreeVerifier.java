@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 /**
@@ -24,7 +24,7 @@ public class TreeVerifier {
      * @param rulesToApply   - The list of rules to apply to the artifact tree
      * @return A mapping between artifact Ids and the list of rules it violated
      */
-    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactBody> artifactBodies,
+    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
                                                                 List<TraceLink> traceLinks,
                                                                 List<Rule> rulesToApply) {
         Map<String, List<RuleName>> results = new HashMap<>();

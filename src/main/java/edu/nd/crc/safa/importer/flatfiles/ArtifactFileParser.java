@@ -17,10 +17,10 @@ import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
@@ -50,7 +50,7 @@ public class ArtifactFileParser {
 
     ArtifactFileRepository artifactFileRepository;
     ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
@@ -60,14 +60,14 @@ public class ArtifactFileParser {
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
                               ArtifactRepository artifactRepository,
-                              ArtifactBodyRepository artifactBodyRepository,
+                              ArtifactVersionRepository artifactVersionRepository,
                               ArtifactTypeRepository artifactTypeRepository,
                               ProjectVersionRepository projectVersionRepository,
                               ArtifactVersionService artifactVersionService,
                               ParserErrorRepository parserErrorRepository) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactVersionService = artifactVersionService;

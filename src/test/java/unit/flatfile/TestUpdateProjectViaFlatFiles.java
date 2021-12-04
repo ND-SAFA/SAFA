@@ -10,8 +10,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
@@ -144,7 +144,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(projectArtifacts.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // VP - Artifact bodies
-        List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProjectVersion(projectVersion);
+        List<ArtifactVersion> artifactBodies = artifactVersionRepository.findByProjectVersion(projectVersion);
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
@@ -181,13 +181,13 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - Verify that no artifacts associated with empty version
-        List<ArtifactBody> initialBodies = this.artifactBodyRepository.findByProjectVersion(emptyVersion);
+        List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
         assertThat(initialBodies.size())
             .as("no bodies at init")
             .isEqualTo(0);
 
         // VP - Verify that artifacts are constructed and associated with update version
-        List<ArtifactBody> updateBodies = this.artifactBodyRepository.findByProjectVersion(updateVersion);
+        List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
         assertThat(updateBodies.size())
             .as("bodies created in later version")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
@@ -198,7 +198,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
 
         // VP - No new artifacts were created
-        List<ArtifactBody> noChangeBodies = this.artifactBodyRepository.findByProjectVersion(noChangeVersion);
+        List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);
         assertThat(noChangeBodies.size())
             .as("no changes were detected in project versions")
             .isEqualTo(0);

@@ -14,11 +14,11 @@ import edu.nd.crc.safa.importer.tracegenerator.vsm.Controller;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
@@ -34,15 +34,15 @@ public class TraceLinkGenerator {
 
     private final TraceLinkService traceLinkService;
     private final TraceLinkRepository traceLinkRepository;
-    private final ArtifactBodyRepository artifactBodyRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public TraceLinkGenerator(TraceLinkService traceLinkService,
                               TraceLinkRepository traceLinkRepository,
-                              ArtifactBodyRepository artifactBodyRepository) {
+                              ArtifactVersionRepository artifactVersionRepository) {
         this.traceLinkService = traceLinkService;
         this.traceLinkRepository = traceLinkRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
     }
 
     public List<TraceLink> generateTraceLinksToFile(ProjectVersion projectVersion,
@@ -97,16 +97,16 @@ public class TraceLinkGenerator {
 
     private Map<Artifact, Collection<String>> tokenizeArtifactOfType(ProjectVersion projectVersion,
                                                                      ArtifactType artifactType) {
-        List<ArtifactBody> sourceArtifactBodies = this.artifactBodyRepository
+        List<ArtifactVersion> sourceArtifactBodies = this.artifactVersionRepository
             .findByProjectVersionAndArtifactType(projectVersion, artifactType);
         return tokenizeArtifacts(sourceArtifactBodies);
     }
 
-    private Map<Artifact, Collection<String>> tokenizeArtifacts(List<ArtifactBody> artifacts) {
+    private Map<Artifact, Collection<String>> tokenizeArtifacts(List<ArtifactVersion> artifacts) {
         Map<Artifact, Collection<String>> artifactTokens = new HashMap<>();
-        for (ArtifactBody artifactBody : artifacts) {
-            Artifact artifact = artifactBody.getArtifact();
-            artifactTokens.put(artifact, getWordsInArtifactBody(artifactBody));
+        for (ArtifactVersion artifactVersion : artifacts) {
+            Artifact artifact = artifactVersion.getArtifact();
+            artifactTokens.put(artifact, getWordsInArtifactBody(artifactVersion));
         }
         return artifactTokens;
     }
@@ -119,8 +119,8 @@ public class TraceLinkGenerator {
         return artifactTokens;
     }
 
-    private List<String> getWordsInArtifactBody(ArtifactBody artifactBody) {
-        String[] artifactWords = artifactBody.getContent().split(" ");
+    private List<String> getWordsInArtifactBody(ArtifactVersion artifactVersion) {
+        String[] artifactWords = artifactVersion.getContent().split(" ");
         return Arrays.asList(artifactWords);
     }
 

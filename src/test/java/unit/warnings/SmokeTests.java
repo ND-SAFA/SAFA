@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.warnings.ArtifactRelationship;
@@ -117,7 +117,7 @@ public class SmokeTests extends ApplicationBaseTest {
             .newArtifactBody(projectName, sourceName, "", "")
             .newTraceLink(projectName, sourceName, targetName);
 
-        List<ArtifactBody> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
+        List<ArtifactVersion> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
         List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
         TreeVerifier verifier = new TreeVerifier();
         Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,

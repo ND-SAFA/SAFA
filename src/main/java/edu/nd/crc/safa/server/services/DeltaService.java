@@ -12,12 +12,12 @@ import edu.nd.crc.safa.server.entities.app.ModifiedArtifact;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.app.RemovedArtifact;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
@@ -32,15 +32,15 @@ public class DeltaService {
 
     ProjectVersionRepository projectVersionRepository;
     ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public DeltaService(ProjectVersionRepository projectVersionRepository,
                         ArtifactRepository artifactRepository,
-                        ArtifactBodyRepository artifactBodyRepository) {
+                        ArtifactVersionRepository artifactVersionRepository) {
         this.projectVersionRepository = projectVersionRepository;
         this.artifactRepository = artifactRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
     }
 
     /**
@@ -103,21 +103,21 @@ public class DeltaService {
      * @param appEntity      - The artifact's new changes in the form of the domain model.
      * @return ArtifactBody - unsaved ArtifactBody with changes OR null if no change is detected.
      */
-    public ArtifactBody calculateArtifactChange(ProjectVersion projectVersion,
-                                                Artifact artifact,
-                                                ArtifactAppEntity appEntity) {
-        ArtifactBody artifactBody = null;
-        ArtifactBody previousBody =
-            getArtifactBodyContentBeforeVersion(this.artifactBodyRepository.findByArtifact(artifact), projectVersion);
+    public ArtifactVersion calculateArtifactChange(ProjectVersion projectVersion,
+                                                   Artifact artifact,
+                                                   ArtifactAppEntity appEntity) {
+        ArtifactVersion artifactVersion = null;
+        ArtifactVersion previousBody =
+            getArtifactBodyContentBeforeVersion(this.artifactVersionRepository.findByArtifact(artifact), projectVersion);
         if (previousBody != null) {
             if (appEntity == null) {
-                artifactBody = new ArtifactBody(projectVersion,
+                artifactVersion = new ArtifactVersion(projectVersion,
                     ModificationType.REMOVED,
                     artifact,
                     "",
                     "");
             } else if (previousBody.getModificationType() == ModificationType.REMOVED) {
-                artifactBody = new ArtifactBody(projectVersion,
+                artifactVersion = new ArtifactVersion(projectVersion,
                     ModificationType.ADDED,
                     artifact,
                     appEntity.summary,
@@ -126,7 +126,7 @@ public class DeltaService {
                 !previousBody.getContent().equals(appEntity.body)
                     || !previousBody.getSummary().equals(appEntity.summary)
                     || !previousBody.getName().equals(appEntity.name)) {
-                artifactBody = new ArtifactBody(projectVersion,
+                artifactVersion = new ArtifactVersion(projectVersion,
                     ModificationType.MODIFIED,
                     artifact,
                     appEntity.summary,
@@ -136,22 +136,22 @@ public class DeltaService {
             if (appEntity == null) {
                 return null;
             }
-            artifactBody = new ArtifactBody(projectVersion,
+            artifactVersion = new ArtifactVersion(projectVersion,
                 ModificationType.ADDED,
                 artifact,
                 appEntity.summary,
                 appEntity.body);
         }
 
-        if (artifactBody == null) {
+        if (artifactVersion == null) {
             return null;
         } else {
-            Optional<ArtifactBody> bodyQuery =
-                this.artifactBodyRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
+            Optional<ArtifactVersion> bodyQuery =
+                this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
             if (bodyQuery.isPresent()) {
-                artifactBody.setArtifactBodyId(bodyQuery.get().getArtifactBodyId());
+                artifactVersion.setArtifactBodyId(bodyQuery.get().getArtifactBodyId());
             }
-            return artifactBody;
+            return artifactVersion;
         }
     }
 
@@ -160,9 +160,9 @@ public class DeltaService {
                                                                        ProjectVersion afterVersion) {
 
         String artifactName = artifact.getName();
-        List<ArtifactBody> bodies = this.artifactBodyRepository.findByArtifact(artifact);
-        ArtifactBody beforeBody = getArtifactBodyContentAtVersion(bodies, beforeVersion);
-        ArtifactBody afterBody = getArtifactBodyContentAtVersion(bodies, afterVersion);
+        List<ArtifactVersion> bodies = this.artifactVersionRepository.findByArtifact(artifact);
+        ArtifactVersion beforeBody = getArtifactBodyContentAtVersion(bodies, beforeVersion);
+        ArtifactVersion afterBody = getArtifactBodyContentAtVersion(bodies, afterVersion);
 
         ModificationType modificationType = calculateModificationTypeBetweenArtifactBodies(beforeBody, afterBody);
 
@@ -186,8 +186,8 @@ public class DeltaService {
         }
     }
 
-    private ModificationType calculateModificationTypeBetweenArtifactBodies(ArtifactBody beforeBody,
-                                                                            ArtifactBody afterBody) {
+    private ModificationType calculateModificationTypeBetweenArtifactBodies(ArtifactVersion beforeBody,
+                                                                            ArtifactVersion afterBody) {
         if (beforeBody == null || afterBody == null) {
             if (beforeBody == afterBody) {
                 return null;
@@ -214,19 +214,19 @@ public class DeltaService {
         }
     }
 
-    private ArtifactBody getArtifactBodyContentAtVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+    private ArtifactVersion getArtifactBodyContentAtVersion(List<ArtifactVersion> bodies, ProjectVersion version) {
         return getMostUpToDateArtifactBodyThroughFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
     }
 
-    private ArtifactBody getArtifactBodyContentBeforeVersion(List<ArtifactBody> bodies, ProjectVersion version) {
+    private ArtifactVersion getArtifactBodyContentBeforeVersion(List<ArtifactVersion> bodies, ProjectVersion version) {
         return getMostUpToDateArtifactBodyThroughFilter(bodies, (target) -> target.isLessThan(version));
     }
 
-    private ArtifactBody getMostUpToDateArtifactBodyThroughFilter(List<ArtifactBody> bodies,
-                                                                  ProjectVersionFilter filter) {
-        ArtifactBody closestBodyToVersion = null;
+    private ArtifactVersion getMostUpToDateArtifactBodyThroughFilter(List<ArtifactVersion> bodies,
+                                                                     ProjectVersionFilter filter) {
+        ArtifactVersion closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
-            ArtifactBody currentBody = bodies.get(i);
+            ArtifactVersion currentBody = bodies.get(i);
             ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
             if (filter.shouldKeep(currentBodyVersion)) {
                 if (closestBodyToVersion == null) {

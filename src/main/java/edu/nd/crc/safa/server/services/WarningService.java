@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.Warning;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
@@ -28,15 +28,15 @@ public class WarningService {
 
     WarningRepository warningRepository;
     TraceLinkRepository traceLinkRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public WarningService(WarningRepository warningRepository,
                           TraceLinkRepository traceLinkRepository,
-                          ArtifactBodyRepository artifactBodyRepository) {
+                          ArtifactVersionRepository artifactVersionRepository) {
         this.warningRepository = warningRepository;
         this.traceLinkRepository = traceLinkRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
     }
 
     /**
@@ -47,13 +47,13 @@ public class WarningService {
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactBody> artifacts = artifactBodyRepository.getEntitiesAtVersion(projectVersion);
+        List<ArtifactVersion> artifacts = artifactVersionRepository.getEntitiesAtVersion(projectVersion);
         List<TraceLink> traceLinks = this.traceLinkRepository.getApprovedLinks(project);
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);
     }
 
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion,
-                                                                    List<ArtifactBody> artifacts,
+                                                                    List<ArtifactVersion> artifacts,
                                                                     List<TraceLink> traceLinks) {
         Project project = projectVersion.getProject();
         TreeVerifier verifier = new TreeVerifier();

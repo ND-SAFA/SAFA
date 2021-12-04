@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.app;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 
 import org.json.JSONObject;
 
@@ -43,7 +43,7 @@ public class ArtifactAppEntity {
         this.body = body;
     }
 
-    public ArtifactAppEntity(ArtifactBody body) {
+    public ArtifactAppEntity(ArtifactVersion body) {
         this(body.getArtifact().getArtifactId().toString(),
             body.getTypeName(),
             body.getName(),

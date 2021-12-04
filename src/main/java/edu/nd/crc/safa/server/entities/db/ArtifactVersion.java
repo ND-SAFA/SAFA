@@ -33,7 +33,7 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
-public class ArtifactBody implements Serializable, IEntityVersion {
+public class ArtifactVersion implements Serializable, IEntityVersion {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -63,16 +63,16 @@ public class ArtifactBody implements Serializable, IEntityVersion {
     @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
     String content;
 
-    public ArtifactBody() {
+    public ArtifactVersion() {
         this.summary = "";
         this.content = "";
     }
 
-    public ArtifactBody(ProjectVersion projectVersion,
-                        ModificationType modificationType,
-                        Artifact artifact,
-                        String summary,
-                        String content) {
+    public ArtifactVersion(ProjectVersion projectVersion,
+                           ModificationType modificationType,
+                           Artifact artifact,
+                           String summary,
+                           String content) {
         this.artifact = artifact;
         this.modificationType = modificationType;
         this.projectVersion = projectVersion;
@@ -80,10 +80,10 @@ public class ArtifactBody implements Serializable, IEntityVersion {
         this.content = content;
     }
 
-    public ArtifactBody(ProjectVersion projectVersion,
-                        Artifact artifact,
-                        String summary,
-                        String content) {
+    public ArtifactVersion(ProjectVersion projectVersion,
+                           Artifact artifact,
+                           String summary,
+                           String content) {
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
@@ -147,7 +147,7 @@ public class ArtifactBody implements Serializable, IEntityVersion {
         this.projectVersion = projectVersion;
     }
 
-    public boolean hasSameId(ArtifactBody other) {
+    public boolean hasSameId(ArtifactVersion other) {
         return this.artifactBodyId.equals(other.artifactBodyId);
     }
 

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
@@ -38,8 +38,8 @@ public class TestModificationDetected extends DeltaBaseTest {
         ProjectVersion afterVersion = versionPair.getValue1();
 
         // VP - Verify that number of changes is detected
-        List<ArtifactBody> originalBodies = this.artifactBodyRepository.findByProjectVersion(beforeVersion);
-        List<ArtifactBody> changedBodies = this.artifactBodyRepository.findByProjectVersion(afterVersion);
+        List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
+        List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
         assertThat(originalBodies.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
         assertThat(changedBodies.size()).isEqualTo(3);
 

@@ -71,7 +71,7 @@ public class ArtifactVersionService {
     public List<ArtifactBody> getArtifactBodiesAtVersion(ProjectVersion projectVersion) {
         Hashtable<String, List<ArtifactBody>> artifactBodyTable =
             groupProjectArtifactBodiesByArtifactName(projectVersion);
-        return calculateArtifactBodiesAtProjectVersion(projectVersion, artifactBodyTable);
+        return this.artifactBodyRepository.retrieveEntitiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
 
     /**
@@ -143,27 +143,6 @@ public class ArtifactVersionService {
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
     }
 
-    private List<ArtifactBody> calculateArtifactBodiesAtProjectVersion(
-        ProjectVersion projectVersion,
-        Hashtable<String, List<ArtifactBody>> artifactBodiesByArtifactName) {
-        List<ArtifactBody> artifacts = new ArrayList<>();
-        for (String key : artifactBodiesByArtifactName.keySet()) {
-            List<ArtifactBody> bodyVersions = artifactBodiesByArtifactName.get(key);
-            ArtifactBody latest = null;
-            for (ArtifactBody body : bodyVersions) {
-                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
-                    if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
-                        latest = body;
-                    }
-                }
-            }
-
-            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
-                artifacts.add(latest);
-            }
-        }
-        return artifacts;
-    }
 
     private List<ArtifactBody> calculateArtifactBodiesAtVersion(
         ProjectVersion projectVersion,

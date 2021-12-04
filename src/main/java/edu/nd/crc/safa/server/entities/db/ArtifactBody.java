@@ -33,19 +33,22 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
-public class ArtifactBody implements Serializable {
+public class ArtifactBody implements Serializable, IEntityVersion {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
     UUID artifactBodyId;
+    
     @Column(name = "modification_type")
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -53,8 +56,10 @@ public class ArtifactBody implements Serializable {
         nullable = false
     )
     ProjectVersion projectVersion;
+
     @Column(name = "summary", nullable = false)
     String summary;
+
     @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
     String content;
 

@@ -3,14 +3,22 @@ package edu.nd.crc.safa.server.repositories.impl;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
+
+import org.javatuples.Pair;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Implements the generic logic for retrieving, creating, and modifying versioned entities.
@@ -211,5 +219,56 @@ public abstract class GenericVersionRepository<
             return;
         }
         saveVersionEntity(artifactVersion);
+    }
+
+    @Override
+    public List<ParserError> setAppEntitiesAtProjectVersion(ProjectVersion projectVersion,
+                                                            List<AppEntity> appEntities) throws SafaError {
+        Pair<List<VersionEntity>, List<ParserError>> response = this
+            .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
+
+        for (VersionEntity body : response.getValue0()) {
+            this.saveVersionEntity(body);
+        }
+        return response.getValue1();
+    }
+
+    @Override
+    public Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
+        ProjectVersion projectVersion,
+        List<AppEntity> appEntities) {
+        Hashtable<String, AppEntity> artifactsUpdated = new Hashtable<>();
+        List<VersionEntity> updatedArtifactBodies = new ArrayList<>();
+        List<ParserError> parserErrors = new ArrayList<>();
+        for (AppEntity appEntity : appEntities) {
+            artifactsUpdated.put(appEntity.getName(), appEntity);
+            try {
+                VersionEntity artifactVersion = this
+                    .calculateEntityVersionAtProjectVersion(projectVersion, appEntity);
+                updatedArtifactBodies.add(artifactVersion);
+            } catch (DataIntegrityViolationException e) {
+                ParserError parserError = new ParserError(
+                    projectVersion,
+                    "Could not parse artifact " + appEntity.getName() + ": " + AppConstraints.getConstraintError(e),
+                    ProjectParsingActivities.PARSING_ARTIFACTS);
+                parserErrors.add(parserError);
+            }
+        }
+        updatedArtifactBodies = updatedArtifactBodies
+            .stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        List<VersionEntity> removedArtifactBodies = this.getProjectBaseEntities(
+                projectVersion.getProject())
+            .stream()
+            .filter(a -> !artifactsUpdated.containsKey(a.getName()))
+            .map(a -> this.calculateEntityVersionAtProjectVersion(projectVersion, a, null))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
+        allArtifactBodies.addAll(removedArtifactBodies);
+        return new Pair<>(allArtifactBodies, parserErrors);
     }
 }

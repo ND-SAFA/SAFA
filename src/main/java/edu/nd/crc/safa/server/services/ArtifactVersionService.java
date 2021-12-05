@@ -1,13 +1,8 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -25,7 +20,6 @@ import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,9 +64,11 @@ public class ArtifactVersionService {
      */
     public void setArtifactsAtVersion(ProjectVersion projectVersion,
                                       List<ArtifactAppEntity> projectArtifacts) throws SafaError {
-        List<ArtifactVersion> allArtifactBodies = calculateArtifactBodiesAtVersion(projectVersion, projectArtifacts);
-        for (ArtifactVersion body : allArtifactBodies) {
-            this.artifactVersionRepository.saveVersionEntity(body);
+        List<ParserError> parserErrors = this.artifactVersionRepository
+            .setAppEntitiesAtProjectVersion(projectVersion, projectArtifacts);
+        for (ParserError parserError : parserErrors) {
+            parserError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
+            this.parserErrorRepository.save(parserError);
         }
     }
 
@@ -106,43 +102,5 @@ public class ArtifactVersionService {
             }));
         });
         return new ServerResponse(String.format("%s successfully deleted.", artifactName));
-    }
-
-    private List<ArtifactVersion> calculateArtifactBodiesAtVersion(
-        ProjectVersion projectVersion,
-        List<ArtifactAppEntity> projectArtifacts) {
-        Hashtable<String, ArtifactAppEntity> artifactsUpdated = new Hashtable<>();
-        List<ArtifactVersion> updatedArtifactBodies = new ArrayList<>();
-        for (ArtifactAppEntity a : projectArtifacts) {
-            artifactsUpdated.put(a.getName(), a);
-            try {
-                ArtifactVersion artifactVersion = this.artifactVersionRepository
-                    .calculateEntityVersionAtProjectVersion(projectVersion, a);
-                updatedArtifactBodies.add(artifactVersion);
-            } catch (DataIntegrityViolationException e) {
-                ParserError parserError = new ParserError(
-                    projectVersion,
-                    "Could not parse artifact " + a.getName() + ": " + AppConstraints.getConstraintError(e),
-                    ProjectParsingActivities.PARSING_ARTIFACTS);
-                this.parserErrorRepository.save(parserError);
-
-            }
-        }
-        updatedArtifactBodies = updatedArtifactBodies
-            .stream()
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        List<ArtifactVersion> removedArtifactBodies = this.artifactRepository
-            .getProjectArtifacts(projectVersion.getProject())
-            .stream()
-            .filter(a -> !artifactsUpdated.containsKey(a.getName()))
-            .map(a -> artifactVersionRepository.calculateEntityVersionAtProjectVersion(projectVersion, a, null))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        List<ArtifactVersion> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
-        allArtifactBodies.addAll(removedArtifactBodies);
-        return allArtifactBodies;
     }
 }

@@ -35,17 +35,13 @@ public class ParserError implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "version_id", nullable = false)
     ProjectVersion projectVersion;
-
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
     ProjectParsingActivities applicationActivity;
-
     @Column(name = "file_name")
     String fileName;
-
     @Column(name = "line_number")
     Long lineNumber;
-
     @Column(name = "description", length = 500)
     String description;
 
@@ -82,6 +78,10 @@ public class ParserError implements Serializable {
 
     public ProjectParsingActivities getApplicationActivity() {
         return this.applicationActivity;
+    }
+
+    public void setApplicationActivity(ProjectParsingActivities applicationActivity) {
+        this.applicationActivity = applicationActivity;
     }
 
     public String getFileName() {

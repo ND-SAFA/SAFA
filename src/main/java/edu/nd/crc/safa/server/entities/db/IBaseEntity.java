@@ -5,4 +5,5 @@ package edu.nd.crc.safa.server.entities.db;
  */
 
 public interface IBaseEntity {
+    String getName();
 }

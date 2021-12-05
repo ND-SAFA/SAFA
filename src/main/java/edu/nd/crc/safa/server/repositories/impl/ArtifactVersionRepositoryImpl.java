@@ -127,4 +127,9 @@ public class ArtifactVersionRepositoryImpl
             throw new SafaError(error, e);
         }
     }
+
+    @Override
+    public List<Artifact> getProjectBaseEntities(Project project) {
+        return this.artifactRepository.findByProject(project);
+    }
 }

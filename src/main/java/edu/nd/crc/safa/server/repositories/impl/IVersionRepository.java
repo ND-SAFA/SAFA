@@ -8,9 +8,12 @@ import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
+
+import org.javatuples.Pair;
 
 /**
  * Defines interface that all repositories related to versioned entities.
@@ -63,4 +66,13 @@ public interface IVersionRepository<
     void saveVersionEntity(VersionEntity artifactVersion) throws SafaError;
 
     void setAppEntityAtProjectVersion(ProjectVersion projectVersion, AppEntity artifact) throws SafaError;
+
+    List<BaseEntity> getProjectBaseEntities(Project project);
+
+    Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
+        ProjectVersion projectVersion,
+        List<AppEntity> projectArtifacts);
+
+    List<ParserError> setAppEntitiesAtProjectVersion(ProjectVersion projectVersion,
+                                                     List<AppEntity> appEntities) throws SafaError;
 }

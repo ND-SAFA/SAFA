@@ -5,8 +5,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -14,9 +14,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -38,7 +38,7 @@ public class DbEntityBuilder extends BaseBuilder {
     ProjectVersionRepository projectVersionRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
     TraceLinkRepository traceLinkRepository;
     ProjectMembershipRepository projectMembershipRepository;
 
@@ -46,7 +46,7 @@ public class DbEntityBuilder extends BaseBuilder {
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
     Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
     Hashtable<String, Hashtable<String, Artifact>> artifacts;
-    Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactBody>>> bodies;
+    Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactVersion>>> bodies;
 
     int revisionNumber;
 
@@ -57,14 +57,14 @@ public class DbEntityBuilder extends BaseBuilder {
                            ProjectVersionRepository projectVersionRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactRepository artifactRepository,
-                           ArtifactBodyRepository artifactBodyRepository,
+                           ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
                            ProjectMembershipRepository projectMembershipRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkRepository = traceLinkRepository;
         this.projectMembershipRepository = projectMembershipRepository;
     }
@@ -79,7 +79,7 @@ public class DbEntityBuilder extends BaseBuilder {
         this.projectVersionRepository.deleteAll();
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
-        this.artifactBodyRepository.deleteAll();
+        this.artifactVersionRepository.deleteAll();
         this.revisionNumber = 1;
     }
 
@@ -168,12 +168,12 @@ public class DbEntityBuilder extends BaseBuilder {
         return this.newArtifactBody(projectName, versionIndex, artifactName, summary, content);
     }
 
-    public ArtifactBody newArtifactBodyWithReturn(String projectName,
-                                                  int versionIndex,
-                                                  ModificationType modificationType,
-                                                  String artifactName,
-                                                  String summary,
-                                                  String content) {
+    public ArtifactVersion newArtifactBodyWithReturn(String projectName,
+                                                     int versionIndex,
+                                                     ModificationType modificationType,
+                                                     String artifactName,
+                                                     String summary,
+                                                     String content) {
         newArtifactBody(projectName, versionIndex, modificationType, artifactName, summary, content);
         return getArtifactBody(projectName, artifactName, versionIndex);
     }
@@ -201,13 +201,13 @@ public class DbEntityBuilder extends BaseBuilder {
                                            String content) {
         ProjectVersion projectVersion = this.getProjectVersion(projectName, versionIndex);
         Artifact artifact = this.getArtifact(projectName, artifactName);
-        ArtifactBody artifactBody = new ArtifactBody(projectVersion,
+        ArtifactVersion artifactVersion = new ArtifactVersion(projectVersion,
             modificationType,
             artifact,
             summary,
             content);
-        this.artifactBodyRepository.save(artifactBody);
-        addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactBody);
+        this.artifactVersionRepository.save(artifactVersion);
+        addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactVersion);
         return this;
     }
 
@@ -280,17 +280,17 @@ public class DbEntityBuilder extends BaseBuilder {
         return new ArrayList<>(this.artifacts.get(projectName).values());
     }
 
-    public ArtifactBody getArtifactBody(String projectName, String artifactName, int versionIndex) {
+    public ArtifactVersion getArtifactBody(String projectName, String artifactName, int versionIndex) {
         assertProjectExists(this.bodies, projectName);
-        Hashtable<String, Hashtable<Long, ArtifactBody>> project = this.bodies.get(projectName);
+        Hashtable<String, Hashtable<Long, ArtifactVersion>> project = this.bodies.get(projectName);
         assertEntityExists(project, "Artifact", artifactName);
         assertEntityExists(project.get(artifactName), "Version Index", (long) versionIndex);
         return this.bodies.get(projectName).get(artifactName).get((long) versionIndex);
     }
 
-    public List<ArtifactBody> getArtifactBodies(String projectName) {
+    public List<ArtifactVersion> getArtifactBodies(String projectName) {
         assertProjectExists(this.bodies, projectName);
-        List<ArtifactBody> projectBodies = new ArrayList<>();
+        List<ArtifactVersion> projectBodies = new ArrayList<>();
         this.bodies.get(projectName).values().forEach(artifactVersionTable -> {
             projectBodies.addAll(artifactVersionTable.values());
         });

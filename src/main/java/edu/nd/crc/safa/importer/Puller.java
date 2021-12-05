@@ -18,9 +18,9 @@ import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
@@ -56,7 +56,7 @@ public class Puller {
     ProjectRepository projectRepository;
     ArtifactTypeRepository artifactTypeRepository;
     ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
+    ArtifactVersionRepository artifactVersionRepository;
 
     ArtifactVersionService artifactVersionService;
     TraceLinkService traceLinkService;
@@ -66,14 +66,14 @@ public class Puller {
                   ProjectRepository projectRepository,
                   ArtifactTypeRepository artifactTypeRepository,
                   ArtifactRepository artifactRepository,
-                  ArtifactBodyRepository artifactBodyRepository,
+                  ArtifactVersionRepository artifactVersionRepository,
                   ArtifactVersionService artifactVersionService,
                   TraceLinkService traceLinkService) {
         this.mJira = jira;
         this.projectRepository = projectRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.artifactVersionService = artifactVersionService;
         this.traceLinkService = traceLinkService;
     }

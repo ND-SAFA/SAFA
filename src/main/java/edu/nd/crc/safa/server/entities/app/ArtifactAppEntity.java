@@ -3,14 +3,14 @@ package edu.nd.crc.safa.server.entities.app;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 
 import org.json.JSONObject;
 
 /**
  * Represents the JSON model that is used on the front-end application.
  */
-public class ArtifactAppEntity {
+public class ArtifactAppEntity implements IAppEntity {
     @NotNull
     public String id;
     @NotNull
@@ -43,7 +43,7 @@ public class ArtifactAppEntity {
         this.body = body;
     }
 
-    public ArtifactAppEntity(ArtifactBody body) {
+    public ArtifactAppEntity(ArtifactVersion body) {
         this(body.getArtifact().getArtifactId().toString(),
             body.getTypeName(),
             body.getName(),
@@ -57,6 +57,10 @@ public class ArtifactAppEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean hasEmptyId() {
+        return this.id == null || this.id.equals("");
     }
 
     public String getName() {

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
@@ -22,18 +22,24 @@ import unit.SampleProjectConstants;
  */
 public class TestModificationDetected extends DeltaBaseTest {
 
+    /**
+     * Tests that modifications to artifact bodies are detected in
+     * delta calculations
+     *
+     * @throws Exception Throws error if http request fails.
+     */
     @Test
     public void testModificationDetected() throws Exception {
         String projectName = "test-project";
 
+        // Step - Create before and after version
         Pair<ProjectVersion, ProjectVersion> versionPair = setupDualVersions(projectName);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();
 
         // VP - Verify that number of changes is detected
-        List<ArtifactBody> originalBodies = this.artifactBodyRepository.findByProjectVersion(beforeVersion);
-        List<ArtifactBody> changedBodies = this.artifactBodyRepository.findByProjectVersion(afterVersion);
-
+        List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
+        List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
         assertThat(originalBodies.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
         assertThat(changedBodies.size()).isEqualTo(3);
 
@@ -43,16 +49,15 @@ public class TestModificationDetected extends DeltaBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject response = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
+        JSONObject deltaResponse = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
 
         // VP - Verify that changes are detected
-        assertThat(response.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(response.getJSONObject("removed").has("D7")).isTrue();
-        assertThat(response.getJSONObject("added").has("M1")).isTrue();
-        assertThat(response.getJSONArray("missingArtifacts").length()).isEqualTo(1);
+        assertThat(deltaResponse.getJSONObject("modified").has("F3")).isTrue();
+        assertThat(deltaResponse.getJSONObject("removed").has("D7")).isTrue();
+        assertThat(deltaResponse.getJSONObject("added").has("M1")).isTrue();
+        assertThat(deltaResponse.getJSONArray("missingArtifacts").length()).isEqualTo(1);
 
         ProjectAppEntity beforeAppEntity = this.projectRetrievalService.createApplicationEntity(beforeVersion);
-        // assertThat(beforeAppEntity.getArtifacts().size()).isEqualTo(TestConstants.N_ARTIFACTS);
         List<String> beforeArtifactNames = beforeAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)

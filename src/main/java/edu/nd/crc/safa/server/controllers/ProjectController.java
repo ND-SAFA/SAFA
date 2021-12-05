@@ -137,7 +137,7 @@ public class ProjectController extends BaseController {
      *
      * @param projectMembershipId ID of the membership linking user and project.
      */
-    @DeleteMapping(AppRoutes.Projects.deleteProjectMember)
+    @DeleteMapping(AppRoutes.Projects.deleteProjectMembership)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
         this.projectService.deleteProjectMemberById(projectMembershipId);

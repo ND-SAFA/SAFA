@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
@@ -59,8 +59,8 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
             .getString("versionId");
         Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
         testProjectArtifactsCreated(project, 1);
-        List<ArtifactBody> artifactBodiesQuery =
-            this.artifactBodyRepository.getBodiesWithName(project, a1Name);
+        List<ArtifactVersion> artifactBodiesQuery =
+            this.artifactVersionRepository.getBodiesWithName(project, a1Name);
         assertThat(artifactBodiesQuery.size()).as("# of bodies on init").isEqualTo(1);
 
         // Step - Create Updated Request and Send
@@ -81,7 +81,7 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         testProjectArtifactsCreated(project, 1);
         // VP - Verify that artifact has two versions and the latest has updated body.
         artifactBodiesQuery =
-            this.artifactBodyRepository.getBodiesWithName(project, a1Name);
+            this.artifactVersionRepository.getBodiesWithName(project, a1Name);
         assertThat(artifactBodiesQuery.size()).as("# of bodies on update").isEqualTo(1);
         assertThat(artifactBodiesQuery.get(0).getContent()).isEqualTo(newArtifactBody);
     }
@@ -117,7 +117,7 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         assertThat(projectArtifacts.size()).isEqualTo(N_ARTIFACTS);
 
         // VP - Artifact bodies
-        List<ArtifactBody> artifactBodies = artifactBodyRepository.findByProjectVersion(projectVersion);
+        List<ArtifactVersion> artifactBodies = artifactVersionRepository.findByProjectVersion(projectVersion);
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
             .isEqualTo(N_ARTIFACTS);

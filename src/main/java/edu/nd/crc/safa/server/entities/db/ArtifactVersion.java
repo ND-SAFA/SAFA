@@ -15,6 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -33,19 +34,22 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
-public class ArtifactBody implements Serializable {
+public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactAppEntity> {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
-    UUID artifactBodyId;
+    UUID entityVersionId;
+
     @Column(name = "modification_type")
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -53,21 +57,23 @@ public class ArtifactBody implements Serializable {
         nullable = false
     )
     ProjectVersion projectVersion;
+
     @Column(name = "summary", nullable = false)
     String summary;
+
     @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
     String content;
 
-    public ArtifactBody() {
+    public ArtifactVersion() {
         this.summary = "";
         this.content = "";
     }
 
-    public ArtifactBody(ProjectVersion projectVersion,
-                        ModificationType modificationType,
-                        Artifact artifact,
-                        String summary,
-                        String content) {
+    public ArtifactVersion(ProjectVersion projectVersion,
+                           ModificationType modificationType,
+                           Artifact artifact,
+                           String summary,
+                           String content) {
         this.artifact = artifact;
         this.modificationType = modificationType;
         this.projectVersion = projectVersion;
@@ -75,19 +81,24 @@ public class ArtifactBody implements Serializable {
         this.content = content;
     }
 
-    public ArtifactBody(ProjectVersion projectVersion,
-                        Artifact artifact,
-                        String summary,
-                        String content) {
+    public ArtifactVersion(ProjectVersion projectVersion,
+                           Artifact artifact,
+                           String summary,
+                           String content) {
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
-    public UUID getArtifactBodyId() {
-        return this.artifactBodyId;
+    public UUID getEntityVersionId() {
+        return this.entityVersionId;
     }
 
-    public void setArtifactBodyId(UUID artifactBodyId) {
-        this.artifactBodyId = artifactBodyId;
+    public void setEntityVersionId(UUID artifactBodyId) {
+        this.entityVersionId = artifactBodyId;
+    }
+
+    @Override
+    public String getBaseEntityId() {
+        return this.artifact.getArtifactId().toString();
     }
 
     public String getName() {
@@ -138,8 +149,8 @@ public class ArtifactBody implements Serializable {
         this.projectVersion = projectVersion;
     }
 
-    public boolean hasSameId(ArtifactBody other) {
-        return this.artifactBodyId.equals(other.artifactBodyId);
+    public boolean hasSameId(ArtifactVersion other) {
+        return this.entityVersionId.equals(other.entityVersionId);
     }
 
     public String toString() {
@@ -149,5 +160,25 @@ public class ArtifactBody implements Serializable {
         json.put("body", this.content);
         json.put("modificationType", modificationType);
         return json.toString();
+    }
+
+    public boolean hasSameContent(IVersionEntity entityVersion) {
+        if (entityVersion instanceof ArtifactVersion) {
+            ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
+            return hasSameContent(artifactVersion.getName(),
+                artifactVersion.getSummary(),
+                artifactVersion.getContent());
+        }
+        return false;
+    }
+
+    public boolean hasSameContent(ArtifactAppEntity a) {
+        return hasSameContent(a.name, a.summary, a.body);
+    }
+
+    private boolean hasSameContent(String name, String summary, String content) {
+        return this.artifact.getName().equals(name)
+            && this.summary.equals(summary)
+            && this.content.equals(content);
     }
 }

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
+import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
@@ -30,8 +31,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 public abstract class GenericVersionRepository<
     BaseEntity extends IBaseEntity,
     VersionEntity extends IVersionEntity<AppEntity>,
-    AppEntity extends IAppEntity>
-    implements IVersionRepository<BaseEntity, VersionEntity, AppEntity> {
+    AppEntity extends IAppEntity,
+    DeltaEntity extends IDeltaEntity>
+    implements IVersionRepository<BaseEntity, VersionEntity, AppEntity, DeltaEntity> {
 
 
     /**
@@ -283,5 +285,26 @@ public abstract class GenericVersionRepository<
             VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
             this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
         }
+    }
+
+    public DeltaEntity calculateArtifactModificationBetweenVersions(BaseEntity artifact,
+                                                                    ProjectVersion beforeVersion,
+                                                                    ProjectVersion afterVersion) {
+        String artifactName = artifact.getName();
+        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(artifact);
+
+        VersionEntity beforeBody = this.getEntityAtVersion(bodies,
+            beforeVersion);
+        VersionEntity afterBody = this.getEntityAtVersion(bodies,
+            afterVersion);
+
+        ModificationType modificationType = this
+            .calculateModificationType(beforeBody, afterBody);
+
+        if (modificationType == null) {
+            return null;
+        }
+
+        return this.createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
     }
 }

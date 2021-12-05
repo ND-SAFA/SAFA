@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
+import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
@@ -23,7 +24,8 @@ import org.javatuples.Pair;
 public interface IVersionRepository<
     BaseEntity extends IBaseEntity,
     VersionEntity extends IVersionEntity<AppEntity>,
-    AppEntity extends IAppEntity> {
+    AppEntity extends IAppEntity,
+    DeltaEntity extends IDeltaEntity> {
     List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
 
     List<VersionEntity> getEntitiesInProject(Project project);
@@ -85,4 +87,15 @@ public interface IVersionRepository<
     void deleteVersionEntityByName(
         ProjectVersion projectVersion,
         String artifactName) throws SafaError;
+
+    DeltaEntity createDeltaArtifactFrom(ModificationType modificationType,
+                                        String artifactName,
+                                        VersionEntity beforeBody,
+                                        VersionEntity afterBody);
+
+    List<VersionEntity> findVersionEntitiesWithBaseEntity(BaseEntity baseEntity);
+
+    DeltaEntity calculateArtifactModificationBetweenVersions(BaseEntity artifact,
+                                                             ProjectVersion beforeVersion,
+                                                             ProjectVersion afterVersion);
 }

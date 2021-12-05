@@ -11,8 +11,6 @@ import edu.nd.crc.safa.server.entities.app.ModifiedArtifact;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.app.RemovedArtifact;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -60,10 +58,11 @@ public class DeltaService {
         List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : projectArtifacts) {
-            DeltaArtifact deltaArtifact = calculateArtifactModificationBetweenVersions(
-                artifact,
-                baselineVersion,
-                targetVersion);
+            DeltaArtifact deltaArtifact = this.artifactVersionRepository
+                .calculateArtifactModificationBetweenVersions(
+                    artifact,
+                    baselineVersion,
+                    targetVersion);
             if (deltaArtifact == null) {
                 continue;
             }
@@ -90,79 +89,6 @@ public class DeltaService {
         }
 
         return new ProjectDelta(added, modified, removed, missingArtifacts);
-    }
-
-    /**
-     * Creates an artifact's body such that its modification type is calculated relative to the
-     * last registered change. If not change is detected then the body is added as a new change.
-     *
-     * @param projectVersion - The version associated with the change created.
-     * @param artifact       - The registered artifact in the project associated with the project version.
-     * @param appEntity      - The artifact's new changes in the form of the domain model.
-     * @return ArtifactBody - unsaved ArtifactBody with changes OR null if no change is detected.
-     */
-    public ArtifactVersion calculateArtifactVersionAtProjectVersion(ProjectVersion projectVersion,
-                                                                    Artifact artifact,
-                                                                    ArtifactAppEntity appEntity) {
-        ModificationType modificationType = artifactVersionRepository
-            .calculateModificationTypeForAppEntity(projectVersion, artifact, appEntity);
-
-        if (modificationType == null) {
-            return null;
-        }
-
-        ArtifactVersion artifactVersion = this.artifactVersionRepository
-            .createEntityVersionWithModification(
-                projectVersion,
-                modificationType,
-                artifact,
-                appEntity);
-
-        this.artifactVersionRepository
-            .findEntityVersionInProjectVersion(projectVersion, artifact)
-            .ifPresent(version -> artifactVersion.setEntityVersionId(version.getEntityVersionId()));
-        return artifactVersion;
-    }
-
-    private DeltaArtifact calculateArtifactModificationBetweenVersions(Artifact artifact,
-                                                                       ProjectVersion beforeVersion,
-                                                                       ProjectVersion afterVersion) {
-        String artifactName = artifact.getName();
-        List<ArtifactVersion> bodies = this.artifactVersionRepository.findByArtifact(artifact);
-
-        ArtifactVersion beforeBody = this.artifactVersionRepository.getEntityAtVersion(bodies,
-            beforeVersion);
-        ArtifactVersion afterBody = this.artifactVersionRepository.getEntityAtVersion(bodies,
-            afterVersion);
-
-        ModificationType modificationType = this.artifactVersionRepository
-            .calculateModificationType(beforeBody, afterBody);
-
-        if (modificationType == null) {
-            return null;
-        }
-
-        return createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
-    }
-
-    private DeltaArtifact createDeltaArtifactFrom(ModificationType modificationType,
-                                                  String artifactName,
-                                                  ArtifactVersion beforeBody,
-                                                  ArtifactVersion afterBody) {
-        switch (modificationType) {
-            case MODIFIED:
-                return new ModifiedArtifact(artifactName,
-                    beforeBody.getContent(),
-                    beforeBody.getSummary(),
-                    afterBody.getContent(),
-                    afterBody.getSummary());
-            case ADDED:
-                return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
-            case REMOVED:
-                return new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
-            default:
-                return null;
-        }
     }
 }
 

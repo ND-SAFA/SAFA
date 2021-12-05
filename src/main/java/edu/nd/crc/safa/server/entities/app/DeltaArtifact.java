@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.app;
 /**
  * The base model for representing a way an artifact can change between versions.
  */
-public class DeltaArtifact {
+public class DeltaArtifact implements IDeltaEntity {
 
     String artifactId;
 

@@ -35,6 +35,97 @@ public abstract class GenericVersionRepository<
     DeltaEntity extends IDeltaEntity>
     implements IVersionRepository<BaseEntity, VersionEntity, AppEntity, DeltaEntity> {
 
+    /**
+     * @param project The project whose entities are retrieved.
+     * @return Queries for all version entities in given project.
+     */
+    abstract List<VersionEntity> getEntitiesInProject(Project project);
+
+    /**
+     * @param entity The base entities whose versions are retrieved
+     * @return List of versions associated with given base entities.
+     */
+    abstract List<VersionEntity> findByEntity(BaseEntity entity);
+
+    /**
+     * Creates an entity version with content of app entity and containing
+     * given modification type.
+     *
+     * @param projectVersion   The project version where version entity is created.
+     * @param modificationType The type of change required to move from last commit to given app entity.
+     * @param baseEntity       The base entity represented by app entity.
+     * @param appEntity        The app entity whose content is being compared to previous commits.
+     * @return The version entity for saving the app entity content to project version.
+     */
+    abstract VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
+                                                               ModificationType modificationType,
+                                                               BaseEntity baseEntity,
+                                                               AppEntity appEntity);
+
+    /**
+     * @param project The project to search for base entity.
+     * @param name    The name of the base entity.
+     * @return Returns the base entity in given project with given name.
+     */
+    abstract Optional<BaseEntity> findBaseEntityByName(Project project, String name);
+
+    /**
+     * Creates and missing auxiliary types used in app entity.
+     *
+     * @param project           The project associated with given app entity.
+     * @param artifactAppEntity The application entity whose sub entities are being created.
+     * @return
+     */
+    abstract BaseEntity findOrCreateBaseEntityFromAppEntity(Project project,
+                                                            AppEntity artifactAppEntity);
+
+    /**
+     * Saves given artifact version to project version, deleting any previous entry
+     * to the project version if it exists.
+     *
+     * @param projectVersion  The project version which the entity is being saved to.
+     * @param artifactVersion The version entity being saved.
+     * @throws SafaError Throws error if saving fails.
+     */
+    abstract void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+                                              VersionEntity artifactVersion) throws SafaError;
+
+    /**
+     * @param project The project whose entities are retrieved.
+     * @return Returns list of base entities existing in project.
+     */
+    abstract List<BaseEntity> getProjectBaseEntities(Project project);
+
+    /**
+     * Creates the VersionEntity representing a deletion in a project version.
+     *
+     * @param projectVersion The project version associated with deletion.
+     * @param baseEntity     The base entity being deleted.
+     * @return The version entity representing the deletion.
+     */
+    abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
+                                                      BaseEntity baseEntity);
+
+    /**
+     * Creates and populated delta entity using the modification type and given
+     * source and target version entities.
+     *
+     * @param modificationType    The type of change between base and target entities
+     * @param baseEntityName      The name of the base entity.
+     * @param baseVersionEntity   The version entity representing the start of the delta.
+     * @param targetVersionEntity The version entity representing the final state of the delta.
+     * @return The populated delta artifacts with given modification.
+     */
+    abstract DeltaEntity createDeltaArtifactFrom(ModificationType modificationType,
+                                                 String baseEntityName,
+                                                 VersionEntity baseVersionEntity,
+                                                 VersionEntity targetVersionEntity);
+
+    /**
+     * @param baseEntity The base entity whose versions are returned.
+     * @return Returns list of versions associated with base entity.
+     */
+    abstract List<VersionEntity> findVersionEntitiesWithBaseEntity(BaseEntity baseEntity);
 
     /**
      * Calculates contents of each artifact at given version and returns bodies at version.
@@ -49,6 +140,67 @@ public abstract class GenericVersionRepository<
         return this.retrieveEntitiesAtProjectVersion(projectVersion, artifactBodyTable);
     }
 
+    @Override
+    public void commitAppEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity)
+        throws SafaError {
+        VersionEntity artifactVersion = this
+            .calculateEntityVersionAtProjectVersion(projectVersion, appEntity);
+        if (artifactVersion == null) {
+            return;
+        }
+        saveOrOverrideVersionEntity(projectVersion, artifactVersion);
+    }
+
+    @Override
+    public List<ParserError> commitAppEntitiesToProjectVersion(ProjectVersion projectVersion,
+                                                               List<AppEntity> appEntities) throws SafaError {
+        Pair<List<VersionEntity>, List<ParserError>> response = this
+            .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
+
+        for (VersionEntity body : response.getValue0()) {
+            this.saveOrOverrideVersionEntity(projectVersion, body);
+        }
+        return response.getValue1();
+    }
+
+    @Override
+    public DeltaEntity calculateDeltaEntityBetweenProjectVersions(BaseEntity baseEntity,
+                                                                  ProjectVersion baseVersion,
+                                                                  ProjectVersion targetVersion) {
+        String artifactName = baseEntity.getName();
+        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(baseEntity);
+
+        VersionEntity beforeBody = this.getEntityAtVersion(bodies,
+            baseVersion);
+        VersionEntity afterBody = this.getEntityAtVersion(bodies,
+            targetVersion);
+
+        ModificationType modificationType = this
+            .calculateModificationType(beforeBody, afterBody);
+
+        if (modificationType == null) {
+            return null;
+        }
+
+        return this.createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
+    }
+
+    @Override
+    public void deleteVersionEntityByName(
+        ProjectVersion projectVersion,
+        String baseEntityName) throws SafaError {
+
+        Project project = projectVersion.getProject();
+        Optional<BaseEntity> baseEntityOptional = this
+            .findBaseEntityByName(project, baseEntityName);
+
+        if (baseEntityOptional.isPresent()) {
+            BaseEntity baseEntity = baseEntityOptional.get();
+            VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
+            this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
+        }
+    }
+
     /**
      * Returns the most recent entity version that passes given filter
      *
@@ -56,8 +208,8 @@ public abstract class GenericVersionRepository<
      * @param filter The filter deciding whether an entity's version is valid.
      * @return The latest entity version passing given filter.
      */
-    public VersionEntity getLatestEntityVersionWithFilter(List<VersionEntity> bodies,
-                                                          ProjectVersionFilter filter) {
+    private VersionEntity getLatestEntityVersionWithFilter(List<VersionEntity> bodies,
+                                                           ProjectVersionFilter filter) {
         VersionEntity closestBodyToVersion = null;
         for (int i = bodies.size() - 1; i >= 0; i--) {
             VersionEntity currentBody = bodies.get(i);
@@ -81,8 +233,8 @@ public abstract class GenericVersionRepository<
      * @param targetEntity The entity whose changes are compared against the base content.
      * @return The type of change occurring to base in order to reach target entity.
      */
-    public ModificationType calculateModificationType(VersionEntity baseEntity,
-                                                      VersionEntity targetEntity) {
+    private ModificationType calculateModificationType(VersionEntity baseEntity,
+                                                       VersionEntity targetEntity) {
         if (baseEntity == null || targetEntity == null) {
             if (baseEntity == targetEntity) {
                 return null;
@@ -144,9 +296,9 @@ public abstract class GenericVersionRepository<
         return entityHashtable;
     }
 
-    public ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
-                                                                  BaseEntity baseEntity,
-                                                                  AppEntity appEntity) {
+    private ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
+                                                                   BaseEntity baseEntity,
+                                                                   AppEntity appEntity) {
         VersionEntity previousBody =
             getEntityBeforeVersion(this.findByEntity(baseEntity), projectVersion);
         if (previousBody == null) {
@@ -165,21 +317,18 @@ public abstract class GenericVersionRepository<
         }
     }
 
-    @Override
-    public VersionEntity getEntityAtVersion(List<VersionEntity> bodies, ProjectVersion version) {
+    private VersionEntity getEntityAtVersion(List<VersionEntity> bodies, ProjectVersion version) {
         return this
             .getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
     }
 
-    @Override
-    public VersionEntity getEntityBeforeVersion(List<VersionEntity> bodies, ProjectVersion version) {
+    private VersionEntity getEntityBeforeVersion(List<VersionEntity> bodies, ProjectVersion version) {
         return this.getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
     }
 
-    @Override
-    public VersionEntity calculateEntityVersionAtProjectVersion(ProjectVersion projectVersion,
-                                                                BaseEntity artifact,
-                                                                AppEntity appEntity) {
+    private VersionEntity calculateEntityVersionAtProjectVersion(ProjectVersion projectVersion,
+                                                                 BaseEntity artifact,
+                                                                 AppEntity appEntity) {
         ModificationType modificationType = this
             .calculateModificationTypeForAppEntity(projectVersion, artifact, appEntity);
 
@@ -196,12 +345,11 @@ public abstract class GenericVersionRepository<
 
     }
 
-    @Override
-    public VersionEntity calculateEntityVersionAtProjectVersion(
+    private VersionEntity calculateEntityVersionAtProjectVersion(
         ProjectVersion projectVersion,
         AppEntity appEntity) {
         BaseEntity baseEntity = this.findOrCreateBaseEntityFromAppEntity(
-            projectVersion,
+            projectVersion.getProject(),
             appEntity);
 
         return this.calculateEntityVersionAtProjectVersion(
@@ -210,31 +358,7 @@ public abstract class GenericVersionRepository<
             appEntity);
     }
 
-    @Override
-    public void setAppEntityAtProjectVersion(ProjectVersion projectVersion, AppEntity artifact)
-        throws SafaError {
-        VersionEntity artifactVersion = this
-            .calculateEntityVersionAtProjectVersion(projectVersion, artifact);
-        if (artifactVersion == null) {
-            return;
-        }
-        saveOrOverrideVersionEntity(projectVersion, artifactVersion);
-    }
-
-    @Override
-    public List<ParserError> setAppEntitiesAtProjectVersion(ProjectVersion projectVersion,
-                                                            List<AppEntity> appEntities) throws SafaError {
-        Pair<List<VersionEntity>, List<ParserError>> response = this
-            .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
-
-        for (VersionEntity body : response.getValue0()) {
-            this.saveOrOverrideVersionEntity(projectVersion, body);
-        }
-        return response.getValue1();
-    }
-
-    @Override
-    public Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
+    private Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
         ProjectVersion projectVersion,
         List<AppEntity> appEntities) {
         Hashtable<String, AppEntity> artifactsUpdated = new Hashtable<>();
@@ -270,41 +394,5 @@ public abstract class GenericVersionRepository<
         List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
         allArtifactBodies.addAll(removedArtifactBodies);
         return new Pair<>(allArtifactBodies, parserErrors);
-    }
-
-    public void deleteVersionEntityByName(
-        ProjectVersion projectVersion,
-        String artifactName) throws SafaError {
-
-        Project project = projectVersion.getProject();
-        Optional<BaseEntity> baseEntityOptional = this
-            .findBaseEntityByName(project, artifactName);
-
-        if (baseEntityOptional.isPresent()) {
-            BaseEntity baseEntity = baseEntityOptional.get();
-            VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
-            this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
-        }
-    }
-
-    public DeltaEntity calculateArtifactModificationBetweenVersions(BaseEntity artifact,
-                                                                    ProjectVersion beforeVersion,
-                                                                    ProjectVersion afterVersion) {
-        String artifactName = artifact.getName();
-        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(artifact);
-
-        VersionEntity beforeBody = this.getEntityAtVersion(bodies,
-            beforeVersion);
-        VersionEntity afterBody = this.getEntityAtVersion(bodies,
-            afterVersion);
-
-        ModificationType modificationType = this
-            .calculateModificationType(beforeBody, afterBody);
-
-        if (modificationType == null) {
-            return null;
-        }
-
-        return this.createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
     }
 }

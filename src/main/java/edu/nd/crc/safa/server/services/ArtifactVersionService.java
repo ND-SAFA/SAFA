@@ -59,7 +59,7 @@ public class ArtifactVersionService {
     public void setArtifactsAtVersion(ProjectVersion projectVersion,
                                       List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         List<ParserError> parserErrors = this.artifactVersionRepository
-            .setAppEntitiesAtProjectVersion(projectVersion, projectArtifacts);
+            .commitAppEntitiesToProjectVersion(projectVersion, projectArtifacts);
         for (ParserError parserError : parserErrors) {
             parserError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
             this.parserErrorRepository.save(parserError);

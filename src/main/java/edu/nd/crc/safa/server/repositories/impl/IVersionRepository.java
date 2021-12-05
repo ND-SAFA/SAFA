@@ -1,20 +1,14 @@
 package edu.nd.crc.safa.server.repositories.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.utilities.ProjectVersionFilter;
-
-import org.javatuples.Pair;
 
 /**
  * Defines interface that all repositories related to versioned entities.
@@ -28,74 +22,48 @@ public interface IVersionRepository<
     DeltaEntity extends IDeltaEntity> {
     List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
 
-    List<VersionEntity> getEntitiesInProject(Project project);
+    /**
+     * Saves the state of given app entity to given project version.
+     *
+     * @param projectVersion The project version to save the changes to.
+     * @param appEntity      The app entity whose state is saved.
+     * @throws SafaError Throws error if saving changes fails.
+     */
+    void commitAppEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) throws SafaError;
 
-    VersionEntity getLatestEntityVersionWithFilter(List<VersionEntity> bodies,
-                                                   ProjectVersionFilter filter);
+    /**
+     * Saves given application entities to given version, saving removal entities for entities present in previous
+     * versions but not present in given entities.
+     *
+     * @param projectVersion The project version whose changes are committed to.
+     * @param appEntities    The app entities whose states are saved.
+     * @return List of parsing errors occurring while saving app entities.
+     * @throws SafaError Throws error if a fatal constraint or condition is not met.
+     */
+    List<ParserError> commitAppEntitiesToProjectVersion(ProjectVersion projectVersion,
+                                                        List<AppEntity> appEntities) throws SafaError;
 
-    ModificationType calculateModificationType(VersionEntity beforeBody,
-                                               VersionEntity afterBody);
-
-    List<VersionEntity> findByEntity(BaseEntity entity);
-
-    VersionEntity getEntityAtVersion(List<VersionEntity> bodies, ProjectVersion version);
-
-    VersionEntity getEntityBeforeVersion(List<VersionEntity> bodies, ProjectVersion version);
-
-    ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
-                                                           BaseEntity baseEntity,
-                                                           AppEntity appEntity);
-
-    VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
-                                                      ModificationType modificationType,
-                                                      BaseEntity baseEntity,
-                                                      AppEntity appEntity);
-
-    Optional<VersionEntity> findEntityVersionInProjectVersion(ProjectVersion projectVersion,
-                                                              BaseEntity baseEntity);
-
-    VersionEntity calculateEntityVersionAtProjectVersion(ProjectVersion projectVersion,
-                                                         BaseEntity artifact,
-                                                         AppEntity appEntity);
-
-    BaseEntity findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
-                                                   AppEntity artifactAppEntity);
-
-    VersionEntity calculateEntityVersionAtProjectVersion(
-        ProjectVersion projectVersion,
-        AppEntity appEntity);
-
-    void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
-                                     VersionEntity artifactVersion) throws SafaError;
-
-    void setAppEntityAtProjectVersion(ProjectVersion projectVersion, AppEntity artifact) throws SafaError;
-
-    List<BaseEntity> getProjectBaseEntities(Project project);
-
-    Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
-        ProjectVersion projectVersion,
-        List<AppEntity> projectArtifacts);
-
-    List<ParserError> setAppEntitiesAtProjectVersion(ProjectVersion projectVersion,
-                                                     List<AppEntity> appEntities) throws SafaError;
-
-    VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
-                                             BaseEntity baseEntity);
-
-    Optional<BaseEntity> findBaseEntityByName(Project project, String name);
-
+    /**
+     * Deletes entity version with given name and commits to given project version.
+     *
+     * @param projectVersion The project version associated with committed removal.
+     * @param baseEntityName The name of the base entity whose removal is committed to given version.
+     * @throws SafaError Throws error is something occurs while saving removal.
+     */
     void deleteVersionEntityByName(
         ProjectVersion projectVersion,
-        String artifactName) throws SafaError;
+        String baseEntityName) throws SafaError;
 
-    DeltaEntity createDeltaArtifactFrom(ModificationType modificationType,
-                                        String artifactName,
-                                        VersionEntity beforeBody,
-                                        VersionEntity afterBody);
-
-    List<VersionEntity> findVersionEntitiesWithBaseEntity(BaseEntity baseEntity);
-
-    DeltaEntity calculateArtifactModificationBetweenVersions(BaseEntity artifact,
-                                                             ProjectVersion beforeVersion,
-                                                             ProjectVersion afterVersion);
+    /**
+     * Calculates and returns the delta between the versions of given baseEntity
+     * beginning at base version and ending at target version.
+     *
+     * @param baseEntity    The baseEntity whose versions are being compared.
+     * @param baseVersion   The starting version of the delta.
+     * @param targetVersion The ending version of the delta.
+     * @return The change necessary to move between base and target version of artifact.
+     */
+    DeltaEntity calculateDeltaEntityBetweenProjectVersions(BaseEntity baseEntity,
+                                                           ProjectVersion baseVersion,
+                                                           ProjectVersion targetVersion);
 }

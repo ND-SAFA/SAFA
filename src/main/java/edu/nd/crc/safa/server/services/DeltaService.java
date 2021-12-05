@@ -59,7 +59,7 @@ public class DeltaService {
 
         for (Artifact artifact : projectArtifacts) {
             DeltaArtifact deltaArtifact = this.artifactVersionRepository
-                .calculateArtifactModificationBetweenVersions(
+                .calculateDeltaEntityBetweenProjectVersions(
                     artifact,
                     baselineVersion,
                     targetVersion);

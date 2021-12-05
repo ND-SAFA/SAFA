@@ -76,19 +76,12 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    @Override
-    public Optional<ArtifactVersion> findEntityVersionInProjectVersion(ProjectVersion projectVersion,
-                                                                       Artifact artifact) {
-        return artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion, artifact);
-    }
-
-    public Artifact findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
+    public Artifact findOrCreateBaseEntityFromAppEntity(Project project,
                                                         ArtifactAppEntity artifactAppEntity) {
         String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.getType();
         String artifactName = artifactAppEntity.getName();
 
-        Project project = projectVersion.getProject();
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);
 
@@ -160,20 +153,20 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public DeltaArtifact createDeltaArtifactFrom(ModificationType modificationType,
-                                                 String artifactName,
-                                                 ArtifactVersion beforeBody,
-                                                 ArtifactVersion afterBody) {
+                                                 String baseEntityName,
+                                                 ArtifactVersion baseVersionEntity,
+                                                 ArtifactVersion targetVersionEntity) {
         switch (modificationType) {
             case MODIFIED:
-                return new ModifiedArtifact(artifactName,
-                    beforeBody.getContent(),
-                    beforeBody.getSummary(),
-                    afterBody.getContent(),
-                    afterBody.getSummary());
+                return new ModifiedArtifact(baseEntityName,
+                    baseVersionEntity.getContent(),
+                    baseVersionEntity.getSummary(),
+                    targetVersionEntity.getContent(),
+                    targetVersionEntity.getSummary());
             case ADDED:
-                return new AddedArtifact(artifactName, afterBody.getContent(), afterBody.getSummary());
+                return new AddedArtifact(baseEntityName, targetVersionEntity.getContent(), targetVersionEntity.getSummary());
             case REMOVED:
-                return new RemovedArtifact(artifactName, beforeBody.getContent(), beforeBody.getSummary());
+                return new RemovedArtifact(baseEntityName, baseVersionEntity.getContent(), baseVersionEntity.getSummary());
             default:
                 return null;
         }

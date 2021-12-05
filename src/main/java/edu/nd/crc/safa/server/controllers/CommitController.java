@@ -79,7 +79,7 @@ public class CommitController extends BaseController {
                 artifacts.getModified().stream())
             .collect(Collectors.toList());
         for (ArtifactAppEntity artifact : changedArtifacts) {
-            this.artifactVersionRepository.setAppEntityAtProjectVersion(projectVersion, artifact);
+            this.artifactVersionRepository.commitAppEntityToProjectVersion(projectVersion, artifact);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
             this.artifactVersionRepository.deleteVersionEntityByName(projectVersion, artifact.name);

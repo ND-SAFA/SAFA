@@ -1,10 +1,12 @@
 package edu.nd.crc.safa.server.repositories.impl;
 
 import java.util.List;
+import java.util.Optional;
 
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
-import edu.nd.crc.safa.server.entities.db.IEntity;
-import edu.nd.crc.safa.server.entities.db.IEntityVersion;
+import edu.nd.crc.safa.server.entities.db.IBaseEntity;
+import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -13,29 +15,52 @@ import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 /**
  * Defines interface that all repositories related to versioned entities.
  *
- * @param <VersionType> The type of versioned entity.
+ * @param <VersionEntity> The type of versioned entity.
  */
 public interface IVersionRepository<
-    EntityType extends IEntity,
-    VersionType extends IEntityVersion<AppType>,
-    AppType extends IAppEntity> {
-    List<VersionType> getEntitiesAtVersion(ProjectVersion projectVersion);
+    BaseEntity extends IBaseEntity,
+    VersionEntity extends IVersionEntity<AppEntity>,
+    AppEntity extends IAppEntity> {
+    List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
 
-    List<VersionType> getEntitiesInProject(Project project);
+    List<VersionEntity> getEntitiesInProject(Project project);
 
-    VersionType getLatestEntityVersionWithFilter(List<VersionType> bodies,
-                                                 ProjectVersionFilter filter);
+    VersionEntity getLatestEntityVersionWithFilter(List<VersionEntity> bodies,
+                                                   ProjectVersionFilter filter);
 
-    ModificationType calculateModificationType(VersionType beforeBody,
-                                               VersionType afterBody);
+    ModificationType calculateModificationType(VersionEntity beforeBody,
+                                               VersionEntity afterBody);
 
-    List<VersionType> findByEntity(EntityType entity);
+    List<VersionEntity> findByEntity(BaseEntity entity);
 
-    VersionType getEntityAtVersion(List<VersionType> bodies, ProjectVersion version);
+    VersionEntity getEntityAtVersion(List<VersionEntity> bodies, ProjectVersion version);
 
-    VersionType getEntityBeforeVersion(List<VersionType> bodies, ProjectVersion version);
+    VersionEntity getEntityBeforeVersion(List<VersionEntity> bodies, ProjectVersion version);
 
     ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
-                                                           EntityType baseEntity,
-                                                           AppType appEntity);
+                                                           BaseEntity baseEntity,
+                                                           AppEntity appEntity);
+
+    VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
+                                                      ModificationType modificationType,
+                                                      BaseEntity baseEntity,
+                                                      AppEntity appEntity);
+
+    Optional<VersionEntity> findEntityVersionInProjectVersion(ProjectVersion projectVersion,
+                                                              BaseEntity baseEntity);
+
+    VersionEntity calculateEntityVersionAtProjectVersion(ProjectVersion projectVersion,
+                                                         BaseEntity artifact,
+                                                         AppEntity appEntity);
+
+    BaseEntity findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
+                                                   AppEntity artifactAppEntity);
+
+    VersionEntity calculateEntityVersionAtProjectVersion(
+        ProjectVersion projectVersion,
+        AppEntity appEntity);
+
+    void saveVersionEntity(VersionEntity artifactVersion) throws SafaError;
+
+    void setAppEntityAtProjectVersion(ProjectVersion projectVersion, AppEntity artifact) throws SafaError;
 }

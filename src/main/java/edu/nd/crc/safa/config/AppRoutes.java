@@ -12,12 +12,11 @@ public class AppRoutes {
     }
 
     public static class Projects {
-        //PREFIXES
         private static final String projectPrefix = "/projects";
         public static final String projectById = projectPrefix + "/{projectId}";
         public static final String addProjectMember = projectPrefix + "/{projectId}/members";
         public static final String getProjectMembers = projectPrefix + "/{projectId}/members";
-        public static final String deleteProjectMember = projectPrefix + "/members/{projectMembershipId}";
+        public static final String deleteProjectMembership = projectPrefix + "/members/{projectMembershipId}";
         // Project Controller
         public static final String projects = projectPrefix;
         // Trace Link Controller

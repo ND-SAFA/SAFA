@@ -47,7 +47,7 @@ public class WarningService {
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactVersion> artifacts = artifactVersionRepository.getEntitiesAtVersion(projectVersion);
+        List<ArtifactVersion> artifacts = artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
         List<TraceLink> traceLinks = this.traceLinkRepository.getApprovedLinks(project);
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);
     }

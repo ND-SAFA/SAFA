@@ -59,6 +59,10 @@ public class ArtifactAppEntity implements IAppEntity {
         this.id = id;
     }
 
+    public boolean hasEmptyId() {
+        return this.id == null || this.id.equals("");
+    }
+
     public String getName() {
         return this.name;
     }

@@ -34,12 +34,12 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
-public class ArtifactVersion implements Serializable, IEntityVersion<ArtifactAppEntity> {
+public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactAppEntity> {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
-    UUID artifactBodyId;
+    UUID entityVersionId;
 
     @Column(name = "modification_type")
     @Enumerated(EnumType.ORDINAL)
@@ -88,15 +88,16 @@ public class ArtifactVersion implements Serializable, IEntityVersion<ArtifactApp
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
-    public UUID getArtifactBodyId() {
-        return this.artifactBodyId;
+    public UUID getEntityVersionId() {
+        return this.entityVersionId;
     }
 
-    public void setArtifactBodyId(UUID artifactBodyId) {
-        this.artifactBodyId = artifactBodyId;
+    public void setEntityVersionId(UUID artifactBodyId) {
+        this.entityVersionId = artifactBodyId;
     }
 
-    public String getEntityId() {
+    @Override
+    public String getBaseEntityId() {
         return this.artifact.getArtifactId().toString();
     }
 
@@ -149,7 +150,7 @@ public class ArtifactVersion implements Serializable, IEntityVersion<ArtifactApp
     }
 
     public boolean hasSameId(ArtifactVersion other) {
-        return this.artifactBodyId.equals(other.artifactBodyId);
+        return this.entityVersionId.equals(other.entityVersionId);
     }
 
     public String toString() {
@@ -161,7 +162,7 @@ public class ArtifactVersion implements Serializable, IEntityVersion<ArtifactApp
         return json.toString();
     }
 
-    public boolean hasSameContent(IEntityVersion entityVersion) {
+    public boolean hasSameContent(IVersionEntity entityVersion) {
         if (entityVersion instanceof ArtifactVersion) {
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
             return hasSameContent(artifactVersion.getName(),

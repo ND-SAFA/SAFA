@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ArtifactVersionService;
@@ -36,17 +37,20 @@ public class CommitController extends BaseController {
     TraceLinkService traceLinkService;
 
     ArtifactVersionService artifactVersionService;
+    ArtifactVersionRepository artifactVersionRepository;
     RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
+                            ArtifactVersionRepository artifactVersionRepository,
                             ResourceBuilder resourceBuilder,
                             TraceLinkService traceLinkService,
                             ArtifactVersionService artifactVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
+        this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkService = traceLinkService;
         this.artifactVersionService = artifactVersionService;
         this.revisionNotificationService = revisionNotificationService;
@@ -75,7 +79,7 @@ public class CommitController extends BaseController {
                 artifacts.getModified().stream())
             .collect(Collectors.toList());
         for (ArtifactAppEntity artifact : changedArtifacts) {
-            this.artifactVersionService.setArtifactAtProjectVersion(projectVersion, artifact);
+            this.artifactVersionRepository.setAppEntityAtProjectVersion(projectVersion, artifact);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
             this.artifactVersionService.deleteArtifactBody(projectVersion, artifact.name);

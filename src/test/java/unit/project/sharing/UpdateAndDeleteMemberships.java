@@ -61,7 +61,7 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
         Optional<ProjectMembership> query = this.projectMembershipRepository.findByProjectAndMember(project,
             this.otherUser);
         String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteProjectMember)
+            .withRoute(AppRoutes.Projects.deleteProjectMembership)
             .withProjectMembership(query.get())
             .get();
         sendDelete(url, status().isNoContent());

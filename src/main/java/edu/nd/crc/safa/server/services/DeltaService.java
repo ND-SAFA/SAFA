@@ -101,9 +101,9 @@ public class DeltaService {
      * @param appEntity      - The artifact's new changes in the form of the domain model.
      * @return ArtifactBody - unsaved ArtifactBody with changes OR null if no change is detected.
      */
-    public ArtifactVersion calculateArtifactVersion(ProjectVersion projectVersion,
-                                                    Artifact artifact,
-                                                    ArtifactAppEntity appEntity) {
+    public ArtifactVersion calculateArtifactVersionAtProjectVersion(ProjectVersion projectVersion,
+                                                                    Artifact artifact,
+                                                                    ArtifactAppEntity appEntity) {
         ModificationType modificationType = artifactVersionRepository
             .calculateModificationTypeForAppEntity(projectVersion, artifact, appEntity);
 
@@ -111,15 +111,16 @@ public class DeltaService {
             return null;
         }
 
-        ArtifactVersion artifactVersion = createArtifactVersionFromModification(
-            projectVersion,
-            modificationType,
-            artifact,
-            appEntity);
+        ArtifactVersion artifactVersion = this.artifactVersionRepository
+            .createEntityVersionWithModification(
+                projectVersion,
+                modificationType,
+                artifact,
+                appEntity);
 
         this.artifactVersionRepository
-            .findByProjectVersionAndArtifact(projectVersion, artifact)
-            .ifPresent(version -> artifactVersion.setArtifactBodyId(version.getArtifactBodyId()));
+            .findEntityVersionInProjectVersion(projectVersion, artifact)
+            .ifPresent(version -> artifactVersion.setEntityVersionId(version.getEntityVersionId()));
         return artifactVersion;
     }
 
@@ -142,36 +143,6 @@ public class DeltaService {
         }
 
         return createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
-    }
-
-    private ArtifactVersion createArtifactVersionFromModification(
-        ProjectVersion projectVersion,
-        ModificationType modificationType,
-        Artifact artifact,
-        ArtifactAppEntity artifactAppEntity
-    ) {
-        switch (modificationType) {
-            case ADDED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.ADDED,
-                    artifact,
-                    artifactAppEntity.summary,
-                    artifactAppEntity.body);
-            case MODIFIED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.MODIFIED,
-                    artifact,
-                    artifactAppEntity.summary,
-                    artifactAppEntity.body);
-            case REMOVED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.REMOVED,
-                    artifact,
-                    "",
-                    "");
-            default:
-                throw new RuntimeException("Missing case in delta service.");
-        }
     }
 
     private DeltaArtifact createDeltaArtifactFrom(ModificationType modificationType,

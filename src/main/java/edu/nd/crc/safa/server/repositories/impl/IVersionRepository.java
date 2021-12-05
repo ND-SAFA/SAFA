@@ -63,7 +63,8 @@ public interface IVersionRepository<
         ProjectVersion projectVersion,
         AppEntity appEntity);
 
-    void saveVersionEntity(VersionEntity artifactVersion) throws SafaError;
+    void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+                                     VersionEntity artifactVersion) throws SafaError;
 
     void setAppEntityAtProjectVersion(ProjectVersion projectVersion, AppEntity artifact) throws SafaError;
 
@@ -75,4 +76,13 @@ public interface IVersionRepository<
 
     List<ParserError> setAppEntitiesAtProjectVersion(ProjectVersion projectVersion,
                                                      List<AppEntity> appEntities) throws SafaError;
+
+    VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
+                                             BaseEntity baseEntity);
+
+    Optional<BaseEntity> findBaseEntityByName(Project project, String name);
+
+    void deleteVersionEntityByName(
+        ProjectVersion projectVersion,
+        String artifactName) throws SafaError;
 }

@@ -82,7 +82,7 @@ public class CommitController extends BaseController {
             this.artifactVersionRepository.setAppEntityAtProjectVersion(projectVersion, artifact);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
-            this.artifactVersionService.deleteArtifactBody(projectVersion, artifact.name);
+            this.artifactVersionRepository.deleteVersionEntityByName(projectVersion, artifact.name);
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
     }

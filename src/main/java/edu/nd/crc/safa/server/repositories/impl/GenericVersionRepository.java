@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
@@ -13,6 +14,7 @@ import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
@@ -183,17 +185,13 @@ public abstract class GenericVersionRepository<
             return null;
         }
 
-        VersionEntity artifactVersion = this
+        return this
             .createEntityVersionWithModification(
                 projectVersion,
                 modificationType,
                 artifact,
                 appEntity);
 
-        this
-            .findEntityVersionInProjectVersion(projectVersion, artifact)
-            .ifPresent(version -> artifactVersion.setEntityVersionId(version.getEntityVersionId()));
-        return artifactVersion;
     }
 
     @Override
@@ -218,7 +216,7 @@ public abstract class GenericVersionRepository<
         if (artifactVersion == null) {
             return;
         }
-        saveVersionEntity(artifactVersion);
+        saveOrOverrideVersionEntity(projectVersion, artifactVersion);
     }
 
     @Override
@@ -228,7 +226,7 @@ public abstract class GenericVersionRepository<
             .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
 
         for (VersionEntity body : response.getValue0()) {
-            this.saveVersionEntity(body);
+            this.saveOrOverrideVersionEntity(projectVersion, body);
         }
         return response.getValue1();
     }
@@ -270,5 +268,20 @@ public abstract class GenericVersionRepository<
         List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
         allArtifactBodies.addAll(removedArtifactBodies);
         return new Pair<>(allArtifactBodies, parserErrors);
+    }
+
+    public void deleteVersionEntityByName(
+        ProjectVersion projectVersion,
+        String artifactName) throws SafaError {
+
+        Project project = projectVersion.getProject();
+        Optional<BaseEntity> baseEntityOptional = this
+            .findBaseEntityByName(project, artifactName);
+
+        if (baseEntityOptional.isPresent()) {
+            BaseEntity baseEntity = baseEntityOptional.get();
+            VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
+            this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
+        }
     }
 }

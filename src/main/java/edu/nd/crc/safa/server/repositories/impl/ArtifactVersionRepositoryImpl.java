@@ -119,11 +119,17 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public void saveVersionEntity(ArtifactVersion artifactVersion) throws SafaError {
+    public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+                                            ArtifactVersion newArtifactVersion) throws SafaError {
         try {
-            this.artifactVersionRepository.save(artifactVersion);
+            this.artifactVersionRepository
+                .findByProjectVersionAndArtifactName(projectVersion, newArtifactVersion.getName())
+                .ifPresent((existingVersionEntity) -> {
+                    artifactVersionRepository.delete(existingVersionEntity);
+                });
+            this.artifactVersionRepository.save(newArtifactVersion);
         } catch (Exception e) {
-            String error = String.format("An error occurred while saving artifact: %s", artifactVersion.getName());
+            String error = String.format("An error occurred while saving artifact: %s", newArtifactVersion.getName());
             throw new SafaError(error, e);
         }
     }
@@ -131,5 +137,20 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public List<Artifact> getProjectBaseEntities(Project project) {
         return this.artifactRepository.findByProject(project);
+    }
+
+    @Override
+    public ArtifactVersion createRemovedVersionEntity(ProjectVersion projectVersion,
+                                                      Artifact artifact) {
+        return new ArtifactVersion(
+            projectVersion,
+            ModificationType.REMOVED,
+            artifact,
+            "", "");
+    }
+
+    @Override
+    public Optional<Artifact> findBaseEntityByName(Project project, String name) {
+        return this.artifactRepository.findByProjectAndName(project, name);
     }
 }

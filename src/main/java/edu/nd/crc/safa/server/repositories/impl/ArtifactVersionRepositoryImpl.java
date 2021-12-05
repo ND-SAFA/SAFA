@@ -164,9 +164,13 @@ public class ArtifactVersionRepositoryImpl
                     targetVersionEntity.getContent(),
                     targetVersionEntity.getSummary());
             case ADDED:
-                return new AddedArtifact(baseEntityName, targetVersionEntity.getContent(), targetVersionEntity.getSummary());
+                return new AddedArtifact(baseEntityName,
+                    targetVersionEntity.getContent(),
+                    targetVersionEntity.getSummary());
             case REMOVED:
-                return new RemovedArtifact(baseEntityName, baseVersionEntity.getContent(), baseVersionEntity.getSummary());
+                return new RemovedArtifact(baseEntityName,
+                    baseVersionEntity.getContent(),
+                    baseVersionEntity.getSummary());
             default:
                 return null;
         }

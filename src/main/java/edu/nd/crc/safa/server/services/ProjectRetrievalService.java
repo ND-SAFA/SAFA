@@ -65,7 +65,8 @@ public class ProjectRetrievalService {
      */
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
         Project project = projectVersion.getProject();
-        List<ArtifactVersion> artifactBodies = artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
+        List<ArtifactVersion> artifactBodies = artifactVersionRepository
+            .getEntityVersionsInProjectVersion(projectVersion);
 
         List<ArtifactAppEntity> artifacts =
             artifactBodies

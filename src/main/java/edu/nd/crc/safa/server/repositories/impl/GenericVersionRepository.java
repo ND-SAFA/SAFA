@@ -74,7 +74,7 @@ public abstract class GenericVersionRepository<
      *
      * @param project           The project associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
-     * @return
+     * @return Returns the base entity associated with given app entity.
      */
     abstract BaseEntity findOrCreateBaseEntityFromAppEntity(Project project,
                                                             AppEntity artifactAppEntity);

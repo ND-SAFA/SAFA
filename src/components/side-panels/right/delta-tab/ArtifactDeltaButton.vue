@@ -1,5 +1,5 @@
 <template>
-  <v-btn small fab :color="titleColor" @click="$emit('click', name)">
+  <v-btn outlined :color="titleColor" @click="$emit('click', name)">
     {{ name }}
   </v-btn>
 </template>

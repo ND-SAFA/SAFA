@@ -6,8 +6,9 @@
         label="Email"
         v-model="email"
         :error-messages="isError ? ['Invalid username or password'] : []"
+        @keydown.enter="handleLogin"
       />
-      <password-field v-model="password" />
+      <password-field v-model="password" @submit="handleLogin" />
     </template>
 
     <template v-slot:actions>
@@ -16,6 +17,7 @@
         width="8em"
         @click="handleLogin"
         :disabled="password.length === 0"
+        :loading="isLoading"
       >
         Login
       </v-btn>
@@ -59,11 +61,14 @@ export default Vue.extend({
     email: "",
     password: "",
     isError: false,
+    isLoading: false,
   }),
   methods: {
     handleLogin() {
       const goToPage =
         new URLSearchParams(window.location.search).get("to") || Routes.HOME;
+
+      this.isLoading = true;
 
       sessionModule
         .login({
@@ -71,7 +76,10 @@ export default Vue.extend({
           password: this.password,
         })
         .then(() => navigateTo(goToPage))
-        .catch(() => (this.isError = true));
+        .catch(() => {
+          this.isError = true;
+          this.isLoading = false;
+        });
     },
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);

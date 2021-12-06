@@ -20,6 +20,10 @@ export interface SessionModel {
    * The JWT token authorizing current user.
    */
   token: string;
+  /**
+   * The version ID to load when the app loads.
+   */
+  versionId?: string;
 }
 
 /**

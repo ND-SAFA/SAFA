@@ -15,11 +15,10 @@ import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -50,26 +49,26 @@ public class TraceFileParser {
     private final String TARGET_PARAM = "target";
     private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
 
-    TraceLinkService traceLinkService;
-    ArtifactRepository artifactRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ParserErrorRepository parserErrorRepository;
-    TraceLinkRepository traceLinkRepository;
-    TraceLinkGenerator traceLinkGenerator;
+    private final TraceLinkService traceLinkService;
+    private final ArtifactRepository artifactRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
+    private final ParserErrorRepository parserErrorRepository;
+    private final TraceLinkGenerator traceLinkGenerator;
+    private final EntityVersionService entityVersionService;
 
     @Autowired
     public TraceFileParser(TraceLinkService traceLinkService,
                            ArtifactRepository artifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
-                           TraceLinkRepository traceLinkRepository,
-                           TraceLinkGenerator traceLinkGenerator) {
+                           TraceLinkGenerator traceLinkGenerator,
+                           EntityVersionService entityVersionService) {
         this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
-        this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
+        this.entityVersionService = entityVersionService;
     }
 
     /**
@@ -89,13 +88,13 @@ public class TraceFileParser {
             && traceMatrixDefinition.getBoolean("generatelinks");
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-        List<TraceLink> manualLinks = readAndParseTraceFile(projectVersion, matrixArtifactTypes, fileName);
-        this.traceLinkRepository.saveAll(manualLinks);
-        List<TraceLink> generatedLinks = new ArrayList<>();
+        List<TraceAppEntity> manualLinks = readAndParseTraceFile(projectVersion, matrixArtifactTypes, fileName);
+        this.entityVersionService.setTracesAtVersion(projectVersion, manualLinks);
+        List<TraceAppEntity> generatedLinks = new ArrayList<>();
         if (isGenerated) {
             generatedLinks.addAll(traceLinkGenerator.generateTraceLinksToFile(projectVersion, matrixArtifactTypes));
         }
-        this.traceLinkRepository.saveAll(generatedLinks);
+        this.entityVersionService.setTracesAtVersion(projectVersion, generatedLinks);
     }
 
     /**
@@ -116,14 +115,14 @@ public class TraceFileParser {
         return Pair.with(sourceType, targetType);
     }
 
-    public List<TraceLink> readAndParseTraceFile(ProjectVersion projectVersion,
-                                                 Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
-                                                 String fileName) throws SafaError {
+    public List<TraceAppEntity> readAndParseTraceFile(ProjectVersion projectVersion,
+                                                      Pair<ArtifactType, ArtifactType> matrixArtifactTypes,
+                                                      String fileName) throws SafaError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser traceFileParser = FileUtilities.readCSVFile(pathToFile);
 
-        Pair<List<TraceLink>, List<Pair<String, Long>>> parseResponse =
+        Pair<List<TraceAppEntity>, List<Pair<String, Long>>> parseResponse =
             parseTraceFile((a) -> artifactRepository.findByProjectAndName(project, a),
                 (s, t) -> traceLinkService.queryForLinkBetween(s, t),
                 traceFileParser);
@@ -137,9 +136,9 @@ public class TraceFileParser {
         return parseResponse.getValue0();
     }
 
-    public Pair<List<TraceLink>, List<Pair<String, Long>>> parseTraceFile(ArtifactFinder artifactFinder,
-                                                                          TraceLinkFinder traceLinkFinder,
-                                                                          CSVParser traceFileParser)
+    public Pair<List<TraceAppEntity>, List<Pair<String, Long>>> parseTraceFile(ArtifactFinder artifactFinder,
+                                                                               TraceLinkFinder traceLinkFinder,
+                                                                               CSVParser traceFileParser)
         throws SafaError {
         FileUtilities.assertHasColumns(traceFileParser, REQUIRED_COLUMNS);
         List<CSVRecord> records;
@@ -150,12 +149,12 @@ public class TraceFileParser {
             return new Pair<>(new ArrayList<>(), List.of(new Pair<>(error, (long) -1)));
         }
 
-        List<TraceLink> traceLinks = new ArrayList<>();
+        List<TraceAppEntity> traceLinks = new ArrayList<>();
         List<Pair<String, Long>> errors = new ArrayList<>();
         for (CSVRecord record : records) {
             String sourceId = record.get(SOURCE_PARAM).trim();
             String targetId = record.get(TARGET_PARAM).trim();
-            Pair<TraceLink, String> traceResult = traceLinkService.parseTraceLink(artifactFinder,
+            Pair<TraceAppEntity, String> traceResult = traceLinkService.parseTraceLink(artifactFinder,
                 traceLinkFinder,
                 sourceId,
                 targetId);

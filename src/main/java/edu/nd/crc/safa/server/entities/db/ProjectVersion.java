@@ -18,7 +18,6 @@ import edu.nd.crc.safa.config.AppConstraints;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Identifies each project's version.
@@ -152,12 +151,6 @@ public class ProjectVersion implements Serializable {
     }
 
     public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("versionId", versionId);
-        json.put("majorVersion", majorVersion);
-        json.put("minorVersion", minorVersion);
-        json.put("revision", revision);
-        json.put("project", project);
-        return json.toString();
+        return String.format("%s.%s.%s", majorVersion, minorVersion, revision);
     }
 }

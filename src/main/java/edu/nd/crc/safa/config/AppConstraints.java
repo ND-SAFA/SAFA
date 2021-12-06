@@ -14,6 +14,7 @@ public class AppConstraints {
     public static final String SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET = "SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET";
     public static final String UNIQUE_ARTIFACT_BODY_PER_VERSION = "UNIQUE_ARTIFACT_BODY_PER_VERSION";
     public static final String UNIQUE_VERSION_ID_PER_PROJECT = "UNIQUE_VERSION_ID_PER_PROJECT";
+    public static final String SINGLE_TRACE_VERSION_PER_PROJECT_VERSION = "SINGLE_TRACE_VERSION_PER_PROJECT_VERSION";
 
     //Permissions
     public static final String SINGLE_ROLE_PER_PROJECT = "SINGLE_ROLE_PER_PROJECT";
@@ -28,6 +29,7 @@ public class AppConstraints {
         UNIQUE_ARTIFACT_BODY_PER_VERSION,
         UNIQUE_VERSION_ID_PER_PROJECT,
         SINGLE_ROLE_PER_PROJECT,
+        SINGLE_TRACE_VERSION_PER_PROJECT_VERSION,
         NULL_VALUE
     };
 
@@ -57,6 +59,8 @@ public class AppConstraints {
                 return "version already exists in project.";
             case SINGLE_ROLE_PER_PROJECT:
                 return "A user with given email already exists in the project.";
+            case SINGLE_TRACE_VERSION_PER_PROJECT_VERSION:
+                return "This trace link already contains an entry for this project version";
             case NULL_VALUE:
                 return createNullError(cause);
             default:

@@ -11,7 +11,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -121,7 +121,7 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         assertThat(artifactBodies.size())
             .as("artifact bodies created")
             .isEqualTo(N_ARTIFACTS);
-        List<TraceLink> traceLinks = traceLinkRepository.getApprovedLinks(project);
+        List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         assertThat(traceLinks.size()).isEqualTo(N_TRACES);
     }
 }

@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
-    SafaUserRepository safaUserRepository;
-    PasswordEncoder passwordEncoder;
+    private final SafaUserRepository safaUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public SafaUserController(ProjectRepository projectRepository,

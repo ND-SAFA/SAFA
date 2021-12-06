@@ -18,12 +18,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ResourceBuilder {
+    private final ProjectRepository projectRepository;
+    private final ProjectVersionRepository projectVersionRepository;
+    private final PermissionService permissionService;
+
     Project project;
     ProjectVersion projectVersion;
-
-    ProjectRepository projectRepository;
-    ProjectVersionRepository projectVersionRepository;
-    PermissionService permissionService;
 
     @Autowired
     public ResourceBuilder(ProjectRepository projectRepository,

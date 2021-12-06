@@ -10,11 +10,10 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +27,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectRetrievalService {
 
-    TraceLinkRepository traceLinkRepository;
-    ArtifactVersionRepository artifactVersionRepository;
-    ParserErrorService parserErrorService;
-    WarningService warningService;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final ParserErrorService parserErrorService;
+    private final WarningService warningService;
 
     @Autowired
-    public ProjectRetrievalService(TraceLinkRepository traceLinkRepository,
+    public ProjectRetrievalService(TraceLinkVersionRepository traceLinkVersionRepository,
                                    ParserErrorService parserErrorService,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    WarningService warningService) {
-        this.traceLinkRepository = traceLinkRepository;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.parserErrorService = parserErrorService;
         this.artifactVersionRepository = artifactVersionRepository;
         this.warningService = warningService;
@@ -64,7 +63,6 @@ public class ProjectRetrievalService {
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
     public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
-        Project project = projectVersion.getProject();
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
             .getEntityVersionsInProjectVersion(projectVersion);
 
@@ -73,8 +71,9 @@ public class ProjectRetrievalService {
                 .stream()
                 .map(ArtifactAppEntity::new)
                 .collect(Collectors.toList());
-        List<TraceLink> traceLinks = this.traceLinkRepository
-            .getUnDeclinedLinks(project);
+
+        List<TraceLinkVersion> traceLinks =
+            this.traceLinkVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
         List<TraceAppEntity> traces =
             traceLinks
                 .stream()

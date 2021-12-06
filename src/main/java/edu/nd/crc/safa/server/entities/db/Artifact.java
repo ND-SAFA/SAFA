@@ -81,6 +81,10 @@ public class Artifact implements Serializable, IBaseEntity {
         this.type = artifactType;
     }
 
+    public String getBaseEntityId() {
+        return this.name;
+    }
+
     public String getName() {
         return this.name;
     }

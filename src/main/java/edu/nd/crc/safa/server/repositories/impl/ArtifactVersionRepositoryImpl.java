@@ -132,7 +132,7 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public List<Artifact> getProjectBaseEntities(Project project) {
+    public List<Artifact> getBaseEntitiesInProject(Project project) {
         return this.artifactRepository.findByProject(project);
     }
 
@@ -152,10 +152,10 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public DeltaArtifact createDeltaArtifactFrom(ModificationType modificationType,
-                                                 String baseEntityName,
-                                                 ArtifactVersion baseVersionEntity,
-                                                 ArtifactVersion targetVersionEntity) {
+    public DeltaArtifact createDeltaEntity(ModificationType modificationType,
+                                           String baseEntityName,
+                                           ArtifactVersion baseVersionEntity,
+                                           ArtifactVersion targetVersionEntity) {
         switch (modificationType) {
             case MODIFIED:
                 return new ModifiedArtifact(baseEntityName,

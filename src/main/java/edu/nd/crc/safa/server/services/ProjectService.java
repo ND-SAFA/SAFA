@@ -35,18 +35,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Service
 public class ProjectService {
 
-    ProjectRepository projectRepository;
-    ProjectVersionRepository projectVersionRepository;
-    ProjectMembershipRepository projectMembershipRepository;
-    SafaUserRepository safaUserRepository;
+    private final ProjectRepository projectRepository;
+    private final ProjectVersionRepository projectVersionRepository;
+    private final ProjectMembershipRepository projectMembershipRepository;
+    private final SafaUserRepository safaUserRepository;
 
-    SafaUserService safaUserService;
-    TraceLinkService traceLinkService;
-    ProjectRetrievalService projectRetrievalService;
-    ParserErrorService parserErrorService;
-    ArtifactVersionService artifactVersionService;
-    WarningService warningService;
-    PermissionService permissionService;
+    private final SafaUserService safaUserService;
+    private final ProjectRetrievalService projectRetrievalService;
+    private final EntityVersionService entityVersionService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
@@ -54,23 +50,15 @@ public class ProjectService {
                           ProjectMembershipRepository projectMembershipRepository,
                           SafaUserRepository safaUserRepository,
                           SafaUserService safaUserService,
-                          ParserErrorService parserErrorService,
-                          ArtifactVersionService artifactVersionService,
-                          TraceLinkService traceLinkService,
-                          WarningService warningService,
-                          ProjectRetrievalService projectRetrievalService,
-                          PermissionService permissionService) {
+                          EntityVersionService entityVersionService,
+                          ProjectRetrievalService projectRetrievalService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
-        this.parserErrorService = parserErrorService;
-        this.artifactVersionService = artifactVersionService;
-        this.traceLinkService = traceLinkService;
-        this.warningService = warningService;
+        this.entityVersionService = entityVersionService;
         this.projectRetrievalService = projectRetrievalService;
-        this.permissionService = permissionService;
     }
 
     /**
@@ -88,8 +76,8 @@ public class ProjectService {
                                                         @NotNull List<ArtifactAppEntity> artifacts,
                                                         @NotNull List<TraceAppEntity> traces) throws SafaError {
 
-        artifactVersionService.setArtifactsAtVersion(projectVersion, artifacts);
-        traceLinkService.createTraceLinks(projectVersion, traces);
+        entityVersionService.setArtifactsAtVersion(projectVersion, artifacts);
+        entityVersionService.setTracesAtVersion(projectVersion, traces);
         return projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
     }
 
@@ -244,11 +232,9 @@ public class ProjectService {
      *
      * @param projectMembershipId ID of the membership linking user and project.
      */
-    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
+    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) {
         Optional<ProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findById(projectMembershipId);
-        if (projectMembershipQuery.isPresent()) {
-            this.projectMembershipRepository.delete(projectMembershipQuery.get());
-        }
+        projectMembershipQuery.ifPresent(this.projectMembershipRepository::delete);
     }
 }

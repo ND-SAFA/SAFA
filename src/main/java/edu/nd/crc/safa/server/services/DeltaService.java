@@ -15,7 +15,6 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,15 +25,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeltaService {
 
-    ProjectVersionRepository projectVersionRepository;
-    ArtifactRepository artifactRepository;
-    ArtifactVersionRepository artifactVersionRepository;
+    private final ArtifactRepository artifactRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
-    public DeltaService(ProjectVersionRepository projectVersionRepository,
-                        ArtifactRepository artifactRepository,
+    public DeltaService(ArtifactRepository artifactRepository,
                         ArtifactVersionRepository artifactVersionRepository) {
-        this.projectVersionRepository = projectVersionRepository;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
     }
@@ -75,7 +71,7 @@ public class DeltaService {
                 added.put(deltaArtifactId, (AddedArtifact) deltaArtifact);
                 String typeName = artifact.getType().getName();
                 String artifactId = artifact.getArtifactId().toString();
-                String artifactName = artifact.getName();
+                String artifactName = artifact.getBaseEntityId();
                 String summary = ((AddedArtifact) deltaArtifact).getAfterSummary();
                 String body = ((AddedArtifact) deltaArtifact).getAfter();
                 ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(

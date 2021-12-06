@@ -22,14 +22,14 @@ import unit.ApplicationBaseTest;
  */
 public class TestTraceFileParser extends ApplicationBaseTest {
 
-    @Autowired
-    TraceFileParser traceFileParser;
-
-    String jsonString = "{\n"
+    private final String jsonString = "{\n"
         + "    \"source\": \"Requirement\",\n"
         + "    \"target\": \"Design\",\n"
         + "    \"file\": \"Requirement2Design.csv\"\n"
         + "  }";
+    
+    @Autowired
+    TraceFileParser traceFileParser;
 
     @Test
     public void testSourceTypeNotFound() throws IOException, SafaError {

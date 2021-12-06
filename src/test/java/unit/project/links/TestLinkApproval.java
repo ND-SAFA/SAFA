@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
@@ -18,6 +17,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,7 +43,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
             .newType(projectName, "B")
             .newArtifact(projectName, "A", sourceName)
             .newArtifact(projectName, "B", targetName)
-            .newGeneratedTraceLink(projectName, sourceName, targetName, score);
+            .newGeneratedTraceLink(projectName, sourceName, targetName, score, 0);
 
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
         JSONObject response = sendGet(url, status().isOk());
@@ -67,14 +67,14 @@ public class TestLinkApproval extends ApplicationBaseTest {
             .newType(projectName, "B")
             .newArtifact(projectName, "A", sourceName)
             .newArtifact(projectName, "B", targetName)
-            .newGeneratedTraceLink(projectName, sourceName, targetName, score);
+            .newGeneratedTraceLink(projectName, sourceName, targetName, score, 0);
 
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
-        TraceLink generatedLink = dbEntityBuilder.getTraceLinks(projectName).get(0);
+        TraceLinkVersion generatedLink = dbEntityBuilder.getTraceLinks(projectName).get(0);
 
         // VP - Verify that trace link is unreviewed
-        UUID generatedLinkId = generatedLink.getTraceLinkId();
-        Optional<TraceLink> unreviewedLinkQuery = traceLinkRepository.findById(generatedLinkId);
+        Optional<TraceLinkVersion> unreviewedLinkQuery = traceLinkVersionRepository
+            .findByProjectVersionAndTraceLink(projectVersion, generatedLink.getTraceLink());
         assertThat(unreviewedLinkQuery.isPresent()).isTrue();
         assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.UNREVIEWED);
 
@@ -87,7 +87,10 @@ public class TestLinkApproval extends ApplicationBaseTest {
             .withModifiedTrace(generatedLink));
 
         // VP - Verify that trace link is approved
-        Optional<TraceLink> approvedLinkQuery = traceLinkRepository.findById(generatedLinkId);
+        Optional<TraceLinkVersion> approvedLinkQuery =
+            traceLinkVersionRepository.findByProjectVersionAndTraceLink(
+                projectVersion,
+                generatedLink.getTraceLink());
         assertThat(approvedLinkQuery.isPresent()).isTrue();
         assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
 
@@ -100,8 +103,9 @@ public class TestLinkApproval extends ApplicationBaseTest {
             .withModifiedTrace(generatedLink));
 
         // VP - Verify that link is saved.
-        Optional<TraceLink> declinedLinkQuery = traceLinkRepository.findById(generatedLinkId);
-
+        Optional<TraceLinkVersion> declinedLinkQuery = traceLinkVersionRepository.findByProjectVersionAndTraceLink(
+            projectVersion,
+            generatedLink.getTraceLink());
         assertThat(declinedLinkQuery.isPresent()).isTrue();
         assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.DECLINED);
     }
@@ -109,7 +113,7 @@ public class TestLinkApproval extends ApplicationBaseTest {
     /**
      * Tests that client is able to generate trace links
      *
-     * @throws Exception
+     * @throws Exception If http requests fail
      */
     @Test
     public void testGenerateTraceLinks() throws Exception {
@@ -210,10 +214,10 @@ public class TestLinkApproval extends ApplicationBaseTest {
     }
 
     private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
-        Project project = projectVersion.getProject();
+
         return RouteBuilder
-            .withRoute(AppRoutes.Projects.getGeneratedLinks)
-            .withProject(project)
+            .withRoute(AppRoutes.Projects.getGeneratedLinksInProjectVersion)
+            .withVersion(projectVersion)
             .get();
     }
 }

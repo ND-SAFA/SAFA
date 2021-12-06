@@ -20,7 +20,8 @@ public class AppRoutes {
         // Project Controller
         public static final String projects = projectPrefix;
         // Trace Link Controller
-        public static final String getGeneratedLinks = projectPrefix + "/{projectId}/links/generated";
+        public static final String getGeneratedLinksInProjectVersion = projectPrefix
+            + "/versions/{versionId}/links/generated";
         public static final String generateLinks = projectPrefix + "/links/generate";
         // Version Controller
         public static final String getVersions = projectPrefix + "/{projectId}/versions";

@@ -22,7 +22,7 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
     DeltaService deltaService;
 
     @Test
-    public void testAllChangeTypes() throws SafaError {
+    public void testAllChangeTypes() {
         String projectName = "test-project";
         String artifactType = "requirement";
         String artifactName = "RE-8";

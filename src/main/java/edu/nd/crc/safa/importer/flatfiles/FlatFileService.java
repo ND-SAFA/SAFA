@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class FlatFileService {
 
-    ArtifactFileParser artifactFileParser;
-    TraceFileParser traceFileParser;
+    private final ArtifactFileParser artifactFileParser;
+    private final TraceFileParser traceFileParser;
 
     @Autowired
     public FlatFileService(ArtifactFileParser artifactFileParser,

@@ -16,8 +16,7 @@ import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import org.json.JSONObject;
@@ -30,7 +29,7 @@ import unit.SampleProjectConstants;
 public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
     @Test
-    public void testMultipleFilesUploadRestController() throws Exception {
+    public void testUseCase() throws Exception {
 
         // Step 1 - Upload flat files
         String routeName = AppRoutes.Projects.projectFlatFiles;
@@ -155,8 +154,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
-        List<TraceLink> traceLinks = traceLinkRepository
-            .findBySourceArtifactProjectAndApprovalStatus(project, TraceApproval.APPROVED);
+        List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         projectService.deleteProject(project);
@@ -191,7 +189,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(updateBodies.size())
             .as("bodies created in later version")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
-        List<TraceLink> updateTraces = this.traceLinkRepository.getApprovedLinks(project);
+        List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
@@ -204,7 +202,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
             .isEqualTo(0);
 
         // VP - No new trace links were created
-        List<TraceLink> noChangeTraces = this.traceLinkRepository.getApprovedLinks(project);
+        List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
     }
 }

@@ -106,7 +106,7 @@ public class ProjectAppEntity {
     public List<ArtifactAppEntity> findNewArtifacts(List<Artifact> existingArtifacts) {
         List<String> existingArtifactNames = existingArtifacts
             .stream()
-            .map(Artifact::getName)
+            .map(Artifact::getBaseEntityId)
             .collect(Collectors.toList());
         List<ArtifactAppEntity> newArtifacts = new ArrayList<>();
         for (ArtifactAppEntity potentiallyNewArtifact : artifacts) {

@@ -70,9 +70,9 @@ public class TreeVerifier {
             case BIDIRECTIONAL_LINK:
                 return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
             case CHILD:
-                return satisfiesChildCountRule(ruleToApply, targetArtifact.getName(), traceLinks);
+                return satisfiesChildCountRule(ruleToApply, targetArtifact.getBaseEntityId(), traceLinks);
             case SIBLING:
-                return handleSiblingFunction(ruleToApply, targetArtifact.getName(), traceLinks);
+                return handleSiblingFunction(ruleToApply, targetArtifact.getBaseEntityId(), traceLinks);
             default:
                 return true;
         }
@@ -87,7 +87,7 @@ public class TreeVerifier {
             // Get all traceLinks where we are the source or target
             .filter(t -> {
                 String typeName = artifact.getType().getName();
-                String artifactName = artifact.getName();
+                String artifactName = artifact.getBaseEntityId();
                 String otherType;
                 if (typeName.equalsIgnoreCase(rule.sourceArtifactType)) {
                     otherType = rule.targetArtifactType;
@@ -112,7 +112,6 @@ public class TreeVerifier {
     public boolean satisfiesChildCountRule(final Function childCountRule,
                                            final String targetArtifact,
                                            final List<TraceLink> traceLinks) {
-
         long childCount = traceLinks
             .stream()
             // Get all traceLinks where we are the source

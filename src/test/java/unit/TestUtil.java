@@ -15,7 +15,6 @@ public class TestUtil {
         JSONException {
         MockHttpServletResponse response = apiResponse.getResponse();
         String content = response.getContentAsString();
-        JSONObject responseJson = content.equals("") ? new JSONObject() : new JSONObject(content);
-        return responseJson;
+        return content.equals("") ? new JSONObject() : new JSONObject(content);
     }
 }

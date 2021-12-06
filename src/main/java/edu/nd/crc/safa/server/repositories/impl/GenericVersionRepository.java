@@ -340,11 +340,12 @@ public abstract class GenericVersionRepository<
                     .calculateEntityVersionAtProjectVersion(projectVersion, appEntity);
                 updatedArtifactBodies.add(artifactVersion);
             } catch (DataIntegrityViolationException e) {
+                e.printStackTrace();
                 errorDescription =
-                    "Could not parse artifact " + appEntity.getName() + ": " + AppConstraints.getConstraintError(e);
+                    "Could not parse entity " + appEntity.getName() + ": " + AppConstraints.getConstraintError(e);
             } catch (Exception e) {
                 errorDescription =
-                    "Could not parse artifact " + appEntity.getName() + ": " + e.getMessage();
+                    "Could not parse entity " + appEntity.getName() + ": " + e.getMessage();
             }
 
             if (errorDescription != null) {

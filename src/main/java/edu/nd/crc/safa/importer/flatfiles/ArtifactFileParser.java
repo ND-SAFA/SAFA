@@ -20,13 +20,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.javatuples.Pair;
@@ -43,40 +40,33 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class ArtifactFileParser {
 
+    private final ArtifactFileRepository artifactFileRepository;
+    private final ArtifactRepository artifactRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
+    private final ParserErrorRepository parserErrorRepository;
+
     private final String NAME_PARAM = "id";
     private final String SUMMARY_PARAM = "summary";
     private final String CONTENT_PARAM = "content";
     private final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
-
-    ArtifactFileRepository artifactFileRepository;
-    ArtifactRepository artifactRepository;
-    ArtifactVersionRepository artifactVersionRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ProjectVersionRepository projectVersionRepository;
-    ParserErrorRepository parserErrorRepository;
-
     EntityVersionService entityVersionService;
 
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
                               ArtifactRepository artifactRepository,
-                              ArtifactVersionRepository artifactVersionRepository,
                               ArtifactTypeRepository artifactTypeRepository,
-                              ProjectVersionRepository projectVersionRepository,
                               EntityVersionService entityVersionService,
                               ParserErrorRepository parserErrorRepository) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
-        this.projectVersionRepository = projectVersionRepository;
         this.entityVersionService = entityVersionService;
         this.parserErrorRepository = parserErrorRepository;
     }
 
     public void parseArtifactFiles(ProjectVersion projectVersion,
                                    JSONObject dataFilesJson)
-        throws JSONException, SafaError, JsonProcessingException {
+        throws JSONException, SafaError {
         Project project = projectVersion.getProject();
 
         List<ArtifactAppEntity> projectArtifacts = new ArrayList<>();

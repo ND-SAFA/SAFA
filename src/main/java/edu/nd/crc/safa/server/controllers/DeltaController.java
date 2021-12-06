@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DeltaController extends BaseController {
 
-    DeltaService deltaService;
+    private final DeltaService deltaService;
 
     @Autowired
     public DeltaController(ProjectRepository projectRepository,

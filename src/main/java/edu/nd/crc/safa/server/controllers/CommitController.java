@@ -17,9 +17,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
-import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,12 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommitController extends BaseController {
 
-    TraceLinkService traceLinkService;
-
-    EntityVersionService entityVersionService;
-    ArtifactVersionRepository artifactVersionRepository;
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    RevisionNotificationService revisionNotificationService;
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public CommitController(ProjectRepository projectRepository,
@@ -48,15 +43,11 @@ public class CommitController extends BaseController {
                             ArtifactVersionRepository artifactVersionRepository,
                             TraceLinkVersionRepository traceLinkVersionRepository,
                             ResourceBuilder resourceBuilder,
-                            TraceLinkService traceLinkService,
-                            EntityVersionService entityVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.traceLinkService = traceLinkService;
-        this.entityVersionService = entityVersionService;
         this.revisionNotificationService = revisionNotificationService;
     }
 

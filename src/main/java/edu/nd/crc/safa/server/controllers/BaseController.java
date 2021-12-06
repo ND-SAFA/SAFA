@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public abstract class BaseController {
 
-    protected ProjectVersionRepository projectVersionRepository;
-    protected ProjectRepository projectRepository;
-    protected ResourceBuilder resourceBuilder;
+    protected final ProjectVersionRepository projectVersionRepository;
+    protected final ProjectRepository projectRepository;
+    protected final ResourceBuilder resourceBuilder;
 
     @Autowired
     public BaseController(ProjectRepository projectRepository,

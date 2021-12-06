@@ -122,7 +122,6 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
             .as("artifact bodies created")
             .isEqualTo(N_ARTIFACTS);
         List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
-        System.out.println("TRACE LINKS:" + traceLinkVersionRepository.getProjectLinks(projectVersion.getProject()));
         assertThat(traceLinks.size()).isEqualTo(N_TRACES);
     }
 }

@@ -6,7 +6,6 @@ import java.util.Optional;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @Service
 public class VersionService {
-    ProjectRepository projectRepository;
-    ProjectVersionRepository projectVersionRepository;
+    private final ProjectVersionRepository projectVersionRepository;
 
     @Autowired
-    public VersionService(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository) {
-        this.projectRepository = projectRepository;
+    public VersionService(ProjectVersionRepository projectVersionRepository) {
         this.projectVersionRepository = projectVersionRepository;
     }
 

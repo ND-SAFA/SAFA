@@ -9,8 +9,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,18 +19,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PermissionService {
 
-    ProjectRepository projectRepository;
-    SafaUserRepository safaUserRepository;
-    ProjectMembershipRepository projectMembershipRepository;
-    SafaUserService safaUserService;
+    private final ProjectMembershipRepository projectMembershipRepository;
+    private final SafaUserService safaUserService;
 
     @Autowired
-    public PermissionService(ProjectRepository projectRepository,
-                             SafaUserRepository safaUserRepository,
-                             ProjectMembershipRepository projectMembershipRepository,
+    public PermissionService(ProjectMembershipRepository projectMembershipRepository,
                              SafaUserService safaUserService) {
-        this.projectRepository = projectRepository;
-        this.safaUserRepository = safaUserRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserService = safaUserService;
     }

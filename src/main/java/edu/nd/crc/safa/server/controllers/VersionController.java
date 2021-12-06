@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.importer.Puller;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
@@ -14,7 +13,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
-import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,23 +30,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VersionController extends BaseController {
 
-    Puller mPuller;
-    VersionService versionService;
-    ProjectService projectService;
-    ProjectRetrievalService projectRetrievalService;
+    private final VersionService versionService;
+    private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
     public VersionController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
-                             Puller mPuller,
                              VersionService versionService,
-                             ProjectService projectService,
                              ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
-        this.mPuller = mPuller;
         this.versionService = versionService;
-        this.projectService = projectService;
         this.projectRetrievalService = projectRetrievalService;
     }
 

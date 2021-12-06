@@ -18,10 +18,6 @@ import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
@@ -41,6 +37,10 @@ public class Puller {
     private final Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private final Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
     private final Set<String> foundNodes = new HashSet<String>();
+    private final JIRA mJira;
+    private final EntityVersionService entityVersionService;
+    private final TraceLinkService traceLinkService;
+
     @Value("${git.username:}")
     String gitUsername;
     @Value("${git.password:}")
@@ -51,29 +51,12 @@ public class Puller {
     String gitBranch;
     @Value("${tim.requiredTraceScore:}")
     Double traceRequiredScore;
-    JIRA mJira;
-
-    ProjectRepository projectRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ArtifactRepository artifactRepository;
-    ArtifactVersionRepository artifactVersionRepository;
-
-    EntityVersionService entityVersionService;
-    TraceLinkService traceLinkService;
 
     @Autowired
     public Puller(JIRA jira,
-                  ProjectRepository projectRepository,
-                  ArtifactTypeRepository artifactTypeRepository,
-                  ArtifactRepository artifactRepository,
-                  ArtifactVersionRepository artifactVersionRepository,
                   EntityVersionService entityVersionService,
                   TraceLinkService traceLinkService) {
         this.mJira = jira;
-        this.projectRepository = projectRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.artifactRepository = artifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
         this.entityVersionService = entityVersionService;
         this.traceLinkService = traceLinkService;
     }
@@ -114,7 +97,7 @@ public class Puller {
                                 .equals(type)))
                         .forEach((link) -> traceLinkService.parseTraceLink(projectVersion,
                             issue.key,
-                            // TODO: Add link.Type
+                            // TODO: Where is this being saved? Use commit
                             link.InwardKey));
                 }
             }

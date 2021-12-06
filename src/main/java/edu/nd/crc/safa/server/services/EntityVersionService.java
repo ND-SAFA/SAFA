@@ -24,23 +24,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EntityVersionService {
 
-    ArtifactVersionRepository artifactVersionRepository;
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    ParserErrorRepository parserErrorRepository;
-
-    DeltaService deltaService;
-
-    String bar = "-------------------------------------";
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ParserErrorRepository parserErrorRepository;
 
     @Autowired
     public EntityVersionService(ArtifactVersionRepository artifactVersionRepository,
                                 TraceLinkVersionRepository traceLinkVersionRepository,
-                                ParserErrorRepository parserErrorRepository,
-                                DeltaService deltaService) {
+                                ParserErrorRepository parserErrorRepository) {
         this.artifactVersionRepository = artifactVersionRepository;
         this.parserErrorRepository = parserErrorRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.deltaService = deltaService;
     }
 
     /**
@@ -71,10 +65,8 @@ public class EntityVersionService {
      */
     public void setTracesAtVersion(ProjectVersion projectVersion,
                                    List<TraceAppEntity> traces) throws SafaError {
-        System.out.println("START TRACE VERSIONING:" + traces.size() + bar);
         List<ParserError> parserErrors = this.traceLinkVersionRepository
             .commitAppEntitiesToProjectVersion(projectVersion, traces);
-        System.out.println("PARSER ERRORS:" + parserErrors + bar);
 
         for (ParserError parserError : parserErrors) {
             parserError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);

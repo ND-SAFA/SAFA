@@ -99,16 +99,10 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public TraceLinkVersion(TraceAppEntity traceAppEntity) {
         this();
-        System.out.println("Creating version from:" + traceAppEntity);
         this.traceType = traceAppEntity.traceType == null ? TraceType.MANUAL : traceAppEntity.traceType;
         this.approvalStatus = traceAppEntity.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
             traceAppEntity.approvalStatus;
         this.score = traceAppEntity.score == 0 ? this.score : traceAppEntity.score;
-        //TODO:Remove when tests pas
-//        String traceLinkId = traceLink.getTraceLinkId();
-//        if (traceLinkId != null && !traceLinkId.equals("")) {
-//            this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
-//        }
     }
 
     public TraceLinkVersion(ProjectVersion projectVersion,

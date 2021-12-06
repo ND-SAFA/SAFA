@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ParserErrorService {
-    ParserErrorRepository parserErrorRepository;
+    private final ParserErrorRepository parserErrorRepository;
 
     @Autowired
     public ParserErrorService(ParserErrorRepository parserErrorRepository) {

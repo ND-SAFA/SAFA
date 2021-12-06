@@ -49,9 +49,10 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
 
     List<TraceLinkVersion> findByTraceLink(TraceLink traceLink);
 
-    Optional<TraceLinkVersion> findByTraceLinkSourceArtifactAndTraceLinkTargetArtifactAndApprovalStatus(Artifact sourceArtifact,
-                                                                                                        Artifact targetArtifact,
-                                                                                                        TraceApproval approvalStatus);
+    Optional<TraceLinkVersion> findByTraceLinkSourceArtifactAndTraceLinkTargetArtifactAndApprovalStatus(
+        Artifact sourceArtifact,
+        Artifact targetArtifact,
+        TraceApproval approvalStatus);
 
     List<TraceLinkVersion> findByProjectVersionProjectAndApprovalStatus(Project project,
                                                                         TraceApproval approvalStatus);

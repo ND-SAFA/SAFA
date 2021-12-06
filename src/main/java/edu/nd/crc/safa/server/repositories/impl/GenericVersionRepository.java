@@ -156,9 +156,7 @@ public abstract class GenericVersionRepository<
         Pair<List<VersionEntity>, List<ParserError>> response = this
             .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
 
-        System.out.println("START SAVE:-------------------------------------");
         for (VersionEntity body : response.getValue0()) {
-            System.out.println("SAVING VERSION:" + body);
             this.saveOrOverrideVersionEntity(projectVersion, body);
         }
         return response.getValue1();
@@ -397,11 +395,9 @@ public abstract class GenericVersionRepository<
         ProjectVersion projectVersion,
         AppEntity appEntity) throws SafaError {
 
-        System.out.println("FINDING BASE ENTITY!!!");
         BaseEntity baseEntity = this.findOrCreateBaseEntityFromAppEntity(
             projectVersion.getProject(),
             appEntity);
-        System.out.println("BASE ENTITY: " + baseEntity);
 
         return this.calculateEntityVersionAtProjectVersion(
             projectVersion,

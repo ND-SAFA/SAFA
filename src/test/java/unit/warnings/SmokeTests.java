@@ -134,7 +134,6 @@ public class SmokeTests extends ApplicationBaseTest {
 
         assertThat(violatedRules.size()).isEqualTo(1);
 
-        System.out.println("VIOLATED RULES:" + violatedRules.get(targetName));
         assertThat(violatedRules.get(targetName).size()).isEqualTo(2);
         String targetRule = violatedRules.get(targetName).get(0).toString();
         assertThat(targetRule).contains("design or process");

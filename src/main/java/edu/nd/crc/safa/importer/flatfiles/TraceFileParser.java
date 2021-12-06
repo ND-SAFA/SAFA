@@ -18,7 +18,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 import edu.nd.crc.safa.utilities.ArtifactFinder;
@@ -50,27 +49,24 @@ public class TraceFileParser {
     private final String TARGET_PARAM = "target";
     private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
 
-    TraceLinkService traceLinkService;
-    ArtifactRepository artifactRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ParserErrorRepository parserErrorRepository;
-    TraceLinkRepository traceLinkRepository;
-    TraceLinkGenerator traceLinkGenerator;
-    EntityVersionService entityVersionService;
+    private final TraceLinkService traceLinkService;
+    private final ArtifactRepository artifactRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
+    private final ParserErrorRepository parserErrorRepository;
+    private final TraceLinkGenerator traceLinkGenerator;
+    private final EntityVersionService entityVersionService;
 
     @Autowired
     public TraceFileParser(TraceLinkService traceLinkService,
                            ArtifactRepository artifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ParserErrorRepository parserErrorRepository,
-                           TraceLinkRepository traceLinkRepository,
                            TraceLinkGenerator traceLinkGenerator,
                            EntityVersionService entityVersionService) {
         this.traceLinkService = traceLinkService;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.parserErrorRepository = parserErrorRepository;
-        this.traceLinkRepository = traceLinkRepository;
         this.traceLinkGenerator = traceLinkGenerator;
         this.entityVersionService = entityVersionService;
     }
@@ -93,7 +89,6 @@ public class TraceFileParser {
 
         Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
         List<TraceAppEntity> manualLinks = readAndParseTraceFile(projectVersion, matrixArtifactTypes, fileName);
-        System.out.println("MANUAL LINKS FOUND IN FILE:" + manualLinks.size());
         this.entityVersionService.setTracesAtVersion(projectVersion, manualLinks);
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
         if (isGenerated) {

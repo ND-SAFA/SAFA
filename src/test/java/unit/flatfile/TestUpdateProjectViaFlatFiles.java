@@ -42,8 +42,6 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         JSONObject responseBody = responseContent.getJSONObject("body");
         assertThat(responseBody).as("response body is non-null").isNotNull();
 
-        System.out.println("RESPONSE:" + responseBody);
-
         // Step - Get JSON Response
         JSONObject projectJson = responseBody.getJSONObject("project");
 

@@ -15,7 +15,7 @@ import org.json.JSONObject;
  */
 public class CommitBuilder {
 
-    ProjectCommit projectCommit;
+    private final ProjectCommit projectCommit;
 
     public CommitBuilder(ProjectVersion projectVersion) {
         projectCommit = new ProjectCommit(projectVersion);
@@ -45,7 +45,7 @@ public class CommitBuilder {
         return this;
     }
 
-    public CommitBuilder withModifiedTrace(TraceLinkVersion traceLinkVersion) throws JsonProcessingException {
+    public CommitBuilder withModifiedTrace(TraceLinkVersion traceLinkVersion) {
         this.projectCommit.getTraces().getModified().add(new TraceAppEntity(traceLinkVersion));
         return this;
     }

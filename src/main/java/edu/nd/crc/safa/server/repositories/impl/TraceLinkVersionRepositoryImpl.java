@@ -67,7 +67,6 @@ public class TraceLinkVersionRepositoryImpl
     @Override
     public TraceLink findOrCreateBaseEntityFromAppEntity(Project project,
                                                          TraceAppEntity trace) throws SafaError {
-        System.out.println("HELLO WORLD");
         TraceLink traceLink = this.traceLinkRepository
             .getByProjectAndSourceAndTarget(
                 project,
@@ -80,9 +79,7 @@ public class TraceLinkVersionRepositoryImpl
             Artifact targetArtifact = assertAndFindArtifact(project, trace.target);
             traceLink.setSourceArtifact(sourceArtifact);
             traceLink.setTargetArtifact(targetArtifact);
-            System.out.println("SAVING NEW BASE LINK:" + traceLink);
             this.traceLinkRepository.save(traceLink);
-            System.out.println("SAVED!" + traceLink);
         }
         return traceLink;
     }

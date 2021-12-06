@@ -140,14 +140,6 @@ public class JIRA {
         return retVal;
     }
 
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        return;
-    }
-
     public class Issue {
         String source;
         String key;

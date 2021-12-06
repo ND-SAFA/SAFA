@@ -27,10 +27,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectRetrievalService {
 
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    ArtifactVersionRepository artifactVersionRepository;
-    ParserErrorService parserErrorService;
-    WarningService warningService;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final ParserErrorService parserErrorService;
+    private final WarningService warningService;
 
     @Autowired
     public ProjectRetrievalService(TraceLinkVersionRepository traceLinkVersionRepository,

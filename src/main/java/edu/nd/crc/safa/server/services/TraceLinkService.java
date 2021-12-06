@@ -31,12 +31,12 @@ public class TraceLinkService {
         this.artifactRepository = artifactRepository;
     }
 
-    public Pair<TraceAppEntity, String> parseTraceLink(ProjectVersion projectVersion,
-                                                       String sourceName,
-                                                       String targetName) {
+    public void parseTraceLink(ProjectVersion projectVersion,
+                               String sourceName,
+                               String targetName) {
         ArtifactFinder artifactFinder = (a) ->
             artifactRepository.findByProjectAndName(projectVersion.getProject(), a);
-        return parseTraceLink(artifactFinder, this::queryForLinkBetween, sourceName,
+        parseTraceLink(artifactFinder, this::queryForLinkBetween, sourceName,
             targetName);
     }
 

@@ -28,9 +28,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class WarningService {
 
-    WarningRepository warningRepository;
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    ArtifactVersionRepository artifactVersionRepository;
+    private final WarningRepository warningRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public WarningService(WarningRepository warningRepository,
@@ -51,7 +51,6 @@ public class WarningService {
         List<ArtifactVersion> artifacts = artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
         List<TraceLinkVersion> traceLinkVersions =
             this.traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
-        System.out.println("APPROVED LINKS:" + traceLinkVersions);
         List<TraceLink> traceLinks =
             traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);

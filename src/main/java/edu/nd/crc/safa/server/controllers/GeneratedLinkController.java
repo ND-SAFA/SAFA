@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GeneratedLinkController extends BaseController {
 
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    TraceLinkGenerator traceLinkGenerator;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final TraceLinkGenerator traceLinkGenerator;
 
     @Autowired
     public GeneratedLinkController(ProjectRepository projectRepository,

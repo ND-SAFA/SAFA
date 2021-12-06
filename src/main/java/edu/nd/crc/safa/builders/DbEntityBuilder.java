@@ -37,14 +37,14 @@ public class DbEntityBuilder extends BaseBuilder {
     final int majorVersion = 1;
     final int minorVersion = 1;
 
-    ProjectRepository projectRepository;
-    ProjectVersionRepository projectVersionRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ArtifactRepository artifactRepository;
-    ArtifactVersionRepository artifactVersionRepository;
-    TraceLinkRepository traceLinkRepository;
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    ProjectMembershipRepository projectMembershipRepository;
+    private final ProjectRepository projectRepository;
+    private final ProjectVersionRepository projectVersionRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
+    private final ArtifactRepository artifactRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final TraceLinkRepository traceLinkRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ProjectMembershipRepository projectMembershipRepository;
 
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;

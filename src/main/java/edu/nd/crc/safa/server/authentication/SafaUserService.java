@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SafaUserService implements UserDetailsService {
 
-    SafaUserRepository safaUserRepository;
+    private final SafaUserRepository safaUserRepository;
 
     @Autowired
     public SafaUserService(SafaUserRepository safaUserRepository

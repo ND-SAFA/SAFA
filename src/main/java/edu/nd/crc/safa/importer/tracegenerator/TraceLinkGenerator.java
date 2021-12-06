@@ -20,9 +20,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +32,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class TraceLinkGenerator {
 
-    private final TraceLinkService traceLinkService;
-    private final TraceLinkRepository traceLinkRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
-    TraceLinkVersionRepository traceLinkVersionRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
-    public TraceLinkGenerator(TraceLinkService traceLinkService,
-                              TraceLinkRepository traceLinkRepository,
-                              TraceLinkVersionRepository traceLinkVersionRepository,
+    public TraceLinkGenerator(TraceLinkVersionRepository traceLinkVersionRepository,
                               ArtifactVersionRepository artifactVersionRepository) {
-        this.traceLinkService = traceLinkService;
-        this.traceLinkRepository = traceLinkRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
     }
@@ -74,7 +66,7 @@ public class TraceLinkGenerator {
             artifactTypes.getValue1());
         TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
             new TraceAppEntity(s.getName(), t.getName(), score);
-        
+
         return generateLinksFromTokens(sTokens, tTokens, traceLinkConstructor);
     }
 

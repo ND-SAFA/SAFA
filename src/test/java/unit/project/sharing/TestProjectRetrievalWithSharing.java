@@ -15,9 +15,6 @@ import org.junit.jupiter.api.Test;
  */
 public class TestProjectRetrievalWithSharing extends BaseSharingTest {
 
-    private final String otherUserEmail = "doesNotExist@gmail.com";
-    private final String otherUserPassword = "somePassword";
-
     /**
      * Tests that a user is able to retrieve all the projects they own.
      *
@@ -52,6 +49,7 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
         // VP - Verify that shared project is visible
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
         JSONArray members = response.getJSONArray("body");
+        String otherUserEmail = "doesNotExist@gmail.com";
         assertThat(members.getJSONObject(1).getString("email")).isEqualTo(otherUserEmail);
     }
 }

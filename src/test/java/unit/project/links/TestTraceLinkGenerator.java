@@ -5,9 +5,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
 
         // VP - no error when generating between no artifacts
         Pair<ArtifactType, ArtifactType> artifactTypes = new Pair<>(sourceType, targetType);
-        List<TraceLink> newLinks = traceLinkGenerator.generateLinksBetweenTypes(projectVersion, artifactTypes);
+        List<TraceAppEntity> newLinks = traceLinkGenerator.generateLinksBetweenTypes(projectVersion, artifactTypes);
         assertThat(newLinks.size()).as("empty links works").isEqualTo(0);
 
         // VP - able to generate artifacts between similar artifacts
@@ -56,16 +56,16 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
         newLinks = traceLinkGenerator.generateLinksBetweenTypes(projectVersion, artifactTypes);
         assertThat(newLinks.size()).as("links found").isEqualTo(2);
 
-        TraceLink linkOne = getLinkWithSourceName(newLinks, sourceOneName);
-        assertThat(linkOne.getTargetName()).as("link source name").isEqualTo(targetOneName);
+        TraceAppEntity linkOne = getLinkWithSourceName(newLinks, sourceOneName);
+        assertThat(linkOne.target).as("link source name").isEqualTo(targetOneName);
 
-        TraceLink linkTwo = getLinkWithSourceName(newLinks, sourceTwoName);
-        assertThat(linkTwo.getTargetName()).as("link source name").isEqualTo(targetTwoName);
+        TraceAppEntity linkTwo = getLinkWithSourceName(newLinks, sourceTwoName);
+        assertThat(linkTwo.target).as("link source name").isEqualTo(targetTwoName);
     }
 
-    private TraceLink getLinkWithSourceName(List<TraceLink> links, String sourceName) {
-        for (TraceLink link : links) {
-            if (link.getSourceName().equals(sourceName)) {
+    private TraceAppEntity getLinkWithSourceName(List<TraceAppEntity> links, String sourceName) {
+        for (TraceAppEntity link : links) {
+            if (link.source.equals(sourceName)) {
                 return link;
             }
         }

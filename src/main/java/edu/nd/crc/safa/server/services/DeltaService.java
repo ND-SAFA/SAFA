@@ -75,7 +75,7 @@ public class DeltaService {
                 added.put(deltaArtifactId, (AddedArtifact) deltaArtifact);
                 String typeName = artifact.getType().getName();
                 String artifactId = artifact.getArtifactId().toString();
-                String artifactName = artifact.getName();
+                String artifactName = artifact.getBaseEntityId();
                 String summary = ((AddedArtifact) deltaArtifact).getAfterSummary();
                 String body = ((AddedArtifact) deltaArtifact).getAfter();
                 ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(

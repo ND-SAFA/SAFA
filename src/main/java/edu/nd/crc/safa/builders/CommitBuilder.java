@@ -4,7 +4,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,8 +45,8 @@ public class CommitBuilder {
         return this;
     }
 
-    public CommitBuilder withModifiedTrace(TraceLink traceLink) throws JsonProcessingException {
-        this.projectCommit.getTraces().getModified().add(new TraceAppEntity(traceLink));
+    public CommitBuilder withModifiedTrace(TraceLinkVersion traceLinkVersion) throws JsonProcessingException {
+        this.projectCommit.getTraces().getModified().add(new TraceAppEntity(traceLinkVersion));
         return this;
     }
 

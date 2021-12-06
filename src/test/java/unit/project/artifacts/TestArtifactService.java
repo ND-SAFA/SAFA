@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class TestArtifactService extends ApplicationBaseTest {
 
 
     @Autowired
-    ArtifactVersionService artifactVersionService;
+    EntityVersionService entityVersionService;
 
     @Test
     public void checkAbleToFindLastArtifactBody() {
@@ -52,7 +52,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         assertThat(artifactBodyQuery.isPresent()).isTrue();
         ArtifactVersion artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.ADDED);
-        assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
+        assertThat(artifactVersionFound.getArtifact().getBaseEntityId()).isEqualTo(artifactName);
 
         //Step 2 - Simulate new version added but artifact experienced no change
         dbEntityBuilder.newVersion(projectName);
@@ -73,7 +73,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         assertThat(artifactBodyQuery.isPresent()).isTrue();
         artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.REMOVED);
-        assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
+        assertThat(artifactVersionFound.getArtifact().getBaseEntityId()).isEqualTo(artifactName);
         assertThat(artifactVersionFound.getContent()).isEqualTo("");
         assertThat(artifactVersionFound.getSummary()).isEqualTo("");
     }
@@ -118,7 +118,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        artifactVersionService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
+        entityVersionService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -151,7 +151,7 @@ public class TestArtifactService extends ApplicationBaseTest {
             newContent);
 
         // VP - Verify that artifact body is detected to be modified
-        this.artifactVersionService.setArtifactsAtVersion(projectVersion,
+        this.entityVersionService.setArtifactsAtVersion(projectVersion,
             Arrays.asList(appEntity));
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,

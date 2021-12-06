@@ -22,7 +22,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import com.jsoniter.output.JsonStream;
@@ -58,7 +58,7 @@ public class Puller {
     ArtifactRepository artifactRepository;
     ArtifactVersionRepository artifactVersionRepository;
 
-    ArtifactVersionService artifactVersionService;
+    EntityVersionService entityVersionService;
     TraceLinkService traceLinkService;
 
     @Autowired
@@ -67,14 +67,14 @@ public class Puller {
                   ArtifactTypeRepository artifactTypeRepository,
                   ArtifactRepository artifactRepository,
                   ArtifactVersionRepository artifactVersionRepository,
-                  ArtifactVersionService artifactVersionService,
+                  EntityVersionService entityVersionService,
                   TraceLinkService traceLinkService) {
         this.mJira = jira;
         this.projectRepository = projectRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.artifactVersionService = artifactVersionService;
+        this.entityVersionService = entityVersionService;
         this.traceLinkService = traceLinkService;
     }
 
@@ -112,13 +112,13 @@ public class Puller {
                             .anyMatch((type) -> link
                                 .InwardType
                                 .equals(type)))
-                        .forEach((link) -> traceLinkService.createTrace(projectVersion,
+                        .forEach((link) -> traceLinkService.parseTraceLink(projectVersion,
                             issue.key,
                             // TODO: Add link.Type
                             link.InwardKey));
                 }
             }
-            artifactVersionService.setArtifactsAtVersion(projectVersion, artifactsToUpdate);
+            entityVersionService.setArtifactsAtVersion(projectVersion, artifactsToUpdate);
         } catch (Exception e) {
             e.printStackTrace();
         }

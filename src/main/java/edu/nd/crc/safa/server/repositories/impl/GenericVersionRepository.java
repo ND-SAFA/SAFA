@@ -16,7 +16,6 @@ import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
@@ -77,7 +76,7 @@ public abstract class GenericVersionRepository<
      * @return Returns the base entity associated with given app entity.
      */
     abstract BaseEntity findOrCreateBaseEntityFromAppEntity(Project project,
-                                                            AppEntity artifactAppEntity);
+                                                            AppEntity artifactAppEntity) throws SafaError;
 
     /**
      * Saves given artifact version to project version, deleting any previous entry
@@ -94,7 +93,7 @@ public abstract class GenericVersionRepository<
      * @param project The project whose entities are retrieved.
      * @return Returns list of base entities existing in project.
      */
-    abstract List<BaseEntity> getProjectBaseEntities(Project project);
+    abstract List<BaseEntity> getBaseEntitiesInProject(Project project);
 
     /**
      * Creates the VersionEntity representing a deletion in a project version.
@@ -116,10 +115,10 @@ public abstract class GenericVersionRepository<
      * @param targetVersionEntity The version entity representing the final state of the delta.
      * @return The populated delta artifacts with given modification.
      */
-    abstract DeltaEntity createDeltaArtifactFrom(ModificationType modificationType,
-                                                 String baseEntityName,
-                                                 VersionEntity baseVersionEntity,
-                                                 VersionEntity targetVersionEntity);
+    abstract DeltaEntity createDeltaEntity(ModificationType modificationType,
+                                           String baseEntityName,
+                                           VersionEntity baseVersionEntity,
+                                           VersionEntity targetVersionEntity);
 
     /**
      * @param baseEntity The base entity whose versions are returned.
@@ -157,7 +156,9 @@ public abstract class GenericVersionRepository<
         Pair<List<VersionEntity>, List<ParserError>> response = this
             .calculateApplicationEntitiesAtVersion(projectVersion, appEntities);
 
+        System.out.println("START SAVE:-------------------------------------");
         for (VersionEntity body : response.getValue0()) {
+            System.out.println("SAVING VERSION:" + body);
             this.saveOrOverrideVersionEntity(projectVersion, body);
         }
         return response.getValue1();
@@ -167,7 +168,7 @@ public abstract class GenericVersionRepository<
     public DeltaEntity calculateDeltaEntityBetweenProjectVersions(BaseEntity baseEntity,
                                                                   ProjectVersion baseVersion,
                                                                   ProjectVersion targetVersion) {
-        String artifactName = baseEntity.getName();
+        String artifactName = baseEntity.getBaseEntityId();
         List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(baseEntity);
 
         VersionEntity beforeBody = this.getEntityAtVersion(bodies,
@@ -182,11 +183,11 @@ public abstract class GenericVersionRepository<
             return null;
         }
 
-        return this.createDeltaArtifactFrom(modificationType, artifactName, beforeBody, afterBody);
+        return this.createDeltaEntity(modificationType, artifactName, beforeBody, afterBody);
     }
 
     @Override
-    public void deleteVersionEntityByName(
+    public void deleteVersionEntityByBaseName(
         ProjectVersion projectVersion,
         String baseEntityName) throws SafaError {
 
@@ -326,6 +327,53 @@ public abstract class GenericVersionRepository<
         return this.getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
     }
 
+    private Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
+        ProjectVersion projectVersion,
+        List<AppEntity> appEntities) {
+
+        Hashtable<String, AppEntity> artifactsUpdated = new Hashtable<>();
+        List<VersionEntity> updatedArtifactBodies = new ArrayList<>();
+        List<ParserError> parserErrors = new ArrayList<>();
+        for (AppEntity appEntity : appEntities) {
+            artifactsUpdated.put(appEntity.getName(), appEntity);
+            String errorDescription = null;
+            try {
+                VersionEntity artifactVersion = this
+                    .calculateEntityVersionAtProjectVersion(projectVersion, appEntity);
+                updatedArtifactBodies.add(artifactVersion);
+            } catch (DataIntegrityViolationException e) {
+                errorDescription =
+                    "Could not parse artifact " + appEntity.getName() + ": " + AppConstraints.getConstraintError(e);
+            } catch (Exception e) {
+                errorDescription =
+                    "Could not parse artifact " + appEntity.getName() + ": " + e.getMessage();
+            }
+
+            if (errorDescription != null) {
+                ParserError parserError = new ParserError(
+                    projectVersion,
+                    errorDescription);
+                parserErrors.add(parserError);
+            }
+        }
+        updatedArtifactBodies = updatedArtifactBodies
+            .stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        List<VersionEntity> removedArtifactBodies = this.getBaseEntitiesInProject(
+                projectVersion.getProject())
+            .stream()
+            .filter(a -> !artifactsUpdated.containsKey(a.getBaseEntityId()))
+            .map(a -> this.calculateEntityVersionAtProjectVersion(projectVersion, a, null))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
+        allArtifactBodies.addAll(removedArtifactBodies);
+        return new Pair<>(allArtifactBodies, parserErrors);
+    }
+
     private VersionEntity calculateEntityVersionAtProjectVersion(ProjectVersion projectVersion,
                                                                  BaseEntity artifact,
                                                                  AppEntity appEntity) {
@@ -347,52 +395,17 @@ public abstract class GenericVersionRepository<
 
     private VersionEntity calculateEntityVersionAtProjectVersion(
         ProjectVersion projectVersion,
-        AppEntity appEntity) {
+        AppEntity appEntity) throws SafaError {
+
+        System.out.println("FINDING BASE ENTITY!!!");
         BaseEntity baseEntity = this.findOrCreateBaseEntityFromAppEntity(
             projectVersion.getProject(),
             appEntity);
+        System.out.println("BASE ENTITY: " + baseEntity);
 
         return this.calculateEntityVersionAtProjectVersion(
             projectVersion,
             baseEntity,
             appEntity);
-    }
-
-    private Pair<List<VersionEntity>, List<ParserError>> calculateApplicationEntitiesAtVersion(
-        ProjectVersion projectVersion,
-        List<AppEntity> appEntities) {
-        Hashtable<String, AppEntity> artifactsUpdated = new Hashtable<>();
-        List<VersionEntity> updatedArtifactBodies = new ArrayList<>();
-        List<ParserError> parserErrors = new ArrayList<>();
-        for (AppEntity appEntity : appEntities) {
-            artifactsUpdated.put(appEntity.getName(), appEntity);
-            try {
-                VersionEntity artifactVersion = this
-                    .calculateEntityVersionAtProjectVersion(projectVersion, appEntity);
-                updatedArtifactBodies.add(artifactVersion);
-            } catch (DataIntegrityViolationException e) {
-                ParserError parserError = new ParserError(
-                    projectVersion,
-                    "Could not parse artifact " + appEntity.getName() + ": " + AppConstraints.getConstraintError(e),
-                    ProjectParsingActivities.PARSING_ARTIFACTS);
-                parserErrors.add(parserError);
-            }
-        }
-        updatedArtifactBodies = updatedArtifactBodies
-            .stream()
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        List<VersionEntity> removedArtifactBodies = this.getProjectBaseEntities(
-                projectVersion.getProject())
-            .stream()
-            .filter(a -> !artifactsUpdated.containsKey(a.getName()))
-            .map(a -> this.calculateEntityVersionAtProjectVersion(projectVersion, a, null))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedArtifactBodies);
-        allArtifactBodies.addAll(removedArtifactBodies);
-        return new Pair<>(allArtifactBodies, parserErrors);
     }
 }

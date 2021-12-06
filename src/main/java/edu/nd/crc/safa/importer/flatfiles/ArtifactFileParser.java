@@ -23,7 +23,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,7 +55,7 @@ public class ArtifactFileParser {
     ProjectVersionRepository projectVersionRepository;
     ParserErrorRepository parserErrorRepository;
 
-    ArtifactVersionService artifactVersionService;
+    EntityVersionService entityVersionService;
 
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
@@ -63,14 +63,14 @@ public class ArtifactFileParser {
                               ArtifactVersionRepository artifactVersionRepository,
                               ArtifactTypeRepository artifactTypeRepository,
                               ProjectVersionRepository projectVersionRepository,
-                              ArtifactVersionService artifactVersionService,
+                              EntityVersionService entityVersionService,
                               ParserErrorRepository parserErrorRepository) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectVersionRepository = projectVersionRepository;
-        this.artifactVersionService = artifactVersionService;
+        this.entityVersionService = entityVersionService;
         this.parserErrorRepository = parserErrorRepository;
     }
 
@@ -105,7 +105,7 @@ public class ArtifactFileParser {
             projectArtifacts.addAll(parseResponse.getValue0());
             this.parserErrorRepository.saveAll(parseResponse.getValue1());
         }
-        artifactVersionService.setArtifactsAtVersion(projectVersion, projectArtifacts);
+        entityVersionService.setArtifactsAtVersion(projectVersion, projectArtifacts);
     }
 
     private Pair<List<ArtifactAppEntity>, List<ParserError>> parseArtifactFile(ProjectVersion projectVersion,

@@ -33,7 +33,7 @@ public class TestArtifact extends ApplicationBaseTest {
 
         assertThat(queriedArtifact.isPresent()).isTrue();
         Artifact artifactFound = queriedArtifact.get();
-        assertThat(artifactFound.getName()).isEqualTo(artifactName);
+        assertThat(artifactFound.getBaseEntityId()).isEqualTo(artifactName);
         assertThat(artifactFound.getType().getTypeId()).isEqualTo(artifactType.getTypeId());
 
         // VP - Update artifact name and confirm update
@@ -42,7 +42,7 @@ public class TestArtifact extends ApplicationBaseTest {
         queriedArtifact = this.artifactRepository.findById(artifact.getArtifactId());
         assertThat(queriedArtifact.isPresent()).isTrue();
         artifactFound = queriedArtifact.get();
-        assertThat(artifactFound.getName()).isEqualTo(newArtifactName);
+        assertThat(artifactFound.getBaseEntityId()).isEqualTo(newArtifactName);
         assertThat(artifactFound.getType().getTypeId()).isEqualTo(artifactType.getTypeId());
 
         // VP - Update artifact name and confirm update

@@ -50,11 +50,16 @@ public class ParserError implements Serializable {
     }
 
     public ParserError(ProjectVersion projectVersion,
-                       String description,
-                       ProjectParsingActivities applicationActivity) {
+                       String description) {
         this();
         this.projectVersion = projectVersion;
         this.description = description;
+    }
+
+    public ParserError(ProjectVersion projectVersion,
+                       String description,
+                       ProjectParsingActivities applicationActivity) {
+        this(projectVersion, description);
         this.applicationActivity = applicationActivity;
     }
 

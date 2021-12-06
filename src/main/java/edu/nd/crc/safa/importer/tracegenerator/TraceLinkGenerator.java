@@ -17,9 +17,11 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceApproval;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import org.javatuples.Pair;
@@ -35,38 +37,45 @@ public class TraceLinkGenerator {
     private final TraceLinkService traceLinkService;
     private final TraceLinkRepository traceLinkRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
+    TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
     public TraceLinkGenerator(TraceLinkService traceLinkService,
                               TraceLinkRepository traceLinkRepository,
+                              TraceLinkVersionRepository traceLinkVersionRepository,
                               ArtifactVersionRepository artifactVersionRepository) {
         this.traceLinkService = traceLinkService;
         this.traceLinkRepository = traceLinkRepository;
         this.artifactVersionRepository = artifactVersionRepository;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
     }
 
-    public List<TraceLink> generateTraceLinksToFile(ProjectVersion projectVersion,
-                                                    Pair<ArtifactType, ArtifactType> artifactTypes) {
-        List<TraceLink> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
+    public List<TraceAppEntity> generateTraceLinksToFile(ProjectVersion projectVersion,
+                                                         Pair<ArtifactType, ArtifactType> artifactTypes) {
+        List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
         return generatedLinks
             .stream()
             .filter(t -> {
-                Optional<TraceLink> alreadyApprovedLink = traceLinkService.queryForLinkBetween(
-                    t.getSourceArtifact(),
-                    t.getTargetArtifact());
-                return !alreadyApprovedLink.isPresent();
+                Optional<TraceLinkVersion> alreadyApprovedLink =
+                    this.traceLinkVersionRepository.findByProjectVersionAndSourceAndTarget(projectVersion, t.source,
+                        t.target);
+                return alreadyApprovedLink
+                    .map(traceLinkVersion -> traceLinkVersion.getApprovalStatus() != TraceApproval.APPROVED)
+                    .orElse(true);
             })
             .collect(Collectors.toList());
     }
 
-    public List<TraceLink> generateLinksBetweenTypes(ProjectVersion projectVersion,
-                                                     Pair<ArtifactType, ArtifactType> artifactTypes) {
+    public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
+                                                          Pair<ArtifactType, ArtifactType> artifactTypes) {
         Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(projectVersion,
             artifactTypes.getValue0());
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(projectVersion,
             artifactTypes.getValue1());
-
-        return generateLinksFromTokens(sTokens, tTokens, TraceLink::new);
+        TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
+            new TraceAppEntity(s.getName(), t.getName(), score);
+        
+        return generateLinksFromTokens(sTokens, tTokens, traceLinkConstructor);
     }
 
     public List<TraceAppEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,

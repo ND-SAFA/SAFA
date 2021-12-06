@@ -5,11 +5,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.warnings.ArtifactRelationship;
 import edu.nd.crc.safa.warnings.Condition;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
@@ -118,7 +120,9 @@ public class SmokeTests extends ApplicationBaseTest {
             .newTraceLink(projectName, sourceName, targetName);
 
         List<ArtifactVersion> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
-        List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
+        List<TraceLinkVersion> traceLinkVersions = dbEntityBuilder.getTraceLinks(projectName);
+        List<TraceLink> traceLinks =
+            traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
         TreeVerifier verifier = new TreeVerifier();
         Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
             DefaultTreeRules.getDefaultRules());

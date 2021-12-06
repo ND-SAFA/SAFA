@@ -44,7 +44,7 @@ public class ProjectService {
     TraceLinkService traceLinkService;
     ProjectRetrievalService projectRetrievalService;
     ParserErrorService parserErrorService;
-    ArtifactVersionService artifactVersionService;
+    EntityVersionService entityVersionService;
     WarningService warningService;
     PermissionService permissionService;
 
@@ -55,7 +55,7 @@ public class ProjectService {
                           SafaUserRepository safaUserRepository,
                           SafaUserService safaUserService,
                           ParserErrorService parserErrorService,
-                          ArtifactVersionService artifactVersionService,
+                          EntityVersionService entityVersionService,
                           TraceLinkService traceLinkService,
                           WarningService warningService,
                           ProjectRetrievalService projectRetrievalService,
@@ -66,7 +66,7 @@ public class ProjectService {
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
         this.parserErrorService = parserErrorService;
-        this.artifactVersionService = artifactVersionService;
+        this.entityVersionService = entityVersionService;
         this.traceLinkService = traceLinkService;
         this.warningService = warningService;
         this.projectRetrievalService = projectRetrievalService;
@@ -88,8 +88,8 @@ public class ProjectService {
                                                         @NotNull List<ArtifactAppEntity> artifacts,
                                                         @NotNull List<TraceAppEntity> traces) throws SafaError {
 
-        artifactVersionService.setArtifactsAtVersion(projectVersion, artifacts);
-        traceLinkService.createTraceLinks(projectVersion, traces);
+        entityVersionService.setArtifactsAtVersion(projectVersion, artifacts);
+        entityVersionService.setTracesAtVersion(projectVersion, traces);
         return projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
     }
 

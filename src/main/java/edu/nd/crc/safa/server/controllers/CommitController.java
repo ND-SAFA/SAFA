@@ -16,7 +16,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.RevisionNotificationService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
@@ -36,23 +37,26 @@ public class CommitController extends BaseController {
 
     TraceLinkService traceLinkService;
 
-    ArtifactVersionService artifactVersionService;
+    EntityVersionService entityVersionService;
     ArtifactVersionRepository artifactVersionRepository;
+    TraceLinkVersionRepository traceLinkVersionRepository;
     RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
                             ArtifactVersionRepository artifactVersionRepository,
+                            TraceLinkVersionRepository traceLinkVersionRepository,
                             ResourceBuilder resourceBuilder,
                             TraceLinkService traceLinkService,
-                            ArtifactVersionService artifactVersionService,
+                            EntityVersionService entityVersionService,
                             RevisionNotificationService revisionNotificationService
     ) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkService = traceLinkService;
-        this.artifactVersionService = artifactVersionService;
+        this.entityVersionService = entityVersionService;
         this.revisionNotificationService = revisionNotificationService;
     }
 
@@ -82,20 +86,23 @@ public class CommitController extends BaseController {
             this.artifactVersionRepository.commitAppEntityToProjectVersion(projectVersion, artifact);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
-            this.artifactVersionRepository.deleteVersionEntityByName(projectVersion, artifact.name);
+            this.artifactVersionRepository.deleteVersionEntityByBaseName(projectVersion, artifact.name);
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
     }
 
-    private void commitTraces(ProjectVersion projectVersion, ProjectChange<TraceAppEntity> traces) throws SafaError {
-        for (TraceAppEntity trace : traces.getAdded()) {
-            traceLinkService.createNewTraceLInk(projectVersion, trace.source, trace.target);
+    private void commitTraces(ProjectVersion projectVersion,
+                              ProjectChange<TraceAppEntity> artifacts) throws SafaError {
+        List<TraceAppEntity> changedArtifacts = Stream.concat(
+                artifacts.getAdded().stream(),
+                artifacts.getModified().stream())
+            .collect(Collectors.toList());
+        for (TraceAppEntity artifact : changedArtifacts) {
+            this.traceLinkVersionRepository.commitAppEntityToProjectVersion(projectVersion, artifact);
         }
-        for (TraceAppEntity trace : traces.getModified()) {
-            traceLinkService.updateTraceLink(trace);
+        for (TraceAppEntity trace : artifacts.getRemoved()) {
+            this.traceLinkVersionRepository.deleteVersionEntityByBaseName(projectVersion, trace.traceLinkId);
         }
-        for (TraceAppEntity trace : traces.getRemoved()) {
-            traceLinkService.deleteTraceLink(trace);
-        }
+        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
     }
 }

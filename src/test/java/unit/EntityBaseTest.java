@@ -18,6 +18,7 @@ import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
@@ -55,6 +56,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected TraceLinkRepository traceLinkRepository;
+
+    @Autowired
+    protected TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
     protected FileUploadService fileUploadService;

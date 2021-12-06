@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
@@ -21,6 +22,7 @@ import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,6 +42,7 @@ public class DbEntityBuilder extends BaseBuilder {
     ArtifactRepository artifactRepository;
     ArtifactVersionRepository artifactVersionRepository;
     TraceLinkRepository traceLinkRepository;
+    TraceLinkVersionRepository traceLinkVersionRepository;
     ProjectMembershipRepository projectMembershipRepository;
 
     Hashtable<String, Project> projects;
@@ -59,6 +62,7 @@ public class DbEntityBuilder extends BaseBuilder {
                            ArtifactRepository artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
+                           TraceLinkVersionRepository traceLinkVersionRepository,
                            ProjectMembershipRepository projectMembershipRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
@@ -66,6 +70,7 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkRepository = traceLinkRepository;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
     }
 
@@ -222,11 +227,20 @@ public class DbEntityBuilder extends BaseBuilder {
     public DbEntityBuilder newGeneratedTraceLink(String projectName,
                                                  String sourceName,
                                                  String targetName,
-                                                 double score) {
+                                                 double score,
+                                                 int projectVersionIndex) {
         Artifact source = this.getArtifact(projectName, sourceName);
         Artifact target = this.getArtifact(projectName, targetName);
-        TraceLink traceLink = new TraceLink(source, target, 0.5);
+        TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
+        ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
+        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+            projectVersion,
+            ModificationType.ADDED,
+            traceLink,
+            score
+        );
+        this.traceLinkVersionRepository.save(traceLinkVersion);
         return this;
     }
 
@@ -303,9 +317,9 @@ public class DbEntityBuilder extends BaseBuilder {
         return this.artifactTypes.get(projectName).get(typeName);
     }
 
-    public List<TraceLink> getTraceLinks(String projectName) {
+    public List<TraceLinkVersion> getTraceLinks(String projectName) {
         Project project = getProject(projectName);
-        return this.traceLinkRepository.getLinks(project);
+        return this.traceLinkVersionRepository.getProjectLinks(project);
     }
 
     private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {

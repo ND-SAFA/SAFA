@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import org.json.JSONObject;
@@ -15,7 +15,7 @@ import org.json.JSONObject;
 /**
  * Represents the front-end model of a trace link.
  */
-public class TraceAppEntity {
+public class TraceAppEntity implements IAppEntity {
     @NotNull
     public String traceLinkId;
 
@@ -35,6 +35,15 @@ public class TraceAppEntity {
         this.traceLinkId = "";
     }
 
+    public TraceAppEntity(String source, String target) {
+        this();
+        this.source = source;
+        this.target = target;
+        this.approvalStatus = TraceApproval.APPROVED;
+        this.score = 1;
+        this.traceType = TraceType.MANUAL;
+    }
+
     public TraceAppEntity(String source, String target, double score) {
         this();
         this.source = source;
@@ -44,17 +53,17 @@ public class TraceAppEntity {
         this.traceType = TraceType.GENERATED;
     }
 
-    public TraceAppEntity(TraceLink trace) {
-        UUID traceLinkId = trace.getTraceLinkId();
+    public TraceAppEntity(TraceLinkVersion trace) {
+        UUID traceLinkId = trace.getTraceLink().getTraceLinkId();
         this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
-        this.source = trace.getSourceName();
-        this.target = trace.getTargetName();
+        this.source = trace.getTraceLink().getSourceName();
+        this.target = trace.getTraceLink().getTargetName();
         this.approvalStatus = trace.getApprovalStatus();
         this.score = trace.getScore();
         this.traceType = trace.getTraceType();
     }
 
-    public static List<TraceAppEntity> createEntities(List<TraceLink> links) {
+    public static List<TraceAppEntity> createEntities(List<TraceLinkVersion> links) {
         return links.stream().map(TraceAppEntity::new).collect(Collectors.toList());
     }
 
@@ -104,5 +113,10 @@ public class TraceAppEntity {
         json.put("target:", target);
         json.put("traceType:", traceType);
         return json.toString();
+    }
+
+    @Override
+    public String getName() {
+        return source + "-" + target;
     }
 }

@@ -3,14 +3,16 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.Warning;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
 import edu.nd.crc.safa.warnings.Rule;
@@ -27,15 +29,15 @@ import org.springframework.stereotype.Service;
 public class WarningService {
 
     WarningRepository warningRepository;
-    TraceLinkRepository traceLinkRepository;
+    TraceLinkVersionRepository traceLinkVersionRepository;
     ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public WarningService(WarningRepository warningRepository,
-                          TraceLinkRepository traceLinkRepository,
+                          TraceLinkVersionRepository traceLinkVersionRepository,
                           ArtifactVersionRepository artifactVersionRepository) {
         this.warningRepository = warningRepository;
-        this.traceLinkRepository = traceLinkRepository;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
     }
 
@@ -46,9 +48,10 @@ public class WarningService {
      * @return A mapping of  artifact name's to their resulting violations
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
-        Project project = projectVersion.getProject();
         List<ArtifactVersion> artifacts = artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
-        List<TraceLink> traceLinks = this.traceLinkRepository.getApprovedLinks(project);
+        List<TraceLinkVersion> traceLinkVersions = this.traceLinkVersionRepository.getApprovedLinks(projectVersion);
+        List<TraceLink> traceLinks =
+            traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
         return findViolationsInArtifactTree(projectVersion, artifacts, traceLinks);
     }
 
@@ -60,10 +63,15 @@ public class WarningService {
         List<Rule> rulesToApply = new ArrayList<>();
         rulesToApply.addAll(DefaultTreeRules.getDefaultRules());
         rulesToApply.addAll(this.getProjectRules(project));
-
         return verifier.findRuleViolations(artifacts, traceLinks, rulesToApply);
     }
 
+    /**
+     * Returns list of warning rules defined on given project.
+     *
+     * @param project The project whose rule are returned.
+     * @return The project rules.
+     */
     public List<Rule> getProjectRules(Project project) {
         List<Warning> projectWarnings = this.warningRepository.findAllByProject(project);
         List<Rule> projectRules = new ArrayList<Rule>();

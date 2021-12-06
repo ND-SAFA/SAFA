@@ -50,7 +50,7 @@ public interface IVersionRepository<
      * @param baseEntityName The name of the base entity whose removal is committed to given version.
      * @throws SafaError Throws error is something occurs while saving removal.
      */
-    void deleteVersionEntityByName(
+    void deleteVersionEntityByBaseName(
         ProjectVersion projectVersion,
         String baseEntityName) throws SafaError;
 

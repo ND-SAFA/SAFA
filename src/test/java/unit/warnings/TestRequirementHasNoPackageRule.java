@@ -4,10 +4,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
@@ -41,7 +43,8 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         List<ArtifactVersion> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
-        List<TraceLink> traceLinks = dbEntityBuilder.getTraceLinks(projectName);
+        List<TraceLinkVersion> traceLinkVersions = dbEntityBuilder.getTraceLinks(projectName);
+        List<TraceLink> traceLinks = traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
         Map<String, List<RuleName>> violations = warningService.findViolationsInArtifactTree(projectVersion,
             projectBodies,
             traceLinks);

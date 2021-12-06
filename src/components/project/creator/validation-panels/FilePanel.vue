@@ -52,8 +52,7 @@
               <v-expansion-panel-content>
                 <v-row>
                   <v-btn
-                    :fab="entitiesAreFab"
-                    x-small
+                    outlined
                     color="primary"
                     class="ma-1"
                     v-for="entityName in entityNames"

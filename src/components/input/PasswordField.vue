@@ -6,6 +6,7 @@
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
     @click:append="showPassword = !showPassword"
+    @keydown.enter="$emit('enter')"
   />
 </template>
 
@@ -16,6 +17,7 @@ import Vue from "vue";
  * A generic password input.
  *
  * @emits `input` (string) - On input change.
+ * @emits `enter` - On submit.
  */
 export default Vue.extend({
   name: "password-field",

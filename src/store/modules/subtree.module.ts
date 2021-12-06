@@ -75,9 +75,9 @@ export default class SubtreeModule extends VuexModule {
         this.hiddenSubtreeNodes.concat(childrenInSubtree)
       );
       this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootName]);
-      await this.setProjectEntityOpacity({
+      await this.setProjectEntityVisibility({
         targetArtifactNames: this.hiddenSubtreeNodes,
-        opacity: 0,
+        visible: false,
       });
     }
   }
@@ -99,29 +99,31 @@ export default class SubtreeModule extends VuexModule {
     this.SET_COLLAPSED_PARENT_NODES(
       this.collapsedParentNodes.filter((n) => n !== rootName)
     );
-    await this.setProjectEntityOpacity({
+    await this.setProjectEntityVisibility({
       targetArtifactNames: subtreeNodes,
-      opacity: 1,
+      visible: true,
     });
   }
 
   @Action
   /**
-   * Set the opacity of nodes and edges related to given list of artifact names.
+   * Set the visibility of nodes and edges related to given list of artifact names.
    * A node is related if it represents one of the target artifacts.
    * An edge is related if either source or target is an artifact in target
    * list.
    *
-   * @param request Contains the target set of artifact names and opacity to
-   * set impacted entities to.
+   * @param request Contains the target set of artifact names and whether they should be visible.
    */
-  async setProjectEntityOpacity(request: SetOpacityRequest): Promise<void> {
-    const { targetArtifactNames, opacity } = request;
+  async setProjectEntityVisibility(request: SetOpacityRequest): Promise<void> {
+    const { targetArtifactNames, visible } = request;
+    const display = visible ? "element" : "none";
     const cy = await artifactTreeCyPromise;
     const targetNodes = cy
       .nodes()
       .filter((n) => targetArtifactNames.includes(n.data().id));
-    targetNodes.style({ opacity });
+
+    targetNodes.style({ display });
+
     const targetLinks = cy
       .edges()
       .filter(
@@ -129,7 +131,8 @@ export default class SubtreeModule extends VuexModule {
           targetArtifactNames.includes(e.target().data().id) ||
           targetArtifactNames.includes(e.source().data().id)
       );
-    targetLinks.style({ opacity });
+
+    targetLinks.style({ display });
   }
 
   @Mutation

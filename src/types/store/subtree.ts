@@ -4,5 +4,5 @@
  */
 export interface SetOpacityRequest {
   targetArtifactNames: string[];
-  opacity: number;
+  visible: boolean;
 }

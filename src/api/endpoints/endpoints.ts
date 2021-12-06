@@ -28,7 +28,7 @@ export enum Endpoint {
   isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
 
   //Links
-  getGeneratedLinks = "projects/:projectId/links/generated",
+  getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
 
   //Versions

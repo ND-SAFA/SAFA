@@ -19,6 +19,7 @@ import {
   appModule,
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import { navigateTo, Routes } from "@/router";
@@ -44,10 +45,14 @@ export default class ViewportModule extends VuexModule {
    * @param artifact - The artifact to select and view.
    */
   async viewArtifactSubtree(artifact: Artifact): Promise<void> {
-    const artifactsInSubtree = artifactSelectionModule
+    const artifactsInSubtree = subtreeModule
       .getSubtreeByArtifactName(artifact.name)
       .concat([artifact.name]);
+
+    console.log({ artifactsInSubtree });
+
     artifactSelectionModule.selectArtifact(artifact);
+
     await artifactSelectionModule.filterGraph({
       type: "subtree",
       artifactsInSubtree,

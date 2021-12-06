@@ -52,7 +52,7 @@ export default Vue.extend({
   }),
   methods: {
     isProjectDefined(): boolean {
-      return this.project !== undefined && this.project.projectId !== "";
+      return this.project.projectId !== "";
     },
     onChange(): void {
       if (!this.isDeltaViewEnabled) {
@@ -63,6 +63,7 @@ export default Vue.extend({
         }
       } else {
         deltaModule.setIsDeltaViewEnabled(false);
+        projectModule.reloadProject();
       }
     },
   },

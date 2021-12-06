@@ -19,6 +19,7 @@ import {
   viewportModule,
 } from "@/store";
 import { getSingleQueryResult } from "@/util";
+import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -141,6 +142,14 @@ export default class ProjectModule extends VuexModule {
     if (projectId !== undefined && versionId !== undefined) {
       await connectAndSubscribeToVersion(projectId, versionId);
     }
+  }
+
+  @Action
+  /**
+   * Reloads the current project.
+   */
+  async reloadProject(): Promise<void> {
+    await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
   }
 
   @Mutation

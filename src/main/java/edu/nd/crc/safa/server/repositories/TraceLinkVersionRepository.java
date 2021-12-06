@@ -22,8 +22,12 @@ import org.springframework.stereotype.Repository;
 public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVersion, UUID>,
     IVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity, TraceDelta> {
 
-    default List<TraceLinkVersion> getApprovedLinks(ProjectVersion projectVersion) {
+    default List<TraceLinkVersion> getApprovedLinksInVersion(ProjectVersion projectVersion) {
         return findByProjectVersionAndApprovalStatus(projectVersion, TraceApproval.APPROVED);
+    }
+
+    default List<TraceLinkVersion> getApprovedLinksInProject(Project project) {
+        return findByProjectVersionProjectAndApprovalStatus(project, TraceApproval.APPROVED);
     }
 
     default List<TraceLinkVersion> getGeneratedLinks(ProjectVersion projectVersion) {
@@ -49,7 +53,11 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
                                                                                                         Artifact targetArtifact,
                                                                                                         TraceApproval approvalStatus);
 
-    List<TraceLinkVersion> findByProjectVersionAndApprovalStatus(ProjectVersion projectVersion, TraceApproval approvalStatus);
+    List<TraceLinkVersion> findByProjectVersionProjectAndApprovalStatus(Project project,
+                                                                        TraceApproval approvalStatus);
+
+    List<TraceLinkVersion> findByProjectVersionAndApprovalStatus(ProjectVersion projectVersion,
+                                                                 TraceApproval approvalStatus);
 
     Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
 

@@ -156,7 +156,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
         assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
-        List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinks(projectVersion);
+        List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         projectService.deleteProject(project);
@@ -191,7 +191,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(updateBodies.size())
             .as("bodies created in later version")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
-        List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinks(updateVersion);
+        List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
@@ -204,7 +204,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
             .isEqualTo(0);
 
         // VP - No new trace links were created
-        List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinks(noChangeVersion);
+        List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
     }
 }

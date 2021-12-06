@@ -39,7 +39,7 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
             .newType(projectName, sourceType)
             .newArtifact(projectName, sourceType, sourceName)
             .newArtifactBody(projectName, sourceName, "", "")
-            .newTraceLink(projectName, sourceName, targetName);
+            .newTraceLink(projectName, sourceName, targetName, 0);
 
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         List<ArtifactVersion> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);

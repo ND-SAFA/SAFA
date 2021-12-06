@@ -58,8 +58,7 @@ public class TraceLinkVersionRepositoryImpl
             case REMOVED:
                 return new TraceLinkVersion(projectVersion,
                     ModificationType.REMOVED,
-                    traceLink,
-                    traceAppEntity);
+                    traceLink);
             default:
                 throw new RuntimeException("Missing case in delta service.");
         }

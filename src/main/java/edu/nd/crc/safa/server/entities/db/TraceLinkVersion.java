@@ -56,13 +56,13 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     )
     TraceLink traceLink;
 
-    @Column(name = "trace_type", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    TraceType traceType;
-
     @Column(name = "modification_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
+
+    @Column(name = "trace_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    TraceType traceType;
 
     @Column(name = "approved")
     TraceApproval approvalStatus;
@@ -71,6 +71,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     double score;
 
     public TraceLinkVersion() {
+        this.traceType = TraceType.GENERATED;
         this.approvalStatus = TraceApproval.UNREVIEWED;
         this.score = 0;
     }
@@ -78,6 +79,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     public TraceLinkVersion(ProjectVersion projectVersion,
                             ModificationType modificationType,
                             TraceLink traceLink) {
+        this();
         this.projectVersion = projectVersion;
         this.modificationType = modificationType;
         this.traceLink = traceLink;
@@ -95,6 +97,20 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.traceType = TraceType.GENERATED;
     }
 
+    public TraceLinkVersion(TraceAppEntity traceAppEntity) {
+        this();
+        System.out.println("Creating version from:" + traceAppEntity);
+        this.traceType = traceAppEntity.traceType == null ? TraceType.MANUAL : traceAppEntity.traceType;
+        this.approvalStatus = traceAppEntity.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
+            traceAppEntity.approvalStatus;
+        this.score = traceAppEntity.score == 0 ? this.score : traceAppEntity.score;
+        //TODO:Remove when tests pas
+//        String traceLinkId = traceLink.getTraceLinkId();
+//        if (traceLinkId != null && !traceLinkId.equals("")) {
+//            this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
+//        }
+    }
+
     public TraceLinkVersion(ProjectVersion projectVersion,
                             ModificationType modificationType,
                             TraceLink traceLink,
@@ -103,18 +119,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.projectVersion = projectVersion;
         this.modificationType = modificationType;
         this.traceLink = traceLink;
-    }
-
-    public TraceLinkVersion(TraceAppEntity traceLink) {
-        this();
-        this.traceType = traceLink.traceType == null ? TraceType.MANUAL : traceLink.traceType;
-        this.approvalStatus = traceLink.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
-            traceLink.approvalStatus;
-        this.score = traceLink.score == 0 ? this.score : traceLink.score;
-//        String traceLinkId = traceLink.getTraceLinkId();
-//        if (traceLinkId != null && !traceLinkId.equals("")) {
-//            this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
-//        }
     }
 
     public UUID getTraceLinkVersionId() {
@@ -178,6 +182,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public String toString() {
         JSONObject json = new JSONObject();
+        json.put("version", this.projectVersion);
         json.put("link", this.traceLink.toString());
         json.put("approved", getApprovalStatus());
         return json + "\n";

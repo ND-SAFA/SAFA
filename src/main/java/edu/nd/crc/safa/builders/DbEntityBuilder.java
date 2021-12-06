@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
@@ -216,11 +217,22 @@ public class DbEntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public DbEntityBuilder newTraceLink(String projectName, String sourceName, String targetName) {
+    public DbEntityBuilder newTraceLink(String projectName,
+                                        String sourceName,
+                                        String targetName,
+                                        int projectVersionIndex) {
         Artifact source = this.getArtifact(projectName, sourceName);
         Artifact target = this.getArtifact(projectName, targetName);
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
+        ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
+        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+            projectVersion,
+            ModificationType.ADDED,
+            traceLink
+        );
+        traceLinkVersion.setApprovalStatus(TraceApproval.APPROVED);
+        this.traceLinkVersionRepository.save(traceLinkVersion);
         return this;
     }
 

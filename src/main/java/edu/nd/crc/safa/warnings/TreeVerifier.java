@@ -112,7 +112,7 @@ public class TreeVerifier {
     public boolean satisfiesChildCountRule(final Function childCountRule,
                                            final String targetArtifact,
                                            final List<TraceLink> traceLinks) {
-
+        System.out.println("TRACE LINKS:" + traceLinks);
         long childCount = traceLinks
             .stream()
             // Get all traceLinks where we are the source
@@ -124,6 +124,7 @@ public class TreeVerifier {
                 .getName()
                 .equalsIgnoreCase(childCountRule.sourceArtifactType))
             .count();
+        System.out.println("CHILD COUNT:" + childCount);
         return matchesRuleCount(childCountRule, childCount);
     }
 

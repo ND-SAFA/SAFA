@@ -159,25 +159,29 @@ export default class ProjectModule extends VuexModule {
     await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
   }
 
-  @Action
+  @Action({ rawError: true })
   /**
    * Updates what directions of trace links between artifacts are allowed.
    */
   updateAllowedTraceDirections(): void {
     const allowedDirections: ArtifactTypeDirections = {};
 
-    this.getTraceLinks.forEach(({ source, target }) => {
-      const sourceType = this.getArtifactByName(source).type;
-      const targetType = this.getArtifactByName(target).type;
+    try {
+      this.getTraceLinks.forEach(({ source, target }) => {
+        const sourceType = this.getArtifactByName(source).type;
+        const targetType = this.getArtifactByName(target).type;
 
-      if (!allowedDirections[sourceType]) {
-        allowedDirections[sourceType] = [];
-      }
+        if (!allowedDirections[sourceType]) {
+          allowedDirections[sourceType] = [];
+        }
 
-      if (!allowedDirections[sourceType].includes(targetType)) {
-        allowedDirections[sourceType].push(targetType);
-      }
-    });
+        if (!allowedDirections[sourceType].includes(targetType)) {
+          allowedDirections[sourceType].push(targetType);
+        }
+      });
+    } catch (e) {
+      console.log("Error calculating allowed trace directions", e);
+    }
 
     this.SET_TRACE_DIRECTIONS(allowedDirections);
   }

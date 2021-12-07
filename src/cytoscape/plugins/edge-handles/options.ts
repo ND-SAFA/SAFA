@@ -32,8 +32,8 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
 
     // If the link is not between allowed artifact directions, thee link cannot be created.
     const linkIsAllowedByType = projectModule.isLinkAllowedByType(
-      sourceNode.data().artifactType,
-      targetNode.data().artifactType
+      targetNode.data().artifactType,
+      sourceNode.data().artifactType
     );
 
     return linkDoesNotExist && isNotSameNode && linkIsAllowedByType;

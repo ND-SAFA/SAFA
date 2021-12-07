@@ -17,19 +17,18 @@ export function onArtifactTreeEdgeComplete(
   targetNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
-  disableDrawMode();
-
   const sourceId = sourceNode.data().id;
   const targetId = targetNode.data().id;
   const traceLink: TraceLink = {
     traceLinkId: "",
-    // Links are flipped to to the direction of the drawn edge pointing toward the source.
-    source: targetId,
-    target: sourceId,
+    source: sourceId,
+    target: targetId,
     traceType: TraceType.MANUAL,
     approvalStatus: TraceApproval.APPROVED,
     score: 1,
   };
+
+  disableDrawMode();
 
   createLink(traceLink)
     .then(() => {

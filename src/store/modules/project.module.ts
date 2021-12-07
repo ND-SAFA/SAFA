@@ -166,8 +166,8 @@ export default class ProjectModule extends VuexModule {
   updateAllowedTraceDirections(): void {
     const allowedDirections: ArtifactTypeDirections = {};
 
-    try {
-      this.getTraceLinks.forEach(({ source, target }) => {
+    this.getTraceLinks.forEach(({ source, target }) => {
+      try {
         const sourceType = this.getArtifactByName(source).type;
         const targetType = this.getArtifactByName(target).type;
 
@@ -178,11 +178,11 @@ export default class ProjectModule extends VuexModule {
         if (!allowedDirections[sourceType].includes(targetType)) {
           allowedDirections[sourceType].push(targetType);
         }
-      });
-    } catch (e) {
-      console.log("Error calculating allowed trace directions", e);
-    }
-
+      } catch (e) {
+        console.log("Error calculating allowed trace directions", e);
+      }
+    });
+    console.log(allowedDirections);
     this.SET_TRACE_DIRECTIONS(allowedDirections);
   }
 

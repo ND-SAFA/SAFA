@@ -10,12 +10,13 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import unit.ApplicationBaseTest;
 
 /**
  * Tests that the delta between two project versions can be calculated in the opposite direction
  * (e.g. from present version to past versions).
  */
-public class TestBackwardComparisons extends DeltaBaseTest {
+public class TestBackwardComparisons extends ApplicationBaseTest {
 
     @Test
     public void backwardsVersioning() throws Exception {

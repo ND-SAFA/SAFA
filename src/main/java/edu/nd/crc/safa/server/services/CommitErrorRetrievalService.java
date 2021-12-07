@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
  * Responsible for collecting all parsing errors in a project version.
  */
 @Service
-public class ParserErrorService {
-    private final ParserErrorRepository parserErrorRepository;
+public class CommitErrorRetrievalService {
+    private final CommitErrorRepository commitErrorRepository;
 
     @Autowired
-    public ParserErrorService(ParserErrorRepository parserErrorRepository) {
-        this.parserErrorRepository = parserErrorRepository;
+    public CommitErrorRetrievalService(CommitErrorRepository commitErrorRepository) {
+        this.commitErrorRepository = commitErrorRepository;
     }
 
     /**
@@ -32,17 +32,17 @@ public class ParserErrorService {
      */
     public ProjectParsingErrors collectionProjectErrors(ProjectVersion projectVersion) {
 
-        List<ErrorApplicationEntity> timErrors = this.parserErrorRepository
+        List<ErrorApplicationEntity> timErrors = this.commitErrorRepository
             .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_TIM)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
-        List<ErrorApplicationEntity> artifactErrors = this.parserErrorRepository
+        List<ErrorApplicationEntity> artifactErrors = this.commitErrorRepository
             .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_ARTIFACTS)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
-        List<ErrorApplicationEntity> traceErrors = this.parserErrorRepository
+        List<ErrorApplicationEntity> traceErrors = this.commitErrorRepository
             .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_TRACES)
             .stream()
             .map(ErrorApplicationEntity::new)

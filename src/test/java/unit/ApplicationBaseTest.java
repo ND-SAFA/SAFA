@@ -12,7 +12,10 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
+import org.javatuples.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
  * Testing layer for encapsulating application logic.
  */
 public class ApplicationBaseTest extends AuthenticatedBaseTest {
+
+    @Autowired
+    protected ProjectRetrievalService projectRetrievalService;
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {
@@ -70,5 +76,26 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
             .withRoute(AppRoutes.Projects.commitChange)
             .withVersion(projectVersion)
             .get();
+    }
+
+    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName) throws Exception {
+        return setupDualVersions(projectName, true);
+    }
+
+    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName, boolean uploadFiles) throws Exception {
+        dbEntityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newVersion(projectName);
+
+        ProjectVersion beforeVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
+
+        if (uploadFiles) {
+            uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+            uploadFlatFilesToVersion(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
+        }
+
+        return new Pair<>(beforeVersion, afterVersion);
     }
 }

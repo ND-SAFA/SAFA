@@ -118,7 +118,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        entityVersionService.setArtifactsAtVersion(newVersion, Arrays.asList(artifactApp));
+        entityVersionService.commitVersionArtifacts(newVersion, Arrays.asList(artifactApp));
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -151,7 +151,7 @@ public class TestArtifactService extends ApplicationBaseTest {
             newContent);
 
         // VP - Verify that artifact body is detected to be modified
-        this.entityVersionService.setArtifactsAtVersion(projectVersion,
+        this.entityVersionService.commitVersionArtifacts(projectVersion,
             Arrays.asList(appEntity));
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,

@@ -60,9 +60,11 @@ public class TraceLinkGenerator {
 
     public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
                                                           Pair<ArtifactType, ArtifactType> artifactTypes) {
-        Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(projectVersion,
+        List<ArtifactVersion> artifactsInVersion =
+            this.artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
+        Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue0());
-        Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(projectVersion,
+        Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue1());
         TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
             new TraceAppEntity(s.getName(), t.getName(), score);
@@ -96,11 +98,14 @@ public class TraceLinkGenerator {
         return generatedLinks;
     }
 
-    private Map<Artifact, Collection<String>> tokenizeArtifactOfType(ProjectVersion projectVersion,
+    private Map<Artifact, Collection<String>> tokenizeArtifactOfType(List<ArtifactVersion> artifacts,
                                                                      ArtifactType artifactType) {
-        List<ArtifactVersion> sourceArtifactBodies = this.artifactVersionRepository
-            .findByProjectVersionAndArtifactType(projectVersion, artifactType);
-        return tokenizeArtifacts(sourceArtifactBodies);
+        List<ArtifactVersion> artifactsWithType =
+            artifacts
+                .stream()
+                .filter(a -> a.getArtifact().getType().equals(artifactType))
+                .collect(Collectors.toList());
+        return tokenizeArtifacts(artifactsWithType);
     }
 
     private Map<Artifact, Collection<String>> tokenizeArtifacts(List<ArtifactVersion> artifacts) {

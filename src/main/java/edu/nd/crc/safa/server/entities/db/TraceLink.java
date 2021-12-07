@@ -129,7 +129,7 @@ public class TraceLink implements Serializable, IBaseEntity {
 
     @Override
     public String getBaseEntityId() {
-        return this.traceLinkId.toString();
+        return this.getTraceName();
     }
 
     public boolean equals(TraceLink other) {

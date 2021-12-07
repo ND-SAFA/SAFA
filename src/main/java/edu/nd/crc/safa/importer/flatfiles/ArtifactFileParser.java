@@ -2,25 +2,22 @@ package edu.nd.crc.safa.importer.flatfiles;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactFile;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactFileRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -43,7 +40,7 @@ public class ArtifactFileParser {
     private final ArtifactFileRepository artifactFileRepository;
     private final ArtifactRepository artifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
-    private final ParserErrorRepository parserErrorRepository;
+    private final CommitErrorRepository commitErrorRepository;
 
     private final String NAME_PARAM = "id";
     private final String SUMMARY_PARAM = "summary";
@@ -56,18 +53,17 @@ public class ArtifactFileParser {
                               ArtifactRepository artifactRepository,
                               ArtifactTypeRepository artifactTypeRepository,
                               EntityVersionService entityVersionService,
-                              ParserErrorRepository parserErrorRepository) {
+                              CommitErrorRepository commitErrorRepository) {
         this.artifactFileRepository = artifactFileRepository;
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.entityVersionService = entityVersionService;
-        this.parserErrorRepository = parserErrorRepository;
+        this.commitErrorRepository = commitErrorRepository;
     }
 
-    public void parseArtifactFiles(ProjectVersion projectVersion,
-                                   JSONObject dataFilesJson)
+    public List<ArtifactAppEntity> parseArtifactFiles(ProjectVersion projectVersion,
+                                                      JSONObject dataFilesJson)
         throws JSONException, SafaError {
-        Project project = projectVersion.getProject();
 
         List<ArtifactAppEntity> projectArtifacts = new ArrayList<>();
         for (Iterator<String> keyIterator = dataFilesJson.keys(); keyIterator.hasNext(); ) {
@@ -80,57 +76,39 @@ public class ArtifactFileParser {
 
             String artifactFileName = artifactDefinitionJson.getString("file");
 
-            ArtifactType artifactType = this.artifactTypeRepository
-                .findByProjectAndNameIgnoreCase(project, artifactTypeName)
-                .orElseGet(() -> new ArtifactType(project, artifactTypeName));
-            this.artifactTypeRepository.save(artifactType);
-
-            ArtifactFile newFile = new ArtifactFile(project, artifactType, artifactFileName);
-            this.artifactFileRepository.save(newFile);
-
-            Pair<List<ArtifactAppEntity>, List<ParserError>> parseResponse = parseArtifactFile(projectVersion,
-                artifactType,
+            List<ArtifactAppEntity> artifacts = parseArtifactFile(projectVersion,
+                artifactTypeName,
                 artifactFileName);
 
-            projectArtifacts.addAll(parseResponse.getValue0());
-            this.parserErrorRepository.saveAll(parseResponse.getValue1());
+            projectArtifacts.addAll(artifacts);
         }
-        entityVersionService.setArtifactsAtVersion(projectVersion, projectArtifacts);
+        return projectArtifacts;
     }
 
-    private Pair<List<ArtifactAppEntity>, List<ParserError>> parseArtifactFile(ProjectVersion projectVersion,
-                                                                               ArtifactType artifactType,
-                                                                               String fileName) throws SafaError {
+    private List<ArtifactAppEntity> parseArtifactFile(ProjectVersion projectVersion,
+                                                      String artifactType,
+                                                      String fileName) throws SafaError {
         Project project = projectVersion.getProject();
         String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
 
-        ArtifactFile artifactFile = new ArtifactFile(project, artifactType, fileName);
-        this.artifactFileRepository.save(artifactFile);
-        //TODO: Remove artifact file repository;
-
-        Pair<List<ArtifactAppEntity>, List<String>> response = parseArtifactFileIntoApplicationEntities(
-            projectVersion.getProject(),
+        List<ArtifactAppEntity> artifacts = parseArtifactFileIntoApplicationEntities(
             fileName,
-            artifactType.getName(),
+            artifactType,
             fileParser);
-        List<ParserError> parserErrors = response.getValue1().stream().map(msg -> new ParserError(projectVersion,
-            msg, ProjectParsingActivities.PARSING_ARTIFACTS)).collect(Collectors.toList());
-        return new Pair<>(response.getValue0(), parserErrors);
+
+        return artifacts;
     }
 
-    public Pair<List<ArtifactAppEntity>, List<String>> parseArtifactFileIntoApplicationEntities(
-        Project project,
+    public List<ArtifactAppEntity> parseArtifactFileIntoApplicationEntities(
         String fileName,
         String artifactType,
-        CSVParser parsedFile) {
-        List<CSVRecord> artifactRecords = new ArrayList<>();
-        List<String> errors = new ArrayList<>();
+        CSVParser parsedFile) throws SafaError {
+        List<CSVRecord> artifactRecords;
         try {
             artifactRecords = parsedFile.getRecords();
         } catch (IOException e) {
-            String error = String.format("Unable to read records in file: %s", fileName);
-            errors.add(error);
+            throw new SafaError("Unable to read artifact file: " + fileName);
         }
 
         List<ArtifactAppEntity> artifactAppEntities = new ArrayList<>();
@@ -138,13 +116,12 @@ public class ArtifactFileParser {
             String artifactName = artifactRecord.get(NAME_PARAM);
             String artifactSummary = artifactRecord.get(SUMMARY_PARAM);
             String artifactContent = artifactRecord.get(CONTENT_PARAM);
-            String artifactId = getArtifactIdIfExists(project, artifactName);
 
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
 
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
-                artifactId,
+                "",
                 artifactType,
                 artifactName,
                 artifactSummary,
@@ -153,22 +130,32 @@ public class ArtifactFileParser {
             artifactAppEntities.add(artifactAppEntity);
         }
 
-        return new Pair<>(artifactAppEntities, errors);
-    }
-
-    private String getArtifactIdIfExists(Project project, String artifactName) {
-        String artifactId = "";
-
-        if (project != null) {
-            Optional<Artifact> artifactQuery = artifactRepository.findByProjectAndName(project, artifactName);
-            if (artifactQuery.isPresent()) {
-                artifactId = artifactQuery.get().getArtifactId().toString();
-            }
-        }
-        return artifactId;
+        return artifactAppEntities;
     }
 
     public CSVParser readArtifactFile(MultipartFile file) throws SafaError {
         return FileUtilities.readMultiPartCSVFile(file, REQUIRED_COLUMNS);
+    }
+
+    public Pair<List<ArtifactAppEntity>, List<CommitError>> validateArtifacts(ProjectVersion projectVersion,
+                                                                              List<ArtifactAppEntity> artifacts) {
+        List<String> errors = new ArrayList<>();
+        List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
+
+        Hashtable<String, ArtifactAppEntity> artifactHashtable = new Hashtable<>();
+        for (ArtifactAppEntity a : artifacts) {
+            if (artifactHashtable.containsKey(a.name)) {
+                errors.add("Found duplicate artifact: " + a.name);
+            } else {
+                artifactHashtable.put(a.name, a);
+                validArtifacts.add(a);
+            }
+        }
+
+        List<CommitError> commitErrors = errors
+            .stream()
+            .map(e -> new CommitError(projectVersion, e, ProjectParsingActivities.PARSING_ARTIFACTS))
+            .collect(Collectors.toList());
+        return new Pair<>(validArtifacts, commitErrors);
     }
 }

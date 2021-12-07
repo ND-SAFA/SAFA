@@ -13,13 +13,17 @@ import org.json.JSONObject;
 public class ArtifactAppEntity implements IAppEntity {
     @NotNull
     public String id;
+
     @NotNull
     @NotEmpty
     public String name;
+
     @NotNull
     public String summary;
+
     @NotNull
     public String body;
+
     @NotNull
     @NotEmpty
     public String type;
@@ -57,10 +61,6 @@ public class ArtifactAppEntity implements IAppEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public boolean hasEmptyId() {
-        return this.id == null || this.id.equals("");
     }
 
     public String getName() {

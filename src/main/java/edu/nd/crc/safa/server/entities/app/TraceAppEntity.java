@@ -109,9 +109,11 @@ public class TraceAppEntity implements IAppEntity {
 
     public String toString() {
         JSONObject json = new JSONObject();
-        json.put("source:", source);
-        json.put("target:", target);
-        json.put("traceType:", traceType);
+        json.put("source", source);
+        json.put("target", target);
+        json.put("type", traceType);
+        json.put("status", approvalStatus);
+        json.put("score", score);
         return json.toString();
     }
 

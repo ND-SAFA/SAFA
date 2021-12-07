@@ -29,16 +29,16 @@ public class ProjectRetrievalService {
 
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
-    private final ParserErrorService parserErrorService;
+    private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
 
     @Autowired
     public ProjectRetrievalService(TraceLinkVersionRepository traceLinkVersionRepository,
-                                   ParserErrorService parserErrorService,
+                                   CommitErrorRetrievalService commitErrorRetrievalService,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    WarningService warningService) {
         this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.parserErrorService = parserErrorService;
+        this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.artifactVersionRepository = artifactVersionRepository;
         this.warningService = warningService;
     }
@@ -50,8 +50,9 @@ public class ProjectRetrievalService {
      * @return ProjectCreationResponse containing all relevant project entities
      */
     public ProjectEntities retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
-        ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
-        ProjectParsingErrors projectParsingErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        ProjectAppEntity projectAppEntity = this.retrieveApplicationEntity(projectVersion);
+        ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
+            .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
         return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
     }
@@ -62,7 +63,7 @@ public class ProjectRetrievalService {
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveApplicationEntity(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
             .getEntityVersionsInProjectVersion(projectVersion);
 

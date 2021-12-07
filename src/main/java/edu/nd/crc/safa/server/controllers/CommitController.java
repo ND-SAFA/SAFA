@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,6 +14,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -63,37 +66,49 @@ public class CommitController extends BaseController {
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        commitArtifacts(projectVersion, projectCommit.getArtifacts());
-        commitTraces(projectVersion, projectCommit.getTraces());
+        List<CommitError> artifactErrors = commitArtifacts(projectVersion, projectCommit.getArtifacts());
+        List<CommitError> traceErrors = commitTraces(projectVersion, projectCommit.getTraces());
     }
 
-    private void commitArtifacts(ProjectVersion projectVersion,
-                                 ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
+    private List<CommitError> commitArtifacts(ProjectVersion projectVersion,
+                                              ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
         List<ArtifactAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
             .collect(Collectors.toList());
+        List<CommitError> errors = new ArrayList<>();
         for (ArtifactAppEntity artifact : changedArtifacts) {
-            this.artifactVersionRepository.commitAppEntityToProjectVersion(projectVersion, artifact);
+            CommitError artifactError = this.artifactVersionRepository
+                .commitSingleEntityToProjectVersion(projectVersion, artifact);
+            errors.add(artifactError);
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
-            this.artifactVersionRepository.deleteVersionEntityByBaseName(projectVersion, artifact.name);
+            CommitError artifactError = this.artifactVersionRepository.deleteVersionEntityByBaseName(projectVersion,
+                artifact.name);
+            errors.add(artifactError);
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        return errors.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private void commitTraces(ProjectVersion projectVersion,
-                              ProjectChange<TraceAppEntity> artifacts) throws SafaError {
+    private List<CommitError> commitTraces(ProjectVersion projectVersion,
+                                           ProjectChange<TraceAppEntity> artifacts) throws SafaError {
         List<TraceAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
             .collect(Collectors.toList());
+        List<CommitError> errors = new ArrayList<>();
         for (TraceAppEntity artifact : changedArtifacts) {
-            this.traceLinkVersionRepository.commitAppEntityToProjectVersion(projectVersion, artifact);
+            CommitError traceError = this.traceLinkVersionRepository.commitSingleEntityToProjectVersion(projectVersion,
+                artifact);
+            errors.add(traceError);
         }
         for (TraceAppEntity trace : artifacts.getRemoved()) {
-            this.traceLinkVersionRepository.deleteVersionEntityByBaseName(projectVersion, trace.traceLinkId);
+            CommitError traceError = this.traceLinkVersionRepository.deleteVersionEntityByBaseName(projectVersion,
+                trace.traceLinkId);
+            errors.add(traceError);
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        return errors.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

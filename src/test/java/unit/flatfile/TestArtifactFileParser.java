@@ -7,8 +7,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
@@ -25,10 +24,14 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
     @Autowired
     ArtifactFileParser artifactFileParser;
 
+    /**
+     * Tests that a valid artifact file is read and converted to application entities.
+     *
+     * @throws Exception If any http requests fails.
+     */
     @Test
     public void parseDesignArtifacts() throws Exception {
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
-        Project project = projectVersion.getProject();
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\n"
@@ -36,14 +39,12 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
             + "      \"file\": \"Design.csv\"\n"
             + "    }\n"
             + "  }");
-        artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
+        List<ArtifactAppEntity> artifacts = artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
 
         // VP - Verify that all design artifacts are created
-        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
-        assertThat(projectArtifacts.size())
+        assertThat(artifacts.size())
             .as("artifacts created")
             .isEqualTo(SampleProjectConstants.N_DESIGNS);
-        projectService.deleteProject(project);
     }
 
     @Test

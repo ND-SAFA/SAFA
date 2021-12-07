@@ -15,12 +15,13 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import unit.ApplicationBaseTest;
 import unit.SampleProjectConstants;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.
  */
-public class TestModificationDetected extends DeltaBaseTest {
+public class TestModificationDetected extends ApplicationBaseTest {
 
     /**
      * Tests that modifications to artifact bodies are detected in
@@ -57,7 +58,7 @@ public class TestModificationDetected extends DeltaBaseTest {
         assertThat(deltaResponse.getJSONObject("added").has("M1")).isTrue();
         assertThat(deltaResponse.getJSONArray("missingArtifacts").length()).isEqualTo(1);
 
-        ProjectAppEntity beforeAppEntity = this.projectRetrievalService.createApplicationEntity(beforeVersion);
+        ProjectAppEntity beforeAppEntity = this.projectRetrievalService.retrieveApplicationEntity(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)
@@ -65,7 +66,7 @@ public class TestModificationDetected extends DeltaBaseTest {
         assertThat(beforeArtifactNames.contains("M1")).isFalse();
         assertThat(beforeArtifactNames.contains("D7")).isTrue();
         assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
-        ProjectAppEntity afterAppEntity = this.projectRetrievalService.createApplicationEntity(afterVersion);
+        ProjectAppEntity afterAppEntity = this.projectRetrievalService.retrieveApplicationEntity(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)

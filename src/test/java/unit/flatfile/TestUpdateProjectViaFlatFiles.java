@@ -12,7 +12,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -87,7 +87,6 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         JSONObject traceError = errors.getJSONArray("traces").getJSONObject(0);
         assertThat(traceError.get("errorId")).isNotNull();
         assertThat(traceError.get("message")).isNotNull();
-        assertThat(traceError.get("location")).isNotNull();
         assertThat(traceError.get("activity")).isNotNull();
 
         // VP - Project warnings present in response
@@ -148,11 +147,10 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
             .as("artifact bodies created")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
-        List<ParserError> parserErrors = parserErrorRepository.findByProjectVersion(projectVersion);
-        assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
-        ParserError error = parserErrors.get(0);
+        List<CommitError> commitErrors = commitErrorRepository.findByProjectVersion(projectVersion);
+        assertThat(commitErrors.size()).as("requirement parsing errors").isEqualTo(1);
+        CommitError error = commitErrors.get(0);
         assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
-        assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
         List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInProject(project);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);

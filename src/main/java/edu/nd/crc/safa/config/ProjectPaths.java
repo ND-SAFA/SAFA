@@ -17,14 +17,10 @@ public class ProjectPaths {
     public static final String PATH_TO_RESOURCES = PATH_TO_ROOT + "/resources";
     public static final String PATH_TO_TEST_RESOURCES = PATH_TO_RESOURCES + "/tests";
     public static final String PATH_TO_BEFORE_FILES = PATH_TO_TEST_RESOURCES + "/before";
+    public static final String PATH_TO_MINI_FILES = PATH_TO_TEST_RESOURCES + "/mini";
     public static final String PATH_TO_AFTER_FILES = PATH_TO_TEST_RESOURCES + "/after";
-    public static final String PATH_TO_ARTIFACT_FILES = PATH_TO_TEST_RESOURCES + "/artifactFiles";
-    public static final String PATH_TO_TRACE_FILES = PATH_TO_TEST_RESOURCES + "/traceFiles";
-    public static final String PATH_TO_TEST_1 = PATH_TO_TEST_RESOURCES + "/test1";
     public static final String PATH_TO_TEST_2 = PATH_TO_TEST_RESOURCES + "/test2";
     public static final String PATH_TO_TEST_3 = PATH_TO_TEST_RESOURCES + "/test3";
-    public static final String PATH_TO_ACCOUNT_CONFIRMATION = PATH_TO_RESOURCES + "/email/AccountConfirmationRendered"
-        + ".html";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();

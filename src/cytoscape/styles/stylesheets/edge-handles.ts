@@ -38,12 +38,16 @@ export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
       "line-style": "dotted",
       "line-dash-pattern": [6, 3],
       "line-color": LINE_GHOST_COLOR,
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "chevron",
     },
   },
   {
     selector: ".eh-preview",
     style: {
       "line-color": LINE_PREVIEW_COLOR,
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "chevron",
     },
   },
   {

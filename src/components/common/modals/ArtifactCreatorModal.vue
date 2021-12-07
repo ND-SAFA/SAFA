@@ -8,16 +8,19 @@
     <template v-slot:body>
       <v-container>
         <v-text-field
+          filled
           v-model="name"
-          outlined
-          dense
-          rounded
           label="Artifact Id"
           color="primary"
           :hint="nameHint"
           :error-messages="nameError"
         />
-        <button-row :definitions="buttonDefinitions" justify="center" />
+        <v-combobox
+          filled
+          v-model="type"
+          :items="artifactTypes"
+          label="Artifact Type"
+        />
         <v-textarea
           filled
           label="Artifact Summary"
@@ -40,11 +43,10 @@
 </template>
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType, Artifact } from "@/types";
+import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
 import { appModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
-import { ButtonRow } from "@/components/common/button-row";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
 
@@ -54,7 +56,7 @@ const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
  * @emits `close` - Emitted when modal is exited or artifact is created.
  */
 export default Vue.extend({
-  components: { GenericModal, ButtonRow },
+  components: { GenericModal },
   props: {
     title: {
       type: String,
@@ -97,13 +99,8 @@ export default Vue.extend({
     },
   },
   watch: {
-    artifactTypes(): void {
-      this.setButtonDefinitions();
-    },
     isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.setButtonDefinitions();
-      } else {
+      if (!isOpen) {
         this.name = this.artifact?.name || "";
         this.summary = this.artifact?.summary || "";
         this.body = this.artifact?.body || "";
@@ -112,8 +109,8 @@ export default Vue.extend({
     },
     name(newName: string): void {
       if (newName !== "") {
-        //TODO: Only send request after user has stopped typing for at least
-        // N milliseconds. See cytoscape rendering functions for timeout example.
+        // TODO: Only send request after user has stopped typing for at least
+        //       N milliseconds. See cytoscape rendering functions for timeout example.
         isArtifactNameTaken(this.projectId, newName).then((res) => {
           this.isNameValid = !res.artifactExists;
 
@@ -127,21 +124,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    setButtonDefinitions(): void {
-      this.buttonDefinitions = [
-        {
-          type: ButtonType.LIST_MENU,
-          label: this.type || "Artifact Type",
-          menuItems: this.artifactTypes,
-          menuHandlers: this.artifactTypes.map(
-            (type) => () => (this.type = type)
-          ),
-          buttonColor: "primary",
-          buttonIsText: false,
-          showSelectedValue: true,
-        },
-      ];
-    },
     onSubmit(): void {
       // only called when isValid / button is enabled
       const artifact: Artifact = {

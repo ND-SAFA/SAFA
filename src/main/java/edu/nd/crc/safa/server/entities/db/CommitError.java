@@ -24,7 +24,7 @@ import org.json.JSONObject;
 //TODO: Consider separating error details into an object (e.g. fileName, lineNumber);
 @Entity
 @Table(name = "parse_error")
-public class ParserError implements Serializable {
+public class CommitError implements Serializable {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -35,32 +35,36 @@ public class ParserError implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "version_id", nullable = false)
     ProjectVersion projectVersion;
+
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
     ProjectParsingActivities applicationActivity;
+
     @Column(name = "file_name")
     String fileName;
+
     @Column(name = "line_number")
     Long lineNumber;
+
     @Column(name = "description", length = 500)
     String description;
 
-    public ParserError() {
+    public CommitError() {
         this.applicationActivity = ProjectParsingActivities.UNKNOWN;
     }
 
-    public ParserError(ProjectVersion projectVersion,
+    public CommitError(ProjectVersion projectVersion,
                        String description) {
         this();
         this.projectVersion = projectVersion;
         this.description = description;
     }
 
-    public ParserError(ProjectVersion projectVersion,
+    public CommitError(ProjectVersion projectVersion,
                        String description,
-                       ProjectParsingActivities applicationActivity) {
+                       ProjectParsingActivities projectParsingActivity) {
         this(projectVersion, description);
-        this.applicationActivity = applicationActivity;
+        this.applicationActivity = projectParsingActivity;
     }
 
     public String toString() {
@@ -69,12 +73,6 @@ public class ParserError implements Serializable {
         json.put("description:", this.description);
         json.put("activity:", this.applicationActivity);
         return json.toString();
-    }
-
-    public void setFileSource(String fileName,
-                              Long lineNumber) {
-        this.fileName = fileName;
-        this.lineNumber = lineNumber;
     }
 
     public String getErrorId() {
@@ -87,10 +85,6 @@ public class ParserError implements Serializable {
 
     public void setApplicationActivity(ProjectParsingActivities applicationActivity) {
         this.applicationActivity = applicationActivity;
-    }
-
-    public String getFileName() {
-        return this.fileName;
     }
 
     public String getDescription() {

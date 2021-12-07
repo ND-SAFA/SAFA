@@ -5,9 +5,9 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
-import edu.nd.crc.safa.server.entities.db.ParserError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 /**
@@ -20,6 +20,13 @@ public interface IVersionRepository<
     VersionEntity extends IVersionEntity<AppEntity>,
     AppEntity extends IAppEntity,
     DeltaEntity extends IDeltaEntity> {
+
+    /**
+     * Returns the current entities existing in given project version.
+     *
+     * @param projectVersion The project version whose existing entities are retrieved.
+     * @return List of entities in project version.
+     */
     List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
 
     /**
@@ -27,9 +34,10 @@ public interface IVersionRepository<
      *
      * @param projectVersion The project version to save the changes to.
      * @param appEntity      The app entity whose state is saved.
+     * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
-    void commitAppEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) throws SafaError;
+    CommitError commitSingleEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) throws SafaError;
 
     /**
      * Saves given application entities to given version, saving removal entities for entities present in previous
@@ -40,7 +48,7 @@ public interface IVersionRepository<
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
-    List<ParserError> commitAppEntitiesToProjectVersion(ProjectVersion projectVersion,
+    List<CommitError> commitAllEntitiesInProjectVersion(ProjectVersion projectVersion,
                                                         List<AppEntity> appEntities) throws SafaError;
 
     /**
@@ -48,11 +56,11 @@ public interface IVersionRepository<
      *
      * @param projectVersion The project version associated with committed removal.
      * @param baseEntityName The name of the base entity whose removal is committed to given version.
-     * @throws SafaError Throws error is something occurs while saving removal.
+     * @return CommitError if error occurred while deleting entity, null otherwise.
      */
-    void deleteVersionEntityByBaseName(
+    CommitError deleteVersionEntityByBaseName(
         ProjectVersion projectVersion,
-        String baseEntityName) throws SafaError;
+        String baseEntityName);
 
     /**
      * Calculates and returns the delta between the versions of given baseEntity

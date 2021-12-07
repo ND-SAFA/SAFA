@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
@@ -65,22 +66,34 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLink findOrCreateBaseEntityFromAppEntity(Project project,
+    public TraceLink findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
                                                          TraceAppEntity trace) throws SafaError {
-        TraceLink traceLink = this.traceLinkRepository
+        Project project = projectVersion.getProject();
+
+        TraceLink traceLink;
+        Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
             .getByProjectAndSourceAndTarget(
                 project,
                 trace.source,
-                trace.target)
-            .orElseGet(TraceLink::new);
-        if (traceLink.getSourceArtifact() == null
-            || traceLink.getTargetArtifact() == null) {
+                trace.target);
+        if (traceLinkOptional.isEmpty()) {
             Artifact sourceArtifact = assertAndFindArtifact(project, trace.source);
             Artifact targetArtifact = assertAndFindArtifact(project, trace.target);
-            traceLink.setSourceArtifact(sourceArtifact);
-            traceLink.setTargetArtifact(targetArtifact);
+            traceLink = new TraceLink(sourceArtifact, targetArtifact);
             this.traceLinkRepository.save(traceLink);
+        } else {
+            traceLink = traceLinkOptional.get();
         }
+        Optional<TraceLinkVersion> traceLinkVersionOptional =
+            this.traceLinkVersionRepository.findByProjectVersionAndTraceLink(projectVersion,
+                traceLink);
+        if (traceLinkVersionOptional.isPresent()) {
+            TraceLinkVersion tv = traceLinkVersionOptional.get();
+            if (tv.getTraceType() == TraceType.MANUAL && trace.traceType != TraceType.MANUAL) {
+                throw new SafaError("Generated link cannot override manual one.");
+            }
+        }
+
         return traceLink;
     }
 

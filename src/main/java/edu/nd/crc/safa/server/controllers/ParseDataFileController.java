@@ -78,14 +78,12 @@ public class ParseDataFileController extends BaseController {
         ParseArtifactFileResponse response = new ParseArtifactFileResponse();
         tryParseFile(response, () -> {
             CSVParser fileCSV = artifactFileParser.readArtifactFile(file);
-            Pair<List<ArtifactAppEntity>, List<String>> parseResponse =
+            List<ArtifactAppEntity> artifacts =
                 artifactFileParser.parseArtifactFileIntoApplicationEntities(
-                    null,
                     file.getOriginalFilename(),
                     artifactType,
                     fileCSV);
-            response.setArtifacts(parseResponse.getValue0());
-            response.setErrors(parseResponse.getValue1());
+            response.setArtifacts(artifacts);
         });
         return new ServerResponse(response);
     }
@@ -120,10 +118,7 @@ public class ParseDataFileController extends BaseController {
         tryParseFile(response, () -> {
             CSVParser fileCSV = traceFileParser.readTraceFile(file);
             Pair<List<TraceAppEntity>, List<Pair<String, Long>>> parseResponse =
-                traceFileParser.readTraceFile(
-                    (a) -> Optional.of(new Artifact()), //TODO: Replace with artifacts from json
-                    (s, t) -> Optional.empty(), // TODO: Replace with traces from json
-                    fileCSV);
+                traceFileParser.readTraceFile(fileCSV);
             List<String> errors = parseResponse.getValue1().stream().map(Pair::getValue0).collect(Collectors.toList());
 
             response.setTraces(parseResponse.getValue0());

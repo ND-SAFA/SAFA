@@ -12,13 +12,14 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -59,10 +60,12 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // VP - Traces present in response
-        assertThat(projectJson.getJSONArray("traces").length())
+        JSONArray traces = projectJson.getJSONArray("traces");
+        assertThat(traces.length())
             .as("all traces confirmed")
             .isGreaterThanOrEqualTo(SampleProjectConstants.N_LINKS);
-        int nManual = (int) projectJson.getJSONArray("traces")
+
+        int nManual = (int) traces
             .toList()
             .stream()
             .filter((traceJson) ->
@@ -87,7 +90,6 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
         JSONObject traceError = errors.getJSONArray("traces").getJSONObject(0);
         assertThat(traceError.get("errorId")).isNotNull();
         assertThat(traceError.get("message")).isNotNull();
-        assertThat(traceError.get("location")).isNotNull();
         assertThat(traceError.get("activity")).isNotNull();
 
         // VP - Project warnings present in response
@@ -148,11 +150,10 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
             .as("artifact bodies created")
             .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
-        List<ParserError> parserErrors = parserErrorRepository.findByProjectVersion(projectVersion);
-        assertThat(parserErrors.size()).as("requirement parsing errors").isEqualTo(1);
-        ParserError error = parserErrors.get(0);
+        List<CommitError> commitErrors = commitErrorRepository.findByProjectVersion(projectVersion);
+        assertThat(commitErrors.size()).as("requirement parsing errors").isEqualTo(1);
+        CommitError error = commitErrors.get(0);
         assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
-        assertThat(error.getFileName()).isEqualTo("Requirement2Requirement.csv");
 
         List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
@@ -160,16 +161,22 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
         projectService.deleteProject(project);
     }
 
+    /**
+     * Creates three project versions and uploads to the middle one checking that
+     * the first has no entities while the last has all the entities but no changes.
+     *
+     * @throws Exception If https request fails.
+     */
     @Test
     public void testUpdateProjectViaFlatFiles() throws Exception {
         String projectName = "test-project";
 
+        // Step - Create project with three versions
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
-
         Project project = dbEntityBuilder.getProject(projectName);
         ProjectVersion emptyVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         ProjectVersion updateVersion = dbEntityBuilder.getProjectVersion(projectName, 1);

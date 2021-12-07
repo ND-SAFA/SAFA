@@ -75,4 +75,8 @@ public class ArtifactType implements Serializable {
     public void setProject(Project project) {
         this.project = project;
     }
+
+    public boolean equals(ArtifactType other) {
+        return this.typeId.equals(other.typeId);
+    }
 }

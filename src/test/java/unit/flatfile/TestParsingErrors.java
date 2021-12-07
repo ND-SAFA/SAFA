@@ -43,7 +43,7 @@ public class TestParsingErrors extends ApplicationBaseTest {
             ProjectPaths.PATH_TO_TEST_3);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
 
-        // VP - Verify that error occurred.
+        // VP - Verify that no error occurred.
         assertThat(responseContent.getInt("status")).isEqualTo(0);
 
         // VP - Verify that message contains artifact that failed constraint
@@ -53,6 +53,6 @@ public class TestParsingErrors extends ApplicationBaseTest {
 
         // VP - Verify that artifact error specifies which artifact it occurred on.
         String artifactError = artifactErrors.getJSONObject(0).getString("message");
-        assertThat(artifactError).matches(".*SAF4.*artifact.*name.*[\\s\\S]");
+        assertThat(artifactError).matches(".*duplicate.*artifact.*SAF4.*");
     }
 }

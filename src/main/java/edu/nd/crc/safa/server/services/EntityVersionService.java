@@ -5,11 +5,11 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ParserError;
+import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,14 @@ public class EntityVersionService {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final ParserErrorRepository parserErrorRepository;
+    private final CommitErrorRepository commitErrorRepository;
 
     @Autowired
     public EntityVersionService(ArtifactVersionRepository artifactVersionRepository,
                                 TraceLinkVersionRepository traceLinkVersionRepository,
-                                ParserErrorRepository parserErrorRepository) {
+                                CommitErrorRepository commitErrorRepository) {
         this.artifactVersionRepository = artifactVersionRepository;
-        this.parserErrorRepository = parserErrorRepository;
+        this.commitErrorRepository = commitErrorRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
     }
 
@@ -43,16 +43,18 @@ public class EntityVersionService {
      *
      * @param projectVersion   The ProjectVersion associated with calculated artifact changes.
      * @param projectArtifacts List of artifact's in a project whose version will be stored.
+     * @return List of commit errors occurring while attempting to commit artifacts.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    public void setArtifactsAtVersion(ProjectVersion projectVersion,
-                                      List<ArtifactAppEntity> projectArtifacts) throws SafaError {
-        List<ParserError> parserErrors = this.artifactVersionRepository
-            .commitAppEntitiesToProjectVersion(projectVersion, projectArtifacts);
-        for (ParserError parserError : parserErrors) {
-            parserError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
-            this.parserErrorRepository.save(parserError);
+    public List<CommitError> commitVersionArtifacts(ProjectVersion projectVersion,
+                                                    List<ArtifactAppEntity> projectArtifacts) throws SafaError {
+        List<CommitError> commitErrors = this.artifactVersionRepository
+            .commitAllEntitiesInProjectVersion(projectVersion, projectArtifacts);
+        for (CommitError commitError : commitErrors) {
+            commitError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
+            this.commitErrorRepository.save(commitError);
         }
+        return commitErrors;
     }
 
     /**
@@ -61,16 +63,18 @@ public class EntityVersionService {
      *
      * @param projectVersion The ProjectVersion associated with calculated artifact changes.
      * @param traces         List of artifact's in a project whose version will be stored.
+     * @return List of errors occurring while committing traces.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    public void setTracesAtVersion(ProjectVersion projectVersion,
-                                   List<TraceAppEntity> traces) throws SafaError {
-        List<ParserError> parserErrors = this.traceLinkVersionRepository
-            .commitAppEntitiesToProjectVersion(projectVersion, traces);
+    public List<CommitError> commitVersionTraces(ProjectVersion projectVersion,
+                                                 List<TraceAppEntity> traces) throws SafaError {
+        List<CommitError> commitErrors = this.traceLinkVersionRepository
+            .commitAllEntitiesInProjectVersion(projectVersion, traces);
 
-        for (ParserError parserError : parserErrors) {
-            parserError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);
-            this.parserErrorRepository.save(parserError);
+        for (CommitError commitError : commitErrors) {
+            commitError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);
+            this.commitErrorRepository.save(commitError);
         }
+        return commitErrors;
     }
 }

@@ -98,7 +98,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
 
     @Override
     public String getBaseEntityId() {
-        return this.artifact.getArtifactId().toString();
+        return this.artifact.getBaseEntityId();
     }
 
     public String getName() {

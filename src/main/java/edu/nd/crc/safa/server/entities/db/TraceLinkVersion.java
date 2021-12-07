@@ -64,7 +64,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @Enumerated(EnumType.ORDINAL)
     TraceType traceType;
 
-    @Column(name = "approved")
+    @Column(name = "approval_status")
     TraceApproval approvalStatus;
 
     @Column(name = "score")
@@ -83,6 +83,9 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.projectVersion = projectVersion;
         this.modificationType = modificationType;
         this.traceLink = traceLink;
+        this.traceType = TraceType.MANUAL;
+        this.approvalStatus = TraceApproval.APPROVED;
+        this.score = 1;
     }
 
     public TraceLinkVersion(ProjectVersion projectVersion,
@@ -95,6 +98,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.traceLink = traceLink;
         this.score = score;
         this.traceType = TraceType.GENERATED;
+        this.approvalStatus = TraceApproval.UNREVIEWED;
     }
 
     public TraceLinkVersion(TraceAppEntity traceAppEntity) {
@@ -146,18 +150,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.traceType = traceType;
     }
 
-    private void setIsManual() {
-        this.approvalStatus = TraceApproval.APPROVED;
-        this.traceType = TraceType.MANUAL;
-        this.score = 1;
-    }
-
-    private void setIsGenerated(double score) {
-        this.approvalStatus = TraceApproval.UNREVIEWED;
-        this.traceType = TraceType.GENERATED;
-        this.score = score;
-    }
-
     public double getScore() {
         return this.score;
     }
@@ -179,6 +171,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         json.put("version", this.projectVersion);
         json.put("link", this.traceLink.toString());
         json.put("approved", getApprovalStatus());
+        json.put("type", this.traceType);
         return json + "\n";
     }
 
@@ -240,6 +233,10 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
             && this.traceLink.targetArtifact.getBaseEntityId().equals(target)
             && this.traceType == traceType
             && this.approvalStatus == traceApproval
-            && this.score == score;
+            && areEqualWithDelta(this.score, score, 0.001);
+    }
+
+    private boolean areEqualWithDelta(double a, double b, double delta) {
+        return Math.abs(a - b) < delta;
     }
 }

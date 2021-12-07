@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
@@ -61,50 +61,52 @@ public class Puller {
         this.traceLinkService = traceLinkService;
     }
 
-    public void parseJIRAIssues(ProjectVersion projectVersion) {
-        try {
-            String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
-                "Acceptance Test", "Environmental Assumption", "Simulation"
-            };
+    public void parseJIRAIssues(ProjectVersion projectVersion) throws Exception {
+        String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
+            "Acceptance Test", "Environmental Assumption", "Simulation"
+        };
 
-            Project project = projectVersion.getProject();
+        // Loop over issues returned from JIRA and add the found nodes and links
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        List<TraceAppEntity> traces = new ArrayList<>();
+        for (Issue issue : mJira.getIssues(types)) {
+            String issueContent = getIssueContent(issue);
+            foundNodes.add(issue.key);
 
-            // Loop over issues returned from JIRA and add the found nodes and links
-            List<ArtifactAppEntity> artifactsToUpdate = new ArrayList<>();
-            for (Issue issue : mJira.getIssues(types)) {
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("source", issue.source);
-                data.put("isDelegated", issue.isDelegated);
-                data.put("status", issue.status);
-                data.put("name", issue.name);
-                data.put("href", issue.href);
-                data.put("description", issue.description);
-                data.put("type", issue.type);
+            String artifactName = issue.key;
+            String typeName = issue.key;
 
-                foundNodes.add(issue.key);
+            artifacts.add(new ArtifactAppEntity(null, typeName, artifactName, "", issueContent));
 
-                String artifactName = issue.key;
-                String typeName = issue.key;
-                String artifactContent = JsonStream.serialize(data);
-                artifactsToUpdate.add(new ArtifactAppEntity(null, typeName, artifactName, "", artifactContent));
-
-                // Check that the link is only an inward link to this node
-                if (issue.links.size() > 0) {
-                    issue.links.stream().filter((link) -> Arrays
-                            .stream(types)
-                            .anyMatch((type) -> link
-                                .InwardType
-                                .equals(type)))
-                        .forEach((link) -> traceLinkService.parseTraceLink(projectVersion,
-                            issue.key,
-                            // TODO: Where is this being saved? Use commit
-                            link.InwardKey));
-                }
+            // Check that the link is only an inward link to this node
+            if (issue.links.size() > 0) {
+                issue.links.stream().filter((link) -> Arrays
+                        .stream(types)
+                        .anyMatch((type) -> link
+                            .InwardType
+                            .equals(type)))
+                    .forEach((link) -> {
+                        String source = issue.key;
+                        String target = link.InwardKey;
+                        TraceAppEntity trace = new TraceAppEntity(source, target);
+                        traces.add(trace);
+                    });
             }
-            entityVersionService.setArtifactsAtVersion(projectVersion, artifactsToUpdate);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
+        entityVersionService.commitVersionTraces(projectVersion, traces);
+    }
+
+    private String getIssueContent(Issue issue) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("source", issue.source);
+        data.put("isDelegated", issue.isDelegated);
+        data.put("status", issue.status);
+        data.put("name", issue.name);
+        data.put("href", issue.href);
+        data.put("description", issue.description);
+        data.put("type", issue.type);
+        return JsonStream.serialize(data);
     }
 
     /**

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -64,7 +64,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected FileUploadService fileUploadService;
 
     @Autowired
-    protected ParserErrorRepository parserErrorRepository;
+    protected CommitErrorRepository commitErrorRepository;
 
     @Autowired
     protected SafaUserRepository safaUserRepository;

@@ -76,8 +76,9 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    public Artifact findOrCreateBaseEntityFromAppEntity(Project project,
-                                                        ArtifactAppEntity artifactAppEntity) {
+    public Artifact findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
+                                                        ArtifactAppEntity artifactAppEntity) throws SafaError {
+        Project project = projectVersion.getProject();
         String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.getType();
         String artifactName = artifactAppEntity.getName();
@@ -92,15 +93,20 @@ public class ArtifactVersionRepositoryImpl
     private Artifact createOrUpdateArtifact(Project project,
                                             String artifactId,
                                             String artifactName,
-                                            ArtifactType artifactType) {
+                                            ArtifactType artifactType) throws SafaError {
         if (artifactId.equals("")) {
-            Artifact newArtifact = new Artifact(project, artifactType, artifactName);
+            Artifact newArtifact = this.artifactRepository
+                .findByProjectAndName(project, artifactName)
+                .orElseGet(() -> new Artifact(project, artifactType, artifactName));
             this.artifactRepository.save(newArtifact);
             return newArtifact;
         }
-        Artifact artifact = this.artifactRepository
-            .findById(UUID.fromString(artifactId))
-            .orElseGet(() -> new Artifact(project, artifactType, artifactName));
+        Optional<Artifact> artifactOptional = this.artifactRepository
+            .findById(UUID.fromString(artifactId));
+        if (artifactOptional.isEmpty()) {
+            throw new SafaError("Could not find artifact with id:" + artifactId);
+        }
+        Artifact artifact = artifactOptional.get();
         artifact.setType(artifactType);
         artifact.setName(artifactName);
         this.artifactRepository.save(artifact);

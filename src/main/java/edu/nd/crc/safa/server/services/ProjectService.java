@@ -76,8 +76,8 @@ public class ProjectService {
                                                         @NotNull List<ArtifactAppEntity> artifacts,
                                                         @NotNull List<TraceAppEntity> traces) throws SafaError {
 
-        entityVersionService.setArtifactsAtVersion(projectVersion, artifacts);
-        entityVersionService.setTracesAtVersion(projectVersion, traces);
+        entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
+        entityVersionService.commitVersionTraces(projectVersion, traces);
         return projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
     }
 
@@ -140,7 +140,7 @@ public class ProjectService {
         Project project,
         ProjectVersion projectVersion,
         ProjectAppEntity payload) throws SafaError {
-        ProjectEntities entityCreationResponse;
+        ProjectEntities projectEntities;
         if (projectVersion != null
             && projectVersion.hasValidVersion()
             && projectVersion.hasValidId()) {
@@ -149,11 +149,11 @@ public class ProjectService {
         this.projectRepository.save(project);
         this.setCurrentUserAsOwner(project);
         projectVersion = this.createBaseProjectVersion(project);
-        entityCreationResponse = this.saveProjectEntitiesToVersion(
+        projectEntities = this.saveProjectEntitiesToVersion(
             projectVersion,
             payload.getArtifacts(),
             payload.getTraces());
-        return entityCreationResponse;
+        return projectEntities;
     }
 
     public ProjectVersion createBaseProjectVersion(Project project) {

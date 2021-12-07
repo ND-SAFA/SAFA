@@ -21,9 +21,8 @@ import org.json.JSONObject;
  * Responsible for storing parsing errors when
  * uploading projects.
  */
-//TODO: Consider separating error details into an object (e.g. fileName, lineNumber);
 @Entity
-@Table(name = "parse_error")
+@Table(name = "commit_error")
 public class CommitError implements Serializable {
     @Id
     @GeneratedValue

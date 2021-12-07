@@ -9,7 +9,7 @@ import type {
   ArtifactQueryFunction,
   ProjectIdentifier,
 } from "@/types";
-import { LinkValidator } from "@/types";
+import { ArtifactTypeDirections, LinkValidator } from "@/types";
 import {
   appModule,
   artifactSelectionModule,
@@ -37,6 +37,11 @@ export default class ProjectModule extends VuexModule {
     traces: [],
     projectVersion: undefined,
   };
+
+  /**
+   * A mapping of the allowed directions of traces between artifacts.
+   */
+  private artifactTypeDirections: ArtifactTypeDirections = {};
 
   @Action({ rawError: true })
   /**
@@ -76,6 +81,8 @@ export default class ProjectModule extends VuexModule {
     subtreeModule.resetHiddenNodes();
 
     await subtreeModule.updateSubtreeMap();
+
+    this.updateAllowedTraceDirections();
   }
 
   @Action
@@ -152,6 +159,29 @@ export default class ProjectModule extends VuexModule {
     await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
   }
 
+  @Action
+  /**
+   * Updates what directions of trace links between artifacts are allowed.
+   */
+  updateAllowedTraceDirections(): void {
+    const allowedDirections: ArtifactTypeDirections = {};
+
+    this.getTraceLinks.forEach(({ source, target }) => {
+      const sourceType = this.getArtifactByName(source).type;
+      const targetType = this.getArtifactByName(target).type;
+
+      if (!allowedDirections[sourceType]) {
+        allowedDirections[sourceType] = [];
+      }
+
+      if (!allowedDirections[sourceType].includes(targetType)) {
+        allowedDirections[sourceType].push(targetType);
+      }
+    });
+
+    this.SET_TRACE_DIRECTIONS(allowedDirections);
+  }
+
   @Mutation
   /**
    * Sets a new project.
@@ -226,6 +256,16 @@ export default class ProjectModule extends VuexModule {
       (a) => !newArtifactIds.includes(a.id)
     );
     this.project.artifacts = unaffected.concat(artifacts);
+  }
+
+  @Mutation
+  /**
+   * Sets a new collection of allowed directions between artifact types.
+   *
+   * @param artifactTypeDirections - Directions between artifact types to allow.
+   */
+  SET_TRACE_DIRECTIONS(artifactTypeDirections: ArtifactTypeDirections): void {
+    this.artifactTypeDirections = artifactTypeDirections;
   }
 
   /**
@@ -329,6 +369,28 @@ export default class ProjectModule extends VuexModule {
           (t.target === sourceId && t.source === targetId)
       );
       return traceLinkQuery.length > 0;
+    };
+  }
+
+  /**
+   * Return the allowed directions of traces between artifacts.
+   */
+  get allowedArtifactTypeDirections(): ArtifactTypeDirections {
+    return this.artifactTypeDirections;
+  }
+
+  /**
+   * @return A function for determining if the trace link is allowed
+   * based on the type of the nodes.
+   */
+  get isLinkAllowedByType(): (
+    sourceType: string,
+    targetType: string
+  ) => boolean {
+    return (sourceType, targetType) => {
+      return this.allowedArtifactTypeDirections[sourceType]?.includes(
+        targetType
+      );
     };
   }
 }

@@ -17,15 +17,26 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
    */
   canConnect(sourceNode: NodeSingular, targetNode: NodeSingular): boolean {
     if (sourceNode.data() === undefined || targetNode.data() === undefined) {
+      // If either link doesn't have any data, the link cannot be created.
       return false;
     }
 
-    const doesLinkExist: boolean = projectModule.doesLinkExist(
+    // If this link already exists, the link cannot be created.
+    const linkDoesNotExist = !projectModule.doesLinkExist(
       sourceNode.data().id,
       targetNode.data().id
     );
 
-    return !doesLinkExist && !sourceNode.same(targetNode); // e.g. disallow loops
+    // If this link is to itself, the link cannot be created.
+    const isNotSameNode = !sourceNode.same(targetNode);
+
+    // If the link is not between allowed artifact directions, thee link cannot be created.
+    const linkIsAllowedByType = projectModule.isLinkAllowedByType(
+      sourceNode.data().artifactType,
+      targetNode.data().artifactType
+    );
+
+    return linkDoesNotExist && isNotSameNode && linkIsAllowedByType;
   },
 
   /**

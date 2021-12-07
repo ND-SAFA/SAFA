@@ -5,8 +5,8 @@ import { TraceApproval, TraceLink, TraceType } from "@/types";
 
 export function onArtifactTreeEdgeComplete(
   event: EventObject,
-  sourceNode: NodeSingular,
   targetNode: NodeSingular,
+  sourceNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
   disableDrawMode();

@@ -12,7 +12,7 @@
     :loading="isLoading"
     :search="search"
     :no-data-text="noDataText"
-    @item-selected="$emit('item:select', $event)"
+    @item-selected="$emit('item:select', $event, true)"
   >
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
@@ -79,9 +79,9 @@ import GenericIconButton from "@/components/common/generic/GenericIconButton.vue
  * Displays a generic selector.
  *
  * @emits-1 `refresh` - On refresh.
- * @emits-2 `item:select` - On select item.
- * @emits-3 `item:edit` - On edit item.
- * @emits-4 `item:delete` - On delete item.
+ * @emits-2 `item:select` (item: DataItemProps) - On select item.
+ * @emits-3 `item:edit` (item: DataItemProps) - On edit item.
+ * @emits-4 `item:delete` (item: DataItemProps) - On delete item.
  * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
@@ -143,16 +143,17 @@ export default Vue.extend({
       this.search = "";
     },
   },
+  mounted() {
+    if (this.items.length > 0) {
+      this.selected = [this.items[0]];
+      this.$emit("item:select", { item: this.items[0], value: true });
+    }
+  },
   watch: {
     items(newItems: DataItemProps[]) {
-      if (this.previousItems.length === 0 && newItems.length > 0) {
-        //selects any new item added
-        this.previousItems = newItems;
-      } else if (this.previousItems.length < newItems.length) {
-        const defaultItem: DataItemProps = this.items[0];
-        this.selected = [defaultItem];
-        this.previousItems = newItems;
-      }
+      this.selected = [this.items[0]];
+      this.previousItems = newItems;
+      this.$emit("item:select", { item: this.items[0], value: true });
     },
     isOpen(isOpen: boolean) {
       if (isOpen) {

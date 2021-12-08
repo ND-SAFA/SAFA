@@ -2,13 +2,13 @@
   <v-container>
     <v-row>
       <v-col cols="6">
-        <h3>{{ link.source }}</h3>
-        <p>{{ sourceBody }}</p>
+        <h2 class="text-h4">{{ link.source }}</h2>
+        <p class="text-body-1">{{ sourceBody }}</p>
       </v-col>
       <v-divider vertical />
       <v-col cols="6">
-        <h3>{{ link.target }}</h3>
-        <p>{{ targetBody }}</p>
+        <h2 class="text-h4">{{ link.target }}</h2>
+        <p class="text-body-1">{{ targetBody }}</p>
       </v-col>
     </v-row>
     <v-row justify="center" class="pt-5">

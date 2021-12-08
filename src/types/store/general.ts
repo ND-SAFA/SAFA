@@ -1,3 +1,5 @@
+export type ArtifactTypeDirections = { [id: string]: string[] };
+
 /**
  * Enumerates types of panels.
  */

@@ -9,9 +9,9 @@
       <v-row justify="center" class="mt-5">
         <v-container>
           <v-row justify="center">
-            <h3 style="text-align: center" class="mt-3 mb-3">
+            <span class="text-body-1 mt-3 mb-3 text-center">
               Select a Target Version
-            </h3>
+            </span>
           </v-row>
           <v-row justify="center">
             <version-selector

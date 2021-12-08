@@ -1,15 +1,15 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { connectAndSubscribeToVersion } from "@/api";
 import type {
-  ProjectCreationResponse,
-  Project,
   Artifact,
-  TraceLink,
-  ChannelSubscriptionId,
   ArtifactQueryFunction,
+  ChannelSubscriptionId,
+  Project,
+  ProjectCreationResponse,
   ProjectIdentifier,
+  TraceLink,
 } from "@/types";
-import { LinkValidator } from "@/types";
+import { ArtifactTypeDirections, LinkValidator, PanelType } from "@/types";
 import {
   appModule,
   artifactSelectionModule,
@@ -21,6 +21,15 @@ import {
 import { getSingleQueryResult } from "@/util";
 import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
+const emptyProject: Project = {
+  projectId: "",
+  description: "",
+  name: "Untitled",
+  artifacts: [],
+  traces: [],
+  projectVersion: undefined,
+};
+
 @Module({ namespaced: true, name: "project" })
 /**
  * This module tracks the currently loaded project.
@@ -29,14 +38,12 @@ export default class ProjectModule extends VuexModule {
   /**
    * The currently loaded project.
    */
-  private project: Project = {
-    projectId: "",
-    description: "",
-    name: "Untitled",
-    artifacts: [],
-    traces: [],
-    projectVersion: undefined,
-  };
+  private project: Project = emptyProject;
+
+  /**
+   * A mapping of the allowed directions of traces between artifacts.
+   */
+  private artifactTypeDirections: ArtifactTypeDirections = {};
 
   @Action({ rawError: true })
   /**
@@ -52,8 +59,6 @@ export default class ProjectModule extends VuexModule {
   ): Promise<void> {
     await this.setProject(res.project);
     errorModule.setArtifactWarnings(res.warnings);
-    await viewportModule.setArtifactTreeLayout();
-    deltaModule.setIsDeltaViewEnabled(false);
   }
 
   @Action
@@ -74,8 +79,22 @@ export default class ProjectModule extends VuexModule {
 
     deltaModule.clearDelta();
     subtreeModule.resetHiddenNodes();
+    appModule.closePanel(PanelType.left);
+    appModule.closePanel(PanelType.right);
+    deltaModule.setIsDeltaViewEnabled(false);
 
+    await viewportModule.setArtifactTreeLayout();
     await subtreeModule.updateSubtreeMap();
+
+    this.updateAllowedTraceDirections();
+  }
+
+  @Action
+  /**
+   * Clears the current project.
+   */
+  async clearProject(): Promise<void> {
+    await this.setProject(emptyProject);
   }
 
   @Action
@@ -152,6 +171,33 @@ export default class ProjectModule extends VuexModule {
     await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
   }
 
+  @Action({ rawError: true })
+  /**
+   * Updates what directions of trace links between artifacts are allowed.
+   */
+  updateAllowedTraceDirections(): void {
+    const allowedDirections: ArtifactTypeDirections = {};
+
+    this.getTraceLinks.forEach(({ source, target }) => {
+      try {
+        const sourceType = this.getArtifactByName(source).type;
+        const targetType = this.getArtifactByName(target).type;
+
+        if (!allowedDirections[sourceType]) {
+          allowedDirections[sourceType] = [];
+        }
+
+        if (!allowedDirections[sourceType].includes(targetType)) {
+          allowedDirections[sourceType].push(targetType);
+        }
+      } catch (e) {
+        console.log("Error calculating allowed trace directions", e);
+      }
+    });
+
+    this.SET_TRACE_DIRECTIONS(allowedDirections);
+  }
+
   @Mutation
   /**
    * Sets a new project.
@@ -226,6 +272,16 @@ export default class ProjectModule extends VuexModule {
       (a) => !newArtifactIds.includes(a.id)
     );
     this.project.artifacts = unaffected.concat(artifacts);
+  }
+
+  @Mutation
+  /**
+   * Sets a new collection of allowed directions between artifact types.
+   *
+   * @param artifactTypeDirections - Directions between artifact types to allow.
+   */
+  SET_TRACE_DIRECTIONS(artifactTypeDirections: ArtifactTypeDirections): void {
+    this.artifactTypeDirections = artifactTypeDirections;
   }
 
   /**
@@ -329,6 +385,28 @@ export default class ProjectModule extends VuexModule {
           (t.target === sourceId && t.source === targetId)
       );
       return traceLinkQuery.length > 0;
+    };
+  }
+
+  /**
+   * Return the allowed directions of traces between artifacts.
+   */
+  get allowedArtifactTypeDirections(): ArtifactTypeDirections {
+    return this.artifactTypeDirections;
+  }
+
+  /**
+   * @return A function for determining if the trace link is allowed
+   * based on the type of the nodes.
+   */
+  get isLinkAllowedByType(): (
+    sourceType: string,
+    targetType: string
+  ) => boolean {
+    return (sourceType, targetType) => {
+      return this.allowedArtifactTypeDirections[sourceType]?.includes(
+        targetType
+      );
     };
   }
 }

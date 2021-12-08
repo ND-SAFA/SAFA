@@ -3,7 +3,7 @@
     <h1 v-if="containsProject" class="text-h5 white--text">
       {{ projectName }}@{{ versionName }}
     </h1>
-    <h1 v-else class="text-h5">No Project Selected</h1>
+    <h1 v-else class="text-h5 white--text">No Project Selected</h1>
   </v-row>
 </template>
 <script lang="ts">

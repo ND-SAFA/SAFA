@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="my-2">Delta View</h1>
+    <h1 class="text-h4 my-2">Delta View</h1>
     <v-row justify="center">
       <v-switch
         color="primary"

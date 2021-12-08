@@ -33,7 +33,8 @@ export default Vue.extend({
         data: {
           ...this.traceDefinition,
           id,
-          source: target, //see comment header for explanation
+          // Reversed to show arrow toward parent.
+          source: target,
           target: source,
           count,
         },

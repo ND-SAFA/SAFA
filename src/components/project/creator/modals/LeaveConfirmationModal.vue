@@ -51,6 +51,7 @@
 import { appModule } from "@/store";
 import { Project } from "@/types";
 import Vue, { PropType } from "vue";
+
 export default Vue.extend({
   props: {
     project: {

@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <h3>{{ title }}</h3>
+      <h2 class="text-h6">{{ title }}</h2>
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>

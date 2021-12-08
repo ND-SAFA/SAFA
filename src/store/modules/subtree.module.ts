@@ -54,6 +54,17 @@ export default class SubtreeModule extends VuexModule {
 
   @Action
   /**
+   * Clears all data.
+   */
+  clearSubtrees(): void {
+    this.SET_SUBTREE_MAP({});
+    this.SET_SUBTREE_LINKS([]);
+    this.SET_COLLAPSED_PARENT_NODES([]);
+    this.SET_HIDDEN_SUBTREE_NODES([]);
+  }
+
+  @Action
+  /**
    * Hides the given artifact's subtree and add replaces child links with
    * phantom links. For any child link leaving a node, a phantom link is added
    * between the target and root node. Similarly, for any linking incoming to a

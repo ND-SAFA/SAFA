@@ -4,7 +4,6 @@ import {
   getRootNode,
   isInSubtree,
   doesNotContainType,
-  isRelatedToArtifacts,
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ARTIFACT_TREE_ZOOM,

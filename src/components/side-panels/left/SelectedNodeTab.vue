@@ -3,7 +3,7 @@
     <v-container v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
-          <h1>{{ selectedArtifact.name }}</h1>
+          <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
         </v-col>
         <v-col>
           <v-row justify="end">

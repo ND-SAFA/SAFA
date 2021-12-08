@@ -1,11 +1,11 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <v-row dense>
-        <v-col cols="1" align-self="center">
+      <v-row dense align="center" justify="start">
+        <v-col class="flex-grow-0">
           <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
         </v-col>
-        <v-col cols="11" align-self="center">
+        <v-col>
           <slot name="title" />
         </v-col>
       </v-row>
@@ -47,7 +47,7 @@
           <v-expansion-panels accordion>
             <v-expansion-panel v-if="entityNames.length !== 0">
               <v-expansion-panel-header>
-                <h4>Entities</h4>
+                <span class="text-h6">Entities</span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-row>
@@ -65,25 +65,22 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel v-if="errors.length > 0">
-              <v-expansion-panel-header>
-                <h4>
-                  <v-icon small :color="getIconColor(errorIconName)">{{
-                    errorIconName
-                  }}</v-icon
-                  >{{ errors.length === 0 ? "No Errors" : "Errors" }}
-                </h4>
+              <v-expansion-panel-header disable-icon-rotate>
+                <span class="text-h6">
+                  {{ errors.length === 0 ? "No Errors" : "Errors" }}
+                </span>
+                <template v-slot:actions>
+                  <v-icon color="error">mdi-alert-circle</v-icon>
+                </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-container>
-                  <v-row v-for="(error, i) in errors" :key="i">
-                    <v-col align-self="center" class="ma-0 pa-0">
-                      {{ i }}:
-                      <label class="text-caption" style="color: red">{{
-                        error
-                      }}</label>
-                    </v-col>
-                  </v-row>
-                </v-container>
+                <p
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  class="error--text my-0"
+                >
+                  {{ error }}
+                </p>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>

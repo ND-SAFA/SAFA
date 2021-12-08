@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="my-2">Artifact Hierarchy</h1>
+    <h1 class="text-h4 my-2">Artifact Hierarchy</h1>
     <v-col>
       <v-row>
         <v-text-field

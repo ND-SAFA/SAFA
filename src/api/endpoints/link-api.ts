@@ -7,15 +7,15 @@ import { CommitBuilder } from "@/util/commit-builder";
 /**
  * Returns all generated links for this project.
  *
- * @param projectId - The project ID to return links for.
+ * @param versionId - The project version id whose related links are retrieved.
  *
  * @return The generated links.
  */
 export async function getGeneratedLinks(
-  projectId: string
+  versionId: string
 ): Promise<TraceLink[]> {
   return authHttpClient<TraceLink[]>(
-    fillEndpoint(Endpoint.getGeneratedLinks, { projectId }),
+    fillEndpoint(Endpoint.getGeneratedLinks, { versionId }),
     { method: "GET" }
   );
 }

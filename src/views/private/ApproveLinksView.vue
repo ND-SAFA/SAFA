@@ -75,10 +75,11 @@ export default Vue.extend({
       navigateTo(Routes.ARTIFACT_TREE);
     },
     loadGeneratedLinks() {
-      if (this.projectId === "") {
+      const versionId = projectModule.getProject.projectVersion?.versionId;
+      if (versionId === undefined || versionId === "") {
         return appModule.onWarning("No project has been selected");
       }
-      getGeneratedLinks(this.projectId).then((links) => {
+      getGeneratedLinks(versionId).then((links) => {
         links.forEach((link) => {
           switch (link.approvalStatus) {
             case TraceApproval.UNREVIEWED:

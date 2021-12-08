@@ -18,13 +18,13 @@
         :key="`${traceLink.source}-${traceLink.target}`"
         :trace-definition="traceLink"
       />
+      <trace-link-approval-modal
+        v-if="selectedLink !== undefined"
+        :is-open="isTraceModalOpen"
+        :link="selectedLink"
+        @close="onTraceModalClose"
+      />
     </template>
-    <trace-link-approval-modal
-      v-if="selectedLink !== undefined"
-      :is-open="isTraceModalOpen"
-      :link="selectedLink"
-      @close="onTraceModalClose"
-    />
   </generic-cytoscape-controller>
 </template>
 

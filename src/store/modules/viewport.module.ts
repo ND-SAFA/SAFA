@@ -49,8 +49,6 @@ export default class ViewportModule extends VuexModule {
       .getSubtreeByArtifactName(artifact.name)
       .concat([artifact.name]);
 
-    console.log({ artifactsInSubtree });
-
     artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({

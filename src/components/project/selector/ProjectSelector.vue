@@ -160,11 +160,17 @@ export default Vue.extend({
     },
     deleteProjectHandler(project: ProjectIdentifier) {
       deleteProject(project.projectId)
-        .then(() => {
+        .then(async () => {
           appModule.onSuccess(`${project.name} successfully deleted.`);
+
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
+
+          if (project.name === projectModule.getProject.name) {
+            // Clear the current project if it has been deleted.
+            await projectModule.clearProject();
+          }
         })
         .finally(() => (this.isLoading = false));
     },

@@ -1,15 +1,15 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { connectAndSubscribeToVersion } from "@/api";
 import type {
-  ProjectCreationResponse,
-  Project,
   Artifact,
-  TraceLink,
-  ChannelSubscriptionId,
   ArtifactQueryFunction,
+  ChannelSubscriptionId,
+  Project,
+  ProjectCreationResponse,
   ProjectIdentifier,
+  TraceLink,
 } from "@/types";
-import { ArtifactTypeDirections, LinkValidator } from "@/types";
+import { ArtifactTypeDirections, LinkValidator, PanelType } from "@/types";
 import {
   appModule,
   artifactSelectionModule,
@@ -21,6 +21,15 @@ import {
 import { getSingleQueryResult } from "@/util";
 import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
+const emptyProject: Project = {
+  projectId: "",
+  description: "",
+  name: "Untitled",
+  artifacts: [],
+  traces: [],
+  projectVersion: undefined,
+};
+
 @Module({ namespaced: true, name: "project" })
 /**
  * This module tracks the currently loaded project.
@@ -29,14 +38,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * The currently loaded project.
    */
-  private project: Project = {
-    projectId: "",
-    description: "",
-    name: "Untitled",
-    artifacts: [],
-    traces: [],
-    projectVersion: undefined,
-  };
+  private project: Project = emptyProject;
 
   /**
    * A mapping of the allowed directions of traces between artifacts.
@@ -57,8 +59,6 @@ export default class ProjectModule extends VuexModule {
   ): Promise<void> {
     await this.setProject(res.project);
     errorModule.setArtifactWarnings(res.warnings);
-    await viewportModule.setArtifactTreeLayout();
-    deltaModule.setIsDeltaViewEnabled(false);
   }
 
   @Action
@@ -79,10 +79,22 @@ export default class ProjectModule extends VuexModule {
 
     deltaModule.clearDelta();
     subtreeModule.resetHiddenNodes();
+    appModule.closePanel(PanelType.left);
+    appModule.closePanel(PanelType.right);
+    deltaModule.setIsDeltaViewEnabled(false);
 
+    await viewportModule.setArtifactTreeLayout();
     await subtreeModule.updateSubtreeMap();
 
     this.updateAllowedTraceDirections();
+  }
+
+  @Action
+  /**
+   * Clears the current project.
+   */
+  async clearProject(): Promise<void> {
+    await this.setProject(emptyProject);
   }
 
   @Action
@@ -182,7 +194,7 @@ export default class ProjectModule extends VuexModule {
         console.log("Error calculating allowed trace directions", e);
       }
     });
-    console.log(allowedDirections);
+
     this.SET_TRACE_DIRECTIONS(allowedDirections);
   }
 

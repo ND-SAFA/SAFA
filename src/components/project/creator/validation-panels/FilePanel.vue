@@ -147,6 +147,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isOpen: true,
       error: this.showFileUploader ? DEFAULT_ERROR_MESSAGE : "",
     };
   },
@@ -192,11 +193,13 @@ export default Vue.extend({
     onClear(): void {
       this.$emit("change", undefined);
     },
-    emitChangeFiles(file: File): void {
+    emitChangeFiles(file: File | null): void {
       const fileIsEmpty = file === null;
+
       if (this.fileRequired) {
         this.error = fileIsEmpty ? DEFAULT_ERROR_MESSAGE : "";
       }
+
       if (fileIsEmpty) {
         this.onClear();
       } else {

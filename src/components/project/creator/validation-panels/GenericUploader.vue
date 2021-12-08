@@ -19,6 +19,7 @@
             :artifactMap="artifactMap"
             @change="onChange(i, $event)"
             @delete="deleteFile(i)"
+            @validate="onValidateChange(i, $event)"
           />
         </v-expansion-panels>
         <slot
@@ -108,6 +109,13 @@ export default Vue.extend({
           return a;
         })
       );
+    },
+    onValidateChange(i: number, isValid: boolean): void {
+      if (isValid) {
+        this.openPanelIndexes = this.openPanelIndexes.filter(
+          (panelIndex) => panelIndex !== i
+        );
+      }
     },
     deleteFile(i: number): void {
       this.$emit(

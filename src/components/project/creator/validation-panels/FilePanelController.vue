@@ -32,7 +32,8 @@ import FilePanel from "./FilePanel.vue";
 /**
  * Controls a file panel.
  *
- * @emits `delete` - On delete.
+ * @emits-1 `delete` - On delete.
+ * @emits-2 `validate` (isValid: boolean) - On validate.
  */
 export default Vue.extend({
   components: {
@@ -82,6 +83,7 @@ export default Vue.extend({
     },
     setValidationState(isValid: boolean): void {
       this.panel.projectFile.isValid = isValid;
+      this.$emit("validate", isValid);
     },
   },
   watch: {

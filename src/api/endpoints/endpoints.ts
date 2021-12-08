@@ -23,7 +23,7 @@ export enum Endpoint {
   getProjectMembers = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
 
-  //Changes
+  //Commits
   commit = "projects/versions/:versionId/commit",
   isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
 

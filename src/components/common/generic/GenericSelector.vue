@@ -48,7 +48,7 @@
         @click="$emit('item:edit', item)"
       />
       <generic-icon-button
-        v-if="hasDelete"
+        v-if="isDeleteEnabled(item)"
         icon-id="mdi-delete"
         tooltip="Delete"
         @click="$emit('item:delete', item)"
@@ -74,6 +74,7 @@
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
 import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
+import { DataItem, ProjectVersion } from "@/types";
 
 /**
  * Displays a generic selector.
@@ -120,6 +121,11 @@ export default Vue.extend({
       required: false,
       default: true,
     },
+    canDeleteFirstItem: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     hasSelect: {
       type: Boolean,
       required: false,
@@ -141,6 +147,12 @@ export default Vue.extend({
     clearData() {
       this.selected = [];
       this.search = "";
+    },
+    isDeleteEnabled(item: DataItem<ProjectVersion>): boolean {
+      return (
+        this.hasDelete &&
+        (this.canDeleteFirstItem || item.item !== this.items[0].item)
+      );
     },
   },
   mounted() {

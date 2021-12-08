@@ -8,6 +8,7 @@
     :is-open="isOpen"
     :is-loading="isLoading"
     :has-edit="false"
+    :can-delete-first-item="false"
     @item:select="onSelectVersion"
     @item:delete="onDeleteVersion"
     @item:add="onAddItem"

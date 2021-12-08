@@ -27,7 +27,7 @@
             @upload:invalid="setStepIsValid(1, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <artifact-type-creator-modal
+              <artifact-type-creator
                 :is-open="isCreatorOpen"
                 :artifact-types="artifactTypes"
                 @submit="onAddFile"
@@ -88,7 +88,7 @@ import { appModule, projectModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./uploaders";
-import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
+import { TraceFileCreator, ArtifactTypeCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
@@ -100,7 +100,7 @@ export default Vue.extend({
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
-    ArtifactTypeCreatorModal,
+    ArtifactTypeCreator,
     TraceFileCreator,
     TimTree,
   },

@@ -10,10 +10,9 @@ export const TIM_EDGE_X_MARGIN = 10;
  * Nodes
  */
 export const TIM_NODE_SHAPE = "round-rectangle";
-export const TIM_NODE_HEIGHT = 50;
-export const TIM_NODE_WIDTH = 100;
+export const TIM_NODE_HEIGHT = 100;
+export const TIM_NODE_WIDTH = 200;
 export const TIM_NODE_BACKGROUND_COLOR = "white";
-export const TIM_NODE_BORDER_COLOR = "black";
 export const TIM_NODE_BORDER_WIDTH = "1";
 
 /**

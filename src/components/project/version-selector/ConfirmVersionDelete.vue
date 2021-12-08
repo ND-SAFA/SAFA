@@ -7,11 +7,7 @@
     :actions-height="0"
   >
     <template v-slot:body>
-      <v-container class="mt-5 mb-0 pb-0">
-        <v-row justify="center">
-          <v-btn color="error" @click="onConfirm"> Delete Version </v-btn>
-        </v-row>
-      </v-container>
+      <v-btn color="error" @click="onConfirm" block class="mt-3">Delete</v-btn>
     </template>
   </generic-modal>
 </template>

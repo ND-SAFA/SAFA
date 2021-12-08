@@ -1,29 +1,22 @@
 <template>
-  <generic-modal size="xs" :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal size="md" :is-open="isOpen" :title="title" @close="onCancel">
     <template v-slot:body>
-      <v-container>
-        <v-row justify="center">
-          <v-col align-self="center">
-            <v-text-field
-              v-model="confirmText"
-              :label="textboxLabel"
-              class="ma-3"
-              rounded
-              solo
-              dense
-            />
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-text-field
+        v-model="confirmText"
+        :label="textboxLabel"
+        class="ma-3"
+        filled
+      />
     </template>
     <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn :disabled="!validated" color="error" @click="onConfirm">
-            {{ submitButtonLabel }}
-          </v-btn>
-        </v-row>
-      </v-container>
+      <v-btn
+        :disabled="!validated"
+        color="error"
+        @click="onConfirm"
+        class="ml-auto"
+      >
+        Delete
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -57,7 +50,6 @@ export default Vue.extend({
       textboxLabel: "",
       title: "",
       validated: false,
-      submitButtonLabel: "",
     };
   },
   methods: {
@@ -80,7 +72,6 @@ export default Vue.extend({
       if (project !== undefined) {
         this.textboxLabel = `Type "${project.name}"`;
         this.title = `Deleting: ${project.name}`;
-        this.submitButtonLabel = `Delete Project ${project.name}`;
       }
     },
     confirmText() {

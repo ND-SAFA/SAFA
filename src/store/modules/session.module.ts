@@ -1,16 +1,18 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
-import { loginUser } from "@/api";
+import { getCurrentVersion, getProjects, loginUser } from "@/api";
 import { navigateTo, Routes } from "@/router";
 import { AuthToken } from "@/types";
-import { appModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import jwt_decode from "jwt-decode";
+import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
 /**
  * If you only knew how many things I tried to not have to resort to this...
  */
 const emptySessionModel: SessionModel = {
   token: "",
+  versionId: "",
 };
 
 @Module({ namespaced: true, name: "session" })
@@ -31,7 +33,27 @@ export default class SessionModule extends VuexModule {
    */
   async login(user: UserModel): Promise<void> {
     const session = await loginUser(user);
+
     this.SET_SESSION(session);
+
+    await this.loadLastProject();
+  }
+
+  @Action({ rawError: true })
+  /**
+   * Loads the last stored project.
+   */
+  async loadLastProject(): Promise<void> {
+    const projects = await getProjects();
+
+    if (projects.length) {
+      const versionId = (await getCurrentVersion(projects[0].projectId))
+        .versionId;
+
+      this.SET_SESSION({ ...this.session, versionId });
+
+      await loadVersionIfExistsHandler(versionId);
+    }
   }
 
   @Action({ rawError: true })
@@ -40,6 +62,7 @@ export default class SessionModule extends VuexModule {
    */
   async logout(): Promise<void> {
     this.SET_SESSION(emptySessionModel);
+
     await navigateTo(Routes.LOGIN_ACCOUNT);
   }
 
@@ -48,15 +71,14 @@ export default class SessionModule extends VuexModule {
    * Checks is a token is in the store and
    */
   async hasAuthorization(): Promise<boolean> {
-    let error;
     if (this.isTokenEmpty) {
       return false;
     } else if (this.isTokenExpired) {
-      error = "Your session has expired, please log back in.";
-      appModule.onWarning(error);
+      appModule.onWarning("Your session has expired, please log back in.");
       await this.logout();
       return false;
     }
+
     return true;
   }
 

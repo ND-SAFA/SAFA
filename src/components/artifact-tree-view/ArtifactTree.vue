@@ -80,7 +80,7 @@ export default Vue.extend({
     project() {
       return projectModule.getProject;
     },
-    nodesInView(): Promise<string[]> {
+    nodesInView(): string[] {
       return viewportModule.getNodesInView;
     },
     unselectedNodeOpacity(): number {
@@ -91,9 +91,7 @@ export default Vue.extend({
     },
   },
   mounted() {
-    this.nodesInView.then((artifactIds: string[]) => {
-      this.artifactsInView = artifactIds;
-    });
+    this.artifactsInView = this.nodesInView;
   },
   watch: {
     nodesInView(): void {
@@ -102,9 +100,7 @@ export default Vue.extend({
   },
   methods: {
     setNodesInView(): void {
-      this.nodesInView.then((artifactIds: string[]) => {
-        this.artifactsInView = artifactIds;
-      });
+      this.artifactsInView = this.nodesInView;
     },
     getArtifactOpacity(name: string): number {
       if (this.hiddenSubtreeNodes.includes(name)) {

@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col>
-      <h2>Members</h2>
+      <h2 class="text-h5">Members</h2>
       <v-divider />
       <generic-selector
         :headers="headers"

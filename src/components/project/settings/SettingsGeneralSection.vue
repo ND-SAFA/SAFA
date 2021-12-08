@@ -3,8 +3,8 @@
     <v-col>
       <v-row>
         <v-col cols="11">
-          <h1>{{ project.name }}</h1></v-col
-        >
+          <h1 class="text-h4">{{ project.name }}</h1>
+        </v-col>
         <v-col cols="1">
           <generic-icon-button
             tooltip="Edit title"
@@ -14,7 +14,7 @@
         </v-col>
       </v-row>
       <v-divider />
-      <p>
+      <p class="text-body-1">
         {{ project.description }}
       </p>
     </v-col>

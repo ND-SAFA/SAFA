@@ -6,11 +6,11 @@ import {
 } from "@/types";
 import authHttpClient from "./auth-http-client";
 import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
+import { getCurrentVersion, getProjects } from "@/api";
 
 /**
  * TODO: remove once endpoints exist.
  */
-
 const TEST_ENDPOINTS = true;
 
 /**

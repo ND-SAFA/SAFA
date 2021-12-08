@@ -3,7 +3,7 @@
     <v-container v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
-          <h1>{{ selectedArtifact.name }}</h1>
+          <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
         </v-col>
         <v-col>
           <v-row justify="end">
@@ -38,17 +38,16 @@
             No parents linked.
           </p>
           <v-list dense v-else>
-            <v-list-item-group>
-              <v-list-item
-                v-for="parentName in parents"
-                :key="parentName"
-                @click="onArtifactClick(parentName)"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="parentName" />
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
+            <v-btn
+              outlined
+              block
+              class="mb-1"
+              v-for="parentName in parents"
+              :key="parentName"
+              @click="onArtifactClick(parentName)"
+            >
+              {{ parentName }}
+            </v-btn>
           </v-list>
         </v-col>
 
@@ -59,17 +58,16 @@
             No children linked.
           </p>
           <v-list dense v-else>
-            <v-list-item-group>
-              <v-list-item
-                v-for="childName in children"
-                :key="childName"
-                @click="onArtifactClick(childName)"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="childName" />
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
+            <v-btn
+              outlined
+              block
+              class="mb-1"
+              v-for="childName in children"
+              :key="childName"
+              @click="onArtifactClick(childName)"
+            >
+              {{ childName }}
+            </v-btn>
           </v-list>
         </v-col>
       </v-row>

@@ -19,6 +19,7 @@ import {
   appModule,
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import { navigateTo, Routes } from "@/router";
@@ -44,10 +45,12 @@ export default class ViewportModule extends VuexModule {
    * @param artifact - The artifact to select and view.
    */
   async viewArtifactSubtree(artifact: Artifact): Promise<void> {
-    const artifactsInSubtree = artifactSelectionModule
+    const artifactsInSubtree = subtreeModule
       .getSubtreeByArtifactName(artifact.name)
       .concat([artifact.name]);
+
     artifactSelectionModule.selectArtifact(artifact);
+
     await artifactSelectionModule.filterGraph({
       type: "subtree",
       artifactsInSubtree,
@@ -186,6 +189,7 @@ export default class ViewportModule extends VuexModule {
       artifacts.length === 0
         ? cy.nodes()
         : cy.nodes().filter((n) => artifacts.includes(n.data().id));
+
     if (collection.length > 1) {
       cy.animate({
         fit: { eles: collection, padding: CENTER_GRAPH_PADDING },
@@ -205,29 +209,16 @@ export default class ViewportModule extends VuexModule {
   /**
    * @return nodes in the current viewport.
    */
-  get getNodesInView(): Promise<string[]> {
+  get getNodesInView(): string[] {
     const subtree = artifactSelectionModule.getSelectedSubtree;
     const ignoreTypes = artifactSelectionModule.getIgnoreTypes;
     const artifacts: Artifact[] = projectModule.getArtifacts;
-    const unselectedNodeOpacity =
-      artifactSelectionModule.getUnselectedNodeOpacity;
 
-    const filteredArtifactNames = artifacts
+    return artifacts
       .filter(
         (a) => isInSubtree(subtree, a) && doesNotContainType(ignoreTypes, a)
       )
       .map((a) => a.name);
-
-    return new Promise((resolve) => {
-      artifactTreeCyPromise.then((cyCore: CytoCore) => {
-        cyCore.elements().style("opacity", 1);
-        cyCore
-          .elements()
-          .filter((e) => !isRelatedToArtifacts(filteredArtifactNames, e))
-          .style("opacity", unselectedNodeOpacity);
-        resolve(filteredArtifactNames);
-      });
-    });
   }
 
   @Mutation

@@ -14,11 +14,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, projectModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { Snackbar } from "@/components";
-import { getProjectVersion } from "@/api";
-import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
 export default Vue.extend({
   name: "app",
@@ -27,11 +25,12 @@ export default Vue.extend({
   },
   async mounted() {
     const isAuthorized = await sessionModule.hasAuthorization();
+
     if (!isAuthorized) {
       return await navigateTo(Routes.LOGIN_ACCOUNT);
+    } else {
+      await sessionModule.loadLastProject();
     }
-    const lastVersionId = projectModule.getProject.projectVersion?.versionId;
-    await loadVersionIfExistsHandler(lastVersionId);
   },
 });
 </script>

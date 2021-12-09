@@ -4,14 +4,16 @@
       <v-tabs centered v-model="selectedTab" show-arrows>
         <v-tab>Sub Tree Selector</v-tab>
         <v-tab>Delta</v-tab>
+        <v-tab>Trace Directions</v-tab>
         <v-tab>Safety Notation</v-tab>
       </v-tabs>
     </v-row>
 
     <v-expansion-panels multiple>
-      <SubTreeSelectorTab v-if="selectedTab === 0" />
-      <DeltaTab v-if="selectedTab === 1" @open="openDeltaPanel" />
-      <SafetyNotationTab v-if="selectedTab === 2" />
+      <sub-tree-selector-tab v-if="selectedTab === 0" />
+      <delta-tab v-if="selectedTab === 1" @open="openDeltaPanel" />
+      <trace-link-direction-tab v-if="selectedTab === 2" />
+      <safety-notation-tab v-if="selectedTab === 3" />
     </v-expansion-panels>
   </v-container>
 </template>
@@ -21,12 +23,14 @@ import Vue from "vue";
 import SubTreeSelectorTab from "./SubTreeSelectorTab.vue";
 import DeltaTab from "./DeltaTab.vue";
 import SafetyNotationTab from "./SafetyNotationTab.vue";
+import TraceLinkDirectionTab from "./TraceLinkDirectionTab.vue";
 
 const DELTA_TREE_INDEX = 1;
 
 export default Vue.extend({
   name: "hazard-hierarchy-panel",
   components: {
+    TraceLinkDirectionTab,
     SafetyNotationTab,
     DeltaTab,
     SubTreeSelectorTab,

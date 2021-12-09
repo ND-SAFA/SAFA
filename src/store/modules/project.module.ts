@@ -2,6 +2,7 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { connectAndSubscribeToVersion } from "@/api";
 import type {
   Artifact,
+  ArtifactDirection,
   ArtifactQueryFunction,
   ChannelSubscriptionId,
   Project,
@@ -19,7 +20,7 @@ import {
   viewportModule,
 } from "@/store";
 import { getSingleQueryResult } from "@/util";
-import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
+import { loadVersionIfExistsHandler } from "@/api";
 
 const emptyProject: Project = {
   projectId: "",
@@ -178,14 +179,15 @@ export default class ProjectModule extends VuexModule {
   updateAllowedTraceDirections(): void {
     const allowedDirections: ArtifactTypeDirections = {};
 
+    // Ensure that all artifact types appear in mapping.
+    this.getArtifacts.forEach((artifact) => {
+      allowedDirections[artifact.type] = [];
+    });
+
     this.getTraceLinks.forEach(({ source, target }) => {
       try {
         const sourceType = this.getArtifactByName(source).type;
         const targetType = this.getArtifactByName(target).type;
-
-        if (!allowedDirections[sourceType]) {
-          allowedDirections[sourceType] = [];
-        }
 
         if (!allowedDirections[sourceType].includes(targetType)) {
           allowedDirections[sourceType].push(targetType);
@@ -196,6 +198,17 @@ export default class ProjectModule extends VuexModule {
     });
 
     this.SET_TRACE_DIRECTIONS(allowedDirections);
+  }
+
+  @Action
+  /**
+   * Changes what directions of trace links between artifacts are allowed.
+   */
+  editAllowedTraceDirections({ type, allowedTypes }: ArtifactDirection): void {
+    this.SET_TRACE_DIRECTIONS({
+      ...this.artifactTypeDirections,
+      [type]: allowedTypes,
+    });
   }
 
   @Mutation

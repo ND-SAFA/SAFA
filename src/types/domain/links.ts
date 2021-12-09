@@ -73,3 +73,18 @@ export interface SubtreeLink extends TraceLink {
   type: "SUBTREE";
   rootNode: string;
 }
+
+/**
+ * The direction of trace links allowed by an artifact type.
+ */
+export interface ArtifactDirection {
+  type: string;
+  allowedTypes: string[];
+}
+
+/**
+ * The direction of trace links allowed by an artifact type, with a label.
+ */
+export interface LabeledArtifactDirection extends ArtifactDirection {
+  label: string;
+}

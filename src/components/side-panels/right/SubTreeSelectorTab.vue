@@ -107,7 +107,6 @@ export default Vue.extend({
 
 <style scoped>
 .search-container {
-  height: 200; /* or any height you want */
   overflow-y: auto;
 }
 </style>

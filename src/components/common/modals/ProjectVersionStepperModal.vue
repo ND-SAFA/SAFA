@@ -161,10 +161,14 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.$emit("close");
     },
-    selectProject(project: ProjectIdentifier) {
+    selectProject(project: ProjectIdentifier, goToNextStep = false) {
       this.selectedProject = project;
-      this.currentStep++;
+
       Vue.set(this.localSteps, 0, [project.name, true]);
+
+      if (goToNextStep) {
+        this.currentStep++;
+      }
     },
     unselectProject() {
       this.selectedProject = undefined;

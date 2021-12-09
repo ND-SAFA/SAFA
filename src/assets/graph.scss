@@ -18,6 +18,8 @@ $border-radius: 8px;
   text-align: center;
   border-bottom: 1px solid $color-border;
   margin: 0 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artifact-sub-header {

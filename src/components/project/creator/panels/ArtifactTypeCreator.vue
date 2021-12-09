@@ -1,10 +1,5 @@
 <template>
-  <v-row
-    v-if="isOpen"
-    align="center"
-    class="mx-auto my-3"
-    style="max-width: 30em"
-  >
+  <v-row v-if="isOpen" align="center" class="mx-auto my-3">
     <v-text-field
       v-model="artifactName"
       label="Artifact Name"
@@ -12,7 +7,9 @@
       :error-messages="errors"
       @keydown.enter="onEnterPress"
     />
-    <v-btn @click="onSubmit" color="primary" class="ml-1"> Create </v-btn>
+    <v-btn @click="onSubmit" color="primary" class="ml-1">
+      Create Artifact
+    </v-btn>
   </v-row>
 </template>
 

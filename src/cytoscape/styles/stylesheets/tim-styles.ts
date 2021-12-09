@@ -6,7 +6,6 @@ import {
   TIM_EDGE_WIDTH,
   TIM_EDGE_X_MARGIN,
   TIM_NODE_BACKGROUND_COLOR,
-  TIM_NODE_BORDER_COLOR,
   TIM_NODE_BORDER_WIDTH,
   TIM_NODE_HEIGHT,
   TIM_NODE_SHAPE,
@@ -31,8 +30,8 @@ export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
       width: TIM_NODE_WIDTH,
       height: TIM_NODE_HEIGHT,
       backgroundColor: TIM_NODE_BACKGROUND_COLOR,
-      "border-color": TIM_NODE_BORDER_COLOR,
       "border-width": TIM_NODE_BORDER_WIDTH,
+      "border-color": "white",
     },
   },
 ];

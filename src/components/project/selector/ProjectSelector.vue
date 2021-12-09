@@ -121,9 +121,9 @@ export default Vue.extend({
     onCloseProjectEdit() {
       this.editProjectDialogue = false;
     },
-    onSelectProject(item: DataItem<ProjectIdentifier>) {
+    onSelectProject(item: DataItem<ProjectIdentifier>, goToNextStep = false) {
       if (item.value) {
-        this.$emit("selected", item.item);
+        this.$emit("selected", item.item, goToNextStep);
       } else {
         this.$emit("unselected");
       }

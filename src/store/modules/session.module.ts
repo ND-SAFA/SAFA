@@ -3,7 +3,7 @@ import type { SessionModel, UserModel } from "@/types";
 import { getCurrentVersion, getProjects, loginUser } from "@/api";
 import { navigateTo, Routes } from "@/router";
 import { AuthToken } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { appModule, deltaModule, projectModule, subtreeModule } from "@/store";
 import jwt_decode from "jwt-decode";
 import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
@@ -62,6 +62,10 @@ export default class SessionModule extends VuexModule {
    */
   async logout(): Promise<void> {
     this.SET_SESSION(emptySessionModel);
+
+    await projectModule.clearProject();
+    deltaModule.clearDelta();
+    subtreeModule.clearSubtrees();
 
     await navigateTo(Routes.LOGIN_ACCOUNT);
   }

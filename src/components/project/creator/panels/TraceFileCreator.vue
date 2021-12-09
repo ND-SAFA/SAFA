@@ -1,24 +1,15 @@
 <template>
-  <v-row
-    v-if="isOpen"
-    align="center"
-    class="mx-auto my-3"
-    style="max-width: 35em"
-  >
-    <v-row align="start">
-      <v-col align-self="center">
-        <button-row :definitions="[sourceDefinition]"
-      /></v-col>
-      <v-col align-self="center">
-        <v-row justify="center">
-          <v-icon>mdi-arrow-right</v-icon>
-        </v-row>
-      </v-col>
-      <v-col align-self="center">
+  <v-row v-if="isOpen" class="my-3" align="center">
+    <v-col cols="10">
+      <div class="d-flex" style="width: min-content">
+        <button-row :definitions="[sourceDefinition]" />
+        <v-icon class="mx-2">mdi-arrow-right</v-icon>
         <button-row :definitions="[targetDefinition]" />
-      </v-col>
-    </v-row>
-    <v-btn @click="onSubmit" color="primary" class="ml-10"> Create </v-btn>
+      </div>
+    </v-col>
+    <v-col cols="2">
+      <v-btn @click="onSubmit" color="primary" class="ml-10">Create Link</v-btn>
+    </v-col>
   </v-row>
 </template>
 

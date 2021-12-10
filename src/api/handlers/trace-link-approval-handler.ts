@@ -29,17 +29,18 @@ export async function approveLinkAPIHandler(
  * @param link - The trace link to process.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export function declineLinkAPIHandler(
+export async function declineLinkAPIHandler(
   link: TraceLink,
   onSuccess?: EmptyLambda
-): void {
+): Promise<void> {
   link.approvalStatus = TraceApproval.DECLINED;
 
   linkAPIHandler(link, declineLink, async () => {
     if (onSuccess !== undefined) {
       onSuccess();
     }
-    projectModule.removeTraceLink(link);
+
+    await projectModule.removeTraceLink(link);
   });
 }
 

@@ -21,7 +21,6 @@ import {
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { navigateTo, Routes } from "@/router";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -74,7 +73,6 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout of the artifact tree.
    */
   async setArtifactTreeLayout(): Promise<void> {
-    await navigateTo(Routes.ARTIFACT_TREE);
     const layout = new ArtifactGraphLayout();
     const payload = { layout, cyPromise: artifactTreeCyPromise };
     const cy = await this.setGraphLayout(payload);

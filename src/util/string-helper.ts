@@ -37,6 +37,20 @@ export function capitalize(str: string): string {
 }
 
 /**
+ * Capitalizes the first letter of all words in the given string.
+ *
+ * @param str - The string to capitalize.
+ *
+ * @return The capitalized string.
+ */
+export function capitalizeSentence(str: string): string {
+  return str
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
+}
+
+/**
  * @deprecated Remove when project creator done.
  *
  * Returns the sentence case name of the artifact type.

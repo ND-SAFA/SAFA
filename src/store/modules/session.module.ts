@@ -1,11 +1,15 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SessionModel, UserModel } from "@/types";
-import { getCurrentVersion, getProjects, loginUser } from "@/api";
+import {
+  getCurrentVersion,
+  getProjects,
+  loginUser,
+  loadVersionIfExistsHandler,
+} from "@/api";
 import { navigateTo, Routes } from "@/router";
 import { AuthToken } from "@/types";
 import { appModule, deltaModule, projectModule, subtreeModule } from "@/store";
 import jwt_decode from "jwt-decode";
-import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
 
 /**
  * If you only knew how many things I tried to not have to resort to this...

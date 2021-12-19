@@ -17,7 +17,7 @@ import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { appModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
-import { loadVersionIfExistsHandler } from "@/api/handlers/load-version-if-exists-handler";
+import { loadVersionIfExistsHandler } from "@/api";
 
 const PROJECT_SELECTION_STEP = 1;
 const VERSION_SELECTION_STEP = 2;

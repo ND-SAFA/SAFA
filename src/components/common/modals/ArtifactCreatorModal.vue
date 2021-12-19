@@ -14,6 +14,7 @@
           color="primary"
           :hint="nameHint"
           :error-messages="nameError"
+          :loading="nameCheckIsLoading"
         />
         <v-combobox
           filled
@@ -82,6 +83,8 @@ export default Vue.extend({
       nameHint: DEFAULT_NAME_HINT,
       nameError: "",
       buttonDefinitions: [] as ButtonDefinition[],
+      nameCheckTimer: undefined as NodeJS.Timeout | undefined,
+      nameCheckIsLoading: false,
     };
   },
   computed: {
@@ -109,17 +112,23 @@ export default Vue.extend({
     },
     name(newName: string): void {
       if (newName !== "") {
-        // TODO: Only send request after user has stopped typing for at least
-        //       N milliseconds. See cytoscape rendering functions for timeout example.
-        isArtifactNameTaken(this.projectId, newName).then((res) => {
-          this.isNameValid = !res.artifactExists;
+        if (this.nameCheckTimer) {
+          clearTimeout(this.nameCheckTimer);
+        }
 
-          if (this.isNameValid) {
-            this.nameError = "";
-          } else {
-            this.nameError = "Name is already used, please select another.";
-          }
-        });
+        this.nameCheckIsLoading = true;
+        this.nameCheckTimer = setTimeout(() => {
+          isArtifactNameTaken(this.projectId, newName).then((res) => {
+            this.nameCheckIsLoading = false;
+            this.isNameValid = !res.artifactExists;
+
+            if (this.isNameValid) {
+              this.nameError = "";
+            } else {
+              this.nameError = "Name is already used, please select another.";
+            }
+          });
+        }, 500);
       }
     },
   },

@@ -12,4 +12,4 @@ F9,The system is equipped with ground-facing sensors to compute distance from th
 F15,The system shall provide the capability to automatically assign safe RTL altitudes.,The system shall provide the capability to automatically assign safe RTL altitudes.
 F16,RTL altitudes set above legal limits shall be logged,Whenever an RTL altitude is set above legal limits a persistent log shall be created
 F17,RTL altitudes shall be checked prior to flight to ensure that they are within legal limits.,RTL altitudes shall be checked prior to flight to ensure that they are within legal limits.
-M1,This artifact has never existed,This is a new artifact.
+D12,A brand new design document.,This is a new artifact.

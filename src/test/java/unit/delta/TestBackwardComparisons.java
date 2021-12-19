@@ -34,7 +34,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
         JSONObject backwardResponse = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
             "body");
         assertThat(backwardResponse.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(backwardResponse.getJSONObject("removed").has("M1")).isTrue();
+        assertThat(backwardResponse.getJSONObject("removed").has("D12")).isTrue();
         assertThat(backwardResponse.getJSONObject("added").has("D7")).isTrue();
     }
 

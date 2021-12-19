@@ -71,6 +71,9 @@ export interface TraceLinkDisplayData extends TraceLink {
  */
 export interface SubtreeLink extends TraceLink {
   type: "SUBTREE";
+  /**
+   * The name of the artifact. TODO: Replace with id.
+   */
   rootNode: string;
 }
 
@@ -78,7 +81,13 @@ export interface SubtreeLink extends TraceLink {
  * The direction of trace links allowed by an artifact type.
  */
 export interface ArtifactDirection {
+  /**
+   * The name of source the artifact type.
+   */
   type: string;
+  /**
+   * The names of the allowed target types.
+   */
   allowedTypes: string[];
 }
 
@@ -86,5 +95,8 @@ export interface ArtifactDirection {
  * The direction of trace links allowed by an artifact type, with a label.
  */
 export interface LabeledArtifactDirection extends ArtifactDirection {
+  /**
+   * The label to present an artifact direction.
+   */
   label: string;
 }

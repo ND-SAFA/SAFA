@@ -177,9 +177,6 @@ export default Vue.extend({
     selectVersion(version: ProjectVersion) {
       this.selectedVersion = version;
       Vue.set(this.localSteps, 1, [versionToString(version), true]);
-      if (this.versionStep < this.totalSteps) {
-        this.currentStep++;
-      }
     },
     unselectVersion() {
       this.selectedVersion = undefined;

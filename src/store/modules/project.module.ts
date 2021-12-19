@@ -217,7 +217,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param project - The new project to track.
    */
-  SAVE_PROJECT_IDENTIFIER(project: ProjectIdentifier): void {
+  SET_PROJECT_IDENTIFIER(project: ProjectIdentifier): void {
     this.project = {
       ...this.project,
       name: project.name,

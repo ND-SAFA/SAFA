@@ -187,7 +187,7 @@ export default Vue.extend({
       })
         .then((res: ProjectCreationResponse) => {
           const project = res.project;
-          projectModule.SAVE_PROJECT_IDENTIFIER(project);
+          projectModule.SET_PROJECT_IDENTIFIER(project);
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId
           );

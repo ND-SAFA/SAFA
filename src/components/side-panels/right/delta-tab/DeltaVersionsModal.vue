@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectVersion, DeltaPayload } from "@/types";
+import { Project, ProjectDelta, ProjectVersion } from "@/types";
 import { getProjectDelta } from "@/api";
 import { appModule, deltaModule, viewportModule } from "@/store";
 import { GenericModal } from "@/components/common";
@@ -81,7 +81,7 @@ export default Vue.extend({
           getProjectDelta(
             sourceVersion.versionId,
             this.selectedVersion.versionId
-          ).then(async (deltaPayload: DeltaPayload) => {
+          ).then(async (deltaPayload: ProjectDelta) => {
             await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("close");

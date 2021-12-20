@@ -1,14 +1,32 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type {
   AddedArtifact,
-  DeltaPayload,
+  Artifact,
   ModifiedArtifact,
+  Project,
   ProjectVersion,
   RemovedArtifact,
 } from "@/types";
-import { ArtifactDeltaState, PanelType } from "@/types";
+import {
+  ArtifactDeltaState,
+  EntityModification,
+  PanelType,
+  ProjectDelta,
+} from "@/types";
 import { appModule, projectModule } from "..";
 
+const EMPTY_PROJECT_DELTA = {
+  artifacts: {
+    added: {},
+    modified: {},
+    removed: {},
+  },
+  traces: {
+    added: {},
+    modified: {},
+    removed: {},
+  },
+};
 @Module({ namespaced: true, name: "delta" })
 /**
  * This module defines state variables for tracking artifact deltas.
@@ -25,15 +43,7 @@ export default class ErrorModule extends VuexModule {
   /**
    * A collection of all added artifacts.
    */
-  private added: Record<string, AddedArtifact> = {};
-  /**
-   * A collection of all removed artifacts.
-   */
-  private removed: Record<string, RemovedArtifact> = {};
-  /**
-   * A collection of all modified artifacts.
-   */
-  private modified: Record<string, ModifiedArtifact> = {};
+  private projectDelta: ProjectDelta = EMPTY_PROJECT_DELTA;
 
   @Action
   /**
@@ -51,9 +61,14 @@ export default class ErrorModule extends VuexModule {
    *
    * @param payload - All artifact deltas.
    */
-  async setDeltaPayload(payload: DeltaPayload): Promise<void> {
+  async setDeltaPayload(payload: ProjectDelta): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    await projectModule.addOrUpdateArtifacts(payload.missingArtifacts);
+    await projectModule.addOrUpdateArtifacts(
+      Object.values(payload.artifacts.added)
+    );
+    await projectModule.addOrUpdateTraceLinks(
+      Object.values(payload.traces.added)
+    );
   }
 
   @Action
@@ -71,12 +86,7 @@ export default class ErrorModule extends VuexModule {
    * Clears the current collections of artifact deltas.
    */
   clearDelta(): void {
-    this.SET_DELTA_PAYLOAD({
-      added: {},
-      removed: {},
-      modified: {},
-      missingArtifacts: [],
-    });
+    this.SET_DELTA_PAYLOAD(EMPTY_PROJECT_DELTA);
     this.SET_DELTA_IN_VIEW(false);
     appModule.closePanel(PanelType.right);
   }
@@ -95,12 +105,10 @@ export default class ErrorModule extends VuexModule {
   /**
    * Sets the current artifact deltas.
    *
-   * @param deltaPayload - The collections of deltas to set.
+   * @param projectDelta - The collections of artifact and trace deltas.
    */
-  SET_DELTA_PAYLOAD(deltaPayload: DeltaPayload): void {
-    this.added = deltaPayload.added;
-    this.removed = deltaPayload.removed;
-    this.modified = deltaPayload.modified;
+  SET_DELTA_PAYLOAD(projectDelta: ProjectDelta): void {
+    this.projectDelta = projectDelta;
   }
 
   @Mutation
@@ -116,22 +124,22 @@ export default class ErrorModule extends VuexModule {
   /**
    * @return A collection of added deltas.
    */
-  get getAdded(): Record<string, AddedArtifact> {
-    return this.added;
+  get addedArtifacts(): Record<string, Artifact> {
+    return this.projectDelta.artifacts.added;
   }
 
   /**
    * @return A collection of removed deltas.
    */
-  get getRemoved(): Record<string, RemovedArtifact> {
-    return this.removed;
+  get removedArtifacts(): Record<string, Artifact> {
+    return this.projectDelta.artifacts.removed;
   }
 
   /**
    * @return A collection of modified deltas.
    */
-  get getModified(): Record<string, ModifiedArtifact> {
-    return this.modified;
+  get modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
+    return this.projectDelta.artifacts.modified;
   }
 
   /**
@@ -158,11 +166,11 @@ export default class ErrorModule extends VuexModule {
       const deltaStates = new Set<ArtifactDeltaState>();
 
       for (const name of names) {
-        if (name in this.added) {
+        if (name in this.projectDelta.artifacts.added) {
           deltaStates.add(ArtifactDeltaState.ADDED);
-        } else if (name in this.modified) {
+        } else if (name in this.projectDelta.artifacts.modified) {
           deltaStates.add(ArtifactDeltaState.MODIFIED);
-        } else if (name in this.removed) {
+        } else if (name in this.projectDelta.artifacts.removed) {
           deltaStates.add(ArtifactDeltaState.REMOVED);
         }
       }

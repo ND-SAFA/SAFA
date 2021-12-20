@@ -5,25 +5,30 @@
       v-if="isDeltaMode"
       deltaType="added"
       class="mt-10"
-      :artifacts="artifactsAdded"
-      @click="(name) => selectArtifact(name, artifactsAdded[name])"
+      :names="addedArtifactNames"
+      @click="(name) => selectArtifact(name, addedArtifactNames[name], 'added')"
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
-      :artifacts="artifactsRemoved"
-      @click="(name) => selectArtifact(name, artifactsRemoved[name])"
+      :names="removedArtifactNames"
+      @click="
+        (name) => selectArtifact(name, removedArtifactNames[name], 'removed')
+      "
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
-      :artifacts="artifactsModified"
-      @click="(name) => selectArtifact(name, artifactsModified[name])"
+      :names="artifactsModified"
+      @click="
+        (name) => selectArtifact(name, artifactsModified[name], 'modified')
+      "
     />
     <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
       :isOpen="selectedDeltaArtifact !== undefined"
-      :artifact="selectedDeltaArtifact[1]"
+      :delta-type="selectedDeltaArtifact[2]"
+      :input-artifact="selectedDeltaArtifact[1]"
       :name="selectedDeltaArtifact[0]"
       @close="closeDeltaModal"
     />
@@ -31,14 +36,7 @@
 </template>
 
 <script lang="ts">
-import {
-  AddedArtifact,
-  ArtifactDelta,
-  ModifiedArtifact,
-  RemovedArtifact,
-  DeltaArtifacts,
-  Artifact,
-} from "@/types";
+import { Artifact, EntityModification, DeltaType } from "@/types";
 import Vue from "vue";
 import { deltaModule, projectModule } from "@/store";
 import {
@@ -47,7 +45,8 @@ import {
   ArtifactDeltaDiff,
 } from "./delta-tab";
 
-type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
+type DeltaArtifact = Artifact | EntityModification<Artifact>;
+type OptionalDeltaArtifact = [string, DeltaArtifact, string] | undefined;
 
 /**
  * Displays delta information.
@@ -63,8 +62,12 @@ export default Vue.extend({
     };
   },
   methods: {
-    selectArtifact(name: string, artifact: ArtifactDelta): void {
-      this.selectedDeltaArtifact = [name, artifact];
+    selectArtifact(
+      name: string,
+      artifact: DeltaArtifact,
+      deltaType: DeltaType
+    ): void {
+      this.selectedDeltaArtifact = [name, artifact, deltaType];
     },
     closeDeltaModal(): void {
       this.selectedDeltaArtifact = undefined;
@@ -77,21 +80,19 @@ export default Vue.extend({
     artifactHashmap(): Record<string, Artifact> {
       return projectModule.getArtifactHashmap;
     },
-    artifactsAdded(): Record<string, AddedArtifact> {
-      return deltaModule.getAdded;
+    addedArtifactNames(): string[] {
+      return Object.keys(deltaModule.addedArtifacts);
     },
-    artifactsRemoved(): Record<string, RemovedArtifact> {
-      return deltaModule.getRemoved;
+    removedArtifactNames(): string[] {
+      return Object.keys(deltaModule.removedArtifacts);
     },
-    artifactsModified(): Record<string, ModifiedArtifact> {
-      return deltaModule.getModified;
+    modifiedArtifactNames(): string[] {
+      return Object.keys(deltaModule.modifiedArtifacts);
     },
-    deltaArtifacts(): DeltaArtifacts {
-      return {
-        added: this.artifactsAdded,
-        removed: this.artifactsRemoved,
-        modified: this.artifactsModified,
-      };
+    deltaArtifacts(): string[] {
+      return this.addedArtifactNames.concat(
+        this.removedArtifactNames.concat(this.modifiedArtifactNames)
+      );
     },
     isDeltaMode(): boolean {
       return deltaModule.getIsDeltaViewEnabled;

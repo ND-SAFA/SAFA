@@ -70,7 +70,7 @@ export default Vue.extend({
         artifacts: [],
         traces: [],
       })
-        .then(() => projectModule.SAVE_PROJECT_IDENTIFIER(project))
+        .then(() => projectModule.SET_PROJECT_IDENTIFIER(project))
         .catch((e) => {
           console.error(e);
         })

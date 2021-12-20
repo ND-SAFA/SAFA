@@ -100,6 +100,9 @@ export default Vue.extend({
     isOpen(isOpen: boolean): void {
       if (isOpen) {
         this.fetchProjects();
+        if (this.projects.length === 1) {
+          this.$emit("selected", this.projects[0], true);
+        }
       }
     },
   },
@@ -184,12 +187,13 @@ export default Vue.extend({
       })
         .then((res: ProjectCreationResponse) => {
           const project = res.project;
-          projectModule.SAVE_PROJECT_IDENTIFIER(project);
+          projectModule.SET_PROJECT_IDENTIFIER(project);
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId
           );
 
           this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          this.$emit("selected", project, true);
           return project;
         })
         .finally(() => {

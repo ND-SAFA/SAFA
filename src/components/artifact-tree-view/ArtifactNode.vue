@@ -18,6 +18,7 @@ import {
   ModifiedArtifact,
   RemovedArtifact,
   ArtifactCytoCoreElement,
+  EntityModification,
 } from "@/types";
 import Vue, { PropType } from "vue";
 
@@ -32,21 +33,21 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      addedData: undefined as AddedArtifact | undefined,
-      removedData: undefined as RemovedArtifact | undefined,
-      modifiedData: undefined as ModifiedArtifact | undefined,
+      addedData: undefined as Artifact | undefined,
+      removedData: undefined as Artifact | undefined,
+      modifiedData: undefined as EntityModification<Artifact> | undefined,
     };
   },
   methods: {
-    setAddedData(data: AddedArtifact) {
+    setAddedData(data: Artifact) {
       this.clearData();
       this.addedData = data;
     },
-    setRemovedData(data: RemovedArtifact) {
+    setRemovedData(data: Artifact) {
       this.clearData();
       this.removedData = data;
     },
-    setModifiedData(data: ModifiedArtifact) {
+    setModifiedData(data: EntityModification<Artifact>) {
       this.clearData();
       this.modifiedData = data;
     },
@@ -96,12 +97,14 @@ export default Vue.extend({
       }
 
       const name: string = this.artifactDefinition.name;
-      const addedArtifacts: Record<string, AddedArtifact> =
-        deltaModule.getAdded;
-      const removedArtifacts: Record<string, RemovedArtifact> =
-        deltaModule.getRemoved;
-      const modifiedArtifacts: Record<string, ModifiedArtifact> =
-        deltaModule.getModified;
+      const addedArtifacts: Record<string, Artifact> =
+        deltaModule.addedArtifacts;
+      const removedArtifacts: Record<string, Artifact> =
+        deltaModule.removedArtifacts;
+      const modifiedArtifacts: Record<
+        string,
+        EntityModification<Artifact>
+      > = deltaModule.modifiedArtifacts;
 
       if (name in addedArtifacts) {
         this.setAddedData(addedArtifacts[name]);

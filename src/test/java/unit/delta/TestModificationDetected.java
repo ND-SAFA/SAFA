@@ -55,7 +55,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
         // VP - Verify that changes are detected
         assertThat(deltaResponse.getJSONObject("modified").has("F3")).isTrue();
         assertThat(deltaResponse.getJSONObject("removed").has("D7")).isTrue();
-        assertThat(deltaResponse.getJSONObject("added").has("M1")).isTrue();
+        assertThat(deltaResponse.getJSONObject("added").has("D12")).isTrue();
         assertThat(deltaResponse.getJSONArray("missingArtifacts").length()).isEqualTo(1);
 
         ProjectAppEntity beforeAppEntity = this.projectRetrievalService.retrieveApplicationEntity(beforeVersion);
@@ -63,7 +63,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .getArtifacts()
             .stream().map(a -> a.name)
             .collect(Collectors.toList());
-        assertThat(beforeArtifactNames.contains("M1")).isFalse();
+        assertThat(beforeArtifactNames.contains("D12")).isFalse();
         assertThat(beforeArtifactNames.contains("D7")).isTrue();
         assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
         ProjectAppEntity afterAppEntity = this.projectRetrievalService.retrieveApplicationEntity(afterVersion);
@@ -71,7 +71,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .getArtifacts()
             .stream().map(a -> a.name)
             .collect(Collectors.toList());
-        assertThat(afterArtifactNames.contains("M1")).isTrue();
+        assertThat(afterArtifactNames.contains("D12")).isTrue();
         assertThat(afterArtifactNames.contains("D7")).isFalse();
         assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
     }

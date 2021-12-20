@@ -25,7 +25,7 @@ public class VersionService {
     }
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
-        return this.projectVersionRepository.findByProject(project);
+        return this.projectVersionRepository.findByProjectInBackwardsOrder(project);
     }
 
     public ProjectVersion createNewMajorVersion(Project project) throws SafaError {

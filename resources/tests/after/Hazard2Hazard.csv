@@ -1,5 +1,5 @@
 Source,Target
-F1,F2
-F1,F3
-F1,F4
-F4,F20
+F2,F1
+F3,F1
+F4,F1
+F20,F4

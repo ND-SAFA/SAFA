@@ -209,7 +209,7 @@ export default class ViewportModule extends VuexModule {
   get getNodesInView(): string[] {
     const subtree = artifactSelectionModule.getSelectedSubtree;
     const ignoreTypes = artifactSelectionModule.getIgnoreTypes;
-    const artifacts: Artifact[] = projectModule.getArtifacts;
+    const artifacts: Artifact[] = projectModule.artifacts;
 
     return artifacts
       .filter(

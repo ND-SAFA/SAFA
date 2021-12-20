@@ -131,7 +131,7 @@ export default Vue.extend({
     parents(): string[] {
       const selectedArtifact = this.selectedArtifact;
       if (selectedArtifact !== undefined) {
-        const traceLinks = projectModule.getTraceLinks;
+        const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
           (l) => l.source === selectedArtifact.name
         );
@@ -143,7 +143,7 @@ export default Vue.extend({
     children(): string[] {
       const selectedArtifactName = this.selectedArtifactName;
       if (selectedArtifactName !== undefined) {
-        const traceLinks = projectModule.getTraceLinks;
+        const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
           (l) => l.target === selectedArtifactName
         );

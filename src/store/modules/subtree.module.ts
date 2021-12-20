@@ -38,7 +38,7 @@ export default class SubtreeModule extends VuexModule {
     const cy = await artifactTreeCyPromise;
     const subtreeMap: SubtreeMap = await createSubtreeMap(
       cy,
-      projectModule.getArtifacts
+      projectModule.artifacts
     );
     this.SET_SUBTREE_MAP(subtreeMap);
   }
@@ -225,7 +225,7 @@ export default class SubtreeModule extends VuexModule {
     c: string
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootName: string, childName: string) => {
-      const traceLinks = projectModule.getTraceLinks;
+      const traceLinks = projectModule.traceLinks;
       const subtreeLinkCreator: (f: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {

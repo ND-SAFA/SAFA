@@ -180,11 +180,11 @@ export default class ProjectModule extends VuexModule {
     const allowedDirections: ArtifactTypeDirections = {};
 
     // Ensure that all artifact types appear in mapping.
-    this.getArtifacts.forEach((artifact) => {
+    this.artifacts.forEach((artifact) => {
       allowedDirections[artifact.type] = [];
     });
 
-    this.getTraceLinks.forEach(({ source, target }) => {
+    this.traceLinks.forEach(({ source, target }) => {
       try {
         const sourceType = this.getArtifactByName(source).type;
         const targetType = this.getArtifactByName(target).type;
@@ -316,7 +316,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return The current project artifacts.
    */
-  get getArtifacts(): Artifact[] {
+  get artifacts(): Artifact[] {
     return this.project.artifacts;
   }
 
@@ -363,7 +363,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return All trace links in the current project.
    */
-  get getTraceLinks(): TraceLink[] {
+  get traceLinks(): TraceLink[] {
     return this.project.traces;
   }
 

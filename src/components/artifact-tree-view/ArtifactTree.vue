@@ -69,7 +69,7 @@ export default Vue.extend({
       return projectModule.getArtifactHashmap;
     },
     artifacts(): Artifact[] {
-      return projectModule.getArtifacts;
+      return projectModule.artifacts;
     },
     traces() {
       return projectModule.getProject.traces;

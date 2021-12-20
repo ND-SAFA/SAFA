@@ -73,7 +73,7 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return projectModule.getArtifacts;
+      return projectModule.artifacts;
     },
     definitions(): ButtonDefinition[] {
       // is computed because needs to react to changes to menuItems

@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceDelta;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVersion, UUID>,
-    IVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity, TraceDelta> {
+    IVersionRepository<TraceLinkVersion, TraceAppEntity> {
 
     default List<TraceLinkVersion> getApprovedLinksInVersion(ProjectVersion projectVersion) {
         return findByProjectVersionAndApprovalStatus(projectVersion, TraceApproval.APPROVED);

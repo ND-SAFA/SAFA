@@ -5,11 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.AddedArtifact;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.DeltaArtifact;
-import edu.nd.crc.safa.server.entities.app.ModifiedArtifact;
-import edu.nd.crc.safa.server.entities.app.RemovedArtifact;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
@@ -26,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements custom any custom artifact repository logic.
  */
 public class ArtifactVersionRepositoryImpl
-    extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity, DeltaArtifact> {
+    extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
 
     @Autowired
     ArtifactVersionRepository artifactVersionRepository;
@@ -158,32 +154,12 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public DeltaArtifact createDeltaEntity(ModificationType modificationType,
-                                           String baseEntityName,
-                                           ArtifactVersion baseVersionEntity,
-                                           ArtifactVersion targetVersionEntity) {
-        switch (modificationType) {
-            case MODIFIED:
-                return new ModifiedArtifact(baseEntityName,
-                    baseVersionEntity.getContent(),
-                    baseVersionEntity.getSummary(),
-                    targetVersionEntity.getContent(),
-                    targetVersionEntity.getSummary());
-            case ADDED:
-                return new AddedArtifact(baseEntityName,
-                    targetVersionEntity.getContent(),
-                    targetVersionEntity.getSummary());
-            case REMOVED:
-                return new RemovedArtifact(baseEntityName,
-                    baseVersionEntity.getContent(),
-                    baseVersionEntity.getSummary());
-            default:
-                return null;
-        }
+    public List<ArtifactVersion> findVersionEntitiesWithBaseEntity(Artifact baseEntity) {
+        return this.artifactVersionRepository.findByArtifact(baseEntity);
     }
 
     @Override
-    public List<ArtifactVersion> findVersionEntitiesWithBaseEntity(Artifact baseEntity) {
-        return this.artifactVersionRepository.findByArtifact(baseEntity);
+    public ArtifactAppEntity createAppFromVersion(ArtifactVersion versionEntity) {
+        return new ArtifactAppEntity(versionEntity);
     }
 }

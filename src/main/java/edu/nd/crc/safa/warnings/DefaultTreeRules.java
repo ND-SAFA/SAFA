@@ -9,17 +9,10 @@ import java.util.List;
 public class DefaultTreeRules {
     public static List<Rule> getDefaultRules() {
         List<Rule> defaultRules = new ArrayList<>();
-        defaultRules.add(atLeastOneRequirementForHazard());
         defaultRules.add(atLeastOneRequirementOrDesignOrProcessForRequirement());
         defaultRules.add(requirementHasNoPackageLinks());
         defaultRules.add(atLeastOnePackageForDesigns());
         return defaultRules;
-    }
-
-    public static Rule atLeastOneRequirementForHazard() {
-        return new Rule("Missing child",
-            "Hazard should have at least one child requirement",
-            "at-least-one(Hazard, child, Requirement)");
     }
 
     public static Rule atLeastOneRequirementOrDesignOrProcessForRequirement() {

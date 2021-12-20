@@ -1,7 +1,7 @@
 /**
  * Enumerates the types of artifact deltas.
  */
-import { Artifact } from "@/types";
+import { Artifact, TraceLink } from "@/types";
 
 export enum ArtifactDeltaState {
   NO_CHANGE = "no_change",
@@ -43,29 +43,41 @@ export type ArtifactDelta = AddedArtifact | RemovedArtifact | ModifiedArtifact;
 export type DeltaType = "added" | "modified" | "removed";
 
 /**
+ * Defines a modification over some delta
+ */
+export interface EntityModification<T> {
+  before: T;
+  after: T;
+}
+
+/**
  * Defines the delta artifacts state.
  */
-export interface DeltaArtifacts {
+export interface EntityDelta<T> {
   /**
    * A collection of all added artifacts.
    */
-  added: Record<string, AddedArtifact>;
+  added: Record<string, T>;
   /**
    * A collection of all removed artifacts.
    */
-  removed: Record<string, RemovedArtifact>;
+  removed: Record<string, T>;
   /**
    * A collection of all modified artifacts.
    */
-  modified: Record<string, ModifiedArtifact>;
+  modified: Record<string, EntityModification<T>>;
 }
 
 /**
  * Defines the delta payload state.
  */
-export interface DeltaPayload extends DeltaArtifacts {
+export interface ProjectDelta {
   /**
-   * A list of all missing artifacts.
+   * Mapping of artifact names and their corresponding changes.
    */
-  missingArtifacts: Artifact[];
+  artifacts: EntityDelta<Artifact>;
+  /**
+   * Mapping of trace ids and their corresponding changes.
+   */
+  traces: EntityDelta<TraceLink>;
 }

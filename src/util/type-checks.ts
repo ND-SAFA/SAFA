@@ -1,7 +1,9 @@
 import {
   AddedArtifact,
+  Artifact,
   ArtifactDelta,
   DeltaType,
+  EntityModification,
   ModifiedArtifact,
   RemovedArtifact,
 } from "@/types/domain";
@@ -27,31 +29,6 @@ export function isAPIError<T>(
 }
 
 /**
- * Returns whether the given ArtifactDelta is an added artifact.
- *
- * @param artifact - The artifact to check.
- *
- * @return Whether this item is an added artifact.
- */
-export function isAddedArtifact(
-  artifact: ArtifactDelta
-): artifact is AddedArtifact {
-  return "after" in artifact && !("before" in artifact);
-}
-
-/**
- * Returns whether the given ArtifactDelta is an removed artifact.
- *
- * @param artifact - The artifact to check.
- *
- * @return Whether this item is an removed artifact.
- */
-export function isRemovedArtifact(
-  artifact: ArtifactDelta
-): artifact is RemovedArtifact {
-  return "before" in artifact && !("after" in artifact);
-}
-/**
  * Returns whether the given ArtifactDelta is an modified artifact.
  *
  * @param artifact - The artifact to check.
@@ -59,26 +36,13 @@ export function isRemovedArtifact(
  * @return Whether this item is an modified artifact.
  */
 export function isModifiedArtifact(
-  artifact: ArtifactDelta
-): artifact is ModifiedArtifact {
+  artifact: any
+): artifact is EntityModification<Artifact> {
   return "before" in artifact && "after" in artifact;
 }
 
-/**
- * Returns the delta type of the given ArtifactDelta.
- *
- * @param artifact - The ArtifactDelta to check.
- *
- * @return The corresponding delta type (e.g. added, removed, modified).
- */
-export function getDeltaType(artifact: ArtifactDelta): DeltaType {
-  if (isAddedArtifact(artifact)) return "added";
-  if (isModifiedArtifact(artifact)) return "modified";
-  if (isRemovedArtifact(artifact)) return "removed";
-  else
-    throw Error(
-      "Unrecognized artifact delta state: " + JSON.stringify(artifact)
-    );
+export function isArtifact(obj: any): obj is Artifact {
+  return "id" in obj && "summary" in obj && "body" in obj && "type" in obj;
 }
 
 /**

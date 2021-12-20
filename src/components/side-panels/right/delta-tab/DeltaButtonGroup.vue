@@ -6,9 +6,8 @@
 
     <v-expansion-panel-content>
       <artifact-delta-button
-        v-for="(artifact, name) in artifacts"
+        v-for="name in names"
         :key="name"
-        :artifact="artifact"
         :name="name"
         :deltaType="deltaType"
         @click="$emit('click', $event)"
@@ -19,7 +18,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactDelta, DeltaType } from "@/types";
+import { DeltaType } from "@/types";
 import { capitalize } from "@/util";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -35,26 +34,23 @@ export default Vue.extend({
       type: String as PropType<DeltaType>,
       required: true,
     },
-    artifacts: {
-      type: Object as PropType<Record<string, ArtifactDelta>>,
+    names: {
+      type: Array as PropType<string[]>,
       required: true,
     },
   },
   data() {
     return {
       isDeltaOpen: false,
-      selectedArtifact: undefined as ArtifactDelta | undefined,
       selectedName: undefined as string | undefined,
     };
   },
   methods: {
     closeDeltaModal(): void {
-      this.selectedArtifact = undefined;
       this.selectedName = undefined;
       this.isDeltaOpen = false;
     },
     selectArtifact(artifactName: string): void {
-      this.selectedArtifact = this.artifacts[artifactName];
       this.selectedName = artifactName;
       this.isDeltaOpen = true;
     },

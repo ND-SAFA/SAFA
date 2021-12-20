@@ -1,8 +1,8 @@
 import {
-  DeltaPayload,
   MemberRequest,
   Project,
   ProjectCreationResponse,
+  ProjectDelta,
   ProjectIdentifier,
   ProjectMembership,
   ProjectRole,
@@ -104,8 +104,8 @@ export async function deleteProject(projectId: string): Promise<void> {
 export async function getProjectDelta(
   sourceVersionId: string,
   targetVersionId: string
-): Promise<DeltaPayload> {
-  return authHttpClient<DeltaPayload>(
+): Promise<ProjectDelta> {
+  return authHttpClient<ProjectDelta>(
     fillEndpoint(Endpoint.getProjectDelta, {
       sourceVersionId,
       targetVersionId,

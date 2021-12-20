@@ -10,23 +10,23 @@
         <code-diff
           v-if="deltaType === 'added'"
           :old-string="''"
-          :new-string="splitIntoLines(artifact.after)"
+          :new-string="splitIntoLines(artifact)"
           :context="context"
           :output-format="outputFormat"
           :diff-style="diffStyle"
         />
         <code-diff
-          v-else-if="deltaType === 'removed'"
-          :old-string="splitIntoLines(artifact.before)"
+          v-else-if="deltaType === 'removed' && artifact !== undefined"
+          :old-string="splitIntoLines(artifact.body)"
           :new-string="''"
           :context="context"
           :output-format="outputFormat"
           :diff-style="diffStyle"
         />
         <code-diff
-          v-else-if="deltaType === 'modified'"
-          :old-string="splitIntoLines(artifact.before)"
-          :new-string="splitIntoLines(artifact.after)"
+          v-else-if="deltaType === 'modified' && modification !== undefined"
+          :old-string="splitIntoLines(modification.before.body)"
+          :new-string="splitIntoLines(modification.after.body)"
           :context="context"
           :output-format="outputFormat"
           :diff-style="diffStyle"
@@ -39,9 +39,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import CodeDiff from "vue-code-diff";
-import { ArtifactDelta, DeltaType } from "@/types";
-import { getDeltaType, splitIntoLines } from "@/util";
+import { Artifact, DeltaType, EntityModification } from "@/types";
+import { isArtifact, isModifiedArtifact, splitIntoLines } from "@/util";
 import { GenericModal } from "@/components/common";
+
+type InputArtifact = Artifact | EntityModification<Artifact>;
 
 /**
  * Displays artifact delta code diffs.
@@ -55,12 +57,16 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    artifact: {
-      type: Object as PropType<ArtifactDelta>,
+    inputArtifact: {
+      type: Object as PropType<InputArtifact>,
       required: true,
     },
     name: {
       type: String,
+      required: true,
+    },
+    deltaType: {
+      type: String as PropType<DeltaType>,
       required: true,
     },
   },
@@ -73,8 +79,17 @@ export default Vue.extend({
     };
   },
   computed: {
-    deltaType(): DeltaType {
-      return getDeltaType(this.artifact);
+    artifact(): Artifact | undefined {
+      if (isArtifact(this.artifact)) {
+        return this.artifact;
+      }
+      return undefined;
+    },
+    modification(): EntityModification<Artifact> | undefined {
+      if (isModifiedArtifact(this.inputArtifact)) {
+        return this.inputArtifact;
+      }
+      return undefined;
     },
   },
   methods: {

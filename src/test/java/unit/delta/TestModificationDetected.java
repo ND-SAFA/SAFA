@@ -50,13 +50,14 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject deltaResponse = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
+        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
+        JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
+        JSONObject traceDelta = projectDelta.getJSONObject("traces");
 
-        // VP - Verify that changes are detected
-        assertThat(deltaResponse.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(deltaResponse.getJSONObject("removed").has("D7")).isTrue();
-        assertThat(deltaResponse.getJSONObject("added").has("D12")).isTrue();
-        assertThat(deltaResponse.getJSONArray("missingArtifacts").length()).isEqualTo(1);
+        // VP - Verify that artifact changes are detected
+        assertThat(artifactDelta.getJSONObject("modified").has("F3")).isTrue();
+        assertThat(artifactDelta.getJSONObject("removed").has("D7")).isTrue();
+        assertThat(artifactDelta.getJSONObject("added").has("D12")).isTrue();
 
         ProjectAppEntity beforeAppEntity = this.projectRetrievalService.retrieveApplicationEntity(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity
@@ -74,5 +75,14 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(afterArtifactNames.contains("D12")).isTrue();
         assertThat(afterArtifactNames.contains("D7")).isFalse();
         assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+
+        // VP - Verify that trace link changes are detected
+        int nTracesAdded = traceDelta.getJSONObject("added").keySet().toArray().length;
+        int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
+        int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
+
+        assertThat(nTracesAdded).isEqualTo(1);
+        assertThat(nTracesModified).isEqualTo(0);
+        assertThat(nTracesRemoved).isEqualTo(0);
     }
 }

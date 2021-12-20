@@ -2,6 +2,8 @@ package unit.delta;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.List;
+
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -31,11 +33,24 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .get();
-        JSONObject backwardResponse = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
+        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
             "body");
-        assertThat(backwardResponse.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(backwardResponse.getJSONObject("removed").has("D12")).isTrue();
-        assertThat(backwardResponse.getJSONObject("added").has("D7")).isTrue();
+
+        // VP - Verify that artifact changes are flipped
+        JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
+        assertThat(artifactDelta.getJSONObject("modified").has("F3")).isTrue();
+        assertThat(artifactDelta.getJSONObject("removed").has("D12")).isTrue();
+        assertThat(artifactDelta.getJSONObject("added").has("D7")).isTrue();
+
+        // VP -
+        JSONObject traceDelta = projectDelta.getJSONObject("traces");
+        int nTracesAdded = traceDelta.getJSONObject("added").keySet().toArray().length;
+        int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
+        int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
+
+        assertThat(nTracesAdded).isEqualTo(0);
+        assertThat(nTracesModified).isEqualTo(0);
+        assertThat(nTracesRemoved).isEqualTo(1);
     }
 
     @Test
@@ -62,11 +77,16 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject response = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
+        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
             "body");
-        //
-        assertThat(response.getJSONObject("added").keySet().size()).isEqualTo(0);
-        assertThat(response.getJSONObject("removed").keySet().size()).isEqualTo(0);
-        assertThat(response.getJSONObject("modified").keySet().size()).isEqualTo(0);
+
+
+        // VP - Verify that no changes are detected in artifacts
+        for (String entityName : List.of("artifacts", "traces")) {
+            JSONObject entityDelta = projectDelta.getJSONObject(entityName);
+            assertThat(entityDelta.getJSONObject("added").keySet().size()).isEqualTo(0);
+            assertThat(entityDelta.getJSONObject("removed").keySet().size()).isEqualTo(0);
+            assertThat(entityDelta.getJSONObject("modified").keySet().size()).isEqualTo(0);
+        }
     }
 }

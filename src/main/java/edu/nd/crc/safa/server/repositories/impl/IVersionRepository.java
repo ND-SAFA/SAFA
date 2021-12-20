@@ -3,10 +3,9 @@ package edu.nd.crc.safa.server.repositories.impl;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
-import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
-import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -16,10 +15,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  * @param <VersionEntity> The type of versioned entity.
  */
 public interface IVersionRepository<
-    BaseEntity extends IBaseEntity,
     VersionEntity extends IVersionEntity<AppEntity>,
-    AppEntity extends IAppEntity,
-    DeltaEntity extends IDeltaEntity> {
+    AppEntity extends IAppEntity> {
 
     /**
      * Returns the current entities existing in given project version.
@@ -63,15 +60,20 @@ public interface IVersionRepository<
         String baseEntityName);
 
     /**
-     * Calculates and returns the delta between the versions of given baseEntity
+     * Calculates and returns the delta between the versions
      * beginning at base version and ending at target version.
      *
-     * @param baseEntity    The baseEntity whose versions are being compared.
-     * @param baseVersion   The starting version of the delta.
-     * @param targetVersion The ending version of the delta.
+     * @param baselineVersion The starting version of the delta.
+     * @param targetVersion   The ending version of the delta.
      * @return The change necessary to move between base and target version of artifact.
      */
-    DeltaEntity calculateDeltaEntityBetweenProjectVersions(BaseEntity baseEntity,
-                                                           ProjectVersion baseVersion,
-                                                           ProjectVersion targetVersion);
+    EntityDelta<AppEntity> calculateEntityDelta(ProjectVersion baselineVersion,
+                                                ProjectVersion targetVersion);
+
+
+    /**
+     * @param versionEntity A versioned entity.
+     * @return The corresponding app entity to given version entity.
+     */
+    AppEntity createAppFromVersion(VersionEntity versionEntity);
 }

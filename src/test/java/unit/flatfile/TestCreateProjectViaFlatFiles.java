@@ -94,7 +94,7 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
 
         // VP - Project warnings present in response
         JSONObject projectWarnings = responseBody.getJSONObject("warnings");
-        assertThat(projectWarnings.keySet().size()).isGreaterThanOrEqualTo(2);
+        assertThat(projectWarnings.keySet().size()).isGreaterThanOrEqualTo(1);
 
         // VP 3 - Resources were created
         List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);

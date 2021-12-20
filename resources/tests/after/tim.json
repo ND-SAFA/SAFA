@@ -1,47 +1,42 @@
 {
-    "DataFiles": 
-      {
-        "Hazard": {
-          "File": "Hazard.csv"
-        },
-        "Requirement": {
-          "File": "Requirement.csv"
-        },
-        "Design": {
-          "File": "Design.csv"
-        },
-        "EnvironmentalAssumption": {
-          "File": "EnvironmentalAssumption.csv"
-        }
-      },
-     "HazardToHazard": 
-      {
-        "Source": "Hazard",
-        "Target":  "Hazard",
-        "File": "Hazard2Hazard.csv"
-      },
-     "DesignToDesign": 
-      {
-        "Source": "Design",
-        "Target":  "Design",
-        "File": "Design2Design.csv"
-      },
-    "DesignToRequirement": 
-      {
-        "Source": "Design",
-        "Target":  "Requirement",
-        "File": "Design2Requirement.csv"
-      },
-    "RequirementToHazard": 
-      {
-        "Source": "Requirement",
-        "Target":  "Hazard",
-        "File": "Requirement2Hazard.csv"
-      },
-     "EnvironmentalAssumptionToHazard": 
-      {
-        "Source": "EnvironmentalAssumption",
-        "Target":  "Hazard",
-        "File": "EnvironmentalAssumption2Hazard.csv"
-      }
+  "DataFiles": {
+    "Hazard": {
+      "File": "Hazard.csv"
+    },
+    "Requirement": {
+      "File": "Requirement.csv"
+    },
+    "Design": {
+      "File": "Design.csv"
+    },
+    "EnvironmentalAssumption": {
+      "File": "EnvironmentalAssumption.csv"
+    }
+  },
+  "HazardToHazard": {
+    "Source": "Hazard",
+    "Target": "Hazard",
+    "File": "Hazard2Hazard.csv"
+  },
+  "DesignToDesign": {
+    "Source": "Design",
+    "Target": "Design",
+    "File": "Design2Design.csv"
+  },
+  "DesignToRequirement": {
+    "Source": "Design",
+    "Target": "Requirement",
+    "File": "Design2Requirement.csv",
+    "generateLinks": true
+  },
+  "RequirementToHazard": {
+    "Source": "Requirement",
+    "Target": "Hazard",
+    "File": "Requirement2Hazard.csv"
+  },
+  "EnvironmentalAssumptionToHazard": {
+    "Source": "EnvironmentalAssumption",
+    "Target": "Hazard",
+    "File": "EnvironmentalAssumption2Hazard.csv"
   }
+}

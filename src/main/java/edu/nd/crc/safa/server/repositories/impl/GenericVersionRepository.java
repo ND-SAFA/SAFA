@@ -9,8 +9,9 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
-import edu.nd.crc.safa.server.entities.app.IDeltaEntity;
+import edu.nd.crc.safa.server.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
@@ -21,6 +22,7 @@ import edu.nd.crc.safa.server.entities.db.VersionAction;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
@@ -31,9 +33,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 public abstract class GenericVersionRepository<
     BaseEntity extends IBaseEntity,
     VersionEntity extends IVersionEntity<AppEntity>,
-    AppEntity extends IAppEntity,
-    DeltaEntity extends IDeltaEntity>
-    implements IVersionRepository<BaseEntity, VersionEntity, AppEntity, DeltaEntity> {
+    AppEntity extends IAppEntity>
+    implements IVersionRepository<VersionEntity, AppEntity> {
 
     /**
      * @param project The project whose entities are retrieved.
@@ -107,21 +108,6 @@ public abstract class GenericVersionRepository<
                                                       BaseEntity baseEntity);
 
     /**
-     * Creates and populated delta entity using the modification type and given
-     * source and target version entities.
-     *
-     * @param modificationType    The type of change between base and target entities
-     * @param baseEntityName      The name of the base entity.
-     * @param baseVersionEntity   The version entity representing the start of the delta.
-     * @param targetVersionEntity The version entity representing the final state of the delta.
-     * @return The populated delta artifacts with given modification.
-     */
-    abstract DeltaEntity createDeltaEntity(ModificationType modificationType,
-                                           String baseEntityName,
-                                           VersionEntity baseVersionEntity,
-                                           VersionEntity targetVersionEntity);
-
-    /**
      * @param baseEntity The base entity whose versions are returned.
      * @return Returns list of versions associated with base entity.
      */
@@ -176,28 +162,6 @@ public abstract class GenericVersionRepository<
     }
 
     @Override
-    public DeltaEntity calculateDeltaEntityBetweenProjectVersions(BaseEntity baseEntity,
-                                                                  ProjectVersion baseVersion,
-                                                                  ProjectVersion targetVersion) {
-        String artifactName = baseEntity.getBaseEntityId();
-        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(baseEntity);
-
-        VersionEntity beforeBody = this.getEntityAtVersion(bodies,
-            baseVersion);
-        VersionEntity afterBody = this.getEntityAtVersion(bodies,
-            targetVersion);
-
-        ModificationType modificationType = this
-            .calculateModificationType(beforeBody, afterBody);
-
-        if (modificationType == null) {
-            return null;
-        }
-
-        return this.createDeltaEntity(modificationType, artifactName, beforeBody, afterBody);
-    }
-
-    @Override
     public CommitError deleteVersionEntityByBaseName(
         ProjectVersion projectVersion,
         String baseEntityName) {
@@ -213,6 +177,69 @@ public abstract class GenericVersionRepository<
                     this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
                 }
             });
+    }
+
+    @Override
+    public EntityDelta<AppEntity> calculateEntityDelta(
+        ProjectVersion baselineVersion,
+        ProjectVersion targetVersion) {
+        Project project = baselineVersion.getProject();
+        Hashtable<String, AppEntity> addedArtifacts = new Hashtable<>();
+        Hashtable<String, ModifiedEntity<AppEntity>> modifiedArtifacts = new Hashtable<>();
+        Hashtable<String, AppEntity> removedArtifacts = new Hashtable<>();
+
+        List<BaseEntity> projectArtifacts = this.getBaseEntitiesInProject(project);
+
+        for (BaseEntity artifact : projectArtifacts) {
+            Triplet<VersionEntity, VersionEntity, ModificationType> delta = this
+                .calculateDeltaEntityBetweenProjectVersions(
+                    artifact,
+                    baselineVersion,
+                    targetVersion);
+            ModificationType modificationType = delta.getValue2();
+            if (modificationType == null) {
+                continue;
+            }
+            String baseName = artifact.getBaseEntityId();
+
+            switch (modificationType) {
+                case ADDED:
+                    AppEntity appEntity = this.createAppFromVersion(delta.getValue1());
+                    addedArtifacts.put(baseName, appEntity);
+                    break;
+                case MODIFIED:
+                    AppEntity appBefore = this.createAppFromVersion(delta.getValue0());
+                    AppEntity appAfter = this.createAppFromVersion(delta.getValue1());
+                    ModifiedEntity<AppEntity> modifiedEntity = new ModifiedEntity<>(appBefore, appAfter);
+                    modifiedArtifacts.put(baseName, modifiedEntity);
+                    break;
+                case REMOVED:
+                    AppEntity appRemoved = this.createAppFromVersion(delta.getValue0());
+                    removedArtifacts.put(baseName, appRemoved);
+                    break;
+                default:
+                    throw new RuntimeException("Missing case in switch for modification type:" + modificationType);
+            }
+        }
+
+        return new EntityDelta<>(addedArtifacts, modifiedArtifacts, removedArtifacts);
+    }
+
+    private Triplet<VersionEntity, VersionEntity, ModificationType> calculateDeltaEntityBetweenProjectVersions(
+        BaseEntity baseEntity,
+        ProjectVersion baseVersion,
+        ProjectVersion targetVersion) {
+        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(baseEntity);
+
+        VersionEntity beforeEntity = this.getEntityAtVersion(bodies,
+            baseVersion);
+        VersionEntity afterEntity = this.getEntityAtVersion(bodies,
+            targetVersion);
+
+        ModificationType modificationType = this
+            .calculateModificationType(beforeEntity, afterEntity);
+
+        return new Triplet<>(beforeEntity, afterEntity, modificationType);
     }
 
     private CommitError commitErrorHandler(ProjectVersion projectVersion,

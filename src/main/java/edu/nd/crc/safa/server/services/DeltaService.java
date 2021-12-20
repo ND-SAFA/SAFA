@@ -1,20 +1,12 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
-import edu.nd.crc.safa.server.entities.app.AddedArtifact;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.DeltaArtifact;
-import edu.nd.crc.safa.server.entities.app.ModifiedArtifact;
+import edu.nd.crc.safa.server.entities.app.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
-import edu.nd.crc.safa.server.entities.app.RemovedArtifact;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,14 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeltaService {
 
-    private final ArtifactRepository artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
-    public DeltaService(ArtifactRepository artifactRepository,
-                        ArtifactVersionRepository artifactVersionRepository) {
-        this.artifactRepository = artifactRepository;
+    public DeltaService(ArtifactVersionRepository artifactVersionRepository,
+                        TraceLinkVersionRepository traceLinkVersionRepository) {
         this.artifactVersionRepository = artifactVersionRepository;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
     }
 
     /**
@@ -43,48 +35,13 @@ public class DeltaService {
      * @return ProjectDelta summarizing changes between versions.
      */
     public ProjectDelta calculateProjectDelta(ProjectVersion baselineVersion, ProjectVersion targetVersion) {
-
-        Project project = baselineVersion.getProject();
-
-        Hashtable<String, AddedArtifact> added = new Hashtable<>();
-        Hashtable<String, ModifiedArtifact> modified = new Hashtable<>();
-        Hashtable<String, RemovedArtifact> removed = new Hashtable<>();
-
-        List<Artifact> projectArtifacts = this.artifactRepository.getProjectArtifacts(project);
-        List<ArtifactAppEntity> missingArtifacts = new ArrayList<>();
-
-        for (Artifact artifact : projectArtifacts) {
-            DeltaArtifact deltaArtifact = this.artifactVersionRepository
-                .calculateDeltaEntityBetweenProjectVersions(
-                    artifact,
-                    baselineVersion,
-                    targetVersion);
-            if (deltaArtifact == null) {
-                continue;
-            }
-            String deltaArtifactId = deltaArtifact.getArtifactId();
-            if (deltaArtifact instanceof ModifiedArtifact) {
-                modified.put(deltaArtifactId, (ModifiedArtifact) deltaArtifact);
-            } else if (deltaArtifact instanceof RemovedArtifact) {
-                removed.put(deltaArtifactId, (RemovedArtifact) deltaArtifact);
-            } else if (deltaArtifact instanceof AddedArtifact) {
-                added.put(deltaArtifactId, (AddedArtifact) deltaArtifact);
-                String typeName = artifact.getType().getName();
-                String artifactId = artifact.getArtifactId().toString();
-                String artifactName = artifact.getBaseEntityId();
-                String summary = ((AddedArtifact) deltaArtifact).getAfterSummary();
-                String body = ((AddedArtifact) deltaArtifact).getAfter();
-                ArtifactAppEntity addedArtifactBody = new ArtifactAppEntity(
-                    artifactId,
-                    typeName,
-                    artifactName,
-                    summary,
-                    body);
-                missingArtifacts.add(addedArtifactBody);
-            }
-        }
-
-        return new ProjectDelta(added, modified, removed, missingArtifacts);
+        EntityDelta<ArtifactAppEntity> artifactDelta =
+            this.artifactVersionRepository.calculateEntityDelta(baselineVersion,
+                targetVersion);
+        EntityDelta<TraceAppEntity> traceDelta =
+            this.traceLinkVersionRepository.calculateEntityDelta(baselineVersion,
+                targetVersion);
+        return new ProjectDelta(artifactDelta, traceDelta);
     }
 }
 

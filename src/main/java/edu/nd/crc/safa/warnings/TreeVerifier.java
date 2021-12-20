@@ -129,23 +129,19 @@ public class TreeVerifier {
     public boolean handleSiblingFunction(final Function r,
                                          final String artifactName,
                                          final List<TraceLink> traceLinks) {
-        Integer childCount = traceLinks
+        Long siblingCountAsTarget = traceLinks
             .stream()
             .filter(t -> t.getTargetName().equals(artifactName)) // Get traceLinks that finish with this node
-            .map(TraceLink::getSourceName) // Convert to parent id
-            .map(parentName ->
-                traceLinks
-                    .stream()
-                    // Get all traceLinks where we are the source
-                    .filter(link -> link.getSourceName().equals(parentName))
-                    // Get all traceLinks where the target matches the required target type
-                    .filter(link -> link.getTargetType().getName().equalsIgnoreCase(r.sourceArtifactType))
-                    .count()
-            )
-            .map(Long::intValue)
-            .reduce(0, Integer::sum);
+            .filter(t -> t.getSourceType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            .count();
+        Long siblingCountAsSource = traceLinks
+            .stream()
+            .filter(t -> t.getSourceName().equals(artifactName)) // Get traceLinks that finish with this node
+            .filter(t -> t.getTargetType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            .count();
+        long siblingCount = siblingCountAsTarget + siblingCountAsSource;
 
-        return matchesRuleCount(r, childCount);
+        return matchesRuleCount(r, siblingCount);
     }
 
     private boolean matchesRuleCount(Function r, long childCount) {

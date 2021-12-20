@@ -139,7 +139,7 @@ public class Rule {
         return Optional.of(function);
     }
 
-    public void setFunctionResult(final boolean result) {
+    public void setFunctionResult(final boolean rulePassed) {
         int start = -1;
         int end = -1;
         for (int i = 0; i < mTokens.size(); i++) {
@@ -154,7 +154,7 @@ public class Rule {
             }
         }
 
-        if (result) {
+        if (rulePassed) {
             mTokens.set(start, new Token(TokenType.TRUE, "True"));
         } else {
             mTokens.set(start, new Token(TokenType.FALSE, "False"));

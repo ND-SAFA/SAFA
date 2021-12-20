@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceDelta;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -24,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements the custom logic for versioning trace links.
  */
 public class TraceLinkVersionRepositoryImpl
-    extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity, TraceDelta> {
+    extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity> {
 
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
@@ -143,22 +142,12 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceDelta createDeltaEntity(ModificationType modificationType,
-                                        String baseEntityName,
-                                        TraceLinkVersion baseVersionEntity,
-                                        TraceLinkVersion targetVersionEntity) {
-        switch (modificationType) {
-            case ADDED:
-                return new TraceDelta(targetVersionEntity, modificationType);
-            case REMOVED:
-                return new TraceDelta(baseVersionEntity, modificationType);
-            default:
-                return null;
-        }
+    public List<TraceLinkVersion> findVersionEntitiesWithBaseEntity(TraceLink baseEntity) {
+        return this.traceLinkVersionRepository.findByTraceLink(baseEntity);
     }
 
     @Override
-    public List<TraceLinkVersion> findVersionEntitiesWithBaseEntity(TraceLink baseEntity) {
-        return this.traceLinkVersionRepository.findByTraceLink(baseEntity);
+    public TraceAppEntity createAppFromVersion(TraceLinkVersion versionEntity) {
+        return new TraceAppEntity(versionEntity);
     }
 }

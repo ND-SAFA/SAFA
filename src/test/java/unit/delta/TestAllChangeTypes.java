@@ -2,7 +2,6 @@ package unit.delta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -41,9 +40,10 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
         // VP - Delta against same version is empty
         ProjectVersion firstVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         ProjectDelta deltaZero = deltaService.calculateProjectDelta(firstVersion, firstVersion);
-        assertThat(deltaZero.getModified().size()).isEqualTo(0);
-        assertThat(deltaZero.getRemoved().size()).isEqualTo(0);
-        assertThat(deltaZero.getAdded().size()).isEqualTo(0);
+
+        assertThat(deltaZero.getArtifacts().getModified().size()).isEqualTo(0);
+        assertThat(deltaZero.getArtifacts().getRemoved().size()).isEqualTo(0);
+        assertThat(deltaZero.getArtifacts().getAdded().size()).isEqualTo(0);
 
         // Step - Create second version with modified artifacts
         ProjectVersion secondVersion = dbEntityBuilder.newVersionWithReturn(projectName);
@@ -52,26 +52,26 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
 
         // VP - Verify that system able to detect if modified
         ProjectDelta deltaOne = deltaService.calculateProjectDelta(firstVersion, secondVersion);
-        assertThat(deltaOne.getModified().size()).isEqualTo(1);
-        assertThat(deltaOne.getRemoved().size()).isEqualTo(0);
-        assertThat(deltaOne.getAdded().size()).isEqualTo(0);
+        assertThat(deltaOne.getArtifacts().getModified().size()).isEqualTo(1);
+        assertThat(deltaOne.getArtifacts().getRemoved().size()).isEqualTo(0);
+        assertThat(deltaOne.getArtifacts().getAdded().size()).isEqualTo(0);
 
         // VP - Remove artifact
         ProjectVersion thirdVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         dbEntityBuilder
             .newArtifactBody(projectName, 2, ModificationType.REMOVED, artifactName, "", "");
         ProjectDelta deltaTwo = deltaService.calculateProjectDelta(secondVersion, thirdVersion);
-        assertThat(deltaTwo.getModified().size()).isEqualTo(0);
-        assertThat(deltaTwo.getRemoved().size()).isEqualTo(1);
-        assertThat(deltaTwo.getAdded().size()).isEqualTo(0);
+        assertThat(deltaTwo.getArtifacts().getModified().size()).isEqualTo(0);
+        assertThat(deltaTwo.getArtifacts().getRemoved().size()).isEqualTo(1);
+        assertThat(deltaTwo.getArtifacts().getAdded().size()).isEqualTo(0);
 
         // VP - Remove artifact
         ProjectVersion fourthVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         dbEntityBuilder
             .newArtifactBody(projectName, 3, artifactName, artifactSummary, artifactBody);
         ProjectDelta deltaThree = deltaService.calculateProjectDelta(thirdVersion, fourthVersion);
-        assertThat(deltaThree.getModified().size()).isEqualTo(0);
-        assertThat(deltaThree.getRemoved().size()).isEqualTo(0);
-        assertThat(deltaThree.getAdded().size()).isEqualTo(1);
+        assertThat(deltaThree.getArtifacts().getModified().size()).isEqualTo(0);
+        assertThat(deltaThree.getArtifacts().getRemoved().size()).isEqualTo(0);
+        assertThat(deltaThree.getArtifacts().getAdded().size()).isEqualTo(1);
     }
 }

@@ -1,19 +1,12 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type {
-  AddedArtifact,
-  Artifact,
-  ModifiedArtifact,
-  Project,
-  ProjectVersion,
-  RemovedArtifact,
-} from "@/types";
+import type { Artifact, ProjectVersion } from "@/types";
 import {
   ArtifactDeltaState,
   EntityModification,
   PanelType,
   ProjectDelta,
 } from "@/types";
-import { appModule, projectModule } from "..";
+import { appModule, projectModule, subtreeModule } from "..";
 
 const EMPTY_PROJECT_DELTA = {
   artifacts: {
@@ -69,6 +62,7 @@ export default class ErrorModule extends VuexModule {
     await projectModule.addOrUpdateTraceLinks(
       Object.values(payload.traces.added)
     );
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action

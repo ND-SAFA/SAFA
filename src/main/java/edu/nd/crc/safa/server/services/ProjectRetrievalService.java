@@ -11,7 +11,6 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.RuleName;
@@ -72,13 +71,15 @@ public class ProjectRetrievalService {
                 .stream()
                 .map(ArtifactAppEntity::new)
                 .collect(Collectors.toList());
+        List<String> artifactNames = artifacts.stream().map(ArtifactAppEntity::getName).collect(Collectors.toList());
 
-        List<TraceLinkVersion> traceLinks =
-            this.traceLinkVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
         List<TraceAppEntity> traces =
-            traceLinks
+            this.traceLinkVersionRepository
+                .getEntityVersionsInProjectVersion(projectVersion)
                 .stream()
                 .map(TraceAppEntity::new)
+                .filter(t -> artifactNames.contains(t.source)
+                    && artifactNames.contains(t.target))
                 .collect(Collectors.toList());
         return new ProjectAppEntity(projectVersion, artifacts, traces);
     }

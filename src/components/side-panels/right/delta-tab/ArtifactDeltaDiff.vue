@@ -10,13 +10,13 @@
         <code-diff
           v-if="deltaType === 'added'"
           :old-string="''"
-          :new-string="splitIntoLines(artifact)"
+          :new-string="splitIntoLines(artifact.body)"
           :context="context"
           :output-format="outputFormat"
           :diff-style="diffStyle"
         />
         <code-diff
-          v-else-if="deltaType === 'removed' && artifact !== undefined"
+          v-else-if="deltaType === 'removed'"
           :old-string="splitIntoLines(artifact.body)"
           :new-string="''"
           :context="context"
@@ -80,8 +80,8 @@ export default Vue.extend({
   },
   computed: {
     artifact(): Artifact | undefined {
-      if (isArtifact(this.artifact)) {
-        return this.artifact;
+      if (isArtifact(this.inputArtifact)) {
+        return this.inputArtifact;
       }
       return undefined;
     },

@@ -6,22 +6,20 @@
       deltaType="added"
       class="mt-10"
       :names="addedArtifactNames"
-      @click="(name) => selectArtifact(name, addedArtifactNames[name], 'added')"
+      @click="(name) => selectArtifact(name, addedArtifacts[name], 'added')"
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
       :names="removedArtifactNames"
-      @click="
-        (name) => selectArtifact(name, removedArtifactNames[name], 'removed')
-      "
+      @click="(name) => selectArtifact(name, removedArtifacts[name], 'removed')"
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
-      :names="artifactsModified"
+      :names="modifiedArtifactNames"
       @click="
-        (name) => selectArtifact(name, artifactsModified[name], 'modified')
+        (name) => selectArtifact(name, modifiedArtifacts[name], 'modified')
       "
     />
     <artifact-delta-diff
@@ -80,14 +78,23 @@ export default Vue.extend({
     artifactHashmap(): Record<string, Artifact> {
       return projectModule.getArtifactHashmap;
     },
+    addedArtifacts(): Record<string, Artifact> {
+      return deltaModule.addedArtifacts;
+    },
     addedArtifactNames(): string[] {
-      return Object.keys(deltaModule.addedArtifacts);
+      return Object.keys(this.addedArtifacts);
+    },
+    removedArtifacts(): Record<string, Artifact> {
+      return deltaModule.removedArtifacts;
     },
     removedArtifactNames(): string[] {
-      return Object.keys(deltaModule.removedArtifacts);
+      return Object.keys(this.removedArtifacts);
+    },
+    modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
+      return deltaModule.modifiedArtifacts;
     },
     modifiedArtifactNames(): string[] {
-      return Object.keys(deltaModule.modifiedArtifacts);
+      return Object.keys(this.modifiedArtifacts);
     },
     deltaArtifacts(): string[] {
       return this.addedArtifactNames.concat(

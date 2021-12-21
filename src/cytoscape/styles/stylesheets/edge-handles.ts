@@ -8,6 +8,7 @@ import {
   TARGET_SELECTION_COLOR,
   TARGET_SELECTION_WIDTH,
 } from "@/cytoscape/styles/config/edge-handles";
+import { ThemeColors } from "@/util";
 
 export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
@@ -60,6 +61,24 @@ export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
     selector: ".eh-ghost-edge.eh-preview-active",
     style: {
       opacity: 0,
+    },
+  },
+  {
+    selector: ".eh-delta-added",
+    style: {
+      "line-color": ThemeColors.artifactAdded,
+    },
+  },
+  {
+    selector: ".eh-delta-modified",
+    style: {
+      "line-color": ThemeColors.artifactModified,
+    },
+  },
+  {
+    selector: ".eh-delta-removed",
+    style: {
+      "line-color": ThemeColors.artifactRemoved,
     },
   },
 ];

@@ -6,8 +6,9 @@
 </template>
 
 <script lang="ts">
-import { Link } from "@/types";
+import { TraceLink } from "@/types";
 import Vue, { PropType } from "vue";
+import { deltaModule } from "@/store";
 
 /**
  * Displays trace link edge.
@@ -17,18 +18,27 @@ import Vue, { PropType } from "vue";
 export default Vue.extend({
   name: "trace-link",
   props: {
-    traceDefinition: Object as PropType<Link>,
+    traceDefinition: Object as PropType<TraceLink>,
     count: {
       type: Number,
       required: false,
     },
   },
   computed: {
+    selector() {
+      const source = this.traceDefinition.source;
+      const target = this.traceDefinition.target;
+      const id = `${source}-${target}`;
+
+      return deltaModule.getTraceDeltaType(id);
+    },
     definition() {
       const source = this.traceDefinition.source;
       const target = this.traceDefinition.target;
       const id = `${source}-${target}`;
       const count = this.count ? this.count : 1;
+      const traceType = deltaModule.getTraceDeltaType(id);
+
       return {
         data: {
           ...this.traceDefinition,
@@ -38,6 +48,7 @@ export default Vue.extend({
           target: source,
           count,
         },
+        classes: [`eh-delta-${traceType}`],
       };
     },
   },

@@ -172,4 +172,18 @@ export default class ErrorModule extends VuexModule {
       return Array.from(deltaStates);
     };
   }
+
+  get getTraceDeltaType(): (id: string) => ArtifactDeltaState | undefined {
+    return (id) => {
+      if (!this.getIsDeltaViewEnabled) {
+        return undefined;
+      } else if (id in this.projectDelta.traces.added) {
+        return ArtifactDeltaState.ADDED;
+      } else if (id in this.projectDelta.traces.modified) {
+        return ArtifactDeltaState.MODIFIED;
+      } else if (id in this.projectDelta.traces.removed) {
+        return ArtifactDeltaState.REMOVED;
+      }
+    };
+  }
 }

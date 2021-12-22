@@ -26,16 +26,14 @@ export default Vue.extend({
   },
   computed: {
     selector() {
-      const source = this.traceDefinition.source;
-      const target = this.traceDefinition.target;
-      const id = `${source}-${target}`;
+      const {sourceId, targetId} = this.traceDefinition;
+      const id = `${sourceId}-${targetId}`;
 
       return deltaModule.getTraceDeltaType(id);
     },
-    definition() {
-      const source = this.traceDefinition.source;
-      const target = this.traceDefinition.target;
-      const id = `${source}-${target}`;
+    definition() {{
+      const {sourceId, targetId} = this.traceDefinition;
+      const id = `${sourceId}-${targetId}`;
       const count = this.count ? this.count : 1;
       const traceType = deltaModule.getTraceDeltaType(id);
 
@@ -44,8 +42,8 @@ export default Vue.extend({
           ...this.traceDefinition,
           id,
           // Reversed to show arrow toward parent.
-          source: target,
-          target: source,
+          source: targetId,
+          target: sourceId,
           count,
         },
         classes: [`eh-delta-${traceType}`],

@@ -9,13 +9,13 @@
       />
       <generic-graph-link
         v-for="traceLink in traces"
-        :key="`${traceLink.source}-${traceLink.target}`"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
       />
       <generic-graph-link
         v-for="traceLink in subtreeLinks"
-        :key="`${traceLink.source}-${traceLink.target}`"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
         :trace-definition="traceLink"
       />
       <trace-link-approval-modal
@@ -114,8 +114,8 @@ export default Vue.extend({
     onLinkRightClick(traceLink: TraceLink): void {
       this.selectedLink = {
         ...traceLink,
-        sourceBody: this.artifactHashMap[traceLink.source].body,
-        targetBody: this.artifactHashMap[traceLink.target].body,
+        sourceBody: this.artifactHashMap[traceLink.sourceId].body,
+        targetBody: this.artifactHashMap[traceLink.targetId].body,
       };
       this.isTraceModalOpen = true;
     },

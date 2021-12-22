@@ -7,8 +7,8 @@ export function isRelatedToArtifacts(
 ): boolean {
   if (e.isEdge()) {
     return (
-      artifactsIds.includes(e.data().source) &&
-      artifactsIds.includes(e.data().target)
+      artifactsIds.includes(e.data().sourceId) &&
+      artifactsIds.includes(e.data().targetId)
     );
   } else {
     return artifactsIds.includes(e.data().id);

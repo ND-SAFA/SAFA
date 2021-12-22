@@ -65,7 +65,7 @@ function getSubtree(
  * @return The computed child artifact ids.
  */
 function getChildren(cy: CytoCore, artifactId: string): string[] {
-  const nodeEdges = cy.edges(`edge[source="${artifactId}"]`);
+  const nodeEdges = cy.edges(`edge[sourceId="${artifactId}"]`);
   const children = nodeEdges.targets();
 
   return children.map((child) => child.data().id);

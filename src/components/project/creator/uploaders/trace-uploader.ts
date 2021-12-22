@@ -66,8 +66,8 @@ function generateTraceLinks(
 
 function createTraceFile(traceLink: Link): TraceFile {
   return {
-    source: traceLink.source,
-    target: traceLink.target,
+    source: traceLink.sourceId,
+    target: traceLink.targetId,
     isGenerated: DEFAULT_IS_GENERATED,
     isValid: false,
     errors: [],
@@ -118,7 +118,7 @@ function createParsedArtifactFile(
 }
 
 function getTraceId(traceLink: Link): string {
-  return `${traceLink.source}-${traceLink.target}`;
+  return `${traceLink.sourceId}-${traceLink.targetId}`;
 }
 
 function getTraceError(

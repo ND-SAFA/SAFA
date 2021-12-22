@@ -236,8 +236,8 @@ export default class SubtreeModule extends VuexModule {
       ) => {
         return traceLinks
           .filter((link) => {
-            const value = isIncoming ? link.target : link.source;
-            const oppoValue = isIncoming ? link.source : link.target;
+            const value = isIncoming ? link.targetId : link.sourceId;
+            const oppoValue = isIncoming ? link.sourceId : link.targetId;
             return value === childId && !nodesInSubtree.includes(oppoValue);
           })
           .map((link) => {

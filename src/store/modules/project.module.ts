@@ -184,10 +184,10 @@ export default class ProjectModule extends VuexModule {
       allowedDirections[artifact.type] = [];
     });
 
-    this.traceLinks.forEach(({ source, target }) => {
+    this.traceLinks.forEach(({ sourceId, targetId }) => {
       try {
-        const sourceType = this.getArtifactById(source).type;
-        const targetType = this.getArtifactById(target).type;
+        const sourceType = this.getArtifactById(sourceId).type;
+        const targetType = this.getArtifactById(targetId).type;
 
         if (!allowedDirections[sourceType].includes(targetType)) {
           allowedDirections[sourceType].push(targetType);
@@ -377,7 +377,7 @@ export default class ProjectModule extends VuexModule {
   ) => TraceLink {
     return (sourceId, targetId) => {
       const traceQuery = this.project.traces.filter(
-        (t) => t.source === sourceId && t.target === targetId
+        (t) => t.sourceId === sourceId && t.targetId === targetId
       );
 
       if (traceQuery.length === 0) {
@@ -399,8 +399,8 @@ export default class ProjectModule extends VuexModule {
       const traceLinks = this.project.traces;
       const traceLinkQuery = traceLinks.filter(
         (t) =>
-          (t.source === sourceId && t.target === targetId) ||
-          (t.target === sourceId && t.source === targetId)
+          (t.sourceId === sourceId && t.targetId === targetId) ||
+          (t.targetId === sourceId && t.sourceId === targetId)
       );
       return traceLinkQuery.length > 0;
     };

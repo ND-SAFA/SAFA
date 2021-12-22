@@ -154,7 +154,7 @@ export default class CommitModule extends VuexModule {
         (a: Artifact) => projectModule.getArtifactById(a.id)
       );
       const originalTraces = commit.traces.modified.map((t) =>
-        projectModule.getTraceLinkByArtifacts(t.source, t.target)
+        projectModule.getTraceLinkByArtifacts(t.sourceId, t.targetId)
       );
 
       return {

@@ -49,7 +49,6 @@ export default class ProjectModule extends VuexModule {
    * Whether the artifact creator is open.
    */
   private isArtifactCreatorOpen = false;
-
   /**
    * Whether the confirmation modal is open.
    */
@@ -95,7 +94,6 @@ export default class ProjectModule extends VuexModule {
    * @param message - The error message encountered.
    */
   onError(message: string): void {
-    console.error(message);
     this.SET_MESSAGE({ message, type: MessageType.ERROR, errors: [] });
   }
 
@@ -106,7 +104,6 @@ export default class ProjectModule extends VuexModule {
    * @param message - The message to display.
    */
   onInfo(message: string): void {
-    console.log(message);
     this.SET_MESSAGE({ message, type: MessageType.INFO, errors: [] });
   }
 
@@ -117,7 +114,6 @@ export default class ProjectModule extends VuexModule {
    * @param message - The message to display.
    */
   onWarning(message: string): void {
-    console.warn(message);
     this.SET_MESSAGE({ message, type: MessageType.WARNING, errors: [] });
   }
 
@@ -128,7 +124,6 @@ export default class ProjectModule extends VuexModule {
    * @param message - The message to display.
    */
   onSuccess(message: string): void {
-    console.log(message);
     this.SET_MESSAGE({ message, type: MessageType.SUCCESS, errors: [] });
   }
 

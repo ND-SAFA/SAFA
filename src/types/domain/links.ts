@@ -22,7 +22,7 @@ export interface Link {
   /**
    * The source node ID.
    */
-  source: string;
+  sourceId: string;
   /**
    * The source node name.
    */
@@ -30,7 +30,7 @@ export interface Link {
   /**
    * The target node ID.
    */
-  target: string;
+  targetId: string;
   /**
    * The target node name.
    */

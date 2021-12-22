@@ -22,8 +22,12 @@ public class TraceAppEntity implements IAppEntity {
     @NotEmpty
     public String source;
 
+    public String sourceId;
+    
     @NotEmpty
     public String target;
+
+    public String targetId;
 
     public TraceApproval approvalStatus;
 
@@ -57,7 +61,9 @@ public class TraceAppEntity implements IAppEntity {
         UUID traceLinkId = trace.getTraceLink().getTraceLinkId();
         this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
         this.source = trace.getTraceLink().getSourceName();
+        this.sourceId = trace.getTraceLink().getSourceArtifact().getArtifactId().toString();
         this.target = trace.getTraceLink().getTargetName();
+        this.targetId = trace.getTraceLink().getTargetArtifact().getArtifactId().toString();
         this.approvalStatus = trace.getApprovalStatus();
         this.score = trace.getScore();
         this.traceType = trace.getTraceType();
@@ -65,6 +71,22 @@ public class TraceAppEntity implements IAppEntity {
 
     public static List<TraceAppEntity> createEntities(List<TraceLinkVersion> links) {
         return links.stream().map(TraceAppEntity::new).collect(Collectors.toList());
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(String targetId) {
+        this.targetId = targetId;
     }
 
     public String getSource() {

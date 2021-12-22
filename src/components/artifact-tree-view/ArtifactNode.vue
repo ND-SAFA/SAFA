@@ -66,9 +66,6 @@ export default Vue.extend({
     selectedArtifact(): Artifact | undefined {
       return artifactSelectionModule.getSelectedArtifact;
     },
-    selectedSubtree(): string[] {
-      return artifactSelectionModule.getSelectedSubtree;
-    },
     isSelected(): boolean {
       const selectedArtifact = this.selectedArtifact;
 
@@ -120,11 +117,8 @@ export default Vue.extend({
       }
     },
     definition(): ArtifactCytoCoreElement {
-      const id = this.artifactDefinition.name;
-      const body = this.artifactDefinition.body;
-      const artifactType = this.artifactDefinition.type;
-      const isSelected = this.isSelected;
-      const hiddenChildren = subtreeModule.getHiddenChildrenByParentName(id);
+      const { id, body, type, name } = this.artifactDefinition;
+      const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
       const hiddenChildWarnings =
         errorModule.getWarningsByArtifactNames(hiddenChildren);
       const hiddenChildDeltaStates =
@@ -134,12 +128,12 @@ export default Vue.extend({
         data: {
           id,
           body,
-          artifactName: id,
+          artifactName: name,
           type: "node",
           warnings: this.localWarnings,
-          artifactType,
+          artifactType: type,
           artifactDeltaState: this.artifactDeltaState,
-          isSelected,
+          isSelected: this.isSelected,
           opacity: this.opacity,
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,

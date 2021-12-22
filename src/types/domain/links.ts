@@ -72,7 +72,7 @@ export interface TraceLinkDisplayData extends TraceLink {
 export interface SubtreeLink extends TraceLink {
   type: "SUBTREE";
   /**
-   * The name of the artifact. TODO: Replace with id.
+   * The id of the artifact.
    */
   rootNode: string;
 }

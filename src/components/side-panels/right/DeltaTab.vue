@@ -75,9 +75,6 @@ export default Vue.extend({
     artifacts(): Artifact[] {
       return projectModule.artifacts;
     },
-    artifactHashmap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
-    },
     addedArtifacts(): Record<string, Artifact> {
       return deltaModule.addedArtifacts;
     },

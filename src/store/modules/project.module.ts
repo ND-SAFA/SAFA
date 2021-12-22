@@ -186,8 +186,8 @@ export default class ProjectModule extends VuexModule {
 
     this.traceLinks.forEach(({ source, target }) => {
       try {
-        const sourceType = this.getArtifactByName(source).type;
-        const targetType = this.getArtifactByName(target).type;
+        const sourceType = this.getArtifactById(source).type;
+        const targetType = this.getArtifactById(target).type;
 
         if (!allowedDirections[sourceType].includes(targetType)) {
           allowedDirections[sourceType].push(targetType);
@@ -333,7 +333,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
-   * @return A function for finding an artifact by name.
+   * @return A function for finding an artifact by id.
    */
   get getArtifactById(): ArtifactQueryFunction {
     return (targetArtifactId) => {
@@ -345,11 +345,11 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
-   * @return A collection of artifacts, keyed by their name.
+   * @return A collection of artifacts, keyed by their id.
    */
   get getArtifactHashmap(): Record<string, Artifact> {
     return this.project.artifacts
-      .map((artifact) => ({ [artifact.name]: artifact }))
+      .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});
   }
 
@@ -369,19 +369,24 @@ export default class ProjectModule extends VuexModule {
 
   /**
    * @return Returns a function to query a single trace link by the
-   * source and target artifact names.
+   * source and target artifact ids.
    */
-  get getTraceLinkByArtifacts(): (s: string, t: string) => TraceLink {
-    return (sourceName: string, targetName: string) => {
+  get getTraceLinkByArtifacts(): (
+    sourceId: string,
+    targetId: string
+  ) => TraceLink {
+    return (sourceId, targetId) => {
       const traceQuery = this.project.traces.filter(
-        (t) => t.source === sourceName && t.target === targetName
+        (t) => t.source === sourceId && t.target === targetId
       );
+
       if (traceQuery.length === 0) {
-        const traceId = `${sourceName}-${targetName}`;
+        const traceId = `${sourceId}-${targetId}`;
         const error = `Could not find trace link with id: ${traceId}`;
         appModule.onDevError(error);
         throw Error(error);
       }
+
       return traceQuery[0];
     };
   }
@@ -391,7 +396,7 @@ export default class ProjectModule extends VuexModule {
    */
   get doesLinkExist(): LinkValidator {
     return (sourceId, targetId) => {
-      const traceLinks: TraceLink[] = this.project.traces;
+      const traceLinks = this.project.traces;
       const traceLinkQuery = traceLinks.filter(
         (t) =>
           (t.source === sourceId && t.target === targetId) ||

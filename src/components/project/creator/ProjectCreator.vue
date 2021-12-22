@@ -150,9 +150,9 @@ export default Vue.extend({
   },
   computed: {
     artifactMap(): Record<string, Artifact> {
-      const artifactMap: Record<string, Artifact> = {};
-      this.artifacts.forEach((a) => (artifactMap[a.name] = a));
-      return artifactMap;
+      return this.artifacts
+        .map((artifact) => ({ [artifact.name]: artifact }))
+        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
     },
     artifacts(): Artifact[] {
       let artifacts: Artifact[] = [];

@@ -15,8 +15,8 @@ export function isRelatedToArtifacts(
   }
 }
 
-export function isInSubtree(subtree: string[], a: Artifact): boolean {
-  return subtree.length === 0 || subtree.includes(a.name);
+export function isInSubtree(subtreeIds: string[], artifact: Artifact): boolean {
+  return subtreeIds.length === 0 || subtreeIds.includes(artifact.id);
 }
 
 export function doesNotContainType(

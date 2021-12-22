@@ -100,10 +100,10 @@ function createParsedArtifactFile(
   return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
     const { traces, errors } = res;
     const validTraces: TraceLink[] = [];
-    traces.forEach((t) => {
-      const error = getTraceError(panel.projectFile, artifactMap, t);
+    traces.forEach((link) => {
+      const error = getTraceError(panel.projectFile, artifactMap, link);
       if (error === undefined) {
-        validTraces.push(t);
+        validTraces.push(link);
       } else {
         errors.push(error);
       }

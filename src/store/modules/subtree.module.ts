@@ -1,9 +1,7 @@
 import { projectModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { SubtreeLink } from "@/types";
-import type { SubtreeMap } from "@/types/store/artifact-selection";
+import type { SubtreeLink, SubtreeMap, SetOpacityRequest } from "@/types";
 import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
-import type { SetOpacityRequest } from "@/types/store/subtree";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -36,10 +34,8 @@ export default class SubtreeModule extends VuexModule {
    */
   async updateSubtreeMap(): Promise<void> {
     const cy = await artifactTreeCyPromise;
-    const subtreeMap: SubtreeMap = await createSubtreeMap(
-      cy,
-      projectModule.artifacts
-    );
+    const subtreeMap = await createSubtreeMap(cy, projectModule.artifacts);
+
     this.SET_SUBTREE_MAP(subtreeMap);
   }
 
@@ -70,24 +66,28 @@ export default class SubtreeModule extends VuexModule {
    * between the target and root node. Similarly, for any linking incoming to a
    * child node, a phantom link is added from the link source to the root node.
    *
-   * @param rootName Name of the root artifact whose subtree is being hidden.
+   * @param rootId Id of the root artifact whose subtree is being hidden.
    */
-  async hideSubtree(rootName: string): Promise<void> {
-    const childrenInSubtree: string[] = this.getSubtreeByArtifactName(rootName);
-    const nodesInSubtree: string[] = childrenInSubtree.concat([rootName]);
-    for (const childName of childrenInSubtree) {
+  async hideSubtree(rootId: string): Promise<void> {
+    const childrenInSubtree = this.getSubtreeByArtifactId(rootId);
+    const nodesInSubtree = [...childrenInSubtree, rootId];
+
+    for (const childId of childrenInSubtree) {
       const newSubtreeLinks = this.createSubtreeLinks(
         nodesInSubtree,
-        rootName,
-        childName
+        rootId,
+        childId
       );
+
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
-      this.SET_HIDDEN_SUBTREE_NODES(
-        this.hiddenSubtreeNodes.concat(childrenInSubtree)
-      );
-      this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootName]);
+      this.SET_HIDDEN_SUBTREE_NODES([
+        ...this.hiddenSubtreeNodes,
+        ...childrenInSubtree,
+      ]);
+      this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
+
       await this.setProjectEntityVisibility({
-        targetArtifactNames: this.hiddenSubtreeNodes,
+        targetArtifactIds: this.hiddenSubtreeNodes,
         visible: false,
       });
     }
@@ -97,21 +97,24 @@ export default class SubtreeModule extends VuexModule {
   /**
    * Un-hides the given artifact's subtree if hidden.
    *
-   * @param rootName The name of artifact whose subtree showed by un-hidden.
+   * @param rootId Id of artifact whose subtree showed by un-hidden.
    */
-  async showSubtree(rootName: string): Promise<void> {
+  async showSubtree(rootId: string): Promise<void> {
     this.SET_SUBTREE_LINKS(
-      this.subtreeLinks.filter((link) => link.rootNode !== rootName)
+      this.subtreeLinks.filter((link) => link.rootNode !== rootId)
     );
-    const subtreeNodes = this.getSubtreeByArtifactName(rootName);
+
+    const subtreeNodes = this.getSubtreeByArtifactId(rootId);
+
     this.SET_HIDDEN_SUBTREE_NODES(
       this.hiddenSubtreeNodes.filter((n) => !subtreeNodes.includes(n))
     );
     this.SET_COLLAPSED_PARENT_NODES(
-      this.collapsedParentNodes.filter((n) => n !== rootName)
+      this.collapsedParentNodes.filter((n) => n !== rootId)
     );
+
     await this.setProjectEntityVisibility({
-      targetArtifactNames: subtreeNodes,
+      targetArtifactIds: subtreeNodes,
       visible: true,
     });
   }
@@ -126,12 +129,13 @@ export default class SubtreeModule extends VuexModule {
    * @param request Contains the target set of artifact names and whether they should be visible.
    */
   async setProjectEntityVisibility(request: SetOpacityRequest): Promise<void> {
-    const { targetArtifactNames, visible } = request;
+    const { targetArtifactIds, visible } = request;
     const display = visible ? "element" : "none";
     const cy = await artifactTreeCyPromise;
+
     const targetNodes = cy
       .nodes()
-      .filter((n) => targetArtifactNames.includes(n.data().id));
+      .filter((n) => targetArtifactIds.includes(n.data().id));
 
     targetNodes.style({ display });
 
@@ -139,8 +143,8 @@ export default class SubtreeModule extends VuexModule {
       .edges()
       .filter(
         (e) =>
-          targetArtifactNames.includes(e.target().data().id) ||
-          targetArtifactNames.includes(e.source().data().id)
+          targetArtifactIds.includes(e.target().data().id) ||
+          targetArtifactIds.includes(e.source().data().id)
       );
 
     targetLinks.style({ display });
@@ -196,9 +200,9 @@ export default class SubtreeModule extends VuexModule {
   /**
    * @returns the pre-computed artifacts in the subtree of root specified.
    */
-  get getSubtreeByArtifactName(): (n: string) => string[] {
-    return (artifactName: string) => {
-      return this.getSubtreeMap[artifactName] || [];
+  get getSubtreeByArtifactId(): (n: string) => string[] {
+    return (artifactId: string) => {
+      return this.getSubtreeMap[artifactId] || [];
     };
   }
 
@@ -210,9 +214,9 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
-   * @returns list of artifact names currently hidden in a subtree
+   * @returns list of artifact ids currently hidden in a subtree.
    */
-  get getHiddenSubtreeNodes(): string[] {
+  get getHiddenSubtreeIds(): string[] {
     return this.hiddenSubtreeNodes;
   }
 
@@ -224,46 +228,49 @@ export default class SubtreeModule extends VuexModule {
     r: string,
     c: string
   ) => SubtreeLink[] {
-    return (nodesInSubtree: string[], rootName: string, childName: string) => {
+    return (nodesInSubtree: string[], rootId: string, childId: string) => {
       const traceLinks = projectModule.traceLinks;
+
       const subtreeLinkCreator: (f: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
         return traceLinks
-          .filter((t) => {
-            const value = isIncoming ? t.target : t.source;
-            const oppoValue = isIncoming ? t.source : t.target;
-            return value === childName && !nodesInSubtree.includes(oppoValue);
+          .filter((link) => {
+            const value = isIncoming ? link.target : link.source;
+            const oppoValue = isIncoming ? link.source : link.target;
+            return value === childId && !nodesInSubtree.includes(oppoValue);
           })
-          .map((t) => {
+          .map((link) => {
             const base: SubtreeLink = {
-              ...t,
+              ...link,
               type: "SUBTREE",
-              rootNode: rootName,
+              rootNode: rootId,
             };
 
             return isIncoming
-              ? { ...base, target: rootName }
-              : { ...base, source: rootName };
+              ? { ...base, target: rootId }
+              : { ...base, source: rootId };
           });
       };
-      const incomingPhantom: SubtreeLink[] = subtreeLinkCreator(true);
-      const outgoingPhantom: SubtreeLink[] = subtreeLinkCreator(false);
-      return this.subtreeLinks.concat(incomingPhantom).concat(outgoingPhantom);
+
+      const incomingPhantom = subtreeLinkCreator(true);
+      const outgoingPhantom = subtreeLinkCreator(false);
+
+      return [...this.subtreeLinks, ...incomingPhantom, ...outgoingPhantom];
     };
   }
 
   /**
-   * @return The names of all hidden children below the given node.
+   * @return The ids of all hidden children below the given node.
    */
-  get getHiddenChildrenByParentName(): (name: string) => string[] {
-    return (parentName) => {
-      if (!this.collapsedParentNodes.includes(parentName)) {
+  get getHiddenChildrenByParentId(): (parentId: string) => string[] {
+    return (parentId) => {
+      if (!this.collapsedParentNodes.includes(parentId)) {
         return [];
       }
 
-      const childNodes = this.getSubtreeByArtifactName(parentName);
-      const hiddenNodes = this.getHiddenSubtreeNodes;
+      const childNodes = this.getSubtreeByArtifactId(parentId);
+      const hiddenNodes = this.getHiddenSubtreeIds;
 
       return childNodes.filter((id) => hiddenNodes.includes(id));
     };

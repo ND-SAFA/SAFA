@@ -5,7 +5,7 @@
         v-for="artifact in artifacts"
         :key="artifact.name"
         :artifact-definition="artifact"
-        :opacity="getArtifactOpacity(artifact.name)"
+        :opacity="getArtifactOpacity(artifact.name, artifact.id)"
       />
       <generic-graph-link
         v-for="traceLink in traces"
@@ -86,8 +86,8 @@ export default Vue.extend({
     unselectedNodeOpacity(): number {
       return artifactSelectionModule.getUnselectedNodeOpacity;
     },
-    hiddenSubtreeNodes(): string[] {
-      return subtreeModule.getHiddenSubtreeNodes;
+    hiddenSubtreeIds(): string[] {
+      return subtreeModule.getHiddenSubtreeIds;
     },
   },
   mounted() {
@@ -102,8 +102,8 @@ export default Vue.extend({
     setNodesInView(): void {
       this.artifactsInView = this.nodesInView;
     },
-    getArtifactOpacity(name: string): number {
-      if (this.hiddenSubtreeNodes.includes(name)) {
+    getArtifactOpacity(name: string, id: string): number {
+      if (this.hiddenSubtreeIds.includes(id)) {
         return 0;
       } else if (this.artifactsInView.includes(name)) {
         return 1;

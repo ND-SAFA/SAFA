@@ -91,7 +91,7 @@ function createNodeHeader(data: ArtifactData, height: number): string {
 function createNodeSubHeader(data: ArtifactData, height: number): string {
   return `
     <span class="artifact-sub-header text-body-1" style="height:${height}px">
-      ${data.id}
+      ${data.artifactName}
     </span>
   `;
 }

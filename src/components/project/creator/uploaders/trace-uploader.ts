@@ -100,6 +100,7 @@ function createParsedArtifactFile(
   return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
     const { traces, errors } = res;
     const validTraces: TraceLink[] = [];
+
     traces.forEach((link) => {
       const error = getTraceError(panel.projectFile, artifactMap, link);
       if (error === undefined) {
@@ -125,14 +126,15 @@ function getTraceError(
   artifactMap: Record<string, Artifact>,
   traceLink: Link
 ): string | undefined {
-  const { source, target } = traceLink;
-  if (!(source in artifactMap)) {
-    return `Artifact ${source} does not exist.`;
-  } else if (!(target in artifactMap)) {
-    return `Artifact ${target} does not exist.`;
+  const { sourceName, targetName } = traceLink;
+
+  if (!(sourceName in artifactMap)) {
+    return `Artifact ${sourceName} does not exist.`;
+  } else if (!(targetName in artifactMap)) {
+    return `Artifact ${targetName} does not exist.`;
   } else {
-    const sourceArtifact = artifactMap[source];
-    const targetArtifact = artifactMap[target];
+    const sourceArtifact = artifactMap[sourceName];
+    const targetArtifact = artifactMap[targetName];
 
     if (sourceArtifact.type !== traceFile.source) {
       return `${sourceArtifact.name} is not of type ${traceFile.source}.`;

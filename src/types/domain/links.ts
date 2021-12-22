@@ -24,9 +24,17 @@ export interface Link {
    */
   source: string;
   /**
+   * The source node name.
+   */
+  sourceName: string;
+  /**
    * The target node ID.
    */
   target: string;
+  /**
+   * The target node name.
+   */
+  targetName: string;
 }
 
 /**

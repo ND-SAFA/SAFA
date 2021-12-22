@@ -57,20 +57,20 @@ public class TestTraceLinkGenerator extends ApplicationBaseTest {
             .newArtifactAndBody(projectName, sourceTypeName, sourceTwoName, "", contentTwo)
             .newArtifactAndBody(projectName, targetTypeName, targetOneName, "", content)
             .newArtifactAndBody(projectName, targetTypeName, targetTwoName, "", contentTwo);
-        
+
         newLinks = traceLinkGenerator.generateLinksBetweenTypes(projectVersion, artifactTypes);
         assertThat(newLinks.size()).as("links found").isEqualTo(2);
 
         TraceAppEntity linkOne = getLinkWithSourceName(newLinks, sourceOneName);
-        assertThat(linkOne.target).as("link source name").isEqualTo(targetOneName);
+        assertThat(linkOne.targetName).as("link source name").isEqualTo(targetOneName);
 
         TraceAppEntity linkTwo = getLinkWithSourceName(newLinks, sourceTwoName);
-        assertThat(linkTwo.target).as("link source name").isEqualTo(targetTwoName);
+        assertThat(linkTwo.targetName).as("link source name").isEqualTo(targetTwoName);
     }
 
     private TraceAppEntity getLinkWithSourceName(List<TraceAppEntity> links, String sourceName) {
         for (TraceAppEntity link : links) {
-            if (link.source.equals(sourceName)) {
+            if (link.sourceName.equals(sourceName)) {
                 return link;
             }
         }

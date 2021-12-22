@@ -105,21 +105,21 @@ public class JsonBuilder extends BaseBuilder {
         return (JSONObject) traces.get(traces.length() - 1);
     }
 
-    public JsonBuilder withTrace(String projectName, String source, String target) {
+    public JsonBuilder withTrace(String projectName, String sourceName, String targetName) {
         JSONObject trace = new JSONObject();
 
         trace.put("traceLinkId", "");
-        trace.put("source", source);
-        trace.put("target", target);
+        trace.put("sourceName", sourceName);
+        trace.put("targetName", targetName);
 
         this.projects.get(projectName).getJSONArray("traces").put(trace);
         return this;
     }
 
-    public JSONObject createTrace(String source, String target) {
+    public JSONObject createTrace(String sourceName, String targetName) {
         JSONObject trace = new JSONObject();
-        trace.put("source", source);
-        trace.put("target", target);
+        trace.put("sourceName", sourceName);
+        trace.put("targetName", targetName);
         return trace;
     }
 }

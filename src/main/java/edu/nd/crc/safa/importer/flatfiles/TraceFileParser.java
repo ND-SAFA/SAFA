@@ -144,8 +144,8 @@ public class TraceFileParser {
             String sourceId = record.get(SOURCE_PARAM).trim();
             String targetId = record.get(TARGET_PARAM).trim();
             TraceAppEntity trace = new TraceAppEntity();
-            trace.setSource(sourceId);
-            trace.setTarget(targetId);
+            trace.setSourceName(sourceId);
+            trace.setTargetName(targetId);
             traceLinks.add(trace);
         }
         return new Pair<>(traceLinks, errors);

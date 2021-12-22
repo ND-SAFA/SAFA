@@ -73,11 +73,11 @@ public class TraceLinkVersionRepositoryImpl
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
             .getByProjectAndSourceAndTarget(
                 project,
-                trace.source,
-                trace.target);
+                trace.sourceName,
+                trace.targetName);
         if (traceLinkOptional.isEmpty()) {
-            Artifact sourceArtifact = assertAndFindArtifact(project, trace.source);
-            Artifact targetArtifact = assertAndFindArtifact(project, trace.target);
+            Artifact sourceArtifact = assertAndFindArtifact(project, trace.sourceName);
+            Artifact targetArtifact = assertAndFindArtifact(project, trace.targetName);
             traceLink = new TraceLink(sourceArtifact, targetArtifact);
             this.traceLinkRepository.save(traceLink);
         } else {

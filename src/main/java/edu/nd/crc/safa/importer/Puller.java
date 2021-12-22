@@ -70,7 +70,7 @@ public class Puller {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         List<TraceAppEntity> traces = new ArrayList<>();
         for (Issue issue : mJira.getIssues(types)) {
-            String issueContent = getIssueContent(issue);
+            String issueContent = getIssueContent(issue); // TODO: Revisit what goes into content.
             foundNodes.add(issue.key);
 
             String artifactName = issue.key;

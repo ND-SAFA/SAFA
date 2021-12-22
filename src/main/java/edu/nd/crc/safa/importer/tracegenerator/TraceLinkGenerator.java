@@ -49,8 +49,8 @@ public class TraceLinkGenerator {
             .stream()
             .filter(t -> {
                 Optional<TraceLinkVersion> alreadyApprovedLink =
-                    this.traceLinkVersionRepository.findByProjectVersionAndSourceAndTarget(projectVersion, t.source,
-                        t.target);
+                    this.traceLinkVersionRepository.findByProjectVersionAndSourceAndTarget(projectVersion, t.sourceName,
+                        t.targetName);
                 return alreadyApprovedLink
                     .map(traceLinkVersion -> traceLinkVersion.getApprovalStatus() != TraceApproval.APPROVED)
                     .orElse(true);

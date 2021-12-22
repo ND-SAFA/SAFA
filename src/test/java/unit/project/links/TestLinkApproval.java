@@ -49,8 +49,8 @@ public class TestLinkApproval extends ApplicationBaseTest {
         JSONObject response = sendGet(url, status().isOk());
         JSONArray links = response.getJSONArray("body");
         assertThat(links.length()).isEqualTo(1);
-        assertThat(links.getJSONObject(0).getString("source")).isEqualTo(sourceName);
-        assertThat(links.getJSONObject(0).getString("target")).isEqualTo(targetName);
+        assertThat(links.getJSONObject(0).getString("sourceName")).isEqualTo(sourceName);
+        assertThat(links.getJSONObject(0).getString("targetName")).isEqualTo(targetName);
     }
 
     @Test
@@ -140,8 +140,8 @@ public class TestLinkApproval extends ApplicationBaseTest {
 
         for (int i = 0; i < links.length(); i++) {
             JSONObject link = links.getJSONObject(i);
-            String source = link.getString("source");
-            String target = link.getString("target");
+            String source = link.getString("sourceName");
+            String target = link.getString("targetName");
 
 
             ArtifactVersion sourceBody = artifactVersionRepository.getBodiesWithName(project, source).get(0);

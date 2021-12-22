@@ -216,8 +216,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @Override
     public boolean hasSameContent(TraceAppEntity other) {
         return hasSameContent(
-            other.source,
-            other.target,
+            other.sourceName,
+            other.targetName,
             other.traceType,
             other.approvalStatus,
             other.score

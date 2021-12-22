@@ -78,8 +78,8 @@ public class ProjectRetrievalService {
                 .getEntityVersionsInProjectVersion(projectVersion)
                 .stream()
                 .map(TraceAppEntity::new)
-                .filter(t -> artifactNames.contains(t.source)
-                    && artifactNames.contains(t.target))
+                .filter(t -> artifactNames.contains(t.sourceName)
+                    && artifactNames.contains(t.targetName))
                 .collect(Collectors.toList());
         return new ProjectAppEntity(projectVersion, artifacts, traces);
     }

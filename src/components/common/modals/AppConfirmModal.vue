@@ -35,21 +35,13 @@ export default Vue.extend({
   },
   computed: {
     isMessageDefined(): boolean {
-      return this.message.type !== ConfirmationType.CLEAR;
+      return !!this.message && this.message.type !== ConfirmationType.CLEAR;
     },
     title(): string {
-      if (this.isMessageDefined) {
-        return this.message.title;
-      } else {
-        return "";
-      }
+      return this.message?.title || "";
     },
     body(): string {
-      if (this.isMessageDefined) {
-        return this.message.body;
-      } else {
-        return "";
-      }
+      return this.message?.body || "";
     },
   },
   data() {

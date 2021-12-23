@@ -1,5 +1,4 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { connectAndSubscribeToVersion } from "@/api";
 import type {
   Artifact,
   ArtifactDirection,
@@ -21,16 +20,11 @@ import {
   viewportModule,
   appModule,
 } from "@/store";
-import { loadVersionIfExistsHandler } from "@/api";
-
-const emptyProject: Project = {
-  projectId: "",
-  description: "",
-  name: "Untitled",
-  artifacts: [],
-  traces: [],
-  projectVersion: undefined,
-};
+import {
+  loadVersionIfExistsHandler,
+  connectAndSubscribeToVersion,
+} from "@/api";
+import { createProject } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -40,7 +34,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * The currently loaded project.
    */
-  private project: Project = emptyProject;
+  private project = createProject();
 
   /**
    * A mapping of the allowed directions of traces between artifacts.
@@ -96,7 +90,7 @@ export default class ProjectModule extends VuexModule {
    * Clears the current project.
    */
   async clearProject(): Promise<void> {
-    await this.setProject(emptyProject);
+    await this.setProject(createProject());
   }
 
   @Action
@@ -123,7 +117,7 @@ export default class ProjectModule extends VuexModule {
     if (selectedArtifact !== undefined) {
       const query = artifacts.filter((a) => a.name === selectedArtifact.name);
       if (query.length > 0) {
-        artifactSelectionModule.selectArtifact(query[0]);
+        await artifactSelectionModule.selectArtifact(query[0]);
       }
     }
     await subtreeModule.updateSubtreeMap();

@@ -1,11 +1,11 @@
+export * from "./util";
 export * from "./artifact-api";
-export * from "./auth-http-client";
 export * from "./link-api";
 export * from "./parse-api";
 export * from "./project-api";
 export * from "./revision-api";
 export * from "./session-api";
-export { baseURL } from "./endpoints";
+export * from "./commit-api";
 export { deleteProjectVersion } from "@/api/endpoints/version-api";
 export { createNewRevisionVersion } from "@/api/endpoints/version-api";
 export { createNewMinorVersion } from "@/api/endpoints/version-api";

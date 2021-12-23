@@ -1,11 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, ProjectVersion } from "@/types";
-import {
-  ArtifactDeltaState,
-  EntityModification,
-  PanelType,
-  ProjectDelta,
-} from "@/types";
+import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
+import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
 import { appModule, projectModule, subtreeModule } from "..";
 
 const EMPTY_PROJECT_DELTA = {

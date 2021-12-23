@@ -2,7 +2,7 @@ import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectVersionUpdate } from "@/types";
 import { appModule, projectModule } from "@/store";
-import { baseURL } from "@/api/endpoints/endpoints";
+import { baseURL } from "@/api/endpoints/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;

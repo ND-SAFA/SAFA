@@ -1,9 +1,8 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, Commit, ProjectVersion } from "@/types";
-import authHttpClient from "@/api/endpoints/auth-http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
 import { appModule, projectModule } from "@/store";
 import type { CommitHistory } from "@/types";
+import { persistCommit } from "@/api";
 
 type CommitFromVersionBuilder = (v: ProjectVersion) => Commit;
 
@@ -80,12 +79,8 @@ export default class CommitModule extends VuexModule {
    * Sends commit to backend to be saved to the database.
    * @param commit The commit to be persisted to the database.
    */
-  persistCommit(commit: Commit): Promise<void> {
-    const versionId = commit.commitVersion.versionId;
-    return authHttpClient<void>(fillEndpoint(Endpoint.commit, { versionId }), {
-      method: "POST",
-      body: JSON.stringify(commit),
-    });
+  async persistCommit(commit: Commit): Promise<void> {
+    await persistCommit(commit);
   }
 
   @Mutation

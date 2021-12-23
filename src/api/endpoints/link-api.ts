@@ -1,8 +1,10 @@
-import { TraceApproval, TraceLink } from "@/types";
-import authHttpClient from "@/api/endpoints/auth-http-client";
-import { Artifact } from "@/types/domain/artifact";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
-import { CommitBuilder } from "@/util/commit-builder";
+import { TraceApproval, TraceLink, Artifact } from "@/types";
+import {
+  CommitBuilder,
+  Endpoint,
+  fillEndpoint,
+  authHttpClient,
+} from "@/api/endpoints/util";
 
 /**
  * Returns all generated links for this project.

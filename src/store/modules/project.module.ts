@@ -9,8 +9,9 @@ import type {
   ProjectCreationResponse,
   ProjectIdentifier,
   TraceLink,
+  ArtifactTypeDirections,
 } from "@/types";
-import { ArtifactTypeDirections, LinkValidator, PanelType } from "@/types";
+import { LinkValidator, PanelType } from "@/types";
 import {
   appModule,
   artifactSelectionModule,

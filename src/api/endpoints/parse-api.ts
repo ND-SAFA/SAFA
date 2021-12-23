@@ -1,6 +1,5 @@
-import authHttpClient from "@/api/endpoints/auth-http-client";
 import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/endpoints/util";
 
 /**
  * Sends BEND an ArtifactDefinition file and returns parsed artifacts and errors.

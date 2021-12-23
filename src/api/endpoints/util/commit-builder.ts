@@ -15,11 +15,11 @@ export class CommitBuilder {
   }
 
   static withCurrentVersion(): CommitBuilder {
-    const version = projectModule.getProject.projectVersion;
-    if (version === undefined) {
+    const { projectVersion } = projectModule.getProject;
+    if (projectVersion === undefined) {
       throw Error("No project version is selected.");
     }
-    return new CommitBuilder(version);
+    return new CommitBuilder(projectVersion);
   }
   withNewArtifact(artifact: Artifact): this {
     this.commit.artifacts.added.push(artifact);

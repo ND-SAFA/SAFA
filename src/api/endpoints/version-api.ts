@@ -1,6 +1,5 @@
 import { ProjectCreationResponse, ProjectVersion } from "@/types";
-import authHttpClient from "@/api/endpoints/auth-http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/endpoints/util";
 
 /**
  * Gets a specific version of a project.

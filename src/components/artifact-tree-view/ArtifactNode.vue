@@ -79,10 +79,10 @@ export default Vue.extend({
     },
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
-      const artifactName = this.artifactDefinition.name;
+      const artifactId = this.artifactDefinition.id;
 
-      if (artifactName in artifactWarnings) {
-        return artifactWarnings[artifactName];
+      if (artifactId in artifactWarnings) {
+        return artifactWarnings[artifactId];
       }
 
       return undefined;

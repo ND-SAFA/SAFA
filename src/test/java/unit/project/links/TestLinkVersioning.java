@@ -37,27 +37,27 @@ public class TestLinkVersioning extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
-        ProjectVersion baseVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion targetVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
-        Project project = baseVersion.getProject();
+        ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
+        Project project = v1.getProject();
 
         // Step - Create base trace link
         String flatFilesPath = ProjectPaths.PATH_TO_MINI_FILES;
-        uploadFlatFilesToVersion(baseVersion, flatFilesPath);
+        uploadFlatFilesToVersion(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectEntities baseEntities = projectRetrievalService.retrieveAndCreateProjectResponse(baseVersion);
+        ProjectEntities baseEntities = projectRetrievalService.retrieveAndCreateProjectResponse(v1);
         List<TraceAppEntity> baseTraces = baseEntities.getProject().getTraces();
         assertThat(baseTraces.size()).isEqualTo(1);
 
         // Step - Save same link to latter version
-        uploadFlatFilesToVersion(targetVersion, flatFilesPath);
+        uploadFlatFilesToVersion(v2, flatFilesPath);
 
         // VP - Verify that no change is stored by system
         assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectEntities targetEntities = projectRetrievalService.retrieveAndCreateProjectResponse(baseVersion);
+        ProjectEntities targetEntities = projectRetrievalService.retrieveAndCreateProjectResponse(v1);
         List<TraceAppEntity> targetTraces = targetEntities.getProject().getTraces();
         assertThat(targetTraces.size()).isEqualTo(1);
     }

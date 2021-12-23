@@ -31,9 +31,10 @@ public class AppEntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public AppEntityBuilder withArtifact(String projectName, String artifactName) {
+    public AppEntityBuilder withArtifact(String projectName, String artifactName, String artifactId) {
         ProjectAppEntity project = projects.get(projectName);
         ArtifactAppEntity artifact = new ArtifactAppEntity();
+        artifact.setId(artifactId);
         artifact.setName(artifactName);
         addEntry(artifacts, projectName, artifactName, artifact);
         project.addArtifact(artifact);

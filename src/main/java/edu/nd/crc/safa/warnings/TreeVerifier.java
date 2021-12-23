@@ -30,7 +30,7 @@ public class TreeVerifier {
         Map<String, List<RuleName>> results = new HashMap<>();
 
         artifactBodies.forEach((artifactBody) -> {
-            String artifactName = artifactBody.getName();
+
             List<RuleName> artifactWarnings = new ArrayList<>();
             for (Rule rule : rulesToApply) {
                 rule = new Rule(rule);
@@ -56,7 +56,8 @@ public class TreeVerifier {
                 }
             }
             if (!artifactWarnings.isEmpty()) {
-                results.put(artifactName, artifactWarnings);
+                String artifactId = artifactBody.getArtifact().getArtifactId().toString();
+                results.put(artifactId, artifactWarnings);
             }
         });
 
@@ -70,9 +71,9 @@ public class TreeVerifier {
             case BIDIRECTIONAL_LINK:
                 return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
             case CHILD:
-                return satisfiesChildCountRule(ruleToApply, targetArtifact.getBaseEntityId(), traceLinks);
+                return satisfiesChildCountRule(ruleToApply, targetArtifact.getName(), traceLinks);
             case SIBLING:
-                return handleSiblingFunction(ruleToApply, targetArtifact.getBaseEntityId(), traceLinks);
+                return handleSiblingFunction(ruleToApply, targetArtifact.getName(), traceLinks);
             default:
                 return true;
         }
@@ -87,7 +88,7 @@ public class TreeVerifier {
             // Get all traceLinks where we are the source or target
             .filter(t -> {
                 String typeName = artifact.getType().getName();
-                String artifactName = artifact.getBaseEntityId();
+                String artifactName = artifact.getName();
                 String otherType;
                 if (typeName.equalsIgnoreCase(rule.sourceArtifactType)) {
                     otherType = rule.targetArtifactType;

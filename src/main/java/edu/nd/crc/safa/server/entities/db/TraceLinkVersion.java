@@ -168,6 +168,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public String toString() {
         JSONObject json = new JSONObject();
+        json.put("mod", this.modificationType);
         json.put("version", this.projectVersion);
         json.put("link", this.traceLink.toString());
         json.put("approved", getApprovalStatus());
@@ -203,8 +204,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         if (e instanceof TraceLinkVersion) {
             TraceLinkVersion other = (TraceLinkVersion) e;
             return hasSameContent(
-                other.traceLink.sourceArtifact.getBaseEntityId(),
-                other.traceLink.targetArtifact.getBaseEntityId(),
+                other.traceLink.sourceArtifact.getName(),
+                other.traceLink.targetArtifact.getName(),
                 other.traceType,
                 other.approvalStatus,
                 other.score
@@ -224,13 +225,13 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         );
     }
 
-    private boolean hasSameContent(String source,
-                                   String target,
+    private boolean hasSameContent(String sourceName,
+                                   String targetName,
                                    TraceType traceType,
                                    TraceApproval traceApproval,
                                    double score) {
-        return this.traceLink.sourceArtifact.getBaseEntityId().equals(source)
-            && this.traceLink.targetArtifact.getBaseEntityId().equals(target)
+        return this.traceLink.sourceArtifact.getName().equals(sourceName)
+            && this.traceLink.targetArtifact.getName().equals(targetName)
             && this.traceType == traceType
             && this.approvalStatus == traceApproval
             && areEqualWithDelta(this.score, score, 0.001);

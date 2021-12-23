@@ -4,12 +4,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
@@ -97,5 +99,14 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
         }
 
         return new Pair<>(beforeVersion, afterVersion);
+    }
+
+    public String getId(String projectName, String artifactName) {
+        Project project = this.dbEntityBuilder.getProject(projectName);
+        Optional<Artifact> artifactOptional = this.artifactRepository.findByProjectAndName(project, artifactName);
+        if (artifactOptional.isPresent()) {
+            return artifactOptional.get().getArtifactId().toString();
+        }
+        throw new RuntimeException("Could not find artifact with name:" + artifactName);
     }
 }

@@ -38,9 +38,9 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
-        assertThat(artifactDelta.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(artifactDelta.getJSONObject("removed").has("D12")).isTrue();
-        assertThat(artifactDelta.getJSONObject("added").has("D7")).isTrue();
+        assertThat(artifactDelta.getJSONObject("modified").has(getId(projectName, "F3"))).isTrue();
+        assertThat(artifactDelta.getJSONObject("removed").has(getId(projectName, "D12"))).isTrue();
+        assertThat(artifactDelta.getJSONObject("added").has(getId(projectName, "D7"))).isTrue();
 
         // VP -
         JSONObject traceDelta = projectDelta.getJSONObject("traces");

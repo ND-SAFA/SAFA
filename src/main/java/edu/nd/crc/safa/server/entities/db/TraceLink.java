@@ -100,15 +100,17 @@ public class TraceLink implements Serializable, IBaseEntity {
     public String toString() {
         JSONObject json = new JSONObject();
         json.put("link", String.format("%s -> %s", sourceArtifact, targetArtifact));
+        json.put("ids", String.format("%s -> %s", sourceArtifact.artifactId, targetArtifact.artifactId));
+
         return json + "\n";
     }
 
     public boolean isSourceName(String sourceName) {
-        return this.sourceArtifact.getBaseEntityId().equals(sourceName);
+        return this.sourceArtifact.getName().equals(sourceName);
     }
 
     public boolean isTargetName(String targetName) {
-        return this.targetArtifact.getBaseEntityId().equals(targetName);
+        return this.targetArtifact.getName().equals(targetName);
     }
 
     public Artifact getSourceArtifact() {
@@ -129,7 +131,7 @@ public class TraceLink implements Serializable, IBaseEntity {
 
     @Override
     public String getBaseEntityId() {
-        return this.getTraceName();
+        return this.getTraceLinkId().toString();
     }
 
     public boolean equals(TraceLink other) {

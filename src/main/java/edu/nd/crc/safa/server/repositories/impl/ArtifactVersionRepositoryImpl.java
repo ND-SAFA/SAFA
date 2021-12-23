@@ -76,8 +76,8 @@ public class ArtifactVersionRepositoryImpl
                                                         ArtifactAppEntity artifactAppEntity) throws SafaError {
         Project project = projectVersion.getProject();
         String artifactId = artifactAppEntity.getId();
-        String typeName = artifactAppEntity.getType();
-        String artifactName = artifactAppEntity.getName();
+        String typeName = artifactAppEntity.type;
+        String artifactName = artifactAppEntity.name;
 
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);

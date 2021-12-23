@@ -20,6 +20,10 @@ export default class SnackbarModule extends VuexModule {
    * Whether the confirmation modal is open.
    */
   private confirmationMessage = createConfirmDialogueMessage();
+  /**
+   * A list of dev messages.
+   */
+  private devMessages: string[] = [];
 
   @Action
   /**
@@ -81,15 +85,16 @@ export default class SnackbarModule extends VuexModule {
    */
   onDevMessage(message: string): void {
     console.log(message);
-    //TODO: Add to log
+    this.ADD_DEV_MESSAGE(`Info: ${message}`);
   }
+
   @Action
   /**
    * Logs and prints warning to the console.
    */
   onDevWarning(message: string): void {
     console.warn(message);
-    //TODO: Add to log
+    this.ADD_DEV_MESSAGE(`Warning: ${message}`);
   }
 
   @Action
@@ -98,7 +103,17 @@ export default class SnackbarModule extends VuexModule {
    */
   onDevError(message: string): void {
     console.error(message);
-    //TODO: Add to log
+    this.ADD_DEV_MESSAGE(`Error: ${message}`);
+  }
+
+  @Mutation
+  /**
+   * Sets the current snackbar message.
+   *
+   * @param message - The message to display.
+   */
+  ADD_DEV_MESSAGE(message: string): void {
+    this.devMessages = [...this.devMessages, message];
   }
 
   @Mutation

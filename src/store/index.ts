@@ -31,6 +31,7 @@ const store = new Vuex.Store({
     viewport: ViewportModule,
     commit: CommitModule,
     subtree: SubtreeModule,
+    snackbar: SnackbarModule,
   },
   plugins: [vuexLocal.plugin],
 });

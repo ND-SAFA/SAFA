@@ -2,19 +2,8 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
 import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
 import { appModule, projectModule, subtreeModule } from "..";
+import { createProjectDelta } from "@/util";
 
-const EMPTY_PROJECT_DELTA = {
-  artifacts: {
-    added: {},
-    modified: {},
-    removed: {},
-  },
-  traces: {
-    added: {},
-    modified: {},
-    removed: {},
-  },
-};
 @Module({ namespaced: true, name: "delta" })
 /**
  * This module defines state variables for tracking artifact deltas.
@@ -31,7 +20,7 @@ export default class ErrorModule extends VuexModule {
   /**
    * A collection of all added artifacts.
    */
-  private projectDelta: ProjectDelta = EMPTY_PROJECT_DELTA;
+  private projectDelta = createProjectDelta();
 
   @Action
   /**
@@ -75,7 +64,7 @@ export default class ErrorModule extends VuexModule {
    * Clears the current collections of artifact deltas.
    */
   clearDelta(): void {
-    this.SET_DELTA_PAYLOAD(EMPTY_PROJECT_DELTA);
+    this.SET_DELTA_PAYLOAD(createProjectDelta());
     this.SET_DELTA_IN_VIEW(false);
     appModule.closePanel(PanelType.right);
   }
@@ -146,7 +135,7 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return Delta states associated with artifacts with given names.
+   * @return All delta states that associated with the artifacts given artifact names.
    */
   get getDeltaStatesByArtifactNames(): (
     names: string[]
@@ -168,6 +157,9 @@ export default class ErrorModule extends VuexModule {
     };
   }
 
+  /**
+   * @return The delta state of the given trace link id.
+   */
   get getTraceDeltaType(): (id: string) => ArtifactDeltaState | undefined {
     return (id) => {
       if (!this.getIsDeltaViewEnabled) {

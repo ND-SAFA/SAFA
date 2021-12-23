@@ -1,4 +1,14 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
+import type { CytoCore, Artifact, LayoutPayload } from "@/types";
+import { areArraysEqual } from "@/util";
+import {
+  logModule,
+  artifactSelectionModule,
+  projectModule,
+  subtreeModule,
+  viewportModule,
+  appModule,
+} from "@/store";
 import {
   artifactTreeCyPromise,
   getRootNode,
@@ -12,16 +22,6 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
-import type { CytoCore, Artifact, LayoutPayload } from "@/types";
-import { areArraysEqual } from "@/util";
-import {
-  logModule,
-  artifactSelectionModule,
-  projectModule,
-  subtreeModule,
-  viewportModule,
-  appModule,
-} from "@/store";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -49,7 +49,7 @@ export default class ViewportModule extends VuexModule {
       artifact.id,
     ];
 
-    artifactSelectionModule.selectArtifact(artifact);
+    await artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",
@@ -177,10 +177,9 @@ export default class ViewportModule extends VuexModule {
         this.currentCenteringCollection !== undefined &&
         areArraysEqual(this.currentCenteringCollection, artifactIds)
       ) {
-        logModule.onDevWarning(
+        return logModule.onDevWarning(
           `Collection is already being rendered: ${artifactIds}`
         );
-        return;
       } else {
         cy.stop(false, false);
       }

@@ -1,5 +1,4 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { connectAndSubscribeToVersion } from "@/api";
 import type {
   Artifact,
   ArtifactDirection,
@@ -21,16 +20,9 @@ import {
   viewportModule,
   appModule,
 } from "@/store";
-import { loadVersionIfExistsHandler } from "@/api";
-
-const emptyProject: Project = {
-  projectId: "",
-  description: "",
-  name: "Untitled",
-  artifacts: [],
-  traces: [],
-  projectVersion: undefined,
-};
+import { connectAndSubscribeToVersion } from "@/api/endpoints";
+import { loadVersionIfExistsHandler } from "@/api/handlers";
+import { createProject } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -40,7 +32,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * The currently loaded project.
    */
-  private project: Project = emptyProject;
+  private project = createProject();
 
   /**
    * A mapping of the allowed directions of traces between artifacts.
@@ -96,7 +88,7 @@ export default class ProjectModule extends VuexModule {
    * Clears the current project.
    */
   async clearProject(): Promise<void> {
-    await this.setProject(emptyProject);
+    await this.setProject(createProject());
   }
 
   @Action
@@ -123,7 +115,7 @@ export default class ProjectModule extends VuexModule {
     if (selectedArtifact !== undefined) {
       const query = artifacts.filter((a) => a.name === selectedArtifact.name);
       if (query.length > 0) {
-        artifactSelectionModule.selectArtifact(query[0]);
+        await artifactSelectionModule.selectArtifact(query[0]);
       }
     }
     await subtreeModule.updateSubtreeMap();
@@ -155,12 +147,11 @@ export default class ProjectModule extends VuexModule {
    *
    * @param subscriptionId - The project and version ID to subscribe to.
    */
-  async subscribeToVersion(
-    subscriptionId: ChannelSubscriptionId
-  ): Promise<void> {
-    const { projectId, versionId } = subscriptionId;
-
-    if (projectId !== undefined && versionId !== undefined) {
+  async subscribeToVersion({
+    projectId,
+    versionId,
+  }: ChannelSubscriptionId): Promise<void> {
+    if (projectId && versionId) {
       await connectAndSubscribeToVersion(projectId, versionId);
     }
   }
@@ -194,7 +185,9 @@ export default class ProjectModule extends VuexModule {
           allowedDirections[sourceType].push(targetType);
         }
       } catch (e) {
-        console.log("Error calculating allowed trace directions", e);
+        logModule.onDevMessage(
+          `Unable to calculate allowed trace directions: ${e}`
+        );
       }
     });
 
@@ -383,7 +376,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return A collection of artifacts, keyed by their id.
    */
-  get getArtifactHashmap(): Record<string, Artifact> {
+  get getArtifactsById(): Record<string, Artifact> {
     return this.project.artifacts
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});

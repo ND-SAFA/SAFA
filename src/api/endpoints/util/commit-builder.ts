@@ -1,5 +1,6 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
 import { commitModule, projectModule } from "@/store";
+import { createCommit } from "@/util";
 
 /**
  * Responsible for creating a commit and saving it to the database.
@@ -11,7 +12,7 @@ export class CommitBuilder {
   commit: Commit;
 
   constructor(version: ProjectVersion) {
-    this.commit = commitModule.emptyCommit(version);
+    this.commit = createCommit(version);
   }
 
   static withCurrentVersion(): CommitBuilder {

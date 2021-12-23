@@ -8,7 +8,7 @@
       :is-open="isArtifactCreatorOpen"
       @close="closeArtifactCreator"
     />
-    <AppConfirmModal :message="confirmationMessage" />
+    <app-confirm-modal :message="confirmationMessage" />
   </v-container>
 </template>
 

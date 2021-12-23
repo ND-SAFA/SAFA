@@ -6,6 +6,7 @@ import {
   Project,
   ProjectDelta,
   ProjectVersion,
+  SessionModel,
   SnackbarMessage,
 } from "@/types";
 
@@ -29,6 +30,16 @@ export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
     title: "",
     body: "",
     statusCallback: () => null,
+  };
+}
+
+/**
+ * @return An empty session.
+ */
+export function createSession(): SessionModel {
+  return {
+    token: "",
+    versionId: "",
   };
 }
 

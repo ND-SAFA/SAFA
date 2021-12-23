@@ -1,6 +1,6 @@
-import { projectModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink, SubtreeMap, SetOpacityRequest } from "@/types";
+import { projectModule } from "@/store";
 import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
@@ -112,7 +112,6 @@ export default class SubtreeModule extends VuexModule {
     this.SET_COLLAPSED_PARENT_NODES(
       this.collapsedParentNodes.filter((n) => n !== rootId)
     );
-
     await this.setProjectEntityVisibility({
       targetArtifactIds: subtreeNodes,
       visible: true,

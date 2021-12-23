@@ -20,10 +20,8 @@ import {
   viewportModule,
   appModule,
 } from "@/store";
-import {
-  loadVersionIfExistsHandler,
-  connectAndSubscribeToVersion,
-} from "@/api";
+import { connectAndSubscribeToVersion } from "@/api/endpoints";
+import { loadVersionIfExistsHandler } from "@/api/handlers";
 import { createProject } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
@@ -149,12 +147,11 @@ export default class ProjectModule extends VuexModule {
    *
    * @param subscriptionId - The project and version ID to subscribe to.
    */
-  async subscribeToVersion(
-    subscriptionId: ChannelSubscriptionId
-  ): Promise<void> {
-    const { projectId, versionId } = subscriptionId;
-
-    if (projectId !== undefined && versionId !== undefined) {
+  async subscribeToVersion({
+    projectId,
+    versionId,
+  }: ChannelSubscriptionId): Promise<void> {
+    if (projectId && versionId) {
       await connectAndSubscribeToVersion(projectId, versionId);
     }
   }
@@ -188,7 +185,9 @@ export default class ProjectModule extends VuexModule {
           allowedDirections[sourceType].push(targetType);
         }
       } catch (e) {
-        console.log("Error calculating allowed trace directions", e);
+        logModule.onDevMessage(
+          `Unable to calculate allowed trace directions: ${e}`
+        );
       }
     });
 
@@ -377,7 +376,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return A collection of artifacts, keyed by their id.
    */
-  get getArtifactHashmap(): Record<string, Artifact> {
+  get getArtifactsById(): Record<string, Artifact> {
     return this.project.artifacts
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});

@@ -1,5 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import jwt_decode from "jwt-decode";
 import type { SessionModel, UserModel } from "@/types";
+import { AuthToken } from "@/types";
 import {
   getCurrentVersion,
   getProjects,
@@ -7,17 +9,8 @@ import {
   loadVersionIfExistsHandler,
 } from "@/api";
 import { navigateTo, Routes } from "@/router";
-import { AuthToken } from "@/types";
 import { logModule, deltaModule, projectModule, subtreeModule } from "@/store";
-import jwt_decode from "jwt-decode";
-
-/**
- * If you only knew how many things I tried to not have to resort to this...
- */
-const emptySessionModel: SessionModel = {
-  token: "",
-  versionId: "",
-};
+import { createSession } from "@/util";
 
 @Module({ namespaced: true, name: "session" })
 /**
@@ -27,7 +20,7 @@ export default class SessionModule extends VuexModule {
   /**
    * The current active session, if one exists.
    */
-  private session: SessionModel = emptySessionModel;
+  private session = createSession();
 
   @Action({ rawError: true })
   /**
@@ -65,7 +58,7 @@ export default class SessionModule extends VuexModule {
    * Attempts to log a user out.
    */
   async logout(): Promise<void> {
-    this.SET_SESSION(emptySessionModel);
+    this.SET_SESSION(createSession());
 
     await navigateTo(Routes.LOGIN_ACCOUNT);
     await projectModule.clearProject();

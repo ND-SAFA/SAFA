@@ -66,7 +66,7 @@ export default Vue.extend({
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
+      return projectModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
       return projectModule.artifacts;

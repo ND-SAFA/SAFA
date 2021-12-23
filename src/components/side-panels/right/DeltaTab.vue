@@ -6,28 +6,46 @@
       deltaType="added"
       class="mt-10"
       :names="addedArtifactNames"
-      @click="(name) => selectArtifact(name, addedArtifacts[name], 'added')"
+      :ids="addedArtifactIds"
+      @click="
+        (id) =>
+          selectArtifact(addedArtifacts[id].name, addedArtifacts[id], 'added')
+      "
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
       :names="removedArtifactNames"
-      @click="(name) => selectArtifact(name, removedArtifacts[name], 'removed')"
+      :ids="removedArtifactIds"
+      @click="
+        (id) =>
+          selectArtifact(
+            removedArtifacts[id].name,
+            removedArtifacts[id],
+            'removed'
+          )
+      "
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
       :names="modifiedArtifactNames"
+      :ids="modifiedArtifactIds"
       @click="
-        (name) => selectArtifact(name, modifiedArtifacts[name], 'modified')
+        (id) =>
+          selectArtifact(
+            modifiedArtifacts[id].after.name,
+            modifiedArtifacts[id],
+            'modified'
+          )
       "
     />
     <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
       :isOpen="selectedDeltaArtifact !== undefined"
-      :delta-type="selectedDeltaArtifact[2]"
-      :input-artifact="selectedDeltaArtifact[1]"
       :name="selectedDeltaArtifact[0]"
+      :input-artifact="selectedDeltaArtifact[1]"
+      :delta-type="selectedDeltaArtifact[2]"
       @close="closeDeltaModal"
     />
   </v-expansion-panels>
@@ -79,19 +97,28 @@ export default Vue.extend({
       return deltaModule.addedArtifacts;
     },
     addedArtifactNames(): string[] {
-      return Object.keys(this.addedArtifacts);
+      return Object.values(this.addedArtifacts).map((a) => a.name);
+    },
+    addedArtifactIds(): string[] {
+      return Object.values(this.addedArtifacts).map((a) => a.id);
     },
     removedArtifacts(): Record<string, Artifact> {
       return deltaModule.removedArtifacts;
     },
     removedArtifactNames(): string[] {
-      return Object.keys(this.removedArtifacts);
+      return Object.values(this.removedArtifacts).map((a) => a.name);
+    },
+    removedArtifactIds(): string[] {
+      return Object.values(this.removedArtifacts).map((a) => a.id);
     },
     modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
       return deltaModule.modifiedArtifacts;
     },
     modifiedArtifactNames(): string[] {
-      return Object.keys(this.modifiedArtifacts);
+      return Object.values(this.modifiedArtifacts).map((a) => a.after.name);
+    },
+    modifiedArtifactIds(): string[] {
+      return Object.values(this.modifiedArtifacts).map((a) => a.after.id);
     },
     deltaArtifacts(): string[] {
       return this.addedArtifactNames.concat(

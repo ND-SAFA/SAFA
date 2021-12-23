@@ -93,7 +93,7 @@ export default Vue.extend({
         return ArtifactDeltaState.NO_CHANGE;
       }
 
-      const name: string = this.artifactDefinition.name;
+      const name: string = this.artifactDefinition.id;
       const addedArtifacts: Record<string, Artifact> =
         deltaModule.addedArtifacts;
       const removedArtifacts: Record<string, Artifact> =

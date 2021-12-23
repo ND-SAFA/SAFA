@@ -116,14 +116,14 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return A collection of added deltas.
+   * @return A mapping of artifact IDs and the artifact's added.
    */
   get addedArtifacts(): Record<string, Artifact> {
     return this.projectDelta.artifacts.added;
   }
 
   /**
-   * @return A collection of removed deltas.
+   * @return A mapping of artifact IDs and the artifact's removed.
    */
   get removedArtifacts(): Record<string, Artifact> {
     return this.projectDelta.artifacts.removed;

@@ -28,8 +28,8 @@ export default Vue.extend({
     const location = window.location.href;
 
     if (!isAuthorized) {
-      return await navigateTo(Routes.LOGIN_ACCOUNT);
-    } else if (location.includes(Routes.ARTIFACT_TREE)) {
+      return await sessionModule.logout();
+    } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
       await sessionModule.loadLastProject();
     }
   },

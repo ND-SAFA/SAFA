@@ -11,8 +11,9 @@ import { navigateTo, Routes } from "@/router";
 export async function loadVersionIfExistsHandler(
   lastVersionId: string | undefined
 ): Promise<void> {
-  if (lastVersionId !== undefined && lastVersionId !== "") {
+  if (lastVersionId) {
     appModule.onLoadStart();
+
     return navigateTo(Routes.ARTIFACT_TREE)
       .then(() => getProjectVersion(lastVersionId))
       .then(projectModule.setProjectCreationResponse)

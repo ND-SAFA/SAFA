@@ -55,6 +55,8 @@ export default class SessionModule extends VuexModule {
       this.SET_SESSION({ ...this.session, versionId });
 
       await loadVersionIfExistsHandler(versionId);
+    } else {
+      await navigateTo(Routes.PROJECT_CREATOR);
     }
   }
 
@@ -65,11 +67,10 @@ export default class SessionModule extends VuexModule {
   async logout(): Promise<void> {
     this.SET_SESSION(emptySessionModel);
 
+    await navigateTo(Routes.LOGIN_ACCOUNT);
     await projectModule.clearProject();
     deltaModule.clearDelta();
     subtreeModule.clearSubtrees();
-
-    await navigateTo(Routes.LOGIN_ACCOUNT);
   }
 
   @Action({ rawError: true })
@@ -81,7 +82,6 @@ export default class SessionModule extends VuexModule {
       return false;
     } else if (this.isTokenExpired) {
       appModule.onWarning("Your session has expired, please log back in.");
-      await this.logout();
       return false;
     }
 

@@ -21,6 +21,7 @@ export default async function authHttpClient<T>(
 ): Promise<T> {
   const isAuthorized = await sessionModule.hasAuthorization();
   if (!isAuthorized) {
+    await sessionModule.logout();
     throw Error(`${relativeUrl} aborted due to authorization failure.`);
   }
   const token = sessionModule.getToken;

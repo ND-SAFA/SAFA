@@ -26,13 +26,13 @@ export default Vue.extend({
   },
   computed: {
     selector() {
-      const {sourceId, targetId} = this.traceDefinition;
+      const { sourceId, targetId } = this.traceDefinition;
       const id = `${sourceId}-${targetId}`;
 
       return deltaModule.getTraceDeltaType(id);
     },
-    definition() {{
-      const {sourceId, targetId} = this.traceDefinition;
+    definition() {
+      const { sourceId, targetId } = this.traceDefinition;
       const id = `${sourceId}-${targetId}`;
       const count = this.count ? this.count : 1;
       const traceType = deltaModule.getTraceDeltaType(id);

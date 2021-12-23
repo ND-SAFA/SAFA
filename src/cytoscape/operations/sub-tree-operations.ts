@@ -26,26 +26,24 @@ export function createSubtreeMap(
  *
  * @param cy - The cytoscape instance to operate on.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
- * @param subtreeMap - A map of previously calculated subtrees used to look up
- * previous calculations.
+ * @param subtreeMapCache - A cache of previously calculated subtrees.
  */
 function getSubtree(
   cy: CytoCore,
   artifactId: string,
-  subtreeMap: SubtreeMap
+  subtreeMapCache: SubtreeMap
 ): string[] {
   let currentSubtree: string[] = [];
 
-  if (artifactId in subtreeMap) {
-    return subtreeMap[artifactId];
+  if (artifactId in subtreeMapCache) {
+    return subtreeMapCache[artifactId];
   }
-
   for (const childId of getChildren(cy, artifactId)) {
-    if (!(childId in subtreeMap)) {
-      subtreeMap[childId] = getSubtree(cy, childId, subtreeMap);
+    if (!(childId in subtreeMapCache)) {
+      subtreeMapCache[childId] = getSubtree(cy, childId, subtreeMapCache);
     }
 
-    const childSubtreeIds = [...subtreeMap[childId], childId];
+    const childSubtreeIds = [...subtreeMapCache[childId], childId];
     const newSubtreeIds = childSubtreeIds.filter(
       (id) => !currentSubtree.includes(id)
     );
@@ -65,7 +63,7 @@ function getSubtree(
  * @return The computed child artifact ids.
  */
 function getChildren(cy: CytoCore, artifactId: string): string[] {
-  const nodeEdges = cy.edges(`edge[sourceId="${artifactId}"]`);
+  const nodeEdges = cy.edges(`edge[source="${artifactId}"]`);
   const children = nodeEdges.targets();
 
   return children.map((child) => child.data().id);

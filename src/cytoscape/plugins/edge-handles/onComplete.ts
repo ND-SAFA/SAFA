@@ -1,7 +1,7 @@
 import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 import { createLink } from "@/api";
 import { disableDrawMode } from "@/cytoscape/plugins/edge-handles/index";
-import { TraceApproval, TraceLink, TraceType } from "@/types";
+import { ArtifactData, TraceApproval, TraceLink, TraceType } from "@/types";
 
 /**
  * Creates the finalized trace link when an edge creation draw is completed.
@@ -17,12 +17,14 @@ export function onArtifactTreeEdgeComplete(
   targetNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
-  const sourceId = sourceNode.data().id;
-  const targetId = targetNode.data().id;
+  const sourceData: ArtifactData = sourceNode.data();
+  const targetData: ArtifactData = targetNode.data();
   const traceLink: TraceLink = {
     traceLinkId: "",
-    source: sourceId,
-    target: targetId,
+    sourceId: sourceData.id,
+    sourceName: sourceData.artifactName,
+    targetId: targetData.id,
+    targetName: targetData.artifactName,
     traceType: TraceType.MANUAL,
     approvalStatus: TraceApproval.APPROVED,
     score: 1,

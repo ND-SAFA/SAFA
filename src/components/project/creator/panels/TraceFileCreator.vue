@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, TraceFile } from "@/types";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { ButtonRow } from "@/components/common";
 
 /**
@@ -55,7 +55,7 @@ export default Vue.extend({
         this.$emit("submit", { source: this.source, target: this.target });
         this.$emit("close");
       } else {
-        appModule.onWarning(
+        logModule.onWarning(
           "Please select valid source and target artifact types."
         );
       }

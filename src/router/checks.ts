@@ -5,7 +5,7 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appModule, projectModule, sessionModule } from "@/store";
+import { appModule, logModule, projectModule, sessionModule } from "@/store";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -30,7 +30,7 @@ export const routerChecks: Record<string, RouterCheck> = {
   requireProjectForRoutes(to: Route, from: Route, next: NavigationGuardNext) {
     const isProjectDefined = projectModule.getProject.projectId !== "";
     if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
-      appModule.onWarning(
+      logModule.onWarning(
         "Project must be selected before approving trace links."
       );
       next(Routes.HOME);

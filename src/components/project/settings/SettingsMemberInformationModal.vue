@@ -45,7 +45,7 @@ import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { addOrUpdateProjectMember } from "@/api";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { getEnumKeys } from "@/util/enum-helper";
 
 /**
@@ -144,7 +144,7 @@ export default Vue.extend({
           .then(() => this.$emit("confirm", project))
           .catch();
       } else {
-        appModule.onWarning("Please define project role.");
+        logModule.onWarning("Please define project role.");
       }
     },
     onCancel() {

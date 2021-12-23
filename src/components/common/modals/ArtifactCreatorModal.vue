@@ -46,7 +46,7 @@
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
@@ -146,7 +146,7 @@ export default Vue.extend({
       this.isLoading = true;
 
       if (this.versionId === undefined) {
-        appModule.onWarning("Please select a project version.");
+        logModule.onWarning("Please select a project version.");
         return;
       }
       const isUpdate = this.artifact !== undefined;
@@ -155,8 +155,8 @@ export default Vue.extend({
           this.$emit("close");
         })
         .catch((e) => {
-          appModule.onDevError(e);
-          appModule.onWarning("Unable to create artifact.");
+          logModule.onDevError(e);
+          logModule.onWarning("Unable to create artifact.");
         })
         .finally(() => (this.isLoading = false));
     },

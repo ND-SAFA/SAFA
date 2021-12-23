@@ -1,10 +1,11 @@
 import { EventObject } from "cytoscape";
 import {
-  appModule,
+  logModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
+  appModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
@@ -27,7 +28,7 @@ export const artifactTreeContextMenuOptions = {
         if (projectModule.isProjectDefined) {
           appModule.openPanel(PanelType.artifactCreator);
         } else {
-          appModule.onWarning("Please select a project to create artifacts.");
+          logModule.onWarning("Please select a project to create artifacts.");
         }
       },
     },
@@ -41,7 +42,7 @@ export const artifactTreeContextMenuOptions = {
         if (projectModule.isProjectDefined) {
           enableDrawMode();
         } else {
-          appModule.onWarning("Please select a project to create trace links.");
+          logModule.onWarning("Please select a project to create trace links.");
         }
       },
     },

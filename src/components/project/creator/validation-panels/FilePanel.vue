@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { GenericSwitch, GenericFileSelector } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
@@ -207,7 +207,7 @@ export default Vue.extend({
       }
     },
     underDevelopmentError(): void {
-      appModule.onWarning("Viewing parsed entities is under development.");
+      logModule.onWarning("Viewing parsed entities is under development.");
     },
   },
 });

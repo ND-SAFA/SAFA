@@ -12,7 +12,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { CytoCore, CytoCoreGraph } from "@/types/cytoscape/core";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 
 /**
  * Abstracts setting up a cytoscape instance and corresponding
@@ -40,7 +40,7 @@ export default Vue.extend({
       if (this.cytoCoreGraph.saveCy) {
         this.cytoCoreGraph.saveCy(cy);
       } else {
-        appModule.onDevError(
+        logModule.onDevError(
           `Unable to save cytoscape instance in: ${this.cytoCoreGraph.name}`
         );
       }

@@ -35,7 +35,7 @@
 import Vue from "vue";
 import { ButtonDefinition, ButtonType, EmptyLambda, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import {
   BaselineVersionModal,
   ButtonRow,
@@ -78,7 +78,7 @@ export default Vue.extend({
       if (versionId !== undefined && versionId !== "") {
         this.changeVersionOpen = true;
       } else {
-        appModule.onWarning("Please select a project.");
+        logModule.onWarning("Please select a project.");
       }
     },
   },

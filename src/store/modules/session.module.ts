@@ -8,7 +8,7 @@ import {
 } from "@/api";
 import { navigateTo, Routes } from "@/router";
 import { AuthToken } from "@/types";
-import { appModule, deltaModule, projectModule, subtreeModule } from "@/store";
+import { logModule, deltaModule, projectModule, subtreeModule } from "@/store";
 import jwt_decode from "jwt-decode";
 
 /**
@@ -81,7 +81,7 @@ export default class SessionModule extends VuexModule {
     if (this.isTokenEmpty) {
       return false;
     } else if (this.isTokenExpired) {
-      appModule.onWarning("Your session has expired, please log back in.");
+      logModule.onWarning("Your session has expired, please log back in.");
       return false;
     }
 

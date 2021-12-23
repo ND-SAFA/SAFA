@@ -210,7 +210,7 @@ export default class ViewportModule extends VuexModule {
   }
 
   /**
-   * @return nodes in the current viewport.
+   * @return artifact ids of those in viewport.
    */
   get getNodesInView(): string[] {
     const subtree = artifactSelectionModule.getSelectedSubtreeIds;
@@ -221,7 +221,7 @@ export default class ViewportModule extends VuexModule {
       .filter(
         (a) => isInSubtree(subtree, a) && doesNotContainType(ignoreTypes, a)
       )
-      .map((a) => a.name);
+      .map((a) => a.id);
   }
 
   @Mutation

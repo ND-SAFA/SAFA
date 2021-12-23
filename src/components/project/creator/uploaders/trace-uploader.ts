@@ -118,7 +118,7 @@ function createParsedArtifactFile(
 }
 
 function getTraceId(traceLink: Link): string {
-  return `${traceLink.sourceId}-${traceLink.targetId}`;
+  return `${traceLink.sourceName}-${traceLink.targetName}`;
 }
 
 function getTraceError(

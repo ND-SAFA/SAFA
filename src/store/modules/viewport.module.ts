@@ -15,11 +15,12 @@ import {
 import type { CytoCore, Artifact, LayoutPayload } from "@/types";
 import { areArraysEqual } from "@/util";
 import {
-  appModule,
+  logModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
+  appModule,
 } from "@/store";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -176,7 +177,7 @@ export default class ViewportModule extends VuexModule {
         this.currentCenteringCollection !== undefined &&
         areArraysEqual(this.currentCenteringCollection, artifactIds)
       ) {
-        appModule.onDevWarning(
+        logModule.onDevWarning(
           `Collection is already being rendered: ${artifactIds}`
         );
         return;

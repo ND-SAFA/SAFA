@@ -52,7 +52,7 @@ import {
 import { GenericSelector } from "@/components";
 import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
-import { appModule, sessionModule } from "@/store";
+import { appModule, logModule, sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
@@ -126,7 +126,7 @@ export default Vue.extend({
       this.isEditOpen = true;
     },
     onDeleteMember(member: ProjectMembership): void {
-      appModule.SET_CONFIRMATION_MESSAGE({
+      logModule.SET_CONFIRMATION_MESSAGE({
         type: ConfirmationType.INFO,
         title: "Remove User from Project",
         body: `Are you sure you want to remove ${member.email} from project?`,

@@ -31,9 +31,8 @@ export function getEdgeHandlesCore(): EdgeHandleCore {
 }
 
 export function enableDrawMode(): void {
-  const core = getEdgeHandlesCore();
-  core.enable();
-  core.enableDrawMode();
+  getEdgeHandlesCore().enable();
+  getEdgeHandlesCore().enableDrawMode();
 }
 
 export function disableDrawMode(): void {

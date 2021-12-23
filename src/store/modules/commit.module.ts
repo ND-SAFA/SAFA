@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, Commit, ProjectVersion } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import type { CommitHistory } from "@/types";
 import { persistCommit } from "@/api";
 
@@ -39,7 +39,7 @@ export default class CommitModule extends VuexModule {
    */
   async undoCommit(): Promise<void> {
     if (!this.canUndo) {
-      return appModule.onWarning("Cannot undo because no commits are written");
+      return logModule.onWarning("Cannot undo because no commits are written");
     }
     const lastCommitIndex = this.commits.length - 1;
     if (lastCommitIndex < 0) {
@@ -59,7 +59,7 @@ export default class CommitModule extends VuexModule {
    */
   async redoCommit(): Promise<void> {
     if (!this.canRedo) {
-      return appModule.onWarning(
+      return logModule.onWarning(
         "Cannot redo because no commits have been reverted."
       );
     }

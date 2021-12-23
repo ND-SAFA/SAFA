@@ -40,7 +40,7 @@
 import Vue, { PropType } from "vue";
 import { Project, ProjectDelta, ProjectVersion } from "@/types";
 import { getProjectDelta } from "@/api";
-import { appModule, deltaModule, viewportModule } from "@/store";
+import { logModule, deltaModule, viewportModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project/version-selector";
 
@@ -73,7 +73,7 @@ export default Vue.extend({
     },
     onSubmit() {
       if (this.selectedVersion === undefined) {
-        appModule.onWarning("Please select a version to upload to");
+        logModule.onWarning("Please select a version to upload to");
       } else {
         const sourceVersion = this.project.projectVersion;
 
@@ -85,11 +85,11 @@ export default Vue.extend({
             await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("close");
-            appModule.onSuccess("Delta state was updated successfully.");
+            logModule.onSuccess("Delta state was updated successfully.");
             await viewportModule.setArtifactTreeLayout();
           });
         } else {
-          appModule.onWarning("Project source version is not selected.");
+          logModule.onWarning("Project source version is not selected.");
         }
       }
     },

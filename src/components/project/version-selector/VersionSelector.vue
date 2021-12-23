@@ -37,7 +37,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion, DataItem } from "@/types";
 import { deleteProjectVersion, getProjectVersions } from "@/api";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { versionSelectorHeader } from "./headers";
 import VersionCreator from "./VersionCreator.vue";
@@ -119,7 +119,7 @@ export default Vue.extend({
       this.isLoading = true;
       deleteProjectVersion(version.versionId)
         .then(() => {
-          appModule.onSuccess("Project version successfully deleted");
+          logModule.onSuccess("Project version successfully deleted");
           this.versions = this.versions.filter(
             (v) => v.versionId != version.versionId
           );

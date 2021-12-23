@@ -13,14 +13,14 @@ import type {
 } from "@/types";
 import { LinkValidator, PanelType } from "@/types";
 import {
-  appModule,
+  logModule,
   artifactSelectionModule,
   deltaModule,
   errorModule,
   subtreeModule,
   viewportModule,
+  appModule,
 } from "@/store";
-import { getSingleQueryResult } from "@/util";
 import { loadVersionIfExistsHandler } from "@/api";
 
 const emptyProject: Project = {
@@ -322,6 +322,38 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * Returns the artifact in list if single item exists.
+   *
+   * @return The found artifact.
+   *
+   * @throws Error if query contains multiple or no results.
+   */
+  get getSingleQueryResult(): (
+    query: Artifact[],
+    queryName: string
+  ) => Artifact {
+    /**
+     * @param query - List of artifacts representing some query for an artifact.
+     * @param queryName - The name of the operation to log if operation fails.
+     */
+    return (query, queryName) => {
+      let error = "";
+      switch (query.length) {
+        case 1:
+          return query[0];
+        case 0:
+          error = `Query resulted in empty results: ${queryName}`;
+          logModule.onWarning(error);
+          throw Error(error);
+        default:
+          error = `Found more than one result in query: ${queryName}`;
+          logModule.onWarning(error);
+          throw Error(error);
+      }
+    };
+  }
+
+  /**
    * @return A function for finding an artifact by name.
    */
   get getArtifactByName(): ArtifactQueryFunction {
@@ -329,7 +361,7 @@ export default class ProjectModule extends VuexModule {
       const query = this.project.artifacts.filter(
         (a) => a.name === artifactName
       );
-      return getSingleQueryResult(query, `Find by name: ${artifactName}`);
+      return this.getSingleQueryResult(query, `Find by name: ${artifactName}`);
     };
   }
 
@@ -341,7 +373,10 @@ export default class ProjectModule extends VuexModule {
       const query = this.project.artifacts.filter(
         (a) => a.id === targetArtifactId
       );
-      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
+      return this.getSingleQueryResult(
+        query,
+        `Find by id: ${targetArtifactId}`
+      );
     };
   }
 
@@ -384,7 +419,7 @@ export default class ProjectModule extends VuexModule {
       if (traceQuery.length === 0) {
         const traceId = `${sourceId}-${targetId}`;
         const error = `Could not find trace link with id: ${traceId}`;
-        appModule.onDevError(error);
+        logModule.onDevError(error);
         throw Error(error);
       }
 

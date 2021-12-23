@@ -1,12 +1,4 @@
-import {
-  AddedArtifact,
-  Artifact,
-  ArtifactDelta,
-  DeltaType,
-  EntityModification,
-  ModifiedArtifact,
-  RemovedArtifact,
-} from "@/types/domain";
+import { Artifact, EntityModification } from "@/types/domain";
 import { APIError, APIResponse } from "@/types/api/base-api";
 import {
   IGenericFilePanel,

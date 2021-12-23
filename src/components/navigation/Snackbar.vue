@@ -36,7 +36,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, PanelType, SnackbarMessage } from "@/types";
-import { appModule } from "@/store";
+import { appModule, logModule } from "@/store";
 import { ServerErrorModal } from "@/components/common";
 
 export default Vue.extend({
@@ -69,7 +69,7 @@ export default Vue.extend({
       return this.errors.length > 0;
     },
     message() {
-      return appModule.getMessage;
+      return logModule.getMessage;
     },
     isErrorDisplayOpen(): boolean {
       return appModule.getIsErrorDisplayOpen;
@@ -107,7 +107,7 @@ export default Vue.extend({
     message(newMessage: SnackbarMessage) {
       if (newMessage.type !== MessageType.CLEAR) {
         this.showMessage(newMessage);
-        appModule.CLEAR_MESSAGE();
+        logModule.CLEAR_MESSAGE();
       }
     },
   },

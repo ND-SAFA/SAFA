@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
@@ -59,11 +60,14 @@ public class TraceAppEntity implements IAppEntity {
 
     public TraceAppEntity(TraceLinkVersion trace) {
         UUID traceLinkId = trace.getTraceLink().getTraceLinkId();
+        Artifact sourceArtifact = trace.getTraceLink().getSourceArtifact();
+        Artifact targetArtifact = trace.getTraceLink().getTargetArtifact();
+
         this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
-        this.sourceName = trace.getTraceLink().getSourceName();
-        this.sourceId = trace.getTraceLink().getSourceArtifact().getArtifactId().toString();
-        this.targetName = trace.getTraceLink().getTargetName();
-        this.targetId = trace.getTraceLink().getTargetArtifact().getArtifactId().toString();
+        this.sourceName = sourceArtifact.getName();
+        this.sourceId = sourceArtifact.getArtifactId().toString();
+        this.targetName = targetArtifact.getName();
+        this.targetId = targetArtifact.getArtifactId().toString();
         this.approvalStatus = trace.getApprovalStatus();
         this.score = trace.getScore();
         this.traceType = trace.getTraceType();
@@ -140,7 +144,12 @@ public class TraceAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getName() {
-        return sourceName + "-" + targetName;
+    public String getId() {
+        return this.traceLinkId;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.traceLinkId = id;
     }
 }

@@ -2,11 +2,9 @@ package edu.nd.crc.safa.server.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -101,21 +99,6 @@ public class ProjectAppEntity {
 
     public void setTraces(List<TraceAppEntity> traces) {
         this.traces = traces;
-    }
-
-    public List<ArtifactAppEntity> findNewArtifacts(List<Artifact> existingArtifacts) {
-        List<String> existingArtifactNames = existingArtifacts
-            .stream()
-            .map(Artifact::getBaseEntityId)
-            .collect(Collectors.toList());
-        List<ArtifactAppEntity> newArtifacts = new ArrayList<>();
-        for (ArtifactAppEntity potentiallyNewArtifact : artifacts) {
-            if (!existingArtifactNames.contains(potentiallyNewArtifact.getName())) {
-                // TODO: Replace with hash table if performance is bad
-                newArtifacts.add(potentiallyNewArtifact);
-            }
-        }
-        return newArtifacts;
     }
 
     public String toString() {

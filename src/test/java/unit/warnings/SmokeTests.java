@@ -128,16 +128,18 @@ public class SmokeTests extends ApplicationBaseTest {
             .map(TraceLinkVersion::getTraceLink)
             .collect(Collectors.toList());
 
+        // Step - Calculate violated rules.
         TreeVerifier verifier = new TreeVerifier();
         Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
             DefaultTreeRules.getDefaultRules());
 
+        // VP - Verify that right warnings were triggered.
+        String targetId = dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
         assertThat(violatedRules.size()).isEqualTo(1);
-
-        assertThat(violatedRules.get(targetName).size()).isEqualTo(2);
-        String targetRule = violatedRules.get(targetName).get(0).toString();
+        assertThat(violatedRules.get(targetId).size()).isEqualTo(2);
+        String targetRule = violatedRules.get(targetId).get(0).toString();
         assertThat(targetRule).contains("design or process");
-        targetRule = violatedRules.get(targetName).get(1).toString();
+        targetRule = violatedRules.get(targetId).get(1).toString();
         assertThat(targetRule).contains("must not have package children");
     }
 }

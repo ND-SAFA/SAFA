@@ -137,13 +137,14 @@ public abstract class GenericVersionRepository<
     @Override
     public CommitError commitSingleEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) {
         return commitErrorHandler(projectVersion, () -> {
-            VersionEntity artifactVersion = this
-                .calculateVersionEntityFromAppEntity(projectVersion, appEntity);
+            Pair<BaseEntity, VersionEntity> entities = this
+                .createVersionEntityFromAppEntity(projectVersion, appEntity);
+            VersionEntity artifactVersion = entities.getValue1();
             if (artifactVersion == null) {
                 return;
             }
             saveOrOverrideVersionEntity(projectVersion, artifactVersion);
-        }, appEntity.getName());
+        }, appEntity.getId());
     }
 
     @Override
@@ -184,45 +185,45 @@ public abstract class GenericVersionRepository<
         ProjectVersion baselineVersion,
         ProjectVersion targetVersion) {
         Project project = baselineVersion.getProject();
-        Hashtable<String, AppEntity> addedArtifacts = new Hashtable<>();
-        Hashtable<String, ModifiedEntity<AppEntity>> modifiedArtifacts = new Hashtable<>();
-        Hashtable<String, AppEntity> removedArtifacts = new Hashtable<>();
+        Hashtable<String, AppEntity> addedEntities = new Hashtable<>();
+        Hashtable<String, ModifiedEntity<AppEntity>> modifiedEntities = new Hashtable<>();
+        Hashtable<String, AppEntity> removedEntities = new Hashtable<>();
 
         List<BaseEntity> projectArtifacts = this.getBaseEntitiesInProject(project);
 
-        for (BaseEntity artifact : projectArtifacts) {
+        for (BaseEntity baseEntity : projectArtifacts) {
             Triplet<VersionEntity, VersionEntity, ModificationType> delta = this
                 .calculateDeltaEntityBetweenProjectVersions(
-                    artifact,
+                    baseEntity,
                     baselineVersion,
                     targetVersion);
             ModificationType modificationType = delta.getValue2();
             if (modificationType == null) {
                 continue;
             }
-            String baseName = artifact.getBaseEntityId();
+            String baseEntityId = baseEntity.getBaseEntityId();
 
             switch (modificationType) {
                 case ADDED:
                     AppEntity appEntity = this.createAppFromVersion(delta.getValue1());
-                    addedArtifacts.put(baseName, appEntity);
+                    addedEntities.put(baseEntityId, appEntity);
                     break;
                 case MODIFIED:
                     AppEntity appBefore = this.createAppFromVersion(delta.getValue0());
                     AppEntity appAfter = this.createAppFromVersion(delta.getValue1());
                     ModifiedEntity<AppEntity> modifiedEntity = new ModifiedEntity<>(appBefore, appAfter);
-                    modifiedArtifacts.put(baseName, modifiedEntity);
+                    modifiedEntities.put(baseEntityId, modifiedEntity);
                     break;
                 case REMOVED:
                     AppEntity appRemoved = this.createAppFromVersion(delta.getValue0());
-                    removedArtifacts.put(baseName, appRemoved);
+                    removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
                     throw new RuntimeException("Missing case in switch for modification type:" + modificationType);
             }
         }
 
-        return new EntityDelta<>(addedArtifacts, modifiedArtifacts, removedArtifacts);
+        return new EntityDelta<>(addedEntities, modifiedEntities, removedEntities);
     }
 
     private Triplet<VersionEntity, VersionEntity, ModificationType> calculateDeltaEntityBetweenProjectVersions(
@@ -238,7 +239,6 @@ public abstract class GenericVersionRepository<
 
         ModificationType modificationType = this
             .calculateModificationType(beforeEntity, afterEntity);
-
         return new Triplet<>(beforeEntity, afterEntity, modificationType);
     }
 
@@ -375,27 +375,33 @@ public abstract class GenericVersionRepository<
         ProjectVersion projectVersion,
         List<AppEntity> appEntities) {
 
-        Hashtable<String, AppEntity> updatedAppEntities = new Hashtable<>();
+        List<String> processedAppEntities = new ArrayList<>();
         List<VersionEntity> updatedVersionEntities = new ArrayList<>();
         List<CommitError> commitErrors = new ArrayList<>();
 
         for (AppEntity appEntity : appEntities) {
             CommitError commitError = commitErrorHandler(projectVersion, () -> {
-                VersionEntity artifactVersion = this
-                    .calculateVersionEntityFromAppEntity(projectVersion, appEntity);
-                if (artifactVersion != null) {
-                    updatedVersionEntities.add(artifactVersion);
+                Pair<BaseEntity, VersionEntity> entities = this
+                    .createVersionEntityFromAppEntity(projectVersion, appEntity);
+                BaseEntity baseEntity = entities.getValue0();
+                VersionEntity versionEntity = entities.getValue1();
+
+                boolean hasChanged = versionEntity != null;
+                if (hasChanged) {
+                    updatedVersionEntities.add(versionEntity);
                 }
-                updatedAppEntities.put(appEntity.getName(), appEntity);
-            }, appEntity.getName());
+                String entityId = baseEntity.getBaseEntityId();
+                appEntity.setId(entityId);
+                processedAppEntities.add(entityId);
+            }, appEntity.getId());
             commitErrors.add(commitError);
         }
 
         List<VersionEntity> removedArtifactBodies = this.getBaseEntitiesInProject(
                 projectVersion.getProject())
             .stream()
-            .filter(a -> !updatedAppEntities.containsKey(a.getBaseEntityId()))
-            .map(a -> this.calculateVersionEntityFromAppEntity(projectVersion, a, null))
+            .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
+            .map(baseEntity -> this.calculateVersionEntityFromAppEntity(projectVersion, baseEntity, null))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -404,7 +410,7 @@ public abstract class GenericVersionRepository<
         return new Pair<>(allArtifactBodies, commitErrors);
     }
 
-    private VersionEntity calculateVersionEntityFromAppEntity(
+    private Pair<BaseEntity, VersionEntity> createVersionEntityFromAppEntity(
         ProjectVersion projectVersion,
         AppEntity appEntity) throws SafaError {
 
@@ -412,17 +418,18 @@ public abstract class GenericVersionRepository<
             projectVersion,
             appEntity);
 
-        return this.calculateVersionEntityFromAppEntity(
+        VersionEntity versionEntity = this.calculateVersionEntityFromAppEntity(
             projectVersion,
             baseEntity,
             appEntity);
+        return new Pair<>(baseEntity, versionEntity);
     }
 
     private VersionEntity calculateVersionEntityFromAppEntity(ProjectVersion projectVersion,
-                                                              BaseEntity artifact,
+                                                              BaseEntity baseEntity,
                                                               AppEntity appEntity) {
         ModificationType modificationType = this
-            .calculateModificationTypeForAppEntity(projectVersion, artifact, appEntity);
+            .calculateModificationTypeForAppEntity(projectVersion, baseEntity, appEntity);
 
         if (modificationType == null) {
             return null;
@@ -431,9 +438,8 @@ public abstract class GenericVersionRepository<
         return this.createEntityVersionWithModification(
             projectVersion,
             modificationType,
-            artifact,
+            baseEntity,
             appEntity);
-
     }
 
     private ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
@@ -441,7 +447,6 @@ public abstract class GenericVersionRepository<
                                                                    AppEntity appEntity) {
         VersionEntity previousBody =
             getEntityBeforeVersion(this.findByEntity(baseEntity), projectVersion);
-
         if (previousBody == null) {
             return appEntity == null ? null : ModificationType.ADDED;
         } else {

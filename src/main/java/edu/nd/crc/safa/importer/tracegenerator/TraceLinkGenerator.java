@@ -120,7 +120,7 @@ public class TraceLinkGenerator {
     public Map<String, Collection<String>> tokenizeArtifactAppEntities(List<ArtifactAppEntity> artifacts) {
         Map<String, Collection<String>> artifactTokens = new HashMap<>();
         for (ArtifactAppEntity artifact : artifacts) {
-            artifactTokens.put(artifact.getName(), getWordsInArtifactAppEntity(artifact));
+            artifactTokens.put(artifact.name, getWordsInArtifactAppEntity(artifact));
         }
         return artifactTokens;
     }

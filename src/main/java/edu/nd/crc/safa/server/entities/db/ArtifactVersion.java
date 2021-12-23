@@ -102,7 +102,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     public String getName() {
-        return this.artifact.getBaseEntityId();
+        return this.artifact.getName();
     }
 
     public String getTypeName() {
@@ -177,7 +177,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     private boolean hasSameContent(String name, String summary, String content) {
-        return this.artifact.getBaseEntityId().equals(name)
+        return this.getName().equals(name)
             && this.summary.equals(summary)
             && this.content.equals(content);
     }

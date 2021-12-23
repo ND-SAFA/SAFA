@@ -55,9 +55,9 @@ public class TestModificationDetected extends ApplicationBaseTest {
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 
         // VP - Verify that artifact changes are detected
-        assertThat(artifactDelta.getJSONObject("modified").has("F3")).isTrue();
-        assertThat(artifactDelta.getJSONObject("removed").has("D7")).isTrue();
-        assertThat(artifactDelta.getJSONObject("added").has("D12")).isTrue();
+        assertThat(artifactDelta.getJSONObject("modified").has(getId(projectName, "F3"))).isTrue();
+        assertThat(artifactDelta.getJSONObject("removed").has(getId(projectName, "D7"))).isTrue();
+        assertThat(artifactDelta.getJSONObject("added").has(getId(projectName, "D12"))).isTrue();
 
         ProjectAppEntity beforeAppEntity = this.projectRetrievalService.retrieveApplicationEntity(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity

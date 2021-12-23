@@ -52,7 +52,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         assertThat(artifactBodyQuery.isPresent()).isTrue();
         ArtifactVersion artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.ADDED);
-        assertThat(artifactVersionFound.getArtifact().getBaseEntityId()).isEqualTo(artifactName);
+        assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
 
         //Step 2 - Simulate new version added but artifact experienced no change
         dbEntityBuilder.newVersion(projectName);
@@ -73,7 +73,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         assertThat(artifactBodyQuery.isPresent()).isTrue();
         artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.REMOVED);
-        assertThat(artifactVersionFound.getArtifact().getBaseEntityId()).isEqualTo(artifactName);
+        assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
         assertThat(artifactVersionFound.getContent()).isEqualTo("");
         assertThat(artifactVersionFound.getSummary()).isEqualTo("");
     }

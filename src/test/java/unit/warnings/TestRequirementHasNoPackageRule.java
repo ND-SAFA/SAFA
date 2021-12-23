@@ -49,6 +49,8 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
             projectBodies,
             traceLinks);
 
-        assertThat(violations.containsKey(targetName)).isTrue();
+        // VP - Verify that target triggered warning
+        String targetId = this.dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
+        assertThat(violations.containsKey(targetId)).isTrue();
     }
 }

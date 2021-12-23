@@ -82,7 +82,7 @@ public class Artifact implements Serializable, IBaseEntity {
     }
 
     public String getBaseEntityId() {
-        return this.name;
+        return this.artifactId.toString();
     }
 
     public String getName() {

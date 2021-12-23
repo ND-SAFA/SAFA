@@ -71,15 +71,15 @@ public class ProjectRetrievalService {
                 .stream()
                 .map(ArtifactAppEntity::new)
                 .collect(Collectors.toList());
-        List<String> artifactNames = artifacts.stream().map(ArtifactAppEntity::getName).collect(Collectors.toList());
+        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
 
         List<TraceAppEntity> traces =
             this.traceLinkVersionRepository
                 .getEntityVersionsInProjectVersion(projectVersion)
                 .stream()
                 .map(TraceAppEntity::new)
-                .filter(t -> artifactNames.contains(t.sourceName)
-                    && artifactNames.contains(t.targetName))
+                .filter(t -> artifactIds.contains(t.sourceId)
+                    && artifactIds.contains(t.targetId))
                 .collect(Collectors.toList());
         return new ProjectAppEntity(projectVersion, artifacts, traces);
     }

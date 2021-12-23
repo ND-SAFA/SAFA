@@ -3,9 +3,9 @@
     <template v-slot:elements>
       <artifact-node
         v-for="artifact in artifacts"
-        :key="artifact.name"
+        :key="artifact.id"
         :artifact-definition="artifact"
-        :opacity="getArtifactOpacity(artifact.name, artifact.id)"
+        :opacity="getArtifactOpacity(artifact.id)"
       />
       <generic-graph-link
         v-for="traceLink in traces"
@@ -102,10 +102,10 @@ export default Vue.extend({
     setNodesInView(): void {
       this.artifactsInView = this.nodesInView;
     },
-    getArtifactOpacity(name: string, id: string): number {
+    getArtifactOpacity(id: string): number {
       if (this.hiddenSubtreeIds.includes(id)) {
         return 0;
-      } else if (this.artifactsInView.includes(name)) {
+      } else if (this.artifactsInView.includes(id)) {
         return 1;
       } else {
         return this.unselectedNodeOpacity;

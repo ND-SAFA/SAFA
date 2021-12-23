@@ -25,10 +25,11 @@ export default Vue.extend({
   },
   async mounted() {
     const isAuthorized = await sessionModule.hasAuthorization();
+    const location = window.location.href;
 
     if (!isAuthorized) {
       return await navigateTo(Routes.LOGIN_ACCOUNT);
-    } else {
+    } else if (location.includes(Routes.ARTIFACT_TREE)) {
       await sessionModule.loadLastProject();
     }
   },

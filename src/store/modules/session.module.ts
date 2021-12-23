@@ -39,8 +39,6 @@ export default class SessionModule extends VuexModule {
     const session = await loginUser(user);
 
     this.SET_SESSION(session);
-
-    await this.loadLastProject();
   }
 
   @Action({ rawError: true })

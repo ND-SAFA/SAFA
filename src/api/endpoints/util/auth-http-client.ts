@@ -1,7 +1,7 @@
 import { APIOptions } from "@/types";
 import { isAPIError } from "@/util";
-import { appModule, sessionModule } from "@/store";
-import { baseURL } from "@/api/endpoints/endpoints";
+import { logModule, sessionModule } from "@/store";
+import { baseURL } from "./endpoints";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -20,9 +20,12 @@ export default async function authHttpClient<T>(
   setJsonContentType = true
 ): Promise<T> {
   const isAuthorized = await sessionModule.hasAuthorization();
+
   if (!isAuthorized) {
+    await sessionModule.logout();
     throw Error(`${relativeUrl} aborted due to authorization failure.`);
   }
+
   const token = sessionModule.getToken;
   const URL = `${baseURL}/${relativeUrl}`;
 
@@ -35,7 +38,7 @@ export default async function authHttpClient<T>(
   if (token === undefined) {
     const error = `${relativeUrl} requires token.`;
 
-    appModule.onDevError(error);
+    logModule.onDevError(error);
 
     throw Error(error);
   } else {
@@ -46,19 +49,21 @@ export default async function authHttpClient<T>(
   }
 
   const res = await fetch(URL, options);
+
   if (res.status === 204) {
-    // TODO: will be removed in the next PR
-    //containing the proper use of http codes.
+    // TODO: will be removed in the next PR containing the proper use of http codes.
     return {} as T;
   }
   const resContent = await res.text();
+
   if (resContent === "") {
     return {} as T;
   }
+
   const resJson = JSON.parse(resContent);
 
   if (!res.ok || isAPIError(resJson)) {
-    appModule.onServerError(resJson.body);
+    logModule.onServerError(resJson.body);
 
     throw Error(resJson.body.message);
   } else {

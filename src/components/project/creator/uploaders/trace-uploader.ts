@@ -48,8 +48,8 @@ function generateTraceLinks(
   artifactMap: ArtifactMap,
   tracePanel: TracePanel
 ): Promise<void> {
-  const sourceType = tracePanel.projectFile.source;
-  const targetType = tracePanel.projectFile.target;
+  const sourceType = tracePanel.projectFile.sourceId;
+  const targetType = tracePanel.projectFile.targetId;
   const artifacts: Artifact[] = Object.values(artifactMap);
   const sourceArtifacts: Artifact[] = artifacts.filter(
     (a) => a.type === sourceType
@@ -66,8 +66,8 @@ function generateTraceLinks(
 
 function createTraceFile(traceLink: Link): TraceFile {
   return {
-    source: traceLink.source,
-    target: traceLink.target,
+    sourceId: traceLink.sourceId,
+    targetId: traceLink.targetId,
     isGenerated: DEFAULT_IS_GENERATED,
     isValid: false,
     errors: [],
@@ -100,10 +100,11 @@ function createParsedArtifactFile(
   return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
     const { traces, errors } = res;
     const validTraces: TraceLink[] = [];
-    traces.forEach((t) => {
-      const error = getTraceError(panel.projectFile, artifactMap, t);
+
+    traces.forEach((link) => {
+      const error = getTraceError(panel.projectFile, artifactMap, link);
       if (error === undefined) {
-        validTraces.push(t);
+        validTraces.push(link);
       } else {
         errors.push(error);
       }
@@ -117,7 +118,7 @@ function createParsedArtifactFile(
 }
 
 function getTraceId(traceLink: Link): string {
-  return `${traceLink.source}-${traceLink.target}`;
+  return `${traceLink.sourceName}-${traceLink.targetName}`;
 }
 
 function getTraceError(
@@ -125,21 +126,22 @@ function getTraceError(
   artifactMap: Record<string, Artifact>,
   traceLink: Link
 ): string | undefined {
-  const { source, target } = traceLink;
-  if (!(source in artifactMap)) {
-    return `Artifact ${source} does not exist.`;
-  } else if (!(target in artifactMap)) {
-    return `Artifact ${target} does not exist.`;
-  } else {
-    const sourceArtifact = artifactMap[source];
-    const targetArtifact = artifactMap[target];
+  const { sourceName, targetName } = traceLink;
 
-    if (sourceArtifact.type !== traceFile.source) {
-      return `${sourceArtifact.name} is not of type ${traceFile.source}.`;
+  if (!(sourceName in artifactMap)) {
+    return `Artifact ${sourceName} does not exist.`;
+  } else if (!(targetName in artifactMap)) {
+    return `Artifact ${targetName} does not exist.`;
+  } else {
+    const sourceArtifact = artifactMap[sourceName];
+    const targetArtifact = artifactMap[targetName];
+
+    if (sourceArtifact.type !== traceFile.sourceId) {
+      return `${sourceArtifact.name} is not of type ${traceFile.sourceId}.`;
     }
 
-    if (targetArtifact.type !== traceFile.target) {
-      return `${targetArtifact.name} is not of type ${traceFile.target}.`;
+    if (targetArtifact.type !== traceFile.targetId) {
+      return `${targetArtifact.name} is not of type ${traceFile.targetId}.`;
     }
   }
 }

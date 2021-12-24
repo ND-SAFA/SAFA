@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { GenericSwitch, GenericFileSelector } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
@@ -109,7 +109,7 @@ const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
  * Displays a file panel.
  *
  * @emits-1 `delete` - On delete.
- * @emits-2 `update:ignore` (ignoreErrors: boolean) - On update ignore errors.
+ * @emits-2 `update:ignore-errors-flag` (ignoreErrors: boolean) - On update ignore errors.
  * @emits-3 `validate` (isValid: boolean) - On validate.
  * @emits-4 `change` (file?: File) - On change.
  */
@@ -157,7 +157,7 @@ export default Vue.extend({
         return this.ignoreErrorsFlag;
       },
       set(ignoreErrors: boolean): void {
-        this.$emit("update:ignore", ignoreErrors);
+        this.$emit("update:ignore-errors-flag", ignoreErrors);
       },
     },
     isValid(): boolean {
@@ -207,7 +207,7 @@ export default Vue.extend({
       }
     },
     underDevelopmentError(): void {
-      appModule.onWarning("Viewing parsed entities is under development.");
+      logModule.onWarning("Viewing parsed entities is under development.");
     },
   },
 });

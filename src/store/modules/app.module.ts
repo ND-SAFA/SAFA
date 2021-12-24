@@ -1,34 +1,12 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ConfirmationType, PanelType, MessageType } from "@/types";
-import type {
-  SnackbarMessage,
-  APIErrorBody,
-  ConfirmDialogueMessage,
-  PanelState,
-} from "@/types";
-
-const emptySnackbarMessage = {
-  errors: [],
-  message: "",
-  type: MessageType.CLEAR,
-};
-
-const emptyConfirmationMessage = {
-  type: ConfirmationType.CLEAR,
-  title: "",
-  body: "",
-  statusCallback: () => null,
-};
+import { PanelType } from "@/types";
+import type { PanelState } from "@/types";
 
 @Module({ namespaced: true, name: "app" })
 /**
  * This module defines state variables shared across the entire app.
  */
 export default class ProjectModule extends VuexModule {
-  /**
-   * The current snackbar message.
-   */
-  private snackbarMessage: SnackbarMessage = emptySnackbarMessage;
   /**
    * Whether the app is currently loading.
    */
@@ -50,12 +28,6 @@ export default class ProjectModule extends VuexModule {
    */
   private isArtifactCreatorOpen = false;
 
-  /**
-   * Whether the confirmation modal is open.
-   */
-  private confirmationMessage: ConfirmDialogueMessage =
-    emptyConfirmationMessage;
-
   @Action
   /**
    * Sets the app to loading.
@@ -70,66 +42,6 @@ export default class ProjectModule extends VuexModule {
    */
   onLoadEnd(): void {
     this.SET_IS_LOADING(false);
-  }
-
-  @Action
-  /**
-   * Creates a snackbar error message with the given server error.
-   *
-   * @param error - The error encountered.
-   */
-  onServerError(error: APIErrorBody): void {
-    const { message, errors } = error;
-
-    this.SET_MESSAGE({
-      message,
-      type: MessageType.ERROR,
-      errors,
-    });
-  }
-
-  @Action
-  /**
-   * Creates a snackbar error message with the given message.
-   *
-   * @param message - The error message encountered.
-   */
-  onError(message: string): void {
-    console.error(message);
-    this.SET_MESSAGE({ message, type: MessageType.ERROR, errors: [] });
-  }
-
-  @Action
-  /**
-   * Creates a snackbar information message with the given message.
-   *
-   * @param message - The message to display.
-   */
-  onInfo(message: string): void {
-    console.log(message);
-    this.SET_MESSAGE({ message, type: MessageType.INFO, errors: [] });
-  }
-
-  @Action
-  /**
-   * Creates a snackbar warning message with the given message.
-   *
-   * @param message - The message to display.
-   */
-  onWarning(message: string): void {
-    console.warn(message);
-    this.SET_MESSAGE({ message, type: MessageType.WARNING, errors: [] });
-  }
-
-  @Action
-  /**
-   * Creates a snackbar success message with the given message.
-   *
-   * @param message - The message to display.
-   */
-  onSuccess(message: string): void {
-    console.log(message);
-    this.SET_MESSAGE({ message, type: MessageType.SUCCESS, errors: [] });
   }
 
   @Action
@@ -174,32 +86,6 @@ export default class ProjectModule extends VuexModule {
     });
   }
 
-  @Action
-  /**
-   * Logs and prints message to the console.
-   */
-  onDevMessage(message: string): void {
-    console.log(message);
-    //TODO: Add to log
-  }
-  @Action
-  /**
-   * Logs and prints warning to the console.
-   */
-  onDevWarning(message: string): void {
-    console.warn(message);
-    //TODO: Add to log
-  }
-
-  @Action
-  /**
-   * Logs and prints error to the console.
-   */
-  onDevError(message: string): void {
-    console.error(message);
-    //TODO: Add to log
-  }
-
   @Mutation
   /**
    * Sets the current loading state.
@@ -208,39 +94,6 @@ export default class ProjectModule extends VuexModule {
    */
   SET_IS_LOADING(isLoading: boolean): void {
     this.isLoading = isLoading;
-  }
-
-  @Mutation
-  /**
-   * Sets the current snackbar message.
-   *
-   * @param message - The message to display.
-   */
-  SET_MESSAGE(message: SnackbarMessage): void {
-    this.snackbarMessage = message;
-  }
-
-  @Mutation
-  /**
-   * Clears the current snackbar message.
-   */
-  CLEAR_MESSAGE(): void {
-    this.snackbarMessage = {
-      ...this.snackbarMessage,
-      type: MessageType.CLEAR,
-    };
-  }
-
-  @Mutation
-  /**
-   * Sets a snackbar message that the current feature isn't implemented.
-   */
-  NOT_IMPLEMENTED_ERROR(): void {
-    this.snackbarMessage = {
-      message: "This feature is under construction",
-      type: MessageType.WARNING,
-      errors: [],
-    };
   }
 
   @Mutation
@@ -289,36 +142,11 @@ export default class ProjectModule extends VuexModule {
     }
   }
 
-  @Mutation
-  /**
-   * Shows message in confirmation box to user, returns whether confirmed or not.
-   *
-   */
-  SET_CONFIRMATION_MESSAGE(message: ConfirmDialogueMessage): void {
-    this.confirmationMessage = message;
-  }
-
-  @Mutation
-  /**
-   * Shows message in confirmation box to user, returns whether confirmed or not.
-   *
-   */
-  CLEAR_CONFIRMATION_MESSAGE(): void {
-    this.confirmationMessage = emptyConfirmationMessage;
-  }
-
   /**
    * @return Whether the app is currently loading.
    */
   get getIsLoading(): boolean {
     return this.isLoading;
-  }
-
-  /**
-   * @return The current snackbar message.
-   */
-  get getMessage(): SnackbarMessage | undefined {
-    return this.snackbarMessage;
   }
 
   /**
@@ -347,12 +175,5 @@ export default class ProjectModule extends VuexModule {
    */
   get getIsErrorDisplayOpen(): boolean {
     return this.isErrorDisplayOpen;
-  }
-
-  /**
-   * @return THe current confirmation message.
-   */
-  get getConfirmationMessage(): ConfirmDialogueMessage | undefined {
-    return this.confirmationMessage;
   }
 }

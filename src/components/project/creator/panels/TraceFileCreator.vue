@@ -15,8 +15,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType, TraceFile } from "@/types";
-import { appModule } from "@/store";
+import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
+import { logModule } from "@/store";
 import { ButtonRow } from "@/components/common";
 
 /**
@@ -52,10 +52,16 @@ export default Vue.extend({
   methods: {
     onSubmit(): void {
       if (this.source !== "" && this.target !== "") {
-        this.$emit("submit", { source: this.source, target: this.target });
+        const traceLink: Link = {
+          sourceName: this.source,
+          sourceId: this.source,
+          targetName: this.target,
+          targetId: this.target,
+        };
+        this.$emit("submit", traceLink);
         this.$emit("close");
       } else {
-        appModule.onWarning(
+        logModule.onWarning(
           "Please select valid source and target artifact types."
         );
       }
@@ -71,7 +77,9 @@ export default Vue.extend({
   },
   computed: {
     targetTypes(): string[] {
-      const traceIds = this.traceFiles.map((f) => `${f.source}-${f.target}`);
+      const traceIds = this.traceFiles.map(
+        (f) => `${f.sourceId}-${f.targetId}`
+      );
       if (this.source === "") {
         return [];
       } else {

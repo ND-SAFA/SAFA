@@ -49,7 +49,7 @@ import {
   ProjectIdentifier,
 } from "@/types";
 import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -164,7 +164,7 @@ export default Vue.extend({
     deleteProjectHandler(project: ProjectIdentifier) {
       deleteProject(project.projectId)
         .then(async () => {
-          appModule.onSuccess(`${project.name} successfully deleted.`);
+          logModule.onSuccess(`${project.name} successfully deleted.`);
 
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId

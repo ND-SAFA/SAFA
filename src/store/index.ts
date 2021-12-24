@@ -8,6 +8,7 @@ import {
   ErrorModule,
   ProjectModule,
   SessionModule,
+  SnackbarModule,
   SubtreeModule,
   ViewportModule,
 } from "./modules";
@@ -30,14 +31,16 @@ const store = new Vuex.Store({
     viewport: ViewportModule,
     commit: CommitModule,
     subtree: SubtreeModule,
+    snackbar: SnackbarModule,
   },
   plugins: [vuexLocal.plugin],
 });
 
+export const appModule = getModule(AppModule, store);
+export const logModule = getModule(SnackbarModule, store);
 export const sessionModule = getModule(SessionModule, store);
 export const errorModule = getModule(ErrorModule, store);
 export const projectModule = getModule(ProjectModule, store);
-export const appModule = getModule(AppModule, store);
 export const artifactSelectionModule = getModule(
   ArtifactSelectionModule,
   store

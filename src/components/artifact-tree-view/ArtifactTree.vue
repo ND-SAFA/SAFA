@@ -3,19 +3,19 @@
     <template v-slot:elements>
       <artifact-node
         v-for="artifact in artifacts"
-        :key="artifact.name"
+        :key="artifact.id"
         :artifact-definition="artifact"
-        :opacity="getArtifactOpacity(artifact.name)"
+        :opacity="getArtifactOpacity(artifact.id)"
       />
       <generic-graph-link
         v-for="traceLink in traces"
-        :key="`${traceLink.source}-${traceLink.target}`"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
       />
       <generic-graph-link
         v-for="traceLink in subtreeLinks"
-        :key="`${traceLink.source}-${traceLink.target}`"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
         :trace-definition="traceLink"
       />
       <trace-link-approval-modal
@@ -66,7 +66,7 @@ export default Vue.extend({
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
+      return projectModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
       return projectModule.artifacts;
@@ -86,8 +86,8 @@ export default Vue.extend({
     unselectedNodeOpacity(): number {
       return artifactSelectionModule.getUnselectedNodeOpacity;
     },
-    hiddenSubtreeNodes(): string[] {
-      return subtreeModule.getHiddenSubtreeNodes;
+    hiddenSubtreeIds(): string[] {
+      return subtreeModule.getHiddenSubtreeIds;
     },
   },
   mounted() {
@@ -102,10 +102,10 @@ export default Vue.extend({
     setNodesInView(): void {
       this.artifactsInView = this.nodesInView;
     },
-    getArtifactOpacity(name: string): number {
-      if (this.hiddenSubtreeNodes.includes(name)) {
+    getArtifactOpacity(id: string): number {
+      if (this.hiddenSubtreeIds.includes(id)) {
         return 0;
-      } else if (this.artifactsInView.includes(name)) {
+      } else if (this.artifactsInView.includes(id)) {
         return 1;
       } else {
         return this.unselectedNodeOpacity;
@@ -114,8 +114,8 @@ export default Vue.extend({
     onLinkRightClick(traceLink: TraceLink): void {
       this.selectedLink = {
         ...traceLink,
-        sourceBody: this.artifactHashMap[traceLink.source].body,
-        targetBody: this.artifactHashMap[traceLink.target].body,
+        sourceBody: this.artifactHashMap[traceLink.sourceId].body,
+        targetBody: this.artifactHashMap[traceLink.targetId].body,
       };
       this.isTraceModalOpen = true;
     },

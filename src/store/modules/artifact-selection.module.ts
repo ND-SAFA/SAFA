@@ -11,11 +11,11 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * The currently selected artifact.
    */
-  private selectedArtifactName = "";
+  private selectedArtifactId = "";
   /**
    * The currently selected subtree.
    */
-  private selectedSubtree: string[] = [];
+  private selectedSubtreeIds: string[] = [];
   /**
    * The opacity of unselected artifact nodes.
    */
@@ -53,10 +53,10 @@ export default class ArtifactSelectionModule extends VuexModule {
    *
    * @param artifact - The artifact to select.
    */
-  selectArtifact(artifact: Artifact): void {
-    this.SELECT_ARTIFACT(artifact.name);
+  async selectArtifact(artifact: Artifact): Promise<void> {
+    this.SELECT_ARTIFACT(artifact.id);
     appModule.openPanel(PanelType.left);
-    viewportModule.centerOnArtifacts([artifact.name]).then();
+    await viewportModule.centerOnArtifacts([artifact.id]);
   }
 
   @Action
@@ -80,31 +80,32 @@ export default class ArtifactSelectionModule extends VuexModule {
   @Mutation
   /**
    * Sets a subtree of artifacts as selected.
-   * @param artifacts - The artifact subtree to select.
+   *
+   * @param artifactIds - The artifact subtree to select.
    */
-  SET_SELECTED_SUBTREE(artifacts: string[]): void {
-    this.selectedSubtree = artifacts;
+  SET_SELECTED_SUBTREE(artifactIds: string[]): void {
+    this.selectedSubtreeIds = artifactIds;
   }
 
   @Mutation
   /**
    * Adds an artifact type to ignore from selection.
    *
-   * @param artifactTypeKey - The type to ignore.
+   * @param artifactType - The type to ignore.
    */
-  ADD_IGNORE_TYPE(artifactTypeKey: string): void {
-    this.ignoreTypes.push(artifactTypeKey);
+  ADD_IGNORE_TYPE(artifactType: string): void {
+    this.ignoreTypes.push(artifactType);
   }
 
   @Mutation
   /**
    * Removes an ignored artifact type.
    *
-   * @param artifactTypeKey - The type to stop ignoring.
+   * @param artifactType - The type to stop ignoring.
    */
-  REMOVE_IGNORE_TYPE(artifactTypeKey: string): void {
+  REMOVE_IGNORE_TYPE(artifactType: string): void {
     this.ignoreTypes = this.ignoreTypes.filter(
-      (at: string) => at !== artifactTypeKey
+      (type: string) => type !== artifactType
     );
   }
 
@@ -112,10 +113,10 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * Sets the given artifact as selected.
    *
-   * @param artifactName - The name of the artifact to select.
+   * @param artifactId - The name of the artifact to select.
    */
-  SELECT_ARTIFACT(artifactName: string): void {
-    this.selectedArtifactName = artifactName;
+  SELECT_ARTIFACT(artifactId: string): void {
+    this.selectedArtifactId = artifactId;
   }
 
   @Mutation
@@ -123,24 +124,23 @@ export default class ArtifactSelectionModule extends VuexModule {
    * Unselects any selected artifact and closes the left app panel.
    */
   UNSELECT_ARTIFACT(): void {
-    this.selectedArtifactName = "";
+    this.selectedArtifactId = "";
   }
 
   /**
    * @return The currently selected artifact.
    */
   get getSelectedArtifact(): Artifact | undefined {
-    if (this.selectedArtifactName === "") {
-      return undefined;
+    if (this.selectedArtifactId !== "") {
+      return projectModule.getArtifactById(this.selectedArtifactId);
     }
-    return projectModule.getArtifactByName(this.selectedArtifactName);
   }
 
   /**
    * @return The currently selected artifact subtree.
    */
-  get getSelectedSubtree(): string[] {
-    return this.selectedSubtree;
+  get getSelectedSubtreeIds(): string[] {
+    return this.selectedSubtreeIds;
   }
 
   /**

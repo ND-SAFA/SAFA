@@ -1,5 +1,5 @@
 import { Artifact, ConfirmationType } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import {
   createArtifact,
   updateArtifact,
@@ -40,13 +40,13 @@ export function deleteArtifactFromCurrentVersion(
   return new Promise((resolve, reject) => {
     const versionId = projectModule.getProject.projectVersion?.versionId;
     if (versionId === undefined) {
-      appModule.onWarning(
+      logModule.onWarning(
         "A project version must be selected to delete an artifact."
       );
       return resolve();
     }
 
-    appModule.SET_CONFIRMATION_MESSAGE({
+    logModule.SET_CONFIRMATION_MESSAGE({
       type: ConfirmationType.INFO,
       title: `Delete ${artifact.name}?`,
       body: `Deleting this artifact cannot be undone in this version of SAFA.`,

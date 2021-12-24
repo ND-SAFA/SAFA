@@ -6,11 +6,11 @@
 
     <v-expansion-panel-content>
       <artifact-delta-button
-        v-for="name in names"
+        v-for="(name, nameIndex) in names"
         :key="name"
         :name="name"
         :deltaType="deltaType"
-        @click="$emit('click', $event)"
+        @click="$emit('click', ids[nameIndex])"
       />
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -35,6 +35,10 @@ export default Vue.extend({
       required: true,
     },
     names: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    ids: {
       type: Array as PropType<string[]>,
       required: true,
     },

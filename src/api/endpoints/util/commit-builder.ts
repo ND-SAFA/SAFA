@@ -1,5 +1,6 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
 import { commitModule, projectModule } from "@/store";
+import { createCommit } from "@/util";
 
 /**
  * Responsible for creating a commit and saving it to the database.
@@ -11,15 +12,15 @@ export class CommitBuilder {
   commit: Commit;
 
   constructor(version: ProjectVersion) {
-    this.commit = commitModule.emptyCommit(version);
+    this.commit = createCommit(version);
   }
 
   static withCurrentVersion(): CommitBuilder {
-    const version = projectModule.getProject.projectVersion;
-    if (version === undefined) {
+    const { projectVersion } = projectModule.getProject;
+    if (projectVersion === undefined) {
       throw Error("No project version is selected.");
     }
-    return new CommitBuilder(version);
+    return new CommitBuilder(projectVersion);
   }
   withNewArtifact(artifact: Artifact): this {
     this.commit.artifacts.added.push(artifact);

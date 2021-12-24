@@ -133,9 +133,9 @@ export default Vue.extend({
       if (selectedArtifact !== undefined) {
         const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
-          (l) => l.source === selectedArtifact.name
+          (l) => l.sourceName === selectedArtifact.name
         );
-        return query.map((l) => l.target);
+        return query.map((l) => l.targetName);
       } else {
         return [];
       }
@@ -145,9 +145,9 @@ export default Vue.extend({
       if (selectedArtifactName !== undefined) {
         const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
-          (l) => l.target === selectedArtifactName
+          (l) => l.targetName === selectedArtifactName
         );
-        return query.map((l) => l.source);
+        return query.map((l) => l.sourceName);
       } else {
         return [];
       }

@@ -47,7 +47,7 @@ import {
   getGeneratedLinks,
 } from "@/api";
 import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { ApprovalSection, PrivatePage } from "@/components";
 import { navigateTo, Routes } from "@/router";
 import { EmptyLambda } from "@/types";
@@ -67,7 +67,7 @@ export default Vue.extend({
       return projectModule.getProject.projectId;
     },
     artifactHashmap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
+      return projectModule.getArtifactsById;
     },
   },
   methods: {
@@ -77,7 +77,7 @@ export default Vue.extend({
     loadGeneratedLinks() {
       const versionId = projectModule.getProject.projectVersion?.versionId;
       if (versionId === undefined || versionId === "") {
-        return appModule.onWarning("No project has been selected");
+        return logModule.onWarning("No project has been selected");
       }
       getGeneratedLinks(versionId).then((links) => {
         links.forEach((link) => {

@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      {{ link.source + "-" + link.target }}
+      {{ link.sourceName + "-" + link.targetName }}
     </v-expansion-panel-header>
     <v-expansion-panel-content>
       <trace-link-display

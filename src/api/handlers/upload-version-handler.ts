@@ -1,5 +1,5 @@
 import { EmptyLambda, ProjectIdentifier, ProjectVersion } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
 import { ProjectCreationResponse } from "@/types";
 import { navigateTo, Routes } from "@/router";
@@ -25,11 +25,11 @@ export async function uploadNewProjectVersion(
   onFinally: EmptyLambda
 ): Promise<void> {
   if (selectedProject === undefined) {
-    appModule.onWarning("Please select a project to update");
+    logModule.onWarning("Please select a project to update");
   } else if (selectedVersion === undefined) {
-    appModule.onWarning("Please select a version to upload to");
+    logModule.onWarning("Please select a version to upload to");
   } else if (selectedFiles.length === 0) {
-    appModule.onWarning("Please at least one file to upload");
+    logModule.onWarning("Please at least one file to upload");
   } else {
     onLoadStart();
     const formData = new FormData();
@@ -42,12 +42,12 @@ export async function uploadNewProjectVersion(
           projectId: selectedProject.projectId,
           versionId: selectedVersion.versionId,
         })
-        .catch((e) => appModule.onError(e.message));
+        .catch((e) => logModule.onError(e.message));
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)
       .then(async (res: ProjectCreationResponse) => {
-        appModule.onSuccess(
+        logModule.onSuccess(
           `Flat files were uploaded successfully and ${res.project.name} was updated.`
         );
         if (setVersionIfSuccessful) {

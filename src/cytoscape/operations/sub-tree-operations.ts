@@ -1,63 +1,71 @@
-import { Artifact, CytoCore } from "@/types";
+import { Artifact, CytoCore, SubtreeMap } from "@/types";
 import { SingularElementArgument, EdgeCollection } from "cytoscape";
-import type { SubtreeMap } from "@/types/store/artifact-selection";
 
 /**
  * Computes the subtree map of given artifacts.
  *
- * @return Promise containing SubtreeMap
+ * @param cy - The cytoscape instance to operate on.
+ * @param artifacts - The current artifacts.
+ *
+ * @return The computed subtree map.
  */
 export function createSubtreeMap(
   cy: CytoCore,
   artifacts: Artifact[]
 ): SubtreeMap {
-  const subtreeMap = {}; //hash table of previously computed subtrees
+  const computedSubtrees = {};
   return artifacts
     .map((artifact) => ({
-      [artifact.name]: getSubtree(cy, artifact.name, subtreeMap),
+      [artifact.id]: getSubtree(cy, artifact.id, computedSubtrees),
     }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {});
 }
 
 /**
  * Returns list of children names for artifact specified.
- * @param cy The cytoscape instance to operate on
- * @param artifactName The name of the root artifacts whose subtree is being
- * calculated.
- * @param subtreeMap Map of previously calculated subtrees used to look up
- * previous calculations.
+ *
+ * @param cy - The cytoscape instance to operate on.
+ * @param artifactId - The id of the root artifact whose subtree is being calculated.
+ * @param subtreeMapCache - A cache of previously calculated subtrees.
  */
 function getSubtree(
   cy: CytoCore,
-  artifactName: string,
-  subtreeMap: SubtreeMap
+  artifactId: string,
+  subtreeMapCache: SubtreeMap
 ): string[] {
-  if (artifactName in subtreeMap) {
-    return subtreeMap[artifactName];
-  }
   let currentSubtree: string[] = [];
-  for (const childName of getChildren(cy, artifactName)) {
-    if (!(childName in subtreeMap)) {
-      subtreeMap[childName] = getSubtree(cy, childName, subtreeMap);
-    }
-    const childSubtree = subtreeMap[childName].concat([childName]);
-    const newSubtreeArtifacts = childSubtree.filter(
-      (t) => !currentSubtree.includes(t)
-    );
-    currentSubtree = currentSubtree.concat(newSubtreeArtifacts);
+
+  if (artifactId in subtreeMapCache) {
+    return subtreeMapCache[artifactId];
   }
+  for (const childId of getChildren(cy, artifactId)) {
+    if (!(childId in subtreeMapCache)) {
+      subtreeMapCache[childId] = getSubtree(cy, childId, subtreeMapCache);
+    }
+
+    const childSubtreeIds = [...subtreeMapCache[childId], childId];
+    const newSubtreeIds = childSubtreeIds.filter(
+      (id) => !currentSubtree.includes(id)
+    );
+
+    currentSubtree = [...currentSubtree, ...newSubtreeIds];
+  }
+
   return currentSubtree;
 }
 
 /**
- * Returns list of artifact names corresponding to children of artifact.
- * @param cy The Cytoscape instance to retrieve elements from.
- * @param artifactName The name of the artifact whose children are being
- * retrieved.
+ * Returns list of artifact ids corresponding to children of artifact.
+ *
+ * @param cy - The cytoscape instance to operate on.
+ * @param artifactId - The id of the root artifact whose subtree is being calculated.
+ *
+ * @return The computed child artifact ids.
  */
-function getChildren(cy: CytoCore, artifactName: string): string[] {
-  const nodeEdges = cy.edges(`edge[source="${artifactName}"]`);
+function getChildren(cy: CytoCore, artifactId: string): string[] {
+  const nodeEdges = cy.edges(`edge[source="${artifactId}"]`);
   const children = nodeEdges.targets();
+
   return children.map((child) => child.data().id);
 }
 
@@ -69,6 +77,8 @@ function getChildren(cy: CytoCore, artifactName: string): string[] {
  * @param cyPromise - A promise returning cytoscape whose root node is returned.
  * @param currentNode - Defines where we are in the tree during recursion.
  * @param traversedNodes - A list of all traversed node IDs to avoid loops.
+ *
+ * @return The root node.
  */
 export async function getRootNode(
   cyPromise: Promise<CytoCore>,
@@ -104,13 +114,14 @@ export async function getRootNode(
 }
 
 /**
- * Returns the node in given Cytoscape instance with the most number of
- * connected edges.
- * @param cyCore
+ * Returns the node in given Cytoscape instance with the most connected edges.
+ *
+ * @param cy - The cytoscape instance to operate on.
  */
-function getMostConnectedNode(cyCore: CytoCore): SingularElementArgument {
+function getMostConnectedNode(cy: CytoCore): SingularElementArgument {
   const counts: Record<string, number> = {};
-  cyCore.edges().forEach((edge) => {
+
+  cy.edges().forEach((edge) => {
     const sourceName = edge.source().data().id;
     const targetName = edge.target().data().id;
     const increaseCounts = (name: string) => {
@@ -125,7 +136,7 @@ function getMostConnectedNode(cyCore: CytoCore): SingularElementArgument {
   });
 
   let max = -1;
-  let maxName = cyCore.nodes().first().data().name;
+  let maxName = cy.nodes().first().data().name;
   for (const [name, count] of Object.entries(counts)) {
     if (count > max) {
       max = count;
@@ -133,7 +144,7 @@ function getMostConnectedNode(cyCore: CytoCore): SingularElementArgument {
     }
   }
 
-  return cyCore
+  return cy
     .nodes()
     .filter((n) => n.data().id === maxName)
     .first();

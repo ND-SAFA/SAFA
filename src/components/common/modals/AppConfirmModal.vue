@@ -17,7 +17,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 export default Vue.extend({
@@ -35,21 +35,13 @@ export default Vue.extend({
   },
   computed: {
     isMessageDefined(): boolean {
-      return this.message.type !== ConfirmationType.CLEAR;
+      return !!this.message && this.message.type !== ConfirmationType.CLEAR;
     },
     title(): string {
-      if (this.isMessageDefined) {
-        return this.message.title;
-      } else {
-        return "";
-      }
+      return this.message?.title || "";
     },
     body(): string {
-      if (this.isMessageDefined) {
-        return this.message.body;
-      } else {
-        return "";
-      }
+      return this.message?.body || "";
     },
   },
   data() {
@@ -60,13 +52,13 @@ export default Vue.extend({
   methods: {
     onConfirm(): void {
       if (this.message !== undefined) {
-        appModule.CLEAR_CONFIRMATION_MESSAGE();
+        logModule.CLEAR_CONFIRMATION_MESSAGE();
         this.message.statusCallback(true);
       }
     },
     onClose(): void {
       if (this.message !== undefined) {
-        appModule.CLEAR_CONFIRMATION_MESSAGE();
+        logModule.CLEAR_CONFIRMATION_MESSAGE();
         this.message.statusCallback(false);
       }
     },

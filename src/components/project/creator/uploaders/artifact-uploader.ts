@@ -75,11 +75,12 @@ function createParsedArtifactFile(
     (res: ParseArtifactFileResponse) => {
       const { artifacts, errors } = res;
       const validArtifacts: Artifact[] = [];
-      artifacts.forEach((a) => {
-        const error = getArtifactError(validArtifactMap, a);
+
+      artifacts.forEach((artifact) => {
+        const error = getArtifactError(validArtifactMap, artifact);
         if (error === undefined) {
-          validArtifacts.push(a);
-          validArtifactMap[a.name] = a;
+          validArtifacts.push(artifact);
+          validArtifactMap[artifact.name] = artifact;
         } else {
           errors.push(error);
         }

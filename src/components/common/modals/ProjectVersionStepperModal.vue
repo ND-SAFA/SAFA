@@ -166,7 +166,7 @@ export default Vue.extend({
 
       Vue.set(this.localSteps, 0, [project.name, true]);
 
-      if (goToNextStep) {
+      if (goToNextStep && this.currentStep == 0) {
         this.currentStep++;
       }
     },

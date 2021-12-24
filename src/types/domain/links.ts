@@ -22,11 +22,19 @@ export interface Link {
   /**
    * The source node ID.
    */
-  source: string;
+  sourceId: string;
+  /**
+   * The source node name.
+   */
+  sourceName: string;
   /**
    * The target node ID.
    */
-  target: string;
+  targetId: string;
+  /**
+   * The target node name.
+   */
+  targetName: string;
 }
 
 /**
@@ -72,7 +80,7 @@ export interface TraceLinkDisplayData extends TraceLink {
 export interface SubtreeLink extends TraceLink {
   type: "SUBTREE";
   /**
-   * The name of the artifact. TODO: Replace with id.
+   * The id of the artifact.
    */
   rootNode: string;
 }

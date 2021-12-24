@@ -1,8 +1,8 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectVersionUpdate } from "@/types";
-import { appModule, projectModule } from "@/store";
-import { baseURL } from "@/api/endpoints/endpoints";
+import { projectModule, logModule } from "@/store";
+import { baseURL } from "@/api/endpoints/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
@@ -28,7 +28,7 @@ function getStompClient(reconnect = false): Client {
     try {
       sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
       sock.onclose = () => {
-        appModule.onDevMessage("Closing WebSocket.");
+        logModule.onDevMessage("Closing WebSocket.");
         connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();
       };
       stompClient = Stomp.over(sock, { debug: false });
@@ -59,13 +59,13 @@ function connect(
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
     if (stomp.connected) {
-      appModule.onDevMessage("Client is connected to WebSocket.");
+      logModule.onDevMessage("Client is connected to WebSocket.");
       clearInterval(recInterval);
       resolve();
     }
 
     if (currentReconnectAttempts > 0) {
-      appModule.onDevMessage(
+      logModule.onDevMessage(
         `Websocket reconnect attempt:${currentReconnectAttempts}`
       );
     }
@@ -75,15 +75,15 @@ function connect(
       { host: WEBSOCKET_URL },
       () => {
         if (currentReconnectAttempts > 1) {
-          appModule.onSuccess("Web Socket reconnected to server.");
+          logModule.onSuccess("Web Socket reconnected to server.");
         }
-        appModule.onDevMessage("Websocket connection successful.");
+        logModule.onDevMessage("Websocket connection successful.");
         clearInterval(recInterval);
         currentReconnectAttempts = 0;
         resolve();
       },
       () => {
-        appModule.onDevMessage("Re-connecting with WebSocket.");
+        logModule.onDevMessage("Re-connecting with WebSocket.");
         clearInterval(recInterval);
         //TODO: Check if out of date during time disconnected.
         recInterval = setInterval(function () {
@@ -95,7 +95,7 @@ function connect(
             clearInterval(recInterval);
             const error =
               "Web Socket lost connection to server, please reload page.";
-            appModule.onError(error);
+            logModule.onError(error);
             reject(error);
           }
         }, reconnectWaitTime);

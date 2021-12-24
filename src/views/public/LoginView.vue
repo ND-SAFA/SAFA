@@ -65,8 +65,7 @@ export default Vue.extend({
   }),
   methods: {
     handleLogin() {
-      const goToPage =
-        new URLSearchParams(window.location.search).get("to") || Routes.HOME;
+      const goToPage = new URLSearchParams(window.location.search).get("to");
 
       this.isLoading = true;
 
@@ -75,7 +74,15 @@ export default Vue.extend({
           email: this.email,
           password: this.password,
         })
-        .then(() => navigateTo(goToPage))
+        .then(async () => {
+          this.isLoading = false;
+
+          if (goToPage && goToPage !== Routes.ARTIFACT_TREE) {
+            await navigateTo(goToPage);
+          } else {
+            await sessionModule.loadLastProject();
+          }
+        })
         .catch(() => {
           this.isError = true;
           this.isLoading = false;

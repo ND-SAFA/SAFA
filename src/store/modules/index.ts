@@ -1,4 +1,5 @@
 export { default as AppModule } from "./app.module";
+export { default as SnackbarModule } from "./snackbar.module";
 export { default as ProjectModule } from "./project.module";
 export { default as DeltaModule } from "./delta.module";
 export { default as ArtifactSelectionModule } from "./artifact-selection.module";

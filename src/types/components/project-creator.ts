@@ -1,4 +1,4 @@
-import { Artifact, TraceLink } from "@/types/domain";
+import { Artifact, Link, TraceLink } from "@/types/domain";
 import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
@@ -17,7 +17,7 @@ export interface IGenericUploader<Environment, T, F extends ProjectFile> {
 
 export type ValidFileTypes = ArtifactFile | TraceFile;
 
-export type ValidPayloads = string | TraceLink;
+export type ValidPayloads = string | Link;
 
 export type ArtifactMap = Record<string, Artifact>;
 

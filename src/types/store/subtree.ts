@@ -3,6 +3,6 @@
  * for the opacity change.
  */
 export interface SetOpacityRequest {
-  targetArtifactNames: string[];
+  targetArtifactIds: string[];
   visible: boolean;
 }

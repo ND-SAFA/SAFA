@@ -1,10 +1,11 @@
 import { EventObject } from "cytoscape";
 import {
-  appModule,
+  logModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
+  appModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
@@ -27,7 +28,7 @@ export const artifactTreeContextMenuOptions = {
         if (projectModule.isProjectDefined) {
           appModule.openPanel(PanelType.artifactCreator);
         } else {
-          appModule.onWarning("Please select a project to create artifacts.");
+          logModule.onWarning("Please select a project to create artifacts.");
         }
       },
     },
@@ -41,7 +42,7 @@ export const artifactTreeContextMenuOptions = {
         if (projectModule.isProjectDefined) {
           enableDrawMode();
         } else {
-          appModule.onWarning("Please select a project to create trace links.");
+          logModule.onWarning("Please select a project to create trace links.");
         }
       },
     },
@@ -53,7 +54,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          artifactSelectionModule.selectArtifact(artifact);
+          await artifactSelectionModule.selectArtifact(artifact);
         }).then();
       },
     },
@@ -65,7 +66,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          deleteArtifactFromCurrentVersion(artifact).then();
+          await deleteArtifactFromCurrentVersion(artifact);
         }).then();
       },
     },
@@ -85,8 +86,9 @@ export const artifactTreeContextMenuOptions = {
       tooltipText: "Hide all children.",
       selector: "node", //TODO: disable this option if already hidden
       onClickFunction: async (event: EventObject): Promise<void> => {
-        const artifactName: string = event.target.data().id;
-        await subtreeModule.hideSubtree(artifactName).then();
+        const artifactId: string = event.target.data().id;
+
+        await subtreeModule.hideSubtree(artifactId);
       },
     },
     {
@@ -95,8 +97,9 @@ export const artifactTreeContextMenuOptions = {
       tooltipText: "Show all hidden children.",
       selector: "node", //TODO: disable this option if already hidden
       onClickFunction: async (event: EventObject): Promise<void> => {
-        const artifactName: string = event.target.data().id;
-        await subtreeModule.showSubtree(artifactName);
+        const artifactId: string = event.target.data().id;
+
+        await subtreeModule.showSubtree(artifactId);
       },
     },
   ],

@@ -43,6 +43,7 @@ import {
   ProjectFile,
   TraceLink,
   ValidPayloads,
+  Link,
 } from "@/types";
 import FilePanelController from "./FilePanelController.vue";
 import ValidatedPanels from "./ValidatedPanels.vue";
@@ -126,7 +127,7 @@ export default Vue.extend({
         this.$emit("upload:invalid");
       }
     },
-    addFile(payload: string | TraceLink): void {
+    addFile(payload: string | Link): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);

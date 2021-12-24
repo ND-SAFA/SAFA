@@ -1,17 +1,15 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, Commit, ProjectVersion } from "@/types";
-import authHttpClient from "@/api/endpoints/auth-http-client";
-import { Endpoint, fillEndpoint } from "@/api/endpoints/endpoints";
-import { appModule, projectModule } from "@/store";
+import type { Artifact, Commit } from "@/types";
+import { logModule, projectModule } from "@/store";
 import type { CommitHistory } from "@/types";
-
-type CommitFromVersionBuilder = (v: ProjectVersion) => Commit;
+import { persistCommit } from "@/api";
+import { createCommit } from "@/util";
 
 @Module({ namespaced: true, name: "commit" })
 /**
- * Keep track of the commits occurring in this sessions. Provides api for:
- * 1. Committing an action
- * 2. Undoing an action
+ * Keep track of the commits occurring in this session. Provides api for:
+ * 1. Committing an action.
+ * 2. Undoing an action.
  */
 export default class CommitModule extends VuexModule {
   /**
@@ -24,68 +22,52 @@ export default class CommitModule extends VuexModule {
   @Action({ rawError: true })
   /**
    * Saves commit to the application store.
-   * @param commit
+   *
+   * @param commit - The commit to save.
    */
   async saveCommit(commit: Commit): Promise<void> {
     const revert = this.createRevert(commit);
-    await this.persistCommit(commit);
-    this.addCommit({ commit, revert });
+
+    await persistCommit(commit);
+    this.ADD_COMMIT({ commit, revert });
   }
 
   @Action
   /**
-   * Removes the last commit from the store and attempts to revert the commit's
-   * changes. If successful, commit is stored in previously reverted commits.
-   * 1. Added artifacts
+   * Removes the last commit from the store and attempts to revert the changes.
+   * If successful, the commit is stored in previously reverted commits.
    */
   async undoCommit(): Promise<void> {
     if (!this.canUndo) {
-      return appModule.onWarning("Cannot undo because no commits are written");
+      return logModule.onWarning("There are no commits to undo.");
     }
+
     const lastCommitIndex = this.commits.length - 1;
-    if (lastCommitIndex < 0) {
-      throw Error("Could not undo commit because there are no commits.");
-    }
     const lastCommitHistory = this.commits[lastCommitIndex];
-    await this.persistCommit(lastCommitHistory.revert);
-    this.setCommits(this.commits.filter((c, i) => i !== lastCommitIndex));
-    this.addRevertedCommit(lastCommitHistory);
+
+    await persistCommit(lastCommitHistory.revert);
+    this.SET_COMMITS(this.commits.filter((c, i) => i !== lastCommitIndex));
+    this.ADD_REVERTED_COMMIT(lastCommitHistory);
   }
 
   @Action
   /**
-   * Removes the last commit from the store and attempts to revert the commit's
-   * changes. Reverting changes follows the following rules:
-   * 1. Added artifacts
+   * Reattempts the last undone commit.
    */
   async redoCommit(): Promise<void> {
     if (!this.canRedo) {
-      return appModule.onWarning(
+      return logModule.onWarning(
         "Cannot redo because no commits have been reverted."
       );
     }
-    const lastCommitIndex = this.revertedCommits.length - 1;
-    if (lastCommitIndex < 0) {
-      throw Error("Could not revert commit because no commits reverted.");
-    }
-    const lastCommitHistory = this.revertedCommits[lastCommitIndex];
-    await this.saveCommit(lastCommitHistory.commit);
-    this.setRevertedCommits(
-      this.revertedCommits.filter((_, i) => i !== lastCommitIndex)
-    );
-  }
 
-  @Action
-  /**
-   * Sends commit to backend to be saved to the database.
-   * @param commit The commit to be persisted to the database.
-   */
-  persistCommit(commit: Commit): Promise<void> {
-    const versionId = commit.commitVersion.versionId;
-    return authHttpClient<void>(fillEndpoint(Endpoint.commit, { versionId }), {
-      method: "POST",
-      body: JSON.stringify(commit),
-    });
+    const lastCommitIndex = this.revertedCommits.length - 1;
+    const lastCommitHistory = this.revertedCommits[lastCommitIndex];
+
+    await this.saveCommit(lastCommitHistory.commit);
+    this.SET_REVERTED_COMMITS(
+      this.revertedCommits.filter((c, i) => i !== lastCommitIndex)
+    );
   }
 
   @Mutation
@@ -93,7 +75,7 @@ export default class CommitModule extends VuexModule {
    * Sets given list as commits.
    * @param commits
    */
-  setCommits(commits: CommitHistory[]): void {
+  SET_COMMITS(commits: CommitHistory[]): void {
     this.commits = commits;
   }
 
@@ -101,7 +83,7 @@ export default class CommitModule extends VuexModule {
   /**
    * Sets given list as reverted commits
    */
-  setRevertedCommits(revertedCommits: CommitHistory[]): void {
+  SET_REVERTED_COMMITS(revertedCommits: CommitHistory[]): void {
     this.revertedCommits = revertedCommits;
   }
 
@@ -109,42 +91,20 @@ export default class CommitModule extends VuexModule {
   /**
    * Adds a commit to the commit history
    */
-  addCommit(commitHistory: CommitHistory): void {
-    this.commits = this.commits.concat([commitHistory]);
+  ADD_COMMIT(commitHistory: CommitHistory): void {
+    this.commits = [...this.commits, commitHistory];
   }
 
   @Mutation
   /**
    * Adds a commit to the commit history
    */
-  addRevertedCommit(commitHistory: CommitHistory): void {
-    this.revertedCommits = this.revertedCommits.concat([commitHistory]);
+  ADD_REVERTED_COMMIT(commitHistory: CommitHistory): void {
+    this.revertedCommits = [...this.revertedCommits, commitHistory];
   }
 
   /**
-   * @return a commit object initialed with given version and empty everywhere
-   * else.
-   */
-  get emptyCommit(): CommitFromVersionBuilder {
-    return (version: ProjectVersion) => {
-      return {
-        commitVersion: version,
-        artifacts: {
-          added: [],
-          removed: [],
-          modified: [],
-        },
-        traces: {
-          added: [],
-          removed: [],
-          modified: [],
-        },
-      };
-    };
-  }
-
-  /**
-   * Given a commit all added entities are deleted, all deleted entities are
+   * Given a commit, all added entities are deleted, all deleted entities are
    * re-added, and modified entities are reverted to their state before the last
    * client change.
    */
@@ -154,11 +114,11 @@ export default class CommitModule extends VuexModule {
         (a: Artifact) => projectModule.getArtifactById(a.id)
       );
       const originalTraces = commit.traces.modified.map((t) =>
-        projectModule.getTraceLinkByArtifacts(t.source, t.target)
+        projectModule.getTraceLinkByArtifacts(t.sourceId, t.targetId)
       );
 
       return {
-        ...this.emptyCommit(commit.commitVersion),
+        ...createCommit(commit.commitVersion),
         artifacts: {
           added: commit.artifacts.removed,
           removed: commit.artifacts.added,
@@ -174,19 +134,22 @@ export default class CommitModule extends VuexModule {
   }
 
   /**
-   * @return true if at least one commit exists and false otherwise.
+   * @return True if at least one commit exists.
    */
   get canUndo(): boolean {
     return this.commits.length > 0;
   }
 
   /**
-   * @return true if at least one commit has been reverted and false otherwise.
+   * @return True if at least one commit has been reverted.
    */
   get canRedo(): boolean {
     return this.revertedCommits.length > 0;
   }
 
+  /**
+   * @return The current commits.
+   */
   get getCommits(): CommitHistory[] {
     return this.commits;
   }

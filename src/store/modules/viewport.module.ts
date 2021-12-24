@@ -1,4 +1,14 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
+import type { CytoCore, Artifact, LayoutPayload } from "@/types";
+import { areArraysEqual } from "@/util";
+import {
+  logModule,
+  artifactSelectionModule,
+  projectModule,
+  subtreeModule,
+  viewportModule,
+  appModule,
+} from "@/store";
 import {
   artifactTreeCyPromise,
   getRootNode,
@@ -12,15 +22,6 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
-import type { CytoCore, Artifact, LayoutPayload } from "@/types";
-import { areArraysEqual } from "@/util";
-import {
-  appModule,
-  artifactSelectionModule,
-  projectModule,
-  subtreeModule,
-  viewportModule,
-} from "@/store";
 
 @Module({ namespaced: true, name: "viewport" })
 /**
@@ -28,7 +29,7 @@ import {
  */
 export default class ViewportModule extends VuexModule {
   /**
-   * A collection of artifact names currently centered on.
+   * A collection of artifact ids currently centered on.
    */
   private currentCenteringCollection?: string[];
 
@@ -43,11 +44,12 @@ export default class ViewportModule extends VuexModule {
    * @param artifact - The artifact to select and view.
    */
   async viewArtifactSubtree(artifact: Artifact): Promise<void> {
-    const artifactsInSubtree = subtreeModule
-      .getSubtreeByArtifactName(artifact.name)
-      .concat([artifact.name]);
+    const artifactsInSubtree = [
+      ...subtreeModule.getSubtreeByArtifactId(artifact.id),
+      artifact.id,
+    ];
 
-    artifactSelectionModule.selectArtifact(artifact);
+    await artifactSelectionModule.selectArtifact(artifact);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",
@@ -61,7 +63,7 @@ export default class ViewportModule extends VuexModule {
    */
   async repositionSelectedSubtree(): Promise<void> {
     const cy = await artifactTreeCyPromise;
-    const artifactsInSubTree = artifactSelectionModule.getSelectedSubtree;
+    const artifactsInSubTree = artifactSelectionModule.getSelectedSubtreeIds;
 
     if (!cy.animated()) {
       await this.centerOnArtifacts(artifactsInSubTree);
@@ -76,6 +78,7 @@ export default class ViewportModule extends VuexModule {
     const layout = new ArtifactGraphLayout();
     const payload = { layout, cyPromise: artifactTreeCyPromise };
     const cy = await this.setGraphLayout(payload);
+
     cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
   }
 
@@ -86,10 +89,11 @@ export default class ViewportModule extends VuexModule {
   async setTimTreeLayout(): Promise<void> {
     const layout = new TimGraphLayout();
     const payload = { layout, cyPromise: timTreeCyPromise };
-    //TODO: Figure out why I can't immediately call animate function
-    //after setting graph layout
-    appModule.SET_IS_LOADING(true);
     const cy = await viewportModule.setGraphLayout(payload);
+
+    appModule.SET_IS_LOADING(true);
+
+    //TODO: Figure out why I can't immediately call animate function after setting graph layout
     setTimeout(() => {
       cy.animate({
         center: { eles: cy.nodes() },
@@ -105,7 +109,9 @@ export default class ViewportModule extends VuexModule {
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<CytoCore> {
     const cy = await layoutPayload.cyPromise;
+
     layoutPayload.layout.createLayout(cy);
+
     return cy;
   }
 
@@ -161,7 +167,7 @@ export default class ViewportModule extends VuexModule {
    * @param cyPromise - A promise returning an instance of cytoscape.
    */
   async centerOnArtifacts(
-    artifacts: string[],
+    artifactIds: string[],
     cyPromise = artifactTreeCyPromise
   ): Promise<void> {
     const cy = await cyPromise;
@@ -169,23 +175,22 @@ export default class ViewportModule extends VuexModule {
     if (cy.animated()) {
       if (
         this.currentCenteringCollection !== undefined &&
-        areArraysEqual(this.currentCenteringCollection, artifacts)
+        areArraysEqual(this.currentCenteringCollection, artifactIds)
       ) {
-        appModule.onDevWarning(
-          `Collection is already being rendered: ${artifacts}`
+        return logModule.onDevWarning(
+          `Collection is already being rendered: ${artifactIds}`
         );
-        return;
       } else {
         cy.stop(false, false);
       }
     }
 
-    this.SET_CURRENT_COLLECTION(artifacts);
+    this.SET_CURRENT_COLLECTION(artifactIds);
 
     const collection =
-      artifacts.length === 0
+      artifactIds.length === 0
         ? cy.nodes()
-        : cy.nodes().filter((n) => artifacts.includes(n.data().id));
+        : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
 
     if (collection.length > 1) {
       cy.animate({
@@ -204,18 +209,18 @@ export default class ViewportModule extends VuexModule {
   }
 
   /**
-   * @return nodes in the current viewport.
+   * @return artifact ids of those in viewport.
    */
   get getNodesInView(): string[] {
-    const subtree = artifactSelectionModule.getSelectedSubtree;
+    const subtree = artifactSelectionModule.getSelectedSubtreeIds;
     const ignoreTypes = artifactSelectionModule.getIgnoreTypes;
-    const artifacts: Artifact[] = projectModule.artifacts;
+    const artifacts = projectModule.artifacts;
 
     return artifacts
       .filter(
         (a) => isInSubtree(subtree, a) && doesNotContainType(ignoreTypes, a)
       )
-      .map((a) => a.name);
+      .map((a) => a.id);
   }
 
   @Mutation

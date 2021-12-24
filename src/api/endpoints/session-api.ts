@@ -4,9 +4,12 @@ import {
   UserModel,
   UserResetModel,
 } from "@/types";
-import authHttpClient from "./auth-http-client";
-import { baseURL, Endpoint, fillEndpoint } from "./endpoints";
-import { getCurrentVersion, getProjects } from "@/api";
+import {
+  baseURL,
+  Endpoint,
+  fillEndpoint,
+  authHttpClient,
+} from "@/api/endpoints/util";
 
 /**
  * TODO: remove once endpoints exist.

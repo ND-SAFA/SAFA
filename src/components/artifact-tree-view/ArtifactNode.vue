@@ -66,15 +66,12 @@ export default Vue.extend({
     selectedArtifact(): Artifact | undefined {
       return artifactSelectionModule.getSelectedArtifact;
     },
-    selectedSubtree(): string[] {
-      return artifactSelectionModule.getSelectedSubtree;
-    },
     isSelected(): boolean {
       const selectedArtifact = this.selectedArtifact;
 
       return (
         selectedArtifact !== undefined &&
-        selectedArtifact.name === this.artifactDefinition.name
+        selectedArtifact.id === this.artifactDefinition.id
       );
     },
     isDeltaViewEnabled(): boolean {
@@ -82,10 +79,10 @@ export default Vue.extend({
     },
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
-      const artifactName = this.artifactDefinition.name;
+      const artifactId = this.artifactDefinition.id;
 
-      if (artifactName in artifactWarnings) {
-        return artifactWarnings[artifactName];
+      if (artifactId in artifactWarnings) {
+        return artifactWarnings[artifactId];
       }
 
       return undefined;
@@ -96,7 +93,7 @@ export default Vue.extend({
         return ArtifactDeltaState.NO_CHANGE;
       }
 
-      const name: string = this.artifactDefinition.name;
+      const artifactId: string = this.artifactDefinition.id;
       const addedArtifacts: Record<string, Artifact> =
         deltaModule.addedArtifacts;
       const removedArtifacts: Record<string, Artifact> =
@@ -106,25 +103,22 @@ export default Vue.extend({
         EntityModification<Artifact>
       > = deltaModule.modifiedArtifacts;
 
-      if (name in addedArtifacts) {
-        this.setAddedData(addedArtifacts[name]);
+      if (artifactId in addedArtifacts) {
+        this.setAddedData(addedArtifacts[artifactId]);
         return ArtifactDeltaState.ADDED;
-      } else if (name in removedArtifacts) {
-        this.setRemovedData(removedArtifacts[name]);
+      } else if (artifactId in removedArtifacts) {
+        this.setRemovedData(removedArtifacts[artifactId]);
         return ArtifactDeltaState.REMOVED;
-      } else if (name in modifiedArtifacts) {
-        this.setModifiedData(modifiedArtifacts[name]);
+      } else if (artifactId in modifiedArtifacts) {
+        this.setModifiedData(modifiedArtifacts[artifactId]);
         return ArtifactDeltaState.MODIFIED;
       } else {
         return ArtifactDeltaState.NO_CHANGE;
       }
     },
     definition(): ArtifactCytoCoreElement {
-      const id = this.artifactDefinition.name;
-      const body = this.artifactDefinition.body;
-      const artifactType = this.artifactDefinition.type;
-      const isSelected = this.isSelected;
-      const hiddenChildren = subtreeModule.getHiddenChildrenByParentName(id);
+      const { id, body, type, name } = this.artifactDefinition;
+      const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
       const hiddenChildWarnings =
         errorModule.getWarningsByArtifactNames(hiddenChildren);
       const hiddenChildDeltaStates =
@@ -134,12 +128,12 @@ export default Vue.extend({
         data: {
           id,
           body,
-          artifactName: id,
+          artifactName: name,
           type: "node",
           warnings: this.localWarnings,
-          artifactType,
+          artifactType: type,
           artifactDeltaState: this.artifactDeltaState,
-          isSelected,
+          isSelected: this.isSelected,
           opacity: this.opacity,
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,

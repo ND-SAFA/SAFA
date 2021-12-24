@@ -8,14 +8,14 @@
       :is-open="isArtifactCreatorOpen"
       @close="closeArtifactCreator"
     />
-    <AppConfirmModal :message="confirmationMessage" />
+    <app-confirm-modal :message="confirmationMessage" />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { appModule } from "@/store";
+import { appModule, logModule } from "@/store";
 import { LeftNavDrawer, RightNavDrawer } from "@/components/side-panels";
 import { AppConfirmModal, ArtifactCreatorModal } from "@/components/common";
 import AppBar from "./AppBar.vue";
@@ -36,7 +36,7 @@ export default Vue.extend({
     isLeftOpen: () => appModule.getIsLeftOpen,
     isRightOpen: () => appModule.getIsRightOpen,
     isArtifactCreatorOpen: () => appModule.getIsArtifactCreatorOpen,
-    confirmationMessage: () => appModule.getConfirmationMessage,
+    confirmationMessage: () => logModule.getConfirmationMessage,
   },
   methods: {
     closeArtifactCreator(): void {

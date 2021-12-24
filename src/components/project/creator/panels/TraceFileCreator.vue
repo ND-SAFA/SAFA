@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="isOpen" class="my-3 debug" align="center">
+  <v-row v-if="isOpen" class="my-3" align="center">
     <v-col cols="10">
       <div class="d-flex" style="width: min-content">
         <button-row :definitions="[sourceDefinition]" />

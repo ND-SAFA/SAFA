@@ -108,7 +108,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
-          menuItems: ["Change Version", "Upload new version"],
+          menuItems: ["Change Version", "Upload Flat Files"],
           menuHandlers: [this.onChangeVersion, this.onUploadVersion],
         },
         {

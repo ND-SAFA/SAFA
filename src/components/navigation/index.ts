@@ -4,3 +4,4 @@ export { default as AppBarHeader } from "./AppBarHeader.vue";
 export { default as SafaIcon } from "./SafaIcon.vue";
 export { default as AppBar } from "./AppBar.vue";
 export { default as PrivatePage } from "./PrivatePage.vue";
+export { default as LoadingBar } from "./LoadingBar.vue";

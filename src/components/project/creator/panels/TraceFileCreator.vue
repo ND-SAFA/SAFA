@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="isOpen" class="my-3" align="center">
+  <v-row v-if="isOpen" class="my-3 debug" align="center">
     <v-col cols="10">
       <div class="d-flex" style="width: min-content">
         <button-row :definitions="[sourceDefinition]" />
@@ -8,7 +8,7 @@
       </div>
     </v-col>
     <v-col cols="2">
-      <v-btn @click="onSubmit" color="primary" class="ml-10">Create Link</v-btn>
+      <v-btn @click="onSubmit" color="primary"> Create Link</v-btn>
     </v-col>
   </v-row>
 </template>

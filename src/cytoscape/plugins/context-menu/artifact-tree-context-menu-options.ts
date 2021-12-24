@@ -1,9 +1,11 @@
 import { EventObject } from "cytoscape";
 import {
-  appModule,
+  logModule,
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
+  appModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
@@ -22,11 +24,11 @@ export const artifactTreeContextMenuOptions = {
       tooltipText: "Create new artifact",
       selector: "node, edge",
       coreAsWell: true,
-      onClickFunction: () => {
+      onClickFunction: (): void => {
         if (projectModule.isProjectDefined) {
           appModule.openPanel(PanelType.artifactCreator);
         } else {
-          appModule.onWarning("Please select a project to create artifacts.");
+          logModule.onWarning("Please select a project to create artifacts.");
         }
       },
     },
@@ -40,7 +42,7 @@ export const artifactTreeContextMenuOptions = {
         if (projectModule.isProjectDefined) {
           enableDrawMode();
         } else {
-          appModule.onWarning("Please select a project to create trace links.");
+          logModule.onWarning("Please select a project to create trace links.");
         }
       },
     },
@@ -52,7 +54,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          artifactSelectionModule.selectArtifact(artifact);
+          await artifactSelectionModule.selectArtifact(artifact);
         }).then();
       },
     },
@@ -64,18 +66,40 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          deleteArtifactFromCurrentVersion(artifact.name).then();
+          await deleteArtifactFromCurrentVersion(artifact);
         }).then();
       },
     },
     {
-      id: "view-artifact-subtree",
+      id: "highlight-artifact-subtree",
       content: "Highlight Subtree",
-      tooltipText: "View Subtree",
+      tooltipText: "Highlight Subtree",
       selector: "node",
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, viewportModule.viewArtifactSubtree).then();
+      },
+    },
+    {
+      id: "hide-artifact-subtree",
+      content: "Hide Subtree",
+      tooltipText: "Hide all children.",
+      selector: "node", //TODO: disable this option if already hidden
+      onClickFunction: async (event: EventObject): Promise<void> => {
+        const artifactId: string = event.target.data().id;
+
+        await subtreeModule.hideSubtree(artifactId);
+      },
+    },
+    {
+      id: "show-artifact-subtree",
+      content: "Show Subtree",
+      tooltipText: "Show all hidden children.",
+      selector: "node", //TODO: disable this option if already hidden
+      onClickFunction: async (event: EventObject): Promise<void> => {
+        const artifactId: string = event.target.data().id;
+
+        await subtreeModule.showSubtree(artifactId);
       },
     },
   ],
@@ -94,8 +118,6 @@ async function handleOnClick(
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
     const artifact = projectModule.getArtifactByName(artifactData.artifactName);
-    if (artifact !== undefined) {
-      await handler(artifact);
-    }
+    await handler(artifact);
   }
 }

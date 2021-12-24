@@ -1,6 +1,6 @@
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types/cytoscape";
 import { NodeSingular, CollectionReturnValue } from "cytoscape";
-import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/onComplete";
+import { onArtifactTreeEdgeComplete } from "./onComplete";
 
 export * from "./options";
 
@@ -31,9 +31,8 @@ export function getEdgeHandlesCore(): EdgeHandleCore {
 }
 
 export function enableDrawMode(): void {
-  const core = getEdgeHandlesCore();
-  core.enable();
-  core.enableDrawMode();
+  getEdgeHandlesCore().enable();
+  getEdgeHandlesCore().enableDrawMode();
 }
 
 export function disableDrawMode(): void {

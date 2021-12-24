@@ -1,56 +1,60 @@
 <template>
-  <v-container class="ma-0 pa-0">
-    <v-row class="ma-0 pa-0">
-      <v-col cols="1" class="ma-0 pa-0" align-self="center">
-        <v-row class="ma-0 pa-0" justify="center">
-          <SafaIcon />
-        </v-row>
-      </v-col>
-      <v-col cols="11" class="ma-0 pa-0">
-        <v-row class="ma-0 pa-0">
-          <ProjectName color="white" />
-        </v-row>
-        <v-row class="ma-0 pa-0">
-          <v-col cols="auto" class="ma-0 pa-0">
-            <ButtonRow :definitions="definitions" justify="start" />
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+  <v-flex class="d-flex flex-row align-center">
+    <v-flex class="d-flex flex-row align-center">
+      <safa-icon />
+      <div>
+        <h1 class="text-h5 white--text pl-4">SAFA</h1>
+        <button-row :definitions="definitions" justify="start" />
+      </div>
+    </v-flex>
+
+    <div class="mr-5">
+      <version-label />
+    </div>
+
+    <account-dropdown />
+
     <upload-new-version-modal
-      :isOpen="uploadVersionOpen"
-      @onClose="uploadVersionOpen = false"
+      :is-open="uploadVersionOpen"
+      @close="uploadVersionOpen = false"
     />
     <baseline-version-modal
       :is-open="openProjectOpen"
-      @onClose="openProjectOpen = false"
+      @close="openProjectOpen = false"
     />
     <baseline-version-modal
       title="Change project version"
       :is-open="changeVersionOpen"
       :project="project"
-      @onClose="changeVersionOpen = false"
+      @close="changeVersionOpen = false"
     />
-  </v-container>
+  </v-flex>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType, Project } from "@/types";
+import { ButtonDefinition, ButtonType, EmptyLambda, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
+import { logModule, projectModule } from "@/store";
 import {
   BaselineVersionModal,
-  UploadNewVersionModal,
   ButtonRow,
+  UploadNewVersionModal,
 } from "@/components/common";
-import ProjectName from "./ProjectName.vue";
 import SafaIcon from "./SafaIcon.vue";
-import { appModule, projectModule } from "@/store";
+import AccountDropdown from "./AccountDropdown.vue";
+import VersionLabel from "@/components/artifact-tree-view/VersionLabel.vue";
+
+/**
+ * Local representation of generated menu items.
+ */
+type CondensedMenuItem = [string, EmptyLambda];
 
 export default Vue.extend({
   components: {
+    VersionLabel,
+    AccountDropdown,
     SafaIcon,
-    ProjectName,
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
@@ -60,7 +64,6 @@ export default Vue.extend({
       openProjectOpen: false,
       uploadVersionOpen: false,
       changeVersionOpen: false,
-      definitions: [] as ButtonDefinition[], // defined once module has been created
     };
   },
   methods: {
@@ -75,7 +78,7 @@ export default Vue.extend({
       if (versionId !== undefined && versionId !== "") {
         this.changeVersionOpen = true;
       } else {
-        appModule.onWarning("Please select a project.");
+        logModule.onWarning("Please select a project.");
       }
     },
   },
@@ -83,34 +86,40 @@ export default Vue.extend({
     project(): Project {
       return projectModule.getProject;
     },
-  },
-  created() {
-    this.definitions = [
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Project",
-        buttonIsText: true,
-        menuItems: ["Open Project", "Create Project"],
-        menuHandlers: [
-          this.onOpenProject,
-          () => navigateTo(Routes.PROJECT_CREATOR),
-        ],
-      },
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Version",
-        buttonIsText: true,
-        menuItems: ["Change Version", "Upload new version"],
-        menuHandlers: [this.onChangeVersion, this.onUploadVersion],
-      },
-      {
-        type: ButtonType.LIST_MENU,
-        label: "Trace Links",
-        buttonIsText: true,
-        menuItems: ["Approve Generated Trace Links"],
-        menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
-      },
-    ];
+    projectMenuItems(): CondensedMenuItem[] {
+      const isProjectDefined = this.project.projectId !== "";
+      const options: CondensedMenuItem[] = [
+        ["Open", this.onOpenProject],
+        ["Create", () => navigateTo(Routes.PROJECT_CREATOR)],
+        ["Settings", () => navigateTo(Routes.PROJECT_SETTINGS)],
+      ];
+      return isProjectDefined ? options : options.slice(0, -1);
+    },
+    definitions(): ButtonDefinition[] {
+      return [
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Project",
+          buttonIsText: true,
+          menuItems: this.projectMenuItems.map((i) => i[0]),
+          menuHandlers: this.projectMenuItems.map((i) => i[1]),
+        },
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Version",
+          buttonIsText: true,
+          menuItems: ["Change Version", "Upload Flat Files"],
+          menuHandlers: [this.onChangeVersion, this.onUploadVersion],
+        },
+        {
+          type: ButtonType.LIST_MENU,
+          label: "Trace Links",
+          buttonIsText: true,
+          menuItems: ["Approve Generated Trace Links"],
+          menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
+        },
+      ];
+    },
   },
 });
 </script>

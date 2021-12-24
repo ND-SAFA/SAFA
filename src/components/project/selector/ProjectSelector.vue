@@ -6,10 +6,10 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    @edit-item="onEditProject"
-    @select-item="onSelectProject"
-    @delete-item="onDeleteProject"
-    @add-item="onAddItem"
+    @item:edit="onEditProject"
+    @item:select="onSelectProject"
+    @item:delete="onDeleteProject"
+    @item:add="onAddItem"
     @refresh="fetchProjects"
   >
     <template v-slot:editItemDialogue>
@@ -17,24 +17,24 @@
         title="Edit Project"
         :is-open="editProjectDialogue"
         :project="projectToEdit"
-        @onSave="onUpdateProject"
-        @onClose="onCloseProjectEdit"
+        @save="onUpdateProject"
+        @close="onCloseProjectEdit"
       />
     </template>
     <template v-slot:addItemDialogue>
       <project-identifier-modal
         title="Create New Project"
         :is-open="addProjectDialogue"
-        @onSave="onSaveNewProject"
-        @onClose="onCloseAddProject"
+        @save="onSaveNewProject"
+        @close="onCloseAddProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
         :is-open="deleteProjectDialogue"
         :project="projectToDelete"
-        @onConfirmDelete="onConfirmDeleteProject"
-        @onCancelDelete="onCancelDeleteProject"
+        @confirm="onConfirmDeleteProject"
+        @cancel="onCancelDeleteProject"
       />
     </template>
   </generic-selector>
@@ -42,11 +42,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, ProjectCreationResponse, ProjectIdentifier } from "@/types";
+import {
+  DataItem,
+  Project,
+  ProjectCreationResponse,
+  ProjectIdentifier,
+} from "@/types";
 import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
-import { appModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
-import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
+import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 import { projectSelectorHeaders } from "./headers";
 
@@ -55,6 +60,8 @@ import { projectSelectorHeaders } from "./headers";
  * select, edit, delete, or create projects. Project list is refreshed whenever
  * mounted or isOpen is changed to true.
  *
+ * @emits-1 `selected` (ProjectIdentifier) - On project selected.
+ * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
   name: "ProjectSelector",
@@ -82,7 +89,7 @@ export default Vue.extend({
       deleteProjectDialogue: false,
       addProjectDialogue: false,
       isLoading: false,
-      projectToEdit: undefined as ProjectIdentifier | undefined,
+      projectToEdit: { name: "", description: "" } as ProjectIdentifier,
       projectToDelete: undefined as ProjectIdentifier | undefined,
     };
   },
@@ -93,34 +100,35 @@ export default Vue.extend({
     isOpen(isOpen: boolean): void {
       if (isOpen) {
         this.fetchProjects();
+        if (this.projects.length === 1) {
+          this.$emit("selected", this.projects[0], true);
+        }
       }
     },
   },
   methods: {
     onUpdateProject(project: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(project, "updated");
+      this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
       this.selected = project;
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject, "created").then(
-        (projectCreated: ProjectCreationResponse) => {
-          this.$emit("onProjectSelected", projectCreated.project);
-        }
-      );
+      this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
+        this.$emit("selected", project);
+      });
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
     onCloseProjectEdit() {
       this.editProjectDialogue = false;
     },
-    onSelectProject(item: DataItem<ProjectIdentifier>) {
+    onSelectProject(item: DataItem<ProjectIdentifier>, goToNextStep = false) {
       if (item.value) {
-        this.$emit("onProjectSelected", item.item);
+        this.$emit("selected", item.item, goToNextStep);
       } else {
-        this.$emit("onProjectUnselected");
+        this.$emit("unselected");
       }
     },
     onAddItem() {
@@ -155,45 +163,42 @@ export default Vue.extend({
     },
     deleteProjectHandler(project: ProjectIdentifier) {
       deleteProject(project.projectId)
-        .then(() => {
-          appModule.onSuccess(`${project.name} successfully deleted.`);
+        .then(async () => {
+          logModule.onSuccess(`${project.name} successfully deleted.`);
+
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
+
+          if (project.name === projectModule.getProject.name) {
+            // Clear the current project if it has been deleted.
+            await projectModule.clearProject();
+          }
         })
         .finally(() => (this.isLoading = false));
     },
-    saveOrUpdateProjectHandler(
-      project: ProjectIdentifier,
-      operation: "updated" | "created"
-    ): Promise<ProjectCreationResponse> {
-      return new Promise<ProjectCreationResponse>((resolve, reject) => {
-        saveOrUpdateProject({
-          projectId: project.projectId,
-          description: project.description,
-          name: project.name,
-          artifacts: [],
-          traces: [],
-        })
-          .then((res: ProjectCreationResponse) => {
-            appModule.onSuccess(
-              `${res.project.name} was successfully ${operation}.`
-            );
-            this.isLoading = false;
-            const projectRemoved = this.projects.filter(
-              (p) => res.project.projectId !== p.projectId
-            );
+    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<Project> {
+      return saveOrUpdateProject({
+        projectId: project.projectId,
+        description: project.description,
+        name: project.name,
+        artifacts: [],
+        traces: [],
+      })
+        .then((res: ProjectCreationResponse) => {
+          const project = res.project;
+          projectModule.SET_PROJECT_IDENTIFIER(project);
+          const projectRemoved = this.projects.filter(
+            (p) => project.projectId !== p.projectId
+          );
 
-            this.projects = [res.project as ProjectIdentifier].concat(
-              projectRemoved
-            );
-            resolve(res);
-          })
-          .catch(reject)
-          .finally(() => {
-            this.isLoading = false;
-          });
-      });
+          this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          this.$emit("selected", project, true);
+          return project;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
 });

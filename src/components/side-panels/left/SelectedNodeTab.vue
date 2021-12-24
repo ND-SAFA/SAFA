@@ -3,7 +3,7 @@
     <v-container v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
-          <h1>{{ selectedArtifact.name }}</h1>
+          <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
         </v-col>
         <v-col>
           <v-row justify="end">
@@ -38,17 +38,16 @@
             No parents linked.
           </p>
           <v-list dense v-else>
-            <v-list-item-group>
-              <v-list-item
-                v-for="parentName in parents"
-                :key="parentName"
-                @click="onArtifactClick(parentName)"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="parentName" />
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
+            <v-btn
+              outlined
+              block
+              class="mb-1"
+              v-for="parentName in parents"
+              :key="parentName"
+              @click="onArtifactClick(parentName)"
+            >
+              {{ parentName }}
+            </v-btn>
           </v-list>
         </v-col>
 
@@ -59,17 +58,16 @@
             No children linked.
           </p>
           <v-list dense v-else>
-            <v-list-item-group>
-              <v-list-item
-                v-for="childName in children"
-                :key="childName"
-                @click="onArtifactClick(childName)"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="childName" />
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
+            <v-btn
+              outlined
+              block
+              class="mb-1"
+              v-for="childName in children"
+              :key="childName"
+              @click="onArtifactClick(childName)"
+            >
+              {{ childName }}
+            </v-btn>
           </v-list>
         </v-col>
       </v-row>
@@ -89,11 +87,11 @@
         {{ selectedArtifactWarnings }}
       </p>
 
-      <ArtifactCreatorModal
+      <artifact-creator-modal
         title="Edit Artifact Contents"
         :is-open="isArtifactCreatorOpen"
         :artifact="selectedArtifact"
-        @onClose="isArtifactCreatorOpen = false"
+        @close="isArtifactCreatorOpen = false"
       />
     </v-container>
 
@@ -133,11 +131,11 @@ export default Vue.extend({
     parents(): string[] {
       const selectedArtifact = this.selectedArtifact;
       if (selectedArtifact !== undefined) {
-        const traceLinks = projectModule.getTraceLinks;
+        const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
-          (l) => l.source === selectedArtifact.name
+          (l) => l.sourceName === selectedArtifact.name
         );
-        return query.map((l) => l.target);
+        return query.map((l) => l.targetName);
       } else {
         return [];
       }
@@ -145,11 +143,11 @@ export default Vue.extend({
     children(): string[] {
       const selectedArtifactName = this.selectedArtifactName;
       if (selectedArtifactName !== undefined) {
-        const traceLinks = projectModule.getTraceLinks;
+        const traceLinks = projectModule.traceLinks;
         const query = traceLinks.filter(
-          (l) => l.target === selectedArtifactName
+          (l) => l.targetName === selectedArtifactName
         );
-        return query.map((l) => l.source);
+        return query.map((l) => l.sourceName);
       } else {
         return [];
       }
@@ -173,14 +171,11 @@ export default Vue.extend({
     },
     onArtifactClick(artifactName: string): void {
       const artifactQuery = projectModule.getArtifactByName(artifactName);
-      if (artifactQuery !== undefined) {
-        artifactSelectionModule.selectArtifact(artifactQuery);
-      }
+      artifactSelectionModule.selectArtifact(artifactQuery);
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
-        const artifactName = this.selectedArtifact.name;
-        deleteArtifactFromCurrentVersion(artifactName).then(() => {
+        deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
           artifactSelectionModule.UNSELECT_ARTIFACT();
           appModule.closePanel(PanelType.left);
         });

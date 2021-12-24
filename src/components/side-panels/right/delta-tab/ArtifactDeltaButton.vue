@@ -1,5 +1,5 @@
 <template>
-  <v-btn small fab :color="titleColor" @click="$emit('onClick', name)">
+  <v-btn outlined :color="titleColor" @click="$emit('click', name)">
     {{ name }}
   </v-btn>
 </template>
@@ -8,6 +8,11 @@
 import { DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
 
+/**
+ * Displays delta information.
+ *
+ * @emits `click` (name: string) - On click.
+ */
 export default Vue.extend({
   props: {
     name: {

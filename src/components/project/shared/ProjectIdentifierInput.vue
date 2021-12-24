@@ -12,6 +12,13 @@
 <script lang="ts">
 import Vue from "vue";
 
+/**
+ * Input fields for editing a project.
+ *
+ * @emits-1 `update:name` (string) - On name updated.
+ * @emits-2 `update:description` (string) - On description updated.
+ * @emits-3 `close` - On close.
+ */
 export default Vue.extend({
   props: {
     name: {
@@ -41,16 +48,14 @@ export default Vue.extend({
       },
     },
   },
-  mounted() {
-    this.clearData();
-  },
   methods: {
     clearData() {
       this.currentName = "";
       this.currentDescription = "";
     },
     onClose() {
-      this.$emit("onClose");
+      this.$emit("close");
+      this.clearData();
     },
   },
 });

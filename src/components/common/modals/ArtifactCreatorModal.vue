@@ -3,21 +3,25 @@
     :title="title"
     :isOpen="isOpen"
     :isLoading="isLoading"
-    @close="$emit('onClose')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <v-container>
         <v-text-field
+          filled
           v-model="name"
-          outlined
-          dense
-          rounded
           label="Artifact Id"
           color="primary"
           :hint="nameHint"
           :error-messages="nameError"
+          :loading="nameCheckIsLoading"
         />
-        <button-row :definitions="buttonDefinitions" justify="center" />
+        <v-combobox
+          filled
+          v-model="type"
+          :items="artifactTypes"
+          label="Artifact Type"
+        />
         <v-textarea
           filled
           label="Artifact Summary"
@@ -40,28 +44,20 @@
 </template>
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ButtonDefinition,
-  ButtonType,
-  ListMenuDefinition,
-  Artifact,
-} from "@/types";
+import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import { appModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
-import { ButtonRow } from "@/components/common/button-row";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
 
-const EMPTY_ARTIFACT: Artifact = {
-  type: "",
-  name: "",
-  summary: "",
-  body: "",
-};
-
+/**
+ * Modal for artifact creation.
+ *
+ * @emits `close` - Emitted when modal is exited or artifact is created.
+ */
 export default Vue.extend({
-  components: { GenericModal, ButtonRow },
+  components: { GenericModal },
   props: {
     title: {
       type: String,
@@ -74,20 +70,21 @@ export default Vue.extend({
     artifact: {
       type: Object as PropType<Artifact>,
       required: false,
-      default: () => EMPTY_ARTIFACT,
     },
   },
   data() {
     return {
-      name: this.artifact.name,
-      summary: this.artifact.summary,
-      body: this.artifact.body,
-      type: this.artifact.type,
+      name: this.artifact?.name || "",
+      summary: this.artifact?.summary || "",
+      body: this.artifact?.body || "",
+      type: this.artifact?.type || "",
       isLoading: false,
-      isNameValid: this.artifact.name !== "",
+      isNameValid: !!this.artifact?.name,
       nameHint: DEFAULT_NAME_HINT,
       nameError: "",
       buttonDefinitions: [] as ButtonDefinition[],
+      nameCheckTimer: undefined as NodeJS.Timeout | undefined,
+      nameCheckIsLoading: false,
     };
   },
   computed: {
@@ -105,59 +102,62 @@ export default Vue.extend({
     },
   },
   watch: {
-    artifactTypes(): void {
-      this.setButtonDefinitions();
-    },
     isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.setButtonDefinitions();
+      if (!isOpen) {
+        this.name = this.artifact?.name || "";
+        this.summary = this.artifact?.summary || "";
+        this.body = this.artifact?.body || "";
+        this.type = this.artifact?.type || "";
       }
     },
     name(newName: string): void {
-      isArtifactNameTaken(this.projectId, newName).then((res) => {
-        this.isNameValid = !res.artifactExists;
-        if (this.isNameValid) {
-          this.nameError = "";
-        } else {
-          this.nameError = "Name is already used, please select another.";
+      if (newName !== "") {
+        if (this.nameCheckTimer) {
+          clearTimeout(this.nameCheckTimer);
         }
-      });
+
+        this.nameCheckIsLoading = true;
+        this.nameCheckTimer = setTimeout(() => {
+          isArtifactNameTaken(this.projectId, newName).then((res) => {
+            this.nameCheckIsLoading = false;
+            this.isNameValid = !res.artifactExists;
+
+            if (this.isNameValid) {
+              this.nameError = "";
+            } else {
+              this.nameError = "Name is already used, please select another.";
+            }
+          });
+        }, 500);
+      }
     },
   },
   methods: {
-    setButtonDefinitions(): void {
-      const label = this.type !== "" ? this.type : "Artifact Type";
-      const menuItem: ListMenuDefinition = {
-        type: ButtonType.LIST_MENU,
-        label,
-        menuItems: this.artifactTypes,
-        menuHandlers: this.artifactTypes.map(
-          (type) => () => (this.type = type)
-        ),
-        buttonColor: "primary",
-        buttonIsText: false,
-        showSelectedValue: true,
-      };
-      this.buttonDefinitions = [menuItem];
-    },
     onSubmit(): void {
       // only called when isValid / button is enabled
       const artifact: Artifact = {
+        id: this.artifact?.id || "",
         name: this.name,
         type: this.type,
         summary: this.summary,
         body: this.body,
       };
+
       this.isLoading = true;
+
       if (this.versionId === undefined) {
-        appModule.onWarning("Please select a project version.");
+        logModule.onWarning("Please select a project version.");
         return;
       }
-      createOrUpdateArtifactHandler(this.versionId, artifact)
+      const isUpdate = this.artifact !== undefined;
+      createOrUpdateArtifactHandler(this.versionId, artifact, isUpdate)
         .then(() => {
-          this.$emit("onClose");
+          this.$emit("close");
         })
-        .catch((e) => console.error(e))
+        .catch((e) => {
+          logModule.onDevError(e);
+          logModule.onWarning("Unable to create artifact.");
+        })
         .finally(() => (this.isLoading = false));
     },
   },

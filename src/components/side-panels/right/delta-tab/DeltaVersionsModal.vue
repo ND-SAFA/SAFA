@@ -3,22 +3,22 @@
     title="Delta View Target Version"
     :is-open="isOpen"
     :is-loading="isLoading"
-    @close="$emit('onClose')"
+    @close="$emit('close')"
   >
     <template v-slot:body>
       <v-row justify="center" class="mt-5">
         <v-container>
           <v-row justify="center">
-            <h3 style="text-align: center" class="mt-3 mb-3">
+            <span class="text-body-1 mt-3 mb-3 text-center">
               Select a Target Version
-            </h3>
+            </span>
           </v-row>
           <v-row justify="center">
-            <VersionSelector
+            <version-selector
               :project="project"
-              :isOpen="isOpen"
-              @onVersionSelected="selectVersion"
-              @onVersionUnselected="unselectVersion"
+              :is-open="isOpen"
+              @selected="selectVersion"
+              @unselected="unselectVersion"
             />
           </v-row>
         </v-container>
@@ -38,12 +38,17 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectVersion, DeltaPayload } from "@/types";
+import { Project, ProjectDelta, ProjectVersion } from "@/types";
 import { getProjectDelta } from "@/api";
-import { appModule, deltaModule, viewportModule } from "@/store";
+import { logModule, deltaModule, viewportModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project/version-selector";
 
+/**
+ * A modal for displaying delta versions.
+ *
+ * @emits `close` - On close.
+ */
 export default Vue.extend({
   components: { VersionSelector, GenericModal },
   props: {
@@ -68,7 +73,7 @@ export default Vue.extend({
     },
     onSubmit() {
       if (this.selectedVersion === undefined) {
-        appModule.onWarning("Please select a version to upload to");
+        logModule.onWarning("Please select a version to upload to");
       } else {
         const sourceVersion = this.project.projectVersion;
 
@@ -76,15 +81,15 @@ export default Vue.extend({
           getProjectDelta(
             sourceVersion.versionId,
             this.selectedVersion.versionId
-          ).then((deltaPayload: DeltaPayload) => {
-            deltaModule.setDeltaPayload(deltaPayload);
+          ).then(async (deltaPayload: ProjectDelta) => {
+            await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
-            this.$emit("onClose");
-            appModule.onSuccess("Delta state was updated successfully.");
-            viewportModule.setArtifactTreeLayout();
+            this.$emit("close");
+            logModule.onSuccess("Delta state was updated successfully.");
+            await viewportModule.setArtifactTreeLayout();
           });
         } else {
-          appModule.onWarning("Project source version is not selected.");
+          logModule.onWarning("Project source version is not selected.");
         }
       }
     },

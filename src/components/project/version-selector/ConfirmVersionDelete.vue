@@ -7,11 +7,7 @@
     :actions-height="0"
   >
     <template v-slot:body>
-      <v-container class="mt-5 mb-0 pb-0">
-        <v-row justify="center">
-          <v-btn color="error" @click="onConfirm"> Delete Version </v-btn>
-        </v-row>
-      </v-container>
+      <v-btn color="error" @click="onConfirm" block class="mt-3">Delete</v-btn>
     </template>
   </generic-modal>
 </template>
@@ -22,6 +18,12 @@ import { ProjectVersion } from "@/types";
 import { versionToString } from "@/util";
 import { GenericModal } from "@/components/common";
 
+/**
+ * A modal for confirming version deletion.
+ *
+ * @emits-1 `confirm` (ProjectVersion) - On delete confirm.
+ * @emits-2 `cancel` - On delete cancel.
+ */
 export default Vue.extend({
   components: { GenericModal },
   props: {
@@ -41,10 +43,10 @@ export default Vue.extend({
   },
   methods: {
     onConfirm() {
-      this.$emit("onConfirmDelete", this.$props.version);
+      this.$emit("confirm", this.$props.version);
     },
     onCancel() {
-      this.$emit("onCancelDelete");
+      this.$emit("cancel");
     },
   },
   watch: {

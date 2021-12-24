@@ -1,13 +1,8 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import type {
-  AddedArtifact,
-  RemovedArtifact,
-  ModifiedArtifact,
-  ProjectVersion,
-  DeltaPayload,
-} from "@/types";
-import { PanelType } from "@/types";
-import { appModule, projectModule } from "..";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
+import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
+import { appModule, projectModule, subtreeModule } from "..";
+import { createProjectDelta } from "@/util";
 
 @Module({ namespaced: true, name: "delta" })
 /**
@@ -25,15 +20,7 @@ export default class ErrorModule extends VuexModule {
   /**
    * A collection of all added artifacts.
    */
-  private added: Record<string, AddedArtifact> = {};
-  /**
-   * A collection of all removed artifacts.
-   */
-  private removed: Record<string, RemovedArtifact> = {};
-  /**
-   * A collection of all modified artifacts.
-   */
-  private modified: Record<string, ModifiedArtifact> = {};
+  private projectDelta = createProjectDelta();
 
   @Action
   /**
@@ -51,9 +38,15 @@ export default class ErrorModule extends VuexModule {
    *
    * @param payload - All artifact deltas.
    */
-  setDeltaPayload(payload: DeltaPayload): void {
+  async setDeltaPayload(payload: ProjectDelta): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    projectModule.ADD_OR_UPDATE_ARTIFACTS(payload.missingArtifacts);
+    await projectModule.addOrUpdateArtifacts(
+      Object.values(payload.artifacts.added)
+    );
+    await projectModule.addOrUpdateTraceLinks(
+      Object.values(payload.traces.added)
+    );
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Action
@@ -71,12 +64,7 @@ export default class ErrorModule extends VuexModule {
    * Clears the current collections of artifact deltas.
    */
   clearDelta(): void {
-    this.SET_DELTA_PAYLOAD({
-      added: {},
-      removed: {},
-      modified: {},
-      missingArtifacts: [],
-    });
+    this.SET_DELTA_PAYLOAD(createProjectDelta());
     this.SET_DELTA_IN_VIEW(false);
     appModule.closePanel(PanelType.right);
   }
@@ -95,12 +83,10 @@ export default class ErrorModule extends VuexModule {
   /**
    * Sets the current artifact deltas.
    *
-   * @param deltaPayload - The collections of deltas to set.
+   * @param projectDelta - The collections of artifact and trace deltas.
    */
-  SET_DELTA_PAYLOAD(deltaPayload: DeltaPayload): void {
-    this.added = deltaPayload.added;
-    this.removed = deltaPayload.removed;
-    this.modified = deltaPayload.modified;
+  SET_DELTA_PAYLOAD(projectDelta: ProjectDelta): void {
+    this.projectDelta = projectDelta;
   }
 
   @Mutation
@@ -114,24 +100,24 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return A collection of added deltas.
+   * @return A mapping of artifact IDs and the artifact's added.
    */
-  get getAdded(): Record<string, AddedArtifact> {
-    return this.added;
+  get addedArtifacts(): Record<string, Artifact> {
+    return this.projectDelta.artifacts.added;
   }
 
   /**
-   * @return A collection of removed deltas.
+   * @return A mapping of artifact IDs and the artifact's removed.
    */
-  get getRemoved(): Record<string, RemovedArtifact> {
-    return this.removed;
+  get removedArtifacts(): Record<string, Artifact> {
+    return this.projectDelta.artifacts.removed;
   }
 
   /**
    * @return A collection of modified deltas.
    */
-  get getModified(): Record<string, ModifiedArtifact> {
-    return this.modified;
+  get modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
+    return this.projectDelta.artifacts.modified;
   }
 
   /**
@@ -146,5 +132,45 @@ export default class ErrorModule extends VuexModule {
    */
   get getIsDeltaViewEnabled(): boolean {
     return this.isDeltaViewEnabled;
+  }
+
+  /**
+   * @return All delta states that associated with the artifacts given artifact names.
+   */
+  get getDeltaStatesByArtifactNames(): (
+    names: string[]
+  ) => ArtifactDeltaState[] {
+    return (names) => {
+      const deltaStates = new Set<ArtifactDeltaState>();
+
+      for (const name of names) {
+        if (name in this.projectDelta.artifacts.added) {
+          deltaStates.add(ArtifactDeltaState.ADDED);
+        } else if (name in this.projectDelta.artifacts.modified) {
+          deltaStates.add(ArtifactDeltaState.MODIFIED);
+        } else if (name in this.projectDelta.artifacts.removed) {
+          deltaStates.add(ArtifactDeltaState.REMOVED);
+        }
+      }
+
+      return Array.from(deltaStates);
+    };
+  }
+
+  /**
+   * @return The delta state of the given trace link id.
+   */
+  get getTraceDeltaType(): (id: string) => ArtifactDeltaState | undefined {
+    return (id) => {
+      if (!this.getIsDeltaViewEnabled) {
+        return undefined;
+      } else if (id in this.projectDelta.traces.added) {
+        return ArtifactDeltaState.ADDED;
+      } else if (id in this.projectDelta.traces.modified) {
+        return ArtifactDeltaState.MODIFIED;
+      } else if (id in this.projectDelta.traces.removed) {
+        return ArtifactDeltaState.REMOVED;
+      }
+    };
   }
 }

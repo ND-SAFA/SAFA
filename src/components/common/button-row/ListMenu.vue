@@ -8,6 +8,7 @@
         v-on="on"
         :disabled="disabled"
       >
+        <v-icon>mdi-chevron-down</v-icon>
         {{ buttonLabel }}
       </v-btn>
     </template>
@@ -50,7 +51,7 @@ export default Vue.extend({
     return {
       hover: true,
       hoverColor: ThemeColors.menuHighlight,
-      selectedValue: "",
+      selectedValue: this.definition.selectedItem || "",
     };
   },
   computed: {

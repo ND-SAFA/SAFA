@@ -1,28 +1,31 @@
 <template>
-  <v-container class="elevation-3">
-    <GenericCytoscapeController :cytoCoreGraph="cytoCoreGraph">
-      <template v-slot:elements>
-        <ArtifactNode
-          v-for="artifact in artifacts"
-          :key="artifact.name"
-          :artifact-definition="artifact"
-          :opacity="getArtifactOpacity(artifact.name)"
-        />
-        <GenericGraphLink
-          v-for="traceLink in traces"
-          :key="`${traceLink.source}-${traceLink.target}`"
-          :trace-definition="traceLink"
-          @right-click="onLinkRightClick"
-        />
-      </template>
-    </GenericCytoscapeController>
-    <TraceLinkApprovalModal
-      v-if="selectedLink !== undefined"
-      :is-open="isTraceModalOpen"
-      :link="selectedLink"
-      @close="onTraceModalClose"
-    />
-  </v-container>
+  <generic-cytoscape-controller :cyto-core-graph="cytoCoreGraph">
+    <template v-slot:elements>
+      <artifact-node
+        v-for="artifact in artifacts"
+        :key="artifact.id"
+        :artifact-definition="artifact"
+        :opacity="getArtifactOpacity(artifact.id)"
+      />
+      <generic-graph-link
+        v-for="traceLink in traces"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        :trace-definition="traceLink"
+        @click:right="onLinkRightClick"
+      />
+      <generic-graph-link
+        v-for="traceLink in subtreeLinks"
+        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        :trace-definition="traceLink"
+      />
+      <trace-link-approval-modal
+        v-if="selectedLink !== undefined"
+        :is-open="isTraceModalOpen"
+        :link="selectedLink"
+        @close="onTraceModalClose"
+      />
+    </template>
+  </generic-cytoscape-controller>
 </template>
 
 <script lang="ts">
@@ -32,6 +35,7 @@ import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
   artifactSelectionModule,
   projectModule,
+  subtreeModule,
   viewportModule,
 } from "@/store";
 import {
@@ -43,7 +47,7 @@ import ArtifactNode from "./ArtifactNode.vue";
 import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
-  name: "artifact-view",
+  name: "artifact-tree",
   components: {
     ArtifactNode,
     GenericGraphLink,
@@ -62,28 +66,32 @@ export default Vue.extend({
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
+      return projectModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
-      return projectModule.getArtifacts;
+      return projectModule.artifacts;
     },
     traces() {
       return projectModule.getProject.traces;
     },
+    subtreeLinks() {
+      return subtreeModule.getSubtreeLinks;
+    },
     project() {
       return projectModule.getProject;
     },
-    nodesInView(): Promise<string[]> {
+    nodesInView(): string[] {
       return viewportModule.getNodesInView;
     },
     unselectedNodeOpacity(): number {
       return artifactSelectionModule.getUnselectedNodeOpacity;
     },
+    hiddenSubtreeIds(): string[] {
+      return subtreeModule.getHiddenSubtreeIds;
+    },
   },
   mounted() {
-    this.nodesInView.then((artifactIds: string[]) => {
-      this.artifactsInView = artifactIds;
-    });
+    this.artifactsInView = this.nodesInView;
   },
   watch: {
     nodesInView(): void {
@@ -92,12 +100,12 @@ export default Vue.extend({
   },
   methods: {
     setNodesInView(): void {
-      this.nodesInView.then((artifactIds: string[]) => {
-        this.artifactsInView = artifactIds;
-      });
+      this.artifactsInView = this.nodesInView;
     },
-    getArtifactOpacity(name: string): number {
-      if (this.artifactsInView.includes(name)) {
+    getArtifactOpacity(id: string): number {
+      if (this.hiddenSubtreeIds.includes(id)) {
+        return 0;
+      } else if (this.artifactsInView.includes(id)) {
         return 1;
       } else {
         return this.unselectedNodeOpacity;
@@ -106,8 +114,8 @@ export default Vue.extend({
     onLinkRightClick(traceLink: TraceLink): void {
       this.selectedLink = {
         ...traceLink,
-        sourceBody: this.artifactHashMap[traceLink.source].body,
-        targetBody: this.artifactHashMap[traceLink.target].body,
+        sourceBody: this.artifactHashMap[traceLink.sourceId].body,
+        targetBody: this.artifactHashMap[traceLink.targetId].body,
       };
       this.isTraceModalOpen = true;
     },

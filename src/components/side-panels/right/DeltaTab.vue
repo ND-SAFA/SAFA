@@ -1,44 +1,58 @@
 <template>
   <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
-    <DeltaPanelNav />
-    <DeltaButtonGroup
+    <delta-panel-nav />
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="added"
       class="mt-10"
-      :artifacts="artifactsAdded"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsAdded[name])"
+      :names="addedArtifactNames"
+      :ids="addedArtifactIds"
+      @click="
+        (id) =>
+          selectArtifact(addedArtifacts[id].name, addedArtifacts[id], 'added')
+      "
     />
-    <DeltaButtonGroup
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
-      :artifacts="artifactsRemoved"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsRemoved[name])"
+      :names="removedArtifactNames"
+      :ids="removedArtifactIds"
+      @click="
+        (id) =>
+          selectArtifact(
+            removedArtifacts[id].name,
+            removedArtifacts[id],
+            'removed'
+          )
+      "
     />
-    <DeltaButtonGroup
+    <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
-      :artifacts="artifactsModified"
-      @onArtifactClick="(name) => selectArtifact(name, artifactsModified[name])"
+      :names="modifiedArtifactNames"
+      :ids="modifiedArtifactIds"
+      @click="
+        (id) =>
+          selectArtifact(
+            modifiedArtifacts[id].after.name,
+            modifiedArtifacts[id],
+            'modified'
+          )
+      "
     />
-    <ArtifactDeltaDiff
+    <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
       :isOpen="selectedDeltaArtifact !== undefined"
-      :artifact="selectedDeltaArtifact[1]"
       :name="selectedDeltaArtifact[0]"
-      @onClose="closeDeltaModal"
+      :input-artifact="selectedDeltaArtifact[1]"
+      :delta-type="selectedDeltaArtifact[2]"
+      @close="closeDeltaModal"
     />
   </v-expansion-panels>
 </template>
 
 <script lang="ts">
-import {
-  AddedArtifact,
-  ArtifactDelta,
-  ModifiedArtifact,
-  RemovedArtifact,
-  DeltaArtifacts,
-  Artifact,
-} from "@/types";
+import { Artifact, EntityModification, DeltaType } from "@/types";
 import Vue from "vue";
 import { deltaModule, projectModule } from "@/store";
 import {
@@ -47,8 +61,14 @@ import {
   ArtifactDeltaDiff,
 } from "./delta-tab";
 
-type OptionalDeltaArtifact = [string, ArtifactDelta] | undefined;
+type DeltaArtifact = Artifact | EntityModification<Artifact>;
+type OptionalDeltaArtifact = [string, DeltaArtifact, string] | undefined;
 
+/**
+ * Displays delta information.
+ *
+ * @emits `open` - On open.
+ */
 export default Vue.extend({
   components: { ArtifactDeltaDiff, DeltaButtonGroup, DeltaPanelNav },
   data() {
@@ -58,8 +78,12 @@ export default Vue.extend({
     };
   },
   methods: {
-    selectArtifact(name: string, artifact: ArtifactDelta): void {
-      this.selectedDeltaArtifact = [name, artifact];
+    selectArtifact(
+      name: string,
+      artifact: DeltaArtifact,
+      deltaType: DeltaType
+    ): void {
+      this.selectedDeltaArtifact = [name, artifact, deltaType];
     },
     closeDeltaModal(): void {
       this.selectedDeltaArtifact = undefined;
@@ -67,26 +91,39 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return projectModule.getArtifacts;
+      return projectModule.artifacts;
     },
-    artifactHashmap(): Record<string, Artifact> {
-      return projectModule.getArtifactHashmap;
+    addedArtifacts(): Record<string, Artifact> {
+      return deltaModule.addedArtifacts;
     },
-    artifactsAdded(): Record<string, AddedArtifact> {
-      return deltaModule.getAdded;
+    addedArtifactNames(): string[] {
+      return Object.values(this.addedArtifacts).map((a) => a.name);
     },
-    artifactsRemoved(): Record<string, RemovedArtifact> {
-      return deltaModule.getRemoved;
+    addedArtifactIds(): string[] {
+      return Object.values(this.addedArtifacts).map((a) => a.id);
     },
-    artifactsModified(): Record<string, ModifiedArtifact> {
-      return deltaModule.getModified;
+    removedArtifacts(): Record<string, Artifact> {
+      return deltaModule.removedArtifacts;
     },
-    deltaArtifacts(): DeltaArtifacts {
-      return {
-        added: this.artifactsAdded,
-        removed: this.artifactsRemoved,
-        modified: this.artifactsModified,
-      };
+    removedArtifactNames(): string[] {
+      return Object.values(this.removedArtifacts).map((a) => a.name);
+    },
+    removedArtifactIds(): string[] {
+      return Object.values(this.removedArtifacts).map((a) => a.id);
+    },
+    modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
+      return deltaModule.modifiedArtifacts;
+    },
+    modifiedArtifactNames(): string[] {
+      return Object.values(this.modifiedArtifacts).map((a) => a.after.name);
+    },
+    modifiedArtifactIds(): string[] {
+      return Object.values(this.modifiedArtifacts).map((a) => a.after.id);
+    },
+    deltaArtifacts(): string[] {
+      return this.addedArtifactNames.concat(
+        this.removedArtifactNames.concat(this.modifiedArtifactNames)
+      );
     },
     isDeltaMode(): boolean {
       return deltaModule.getIsDeltaViewEnabled;

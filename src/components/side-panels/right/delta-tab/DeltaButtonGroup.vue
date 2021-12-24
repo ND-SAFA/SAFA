@@ -1,17 +1,16 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <h3>{{ title }}</h3>
+      <h2 class="text-h6">{{ title }}</h2>
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
-      <ArtifactDeltaButton
-        v-for="(artifact, name) in artifacts"
+      <artifact-delta-button
+        v-for="(name, nameIndex) in names"
         :key="name"
-        :artifact="artifact"
         :name="name"
         :deltaType="deltaType"
-        @onClick="$emit('onArtifactClick', $event)"
+        @click="$emit('click', ids[nameIndex])"
       />
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -19,10 +18,15 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactDelta, DeltaType } from "@/types";
+import { DeltaType } from "@/types";
 import { capitalize } from "@/util";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
+/**
+ * Displays delta buttons.
+ *
+ * @emits `click` - On delta button click.
+ */
 export default Vue.extend({
   components: { ArtifactDeltaButton },
   props: {
@@ -30,26 +34,27 @@ export default Vue.extend({
       type: String as PropType<DeltaType>,
       required: true,
     },
-    artifacts: {
-      type: Object as PropType<Record<string, ArtifactDelta>>,
+    names: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    ids: {
+      type: Array as PropType<string[]>,
       required: true,
     },
   },
   data() {
     return {
       isDeltaOpen: false,
-      selectedArtifact: undefined as ArtifactDelta | undefined,
       selectedName: undefined as string | undefined,
     };
   },
   methods: {
     closeDeltaModal(): void {
-      this.selectedArtifact = undefined;
       this.selectedName = undefined;
       this.isDeltaOpen = false;
     },
     selectArtifact(artifactName: string): void {
-      this.selectedArtifact = this.artifacts[artifactName];
       this.selectedName = artifactName;
       this.isDeltaOpen = true;
     },

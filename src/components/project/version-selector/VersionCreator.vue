@@ -46,6 +46,12 @@ import {
 } from "@/api";
 import { GenericModal } from "@/components/common";
 
+/**
+ * A modal for creating new versions.
+ *
+ * @emits-1 `create` (string) - On version creation.
+ * @emits-2 `close` - On close.
+ */
 export default Vue.extend({
   components: {
     GenericModal,
@@ -100,7 +106,7 @@ export default Vue.extend({
 
         const version = await createVersion(projectId);
 
-        this.$emit("onCreate", version);
+        this.$emit("create", version);
         this.isLoading = false;
       };
 
@@ -119,7 +125,7 @@ export default Vue.extend({
       }
     },
     onClose() {
-      this.$emit("onClose");
+      this.$emit("close");
     },
   },
 

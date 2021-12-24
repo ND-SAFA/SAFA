@@ -3,6 +3,7 @@
     :value="isOpen"
     :width="`${getWidth()}px`"
     @click:outside="$emit('close')"
+    :retain-focus="false"
     persistent
   >
     <v-card :class="`modal-${size}`">
@@ -19,7 +20,9 @@
       </v-card-text>
 
       <v-divider />
+
       <v-progress-linear v-if="isLoading" indeterminate color="secondary" />
+
       <v-card-actions
         v-if="actionsHeight > 0"
         class="grey lighten-1"

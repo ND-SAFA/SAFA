@@ -9,7 +9,7 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <v-container>
-          <ProjectIdentifierInput
+          <project-identifier-input
             v-bind:name.sync="name"
             v-bind:description.sync="description"
           />
@@ -22,16 +22,16 @@
             item-name="artifact"
             :uploader="artifactUploader"
             :artifact-map="artifactMap"
-            @onChange="artifactUploader.panels = $event"
-            @onIsValid="setStepIsValid(1, true)"
-            @onIsInvalid="setStepIsValid(1, false)"
+            @change="artifactUploader.panels = $event"
+            @upload:valid="setStepIsValid(1, true)"
+            @upload:invalid="setStepIsValid(1, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <artifact-type-creator-modal
+              <artifact-type-creator
                 :is-open="isCreatorOpen"
                 :artifact-types="artifactTypes"
-                @onSubmit="onAddFile"
-                @onClose="onClose"
+                @submit="onAddFile"
+                @close="onClose"
               />
             </template>
           </generic-uploader>
@@ -45,17 +45,17 @@
             :uploader="traceUploader"
             :artifact-map="artifactMap"
             :default-valid-state="true"
-            @onChange="traceUploader.panels = $event"
-            @onIsValid="setStepIsValid(2, true)"
-            @onIsInvalid="setStepIsValid(2, false)"
+            @change="traceUploader.panels = $event"
+            @upload:valid="setStepIsValid(2, true)"
+            @upload:invalid="setStepIsValid(2, false)"
           >
             <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
               <trace-file-creator
                 :is-open="isCreatorOpen"
                 :trace-files="traceFiles"
                 :artifact-types="artifactTypes"
-                @onSubmit="onAddFile"
-                @onClose="onClose"
+                @submit="onAddFile"
+                @close="onClose"
               />
             </template>
           </generic-uploader>
@@ -69,7 +69,7 @@
               <h1 class="text-h6">Project TIM</h1>
             </v-col>
           </v-row>
-          <TimTree
+          <tim-tree
             :artifact-panels="artifactUploader.panels"
             :trace-panels="traceUploader.panels"
             :in-view="currentStep === 4"
@@ -88,9 +88,10 @@ import { appModule, projectModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./uploaders";
-import { TraceFileCreator, ArtifactTypeCreatorModal } from "./modals";
+import { TraceFileCreator, ArtifactTypeCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
+import { navigateTo, Routes } from "@/router";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -99,7 +100,7 @@ export default Vue.extend({
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
-    ArtifactTypeCreatorModal,
+    ArtifactTypeCreator,
     TraceFileCreator,
     TimTree,
   },
@@ -131,10 +132,13 @@ export default Vue.extend({
       this.traceUploader = createTraceUploader();
     },
 
-    saveProject(): void {
+    saveProject: function (): void {
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
-        .then(projectModule.setProjectCreationResponse)
+        .then(async (res) => {
+          await navigateTo(Routes.ARTIFACT_TREE);
+          await projectModule.setProjectCreationResponse(res);
+        })
         .then(() => this.clearData())
         .finally(() => {
           appModule.SET_IS_LOADING(false);
@@ -146,9 +150,9 @@ export default Vue.extend({
   },
   computed: {
     artifactMap(): Record<string, Artifact> {
-      const artifactMap: Record<string, Artifact> = {};
-      this.artifacts.forEach((a) => (artifactMap[a.name] = a));
-      return artifactMap;
+      return this.artifacts
+        .map((artifact) => ({ [artifact.name]: artifact }))
+        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
     },
     artifacts(): Artifact[] {
       let artifacts: Artifact[] = [];

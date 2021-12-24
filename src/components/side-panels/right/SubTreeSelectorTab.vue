@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="my-2">Artifact Hierarchy</h1>
+    <h1 class="text-h4 my-2">Artifact Hierarchy</h1>
     <v-col>
       <v-row>
         <v-text-field
@@ -80,7 +80,7 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      const artifacts: Artifact[] = projectModule.getArtifacts;
+      const artifacts: Artifact[] = projectModule.artifacts;
       if (this.searchText !== "") {
         return artifacts.filter((a) => a.body.includes(this.searchText));
       } else {
@@ -107,7 +107,6 @@ export default Vue.extend({
 
 <style scoped>
 .search-container {
-  height: 200; /* or any height you want */
   overflow-y: auto;
 }
 </style>

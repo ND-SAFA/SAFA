@@ -12,8 +12,8 @@
         :target-body="link.targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
-        @approve-link="onApproveLink"
-        @decline-link="onDeclineLink"
+        @link:approve="onApproveLink"
+        @link:decline="onDeclineLink"
       />
     </template>
   </generic-modal>
@@ -70,8 +70,8 @@ export default Vue.extend({
     },
   },
   methods: {
-    onApproveLink(traceLink: TraceLink): void {
-      approveLinkAPIHandler(traceLink, undefined);
+    async onApproveLink(traceLink: TraceLink): Promise<void> {
+      await approveLinkAPIHandler(traceLink, undefined);
       this.$emit("close");
     },
     onDeclineLink(traceLink: TraceLink): void {

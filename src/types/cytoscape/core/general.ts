@@ -245,11 +245,16 @@ export interface CytoEventDefinition {
 export type CytoEventHandlers = Record<string, CytoEventDefinition>;
 
 /**
+ * Defines the style properties within cytoscape
+ */
+type CytoscapeStyle = Record<string, unknown>;
+
+/**
  * Defines a cyto style sheet.
  */
 export interface CytoStyleSheet {
   selector: string;
-  style: Record<string, unknown>;
+  style: CytoscapeStyle;
 }
 
 /**
@@ -258,6 +263,7 @@ export interface CytoStyleSheet {
  */
 export interface CytoCoreElementDefinition {
   data: CytoCoreElementData;
+  style?: CytoscapeStyle;
 }
 
 /**

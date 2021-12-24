@@ -7,17 +7,17 @@
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
-    @onSubmit="onSubmit"
-    @onClose="$emit('onClose')"
+    @submit="onSubmit"
+    @close="$emit('close')"
   />
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
-import { getProjectVersion } from "@/api";
-import { appModule, projectModule } from "@/store";
+import { logModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
+import { loadVersionIfExistsHandler } from "@/api";
 
 const PROJECT_SELECTION_STEP = 1;
 const VERSION_SELECTION_STEP = 2;
@@ -25,7 +25,7 @@ const VERSION_SELECTION_STEP = 2;
 /**
  * Stepper for setting the current project and version.
  *
- * @emits `onClose` - Emitted when modal is exited or project + version set.
+ * @emits `close` - Emitted when modal is exited or project + version set.
  */
 export default Vue.extend({
   name: "baseline-version-modal",
@@ -89,20 +89,17 @@ export default Vue.extend({
     },
   },
   methods: {
-    onSubmit() {
+    async onSubmit() {
       if (this.selectedProject === undefined) {
-        appModule.onWarning("Please select a project to update.");
+        logModule.onWarning("Please select a project to update.");
       } else if (this.selectedVersion === undefined) {
-        appModule.onWarning("Please select a baseline version.");
+        logModule.onWarning("Please select a baseline version.");
       } else {
         this.isLoading = true;
 
-        getProjectVersion(this.selectedVersion.versionId)
-          .then(projectModule.setProjectCreationResponse)
-          .finally(() => {
-            this.isLoading = false;
-            this.$emit("onClose");
-          });
+        await loadVersionIfExistsHandler(this.selectedVersion.versionId);
+        this.isLoading = false;
+        this.$emit("close");
       }
     },
   },

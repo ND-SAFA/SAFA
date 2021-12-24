@@ -22,11 +22,19 @@ export interface Link {
   /**
    * The source node ID.
    */
-  source: string;
+  sourceId: string;
+  /**
+   * The source node name.
+   */
+  sourceName: string;
   /**
    * The target node ID.
    */
-  target: string;
+  targetId: string;
+  /**
+   * The target node name.
+   */
+  targetName: string;
 }
 
 /**
@@ -63,4 +71,40 @@ export interface TraceLinkDisplayData extends TraceLink {
    * The body of the target of the link.
    */
   targetBody: string;
+}
+
+/**
+ * Link used when hiding subtrees to summarize the links of the children
+ * of some root node.
+ */
+export interface SubtreeLink extends TraceLink {
+  type: "SUBTREE";
+  /**
+   * The id of the artifact.
+   */
+  rootNode: string;
+}
+
+/**
+ * The direction of trace links allowed by an artifact type.
+ */
+export interface ArtifactDirection {
+  /**
+   * The name of source the artifact type.
+   */
+  type: string;
+  /**
+   * The names of the allowed target types.
+   */
+  allowedTypes: string[];
+}
+
+/**
+ * The direction of trace links allowed by an artifact type, with a label.
+ */
+export interface LabeledArtifactDirection extends ArtifactDirection {
+  /**
+   * The label to present an artifact direction.
+   */
+  label: string;
 }

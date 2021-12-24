@@ -7,8 +7,13 @@ import {
   DeltaModule,
   ErrorModule,
   ProjectModule,
+  SessionModule,
+  SnackbarModule,
+  SubtreeModule,
   ViewportModule,
 } from "./modules";
+import CommitModule from "@/store/modules/commit.module";
+import { vuexLocal } from "@/plugins/vuex-persist";
 
 Vue.use(Vuex);
 Vue.config.devtools = true;
@@ -17,23 +22,32 @@ const store = new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
+    session: SessionModule,
     app: AppModule,
     project: ProjectModule,
     delta: DeltaModule,
     error: ErrorModule,
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,
+    commit: CommitModule,
+    subtree: SubtreeModule,
+    snackbar: SnackbarModule,
   },
+  plugins: [vuexLocal.plugin],
 });
 
+export const appModule = getModule(AppModule, store);
+export const logModule = getModule(SnackbarModule, store);
+export const sessionModule = getModule(SessionModule, store);
 export const errorModule = getModule(ErrorModule, store);
 export const projectModule = getModule(ProjectModule, store);
-export const appModule = getModule(AppModule, store);
 export const artifactSelectionModule = getModule(
   ArtifactSelectionModule,
   store
 );
 export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
+export const commitModule = getModule(CommitModule, store);
+export const subtreeModule = getModule(SubtreeModule, store);
 
 export default store;

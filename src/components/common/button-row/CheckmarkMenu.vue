@@ -1,12 +1,19 @@
 <template>
   <v-menu offset-y left :close-on-content-click="false">
-    <template v-slot:activator="{ on }">
-      <generic-icon-button
-        v-on="on"
-        color="secondary"
-        :tooltip="definition.label"
-        :icon-id="definition.icon"
-      />
+    <template v-slot:activator="{ on: menuOn }">
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-on="{ ...menuOn, ...on }"
+            v-bind="attrs"
+            color="secondary"
+            icon
+          >
+            <v-icon>{{ definition.icon }}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ definition.label }}</span>
+      </v-tooltip>
     </template>
     <v-list>
       <v-hover
@@ -14,12 +21,17 @@
         v-for="(item, itemIndex) in definition.menuItems"
         :key="item"
       >
-        <v-list-item :style="hover ? `background-color: ${hoverColor};` : ''">
+        <v-list-item
+          :style="hover ? `background-color: ${hoverColor};` : ''"
+          @click="(newState) => definition.menuHandlers[itemIndex](newState)"
+        >
           <v-checkbox
             readonly
             :label="item"
             :input-value="definition.checkmarkValues[itemIndex]"
-            @click="(newState) => definition.menuHandlers[itemIndex](newState)"
+            @click.stop="
+              (newState) => definition.menuHandlers[itemIndex](newState)
+            "
           />
         </v-list-item>
       </v-hover>

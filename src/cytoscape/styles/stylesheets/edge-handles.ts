@@ -8,6 +8,7 @@ import {
   TARGET_SELECTION_COLOR,
   TARGET_SELECTION_WIDTH,
 } from "@/cytoscape/styles/config/edge-handles";
+import { ThemeColors } from "@/util";
 
 export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
@@ -38,12 +39,16 @@ export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
       "line-style": "dotted",
       "line-dash-pattern": [6, 3],
       "line-color": LINE_GHOST_COLOR,
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "chevron",
     },
   },
   {
     selector: ".eh-preview",
     style: {
       "line-color": LINE_PREVIEW_COLOR,
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "chevron",
     },
   },
   {
@@ -56,6 +61,30 @@ export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
     selector: ".eh-ghost-edge.eh-preview-active",
     style: {
       opacity: 0,
+    },
+  },
+  {
+    selector: ".eh-delta-added",
+    style: {
+      "target-arrow-color": ThemeColors.artifactAdded,
+      "source-arrow-color": ThemeColors.artifactAdded,
+      "line-color": ThemeColors.artifactAdded,
+    },
+  },
+  {
+    selector: ".eh-delta-modified",
+    style: {
+      "target-arrow-color": ThemeColors.artifactModified,
+      "source-arrow-color": ThemeColors.artifactModified,
+      "line-color": ThemeColors.artifactModified,
+    },
+  },
+  {
+    selector: ".eh-delta-removed",
+    style: {
+      "target-arrow-color": ThemeColors.artifactRemoved,
+      "source-arrow-color": ThemeColors.artifactRemoved,
+      "line-color": ThemeColors.artifactRemoved,
     },
   },
 ];

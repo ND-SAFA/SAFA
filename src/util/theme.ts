@@ -10,6 +10,7 @@ export enum ThemeColors {
   menuHighlight = "#f0f0f0",
 
   artifactDefault = "#fafafa",
+  artifactBorder = "#888888",
   artifactAdded = "#81c784",
   artifactRemoved = "#e57373",
   artifactModified = "#64b5f6",

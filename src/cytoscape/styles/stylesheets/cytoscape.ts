@@ -1,15 +1,10 @@
 import {
-  ARTIFACT_ADDED_COLOR,
   ARTIFACT_BORDER_STYLE,
   ARTIFACT_BORDER_WIDTH,
-  ARTIFACT_BACKGROUND_COLOR,
   ARTIFACT_HEIGHT,
-  ARTIFACT_MODIFIED_COLOR,
   ARTIFACT_PADDING,
-  ARTIFACT_REMOVED_COLOR as NODE_REMOVED_COLOR,
   ARTIFACT_SHAPE,
   ARTIFACT_WIDTH,
-  ARTIFACT_SELECTED_COLOR,
   ARTIFACT_SELECTED_BORDER_WIDTH,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import {
@@ -18,9 +13,9 @@ import {
   TRACE_WIDTH,
   GENERATED_TRACE_COLOR,
 } from "@/cytoscape/styles/config/trace";
-import { ArtifactDeltaState } from "@/types/domain";
 import { CytoStyleSheet } from "@/types/cytoscape";
 import { Stylesheet } from "cytoscape";
+import { ThemeColors } from "@/util";
 
 export const GENERATED_LINK_SELECTOR = 'edge[traceType="GENERATED"]';
 export const UNREVIEWED_LINK_SELECTOR = 'edge[approvalStatus="UNREVIEWED"]';
@@ -64,38 +59,21 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     selector: "node",
     style: {
       padding: ARTIFACT_PADDING,
-      "background-color": ARTIFACT_BACKGROUND_COLOR,
+      "background-color": ThemeColors.artifactDefault,
       shape: ARTIFACT_SHAPE,
       width: ARTIFACT_WIDTH + "px",
       height: ARTIFACT_HEIGHT + "px",
       "border-style": ARTIFACT_BORDER_STYLE,
       "border-width": ARTIFACT_BORDER_WIDTH,
+      "border-color": "white",
       "text-wrap": "ellipsis",
     },
   } as CytoStyleSheet,
   {
     selector: "node[?isSelected]",
     style: {
-      "border-color": ARTIFACT_SELECTED_COLOR,
+      "border-color": ThemeColors.artifactBorder,
       "border-width": ARTIFACT_SELECTED_BORDER_WIDTH,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.ADDED}"]`,
-    style: {
-      "background-color": ARTIFACT_ADDED_COLOR,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.REMOVED}"]`,
-    style: {
-      "background-color": NODE_REMOVED_COLOR,
-    },
-  },
-  {
-    selector: `node[artifactDeltaState="${ArtifactDeltaState.MODIFIED}"]`,
-    style: {
-      "background-color": ARTIFACT_MODIFIED_COLOR,
     },
   },
   {

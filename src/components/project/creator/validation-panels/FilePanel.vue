@@ -1,11 +1,11 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <v-row dense>
-        <v-col cols="1" align-self="center">
+      <v-row dense align="center" justify="start">
+        <v-col class="flex-grow-0">
           <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
         </v-col>
-        <v-col cols="11" align-self="center">
+        <v-col>
           <slot name="title" />
         </v-col>
       </v-row>
@@ -26,7 +26,7 @@
         <v-row v-if="showFileUploader">
           <generic-file-selector
             :multiple="false"
-            @change-files="emitChangeFiles"
+            @change:files="emitChangeFiles"
           />
         </v-row>
 
@@ -47,13 +47,12 @@
           <v-expansion-panels accordion>
             <v-expansion-panel v-if="entityNames.length !== 0">
               <v-expansion-panel-header>
-                <h4>Entities</h4>
+                <span class="text-h6">Entities</span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-row>
                   <v-btn
-                    :fab="entitiesAreFab"
-                    x-small
+                    outlined
                     color="primary"
                     class="ma-1"
                     v-for="entityName in entityNames"
@@ -66,25 +65,22 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel v-if="errors.length > 0">
-              <v-expansion-panel-header>
-                <h4>
-                  <v-icon small :color="getIconColor(errorIconName)">{{
-                    errorIconName
-                  }}</v-icon
-                  >{{ errors.length === 0 ? "No Errors" : "Errors" }}
-                </h4>
+              <v-expansion-panel-header disable-icon-rotate>
+                <span class="text-h6">
+                  {{ errors.length === 0 ? "No Errors" : "Errors" }}
+                </span>
+                <template v-slot:actions>
+                  <v-icon color="error">mdi-alert-circle</v-icon>
+                </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-container>
-                  <v-row v-for="(error, i) in errors" :key="i">
-                    <v-col align-self="center" class="ma-0 pa-0">
-                      {{ i }}:
-                      <label class="text-caption" style="color: red">{{
-                        error
-                      }}</label>
-                    </v-col>
-                  </v-row>
-                </v-container>
+                <p
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  class="error--text my-0"
+                >
+                  {{ error }}
+                </p>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
@@ -95,7 +91,7 @@
         </v-row>
 
         <v-row class="mt-5" justify="end">
-          <v-btn @click="$emit('onDelete')" color="error"> Delete </v-btn>
+          <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
         </v-row>
       </v-container>
     </v-expansion-panel-content>
@@ -104,11 +100,19 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { appModule } from "@/store";
+import { logModule } from "@/store";
 import { GenericSwitch, GenericFileSelector } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
+/**
+ * Displays a file panel.
+ *
+ * @emits-1 `delete` - On delete.
+ * @emits-2 `update:ignore-errors-flag` (ignoreErrors: boolean) - On update ignore errors.
+ * @emits-3 `validate` (isValid: boolean) - On validate.
+ * @emits-4 `change` (file?: File) - On change.
+ */
 export default Vue.extend({
   name: "file-panel",
   components: {
@@ -143,6 +147,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isOpen: true,
       error: this.showFileUploader ? DEFAULT_ERROR_MESSAGE : "",
     };
   },
@@ -152,7 +157,7 @@ export default Vue.extend({
         return this.ignoreErrorsFlag;
       },
       set(ignoreErrors: boolean): void {
-        this.$emit("update:ignoreErrorsFlag", ignoreErrors);
+        this.$emit("update:ignore-errors-flag", ignoreErrors);
       },
     },
     isValid(): boolean {
@@ -171,7 +176,7 @@ export default Vue.extend({
   },
   watch: {
     isValid(): void {
-      this.$emit("onValidate", this.isValid);
+      this.$emit("validate", this.isValid);
     },
   },
   methods: {
@@ -186,21 +191,23 @@ export default Vue.extend({
       }
     },
     onClear(): void {
-      this.$emit("onChange", undefined);
+      this.$emit("change", undefined);
     },
-    emitChangeFiles(file: File): void {
+    emitChangeFiles(file: File | null): void {
       const fileIsEmpty = file === null;
+
       if (this.fileRequired) {
         this.error = fileIsEmpty ? DEFAULT_ERROR_MESSAGE : "";
       }
+
       if (fileIsEmpty) {
         this.onClear();
       } else {
-        this.$emit("onChange", file);
+        this.$emit("change", file);
       }
     },
     underDevelopmentError(): void {
-      appModule.onWarning("Viewing parsed entities is under development.");
+      logModule.onWarning("Viewing parsed entities is under development.");
     },
   },
 });

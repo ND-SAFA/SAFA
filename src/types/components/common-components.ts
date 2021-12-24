@@ -1,4 +1,4 @@
-import { Artifact } from "@/types";
+import { Artifact, EmptyLambda } from "@/types";
 import { TraceLink } from "@/types";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 
@@ -13,11 +13,6 @@ export enum ButtonType {
 }
 
 /**
- * Defines an empty handler.
- */
-type EmptyHandler = () => void;
-
-/**
  * Defines a general button definition.
  */
 export type ButtonDefinition =
@@ -26,23 +21,30 @@ export type ButtonDefinition =
   | CheckmarkMenuDefinition;
 
 /**
+ * BaseButtonDefinition
+ */
+
+export interface BaseButtonDefinition {
+  label: string;
+  isDisabled?: boolean;
+  buttonColor?: string;
+}
+
+/**
  * Defines an icon button.
  */
-export interface IconDefinition {
+export interface IconDefinition extends BaseButtonDefinition {
   type: ButtonType.ICON;
-  handler?: EmptyHandler;
-  label: string;
+  handler?: EmptyLambda;
   icon?: string;
 }
 
 /**
  * Defines an menu button.
  */
-interface MenuDefinition {
-  label: string;
+interface MenuDefinition extends BaseButtonDefinition {
   menuItems?: string[];
-  menuHandlers?: EmptyHandler[];
-  buttonColor?: string;
+  menuHandlers?: EmptyLambda[];
   buttonIsText?: boolean;
   itemColor?: string;
   showSelectedValue?: boolean;
@@ -53,7 +55,7 @@ interface MenuDefinition {
  */
 export interface ListMenuDefinition extends MenuDefinition {
   type: ButtonType.LIST_MENU;
-  isDisabled?: boolean;
+  selectedItem?: string;
 }
 
 /**
@@ -121,11 +123,11 @@ export interface TraceFile extends ProjectFile {
   /**
    * The source type of the trace file.
    */
-  source: string;
+  sourceId: string;
   /**
    * The target type of the trace file.
    */
-  target: string;
+  targetId: string;
   /**
    * If true, the trace file should be generated.
    */
@@ -134,4 +136,18 @@ export interface TraceFile extends ProjectFile {
    * A list of traces from the file.
    */
   traces: TraceLink[];
+}
+
+/**
+ * Defines a toggleable item of data.
+ */
+export interface DataItem<T> {
+  /**
+   * Whether this item is enabled.
+   */
+  value: boolean;
+  /**
+   * The item of data.
+   */
+  item: T;
 }

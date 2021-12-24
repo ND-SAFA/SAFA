@@ -6,6 +6,10 @@ import { CytoCoreElementData } from "@/types/cytoscape";
  */
 export interface Artifact {
   /**
+   * A unique UUID identifying an artifact across versions.
+   */
+  id: string;
+  /**
    * The name of the artifact.
    */
   name: string;
@@ -55,6 +59,19 @@ export interface ArtifactData extends CytoCoreElementData {
    * The opacity of this artifact.
    */
   opacity: number;
+
+  /**
+   * The number of hidden child elements.
+   */
+  hiddenChildren?: number;
+  /**
+   * The delta states of any hidden children.
+   */
+  childDeltaStates?: ArtifactDeltaState[];
+  /**
+   * Any warnings in child elements.
+   */
+  childWarnings?: ArtifactWarning[];
 }
 
 /**
@@ -79,4 +96,4 @@ export type ProjectWarnings = Record<string, ArtifactWarning[]>;
 /**
  * Returns an artifact matching the given query, if one exists.
  */
-export type ArtifactQueryFunction = (q: string) => Artifact | undefined;
+export type ArtifactQueryFunction = (q: string) => Artifact;

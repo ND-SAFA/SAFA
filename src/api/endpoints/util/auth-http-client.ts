@@ -1,6 +1,6 @@
 import { APIOptions } from "@/types";
 import { isAPIError } from "@/util";
-import { logModule, sessionModule } from "@/store";
+import { appModule, logModule, sessionModule } from "@/store";
 import { baseURL } from "./endpoints";
 
 /**
@@ -19,13 +19,6 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   setJsonContentType = true
 ): Promise<T> {
-  const isAuthorized = await sessionModule.hasAuthorization();
-
-  if (!isAuthorized) {
-    await sessionModule.logout();
-    throw Error(`${relativeUrl} aborted due to authorization failure.`);
-  }
-
   const token = sessionModule.getToken;
   const URL = `${baseURL}/${relativeUrl}`;
 
@@ -49,6 +42,13 @@ export default async function authHttpClient<T>(
   }
 
   const res = await fetch(URL, options);
+
+  if (res.status === 403) {
+    const message = "Session has timed out. Please log back in.";
+    logModule.onWarning(message);
+    await sessionModule.logout();
+    throw Error(message);
+  }
 
   if (res.status === 204) {
     // TODO: will be removed in the next PR containing the proper use of http codes.

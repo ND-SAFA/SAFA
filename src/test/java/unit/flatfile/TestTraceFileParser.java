@@ -6,30 +6,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.api.ServerError;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.EntityBaseTest;
+import unit.ApplicationBaseTest;
 
-public class TestTraceFileParser extends EntityBaseTest {
+/**
+ * Provides a smoke test for testing the TraceFileParser is able to create trace links.
+ */
+public class TestTraceFileParser extends ApplicationBaseTest {
 
-    @Autowired
-    TraceFileParser traceFileParser;
-
-    String jsonString = "{\n"
+    private final String jsonString = "{\n"
         + "    \"source\": \"Requirement\",\n"
         + "    \"target\": \"Design\",\n"
         + "    \"file\": \"Requirement2Design.csv\"\n"
         + "  }";
+    
+    @Autowired
+    TraceFileParser traceFileParser;
 
     @Test
-    public void testSourceTypeNotFound() throws IOException, ServerError {
+    public void testSourceTypeNotFound() throws IOException, SafaError {
         String sourceTypeName = "requirement";
         String targetTypeName = "design";
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
@@ -37,18 +40,18 @@ public class TestTraceFileParser extends EntityBaseTest {
         JSONObject traceMatrixDefinition = new JSONObject(jsonString);
 
         // VP - verify that source type not found
-        Exception sourceException = assertThrows(ServerError.class, () -> {
+        Exception sourceException = assertThrows(SafaError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(sourceException.getMessage()).contains("Unexpected artifact type: Requirement");
+        assertThat(sourceException.getMessage()).matches(".*unknown type.*Requirement.*[\\s\\S]");
 
         // VP - verify that source type is found but not target
         ArtifactType sourceType = new ArtifactType(project, sourceTypeName);
         this.artifactTypeRepository.save(sourceType);
-        Exception targetException = assertThrows(ServerError.class, () -> {
+        Exception targetException = assertThrows(SafaError.class, () -> {
             traceFileParser.findMatrixArtifactTypes(project, traceMatrixDefinition);
         });
-        assertThat(targetException.getMessage()).contains("Unexpected artifact type: Design");
+        assertThat(targetException.getMessage()).matches(".*unknown type.*Design.*[\\s\\S]");
 
         // VP - verify that source and target types found
         ArtifactType targetType = new ArtifactType(project, targetTypeName);

@@ -2,16 +2,19 @@ package edu.nd.crc.safa.server.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 
+/**
+ * Represents the front-end model of a project.
+ */
 public class ProjectAppEntity {
+    @NotNull
     public String projectId;
 
     @NotNull
@@ -20,13 +23,14 @@ public class ProjectAppEntity {
     @NotNull
     public String description;
 
+    @Valid
     public ProjectVersion projectVersion;
 
     @NotNull
-    public List<ArtifactAppEntity> artifacts;
+    public List<@Valid @NotNull ArtifactAppEntity> artifacts;
 
     @NotNull
-    public List<TraceApplicationEntity> traces;
+    public List<@Valid @NotNull TraceAppEntity> traces;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -35,11 +39,12 @@ public class ProjectAppEntity {
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
-                            List<TraceApplicationEntity> traces) {
+                            List<TraceAppEntity> traces) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
         this.name = project.getName();
+        this.description = project.getDescription();
         this.artifacts = artifacts;
         this.traces = traces;
     }
@@ -88,27 +93,12 @@ public class ProjectAppEntity {
         this.artifacts.add(artifact);
     }
 
-    public List<TraceApplicationEntity> getTraces() {
+    public List<TraceAppEntity> getTraces() {
         return this.traces;
     }
 
-    public void setTraces(List<TraceApplicationEntity> traces) {
+    public void setTraces(List<TraceAppEntity> traces) {
         this.traces = traces;
-    }
-
-    public List<ArtifactAppEntity> findNewArtifacts(List<Artifact> existingArtifacts) {
-        List<String> existingArtifactNames = existingArtifacts
-            .stream()
-            .map(Artifact::getName)
-            .collect(Collectors.toList());
-        List<ArtifactAppEntity> newArtifacts = new ArrayList<>();
-        for (ArtifactAppEntity potentiallyNewArtifact : artifacts) {
-            if (!existingArtifactNames.contains(potentiallyNewArtifact.getName())) {
-                // TODO: Replace with hash table if performance is bad
-                newArtifacts.add(potentiallyNewArtifact);
-            }
-        }
-        return newArtifacts;
     }
 
     public String toString() {

@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.warnings;
 
+/**
+ * The types of token expected to be found in a rule definition.
+ */
 public enum TokenType {
     LEFT_PAREN,
     RIGHT_PAREN,

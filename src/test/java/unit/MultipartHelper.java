@@ -11,6 +11,9 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Creates a test layer for sending multi-part file http requests.
+ */
 public class MultipartHelper {
 
 

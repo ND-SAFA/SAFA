@@ -27,10 +27,10 @@ public class Project implements Serializable {
     @Column(name = "project_id")
     UUID projectId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     String name;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     String description;
 
     public Project() {
@@ -43,7 +43,7 @@ public class Project implements Serializable {
 
     public static Project fromAppEntity(ProjectAppEntity appEntity) {
         Project project = new Project();
-        if (appEntity.getProjectId() != null && !appEntity.getProjectId().equals("")) {
+        if (!appEntity.getProjectId().equals("")) {
             project.projectId = UUID.fromString(appEntity.getProjectId());
         }
         project.name = appEntity.getName();
@@ -53,6 +53,10 @@ public class Project implements Serializable {
 
     public UUID getProjectId() {
         return this.projectId;
+    }
+
+    public void setProjectId(UUID projectId) {
+        this.projectId = projectId;
     }
 
     public String getName() {

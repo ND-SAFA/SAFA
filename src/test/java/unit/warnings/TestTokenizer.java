@@ -10,6 +10,9 @@ import edu.nd.crc.safa.warnings.Tokenizer;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests that a rule definitions is correctly split into tokens.
+ */
 public class TestTokenizer {
 
     @Test

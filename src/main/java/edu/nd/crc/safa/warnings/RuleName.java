@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.warnings;
 
+/**
+ * Provides rules with a name and message.
+ */
 public class RuleName {
     public String ruleName;
     public String ruleMessage;

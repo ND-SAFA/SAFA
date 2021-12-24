@@ -1,56 +1,31 @@
 package edu.nd.crc.safa.server.entities.app;
 
-import java.util.Hashtable;
-import java.util.List;
-
+/**
+ * Contains the changes for all versioned entities in a project.
+ */
 public class ProjectDelta {
-    Hashtable<String, AddedArtifact> added;
-    Hashtable<String, ModifiedArtifact> modified;
-    Hashtable<String, RemovedArtifact> removed;
-    List<ArtifactAppEntity> missingArtifacts;
+    EntityDelta<ArtifactAppEntity> artifacts;
+    EntityDelta<TraceAppEntity> traces;
 
-    public ProjectDelta() {
+    public ProjectDelta(EntityDelta<ArtifactAppEntity> artifacts,
+                        EntityDelta<TraceAppEntity> traces) {
+        this.artifacts = artifacts;
+        this.traces = traces;
     }
 
-    public ProjectDelta(Hashtable<String, AddedArtifact> added,
-                        Hashtable<String, ModifiedArtifact> modified,
-                        Hashtable<String, RemovedArtifact> removed,
-                        List<ArtifactAppEntity> missingArtifacts) {
-        this.added = added;
-        this.modified = modified;
-        this.removed = removed;
-        this.missingArtifacts = missingArtifacts;
+    public EntityDelta<ArtifactAppEntity> getArtifacts() {
+        return artifacts;
     }
 
-    public Hashtable<String, AddedArtifact> getAdded() {
-        return this.added;
+    public void setArtifacts(EntityDelta<ArtifactAppEntity> artifacts) {
+        this.artifacts = artifacts;
     }
 
-    public void setAdded(Hashtable<String, AddedArtifact> added) {
-        this.added = added;
+    public EntityDelta<TraceAppEntity> getTraces() {
+        return traces;
     }
 
-    public Hashtable<String, ModifiedArtifact> getModified() {
-        return this.modified;
-    }
-
-    public void setModified(Hashtable<String, ModifiedArtifact> modified) {
-        this.modified = modified;
-    }
-
-    public Hashtable<String, RemovedArtifact> getRemoved() {
-        return this.removed;
-    }
-
-    public void setRemoved(Hashtable<String, RemovedArtifact> removed) {
-        this.removed = removed;
-    }
-
-    public List<ArtifactAppEntity> getMissingArtifacts() {
-        return this.missingArtifacts;
-    }
-
-    public void setMissingArtifacts(List<ArtifactAppEntity> missingArtifacts) {
-        this.missingArtifacts = missingArtifacts;
+    public void setTraces(EntityDelta<TraceAppEntity> traces) {
+        this.traces = traces;
     }
 }

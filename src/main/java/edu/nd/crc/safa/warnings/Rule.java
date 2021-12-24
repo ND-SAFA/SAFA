@@ -7,6 +7,9 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.Warning;
 
+/**
+ * Defines the client-facing entity for defining a new rule that generates project warnings.
+ */
 public class Rule {
     private final RuleName mRuleName;
     public List<Token> mTokens;
@@ -124,10 +127,10 @@ public class Rule {
         String nextArgument = arguments.get(argOffset + 1).trim().toLowerCase();
         switch (nextArgument) {
             case "child":
-                function.relationship = Relationship.CHILD;
+                function.artifactRelationship = ArtifactRelationship.CHILD;
                 break;
             case "sibling":
-                function.relationship = Relationship.SIBLING;
+                function.artifactRelationship = ArtifactRelationship.SIBLING;
                 break;
             default:
         }
@@ -136,7 +139,7 @@ public class Rule {
         return Optional.of(function);
     }
 
-    public void setFunctionResult(final boolean result) {
+    public void setFunctionResult(final boolean rulePassed) {
         int start = -1;
         int end = -1;
         for (int i = 0; i < mTokens.size(); i++) {
@@ -151,7 +154,7 @@ public class Rule {
             }
         }
 
-        if (result) {
+        if (rulePassed) {
             mTokens.set(start, new Token(TokenType.TRUE, "True"));
         } else {
             mTokens.set(start, new Token(TokenType.FALSE, "False"));

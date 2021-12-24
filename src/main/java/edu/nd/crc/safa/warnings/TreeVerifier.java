@@ -7,9 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 
+/**
+ * Responsible for applying a set of rules to a set of artifacts and links between them
+ * generating warnings if the rules are not met.
+ */
 public class TreeVerifier {
 
     /**
@@ -20,13 +24,13 @@ public class TreeVerifier {
      * @param rulesToApply   - The list of rules to apply to the artifact tree
      * @return A mapping between artifact Ids and the list of rules it violated
      */
-    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactBody> artifactBodies,
+    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
                                                                 List<TraceLink> traceLinks,
                                                                 List<Rule> rulesToApply) {
         Map<String, List<RuleName>> results = new HashMap<>();
 
         artifactBodies.forEach((artifactBody) -> {
-            String artifactName = artifactBody.getName();
+
             List<RuleName> artifactWarnings = new ArrayList<>();
             for (Rule rule : rulesToApply) {
                 rule = new Rule(rule);
@@ -52,7 +56,8 @@ public class TreeVerifier {
                 }
             }
             if (!artifactWarnings.isEmpty()) {
-                results.put(artifactName, artifactWarnings);
+                String artifactId = artifactBody.getArtifact().getArtifactId().toString();
+                results.put(artifactId, artifactWarnings);
             }
         });
 
@@ -62,7 +67,7 @@ public class TreeVerifier {
     private boolean isRuleSatisfied(final Function ruleToApply,
                                     Artifact targetArtifact,
                                     final List<TraceLink> traceLinks) {
-        switch (ruleToApply.relationship) {
+        switch (ruleToApply.artifactRelationship) {
             case BIDIRECTIONAL_LINK:
                 return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
             case CHILD:
@@ -108,7 +113,6 @@ public class TreeVerifier {
     public boolean satisfiesChildCountRule(final Function childCountRule,
                                            final String targetArtifact,
                                            final List<TraceLink> traceLinks) {
-
         long childCount = traceLinks
             .stream()
             // Get all traceLinks where we are the source
@@ -126,23 +130,19 @@ public class TreeVerifier {
     public boolean handleSiblingFunction(final Function r,
                                          final String artifactName,
                                          final List<TraceLink> traceLinks) {
-        Integer childCount = traceLinks
+        Long siblingCountAsTarget = traceLinks
             .stream()
             .filter(t -> t.getTargetName().equals(artifactName)) // Get traceLinks that finish with this node
-            .map(TraceLink::getSourceName) // Convert to parent id
-            .map(parentName ->
-                traceLinks
-                    .stream()
-                    // Get all traceLinks where we are the source
-                    .filter(link -> link.getSourceName().equals(parentName))
-                    // Get all traceLinks where the target matches the required target type
-                    .filter(link -> link.getTargetType().getName().equalsIgnoreCase(r.sourceArtifactType))
-                    .count()
-            )
-            .map(Long::intValue)
-            .reduce(0, Integer::sum);
+            .filter(t -> t.getSourceType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            .count();
+        Long siblingCountAsSource = traceLinks
+            .stream()
+            .filter(t -> t.getSourceName().equals(artifactName)) // Get traceLinks that finish with this node
+            .filter(t -> t.getTargetType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            .count();
+        long siblingCount = siblingCountAsTarget + siblingCountAsSource;
 
-        return matchesRuleCount(r, childCount);
+        return matchesRuleCount(r, siblingCount);
     }
 
     private boolean matchesRuleCount(Function r, long childCount) {

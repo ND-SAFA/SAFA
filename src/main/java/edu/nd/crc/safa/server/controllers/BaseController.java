@@ -1,13 +1,10 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -25,19 +22,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public abstract class BaseController {
 
-    protected ProjectVersionRepository projectVersionRepository;
-    protected ProjectRepository projectRepository;
+    protected final ProjectVersionRepository projectVersionRepository;
+    protected final ProjectRepository projectRepository;
+    protected final ResourceBuilder resourceBuilder;
 
     @Autowired
     public BaseController(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository) {
+                          ProjectVersionRepository projectVersionRepository,
+                          ResourceBuilder resourceBuilder) {
         this.projectVersionRepository = projectVersionRepository;
         this.projectRepository = projectRepository;
+        this.resourceBuilder = resourceBuilder;
     }
 
-    @ExceptionHandler(ServerError.class)
+    @ExceptionHandler(SafaError.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleServerError(ServerError exception) {
+    public ServerResponse handleServerError(SafaError exception) {
         exception.printError();
         return new ServerResponse(exception, ResponseCodes.FAILURE);
     }
@@ -50,7 +50,7 @@ public abstract class BaseController {
         for (ObjectError error : bindingResult.getAllErrors()) {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
-        ServerError error = new ServerError(errorMessage.toString());
+        SafaError error = new SafaError(errorMessage.toString());
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }
@@ -59,9 +59,8 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         exception.printStackTrace();
-        String causeName = exception.getMostSpecificCause().toString();
-        String errorMessage = String.format("Data integrity violation: %s", causeName);
-        ServerError error = new ServerError(errorMessage, exception);
+        String errorMessage = AppConstraints.getConstraintError(exception);
+        SafaError error = new SafaError(errorMessage, exception);
         error.setDetails(exception.getMessage());
         return new ServerResponse(error, ResponseCodes.FAILURE);
     }
@@ -70,16 +69,8 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ServerResponse handleGenericError(Exception ex) {
         ex.printStackTrace();
-        ServerError wrapper = new ServerError("An unexpected server error occurred.", ex);
+        SafaError wrapper = new SafaError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
-    }
-
-    protected Project getProject(String projectId) throws ServerError {
-        Optional<Project> queriedProject = this.projectRepository.findById(UUID.fromString(projectId));
-        if (queriedProject.isEmpty()) {
-            throw new ServerError("Could not find project with id:" + projectId);
-        }
-        return queriedProject.get();
     }
 
     private String createValidationMessage(ObjectError error) {
@@ -91,17 +82,5 @@ public abstract class BaseController {
         } else {
             return objectName + message;
         }
-    }
-
-    protected Project createProjectIdentifier(String name, String description) {
-        Project project = new Project(name, description); // TODO: extract name from TIM file
-        this.projectRepository.save(project);
-        return project;
-    }
-
-    protected ProjectVersion createProjectVersion(Project project) {
-        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
-        this.projectVersionRepository.save(projectVersion);
-        return projectVersion;
     }
 }

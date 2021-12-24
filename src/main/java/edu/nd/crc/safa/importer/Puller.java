@@ -16,13 +16,9 @@ import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.services.ArtifactVersionService;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import com.jsoniter.output.JsonStream;
@@ -41,6 +37,10 @@ public class Puller {
     private final Pattern mCommitApplies = Pattern.compile(".*(UAV-\\d+).*");
     private final Pattern mPackagePattern = Pattern.compile(".*src/(.*)/(.*\\.java)");
     private final Set<String> foundNodes = new HashSet<String>();
+    private final JIRA mJira;
+    private final EntityVersionService entityVersionService;
+    private final TraceLinkService traceLinkService;
+
     @Value("${git.username:}")
     String gitUsername;
     @Value("${git.password:}")
@@ -51,78 +51,62 @@ public class Puller {
     String gitBranch;
     @Value("${tim.requiredTraceScore:}")
     Double traceRequiredScore;
-    JIRA mJira;
-
-    ProjectRepository projectRepository;
-    ArtifactTypeRepository artifactTypeRepository;
-    ArtifactRepository artifactRepository;
-    ArtifactBodyRepository artifactBodyRepository;
-
-    ArtifactVersionService artifactVersionService;
-    TraceLinkService traceLinkService;
 
     @Autowired
     public Puller(JIRA jira,
-                  ProjectRepository projectRepository,
-                  ArtifactTypeRepository artifactTypeRepository,
-                  ArtifactRepository artifactRepository,
-                  ArtifactBodyRepository artifactBodyRepository,
-                  ArtifactVersionService artifactVersionService,
+                  EntityVersionService entityVersionService,
                   TraceLinkService traceLinkService) {
         this.mJira = jira;
-        this.projectRepository = projectRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.artifactRepository = artifactRepository;
-        this.artifactBodyRepository = artifactBodyRepository;
-        this.artifactVersionService = artifactVersionService;
+        this.entityVersionService = entityVersionService;
         this.traceLinkService = traceLinkService;
     }
 
-    public void parseJIRAIssues(ProjectVersion projectVersion) {
-        try {
-            String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
-                "Acceptance Test", "Environmental Assumption", "Simulation"
-            };
+    public void parseJIRAIssues(ProjectVersion projectVersion) throws Exception {
+        String[] types = new String[]{"Requirement", "Hazard", "Sub-task", "Design Definition", "Context",
+            "Acceptance Test", "Environmental Assumption", "Simulation"
+        };
 
-            Project project = projectVersion.getProject();
+        // Loop over issues returned from JIRA and add the found nodes and links
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        List<TraceAppEntity> traces = new ArrayList<>();
+        for (Issue issue : mJira.getIssues(types)) {
+            String issueContent = getIssueContent(issue); // TODO: Revisit what goes into content.
+            foundNodes.add(issue.key);
 
-            // Loop over issues returned from JIRA and add the found nodes and links
-            List<ArtifactAppEntity> artifactsToUpdate = new ArrayList<>();
-            for (Issue issue : mJira.getIssues(types)) {
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("source", issue.source);
-                data.put("isDelegated", issue.isDelegated);
-                data.put("status", issue.status);
-                data.put("name", issue.name);
-                data.put("href", issue.href);
-                data.put("description", issue.description);
-                data.put("type", issue.type);
+            String artifactName = issue.key;
+            String typeName = issue.key;
 
-                foundNodes.add(issue.key);
+            artifacts.add(new ArtifactAppEntity(null, typeName, artifactName, "", issueContent));
 
-                String artifactName = issue.key;
-                String typeName = issue.key;
-                String artifactContent = JsonStream.serialize(data);
-
-                artifactsToUpdate.add(new ArtifactAppEntity(typeName, artifactName, "", artifactContent));
-
-                // Check that the link is only an inward link to this node
-                if (issue.links.size() > 0) {
-                    issue.links.stream().filter((link) -> Arrays
-                            .stream(types)
-                            .anyMatch((type) -> link
-                                .InwardType
-                                .equals(type)))
-                        .forEach((link) -> traceLinkService.createTrace(projectVersion,
-                            issue.key,
-                            // TODO: Add link.Type
-                            link.InwardKey));
-                }
+            // Check that the link is only an inward link to this node
+            if (issue.links.size() > 0) {
+                issue.links.stream().filter((link) -> Arrays
+                        .stream(types)
+                        .anyMatch((type) -> link
+                            .InwardType
+                            .equals(type)))
+                    .forEach((link) -> {
+                        String source = issue.key;
+                        String target = link.InwardKey;
+                        TraceAppEntity trace = new TraceAppEntity(source, target);
+                        traces.add(trace);
+                    });
             }
-            artifactVersionService.setArtifactsAtVersion(projectVersion, artifactsToUpdate);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
+        entityVersionService.commitVersionTraces(projectVersion, traces);
+    }
+
+    private String getIssueContent(Issue issue) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("source", issue.source);
+        data.put("isDelegated", issue.isDelegated);
+        data.put("status", issue.status);
+        data.put("name", issue.name);
+        data.put("href", issue.href);
+        data.put("description", issue.description);
+        data.put("type", issue.type);
+        return JsonStream.serialize(data);
     }
 
     /**
@@ -198,7 +182,6 @@ public class Puller {
                                     // Only add it one time as the commits are newest to oldest
                                     if (!seenFiles.contains(entry.getNewPath())) {
                                         if (foundNodes.stream().anyMatch(id::equals)) {
-                                            //TODO: mNeo4JService.addSource(m.group(2), rev.name(), pkg, id);
                                             throw new RuntimeException("Adding source in puller has not been restored");
                                         }
                                         commitFiles.add(entry.getNewPath());

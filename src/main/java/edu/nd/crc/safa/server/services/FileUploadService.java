@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
@@ -26,9 +26,9 @@ public class FileUploadService {
      *
      * @param project      The project whose files are related to.
      * @param requestFiles The files being stored on the server.
-     * @throws ServerError Throws error if error occurs while creating necessary directory structure or writing to disk.
+     * @throws SafaError Throws error if error occurs while creating necessary directory structure or writing to disk.
      */
-    public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws ServerError {
+    public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError {
         String pathToStorage = ProjectPaths.getPathToStorage(project);
         OSHelper.clearOrCreateDirectory(pathToStorage);
 
@@ -44,7 +44,7 @@ public class FileUploadService {
 
             } catch (IOException e) {
                 String error = String.format("Could not upload file: %s", requestFile.getOriginalFilename());
-                throw new ServerError(error, e);
+                throw new SafaError(error, e);
             }
         }
     }

@@ -14,13 +14,13 @@ public class ProjectPaths {
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
     public static final String PATH_TO_BUILD = PATH_TO_ROOT + "/build";
     public static final String PATH_TO_STORAGE = PATH_TO_BUILD + "/storage";
-    public static final String PATH_TO_BEFORE_FILES = PATH_TO_ROOT + "/resources/before";
-    public static final String PATH_TO_AFTER_FILES = PATH_TO_ROOT + "/resources/after";
-    public static final String PATH_TO_ARTIFACT_FILES = PATH_TO_ROOT + "/resources/artifactFiles";
-    public static final String PATH_TO_TRACE_FILES = PATH_TO_ROOT + "/resources/traceFiles";
-    public static final String PATH_TO_TEST_1 = PATH_TO_ROOT + "/resources/test1";
-    public static final String PATH_TO_TEST_2 = PATH_TO_ROOT + "/resources/test2";
-    public static final String PATH_TO_TEST_3 = PATH_TO_ROOT + "/resources/test3";
+    public static final String PATH_TO_RESOURCES = PATH_TO_ROOT + "/resources";
+    public static final String PATH_TO_TEST_RESOURCES = PATH_TO_RESOURCES + "/tests";
+    public static final String PATH_TO_BEFORE_FILES = PATH_TO_TEST_RESOURCES + "/before";
+    public static final String PATH_TO_MINI_FILES = PATH_TO_TEST_RESOURCES + "/mini";
+    public static final String PATH_TO_AFTER_FILES = PATH_TO_TEST_RESOURCES + "/after";
+    public static final String PATH_TO_TEST_2 = PATH_TO_TEST_RESOURCES + "/test2";
+    public static final String PATH_TO_TEST_3 = PATH_TO_TEST_RESOURCES + "/test3";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();

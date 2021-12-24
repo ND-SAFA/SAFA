@@ -1,27 +1,29 @@
 package unit;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.AppBuilder;
-import edu.nd.crc.safa.builders.EntityBuilder;
+import edu.nd.crc.safa.builders.AppEntityBuilder;
+import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
-import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ServerError;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactBodyRepository;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ParserErrorRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.multipart.MultipartFile;
 
-public class EntityBaseTest extends SpringBootBaseTest {
+/**
+ * Provides layer of access to entities in database.
+ */
+public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected ProjectRepository projectRepository;
@@ -49,90 +52,75 @@ public class EntityBaseTest extends SpringBootBaseTest {
     protected ArtifactRepository artifactRepository;
 
     @Autowired
-    protected ArtifactBodyRepository artifactBodyRepository;
+    protected ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     protected TraceLinkRepository traceLinkRepository;
 
     @Autowired
+    protected TraceLinkVersionRepository traceLinkVersionRepository;
+
+    @Autowired
     protected FileUploadService fileUploadService;
 
     @Autowired
-    protected ParserErrorRepository parserErrorRepository;
+    protected CommitErrorRepository commitErrorRepository;
+
+    @Autowired
+    protected SafaUserRepository safaUserRepository;
+
+    @Autowired
+    protected ProjectMembershipRepository projectMembershipRepository;
 
     @Autowired
     protected ProjectService projectService;
 
     @Autowired
-    protected EntityBuilder entityBuilder;
+    protected SafaUserService safaUserService;
 
     @Autowired
-    protected AppBuilder appBuilder;
+    protected DbEntityBuilder dbEntityBuilder;
+
+    @Autowired
+    protected AppEntityBuilder appBuilder;
 
     @Autowired
     protected JsonBuilder jsonBuilder;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @BeforeEach
-    public void createData() {
-        entityBuilder.createEmptyData();
+    public void createNewBuilders() {
+        dbEntityBuilder.createEmptyData();
         appBuilder.createEmptyData();
+        jsonBuilder.createEmptyData();
     }
 
-    public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
-                                         String pathToFileDir) throws Exception {
-        String beforeRouteName = String.format("/projects/versions/%s/flat-files",
-            projectVersion.getVersionId().toString());
-        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(beforeRouteName,
-            pathToFileDir);
-        sendRequest(beforeRequest, MockMvcResultMatchers.status().isCreated());
+    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request, JSONObject body) {
+        return request
+            .content(body.toString())
+            .contentType(MediaType.APPLICATION_JSON);
     }
 
-    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws ServerError, IOException {
-        ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
-        Project project = projectVersion.getProject();
-        List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
-            ProjectPaths.PATH_TO_BEFORE_FILES,
-            "files");
-        fileUploadService.uploadFilesToServer(project, files);
-        return projectVersion;
-    }
 
-    public ProjectVersion createProjectWithNewVersion(String projectName) {
-        return entityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .getProjectVersion(projectName, 0);
-    }
-
-    public void sendPut(String routeName, JSONObject body, ResultMatcher test) throws Exception {
-        sendRequest(put(routeName)
-                .content(body.toString())
-                .contentType(MediaType.APPLICATION_JSON),
-            test);
-    }
-
-    public JSONObject sendPost(String routeName, JSONObject body, ResultMatcher test) throws Exception {
-        return sendRequest(post(routeName)
-                .content(body.toString())
-                .contentType(MediaType.APPLICATION_JSON),
-            test);
-    }
-
-    public JSONObject sendGet(String routeName, ResultMatcher test) throws Exception {
-        return sendRequest(get(routeName), test);
-    }
-
-    public JSONObject sendDelete(String routeName, ResultMatcher test) throws Exception {
-        return sendRequest(delete(routeName), test);
+    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
+                                  ResultMatcher test,
+                                  String authorizationToken
+    ) throws Exception {
+        MockHttpServletRequestBuilder authorizedRequest = request.header("Authorization", authorizationToken);
+        return sendRequest(authorizedRequest, test);
     }
 
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
                                   ResultMatcher test) throws Exception {
+
         MvcResult response = mockMvc
             .perform(request)
             .andExpect(test)
             .andReturn();
-        return TestUtil.asJson(response);
+
+        return TestUtil.apiResponseAsJson(response);
     }
 
     public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)
@@ -159,5 +147,10 @@ public class EntityBaseTest extends SpringBootBaseTest {
         request.file(file);
 
         return request;
+    }
+
+    public JSONObject toJson(Object object) throws JsonProcessingException {
+        String objectJsonString = objectMapper.writeValueAsString(object);
+        return new JSONObject(objectJsonString);
     }
 }

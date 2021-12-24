@@ -1,13 +1,18 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ServerError;
+import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -16,7 +21,6 @@ import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +29,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
+/**
+ * Provides endpoints for creating and updating project entities via JSON.
+ */
 @RestController
 public class ProjectController extends BaseController {
 
@@ -34,8 +40,9 @@ public class ProjectController extends BaseController {
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
+                             ResourceBuilder resourceBuilder,
                              ProjectService projectService) {
-        super(projectRepository, projectVersionRepository);
+        super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
     }
 
@@ -45,20 +52,21 @@ public class ProjectController extends BaseController {
      *
      * @param project The project entity containing artifacts, traces, name, and decriptions.
      * @return The project and associated entities created.
-     * @throws ServerError Throws error if a database violation occurred while creating or updating any entities in
-     *                     payload.
+     * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
+     *                   payload.
      */
-    @PostMapping("projects")
+    @PostMapping(AppRoutes.Projects.projects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@Valid @RequestBody ProjectAppEntity project) throws ServerError {
-        Project payloadProject = Project.fromAppEntity(project); // gets
+    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
+        Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
         ProjectEntities response;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            response = createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
+            response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
         } else {
-            response = updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
+            this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
+            response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
         return new ServerResponse(response);
@@ -69,9 +77,10 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping("projects")
+    @GetMapping(AppRoutes.Projects.projects)
     public ServerResponse getProjects() {
-        return new ServerResponse(this.projectRepository.findAll());
+        List<Project> userProjects = projectService.getCurrentUserProjects();
+        return new ServerResponse(userProjects);
     }
 
     /**
@@ -79,58 +88,58 @@ public class ProjectController extends BaseController {
      *
      * @param projectId UUID of project to delete.
      * @return String with success message.
-     * @throws ServerError Throws error if project with associated id is not found.
+     * @throws SafaError Throws error if project with associated id is not found.
      */
-    @DeleteMapping("projects/{projectId}")
+    @DeleteMapping(AppRoutes.Projects.projectById)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteProject(@PathVariable String projectId) throws ServerError {
-        Optional<Project> projectQuery = this.projectRepository.findById(UUID.fromString(projectId));
-        if (projectQuery.isPresent()) {
-            this.projectRepository.delete(projectQuery.get());
-            return new ServerResponse("Project deleted successfully");
-        } else {
-            throw new ServerError("Could not find project with id" + projectId);
-        }
+    public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        this.projectRepository.delete(project);
+        return new ServerResponse("Project deleted successfully");
     }
 
-    private ProjectEntities updateProjectAtVersion(Project project,
-                                                   ProjectVersion projectVersion,
-                                                   ProjectAppEntity payload) throws ServerError {
-        ProjectEntities response;
-        this.projectRepository.save(project);
-        //TODO: Update traces
-        if (projectVersion == null) {
-            if ((payload.artifacts != null
-                && payload.artifacts.size() > 0)) {
-                throw new ServerError("Cannot update artifacts because project version not defined");
-            }
-            response = new ProjectEntities(payload, null, null, null);
-        } else if (!projectVersion.hasValidId()) {
-            throw new ServerError("Invalid Project version: must have a valid ID.");
-        } else if (!projectVersion.hasValidVersion()) {
-            throw new ServerError("Invalid Project version: must contain positive major, minor, and revision "
-                + "numbers.");
-        } else {
-            projectVersion.setProject(project);
-            this.projectVersionRepository.save(projectVersion);
-            response = this.projectService.updateProject(projectVersion, payload);
-        }
-        return response;
+    /**
+     * Adds specified user account with given email to project assigned with
+     * given role.
+     *
+     * @param projectId The UUID of the project which the member is being added to.
+     * @param request   The request containing project, member to add, and their given role.
+     */
+    @PostMapping(AppRoutes.Projects.addProjectMember)
+    public void addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                             @RequestBody ProjectMembershipRequest request)
+        throws SafaError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        this.projectService.addOrUpdateProjectMembership(project,
+            request.getMemberEmail(),
+            request.getProjectRole());
     }
 
-    private ProjectEntities createNewProjectWithVersion(
-        Project project,
-        ProjectVersion projectVersion,
-        ProjectAppEntity payload) throws ServerError {
-        ProjectEntities response;
-        if (projectVersion != null
-            && projectVersion.hasValidVersion()
-            && projectVersion.hasValidId()) {
-            throw new ServerError("Invalid ProjectVersion: cannot be defined when creating a new project.");
-        }
-        project = createProjectIdentifier(project.getName(), project.getDescription());
-        projectVersion = createProjectVersion(project);
-        response = this.projectService.saveProjectAppEntity(projectVersion, payload);
-        return response;
+    /**
+     * Returns all members belonging to given project.
+     *
+     * @param projectId The project whose members are being retrieved.
+     * @return ServerResponse containing list of project members ships
+     */
+    @GetMapping(AppRoutes.Projects.getProjectMembers)
+    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
+            .stream()
+            .map(ProjectMemberAppEntity::new)
+            .collect(Collectors.toList());
+        return new ServerResponse(projectMemberships);
+    }
+
+    /**
+     * Deletes project membership effectively removing user from
+     * associated project
+     *
+     * @param projectMembershipId ID of the membership linking user and project.
+     */
+    @DeleteMapping(AppRoutes.Projects.deleteProjectMembership)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
+        this.projectService.deleteProjectMemberById(projectMembershipId);
     }
 }

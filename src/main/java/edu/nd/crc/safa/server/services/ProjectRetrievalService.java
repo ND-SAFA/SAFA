@@ -5,15 +5,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ProjectErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceApplicationEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactBody;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +26,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectRetrievalService {
 
-    TraceLinkRepository traceLinkRepository;
-    ArtifactVersionService artifactVersionService;
-    ParserErrorService parserErrorService;
-    WarningService warningService;
+    private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
+    private final CommitErrorRetrievalService commitErrorRetrievalService;
+    private final WarningService warningService;
 
     @Autowired
-    public ProjectRetrievalService(TraceLinkRepository traceLinkRepository,
-                                   ParserErrorService parserErrorService,
-                                   ArtifactVersionService artifactVersionService,
+    public ProjectRetrievalService(TraceLinkVersionRepository traceLinkVersionRepository,
+                                   CommitErrorRetrievalService commitErrorRetrievalService,
+                                   ArtifactVersionRepository artifactVersionRepository,
                                    WarningService warningService) {
-        this.traceLinkRepository = traceLinkRepository;
-        this.parserErrorService = parserErrorService;
-        this.artifactVersionService = artifactVersionService;
+        this.traceLinkVersionRepository = traceLinkVersionRepository;
+        this.commitErrorRetrievalService = commitErrorRetrievalService;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.warningService = warningService;
     }
 
@@ -50,10 +49,11 @@ public class ProjectRetrievalService {
      * @return ProjectCreationResponse containing all relevant project entities
      */
     public ProjectEntities retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
-        ProjectAppEntity projectAppEntity = createApplicationEntity(projectVersion);
-        ProjectErrors projectErrors = this.parserErrorService.collectionProjectErrors(projectVersion);
+        ProjectAppEntity projectAppEntity = this.retrieveApplicationEntity(projectVersion);
+        ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
+            .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectErrors, projectWarnings);
+        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
     }
 
     /**
@@ -62,22 +62,24 @@ public class ProjectRetrievalService {
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity createApplicationEntity(ProjectVersion projectVersion) {
-        Project project = projectVersion.getProject();
-        List<ArtifactBody> artifactBodies = artifactVersionService
-            .getArtifactBodiesAtVersion(projectVersion);
+    public ProjectAppEntity retrieveApplicationEntity(ProjectVersion projectVersion) {
+        List<ArtifactVersion> artifactBodies = artifactVersionRepository
+            .getEntityVersionsInProjectVersion(projectVersion);
 
         List<ArtifactAppEntity> artifacts =
             artifactBodies
                 .stream()
                 .map(ArtifactAppEntity::new)
                 .collect(Collectors.toList());
-        List<TraceLink> traceLinks = this.traceLinkRepository
-            .getUnDeclinedLinks(project);
-        List<TraceApplicationEntity> traces =
-            traceLinks
+        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
+
+        List<TraceAppEntity> traces =
+            this.traceLinkVersionRepository
+                .getEntityVersionsInProjectVersion(projectVersion)
                 .stream()
-                .map(TraceApplicationEntity::new)
+                .map(TraceAppEntity::new)
+                .filter(t -> artifactIds.contains(t.sourceId)
+                    && artifactIds.contains(t.targetId))
                 .collect(Collectors.toList());
         return new ProjectAppEntity(projectVersion, artifacts, traces);
     }

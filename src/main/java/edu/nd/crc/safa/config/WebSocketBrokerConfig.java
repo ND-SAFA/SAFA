@@ -10,6 +10,12 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
+/**
+ * Configures the general WebSocket configurations including:
+ * - endpoint for initial connects to websockets
+ * - setting message size
+ * - setting the topic and individual message endpoints.
+ */
 @Configuration
 @EnableWebSocket
 @EnableWebSocketMessageBroker
@@ -21,7 +27,6 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.setMessageSizeLimit(messageSizeLimit); // default : 64 * 1024
-        //registration.setSendTimeLimit(10 * 10000); // default : 10 * 10000
         registration.setSendBufferSizeLimit(messageSizeLimit); // default : 512 * 1024
     }
 

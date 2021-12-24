@@ -4,6 +4,9 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 
+/**
+ * Container for a request to generate trace links between artifacts.
+ */
 public class TraceLinkGenerationRequest {
 
     List<ArtifactAppEntity> sourceArtifacts;

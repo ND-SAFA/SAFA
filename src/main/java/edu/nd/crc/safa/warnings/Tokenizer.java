@@ -3,6 +3,9 @@ package edu.nd.crc.safa.warnings;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The modules that parses a rule definition into a list of tokens.
+ */
 public class Tokenizer {
 
     public static List<Token> lex(String input) {

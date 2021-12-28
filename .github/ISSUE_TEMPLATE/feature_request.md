@@ -1,19 +1,20 @@
-# Feature Request Summary
-*Describe what new functionality is being proposed.
-If proposing changing an existing functionality, 
-please describe why this change is better.*
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
 
-**[Notion Issue]()** <br>
+---
 
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-[TODO]
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
 
-## Affected Features
-- [FEATURE 1]
-- [FEATURE 2]
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
 
-## Acceptance Criteria
-*List the characteristics of new functionality*
-
-- [ ] [CHARACTERISTIC 1]
-- [ ] [CHARACTERISTIC 2]
+**Additional context**
+Add any other context or screenshots about the feature request here.

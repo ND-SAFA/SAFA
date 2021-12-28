@@ -57,7 +57,7 @@ export default Vue.extend({
   methods: {
     getTraceId(tracePanel: TracePanel): string {
       const traceFile = tracePanel.projectFile;
-      return `${traceFile.source}-${traceFile.target}`;
+      return `${traceFile.sourceId}-${traceFile.targetId}`;
     },
   },
   computed: {

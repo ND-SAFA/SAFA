@@ -77,7 +77,9 @@ export default Vue.extend({
   },
   computed: {
     targetTypes(): string[] {
-      const traceIds = this.traceFiles.map((f) => `${f.source}-${f.target}`);
+      const traceIds = this.traceFiles.map(
+        (f) => `${f.sourceId}-${f.targetId}`
+      );
       if (this.source === "") {
         return [];
       } else {

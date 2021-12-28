@@ -123,11 +123,11 @@ export interface TraceFile extends ProjectFile {
   /**
    * The source type of the trace file.
    */
-  source: string;
+  sourceId: string;
   /**
    * The target type of the trace file.
    */
-  target: string;
+  targetId: string;
   /**
    * If true, the trace file should be generated.
    */

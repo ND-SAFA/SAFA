@@ -48,8 +48,8 @@ function generateTraceLinks(
   artifactMap: ArtifactMap,
   tracePanel: TracePanel
 ): Promise<void> {
-  const sourceType = tracePanel.projectFile.source;
-  const targetType = tracePanel.projectFile.target;
+  const sourceType = tracePanel.projectFile.sourceId;
+  const targetType = tracePanel.projectFile.targetId;
   const artifacts: Artifact[] = Object.values(artifactMap);
   const sourceArtifacts: Artifact[] = artifacts.filter(
     (a) => a.type === sourceType
@@ -66,8 +66,8 @@ function generateTraceLinks(
 
 function createTraceFile(traceLink: Link): TraceFile {
   return {
-    source: traceLink.sourceId,
-    target: traceLink.targetId,
+    sourceId: traceLink.sourceId,
+    targetId: traceLink.targetId,
     isGenerated: DEFAULT_IS_GENERATED,
     isValid: false,
     errors: [],
@@ -136,12 +136,12 @@ function getTraceError(
     const sourceArtifact = artifactMap[sourceName];
     const targetArtifact = artifactMap[targetName];
 
-    if (sourceArtifact.type !== traceFile.source) {
-      return `${sourceArtifact.name} is not of type ${traceFile.source}.`;
+    if (sourceArtifact.type !== traceFile.sourceId) {
+      return `${sourceArtifact.name} is not of type ${traceFile.sourceId}.`;
     }
 
-    if (targetArtifact.type !== traceFile.target) {
-      return `${targetArtifact.name} is not of type ${traceFile.target}.`;
+    if (targetArtifact.type !== traceFile.targetId) {
+      return `${targetArtifact.name} is not of type ${traceFile.targetId}.`;
     }
   }
 }

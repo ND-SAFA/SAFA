@@ -3,6 +3,7 @@
     <v-flex>
       <app-bar-header />
       <v-divider class="blue-grey" v-if="doShowGraphButtons" />
+      <loading-bar v-if="!doShowGraphButtons" :isLoading="isLoading" />
     </v-flex>
 
     <template v-slot:extension v-if="doShowGraphButtons">
@@ -33,15 +34,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-progress-linear
-            rounded
-            height="5"
-            v-show="isLoading"
-            indeterminate
-            absolute
-            bottom
-            color="secondary"
-          />
+          <loading-bar :isLoading="isLoading" />
         </v-row>
       </v-container>
     </template>
@@ -52,15 +45,17 @@
 import Vue from "vue";
 import { appModule } from "@/store";
 import { GenericIconButton } from "@/components/common";
+import { router, Routes } from "@/router";
 import AppBarHeader from "./AppBarHeader.vue";
 import GraphNavIcons from "./GraphNavIcons.vue";
-import { router, Routes } from "@/router";
+import LoadingBar from "./LoadingBar.vue";
 
 export default Vue.extend({
   components: {
     GraphNavIcons,
     AppBarHeader,
     GenericIconButton,
+    LoadingBar,
   },
   props: {
     isLeftOpen: Boolean,

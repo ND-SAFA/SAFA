@@ -1,4 +1,13 @@
-# Bug Summary
+---
+name: Bug Fix
+about: Describes how a bug is being fixed.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+**Bug Summary**
 
 **[Notion Issue]()** <br>
 
@@ -17,7 +26,7 @@
 
 [TODO]
 
-# Test Case
+**Test Case** <br>
 *Please describe how this fix was tested.*
 - [ ] [STEP 1]
 - [ ] [STEP 2]

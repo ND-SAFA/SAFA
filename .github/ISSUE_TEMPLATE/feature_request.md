@@ -1,6 +1,15 @@
-# Feature Request Summary
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+**Feature Request Summary** <br>
 *Describe what new functionality is being proposed.
-If proposing changing an existing functionality, 
+If proposing changing an existing functionality,
 please describe why this change is better.*
 
 **[Notion Issue]()** <br>
@@ -8,11 +17,11 @@ please describe why this change is better.*
 
 [TODO]
 
-## Affected Features
+**Affected Features** <br>
 - [FEATURE 1]
 - [FEATURE 2]
 
-## Acceptance Criteria
+**Acceptance Criteria** <br>
 *List the characteristics of new functionality*
 
 - [ ] [CHARACTERISTIC 1]

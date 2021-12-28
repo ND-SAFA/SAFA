@@ -1,5 +1,11 @@
-# Feature Summary
-*Describe what new functionality is being introduced.*
+---
+name: New Functionality
+about: Describes new system feature(s).
+title: ''
+labels: ''
+assignees: ''
+
+---
 
 **[Notion Issue]()** <br>
 

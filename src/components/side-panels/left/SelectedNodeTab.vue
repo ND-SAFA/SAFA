@@ -170,8 +170,8 @@ export default Vue.extend({
       this.isArtifactCreatorOpen = true;
     },
     onArtifactClick(artifactName: string): void {
-      const artifactQuery = projectModule.getArtifactByName(artifactName);
-      artifactSelectionModule.selectArtifact(artifactQuery);
+      const artifact = projectModule.getArtifactByName(artifactName);
+      artifactSelectionModule.selectArtifact(artifact.id);
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {

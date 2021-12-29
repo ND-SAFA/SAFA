@@ -54,7 +54,7 @@ export const artifactTreeContextMenuOptions = {
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
-          await artifactSelectionModule.selectArtifact(artifact);
+          await artifactSelectionModule.selectArtifact(artifact.id);
         }).then();
       },
     },

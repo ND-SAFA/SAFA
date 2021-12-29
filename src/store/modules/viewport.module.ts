@@ -49,7 +49,7 @@ export default class ViewportModule extends VuexModule {
       artifact.id,
     ];
 
-    await artifactSelectionModule.selectArtifact(artifact);
+    await artifactSelectionModule.selectArtifact(artifact.id);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",

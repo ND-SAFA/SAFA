@@ -115,7 +115,7 @@ export default class ProjectModule extends VuexModule {
     if (selectedArtifact !== undefined) {
       const query = artifacts.filter((a) => a.name === selectedArtifact.name);
       if (query.length > 0) {
-        await artifactSelectionModule.selectArtifact(query[0]);
+        await artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
     await subtreeModule.updateSubtreeMap();

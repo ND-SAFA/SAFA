@@ -1,5 +1,5 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { appModule, artifactSelectionModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/endpoints";
 
 /**
@@ -19,6 +19,7 @@ export async function approveLinkAPIHandler(
       onSuccess();
     }
 
+    await artifactSelectionModule.selectArtifact(link.sourceId);
     await projectModule.addOrUpdateTraceLinks([link]);
   });
 }
@@ -40,6 +41,7 @@ export async function declineLinkAPIHandler(
       onSuccess();
     }
 
+    await artifactSelectionModule.selectArtifact(link.sourceId);
     await projectModule.removeTraceLink(link);
   });
 }

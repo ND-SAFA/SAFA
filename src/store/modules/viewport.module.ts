@@ -208,6 +208,16 @@ export default class ViewportModule extends VuexModule {
     }
   }
 
+  @Mutation
+  /**
+   * Sets a new centered collection of artifacts.
+   *
+   * @param centeringCollection - The new collection to set.
+   */
+  SET_CURRENT_COLLECTION(centeringCollection?: string[]): void {
+    this.currentCenteringCollection = centeringCollection;
+  }
+
   /**
    * @return artifact ids of those in viewport.
    */
@@ -223,13 +233,10 @@ export default class ViewportModule extends VuexModule {
       .map((a) => a.id);
   }
 
-  @Mutation
   /**
-   * Sets a new centered collection of artifacts.
-   *
-   * @param centeringCollection - The new collection to set.
+   * @return The currently centered nodes.
    */
-  SET_CURRENT_COLLECTION(centeringCollection?: string[]): void {
-    this.currentCenteringCollection = centeringCollection;
+  get currentCenteredNodes(): string[] {
+    return this.currentCenteringCollection || [];
   }
 }

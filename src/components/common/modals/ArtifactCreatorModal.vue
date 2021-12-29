@@ -158,7 +158,9 @@ export default Vue.extend({
           logModule.onDevError(e);
           logModule.onWarning("Unable to create artifact.");
         })
-        .finally(() => (this.isLoading = false));
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
 });

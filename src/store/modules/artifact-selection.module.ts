@@ -128,6 +128,20 @@ export default class ArtifactSelectionModule extends VuexModule {
   }
 
   /**
+   * @return The currently selected artifact id.
+   */
+  get getSelectedArtifactId(): string {
+    return this.selectedArtifactId;
+  }
+
+  /**
+   * @return Whether there is a currently selected artifact.
+   */
+  get isArtifactSelected(): boolean {
+    return this.selectedArtifactId !== "";
+  }
+
+  /**
    * @return The currently selected artifact.
    */
   get getSelectedArtifact(): Artifact | undefined {

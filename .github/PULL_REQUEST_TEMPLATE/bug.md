@@ -3,34 +3,34 @@
 
 **[Notion Issue]()** <br>
 
-**Expected Behavior (Dev)** <br>
+**Expected Behavior** <br>
 *Describe how the system is supposed to behave.* <br>
 
-[TODO]
+> [TODO]
 
-**Actual Behavior (Dev)** <br>
+**Actual Behavior** <br>
 *Describe how the system used to behave.* <br>
 
-[TODO]
+> [TODO]
 
-**Fix (Dev)** <br>
+**Fix** <br>
 *Describe what is being changed and how it changes the system behavior.* <br>
 
-[TODO]
+> [TODO]
 
 # Review
 **Test Case** <br>
 *Please describe how these changes were tested.*
-- [STEP 1]
-- [STEP 2]
+> - [STEP 1]
+> - [STEP 2]
 
-## Checklist
+**Checklist** <br>
 
 **Can the code be easily modified?**<br>
-[TODO]
+> [TODO]
 
 **Would you feel comfortable building on top of this code?** <br>
-[TODO]
+> [TODO]
 
 **Does this code bring any undesirable side effects?** <br>
-[TODO]
+> [TODO]

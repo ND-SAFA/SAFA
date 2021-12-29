@@ -1,13 +1,5 @@
----
-name: Bug Fix
-about: Describes how a bug is being fixed.
-title: ''
-labels: ''
-assignees: ''
 
----
-
-**Bug Summary**
+# Bug Fix
 
 **[Notion Issue]()** <br>
 

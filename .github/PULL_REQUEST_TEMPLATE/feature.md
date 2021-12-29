@@ -1,16 +1,10 @@
----
-name: New Functionality
-about: Describes new system feature(s).
-title: ''
-labels: ''
-assignees: ''
-
----
-
+# New Feature
+*Describe what new functionality is being implemented 
+how it was implemented.* <br>
 **[Notion Issue]()** <br>
 
 
-[summary here]
+[SUMMARY]
 
 ## Acceptance Criteria
 *List the characteristics of new functionality*

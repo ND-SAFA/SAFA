@@ -1,18 +1,9 @@
----
-name: Refactor
-about: Describe what new functionality is being introduced.
-title: ''
-labels: ''
-assignees: ''
-
----
-
-**Refactor Summary** <br>
+# Refactor <br>
 *Describe what is being changed and why this change is necessary.* <br>
 
 **[Notion Issue]()** <br>
 
-[TODO]
+[SUMMARY]
 
 **Affected Features** <br>
 *Describe what features are being touched.* <br>

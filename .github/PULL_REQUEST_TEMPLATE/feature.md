@@ -1,24 +1,31 @@
----
-name: New Functionality
-about: Describes new system feature(s).
-title: ''
-labels: ''
-assignees: ''
-
----
-
+# New Feature
+*Describe what new functionality is being implemented 
+how it was implemented.* <br>
 **[Notion Issue]()** <br>
 
 
-[summary here]
+> [SUMMARY]
 
-## Acceptance Criteria
+**Acceptance Criteria** <br>
+
 *List the characteristics of new functionality*
 
-- [ ] [CHARACTERISTIC 1]
-- [ ] [CHARACTERISTIC 2]
+> - [ ] [CHARACTERISTIC 1]
+> - [ ] [CHARACTERISTIC 2]
 
-# Test Case
-*Please describe how the acceptance criteria was verified.*
-- [ ] [STEP 1]
-- [ ] [STEP 2]
+# Review
+**Test Case** <br>
+*Please describe how these changes were tested.*
+> - [STEP 1]
+> - [STEP 2]
+
+**Checklist** <br>
+
+**Can the code be easily modified?**<br>
+> [TODO]
+
+**Would you feel comfortable building on top of this code?** <br>
+> [TODO]
+
+**Does this code bring any undesirable side effects?** <br>
+> [TODO]

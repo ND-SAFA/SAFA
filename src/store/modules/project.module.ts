@@ -76,7 +76,6 @@ export default class ProjectModule extends VuexModule {
     appModule.closePanel(PanelType.left);
     appModule.closePanel(PanelType.right);
     deltaModule.setIsDeltaViewEnabled(false);
-    await subtreeModule.updateSubtreeMap();
     this.updateAllowedTraceDirections();
 
     if (isDifferentProject) {
@@ -84,6 +83,8 @@ export default class ProjectModule extends VuexModule {
       await subtreeModule.resetHiddenNodes();
       await viewportModule.setArtifactTreeLayout();
     }
+
+    await subtreeModule.initializeProject(newProject);
   }
 
   @Action

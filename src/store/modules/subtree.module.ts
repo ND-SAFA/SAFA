@@ -1,6 +1,11 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { SubtreeLink, SubtreeMap, SetOpacityRequest } from "@/types";
-import { projectModule } from "@/store";
+import type {
+  SubtreeLink,
+  SubtreeMap,
+  SetOpacityRequest,
+  Project,
+} from "@/types";
+import { projectModule, subtreeModule } from "@/store";
 import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
@@ -27,6 +32,12 @@ export default class SubtreeModule extends VuexModule {
    * List of nodes whose children are currently hidden.
    */
   private collapsedParentNodes: string[] = [];
+
+  /**
+   * The amount of child nodes that a node must have greater than or equal to
+   * for the node to have its children automatically hidden.
+   */
+  private autoCollapseSubtreeSize = 5;
 
   @Action
   /**
@@ -57,6 +68,32 @@ export default class SubtreeModule extends VuexModule {
     this.SET_SUBTREE_MAP({});
     this.SET_SUBTREE_LINKS([]);
     await this.resetHiddenNodes();
+  }
+
+  @Action
+  /**
+   * Updates the subtree map, and hides all subtrees greater than the set threshold.
+   */
+  async initializeProject(project: Project): Promise<void> {
+    const artifactIds = project.artifacts.map(({ id }) => id).reverse();
+    const childrenPerArtifact = project.traces
+      .map(({ targetId }) => targetId)
+      .reduce(
+        (acc, id) => ({ ...acc, [id]: (acc[id] || 0) + 1 }),
+        {} as Record<string, number>
+      );
+
+    await subtreeModule.updateSubtreeMap();
+
+    for (const id of artifactIds) {
+      if (this.hiddenSubtreeNodes.includes(id)) continue;
+
+      const childCount = childrenPerArtifact[id] || 0;
+
+      if (childCount >= this.autoCollapseSubtreeSize) {
+        await this.hideSubtree(id);
+      }
+    }
   }
 
   @Action

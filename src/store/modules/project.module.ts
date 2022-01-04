@@ -64,6 +64,7 @@ export default class ProjectModule extends VuexModule {
    * @param newProject - The new project to set.
    */
   async setProject(newProject: Project): Promise<void> {
+    const isDifferentProject = this.project.projectId !== newProject.projectId;
     const projectId = newProject.projectId;
     const versionId = newProject.projectVersion?.versionId;
 
@@ -72,15 +73,17 @@ export default class ProjectModule extends VuexModule {
     await this.subscribeToVersion({ projectId, versionId });
 
     deltaModule.clearDelta();
-    subtreeModule.resetHiddenNodes();
     appModule.closePanel(PanelType.left);
     appModule.closePanel(PanelType.right);
     deltaModule.setIsDeltaViewEnabled(false);
-
-    await viewportModule.setArtifactTreeLayout();
     await subtreeModule.updateSubtreeMap();
-
     this.updateAllowedTraceDirections();
+
+    if (isDifferentProject) {
+      await artifactSelectionModule.unselectArtifact();
+      await subtreeModule.resetHiddenNodes();
+      await viewportModule.setArtifactTreeLayout();
+    }
   }
 
   @Action
@@ -115,7 +118,7 @@ export default class ProjectModule extends VuexModule {
     if (selectedArtifact !== undefined) {
       const query = artifacts.filter((a) => a.name === selectedArtifact.name);
       if (query.length > 0) {
-        await artifactSelectionModule.selectArtifact(query[0]);
+        await artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
     await subtreeModule.updateSubtreeMap();

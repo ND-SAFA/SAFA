@@ -51,12 +51,12 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * Sets the given artifact as selected.
    *
-   * @param artifact - The artifact to select.
+   * @param artifactId - The artifact to select.
    */
-  async selectArtifact(artifact: Artifact): Promise<void> {
-    this.SELECT_ARTIFACT(artifact.id);
+  async selectArtifact(artifactId: string): Promise<void> {
+    this.SELECT_ARTIFACT(artifactId);
     appModule.openPanel(PanelType.left);
-    await viewportModule.centerOnArtifacts([artifact.id]);
+    await viewportModule.centerOnArtifacts([artifactId]);
   }
 
   @Action
@@ -125,6 +125,20 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   UNSELECT_ARTIFACT(): void {
     this.selectedArtifactId = "";
+  }
+
+  /**
+   * @return The currently selected artifact id.
+   */
+  get getSelectedArtifactId(): string {
+    return this.selectedArtifactId;
+  }
+
+  /**
+   * @return Whether there is a currently selected artifact.
+   */
+  get isArtifactSelected(): boolean {
+    return this.selectedArtifactId !== "";
   }
 
   /**

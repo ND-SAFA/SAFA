@@ -43,20 +43,20 @@ export default class SubtreeModule extends VuexModule {
   /**
    * Resets hidden nodes.
    */
-  resetHiddenNodes(): void {
+  async resetHiddenNodes(): Promise<void> {
     this.SET_COLLAPSED_PARENT_NODES([]);
     this.SET_HIDDEN_SUBTREE_NODES([]);
+    await this.showAllEntities();
   }
 
   @Action
   /**
    * Clears all data.
    */
-  clearSubtrees(): void {
+  async clearSubtrees(): Promise<void> {
     this.SET_SUBTREE_MAP({});
     this.SET_SUBTREE_LINKS([]);
-    this.SET_COLLAPSED_PARENT_NODES([]);
-    this.SET_HIDDEN_SUBTREE_NODES([]);
+    await this.resetHiddenNodes();
   }
 
   @Action
@@ -147,6 +147,17 @@ export default class SubtreeModule extends VuexModule {
       );
 
     targetLinks.style({ display });
+  }
+
+  @Action
+  /**
+   * Shows all nodes and edges.
+   */
+  async showAllEntities(): Promise<void> {
+    const cy = await artifactTreeCyPromise;
+
+    cy.nodes().style({ display: "element" });
+    cy.edges().style({ display: "element" });
   }
 
   @Mutation

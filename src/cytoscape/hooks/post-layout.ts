@@ -5,7 +5,7 @@ import {
   CytoCore,
   IGraphLayout,
 } from "@/types";
-import { viewportModule } from "@/store";
+import { artifactSelectionModule, viewportModule } from "@/store";
 
 export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
@@ -42,7 +42,13 @@ export const applyCytoEvents: LayoutHook = (
 };
 
 export const centerViewOnRootNode: LayoutHook = (): void => {
-  viewportModule.centerOnRootNode().then();
+  const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
+
+  if (!selectedArtifacts) {
+    viewportModule.centerOnRootNode().then();
+  } else {
+    viewportModule.centerOnArtifacts([selectedArtifacts]).then();
+  }
 };
 
 export const DefaultPostLayoutHooks: LayoutHook[] = [

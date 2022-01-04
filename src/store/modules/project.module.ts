@@ -10,7 +10,7 @@ import type {
   TraceLink,
   ArtifactTypeDirections,
 } from "@/types";
-import { LinkValidator, PanelType } from "@/types";
+import { LinkValidator, PanelType, ProjectVersionUpdate } from "@/types";
 import {
   logModule,
   artifactSelectionModule,
@@ -121,6 +121,7 @@ export default class ProjectModule extends VuexModule {
         await artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
+
     await subtreeModule.updateSubtreeMap();
   }
 

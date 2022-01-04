@@ -80,6 +80,7 @@ export default class ProjectModule extends VuexModule {
     this.updateAllowedTraceDirections();
 
     if (isDifferentProject) {
+      await artifactSelectionModule.unselectArtifact();
       await subtreeModule.resetHiddenNodes();
       await viewportModule.setArtifactTreeLayout();
     }

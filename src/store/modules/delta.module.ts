@@ -66,6 +66,7 @@ export default class ErrorModule extends VuexModule {
   clearDelta(): void {
     this.SET_DELTA_PAYLOAD(createProjectDelta());
     this.SET_DELTA_IN_VIEW(false);
+    this.setIsDeltaViewEnabled(false);
     appModule.closePanel(PanelType.right);
   }
 

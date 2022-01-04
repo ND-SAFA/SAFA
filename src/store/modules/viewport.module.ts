@@ -208,6 +208,14 @@ export default class ViewportModule extends VuexModule {
     }
   }
 
+  @Action
+  /**
+   * Deselects all artifacts.
+   */
+  deselectArtifacts(): void {
+    this.SET_CURRENT_COLLECTION([]);
+  }
+
   @Mutation
   /**
    * Sets a new centered collection of artifacts.

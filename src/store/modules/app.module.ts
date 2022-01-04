@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { PanelType } from "@/types";
 import type { PanelState } from "@/types";
+import { PanelType } from "@/types";
 
 @Module({ namespaced: true, name: "app" })
 /**
@@ -58,6 +58,15 @@ export default class ProjectModule extends VuexModule {
    */
   toggleLeftPanel(): void {
     this.TOGGLE_PANEL_STATE(PanelType.left);
+  }
+
+  @Action
+  /**
+   * Closes the side panels.
+   */
+  closeSidePanels(): void {
+    this.closePanel(PanelType.left);
+    this.closePanel(PanelType.right);
   }
 
   @Action

@@ -61,20 +61,12 @@ export default class ArtifactSelectionModule extends VuexModule {
 
   @Action
   /**
-   * Unselects any selected artifact and closes the left app panel.
-   */
-  unselectArtifact(): void {
-    this.UNSELECT_ARTIFACT();
-    appModule.closePanel(PanelType.left);
-  }
-
-  @Action
-  /**
    * Clears any selected artifact(s) in artifact tree.
    */
   clearSelections(): void {
-    this.unselectArtifact();
     this.SET_SELECTED_SUBTREE([]);
+    this.UNSELECT_ARTIFACT();
+    appModule.closePanel(PanelType.left);
   }
 
   @Mutation
@@ -146,7 +138,11 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   get getSelectedArtifact(): Artifact | undefined {
     if (this.selectedArtifactId !== "") {
-      return projectModule.getArtifactById(this.selectedArtifactId);
+      try {
+        return projectModule.getArtifactById(this.selectedArtifactId);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 

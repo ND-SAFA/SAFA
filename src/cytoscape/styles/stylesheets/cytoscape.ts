@@ -6,6 +6,7 @@ import {
   ARTIFACT_SHAPE,
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_BORDER_WIDTH,
+  ARTIFACT_COLOR,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import {
   TRACE_COLOR,
@@ -59,13 +60,13 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     selector: "node",
     style: {
       padding: ARTIFACT_PADDING,
-      "background-color": ThemeColors.artifactDefault,
+      "background-color": ARTIFACT_COLOR,
       shape: ARTIFACT_SHAPE,
       width: ARTIFACT_WIDTH + "px",
       height: ARTIFACT_HEIGHT + "px",
       "border-style": ARTIFACT_BORDER_STYLE,
       "border-width": ARTIFACT_BORDER_WIDTH,
-      "border-color": "white",
+      "border-color": ARTIFACT_COLOR,
       "text-wrap": "ellipsis",
     },
   } as CytoStyleSheet,

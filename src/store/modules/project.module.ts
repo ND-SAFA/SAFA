@@ -82,6 +82,7 @@ export default class ProjectModule extends VuexModule {
     appModule.closeSidePanels();
     await subtreeModule.updateSubtreeMap();
     this.updateAllowedTraceDirections();
+    await subtreeModule.initializeProject(newProject);
   }
 
   @Action

@@ -10,7 +10,7 @@ import type {
   TraceLink,
   ArtifactTypeDirections,
 } from "@/types";
-import { LinkValidator, PanelType } from "@/types";
+import { LinkValidator, PanelType, ProjectVersionUpdate } from "@/types";
 import {
   logModule,
   artifactSelectionModule,
@@ -68,22 +68,20 @@ export default class ProjectModule extends VuexModule {
     const projectId = newProject.projectId;
     const versionId = newProject.projectVersion?.versionId;
 
-    this.SAVE_PROJECT(newProject);
+    await artifactSelectionModule.clearSelections();
 
+    this.SAVE_PROJECT(newProject);
     await this.subscribeToVersion({ projectId, versionId });
 
-    deltaModule.clearDelta();
-    appModule.closePanel(PanelType.left);
-    appModule.closePanel(PanelType.right);
-    deltaModule.setIsDeltaViewEnabled(false);
-    this.updateAllowedTraceDirections();
-
     if (isDifferentProject) {
-      await artifactSelectionModule.unselectArtifact();
       await subtreeModule.resetHiddenNodes();
       await viewportModule.setArtifactTreeLayout();
     }
 
+    deltaModule.clearDelta();
+    appModule.closeSidePanels();
+    await subtreeModule.updateSubtreeMap();
+    this.updateAllowedTraceDirections();
     await subtreeModule.initializeProject(newProject);
   }
 
@@ -122,6 +120,7 @@ export default class ProjectModule extends VuexModule {
         await artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
+
     await subtreeModule.updateSubtreeMap();
   }
 

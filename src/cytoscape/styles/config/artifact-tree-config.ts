@@ -1,4 +1,3 @@
-import { ThemeColors } from "@/util";
 import {
   FixedAlignment,
   LayoutDirection,
@@ -13,9 +12,11 @@ export const ARTIFACT_PADDING = 50;
 export const ARTIFACT_WIDTH = 105;
 export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
 
+export const ARTIFACT_COLOR = "#888888";
 export const ARTIFACT_SHAPE = "roundrectangle";
+
 export const ARTIFACT_BORDER_STYLE = "solid";
-export const ARTIFACT_BORDER_WIDTH = 1;
+export const ARTIFACT_BORDER_WIDTH = 0;
 
 export const ARTIFACT_TRUNCATE_LENGTH = 150;
 export const ARTIFACT_REDUCED_TRUNCATE_LENGTH = 100;

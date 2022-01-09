@@ -20,6 +20,7 @@
       >
         <v-btn
           text
+          block
           class="text-none"
           :color="itemColor"
           @click="() => onItemClick(itemIndex, item)"

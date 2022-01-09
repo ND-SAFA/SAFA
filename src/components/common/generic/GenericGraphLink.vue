@@ -36,6 +36,11 @@ export default Vue.extend({
       const id = `${sourceId}-${targetId}`;
       const count = this.count ? this.count : 1;
       const traceType = deltaModule.getTraceDeltaType(id);
+      const classes = [`eh-delta-${traceType}`];
+
+      if (sourceId === targetId) {
+        classes.push("loop");
+      }
 
       return {
         data: {
@@ -46,7 +51,7 @@ export default Vue.extend({
           target: sourceId,
           count,
         },
-        classes: [`eh-delta-${traceType}`],
+        classes,
       };
     },
   },

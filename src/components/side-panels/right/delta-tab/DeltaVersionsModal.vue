@@ -86,7 +86,6 @@ export default Vue.extend({
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("close");
             logModule.onSuccess("Delta state was updated successfully.");
-            await viewportModule.setArtifactTreeLayout();
           });
         } else {
           logModule.onWarning("Project source version is not selected.");

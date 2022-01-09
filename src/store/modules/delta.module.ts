@@ -46,7 +46,6 @@ export default class ErrorModule extends VuexModule {
     await projectModule.addOrUpdateTraceLinks(
       Object.values(payload.traces.added)
     );
-    await subtreeModule.updateSubtreeMap();
   }
 
   @Action

@@ -68,22 +68,20 @@ export default class ProjectModule extends VuexModule {
     const projectId = newProject.projectId;
     const versionId = newProject.projectVersion?.versionId;
 
-    this.SAVE_PROJECT(newProject);
+    await artifactSelectionModule.clearSelections();
 
+    this.SAVE_PROJECT(newProject);
     await this.subscribeToVersion({ projectId, versionId });
 
-    deltaModule.clearDelta();
-    appModule.closePanel(PanelType.left);
-    appModule.closePanel(PanelType.right);
-    deltaModule.setIsDeltaViewEnabled(false);
-    await subtreeModule.updateSubtreeMap();
-    this.updateAllowedTraceDirections();
-
     if (isDifferentProject) {
-      await artifactSelectionModule.unselectArtifact();
       await subtreeModule.resetHiddenNodes();
       await viewportModule.setArtifactTreeLayout();
     }
+
+    deltaModule.clearDelta();
+    appModule.closeSidePanels();
+    await subtreeModule.updateSubtreeMap();
+    this.updateAllowedTraceDirections();
   }
 
   @Action

@@ -62,8 +62,8 @@ export default class SessionModule extends VuexModule {
 
     await navigateTo(Routes.LOGIN_ACCOUNT);
     await projectModule.clearProject();
+    await subtreeModule.clearSubtrees();
     deltaModule.clearDelta();
-    subtreeModule.clearSubtrees();
   }
 
   @Action({ rawError: true })

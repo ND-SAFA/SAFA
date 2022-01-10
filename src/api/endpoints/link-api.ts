@@ -74,6 +74,6 @@ export async function declineLink(traceLink: TraceLink): Promise<void> {
  * @return The created trace link.
  */
 export async function createLink(traceLink: TraceLink): Promise<void> {
-  traceLink.approvalStatus = TraceApproval.DECLINED;
+  traceLink.approvalStatus = TraceApproval.APPROVED;
   return CommitBuilder.withCurrentVersion().withNewTraceLink(traceLink).save();
 }

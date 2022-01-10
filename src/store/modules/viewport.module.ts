@@ -1,5 +1,5 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore, Artifact, LayoutPayload } from "@/types";
+import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
 import { areArraysEqual } from "@/util";
 import {
   logModule,
@@ -32,6 +32,10 @@ export default class ViewportModule extends VuexModule {
    * A collection of artifact ids currently centered on.
    */
   private currentCenteringCollection?: string[];
+  /**
+   * The current graph layout
+   */
+  private layout?: IGraphLayout;
 
   @Action
   /**
@@ -111,6 +115,8 @@ export default class ViewportModule extends VuexModule {
     const cy = await layoutPayload.cyPromise;
 
     layoutPayload.layout.createLayout(cy);
+
+    this.SET_LAYOUT(layoutPayload.layout);
 
     return cy;
   }
@@ -218,6 +224,16 @@ export default class ViewportModule extends VuexModule {
 
   @Mutation
   /**
+   * Sets a new layout.
+   *
+   * @param layout - The new layout to set.
+   */
+  SET_LAYOUT(layout: IGraphLayout): void {
+    this.layout = layout;
+  }
+
+  @Mutation
+  /**
    * Sets a new centered collection of artifacts.
    *
    * @param centeringCollection - The new collection to set.
@@ -246,5 +262,12 @@ export default class ViewportModule extends VuexModule {
    */
   get currentCenteredNodes(): string[] {
     return this.currentCenteringCollection || [];
+  }
+
+  /**
+   * @return The current layout.
+   */
+  get currentLayout(): IGraphLayout | undefined {
+    return this.layout;
   }
 }

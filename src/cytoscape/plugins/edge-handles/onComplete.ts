@@ -10,7 +10,7 @@ import {
 import { getTraceId } from "@/util";
 import { createLink } from "@/api";
 import { projectModule, viewportModule } from "@/store";
-import { addAutoMoveToNode } from "@/cytoscape";
+import { applyAutoMoveEvents } from "@/cytoscape";
 import { disableDrawMode } from "./edgeHandlesCore";
 
 /**
@@ -51,7 +51,7 @@ export function onArtifactTreeEdgeComplete(
       await projectModule.addOrUpdateTraceLinks([traceLink]);
 
       if (viewportModule.currentLayout) {
-        addAutoMoveToNode(cy, viewportModule.currentLayout, targetNode);
+        applyAutoMoveEvents(cy, viewportModule.currentLayout);
       }
     })
     .catch((e) => console.error(e));

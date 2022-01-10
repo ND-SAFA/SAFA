@@ -36,6 +36,7 @@ export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
   layout: IGraphLayout
 ): void => {
+  cy.automove("destroy");
   cy.nodes().forEach((node) => addAutoMoveToNode(cy, layout, node));
 };
 

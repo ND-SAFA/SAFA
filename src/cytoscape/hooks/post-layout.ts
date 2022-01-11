@@ -60,9 +60,9 @@ export const centerViewOnRootNode: LayoutHook = (): void => {
   const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
 
   if (!selectedArtifacts) {
-    viewportModule.centerOnRootNode().then();
+    viewportModule.centerOnRootNode();
   } else {
-    viewportModule.centerOnArtifacts([selectedArtifacts]).then();
+    viewportModule.centerOnArtifacts([selectedArtifacts]);
   }
 };
 

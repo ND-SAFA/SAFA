@@ -28,7 +28,7 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
-  await artifactSelectionModule.clearSelections();
+  artifactSelectionModule.clearSelections();
   projectModule.SAVE_PROJECT(project);
 
   if (isDifferentProject) {

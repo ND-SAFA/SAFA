@@ -18,9 +18,9 @@ export async function login(user: UserModel): Promise<void> {
  * Attempts to log a user out.
  */
 export async function logout(): Promise<void> {
-  await sessionModule.SET_SESSION(createSession());
-  await clearProject();
-  await subtreeModule.clearSubtrees();
-  deltaModule.clearDelta();
+  sessionModule.SET_SESSION(createSession());
   await navigateTo(Routes.LOGIN_ACCOUNT);
+  deltaModule.clearDelta();
+  await subtreeModule.clearSubtrees();
+  await clearProject();
 }

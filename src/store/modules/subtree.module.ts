@@ -6,7 +6,11 @@ import type {
   Project,
 } from "@/types";
 import { projectModule, subtreeModule } from "@/store";
-import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
+import {
+  artifactTreeCyPromise,
+  artifactTreeResolveCy,
+  createSubtreeMap,
+} from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -44,10 +48,11 @@ export default class SubtreeModule extends VuexModule {
    * Recalculates the subtree map of project artifacts and updates store.
    */
   async updateSubtreeMap(): Promise<void> {
-    const cy = await artifactTreeCyPromise;
-    const subtreeMap = await createSubtreeMap(cy, projectModule.artifacts);
+    artifactTreeCyPromise.then(async (cy) => {
+      const subtreeMap = await createSubtreeMap(cy, projectModule.artifacts);
 
-    this.SET_SUBTREE_MAP(subtreeMap);
+      this.SET_SUBTREE_MAP(subtreeMap);
+    });
   }
 
   @Action
@@ -167,23 +172,20 @@ export default class SubtreeModule extends VuexModule {
   async setProjectEntityVisibility(request: SetOpacityRequest): Promise<void> {
     const { targetArtifactIds, visible } = request;
     const display = visible ? "element" : "none";
-    const cy = await artifactTreeCyPromise;
 
-    const targetNodes = cy
-      .nodes()
-      .filter((n) => targetArtifactIds.includes(n.data().id));
+    artifactTreeCyPromise.then((cy) => {
+      cy.nodes()
+        .filter((n) => targetArtifactIds.includes(n.data().id))
+        .style({ display });
 
-    targetNodes.style({ display });
-
-    const targetLinks = cy
-      .edges()
-      .filter(
-        (e) =>
-          targetArtifactIds.includes(e.target().data().id) ||
-          targetArtifactIds.includes(e.source().data().id)
-      );
-
-    targetLinks.style({ display });
+      cy.edges()
+        .filter(
+          (e) =>
+            targetArtifactIds.includes(e.target().data().id) ||
+            targetArtifactIds.includes(e.source().data().id)
+        )
+        .style({ display });
+    });
   }
 
   @Action
@@ -191,10 +193,10 @@ export default class SubtreeModule extends VuexModule {
    * Shows all nodes and edges.
    */
   async showAllEntities(): Promise<void> {
-    const cy = await artifactTreeCyPromise;
-
-    cy.nodes().style({ display: "element" });
-    cy.edges().style({ display: "element" });
+    artifactTreeCyPromise.then((cy) => {
+      cy.nodes().style({ display: "element" });
+      cy.edges().style({ display: "element" });
+    });
   }
 
   @Mutation

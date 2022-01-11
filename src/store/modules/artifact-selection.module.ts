@@ -56,7 +56,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   async selectArtifact(artifactId: string): Promise<void> {
     this.SELECT_ARTIFACT(artifactId);
     appModule.openPanel(PanelType.left);
-    await viewportModule.centerOnArtifacts([artifactId]);
+    viewportModule.centerOnArtifacts([artifactId]);
   }
 
   @Action

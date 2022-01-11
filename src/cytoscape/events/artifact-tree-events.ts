@@ -3,6 +3,9 @@ import { artifactSelectionModule } from "@/store";
 import { EventObject } from "cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 
+/**
+ * Handlers for mouse events on the artifact tree.
+ */
 export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   ...DefaultCytoEvents,
   unselectArtifactOnBackgroundClick: {

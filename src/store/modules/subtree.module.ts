@@ -6,11 +6,7 @@ import type {
   Project,
 } from "@/types";
 import { projectModule, subtreeModule } from "@/store";
-import {
-  artifactTreeCyPromise,
-  artifactTreeResolveCy,
-  createSubtreeMap,
-} from "@/cytoscape";
+import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -127,7 +123,6 @@ export default class SubtreeModule extends VuexModule {
         ...childrenInSubtree,
       ]);
       this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-
       await this.setProjectEntityVisibility({
         targetArtifactIds: this.hiddenSubtreeNodes,
         visible: false,
@@ -250,9 +245,7 @@ export default class SubtreeModule extends VuexModule {
    * @returns the pre-computed artifacts in the subtree of root specified.
    */
   get getSubtreeByArtifactId(): (n: string) => string[] {
-    return (artifactId: string) => {
-      return this.getSubtreeMap[artifactId] || [];
-    };
+    return (artifactId: string) => this.getSubtreeMap[artifactId] || [];
   }
 
   /**

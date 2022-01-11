@@ -12,7 +12,6 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
    *
    * @param sourceNode - The source node on the graph.
    * @param targetNode - The target node on the graph.
-   *
    * @returns Whether the two nodes can be traced.
    */
   canConnect(sourceNode: NodeSingular, targetNode: NodeSingular): boolean {
@@ -45,7 +44,6 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
    *
    * @param sourceNode - The source node on the graph.
    * @param targetNode - The target node on the graph.
-   *
    * @returns The created edge.
    */
   edgeParams(

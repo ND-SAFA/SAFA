@@ -8,9 +8,9 @@ import {
 import { artifactSelectionModule, viewportModule } from "@/store";
 
 /**
- * Adds automove handlers to a node, so that its child nodes are dragged along with it.
+ * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.
  *
- * @param cy - The Cytocore instance.
+ * @param cy - The cy instance.
  * @param layout - The layout instance.
  * @param node - The node to add handlers for.
  */
@@ -32,6 +32,12 @@ export function addAutoMoveToNode(
   }
 }
 
+/**
+ * Adds auto-move handlers to all nodes, so that their children nodes are dragged along with then.
+ *
+ * @param cy - The cy instance.
+ * @param layout - The layout instance.
+ */
 export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
   layout: IGraphLayout
@@ -40,6 +46,12 @@ export const applyAutoMoveEvents: LayoutHook = (
   cy.nodes().forEach((node) => addAutoMoveToNode(cy, layout, node));
 };
 
+/**
+ * Applies cytoscape event handlers in the layout.
+ *
+ * @param cy - The cy instance.
+ * @param layout - The layout instance.
+ */
 export const applyCytoEvents: LayoutHook = (
   cy: CytoCore,
   layout: IGraphLayout
@@ -56,7 +68,10 @@ export const applyCytoEvents: LayoutHook = (
   }
 };
 
-export const centerViewOnRootNode: LayoutHook = (): void => {
+/**
+ * Centers on the selected or root node of the graph.
+ */
+export const centerViewOnNode: LayoutHook = (): void => {
   const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
 
   if (!selectedArtifacts) {
@@ -67,7 +82,7 @@ export const centerViewOnRootNode: LayoutHook = (): void => {
 };
 
 export const DefaultPostLayoutHooks: LayoutHook[] = [
-  centerViewOnRootNode,
+  centerViewOnNode,
   applyAutoMoveEvents,
   applyCytoEvents,
 ];

@@ -4,15 +4,22 @@ import { CollectionReturnValue, NodeSingular } from "cytoscape";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
+/**
+ * Initializes edge handling.
+ *
+ * @param cyPromise - The cy instance.
+ * @param instance - The edge handles instance.
+ */
 export function setEdgeHandlesCore(
   cyPromise: Promise<CytoCore>,
   instance: EdgeHandleCore
 ): Promise<void> {
   edgeHandlesCore = instance;
-  return cyPromise.then((cytoCore: CytoCore) => {
-    cytoCore.on(CytoEvent.EH_COMPLETE, (event, ...args: unknown[]) =>
+
+  return cyPromise.then((cy: CytoCore) => {
+    cy.on(CytoEvent.EH_COMPLETE, (event, ...args: unknown[]) =>
       onArtifactTreeEdgeComplete(
-        cytoCore,
+        cy,
         event,
         args[0] as NodeSingular,
         args[1] as NodeSingular,
@@ -22,6 +29,9 @@ export function setEdgeHandlesCore(
   });
 }
 
+/**
+ * Returns the edge handle core.
+ */
 export function getEdgeHandlesCore(): EdgeHandleCore {
   if (edgeHandlesCore === undefined) {
     throw Error("EdgeHandles has not been instantiated");
@@ -29,11 +39,17 @@ export function getEdgeHandlesCore(): EdgeHandleCore {
   return edgeHandlesCore;
 }
 
+/**
+ * Enables edge drawing mode.
+ */
 export function enableDrawMode(): void {
   getEdgeHandlesCore().enable();
   getEdgeHandlesCore().enableDrawMode();
 }
 
+/**
+ * Disables edge drawing mode.
+ */
 export function disableDrawMode(): void {
   getEdgeHandlesCore().disableDrawMode();
   getEdgeHandlesCore().disable();

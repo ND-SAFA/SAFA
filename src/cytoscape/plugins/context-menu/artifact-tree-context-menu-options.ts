@@ -11,6 +11,9 @@ import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 
+/**
+ * Defines the options on the artifact tree context menu.
+ */
 export const artifactTreeContextMenuOptions = {
   // Customize event to bring up the context menu
   // Possible options https://js.cytoscape.org/#events/user-input-device-events
@@ -55,7 +58,7 @@ export const artifactTreeContextMenuOptions = {
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
           await artifactSelectionModule.selectArtifact(artifact.id);
-        }).then();
+        });
       },
     },
     {
@@ -67,7 +70,7 @@ export const artifactTreeContextMenuOptions = {
       onClickFunction: (thing: EventObject): void => {
         handleOnClick(thing, async (artifact: Artifact) => {
           await deleteArtifactFromCurrentVersion(artifact);
-        }).then();
+        });
       },
     },
     {
@@ -77,7 +80,7 @@ export const artifactTreeContextMenuOptions = {
       selector: "node",
       coreAsWell: false,
       onClickFunction: (thing: EventObject): void => {
-        handleOnClick(thing, viewportModule.viewArtifactSubtree).then();
+        handleOnClick(thing, viewportModule.viewArtifactSubtree);
       },
     },
     {
@@ -111,13 +114,16 @@ export const artifactTreeContextMenuOptions = {
 
 type ArtifactHandler = (a: Artifact) => void | Promise<void>;
 
-async function handleOnClick(
-  event: EventObject,
-  handler: ArtifactHandler
-): Promise<void> {
+/**
+ * Handles an artifact on click event.
+ * @param event - The event,
+ * @param handler - The handler to call with the event's artifact.
+ */
+function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
     const artifact = projectModule.getArtifactByName(artifactData.artifactName);
-    await handler(artifact);
+
+    handler(artifact);
   }
 }

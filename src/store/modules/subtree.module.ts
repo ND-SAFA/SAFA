@@ -1,12 +1,12 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type {
-  SubtreeLink,
-  SubtreeMap,
-  SetOpacityRequest,
-  Project,
-} from "@/types";
+import type { SubtreeLink, SubtreeMap, Project } from "@/types";
 import { projectModule, subtreeModule } from "@/store";
-import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
+import {
+  artifactTreeCyPromise,
+  createSubtreeMap,
+  cyDisplayAll,
+  cySetDisplay,
+} from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -58,7 +58,7 @@ export default class SubtreeModule extends VuexModule {
   async resetHiddenNodes(): Promise<void> {
     this.SET_COLLAPSED_PARENT_NODES([]);
     this.SET_HIDDEN_SUBTREE_NODES([]);
-    await this.showAllEntities();
+    cyDisplayAll();
   }
 
   @Action
@@ -123,7 +123,7 @@ export default class SubtreeModule extends VuexModule {
         ...childrenInSubtree,
       ]);
       this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-      await this.setProjectEntityVisibility({
+      cySetDisplay({
         targetArtifactIds: this.hiddenSubtreeNodes,
         visible: false,
       });
@@ -149,48 +149,9 @@ export default class SubtreeModule extends VuexModule {
     this.SET_COLLAPSED_PARENT_NODES(
       this.collapsedParentNodes.filter((n) => n !== rootId)
     );
-    await this.setProjectEntityVisibility({
+    cySetDisplay({
       targetArtifactIds: subtreeNodes,
       visible: true,
-    });
-  }
-
-  @Action
-  /**
-   * Set the visibility of nodes and edges related to given list of artifact names.
-   * A node is related if it represents one of the target artifacts.
-   * An edge is related if either source or target is an artifact in target
-   * list.
-   *
-   * @param request Contains the target set of artifact names and whether they should be visible.
-   */
-  async setProjectEntityVisibility(request: SetOpacityRequest): Promise<void> {
-    const { targetArtifactIds, visible } = request;
-    const display = visible ? "element" : "none";
-
-    artifactTreeCyPromise.then((cy) => {
-      cy.nodes()
-        .filter((n) => targetArtifactIds.includes(n.data().id))
-        .style({ display });
-
-      cy.edges()
-        .filter(
-          (e) =>
-            targetArtifactIds.includes(e.target().data().id) ||
-            targetArtifactIds.includes(e.source().data().id)
-        )
-        .style({ display });
-    });
-  }
-
-  @Action
-  /**
-   * Shows all nodes and edges.
-   */
-  async showAllEntities(): Promise<void> {
-    artifactTreeCyPromise.then((cy) => {
-      cy.nodes().style({ display: "element" });
-      cy.edges().style({ display: "element" });
     });
   }
 

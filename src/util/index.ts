@@ -6,3 +6,4 @@ export * from "./type-checks";
 export * from "./theme";
 export * from "./enum-helper";
 export * from "./object-factory";
+export * from "./artifact-helper";

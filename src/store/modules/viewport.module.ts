@@ -1,26 +1,24 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
-import { areArraysEqual } from "@/util";
 import {
-  logModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
-  appModule,
 } from "@/store";
 import {
   artifactTreeCyPromise,
   getRootNode,
   isInSubtree,
   doesNotContainType,
-  ANIMATION_DURATION,
-  CENTER_GRAPH_PADDING,
-  DEFAULT_ARTIFACT_TREE_ZOOM,
-  ZOOM_INCREMENT,
   ArtifactGraphLayout,
   TimGraphLayout,
   timTreeCyPromise,
+  cyIfNotAnimated,
+  cyZoomReset,
+  cyCenterNodes,
+  cyCreateLayout,
+  cyCenterOnArtifacts,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -68,11 +66,7 @@ export default class ViewportModule extends VuexModule {
   async repositionSelectedSubtree(): Promise<void> {
     const artifactsInSubTree = artifactSelectionModule.getSelectedSubtreeIds;
 
-    artifactTreeCyPromise.then((cy) => {
-      if (!cy.animated()) {
-        this.centerOnArtifacts(artifactsInSubTree);
-      }
-    });
+    cyIfNotAnimated(() => this.centerOnArtifacts(artifactsInSubTree));
   }
 
   @Action
@@ -85,9 +79,7 @@ export default class ViewportModule extends VuexModule {
 
     await this.setGraphLayout(payload);
 
-    artifactTreeCyPromise.then((cy) => {
-      cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
-    });
+    cyZoomReset();
   }
 
   @Action({ rawError: true })
@@ -99,17 +91,7 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: timTreeCyPromise };
 
     await viewportModule.setGraphLayout(payload);
-    appModule.SET_IS_LOADING(true);
-
-    timTreeCyPromise.then((cy) => {
-      setTimeout(() => {
-        cy.animate({
-          center: { eles: cy.nodes() },
-          duration: ANIMATION_DURATION,
-          complete: () => appModule.SET_IS_LOADING(false),
-        });
-      }, 250);
-    });
+    cyCenterNodes();
   }
 
   @Action
@@ -119,33 +101,7 @@ export default class ViewportModule extends VuexModule {
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
     this.SET_LAYOUT(layoutPayload.layout);
 
-    layoutPayload.cyPromise.then((cy) => {
-      layoutPayload.layout.createLayout(cy);
-    });
-  }
-
-  @Action
-  /**
-   * Zooms the viewport out.
-   */
-  onZoomOut(cyPromise: Promise<CytoCore> = artifactTreeCyPromise): void {
-    cyPromise.then((cy) => {
-      cy.zoom(cy.zoom() - ZOOM_INCREMENT);
-      cy.center(cy.nodes());
-    });
-  }
-
-  @Action
-  /**
-   * Zooms the viewport in.
-   *
-   * @param cyPromise - A promise returning cytoscape instance to zoom on.
-   */
-  onZoomIn(cyPromise: Promise<CytoCore> = artifactTreeCyPromise): void {
-    cyPromise.then((cy) => {
-      cy.zoom(cy.zoom() + ZOOM_INCREMENT);
-      cy.center(cy.nodes());
-    });
+    cyCreateLayout(layoutPayload);
   }
 
   @Action
@@ -175,42 +131,12 @@ export default class ViewportModule extends VuexModule {
     artifactIds: string[],
     cyPromise = artifactTreeCyPromise
   ): void {
-    cyPromise.then((cy) => {
-      if (cy.animated()) {
-        if (
-          this.currentCenteringCollection !== undefined &&
-          areArraysEqual(this.currentCenteringCollection, artifactIds)
-        ) {
-          return logModule.onDevWarning(
-            `Collection is already being rendered: ${artifactIds}`
-          );
-        } else {
-          cy.stop(false, false);
-        }
-      }
-
-      this.SET_CURRENT_COLLECTION(artifactIds);
-
-      const collection =
-        artifactIds.length === 0
-          ? cy.nodes()
-          : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
-
-      if (collection.length > 1) {
-        cy.animate({
-          fit: { eles: collection, padding: CENTER_GRAPH_PADDING },
-          duration: ANIMATION_DURATION,
-          complete: () => this.SET_CURRENT_COLLECTION(undefined),
-        });
-      } else {
-        cy.animate({
-          zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
-          center: { eles: collection },
-          duration: ANIMATION_DURATION,
-          complete: () => this.SET_CURRENT_COLLECTION(undefined),
-        });
-      }
-    });
+    cyCenterOnArtifacts(
+      this.currentCenteringCollection,
+      artifactIds,
+      (ids) => this.SET_CURRENT_COLLECTION(ids),
+      cyPromise
+    );
   }
 
   @Action

@@ -10,7 +10,7 @@ import type {
 } from "@/types";
 import { LinkValidator } from "@/types";
 import { logModule, artifactSelectionModule, subtreeModule } from "@/store";
-import { createProject } from "@/util";
+import { createProject, getSingleQueryResult, getTraceId } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -154,7 +154,7 @@ export default class ProjectModule extends VuexModule {
     const unaffected = this.project.traces.filter(
       (link) => !traceLinkIds.includes(link.traceLinkId)
     );
-    this.project.traces = unaffected.concat(traceLinks);
+    this.project.traces = [...unaffected, ...traceLinks];
   }
 
   @Mutation
@@ -192,7 +192,7 @@ export default class ProjectModule extends VuexModule {
     const unaffected = this.project.artifacts.filter(
       (a) => !newArtifactIds.includes(a.id)
     );
-    this.project.artifacts = unaffected.concat(artifacts);
+    this.project.artifacts = [...unaffected, ...artifacts];
   }
 
   @Mutation
@@ -229,38 +229,6 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
-   * Returns the artifact in list if single item exists.
-   *
-   * @return The found artifact.
-   *
-   * @throws Error if query contains multiple or no results.
-   */
-  get getSingleQueryResult(): (
-    query: Artifact[],
-    queryName: string
-  ) => Artifact {
-    /**
-     * @param query - List of artifacts representing some query for an artifact.
-     * @param queryName - The name of the operation to log if operation fails.
-     */
-    return (query, queryName) => {
-      let error = "";
-      switch (query.length) {
-        case 1:
-          return query[0];
-        case 0:
-          error = `Query resulted in empty results: ${queryName}`;
-          logModule.onWarning(error);
-          throw Error(error);
-        default:
-          error = `Found more than one result in query: ${queryName}`;
-          logModule.onWarning(error);
-          throw Error(error);
-      }
-    };
-  }
-
-  /**
    * @return A function for finding an artifact by name.
    */
   get getArtifactByName(): ArtifactQueryFunction {
@@ -268,7 +236,8 @@ export default class ProjectModule extends VuexModule {
       const query = this.project.artifacts.filter(
         (a) => a.name === artifactName
       );
-      return this.getSingleQueryResult(query, `Find by name: ${artifactName}`);
+
+      return getSingleQueryResult(query, `Find by name: ${artifactName}`);
     };
   }
 
@@ -280,10 +249,8 @@ export default class ProjectModule extends VuexModule {
       const query = this.project.artifacts.filter(
         (a) => a.id === targetArtifactId
       );
-      return this.getSingleQueryResult(
-        query,
-        `Find by id: ${targetArtifactId}`
-      );
+
+      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
     };
   }
 
@@ -324,10 +291,9 @@ export default class ProjectModule extends VuexModule {
       );
 
       if (traceQuery.length === 0) {
-        const traceId = `${sourceId}-${targetId}`;
-        const error = `Could not find trace link with id: ${traceId}`;
-        logModule.onDevError(error);
-        throw Error(error);
+        throw Error(
+          `Could not find trace link with id: ${getTraceId(sourceId, targetId)}`
+        );
       }
 
       return traceQuery[0];
@@ -339,8 +305,7 @@ export default class ProjectModule extends VuexModule {
    */
   get doesLinkExist(): LinkValidator {
     return (sourceId, targetId) => {
-      const traceLinks = this.project.traces;
-      const traceLinkQuery = traceLinks.filter(
+      const traceLinkQuery = this.project.traces.filter(
         (t) =>
           (t.sourceId === sourceId && t.targetId === targetId) ||
           (t.targetId === sourceId && t.sourceId === targetId)

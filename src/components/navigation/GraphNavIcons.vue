@@ -32,6 +32,7 @@ import {
 } from "@/store";
 import { GenericIconButton, CheckmarkMenu } from "@/components/common";
 import { redoCommit, undoCommit } from "@/api";
+import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 
 export default Vue.extend({
   components: {
@@ -90,13 +91,13 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: () => viewportModule.onZoomIn(),
+          handler: () => cyZoomIn(),
           label: "Zoom In",
           icon: "mdi-magnify-plus-outline",
         },
         {
           type: ButtonType.ICON,
-          handler: () => viewportModule.onZoomOut(),
+          handler: () => cyZoomOut(),
           label: "Zoom Out",
           icon: "mdi-magnify-minus-outline",
         },

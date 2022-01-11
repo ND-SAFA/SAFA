@@ -1,7 +1,7 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
 import { projectModule } from "@/store";
 import { createCommit } from "@/util";
-import { saveCommit } from "@/api/handlers";
+import { saveCommit } from "./commit-handler";
 
 /**
  * Responsible for creating a commit and saving it to the database.

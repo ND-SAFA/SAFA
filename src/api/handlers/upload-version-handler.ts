@@ -1,9 +1,15 @@
-import { EmptyLambda, ProjectIdentifier, ProjectVersion } from "@/types";
-import { logModule, projectModule } from "@/store";
-import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
-import { ProjectCreationResponse } from "@/types";
+import {
+  EmptyLambda,
+  ProjectIdentifier,
+  ProjectVersion,
+  ProjectCreationResponse,
+} from "@/types";
+import { logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { connectAndSubscribeToVersion } from "@/api";
+import {
+  connectAndSubscribeToVersion,
+  updateProjectThroughFlatFiles,
+} from "@/api/endpoints";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.

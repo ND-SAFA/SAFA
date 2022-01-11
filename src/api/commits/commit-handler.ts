@@ -1,6 +1,6 @@
 import { Commit } from "@/types";
 import { commitModule } from "@/store";
-import { persistCommit } from "@/api/commits";
+import { persistCommit } from "./commit-api";
 
 /**
  * Saves commit to the application store, and persist the commit.

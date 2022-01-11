@@ -1,6 +1,6 @@
 import { appModule } from "@/store";
-import { getProjectVersion } from "@/api";
 import { navigateTo, Routes } from "@/router";
+import { getProjectVersion } from "@/api/endpoints";
 import { setCreatedProject } from "./set-project-handler";
 
 /**

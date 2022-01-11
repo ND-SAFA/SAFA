@@ -29,7 +29,7 @@ export default Vue.extend({
     const location = window.location.href;
 
     if (!isAuthorized) {
-      return await logout();
+      await logout();
     } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
       await loadLastProject();
     }

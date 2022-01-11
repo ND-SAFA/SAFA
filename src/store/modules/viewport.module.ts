@@ -86,7 +86,7 @@ export default class ViewportModule extends VuexModule {
     cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
   }
 
-  @Action
+  @Action({ rawError: true })
   /**
    * Resets the TIM graph back to fit all nodes.
    */

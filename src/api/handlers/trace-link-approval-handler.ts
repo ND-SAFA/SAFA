@@ -1,6 +1,6 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
 import { appModule, artifactSelectionModule, projectModule } from "@/store";
-import { approveLink, declineLink } from "@/api/endpoints";
+import { approveLink, declineLink } from "@/api/commits";
 
 /**
  * Processes link approvals, setting the app state to loading in between, and updating trace links afterwards.

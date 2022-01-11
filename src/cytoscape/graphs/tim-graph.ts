@@ -1,19 +1,15 @@
+import klay from "cytoscape-klay";
+import nodeHtmlLabel from "cytoscape-node-html-label";
+import { CytoCoreGraph, CytoCore } from "@/types";
+import { viewportModule } from "@/store";
 import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   MOTION_BLUE_OPACITY,
-  timTreeResolveCy,
   USE_MOTION_BLUR,
-  TimGraphLayout,
-  timTreeCyPromise,
-  ANIMATION_DURATION,
 } from "@/cytoscape";
-import { CytoCoreGraph } from "@/types/cytoscape/core/cyto-core-graph";
-import { appModule, viewportModule } from "@/store";
-import klay from "cytoscape-klay";
+import { timTreeResolveCy } from "@/cytoscape/cy";
 import { TimStyleSheets } from "@/cytoscape/styles/stylesheets/tim-styles";
-import { CytoCore } from "@/types";
 import { timNodeHtml } from "@/cytoscape/styles/html/tim-html";
-import nodeHtmlLabel from "cytoscape-node-html-label";
 
 export const timGraph: CytoCoreGraph = {
   name: "tim-tree-graph",

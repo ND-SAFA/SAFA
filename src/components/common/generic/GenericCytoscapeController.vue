@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CytoCore, CytoCoreGraph } from "@/types/cytoscape/core";
+import { CytoCore, CytoCoreGraph } from "@/types";
 import { logModule } from "@/store";
 
 /**

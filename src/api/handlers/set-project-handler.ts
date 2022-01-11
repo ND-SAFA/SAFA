@@ -9,10 +9,8 @@ import {
   subtreeModule,
   viewportModule,
 } from "@/store";
-import {
-  connectAndSubscribeToVersion,
-  loadVersionIfExistsHandler,
-} from "@/api";
+import { connectAndSubscribeToVersion } from "@/api/endpoints";
+import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 
 /**
  1. Sets a new project.

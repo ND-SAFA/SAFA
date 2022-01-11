@@ -1,10 +1,7 @@
-import {
-  getCurrentVersion,
-  getProjects,
-  loadVersionIfExistsHandler,
-} from "@/api";
 import { navigateTo, Routes } from "@/router";
 import { sessionModule } from "@/store";
+import { getCurrentVersion, getProjects } from "@/api/endpoints";
+import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 
 /**
  * Loads the last stored project.

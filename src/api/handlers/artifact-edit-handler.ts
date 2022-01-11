@@ -4,7 +4,7 @@ import {
   createArtifact,
   updateArtifact,
   deleteArtifactBody,
-} from "@/api/endpoints";
+} from "@/api/commits";
 
 /**
  * Creates or updates artifact in BEND then updates app state.

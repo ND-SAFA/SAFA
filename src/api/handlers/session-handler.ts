@@ -1,12 +1,8 @@
 import { createSession } from "@/util";
 import { navigateTo, Routes } from "@/router";
-import {
-  deltaModule,
-  projectModule,
-  sessionModule,
-  subtreeModule,
-} from "@/store";
-import { clearProject, loginUser } from "@/api";
+import { deltaModule, sessionModule, subtreeModule } from "@/store";
+import { loginUser } from "@/api/endpoints";
+import { clearProject } from "./set-project-handler";
 import { UserModel } from "@/types";
 
 /**

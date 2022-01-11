@@ -10,6 +10,7 @@ import {
   fillEndpoint,
   authHttpClient,
 } from "@/api/endpoints/util";
+import { sessionModule } from "@/store";
 
 /**
  * TODO: remove once endpoints exist.

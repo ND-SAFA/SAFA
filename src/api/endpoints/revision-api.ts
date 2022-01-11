@@ -4,6 +4,7 @@ import { ProjectVersionUpdate } from "@/types";
 import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/endpoints/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
+import { setCreatedProject } from "@/api/handlers/set-project-handler";
 
 const WEBSOCKET_URL = `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -125,6 +126,11 @@ export function connectAndSubscribeToVersion(
   versionId: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (!projectId || !versionId) {
+      resolve();
+      return;
+    }
+
     connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME)
       .then(() => {
         clearSubscriptions();
@@ -162,8 +168,6 @@ async function revisionMessageHandler(
       await projectModule.addOrUpdateTraceLinks(revision.traces);
       break;
     case "excluded":
-      getProjectVersion(versionId).then(
-        projectModule.setProjectCreationResponse
-      );
+      getProjectVersion(versionId).then(setCreatedProject);
   }
 }

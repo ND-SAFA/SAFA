@@ -3,6 +3,7 @@ import { logModule, projectModule } from "@/store";
 import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
 import { ProjectCreationResponse } from "@/types";
 import { navigateTo, Routes } from "@/router";
+import { connectAndSubscribeToVersion } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -37,12 +38,10 @@ export async function uploadNewProjectVersion(
       formData.append("files", file);
     });
     if (setVersionIfSuccessful) {
-      await projectModule
-        .subscribeToVersion({
-          projectId: selectedProject.projectId,
-          versionId: selectedVersion.versionId,
-        })
-        .catch((e) => logModule.onError(e.message));
+      connectAndSubscribeToVersion(
+        selectedProject.projectId,
+        selectedVersion.versionId
+      ).catch((e) => logModule.onError(e.message));
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)

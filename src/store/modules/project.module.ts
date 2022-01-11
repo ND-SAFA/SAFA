@@ -3,25 +3,13 @@ import type {
   Artifact,
   ArtifactDirection,
   ArtifactQueryFunction,
-  ChannelSubscriptionId,
   Project,
-  ProjectCreationResponse,
   ProjectIdentifier,
   TraceLink,
   ArtifactTypeDirections,
 } from "@/types";
-import { LinkValidator, PanelType, ProjectVersionUpdate } from "@/types";
-import {
-  logModule,
-  artifactSelectionModule,
-  deltaModule,
-  errorModule,
-  subtreeModule,
-  viewportModule,
-  appModule,
-} from "@/store";
-import { connectAndSubscribeToVersion } from "@/api/endpoints";
-import { loadVersionIfExistsHandler } from "@/api/handlers";
+import { LinkValidator } from "@/types";
+import { logModule, artifactSelectionModule, subtreeModule } from "@/store";
 import { createProject } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
@@ -38,60 +26,6 @@ export default class ProjectModule extends VuexModule {
    * A mapping of the allowed directions of traces between artifacts.
    */
   private artifactTypeDirections: ArtifactTypeDirections = {};
-
-  @Action({ rawError: true })
-  /**
-   * 1. Sets the current project to the created project.
-   * 2. Sets any warnings generated when loading the project.
-   * 3. Resets the viewport to frame the new project graph.
-   * 4. Disables delta view, if it was enabled.
-   *
-   * @param res - The response from creating the project.
-   */
-  async setProjectCreationResponse(
-    res: ProjectCreationResponse
-  ): Promise<void> {
-    await this.setProject(res.project);
-    errorModule.setArtifactWarnings(res.warnings);
-  }
-
-  @Action
-  /**
-   * 1. Sets a new project.
-   * 2. Subscribes to the new project's version.
-   * 3. Clears any deltas to previous projects.
-   *
-   * @param newProject - The new project to set.
-   */
-  async setProject(newProject: Project): Promise<void> {
-    const isDifferentProject = this.project.projectId !== newProject.projectId;
-    const projectId = newProject.projectId;
-    const versionId = newProject.projectVersion?.versionId;
-
-    await artifactSelectionModule.clearSelections();
-
-    this.SAVE_PROJECT(newProject);
-    await this.subscribeToVersion({ projectId, versionId });
-
-    if (isDifferentProject) {
-      await subtreeModule.resetHiddenNodes();
-      await viewportModule.setArtifactTreeLayout();
-    }
-
-    deltaModule.clearDelta();
-    appModule.closeSidePanels();
-    await subtreeModule.updateSubtreeMap();
-    this.updateAllowedTraceDirections();
-    await subtreeModule.initializeProject(newProject);
-  }
-
-  @Action
-  /**
-   * Clears the current project.
-   */
-  async clearProject(): Promise<void> {
-    await this.setProject(createProject());
-  }
 
   @Action
   /**
@@ -142,29 +76,6 @@ export default class ProjectModule extends VuexModule {
   async deleteArtifactByName(artifactName: string): Promise<void> {
     this.DELETE_ARTIFACT_BY_NAME(artifactName);
     await subtreeModule.updateSubtreeMap();
-  }
-
-  @Action
-  /**
-   * Subscribes to a new project version.
-   *
-   * @param subscriptionId - The project and version ID to subscribe to.
-   */
-  async subscribeToVersion({
-    projectId,
-    versionId,
-  }: ChannelSubscriptionId): Promise<void> {
-    if (projectId && versionId) {
-      await connectAndSubscribeToVersion(projectId, versionId);
-    }
-  }
-
-  @Action
-  /**
-   * Reloads the current project.
-   */
-  async reloadProject(): Promise<void> {
-    await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
   }
 
   @Action({ rawError: true })

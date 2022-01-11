@@ -1,6 +1,7 @@
-import { appModule, projectModule } from "@/store";
+import { appModule } from "@/store";
 import { getProjectVersion } from "@/api";
 import { navigateTo, Routes } from "@/router";
+import { setCreatedProject } from "./set-project-handler";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -16,7 +17,7 @@ export async function loadVersionIfExistsHandler(
 
     return navigateTo(Routes.ARTIFACT_TREE)
       .then(() => getProjectVersion(lastVersionId))
-      .then(projectModule.setProjectCreationResponse)
+      .then(setCreatedProject)
       .finally(appModule.onLoadEnd);
   }
 }

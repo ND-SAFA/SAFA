@@ -40,6 +40,7 @@ import { Project } from "@/types";
 import { versionToString } from "@/util";
 import { deltaModule, projectModule } from "@/store";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
+import { reloadProject } from "@/api";
 
 export default Vue.extend({
   name: "left-panel-nav",
@@ -63,7 +64,7 @@ export default Vue.extend({
         }
       } else {
         deltaModule.setIsDeltaViewEnabled(false);
-        projectModule.reloadProject();
+        reloadProject();
       }
     },
   },

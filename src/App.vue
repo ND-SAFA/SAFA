@@ -15,8 +15,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { sessionModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import { Routes } from "@/router";
 import { Snackbar } from "@/components";
+import { loadLastProject, logout } from "@/api";
 
 export default Vue.extend({
   name: "app",
@@ -28,9 +29,9 @@ export default Vue.extend({
     const location = window.location.href;
 
     if (!isAuthorized) {
-      return await sessionModule.logout();
+      return await logout();
     } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
-      await sessionModule.loadLastProject();
+      await loadLastProject();
     }
   },
 });

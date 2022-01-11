@@ -48,7 +48,12 @@ import {
   ProjectCreationResponse,
   ProjectIdentifier,
 } from "@/types";
-import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
+import {
+  clearProject,
+  deleteProject,
+  getProjects,
+  saveOrUpdateProject,
+} from "@/api";
 import { logModule, projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -172,7 +177,7 @@ export default Vue.extend({
 
           if (project.name === projectModule.getProject.name) {
             // Clear the current project if it has been deleted.
-            await projectModule.clearProject();
+            await clearProject();
           }
         })
         .finally(() => (this.isLoading = false));

@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { projectModule } from "@/store";
+import { linkDirectionsModule, projectModule } from "@/store";
 import { capitalizeSentence } from "@/util";
 import { LabeledArtifactDirection } from "@/types";
 
@@ -31,12 +31,10 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.artifactTypes = Object.keys(
-      projectModule.allowedArtifactTypeDirections
-    );
+    this.artifactTypes = linkDirectionsModule.artifactTypes;
 
     this.artifactDirections = Object.entries(
-      projectModule.allowedArtifactTypeDirections
+      linkDirectionsModule.linkDirections
     ).map(([type, allowedTypes]) => ({
       type,
       allowedTypes,
@@ -45,7 +43,10 @@ export default Vue.extend({
   },
   methods: {
     onChange(type: string, allowedTypes: string[]) {
-      projectModule.editAllowedTraceDirections({ type, allowedTypes });
+      linkDirectionsModule.updateLinkDirections({
+        type,
+        allowedTypes,
+      });
     },
   },
 });

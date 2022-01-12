@@ -2,11 +2,11 @@ import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectVersionUpdate } from "@/types";
 import { projectModule, logModule } from "@/store";
-import { baseURL } from "@/api/endpoints/util";
+import { baseURL } from "@/api/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
 import { setCreatedProject } from "@/api/handlers/set-project-handler";
 
-const WEBSOCKET_URL = `${baseURL}/websocket`;
+const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
 let stompClient: Client;
 
@@ -27,7 +27,7 @@ let currentReconnectAttempts = 0;
 function getStompClient(reconnect = false): Client {
   if (sock === undefined || stompClient === undefined || reconnect) {
     try {
-      sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
+      sock = new SockJS(WEBSOCKET_URL(), { DEBUG: false });
       sock.onclose = () => {
         logModule.onDevMessage("Closing WebSocket.");
         connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();
@@ -73,7 +73,7 @@ function connect(
 
     currentReconnectAttempts++;
     stomp.connect(
-      { host: WEBSOCKET_URL },
+      { host: WEBSOCKET_URL() },
       () => {
         if (currentReconnectAttempts > 1) {
           logModule.onSuccess("Web Socket reconnected to server.");

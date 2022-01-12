@@ -11,6 +11,7 @@ import {
   SnackbarModule,
   SubtreeModule,
   ViewportModule,
+  LinkDirectionsModule,
 } from "./modules";
 import CommitModule from "@/store/modules/commit.module";
 import { vuexLocal } from "@/plugins/vuex-persist";
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
     project: ProjectModule,
     delta: DeltaModule,
     error: ErrorModule,
+    linkDirections: LinkDirectionsModule,
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,
     commit: CommitModule,
@@ -49,5 +51,6 @@ export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
 export const commitModule = getModule(CommitModule, store);
 export const subtreeModule = getModule(SubtreeModule, store);
+export const linkDirectionsModule = getModule(LinkDirectionsModule, store);
 
 export default store;

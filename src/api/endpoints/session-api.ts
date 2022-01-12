@@ -4,13 +4,7 @@ import {
   UserModel,
   UserResetModel,
 } from "@/types";
-import {
-  baseURL,
-  Endpoint,
-  fillEndpoint,
-  authHttpClient,
-} from "@/api/endpoints/util";
-import { sessionModule } from "@/store";
+import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
  * TODO: remove once endpoints exist.

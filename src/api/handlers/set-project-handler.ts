@@ -5,6 +5,7 @@ import {
   artifactSelectionModule,
   deltaModule,
   errorModule,
+  linkDirectionsModule,
   projectModule,
   subtreeModule,
   viewportModule,
@@ -39,7 +40,7 @@ export async function setAndSubscribeToProject(
   deltaModule.clearDelta();
   appModule.closeSidePanels();
   await subtreeModule.updateSubtreeMap();
-  projectModule.updateAllowedTraceDirections();
+  linkDirectionsModule.setLinkDirections(project);
   await subtreeModule.initializeProject(project);
 }
 

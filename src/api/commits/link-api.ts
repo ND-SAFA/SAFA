@@ -1,5 +1,5 @@
 import { TraceApproval, TraceLink, Artifact } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/endpoints/util";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "./commit-builder";
 
 /**

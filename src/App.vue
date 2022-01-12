@@ -15,9 +15,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { sessionModule } from "@/store";
+import { loadLastProject, logout } from "@/api";
 import { Routes } from "@/router";
 import { Snackbar } from "@/components";
-import { loadLastProject, logout } from "@/api";
 
 export default Vue.extend({
   name: "app",
@@ -39,6 +39,4 @@ export default Vue.extend({
 
 <style lang="scss">
 @import "./assets/main.scss";
-@import "./assets/app-styles.css";
-@import "./assets/context-menu.css";
 </style>

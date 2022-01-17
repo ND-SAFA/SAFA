@@ -31,6 +31,8 @@ import {
   viewportModule,
 } from "@/store";
 import { GenericIconButton, CheckmarkMenu } from "@/components/common";
+import { redoCommit, undoCommit } from "@/api";
+import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 
 export default Vue.extend({
   components: {
@@ -81,7 +83,7 @@ export default Vue.extend({
         {
           type: ButtonType.ICON,
           handler: () => {
-            commitModule.undoCommit().then();
+            undoCommit().then();
           },
           label: "Undo Commit",
           icon: "mdi-undo",
@@ -89,13 +91,13 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: () => viewportModule.onZoomIn(),
+          handler: () => cyZoomIn(),
           label: "Zoom In",
           icon: "mdi-magnify-plus-outline",
         },
         {
           type: ButtonType.ICON,
-          handler: () => viewportModule.onZoomOut(),
+          handler: () => cyZoomOut(),
           label: "Zoom Out",
           icon: "mdi-magnify-minus-outline",
         },
@@ -122,7 +124,7 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: () => commitModule.redoCommit().then(),
+          handler: () => redoCommit().then(),
           label: "Redo Commit",
           icon: "mdi-redo",
           isDisabled: !commitModule.canRedo,

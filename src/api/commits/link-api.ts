@@ -1,10 +1,6 @@
 import { TraceApproval, TraceLink, Artifact } from "@/types";
-import {
-  CommitBuilder,
-  Endpoint,
-  fillEndpoint,
-  authHttpClient,
-} from "@/api/endpoints/util";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { CommitBuilder } from "./commit-builder";
 
 /**
  * Returns all generated links for this project.
@@ -74,6 +70,6 @@ export async function declineLink(traceLink: TraceLink): Promise<void> {
  * @return The created trace link.
  */
 export async function createLink(traceLink: TraceLink): Promise<void> {
-  traceLink.approvalStatus = TraceApproval.DECLINED;
+  traceLink.approvalStatus = TraceApproval.APPROVED;
   return CommitBuilder.withCurrentVersion().withNewTraceLink(traceLink).save();
 }

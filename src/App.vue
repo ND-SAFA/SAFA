@@ -15,7 +15,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { sessionModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import { loadLastProject, logout } from "@/api";
+import { Routes } from "@/router";
 import { Snackbar } from "@/components";
 
 export default Vue.extend({
@@ -28,9 +29,9 @@ export default Vue.extend({
     const location = window.location.href;
 
     if (!isAuthorized) {
-      return await sessionModule.logout();
+      await logout();
     } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
-      await sessionModule.loadLastProject();
+      await loadLastProject();
     }
   },
 });
@@ -38,6 +39,4 @@ export default Vue.extend({
 
 <style lang="scss">
 @import "./assets/main.scss";
-@import "./assets/app-styles.css";
-@import "./assets/context-menu.css";
 </style>

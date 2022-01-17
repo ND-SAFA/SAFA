@@ -1,28 +1,14 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type {
   Artifact,
-  ArtifactDirection,
   ArtifactQueryFunction,
-  ChannelSubscriptionId,
   Project,
-  ProjectCreationResponse,
   ProjectIdentifier,
   TraceLink,
-  ArtifactTypeDirections,
 } from "@/types";
-import { LinkValidator, PanelType, ProjectVersionUpdate } from "@/types";
-import {
-  logModule,
-  artifactSelectionModule,
-  deltaModule,
-  errorModule,
-  subtreeModule,
-  viewportModule,
-  appModule,
-} from "@/store";
-import { connectAndSubscribeToVersion } from "@/api/endpoints";
-import { loadVersionIfExistsHandler } from "@/api/handlers";
-import { createProject } from "@/util";
+import { LinkValidator } from "@/types";
+import { artifactSelectionModule, subtreeModule } from "@/store";
+import { createProject, getSingleQueryResult, getTraceId } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -33,65 +19,6 @@ export default class ProjectModule extends VuexModule {
    * The currently loaded project.
    */
   private project = createProject();
-
-  /**
-   * A mapping of the allowed directions of traces between artifacts.
-   */
-  private artifactTypeDirections: ArtifactTypeDirections = {};
-
-  @Action({ rawError: true })
-  /**
-   * 1. Sets the current project to the created project.
-   * 2. Sets any warnings generated when loading the project.
-   * 3. Resets the viewport to frame the new project graph.
-   * 4. Disables delta view, if it was enabled.
-   *
-   * @param res - The response from creating the project.
-   */
-  async setProjectCreationResponse(
-    res: ProjectCreationResponse
-  ): Promise<void> {
-    await this.setProject(res.project);
-    errorModule.setArtifactWarnings(res.warnings);
-  }
-
-  @Action
-  /**
-   * 1. Sets a new project.
-   * 2. Subscribes to the new project's version.
-   * 3. Clears any deltas to previous projects.
-   *
-   * @param newProject - The new project to set.
-   */
-  async setProject(newProject: Project): Promise<void> {
-    const isDifferentProject = this.project.projectId !== newProject.projectId;
-    const projectId = newProject.projectId;
-    const versionId = newProject.projectVersion?.versionId;
-
-    await artifactSelectionModule.clearSelections();
-
-    this.SAVE_PROJECT(newProject);
-    await this.subscribeToVersion({ projectId, versionId });
-
-    if (isDifferentProject) {
-      await subtreeModule.resetHiddenNodes();
-      await viewportModule.setArtifactTreeLayout();
-    }
-
-    deltaModule.clearDelta();
-    appModule.closeSidePanels();
-    await subtreeModule.updateSubtreeMap();
-    this.updateAllowedTraceDirections();
-    await subtreeModule.initializeProject(newProject);
-  }
-
-  @Action
-  /**
-   * Clears the current project.
-   */
-  async clearProject(): Promise<void> {
-    await this.setProject(createProject());
-  }
 
   @Action
   /**
@@ -144,70 +71,6 @@ export default class ProjectModule extends VuexModule {
     await subtreeModule.updateSubtreeMap();
   }
 
-  @Action
-  /**
-   * Subscribes to a new project version.
-   *
-   * @param subscriptionId - The project and version ID to subscribe to.
-   */
-  async subscribeToVersion({
-    projectId,
-    versionId,
-  }: ChannelSubscriptionId): Promise<void> {
-    if (projectId && versionId) {
-      await connectAndSubscribeToVersion(projectId, versionId);
-    }
-  }
-
-  @Action
-  /**
-   * Reloads the current project.
-   */
-  async reloadProject(): Promise<void> {
-    await loadVersionIfExistsHandler(this.project.projectVersion?.versionId);
-  }
-
-  @Action({ rawError: true })
-  /**
-   * Updates what directions of trace links between artifacts are allowed.
-   */
-  updateAllowedTraceDirections(): void {
-    const allowedDirections: ArtifactTypeDirections = {};
-
-    // Ensure that all artifact types appear in mapping.
-    this.artifacts.forEach((artifact) => {
-      allowedDirections[artifact.type] = [];
-    });
-
-    this.traceLinks.forEach(({ sourceId, targetId }) => {
-      try {
-        const sourceType = this.getArtifactById(sourceId).type;
-        const targetType = this.getArtifactById(targetId).type;
-
-        if (!allowedDirections[sourceType].includes(targetType)) {
-          allowedDirections[sourceType].push(targetType);
-        }
-      } catch (e) {
-        logModule.onDevMessage(
-          `Unable to calculate allowed trace directions: ${e}`
-        );
-      }
-    });
-
-    this.SET_TRACE_DIRECTIONS(allowedDirections);
-  }
-
-  @Action
-  /**
-   * Changes what directions of trace links between artifacts are allowed.
-   */
-  editAllowedTraceDirections({ type, allowedTypes }: ArtifactDirection): void {
-    this.SET_TRACE_DIRECTIONS({
-      ...this.artifactTypeDirections,
-      [type]: allowedTypes,
-    });
-  }
-
   @Mutation
   /**
    * Sets a new project.
@@ -240,10 +103,10 @@ export default class ProjectModule extends VuexModule {
    */
   ADD_OR_UPDATE_TRACE_LINKS(traceLinks: TraceLink[]): void {
     const traceLinkIds = traceLinks.map((t) => t.traceLinkId);
-    const unaffected = this.project.traces.filter(
+    const unaffected = this.traceLinks.filter(
       (link) => !traceLinkIds.includes(link.traceLinkId)
     );
-    this.project.traces = unaffected.concat(traceLinks);
+    this.project.traces = [...unaffected, ...traceLinks];
   }
 
   @Mutation
@@ -253,7 +116,7 @@ export default class ProjectModule extends VuexModule {
    * @param traceLink - The trace link to remove.
    */
   REMOVE_TRACE_LINK(traceLink: TraceLink): void {
-    this.project.traces = this.project.traces.filter(
+    this.project.traces = this.traceLinks.filter(
       (link) => link.traceLinkId !== traceLink.traceLinkId
     );
   }
@@ -265,7 +128,7 @@ export default class ProjectModule extends VuexModule {
    * @param artifactName - The artifact to remove.
    */
   DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
-    this.project.artifacts = this.project.artifacts.filter(
+    this.project.artifacts = this.artifacts.filter(
       (a) => a.name !== artifactName
     );
   }
@@ -278,20 +141,10 @@ export default class ProjectModule extends VuexModule {
    */
   ADD_OR_UPDATE_ARTIFACTS(artifacts: Artifact[]): void {
     const newArtifactIds = artifacts.map((a) => a.id);
-    const unaffected = this.project.artifacts.filter(
+    const unaffected = this.artifacts.filter(
       (a) => !newArtifactIds.includes(a.id)
     );
-    this.project.artifacts = unaffected.concat(artifacts);
-  }
-
-  @Mutation
-  /**
-   * Sets a new collection of allowed directions between artifact types.
-   *
-   * @param artifactTypeDirections - Directions between artifact types to allow.
-   */
-  SET_TRACE_DIRECTIONS(artifactTypeDirections: ArtifactTypeDirections): void {
-    this.artifactTypeDirections = artifactTypeDirections;
+    this.project.artifacts = [...unaffected, ...artifacts];
   }
 
   /**
@@ -318,61 +171,26 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
-   * Returns the artifact in list if single item exists.
-   *
-   * @return The found artifact.
-   *
-   * @throws Error if query contains multiple or no results.
-   */
-  get getSingleQueryResult(): (
-    query: Artifact[],
-    queryName: string
-  ) => Artifact {
-    /**
-     * @param query - List of artifacts representing some query for an artifact.
-     * @param queryName - The name of the operation to log if operation fails.
-     */
-    return (query, queryName) => {
-      let error = "";
-      switch (query.length) {
-        case 1:
-          return query[0];
-        case 0:
-          error = `Query resulted in empty results: ${queryName}`;
-          logModule.onWarning(error);
-          throw Error(error);
-        default:
-          error = `Found more than one result in query: ${queryName}`;
-          logModule.onWarning(error);
-          throw Error(error);
-      }
-    };
-  }
-
-  /**
    * @return A function for finding an artifact by name.
+   * @throws If exactly 1 artifact is found to match.
    */
   get getArtifactByName(): ArtifactQueryFunction {
     return (artifactName) => {
-      const query = this.project.artifacts.filter(
-        (a) => a.name === artifactName
-      );
-      return this.getSingleQueryResult(query, `Find by name: ${artifactName}`);
+      const query = this.artifacts.filter((a) => a.name === artifactName);
+
+      return getSingleQueryResult(query, `Find by name: ${artifactName}`);
     };
   }
 
   /**
    * @return A function for finding an artifact by id.
+   * @throws If exactly 1 artifact is found to match.
    */
   get getArtifactById(): ArtifactQueryFunction {
     return (targetArtifactId) => {
-      const query = this.project.artifacts.filter(
-        (a) => a.id === targetArtifactId
-      );
-      return this.getSingleQueryResult(
-        query,
-        `Find by id: ${targetArtifactId}`
-      );
+      const query = this.artifacts.filter((a) => a.id === targetArtifactId);
+
+      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
     };
   }
 
@@ -380,16 +198,9 @@ export default class ProjectModule extends VuexModule {
    * @return A collection of artifacts, keyed by their id.
    */
   get getArtifactsById(): Record<string, Artifact> {
-    return this.project.artifacts
+    return this.artifacts
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-  }
-
-  /**
-   * @return All artifact types in the current project.
-   */
-  get getArtifactTypes(): string[] {
-    return Array.from(new Set(this.project.artifacts.map((a) => a.type)));
   }
 
   /**
@@ -408,15 +219,14 @@ export default class ProjectModule extends VuexModule {
     targetId: string
   ) => TraceLink {
     return (sourceId, targetId) => {
-      const traceQuery = this.project.traces.filter(
+      const traceQuery = this.traceLinks.filter(
         (t) => t.sourceId === sourceId && t.targetId === targetId
       );
 
       if (traceQuery.length === 0) {
-        const traceId = `${sourceId}-${targetId}`;
-        const error = `Could not find trace link with id: ${traceId}`;
-        logModule.onDevError(error);
-        throw Error(error);
+        throw Error(
+          `Could not find trace link with id: ${getTraceId(sourceId, targetId)}`
+        );
       }
 
       return traceQuery[0];
@@ -428,35 +238,12 @@ export default class ProjectModule extends VuexModule {
    */
   get doesLinkExist(): LinkValidator {
     return (sourceId, targetId) => {
-      const traceLinks = this.project.traces;
-      const traceLinkQuery = traceLinks.filter(
+      const traceLinkQuery = this.traceLinks.filter(
         (t) =>
           (t.sourceId === sourceId && t.targetId === targetId) ||
           (t.targetId === sourceId && t.sourceId === targetId)
       );
       return traceLinkQuery.length > 0;
-    };
-  }
-
-  /**
-   * Return the allowed directions of traces between artifacts.
-   */
-  get allowedArtifactTypeDirections(): ArtifactTypeDirections {
-    return this.artifactTypeDirections;
-  }
-
-  /**
-   * @return A function for determining if the trace link is allowed
-   * based on the type of the nodes.
-   */
-  get isLinkAllowedByType(): (
-    sourceType: string,
-    targetType: string
-  ) => boolean {
-    return (sourceType, targetType) => {
-      return this.allowedArtifactTypeDirections[sourceType]?.includes(
-        targetType
-      );
     };
   }
 }

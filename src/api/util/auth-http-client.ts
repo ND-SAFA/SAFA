@@ -1,7 +1,8 @@
 import { APIOptions } from "@/types";
 import { isAPIError } from "@/util";
-import { appModule, logModule, sessionModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 import { baseURL } from "./endpoints";
+import { logout } from "@/api/handlers";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -46,7 +47,7 @@ export default async function authHttpClient<T>(
   if (res.status === 403) {
     const message = "Session has timed out. Please log back in.";
     logModule.onWarning(message);
-    await sessionModule.logout();
+    await logout();
     throw Error(message);
   }
 

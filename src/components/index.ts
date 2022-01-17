@@ -1,5 +1,5 @@
 export * from "./common";
-export * from "./input";
+export * from "./common/input";
 export * from "./public";
 export * from "./side-panels";
 export * from "./navigation";

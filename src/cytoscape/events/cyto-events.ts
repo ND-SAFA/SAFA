@@ -1,5 +1,8 @@
 import { CSSCursor, CytoEvent, CytoEventHandlers } from "@/types";
 
+/**
+ * Handlers for mouse events on the graph.
+ */
 export const DefaultCytoEvents: CytoEventHandlers = {
   mouseOverCursor: {
     events: [CytoEvent.MOUSE_OVER],
@@ -20,14 +23,14 @@ export const DefaultCytoEvents: CytoEventHandlers = {
     events: [CytoEvent.DRAG],
     selector: "node",
     action: () => {
-      document.body.style.cursor = "grabbing";
+      document.body.style.cursor = CSSCursor.GRABBING;
     },
   },
   setDragFreeCursor: {
     events: [CytoEvent.DRAG_FREE, CytoEvent.FREE],
     selector: "node",
     action: () => {
-      document.body.style.cursor = "auto";
+      document.body.style.cursor = CSSCursor.AUTO;
     },
   },
 };

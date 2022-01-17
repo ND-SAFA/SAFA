@@ -1,10 +1,6 @@
 import { Artifact, ArtifactNameValidationResponse } from "@/types";
-import {
-  CommitBuilder,
-  Endpoint,
-  fillEndpoint,
-  authHttpClient,
-} from "@/api/endpoints/util";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { CommitBuilder } from "./commit-builder";
 
 /**
  * Returns whether the given artifact name already exists.

@@ -18,5 +18,4 @@ export const TIM_NODE_BORDER_WIDTH = 0;
 /**
  * Graph
  */
-export const DEFAULT_TIM_TREE_ZOOM = 3;
 export const TIM_GRAPH_NODE_SPACING = 50;

@@ -25,14 +25,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { sessionModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import { logout } from "@/api";
 
 export default Vue.extend({
   name: "account-dropdown",
   methods: {
     handleLogout(): void {
-      sessionModule.logout().then(() => navigateTo(Routes.LOGIN_ACCOUNT));
+      logout();
     },
   },
 });

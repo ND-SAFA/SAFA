@@ -69,7 +69,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "border-color": ARTIFACT_COLOR,
       "text-wrap": "ellipsis",
     },
-  } as CytoStyleSheet,
+  },
   {
     selector: "node[?isSelected]",
     style: {

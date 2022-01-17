@@ -7,3 +7,5 @@ export { default as ErrorModule } from "./error.module";
 export { default as ViewportModule } from "./viewport.module";
 export { default as SessionModule } from "./session.module";
 export { default as SubtreeModule } from "./subtree.module";
+export { default as LinkDirectionsModule } from "./linkDirections.module";
+export { default as CommitModule } from "./commit.module";

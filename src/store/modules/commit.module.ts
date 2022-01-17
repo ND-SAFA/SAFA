@@ -1,9 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, Commit } from "@/types";
-import { logModule, projectModule } from "@/store";
-import type { CommitHistory } from "@/types";
-import { persistCommit } from "@/api";
+import type { Artifact, Commit, CommitHistory } from "@/types";
 import { createCommit } from "@/util";
+import { logModule, projectModule } from "@/store";
 
 @Module({ namespaced: true, name: "commit" })
 /**
@@ -28,7 +26,6 @@ export default class CommitModule extends VuexModule {
   async saveCommit(commit: Commit): Promise<void> {
     const revert = this.createRevert(commit);
 
-    await persistCommit(commit);
     this.ADD_COMMIT({ commit, revert });
   }
 
@@ -36,38 +33,44 @@ export default class CommitModule extends VuexModule {
   /**
    * Removes the last commit from the store and attempts to revert the changes.
    * If successful, the commit is stored in previously reverted commits.
+   *
+   * @return The undone commit.
    */
-  async undoCommit(): Promise<void> {
+  async undoCommit(): Promise<Commit | undefined> {
     if (!this.canUndo) {
-      return logModule.onWarning("There are no commits to undo.");
+      logModule.onWarning("There are no commits to undo.");
+      return;
     }
 
     const lastCommitIndex = this.commits.length - 1;
     const lastCommitHistory = this.commits[lastCommitIndex];
 
-    await persistCommit(lastCommitHistory.revert);
     this.SET_COMMITS(this.commits.filter((c, i) => i !== lastCommitIndex));
     this.ADD_REVERTED_COMMIT(lastCommitHistory);
+
+    return lastCommitHistory.revert;
   }
 
   @Action
   /**
    * Reattempts the last undone commit.
+   *
+   * @return The redone commit.
    */
-  async redoCommit(): Promise<void> {
+  async redoCommit(): Promise<Commit | undefined> {
     if (!this.canRedo) {
-      return logModule.onWarning(
-        "Cannot redo because no commits have been reverted."
-      );
+      logModule.onWarning("Cannot redo because no commits have been reverted.");
+      return;
     }
 
     const lastCommitIndex = this.revertedCommits.length - 1;
     const lastCommitHistory = this.revertedCommits[lastCommitIndex];
 
-    await this.saveCommit(lastCommitHistory.commit);
     this.SET_REVERTED_COMMITS(
       this.revertedCommits.filter((c, i) => i !== lastCommitIndex)
     );
+
+    return lastCommitHistory.commit;
   }
 
   @Mutation

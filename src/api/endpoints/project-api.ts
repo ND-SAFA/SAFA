@@ -7,7 +7,7 @@ import {
   ProjectMembership,
   ProjectRole,
 } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/endpoints/util";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
  * Creates a new project from the given flat files.

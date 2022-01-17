@@ -7,22 +7,11 @@ import {
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import { capitalize, ThemeColors } from "@/util";
 
+/**
+ * Renders artifact html.
+ */
 export const artifactHtml: HtmlDefinition<ArtifactData> = {
   query: "node",
-  halign: "center",
-  valign: "center",
-  halignBox: "center",
-  valignBox: "center",
-  tpl(data?: ArtifactData) {
-    // This handles an issue with ghost nodes that are not typesafe.
-    if (!data?.artifactType) return "";
-
-    return createNodeHtml(data);
-  },
-};
-
-export const nodeWarningHtml: HtmlDefinition<ArtifactData> = {
-  query: "node[warnings]",
   halign: "center",
   valign: "center",
   halignBox: "center",

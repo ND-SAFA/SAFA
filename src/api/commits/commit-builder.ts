@@ -1,6 +1,7 @@
 import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
-import { commitModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
 import { createCommit } from "@/util";
+import { saveCommit } from "./commit-handler";
 
 /**
  * Responsible for creating a commit and saving it to the database.
@@ -43,6 +44,6 @@ export class CommitBuilder {
     return this;
   }
   save(): Promise<void> {
-    return commitModule.saveCommit(this.commit);
+    return saveCommit(this.commit);
   }
 }

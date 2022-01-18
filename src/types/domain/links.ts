@@ -107,4 +107,8 @@ export interface LabeledArtifactDirection extends ArtifactDirection {
    * The label to present an artifact direction.
    */
   label: string;
+  /**
+   * The icon representing this artifact type.
+   */
+  icon: string;
 }

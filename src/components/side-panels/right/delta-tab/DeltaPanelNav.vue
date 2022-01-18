@@ -55,7 +55,7 @@ export default Vue.extend({
     isProjectDefined(): boolean {
       return this.project.projectId !== "";
     },
-    onChange(): void {
+    onDirectionChange(): void {
       if (!this.isDeltaViewEnabled) {
         if (this.isProjectDefined()) {
           deltaModule.setIsDeltaViewEnabled(true);

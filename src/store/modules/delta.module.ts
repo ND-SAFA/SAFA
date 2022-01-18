@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
 import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
-import { appModule, projectModule, subtreeModule } from "..";
+import { appModule, projectModule } from "..";
 import { createProjectDelta } from "@/util";
 
 @Module({ namespaced: true, name: "delta" })

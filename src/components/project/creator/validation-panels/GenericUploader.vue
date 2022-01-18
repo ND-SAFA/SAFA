@@ -99,7 +99,7 @@ export default Vue.extend({
     onCloseCreator(): void {
       this.isCreatorOpen = false;
     },
-    onDirectionChange(
+    onChange(
       i: number,
       panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
     ): void {

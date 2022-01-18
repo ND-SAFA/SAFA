@@ -74,7 +74,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    async onDirectionChange(file: File | undefined): Promise<void> {
+    async onChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
         this.panel.clearPanel();
       } else {

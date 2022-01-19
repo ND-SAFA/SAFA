@@ -8,19 +8,27 @@
         multiple
         chips
         deletable-chips
+        small-chips
+        hide-details
         v-model="entry.allowedTypes"
         :items="artifactTypes"
         :label="entry.label + ' Trace To'"
         @change="onDirectionChange(entry)"
       />
-      <v-autocomplete
-        filled
-        v-model="entry.icon"
-        :items="icons"
-        :label="entry.label + ' Icon'"
-        :append-icon="entry.icon"
-        @change="onIconChange(entry)"
-      />
+
+      <h3 class="text-h6 mb-1">{{ entry.label }} Icon</h3>
+
+      <v-btn-toggle v-model="entry.iconIndex">
+        <v-btn
+          v-for="option in icons"
+          :key="option"
+          @change="onIconChange(entry, option)"
+        >
+          <v-icon>{{ option }}</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+
+      <v-divider class="my-4" />
     </div>
   </v-container>
 </template>
@@ -44,15 +52,20 @@ export default Vue.extend({
 
     this.artifactDirections = Object.entries(
       typeOptionsModule.linkDirections
-    ).map(([type, allowedTypes]) => ({
-      type,
-      allowedTypes,
-      label: getArtifactTypePrintName(type),
-      icon: typeOptionsModule.getArtifactTypeIcon(type),
-    }));
+    ).map(([type, allowedTypes]) => {
+      const icon = typeOptionsModule.getArtifactTypeIcon(type);
+
+      return {
+        type,
+        allowedTypes,
+        label: getArtifactTypePrintName(type),
+        icon: typeOptionsModule.getArtifactTypeIcon(type),
+        iconIndex: this.icons.indexOf(icon),
+      };
+    });
   },
   computed: {
-    icons() {
+    icons(): string[] {
       return Object.values(typeOptionsModule.allArtifactTypeIcons);
     },
   },
@@ -60,8 +73,8 @@ export default Vue.extend({
     onDirectionChange(entry: LabeledArtifactDirection) {
       typeOptionsModule.updateLinkDirections(entry);
     },
-    onIconChange(entry: LabeledArtifactDirection) {
-      typeOptionsModule.updateArtifactIcon(entry);
+    onIconChange(entry: LabeledArtifactDirection, icon: string) {
+      typeOptionsModule.updateArtifactIcon({ ...entry, icon });
     },
   },
 });

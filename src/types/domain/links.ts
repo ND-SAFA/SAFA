@@ -111,4 +111,8 @@ export interface LabeledArtifactDirection extends ArtifactDirection {
    * The icon representing this artifact type.
    */
   icon: string;
+  /**
+   * The index of the icon representing this artifact type.
+   */
+  iconIndex: number;
 }

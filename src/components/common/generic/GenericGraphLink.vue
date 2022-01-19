@@ -26,10 +26,9 @@ export default Vue.extend({
   },
   computed: {
     selector() {
-      const { sourceId, targetId } = this.traceDefinition;
-      const id = `${sourceId}-${targetId}`;
+      const { traceLinkId } = this.traceDefinition;
 
-      return deltaModule.getTraceDeltaType(id);
+      return deltaModule.getTraceDeltaType(traceLinkId);
     },
     definition() {
       const { sourceId, targetId, traceLinkId } = this.traceDefinition;

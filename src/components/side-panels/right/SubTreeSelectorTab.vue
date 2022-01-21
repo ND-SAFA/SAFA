@@ -21,9 +21,16 @@
             :prepend-icon="getIconName(type)"
           >
             <template v-slot:activator>
-              <v-list-item-title>{{
-                getTypePrintName(type)
-              }}</v-list-item-title>
+              <v-list-item-title>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-on="on" v-bind="attrs">
+                      {{ getTypePrintName(type) }}
+                    </span>
+                  </template>
+                  <span>{{ getTypePrintName(type) }}</span>
+                </v-tooltip>
+              </v-list-item-title>
             </template>
             <v-list-item
               v-for="artifact in artifactTypeHashTable[type]"
@@ -49,7 +56,7 @@
 import { Artifact } from "@/types";
 import Vue from "vue";
 import { getArtifactTypePrintName } from "@/util";
-import { projectModule, viewportModule } from "@/store";
+import { typeOptionsModule, projectModule, viewportModule } from "@/store";
 
 export default Vue.extend({
   name: "artifact-tab",
@@ -61,18 +68,7 @@ export default Vue.extend({
   methods: {
     getTypePrintName: getArtifactTypePrintName,
     getIconName(type: string): string {
-      switch (type.toLowerCase()) {
-        case "requirement":
-          return "mdi-clipboard-text";
-        case "design":
-          return "mdi-math-compass";
-        case "hazard":
-          return "mdi-hazard-lights";
-        case "environmentalassumption":
-          return "mdi-pine-tree-fire";
-        default:
-          return "mdi-help";
-      }
+      return typeOptionsModule.getArtifactTypeIcon(type);
     },
     async onArtifactClick(artifact: Artifact): Promise<void> {
       await viewportModule.viewArtifactSubtree(artifact);

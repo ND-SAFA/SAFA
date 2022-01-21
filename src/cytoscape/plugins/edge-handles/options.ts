@@ -1,4 +1,4 @@
-import { linkDirectionsModule, projectModule } from "@/store";
+import { typeOptionsModule, projectModule } from "@/store";
 import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
@@ -30,7 +30,7 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
     const isNotSameNode = !sourceNode.same(targetNode);
 
     // If the link is not between allowed artifact directions, thee link cannot be created.
-    const linkIsAllowedByType = linkDirectionsModule.isLinkAllowedByType(
+    const linkIsAllowedByType = typeOptionsModule.isLinkAllowedByType(
       sourceNode.data().artifactType,
       targetNode.data().artifactType
     );

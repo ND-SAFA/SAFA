@@ -1,18 +1,27 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { ArtifactTypeDirections, Project } from "@/types";
-import { ArtifactDirection } from "@/types";
+import type {
+  ArtifactTypeDirections,
+  LabeledArtifactDirection,
+  Project,
+} from "@/types";
+import { ArtifactDirection, ArtifactTypeIcons } from "@/types";
+import { createDefaultTypeIcons } from "@/util";
 import { logModule, projectModule } from "@/store";
 
-@Module({ namespaced: true, name: "linkDirections" })
+@Module({ namespaced: true, name: "typeOptions" })
 /**
- * This module tracks the directions of links between artifacts that are allowed.
+ * This module tracks the directions of links between artifacts that are allowed, and the icons for each type.
  */
-export default class LinkDirectionsModule extends VuexModule {
+export default class TypeOptionsModule extends VuexModule {
   /**
    * A mapping of the allowed directions of links between artifacts.
    */
   private artifactTypeDirections: ArtifactTypeDirections = {};
+  /**
+   * A mapping of the icons for each artifact type.
+   */
+  private artifactTypeIcons: ArtifactTypeIcons = createDefaultTypeIcons();
 
   @Action
   /**
@@ -42,6 +51,7 @@ export default class LinkDirectionsModule extends VuexModule {
     });
 
     this.SET_LINK_DIRECTIONS(allowedDirections);
+    this.SET_TYPE_ICONS(createDefaultTypeIcons());
   }
 
   @Action
@@ -55,6 +65,17 @@ export default class LinkDirectionsModule extends VuexModule {
     });
   }
 
+  @Action
+  /**
+   * Changes what icons each artifact uses.
+   */
+  updateArtifactIcon({ type, icon }: LabeledArtifactDirection): void {
+    this.SET_TYPE_ICONS({
+      ...this.artifactTypeIcons,
+      [type]: icon,
+    });
+  }
+
   @Mutation
   /**
    * Sets a new collection of allowed directions between artifact types.
@@ -65,22 +86,32 @@ export default class LinkDirectionsModule extends VuexModule {
     this.artifactTypeDirections = artifactTypeDirections;
   }
 
+  @Mutation
   /**
-   * Return the allowed directions of traces between artifacts.
+   * Sets a new collection of artifact type icons.
+   *
+   * @param artifactTypeIcons - The icons for each artifact type.
+   */
+  SET_TYPE_ICONS(artifactTypeIcons: ArtifactTypeIcons): void {
+    this.artifactTypeIcons = artifactTypeIcons;
+  }
+
+  /**
+   * @returns The allowed directions of traces between artifacts.
    */
   get linkDirections(): ArtifactTypeDirections {
     return this.artifactTypeDirections;
   }
 
   /**
-   * Returns all types of artifacts.
+   * @returns all types of artifacts.
    */
   get artifactTypes(): string[] {
     return Object.keys(this.linkDirections);
   }
 
   /**
-   * @return A function for determining if the trace link is allowed based on the type of the nodes.
+   * @returns A function for determining if the trace link is allowed based on the type of the nodes.
    */
   get isLinkAllowedByType(): (
     sourceType: string,
@@ -89,5 +120,21 @@ export default class LinkDirectionsModule extends VuexModule {
     return (sourceType, targetType) => {
       return this.artifactTypeDirections[sourceType]?.includes(targetType);
     };
+  }
+
+  /**
+   * @returns All possible artifact type icons.
+   */
+  get allArtifactTypeIcons(): string[] {
+    return Object.values(createDefaultTypeIcons());
+  }
+
+  /**
+   * @returns The icon name for the given artifact type
+   */
+  get getArtifactTypeIcon(): (type: string) => string {
+    return (type) =>
+      this.artifactTypeIcons[type.toLowerCase()] ||
+      this.artifactTypeIcons.default;
   }
 }

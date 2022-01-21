@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
 import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { appModule, projectModule } from "..";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
 

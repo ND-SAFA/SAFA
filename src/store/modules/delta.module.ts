@@ -3,6 +3,7 @@ import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
 import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
 import { appModule, projectModule } from "..";
 import { createProjectDelta } from "@/util";
+import { disableDrawMode } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "delta" })
 /**
@@ -30,6 +31,10 @@ export default class ErrorModule extends VuexModule {
    */
   setIsDeltaViewEnabled(isDeltaViewEnabled: boolean): void {
     this.SET_DELTA_IN_VIEW(isDeltaViewEnabled);
+
+    if (isDeltaViewEnabled) {
+      disableDrawMode();
+    }
   }
 
   @Action

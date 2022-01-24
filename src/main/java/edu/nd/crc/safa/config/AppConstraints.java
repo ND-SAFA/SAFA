@@ -15,6 +15,7 @@ public class AppConstraints {
     public static final String UNIQUE_ARTIFACT_BODY_PER_VERSION = "UNIQUE_ARTIFACT_BODY_PER_VERSION";
     public static final String UNIQUE_VERSION_ID_PER_PROJECT = "UNIQUE_VERSION_ID_PER_PROJECT";
     public static final String SINGLE_TRACE_VERSION_PER_PROJECT_VERSION = "SINGLE_TRACE_VERSION_PER_PROJECT_VERSION";
+    public static final String UNIQUE_TRACE_MATRIX_PER_PROJECT = "UNIQUE_TRACE_MATRIX_PER_PROJECT";
 
     //Permissions
     public static final String SINGLE_ROLE_PER_PROJECT = "SINGLE_ROLE_PER_PROJECT";

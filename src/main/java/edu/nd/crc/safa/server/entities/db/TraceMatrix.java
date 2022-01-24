@@ -1,0 +1,69 @@
+package edu.nd.crc.safa.server.entities.db;
+
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
+import edu.nd.crc.safa.config.AppConstraints;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
+
+/**
+ * Represents the entity for storing a unique trace direction in a project
+ * between two artifact types.
+ */
+@Entity
+@Table(name = "trace_matrix",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "project_id", "source_type_id", "target_type_id"
+        }, name = AppConstraints.UNIQUE_TRACE_MATRIX_PER_PROJECT)
+    }
+)
+public class TraceMatrix {
+
+    @Id
+    @GeneratedValue
+    @Type(type = "uuid-char")
+    @Column(name = "trace_matrix_id")
+    @NotNull
+    UUID versionId;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "project_id", nullable = false)
+    Project project;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = "source_type_id",
+        referencedColumnName = "type_id",
+        nullable = false
+    )
+    ArtifactType sourceArtifactType;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = "target_type_id",
+        referencedColumnName = "type_id",
+        nullable = false
+    )
+    ArtifactType targetArtifactType;
+
+    public TraceMatrix(Project project, ArtifactType sourceArtifactType, ArtifactType targetArtifactType) {
+        this.project = project;
+        this.sourceArtifactType = sourceArtifactType;
+        this.targetArtifactType = targetArtifactType;
+    }
+}

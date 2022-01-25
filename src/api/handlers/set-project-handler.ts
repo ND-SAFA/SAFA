@@ -5,13 +5,14 @@ import {
   artifactSelectionModule,
   deltaModule,
   errorModule,
-  linkDirectionsModule,
+  typeOptionsModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
 import { connectAndSubscribeToVersion } from "@/api/endpoints";
 import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
+import { disableDrawMode } from "@/cytoscape";
 
 /**
  1. Sets a new project.
@@ -37,9 +38,10 @@ export async function setAndSubscribeToProject(
     await viewportModule.setArtifactTreeLayout();
   }
 
+  disableDrawMode();
   deltaModule.clearDelta();
   appModule.closeSidePanels();
-  linkDirectionsModule.setLinkDirections(project);
+  typeOptionsModule.setLinkDirections(project);
   await subtreeModule.initializeProject(project);
 }
 

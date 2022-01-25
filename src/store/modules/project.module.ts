@@ -103,7 +103,7 @@ export default class ProjectModule extends VuexModule {
    */
   ADD_OR_UPDATE_TRACE_LINKS(traceLinks: TraceLink[]): void {
     const traceLinkIds = traceLinks.map((t) => t.traceLinkId);
-    const unaffected = this.traceLinks.filter(
+    const unaffected = this.project.traces.filter(
       (link) => !traceLinkIds.includes(link.traceLinkId)
     );
     this.project.traces = [...unaffected, ...traceLinks];
@@ -116,7 +116,7 @@ export default class ProjectModule extends VuexModule {
    * @param traceLink - The trace link to remove.
    */
   REMOVE_TRACE_LINK(traceLink: TraceLink): void {
-    this.project.traces = this.traceLinks.filter(
+    this.project.traces = this.project.traces.filter(
       (link) => link.traceLinkId !== traceLink.traceLinkId
     );
   }
@@ -128,7 +128,7 @@ export default class ProjectModule extends VuexModule {
    * @param artifactName - The artifact to remove.
    */
   DELETE_ARTIFACT_BY_NAME(artifactName: string): void {
-    this.project.artifacts = this.artifacts.filter(
+    this.project.artifacts = this.project.artifacts.filter(
       (a) => a.name !== artifactName
     );
   }
@@ -141,7 +141,7 @@ export default class ProjectModule extends VuexModule {
    */
   ADD_OR_UPDATE_ARTIFACTS(artifacts: Artifact[]): void {
     const newArtifactIds = artifacts.map((a) => a.id);
-    const unaffected = this.artifacts.filter(
+    const unaffected = this.project.artifacts.filter(
       (a) => !newArtifactIds.includes(a.id)
     );
     this.project.artifacts = [...unaffected, ...artifacts];

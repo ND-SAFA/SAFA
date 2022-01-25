@@ -1,4 +1,4 @@
-import { CyPromise, LayoutPayload, SetOpacityRequest } from "@/types";
+import { CyPromise, LayoutPayload } from "@/types";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
@@ -153,26 +153,27 @@ export function cyCenterOnArtifacts(
  * An edge is related if either source or target is an artifact in target
  * list.
  *
- * @param request Contains the target set of artifact names and whether they should be visible.
+ * @param artifactIds - The artifacts to display or hide.
+ * @param visible - Whether to display or hide these artifacts.
  * @param cyPromise - The cy instance.
  */
 export function cySetDisplay(
-  request: SetOpacityRequest,
+  artifactIds: string[],
+  visible: boolean,
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
-  const { targetArtifactIds, visible } = request;
   const display = visible ? "element" : "none";
 
   cyPromise.then((cy) => {
     cy.nodes()
-      .filter((n) => targetArtifactIds.includes(n.data().id))
+      .filter((n) => artifactIds.includes(n.data().id))
       .style({ display });
 
     cy.edges()
       .filter(
         (e) =>
-          targetArtifactIds.includes(e.target().data().id) ||
-          targetArtifactIds.includes(e.source().data().id)
+          artifactIds.includes(e.target().data().id) ||
+          artifactIds.includes(e.source().data().id)
       )
       .style({ display });
   });

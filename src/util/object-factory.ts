@@ -76,7 +76,7 @@ export function createProjectDelta(): ProjectDelta {
 }
 
 /**
- * @return An empty commit.
+ * @returns An empty commit.
  */
 export function createCommit(version: ProjectVersion): Commit {
   return {
@@ -91,5 +91,18 @@ export function createCommit(version: ProjectVersion): Commit {
       removed: [],
       modified: [],
     },
+  };
+}
+
+/**
+ * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
+ */
+export function createDefaultTypeIcons(): Record<string, string> {
+  return {
+    requirement: "mdi-clipboard-text",
+    design: "mdi-math-compass",
+    hazard: "mdi-hazard-lights",
+    environmentalassumption: "mdi-pine-tree-fire",
+    default: "mdi-help",
   };
 }

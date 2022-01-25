@@ -1,4 +1,12 @@
-export type ArtifactTypeDirections = { [id: string]: string[] };
+/**
+ * Enumerates the allowed trace link directions between artifact types.
+ */
+export type ArtifactTypeDirections = Record<string, string[]>;
+
+/**
+ * Enumerates the icons for each artifact type.
+ */
+export type ArtifactTypeIcons = Record<string, string>;
 
 /**
  * Enumerates types of panels.

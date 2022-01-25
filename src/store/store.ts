@@ -13,7 +13,7 @@ import {
   SnackbarModule,
   SubtreeModule,
   ViewportModule,
-  LinkDirectionsModule,
+  TypeOptionsModule,
   CommitModule,
 } from "./modules";
 
@@ -29,7 +29,7 @@ const store = new Vuex.Store({
     project: ProjectModule,
     delta: DeltaModule,
     error: ErrorModule,
-    linkDirections: LinkDirectionsModule,
+    typeOptions: TypeOptionsModule,
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,
     commit: CommitModule,
@@ -52,6 +52,6 @@ export const deltaModule = getModule(DeltaModule, store);
 export const viewportModule = getModule(ViewportModule, store);
 export const commitModule = getModule(CommitModule, store);
 export const subtreeModule = getModule(SubtreeModule, store);
-export const linkDirectionsModule = getModule(LinkDirectionsModule, store);
+export const typeOptionsModule = getModule(TypeOptionsModule, store);
 
 export default store;

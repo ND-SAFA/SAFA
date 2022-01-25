@@ -46,7 +46,7 @@
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import { linkDirectionsModule, logModule, projectModule } from "@/store";
+import { typeOptionsModule, logModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
@@ -95,7 +95,7 @@ export default Vue.extend({
       return projectModule.getProject.projectVersion?.versionId;
     },
     artifactTypes(): string[] {
-      return linkDirectionsModule.artifactTypes;
+      return typeOptionsModule.artifactTypes;
     },
     isValid(): boolean {
       return this.isNameValid && this.body !== "" && this.type !== "";

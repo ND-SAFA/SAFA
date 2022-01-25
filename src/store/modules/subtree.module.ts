@@ -120,15 +120,11 @@ export default class SubtreeModule extends VuexModule {
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
     }
 
-    this.SET_HIDDEN_SUBTREE_NODES([
-      ...this.hiddenSubtreeNodes,
-      ...childrenInSubtree,
-    ]);
+    const hiddenNodes = [...this.hiddenSubtreeNodes, ...childrenInSubtree];
+
+    this.SET_HIDDEN_SUBTREE_NODES(hiddenNodes);
     this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-    cySetDisplay({
-      targetArtifactIds: this.hiddenSubtreeNodes,
-      visible: false,
-    });
+    cySetDisplay(hiddenNodes, false);
   }
 
   @Action
@@ -150,10 +146,7 @@ export default class SubtreeModule extends VuexModule {
     this.SET_COLLAPSED_PARENT_NODES(
       this.collapsedParentNodes.filter((n) => n !== rootId)
     );
-    cySetDisplay({
-      targetArtifactIds: subtreeNodes,
-      visible: true,
-    });
+    cySetDisplay(subtreeNodes, true);
   }
 
   @Mutation
@@ -247,6 +240,7 @@ export default class SubtreeModule extends VuexModule {
           .map((link) => {
             const base: SubtreeLink = {
               ...link,
+              traceLinkId: link.traceLinkId + "-phantom",
               type: "SUBTREE",
               rootNode: rootId,
             };

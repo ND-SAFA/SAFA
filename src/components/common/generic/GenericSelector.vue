@@ -121,7 +121,7 @@ export default Vue.extend({
       required: false,
       default: true,
     },
-    canDeleteFirstItem: {
+    canDeleteLastItem: {
       type: Boolean,
       required: false,
       default: true,
@@ -148,11 +148,10 @@ export default Vue.extend({
       this.selected = [];
       this.search = "";
     },
-    isDeleteEnabled(item: DataItem<ProjectVersion>): boolean {
-      return (
-        this.hasDelete &&
-        (this.canDeleteFirstItem || item.item !== this.items[0].item)
-      );
+    isDeleteEnabled(item: DataItemProps): boolean {
+      const isNotLastItem = this.items.indexOf(item) !== this.items.length - 1;
+
+      return this.hasDelete && (this.canDeleteLastItem || isNotLastItem);
     },
   },
   mounted() {

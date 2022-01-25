@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-row>
-      <v-tabs centered v-model="selectedTab" show-arrows>
-        <v-tab>Sub Tree Selector</v-tab>
+      <v-tabs centered v-model="selectedTab">
+        <v-tab>Hierarchy</v-tab>
         <v-tab>Delta</v-tab>
-        <v-tab>Trace Directions</v-tab>
-        <v-tab>Safety Notation</v-tab>
+        <v-tab>Types</v-tab>
+        <v-tab>Safety</v-tab>
       </v-tabs>
     </v-row>
 
@@ -23,7 +23,7 @@ import Vue from "vue";
 import SubTreeSelectorTab from "./SubTreeSelectorTab.vue";
 import DeltaTab from "./DeltaTab.vue";
 import SafetyNotationTab from "./SafetyNotationTab.vue";
-import TraceLinkDirectionTab from "./TraceLinkDirectionTab.vue";
+import TraceLinkDirectionTab from "./TypeOptionsTab.vue";
 
 const DELTA_TREE_INDEX = 1;
 

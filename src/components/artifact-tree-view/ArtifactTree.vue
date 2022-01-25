@@ -9,13 +9,13 @@
       />
       <generic-graph-link
         v-for="traceLink in traces"
-        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
       />
       <generic-graph-link
         v-for="traceLink in subtreeLinks"
-        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
       />
       <trace-link-approval-modal

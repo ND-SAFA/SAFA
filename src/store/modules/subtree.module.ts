@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink, SubtreeMap, Project } from "@/types";
-import { projectModule, subtreeModule } from "@/store";
+import { projectModule } from "@/store";
 import {
   artifactTreeCyPromise,
   createSubtreeMap,
@@ -84,7 +84,7 @@ export default class SubtreeModule extends VuexModule {
         {} as Record<string, number>
       );
 
-    await subtreeModule.updateSubtreeMap();
+    await this.updateSubtreeMap();
 
     for (const id of artifactIds) {
       if (this.hiddenSubtreeNodes.includes(id)) continue;
@@ -118,16 +118,17 @@ export default class SubtreeModule extends VuexModule {
       );
 
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
-      this.SET_HIDDEN_SUBTREE_NODES([
-        ...this.hiddenSubtreeNodes,
-        ...childrenInSubtree,
-      ]);
-      this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-      cySetDisplay({
-        targetArtifactIds: this.hiddenSubtreeNodes,
-        visible: false,
-      });
     }
+
+    this.SET_HIDDEN_SUBTREE_NODES([
+      ...this.hiddenSubtreeNodes,
+      ...childrenInSubtree,
+    ]);
+    this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
+    cySetDisplay({
+      targetArtifactIds: this.hiddenSubtreeNodes,
+      visible: false,
+    });
   }
 
   @Action

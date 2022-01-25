@@ -41,7 +41,6 @@ export async function setAndSubscribeToProject(
   disableDrawMode();
   deltaModule.clearDelta();
   appModule.closeSidePanels();
-  await subtreeModule.updateSubtreeMap();
   typeOptionsModule.setLinkDirections(project);
   await subtreeModule.initializeProject(project);
 }

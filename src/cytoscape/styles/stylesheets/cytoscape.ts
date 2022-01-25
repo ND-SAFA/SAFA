@@ -60,7 +60,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     selector: "node",
     style: {
       padding: ARTIFACT_PADDING,
-      "background-color": ARTIFACT_COLOR,
+      "background-color": "white",
       shape: ARTIFACT_SHAPE,
       width: ARTIFACT_WIDTH + "px",
       height: ARTIFACT_HEIGHT + "px",

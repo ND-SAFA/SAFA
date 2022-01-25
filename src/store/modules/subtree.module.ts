@@ -120,11 +120,12 @@ export default class SubtreeModule extends VuexModule {
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
     }
 
-    const hiddenNodes = [...this.hiddenSubtreeNodes, ...childrenInSubtree];
-
-    this.SET_HIDDEN_SUBTREE_NODES(hiddenNodes);
+    this.SET_HIDDEN_SUBTREE_NODES([
+      ...this.hiddenSubtreeNodes,
+      ...childrenInSubtree,
+    ]);
     this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-    cySetDisplay(hiddenNodes, false);
+    cySetDisplay(childrenInSubtree, false);
   }
 
   @Action

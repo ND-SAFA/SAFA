@@ -109,6 +109,9 @@ export default class SubtreeModule extends VuexModule {
   async hideSubtree(rootId: string): Promise<void> {
     const childrenInSubtree = this.getSubtreeByArtifactId(rootId);
     const nodesInSubtree = [...childrenInSubtree, rootId];
+    const visibleChildren = childrenInSubtree.filter(
+      (id) => !this.hiddenSubtreeNodes.includes(id)
+    );
 
     for (const childId of childrenInSubtree) {
       const newSubtreeLinks = this.createSubtreeLinks(
@@ -122,10 +125,10 @@ export default class SubtreeModule extends VuexModule {
 
     this.SET_HIDDEN_SUBTREE_NODES([
       ...this.hiddenSubtreeNodes,
-      ...childrenInSubtree,
+      ...visibleChildren,
     ]);
     this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-    cySetDisplay(childrenInSubtree, false);
+    cySetDisplay(visibleChildren, false);
   }
 
   @Action

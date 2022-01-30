@@ -54,7 +54,8 @@ public class AppRoutes {
 
         // Trace Matrix Controller
         public static final String getTraceMatrices = projectPrefix + "/{projectId}/matrices";
-        public static final String createTraceMatrix = projectPrefix + "/{projectId}/matrices/{sourceArtifactType"
-            + "}/{targetArtifactType}";
+        public static final String createTraceMatrix = projectPrefix + "/{projectId}/matrices/"
+            + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
+        public static final String deleteTraceMatrix = projectPrefix + "/matrices/{traceMatrixId}";
     }
 }

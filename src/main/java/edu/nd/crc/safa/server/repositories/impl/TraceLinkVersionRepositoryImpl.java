@@ -12,10 +12,12 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.server.entities.db.TraceMatrix;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +35,9 @@ public class TraceLinkVersionRepositoryImpl
 
     @Autowired
     ArtifactRepository artifactRepository;
+
+    @Autowired
+    TraceMatrixRepository traceMatrixRepository;
 
     @Override
     public List<TraceLinkVersion> getEntitiesInProject(Project project) {
@@ -78,6 +83,10 @@ public class TraceLinkVersionRepositoryImpl
         if (traceLinkOptional.isEmpty()) {
             Artifact sourceArtifact = assertAndFindArtifact(project, trace.sourceName);
             Artifact targetArtifact = assertAndFindArtifact(project, trace.targetName);
+
+            Optional<TraceMatrix> traceMatrixOptional = this.traceMatrixRepository.queryForMatrixInProject(project,
+                sourceArtifact.getType(),
+                targetArtifact.getType());
             traceLink = new TraceLink(sourceArtifact, targetArtifact);
             this.traceLinkRepository.save(traceLink);
         } else {

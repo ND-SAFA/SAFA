@@ -69,6 +69,21 @@ public class RouteBuilder {
         return this;
     }
 
+    public RouteBuilder withSourceArtifactTypeName(String sourceArtifactTypeName) {
+        this.path = this.path.replace("{sourceArtifactTypeName}", sourceArtifactTypeName);
+        return this;
+    }
+
+    public RouteBuilder withTargetArtifactTypeName(String targetArtifactTypeName) {
+        this.path = this.path.replace("{targetArtifactTypeName}", targetArtifactTypeName);
+        return this;
+    }
+
+    public RouteBuilder withTraceMatrixId(String traceMatrixId) {
+        this.path = this.path.replace("{traceMatrixId}", traceMatrixId);
+        return this;
+    }
+
     public String get() {
         if (this.path.contains("{")) {
             throw new RuntimeException("Path is not fully configured:" + this.path);

@@ -36,13 +36,11 @@ public class TraceMatrix {
     @Type(type = "uuid-char")
     @Column(name = "trace_matrix_id")
     @NotNull
-    UUID versionId;
-
+    UUID traceMatrixId;
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
     Project project;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -51,7 +49,6 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType sourceArtifactType;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -60,10 +57,27 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType targetArtifactType;
-
+    public TraceMatrix() {
+    }
     public TraceMatrix(Project project, ArtifactType sourceArtifactType, ArtifactType targetArtifactType) {
         this.project = project;
         this.sourceArtifactType = sourceArtifactType;
         this.targetArtifactType = targetArtifactType;
+    }
+
+    public UUID getTraceMatrixId() {
+        return traceMatrixId;
+    }
+
+    public void setTraceMatrixId(UUID traceMatrixId) {
+        this.traceMatrixId = traceMatrixId;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

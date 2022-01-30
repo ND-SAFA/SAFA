@@ -17,6 +17,7 @@ import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +51,7 @@ public class TraceMatrixController extends BaseController {
      * @throws SafaError Throws error if project with ID is not found.
      */
     @GetMapping(AppRoutes.Projects.getTraceMatrices)
-    public ServerResponse getVersions(@PathVariable UUID projectId) throws SafaError {
+    public ServerResponse getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<TraceMatrix> projectTraceMatrices = traceMatrixRepository.findByProject(project);
         return new ServerResponse(projectTraceMatrices);
@@ -60,36 +61,52 @@ public class TraceMatrixController extends BaseController {
      * Creates a new trace matrix between given artifact types names in
      * specified project.
      *
-     * @param projectId          UUID of project whose versions are returned.
-     * @param sourceArtifactName The name of the source artifact type.
-     * @param targetArtifactName The name of the target artifact type.
+     * @param projectId              UUID of project whose versions are returned.
+     * @param sourceArtifactTypeName The name of the source artifact type.
+     * @param targetArtifactTypeName The name of the target artifact type.
      * @throws SafaError Throws error if project with ID is not found.
      */
     @PostMapping(AppRoutes.Projects.createTraceMatrix)
     public void createTraceMatrix(@PathVariable UUID projectId,
-                                  @PathVariable String sourceArtifactName,
-                                  @PathVariable String targetArtifactName) throws SafaError {
+                                  @PathVariable String sourceArtifactTypeName,
+                                  @PathVariable String targetArtifactTypeName) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         Optional<TraceMatrix> traceMatrixQuery = traceMatrixRepository.queryForMatrixInProject(project,
-            sourceArtifactName, targetArtifactName);
+            sourceArtifactTypeName, targetArtifactTypeName);
         if (traceMatrixQuery.isPresent()) {
             String error = String.format("Trace matrix already exists between %s and %s.",
-                sourceArtifactName,
-                targetArtifactName);
+                sourceArtifactTypeName,
+                targetArtifactTypeName);
             throw new SafaError(error);
         }
 
-        ArtifactType sourceArtifactType = getArtifactType(project, sourceArtifactName);
-        ArtifactType targetArtifactType = getArtifactType(project, targetArtifactName);
+        ArtifactType sourceArtifactType = getArtifactType(project, sourceArtifactTypeName);
+        ArtifactType targetArtifactType = getArtifactType(project, targetArtifactTypeName);
         TraceMatrix traceMatrix = new TraceMatrix(project, sourceArtifactType, targetArtifactType);
         this.traceMatrixRepository.save(traceMatrix);
+    }
+
+    /**
+     * Deletes trace matrix with given id if user has edit permission on associated project.
+     *
+     * @param traceMatrixId The traceMatrixId uniquely identifying the matrix.
+     * @throws SafaError Throws error if user does not have edit permissions on project.
+     */
+    @DeleteMapping(AppRoutes.Projects.deleteTraceMatrix)
+    public void deleteTraceMatrix(@PathVariable UUID traceMatrixId) throws SafaError {
+        Optional<TraceMatrix> traceMatrixOptional = this.traceMatrixRepository.findById(traceMatrixId);
+        if (traceMatrixOptional.isPresent()) {
+            TraceMatrix traceMatrixToDelete = traceMatrixOptional.get();
+            this.resourceBuilder.setProject(traceMatrixToDelete.getProject()).withEditProject();
+            this.traceMatrixRepository.delete(traceMatrixToDelete);
+        }
     }
 
     private ArtifactType getArtifactType(Project project, String artifactTypeName) throws SafaError {
         Optional<ArtifactType> artifactTypeQuery = this.artifactTypeRepository.findByProjectAndNameIgnoreCase(project,
             artifactTypeName);
         if (artifactTypeQuery.isEmpty()) {
-            throw new SafaError("Could not find artifact type with name: " + artifactTypeName);
+            throw new SafaError("Could not find artifact type: " + artifactTypeName);
         }
         return artifactTypeQuery.get();
     }

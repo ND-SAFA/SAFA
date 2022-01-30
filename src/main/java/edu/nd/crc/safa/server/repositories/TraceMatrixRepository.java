@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
 
@@ -17,12 +18,23 @@ public interface TraceMatrixRepository extends CrudRepository<TraceMatrix, UUID>
     default Optional<TraceMatrix> queryForMatrixInProject(Project project,
                                                           String sourceArtifactTypeName,
                                                           String targetArtifactTypeName) {
-        return findByProjectAndSourceArtifactTypeNameAndTargetTypeArtifactName(project,
+        return findByProjectAndSourceArtifactTypeNameAndTargetArtifactTypeName(project,
             sourceArtifactTypeName,
             targetArtifactTypeName);
     }
 
-    Optional<TraceMatrix> findByProjectAndSourceArtifactTypeNameAndTargetTypeArtifactName(Project project,
+    default Optional<TraceMatrix> queryForMatrixInProject(Project project,
+                                                          ArtifactType sourceArtifactType,
+                                                          ArtifactType targetArtifactType
+    ) {
+        return findByProjectAndSourceArtifactTypeAndTargetArtifactType(project, sourceArtifactType, targetArtifactType);
+    }
+
+    Optional<TraceMatrix> findByProjectAndSourceArtifactTypeNameAndTargetArtifactTypeName(Project project,
                                                                                           String sourceArtifactTypeName,
                                                                                           String targetArtifactTypeName);
+
+    Optional<TraceMatrix> findByProjectAndSourceArtifactTypeAndTargetArtifactType(Project project,
+                                                                                  ArtifactType sourceArtifactType,
+                                                                                  ArtifactType targetArtifactType);
 }

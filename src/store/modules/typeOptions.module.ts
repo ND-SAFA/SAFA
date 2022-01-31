@@ -118,7 +118,7 @@ export default class TypeOptionsModule extends VuexModule {
     targetType: string
   ) => boolean {
     return (sourceType, targetType) => {
-      return this.artifactTypeDirections[sourceType]?.includes(targetType);
+      return !this.artifactTypeDirections[targetType]?.includes(sourceType);
     };
   }
 

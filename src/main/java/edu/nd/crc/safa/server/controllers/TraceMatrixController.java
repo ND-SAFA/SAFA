@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,12 @@ public class TraceMatrixController extends BaseController {
                 traceLinkDirections.get(sourceTypeName).add(targetTypeName);
             } else {
                 traceLinkDirections.put(sourceTypeName, List.of(targetTypeName));
+            }
+        }
+
+        for (ArtifactType at : this.artifactTypeRepository.findByProject(project)) {
+            if (!traceLinkDirections.containsKey(at.getName())) {
+                traceLinkDirections.put(at.getName(), new ArrayList<>());
             }
         }
         return new ServerResponse(traceLinkDirections);

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class DeleteTraceDirection extends TraceMatrixBaseTest {
+public class DeleteTraceMatrix extends TraceMatrixBaseTest {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
@@ -34,7 +34,9 @@ public class DeleteTraceDirection extends TraceMatrixBaseTest {
         // Step - Send request to delete matrix.
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.deleteTraceMatrix)
-            .withTraceMatrixId(traceMatrix.getTraceMatrixId().toString())
+            .withProject(project)
+            .withSourceArtifactTypeName(sourceArtifactTypeName)
+            .withTargetArtifactTypeName(targetArtifactTypeName)
             .get();
         sendDelete(route, status().isOk());
 

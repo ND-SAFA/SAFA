@@ -101,12 +101,21 @@ public class TraceMatrixController extends BaseController {
     /**
      * Deletes trace matrix with given id if user has edit permission on associated project.
      *
-     * @param traceMatrixId The traceMatrixId uniquely identifying the matrix.
-     * @throws SafaError Throws error if user does not have edit permissions on project.
+     * @param projectId              The id of the project whose trace matrix is being deleted.
+     * @param sourceArtifactTypeName The source artifact type name of the matrix.
+     * @param targetArtifactTypeName The target artifact type name of the matrix.
+     * @throws SafaError Throws error if user does not have edit permission on project.
      */
     @DeleteMapping(AppRoutes.Projects.deleteTraceMatrix)
-    public void deleteTraceMatrix(@PathVariable UUID traceMatrixId) throws SafaError {
-        Optional<TraceMatrix> traceMatrixOptional = this.traceMatrixRepository.findById(traceMatrixId);
+    public void deleteTraceMatrix(@PathVariable UUID projectId,
+                                  @PathVariable String sourceArtifactTypeName,
+                                  @PathVariable String targetArtifactTypeName) throws SafaError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        Optional<TraceMatrix> traceMatrixOptional = this.traceMatrixRepository.queryForMatrixInProject(
+            project,
+            sourceArtifactTypeName,
+            targetArtifactTypeName
+        );
         if (traceMatrixOptional.isPresent()) {
             TraceMatrix traceMatrixToDelete = traceMatrixOptional.get();
             this.resourceBuilder.setProject(traceMatrixToDelete.getProject()).withEditProject();

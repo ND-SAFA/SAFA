@@ -31,6 +31,7 @@ public class AppConstraints {
         UNIQUE_VERSION_ID_PER_PROJECT,
         SINGLE_ROLE_PER_PROJECT,
         SINGLE_TRACE_VERSION_PER_PROJECT_VERSION,
+        UNIQUE_TRACE_MATRIX_PER_PROJECT,
         NULL_VALUE
     };
 
@@ -62,6 +63,8 @@ public class AppConstraints {
                 return "A user with given email already exists in the project.";
             case SINGLE_TRACE_VERSION_PER_PROJECT_VERSION:
                 return "This trace link already contains an entry for this project version";
+            case UNIQUE_TRACE_MATRIX_PER_PROJECT:
+                return "Trace matrix between given types is already created";
             case NULL_VALUE:
                 return createNullError(cause);
             default:

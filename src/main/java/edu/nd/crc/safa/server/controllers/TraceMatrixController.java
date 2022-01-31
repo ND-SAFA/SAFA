@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,7 +56,17 @@ public class TraceMatrixController extends BaseController {
     public ServerResponse getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<TraceMatrix> projectTraceMatrices = traceMatrixRepository.findByProject(project);
-        return new ServerResponse(projectTraceMatrices);
+        Map<String, List<String>> traceLinkDirections = new Hashtable<>();
+        for (TraceMatrix tm : projectTraceMatrices) {
+            String sourceTypeName = tm.getSourceArtifactType().getName();
+            String targetTypeName = tm.getTargetArtifactType().getName();
+            if (traceLinkDirections.containsKey(sourceTypeName)) {
+                traceLinkDirections.get(sourceTypeName).add(targetTypeName);
+            } else {
+                traceLinkDirections.put(sourceTypeName, List.of(targetTypeName));
+            }
+        }
+        return new ServerResponse(traceLinkDirections);
     }
 
     /**

@@ -18,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class CreateNewTraceDirection extends TraceMatrixBaseTest {
+public class CreateTraceMatrix extends TraceMatrixBaseTest {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
 
     @Test
-    public void getProjectsEmpty() throws Exception {
+    public void createTraceMatrix() throws Exception {
         Project project = this.createEmptyProject();
 
         // VP - Assert that single matrix exists for project.

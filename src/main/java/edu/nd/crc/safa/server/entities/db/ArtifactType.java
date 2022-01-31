@@ -53,7 +53,7 @@ public class ArtifactType implements Serializable {
 
     public ArtifactType(Project project, String name) {
         this.project = project;
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
     public String toString() {
@@ -69,7 +69,7 @@ public class ArtifactType implements Serializable {
     }
 
     public void setName(String name) {
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
     public void setProject(Project project) {

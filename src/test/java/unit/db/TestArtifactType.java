@@ -30,12 +30,12 @@ public class TestArtifactType extends ApplicationBaseTest {
 
         assertThat(artifactTypeId).isNotNull();
         assertThat(queriedArtifactType).isNotNull();
-        assertThat(queriedArtifactType.getName()).isEqualTo(artifactTypeName.toLowerCase());
+        assertThat(queriedArtifactType.getName()).isEqualTo(artifactTypeName);
 
         // VP 3 - Update type name
         dbEntityBuilder.updateTypeName(projectName, artifactTypeName, altArtifactTypeName);
         queriedArtifactType = artifactTypeRepository.findByTypeId(artifactTypeId);
-        assertThat(queriedArtifactType.getName()).isEqualTo(altArtifactTypeName.toLowerCase());
+        assertThat(queriedArtifactType.getName()).isEqualTo(altArtifactTypeName);
 
         // VP - Delete Artifact Type
         artifactTypeRepository.delete(queriedArtifactType);

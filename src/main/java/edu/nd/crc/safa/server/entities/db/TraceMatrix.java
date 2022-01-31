@@ -37,10 +37,12 @@ public class TraceMatrix {
     @Column(name = "trace_matrix_id")
     @NotNull
     UUID traceMatrixId;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
     Project project;
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -49,6 +51,7 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType sourceArtifactType;
+    
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(

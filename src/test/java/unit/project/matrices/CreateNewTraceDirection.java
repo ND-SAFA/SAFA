@@ -38,7 +38,6 @@ public class CreateNewTraceDirection extends TraceMatrixBaseTest {
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
             .get();
-        System.out.println("ROUTE:" + route);
         sendPost(route, new JSONObject(), status().isOk());
 
         // VP - Assert that single matrix exists for project.

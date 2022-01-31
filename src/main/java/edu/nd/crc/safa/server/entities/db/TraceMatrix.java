@@ -57,11 +57,29 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType targetArtifactType;
+
     public TraceMatrix() {
     }
+
     public TraceMatrix(Project project, ArtifactType sourceArtifactType, ArtifactType targetArtifactType) {
         this.project = project;
         this.sourceArtifactType = sourceArtifactType;
+        this.targetArtifactType = targetArtifactType;
+    }
+
+    public ArtifactType getSourceArtifactType() {
+        return sourceArtifactType;
+    }
+
+    public void setSourceArtifactType(ArtifactType sourceArtifactType) {
+        this.sourceArtifactType = sourceArtifactType;
+    }
+
+    public ArtifactType getTargetArtifactType() {
+        return targetArtifactType;
+    }
+
+    public void setTargetArtifactType(ArtifactType targetArtifactType) {
         this.targetArtifactType = targetArtifactType;
     }
 
@@ -79,5 +97,11 @@ public class TraceMatrix {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String toString() {
+        return String.format("%s-%s",
+            this.sourceArtifactType.getName(),
+            this.targetArtifactType.getName());
     }
 }

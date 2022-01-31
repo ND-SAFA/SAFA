@@ -2,7 +2,6 @@ package edu.nd.crc.safa.server.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Provides endpoints for commit a versioend change to a project's entities.
+ * Provides endpoints for commit a versioned change to a project's entities.
  */
 @RestController
 public class CommitController extends BaseController {
@@ -66,12 +65,12 @@ public class CommitController extends BaseController {
     public void commitChange(@PathVariable UUID versionId,
                              @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        List<CommitError> artifactErrors = commitArtifacts(projectVersion, projectCommit.getArtifacts());
-        List<CommitError> traceErrors = commitTraces(projectVersion, projectCommit.getTraces());
+        commitArtifacts(projectVersion, projectCommit.getArtifacts());
+        commitTraces(projectVersion, projectCommit.getTraces());
     }
 
-    private List<CommitError> commitArtifacts(ProjectVersion projectVersion,
-                                              ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
+    private void commitArtifacts(ProjectVersion projectVersion,
+                                 ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
         List<ArtifactAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
@@ -80,19 +79,22 @@ public class CommitController extends BaseController {
         for (ArtifactAppEntity artifact : changedArtifacts) {
             CommitError artifactError = this.artifactVersionRepository
                 .commitSingleEntityToProjectVersion(projectVersion, artifact);
-            errors.add(artifactError);
+            if (artifactError != null) {
+                throw new SafaError(artifactError.getDescription());
+            }
         }
         for (ArtifactAppEntity artifact : artifacts.getRemoved()) {
             CommitError artifactError = this.artifactVersionRepository.deleteVersionEntityByBaseName(projectVersion,
                 artifact.name);
-            errors.add(artifactError);
+            if (artifactError != null) {
+                throw new SafaError(artifactError.getDescription());
+            }
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
-        return errors.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private List<CommitError> commitTraces(ProjectVersion projectVersion,
-                                           ProjectChange<TraceAppEntity> artifacts) throws SafaError {
+    private void commitTraces(ProjectVersion projectVersion,
+                              ProjectChange<TraceAppEntity> artifacts) throws SafaError {
         List<TraceAppEntity> changedArtifacts = Stream.concat(
                 artifacts.getAdded().stream(),
                 artifacts.getModified().stream())
@@ -101,14 +103,17 @@ public class CommitController extends BaseController {
         for (TraceAppEntity artifact : changedArtifacts) {
             CommitError traceError = this.traceLinkVersionRepository.commitSingleEntityToProjectVersion(projectVersion,
                 artifact);
-            errors.add(traceError);
+            if (traceError != null) {
+                throw new SafaError(traceError.getDescription());
+            }
         }
         for (TraceAppEntity trace : artifacts.getRemoved()) {
             CommitError traceError = this.traceLinkVersionRepository.deleteVersionEntityByBaseName(projectVersion,
                 trace.traceLinkId);
-            errors.add(traceError);
+            if (traceError != null) {
+                throw new SafaError(traceError.getDescription());
+            }
         }
         this.revisionNotificationService.broadcastUpdateProject(projectVersion);
-        return errors.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

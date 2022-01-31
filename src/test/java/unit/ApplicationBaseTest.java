@@ -17,7 +17,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,12 +61,16 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     }
 
     public void commit(CommitBuilder commitBuilder) throws Exception {
+        commitWithStatus(commitBuilder, status().is2xxSuccessful());
+    }
+
+    public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.commitChange)
             .withVersion(commitVersion)
             .get();
-        sendPost(route, commitBuilder.asJson(), status().is2xxSuccessful());
+        return sendPost(route, commitBuilder.asJson(), expectedStatus);
     }
 
     /**

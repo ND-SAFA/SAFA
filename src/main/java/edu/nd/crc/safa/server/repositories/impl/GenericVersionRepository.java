@@ -71,7 +71,8 @@ public abstract class GenericVersionRepository<
     abstract Optional<BaseEntity> findBaseEntityByName(Project project, String name);
 
     /**
-     * Creates and missing auxiliary types used in app entity.
+     * Finds base entity associated with given app entity if an entity exists.
+     * Otherwise, creates the base entity along with any missing auxiliary objects.
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.

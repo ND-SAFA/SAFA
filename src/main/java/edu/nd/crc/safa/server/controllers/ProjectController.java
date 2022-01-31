@@ -140,6 +140,7 @@ public class ProjectController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.deleteProjectMembership)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
+        //TODO: Check for project permission before deleting.
         this.projectService.deleteProjectMemberById(projectMembershipId);
     }
 }

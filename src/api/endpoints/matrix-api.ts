@@ -4,9 +4,10 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 /**
  * Persists a trace matrices between given source and target
  * artifact types in given project.
- * @param project The project whose trace matrix will be stored with.
- * @param sourceArtifactTypeName The source artifact type name.
- * @param targetArtifactTypeName The target artifact type name.
+ *
+ * @param project - The project whose trace matrix will be stored with.
+ * @param sourceArtifactTypeName - The source artifact type name.
+ * @param targetArtifactTypeName - The target artifact type name.
  */
 export async function createTraceMatrix(
   project: Project,
@@ -25,7 +26,9 @@ export async function createTraceMatrix(
 
 /**
  * Returns the trace directions allowed in given project.
- * @param project
+ *
+ * @param project - The project to load from.
+ * @return The loaded trace matrices.
  */
 export async function retrieveTraceMatrices(
   project: Project
@@ -41,9 +44,10 @@ export async function retrieveTraceMatrices(
 /**
  * Deletes TraceMatrix between given source and target artifact types
  * within specified project.
- * @param project
- * @param sourceArtifactTypeName
- * @param targetArtifactTypeName
+ *
+ * @param project - The project whose trace matrix will be stored with.
+ * @param sourceArtifactTypeName - The source artifact type name.
+ * @param targetArtifactTypeName - The target artifact type name.
  */
 export async function deleteTraceMatrix(
   project: Project,

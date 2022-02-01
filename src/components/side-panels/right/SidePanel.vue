@@ -40,7 +40,6 @@ export default Vue.extend({
       selectedTab: -1,
     };
   },
-
   methods: {
     openDeltaPanel(): void {
       this.selectedTab = DELTA_TREE_INDEX;

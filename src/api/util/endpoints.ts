@@ -49,7 +49,7 @@ export enum Endpoint {
   //Trace Matrices
   createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
   deleteTraceMatrix = "projects/matrices/:traceMatrixId",
-  retrieveTraceMatrices = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
+  retrieveTraceMatrices = "projects/:projectId/matrices",
 }
 
 /**

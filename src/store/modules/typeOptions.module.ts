@@ -1,13 +1,8 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type {
-  ArtifactTypeDirections,
-  LabeledArtifactDirection,
-  Project,
-} from "@/types";
+import type { ArtifactTypeDirections, LabeledArtifactDirection } from "@/types";
 import { ArtifactDirection, ArtifactTypeIcons } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
-import { logModule, projectModule } from "@/store";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
@@ -22,37 +17,6 @@ export default class TypeOptionsModule extends VuexModule {
    * A mapping of the icons for each artifact type.
    */
   private artifactTypeIcons: ArtifactTypeIcons = createDefaultTypeIcons();
-
-  @Action
-  /**
-   * Updates what directions of trace links between artifacts are allowed.
-   */
-  setLinkDirections(project: Project): void {
-    const allowedDirections: ArtifactTypeDirections = {};
-
-    // Ensure that all artifact types appear in mapping.
-    project.artifacts.forEach((artifact) => {
-      allowedDirections[artifact.type] = [];
-    });
-
-    project.traces.forEach(({ sourceId, targetId }) => {
-      try {
-        const sourceType = projectModule.getArtifactById(sourceId).type;
-        const targetType = projectModule.getArtifactById(targetId).type;
-
-        if (!allowedDirections[sourceType].includes(targetType)) {
-          allowedDirections[sourceType].push(targetType);
-        }
-      } catch (e) {
-        logModule.onDevMessage(
-          `Unable to calculate allowed trace directions: ${e}`
-        );
-      }
-    });
-
-    this.SET_LINK_DIRECTIONS(allowedDirections);
-    this.SET_TYPE_ICONS(createDefaultTypeIcons());
-  }
 
   @Action
   /**

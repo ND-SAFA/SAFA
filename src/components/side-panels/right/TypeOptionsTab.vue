@@ -3,18 +3,23 @@
     <h1 class="text-h4 my-2">Type Options</h1>
     <div v-for="entry in artifactDirections" :key="entry.type">
       <h2 class="text-h5 mb-2">{{ entry.label }}</h2>
-      <v-autocomplete
-        filled
-        multiple
-        chips
-        deletable-chips
-        small-chips
-        hide-details
-        v-model="entry.allowedTypes"
-        :items="artifactTypes"
-        :label="entry.label + ' Trace To'"
-        @change="onDirectionChange(entry)"
-      />
+
+      <h3 class="text-h6">{{ entry.label }} Can Trace To</h3>
+
+      <v-chip-group column>
+        <v-chip
+          v-for="type in entry.allowedTypes"
+          :key="type"
+          close
+          @click:close="onDeleteDirection(entry, type)"
+        >
+          {{ getTypeLabel(type) }}
+        </v-chip>
+      </v-chip-group>
+
+      <v-chip v-if="entry.allowedTypes.length === 0">
+        Any Type of Artifact
+      </v-chip>
 
       <h3 class="text-h6 mb-1">{{ entry.label }} Icon</h3>
 
@@ -38,6 +43,7 @@ import Vue from "vue";
 import { LabeledArtifactDirection } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { typeOptionsModule } from "@/store";
+import { removeTraceType } from "@/api";
 
 export default Vue.extend({
   name: "trace-link-direction-tab",
@@ -58,7 +64,7 @@ export default Vue.extend({
       return {
         type,
         allowedTypes,
-        label: getArtifactTypePrintName(type),
+        label: this.getTypeLabel(type),
         icon: typeOptionsModule.getArtifactTypeIcon(type),
         iconIndex: this.icons.indexOf(icon),
       };
@@ -66,15 +72,23 @@ export default Vue.extend({
   },
   computed: {
     icons(): string[] {
-      return Object.values(typeOptionsModule.allArtifactTypeIcons);
+      return typeOptionsModule.allArtifactTypeIcons;
     },
   },
   methods: {
-    onDirectionChange(entry: LabeledArtifactDirection) {
-      typeOptionsModule.updateLinkDirections(entry);
+    getTypeLabel(type: string) {
+      return getArtifactTypePrintName(type);
     },
     onIconChange(entry: LabeledArtifactDirection, icon: string) {
       typeOptionsModule.updateArtifactIcon({ ...entry, icon });
+    },
+    onDeleteDirection(entry: LabeledArtifactDirection, removedType: string) {
+      entry.allowedTypes = entry.allowedTypes.filter(
+        (allowedType) => allowedType !== removedType
+      );
+
+      typeOptionsModule.updateLinkDirections(entry);
+      removeTraceType(entry.type, removedType);
     },
   },
 });

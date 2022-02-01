@@ -45,6 +45,11 @@ export enum Endpoint {
   //Parse Entities
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
+
+  //Trace Matrices
+  createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
+  deleteTraceMatrix = "projects/matrices/:traceMatrixId",
+  retrieveTraceMatrices = "projects/:projectId/matrices",
 }
 
 /**

@@ -69,6 +69,6 @@ export function getArtifactTypePrintName(type?: string): string {
   };
 
   return type
-    ? nameMap[type.toLowerCase()] || capitalize(type.toLowerCase())
-    : "Unknown type";
+    ? nameMap[type.toLowerCase()] || capitalizeSentence(type.toLowerCase())
+    : "Unknown Type";
 }

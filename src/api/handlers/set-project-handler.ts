@@ -5,14 +5,14 @@ import {
   artifactSelectionModule,
   deltaModule,
   errorModule,
-  typeOptionsModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
 import { connectAndSubscribeToVersion } from "@/api/endpoints";
-import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 import { disableDrawMode } from "@/cytoscape";
+import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
+import { reloadTraceMatrices } from "./trace-matrix-handler";
 
 /**
  1. Sets a new project.
@@ -41,7 +41,7 @@ export async function setAndSubscribeToProject(
   disableDrawMode();
   deltaModule.clearDelta();
   appModule.closeSidePanels();
-  typeOptionsModule.setLinkDirections(project);
+  await reloadTraceMatrices();
   await subtreeModule.initializeProject(project);
 }
 

@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-container v-if="selectedArtifact !== undefined">
+    <div v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
           <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
         </v-col>
         <v-col>
-          <v-row justify="end">
+          <v-row justify="end" class="mr-1">
             <generic-icon-button
               tooltip="Edit"
               icon-id="mdi-pencil"
@@ -72,20 +72,33 @@
         </v-col>
       </v-row>
 
-      <v-divider />
-
-      <v-row justify="center" v-if="selectedArtifactWarnings !== undefined">
-        <v-col class="flex-grow-0 my-1">
-          <v-icon color="secondary"> mdi-hazard-lights </v-icon>
-        </v-col>
-      </v-row>
-
-      <p
-        class="text-body-2 font-italic"
-        v-if="selectedArtifactWarnings !== undefined"
-      >
-        {{ selectedArtifactWarnings }}
-      </p>
+      <v-expansion-panels v-if="selectedArtifactWarnings.length > 0">
+        <v-expansion-panel>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-expansion-panel-header
+                v-on="on"
+                v-bind="attrs"
+                disable-icon-rotate
+                expand-icon="mdi-hazard-lights"
+              >
+                Warnings ({{ selectedArtifactWarnings.length }})
+              </v-expansion-panel-header>
+            </template>
+            <span>View warnings</span>
+          </v-tooltip>
+          <v-expansion-panel-content>
+            <p
+              class="text-body-1"
+              v-for="warning in selectedArtifactWarnings"
+              :key="warning"
+            >
+              <v-divider />
+              {{ warning }}
+            </p>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
       <artifact-creator-modal
         title="Edit Artifact Contents"
@@ -93,9 +106,9 @@
         :artifact="selectedArtifact"
         @close="isArtifactCreatorOpen = false"
       />
-    </v-container>
+    </div>
 
-    <p v-else>No artifact selected</p>
+    <p v-else class="text-body-1">No artifact is selected.</p>
   </v-container>
 </template>
 
@@ -155,14 +168,12 @@ export default Vue.extend({
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
     },
-    selectedArtifactWarnings(): string | undefined {
-      if (
-        this.selectedArtifact !== undefined &&
-        this.selectedArtifact.name in this.projectWarnings
-      ) {
-        return this.projectWarnings[this.selectedArtifact.name][0].ruleMessage;
-      }
-      return undefined;
+    selectedArtifactWarnings(): string[] {
+      const id = this.selectedArtifact?.id || "";
+
+      return (this.projectWarnings[id] || []).map(
+        ({ ruleMessage }) => ruleMessage
+      );
     },
   },
   methods: {

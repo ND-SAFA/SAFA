@@ -72,35 +72,26 @@
         </v-col>
       </v-row>
 
-      <v-expansion-panels v-if="selectedArtifactWarnings.length > 0">
-        <v-expansion-panel>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-expansion-panel-header
-                v-on="on"
-                v-bind="attrs"
-                disable-icon-rotate
-              >
-                <template v-slot:actions>
-                  <v-icon color="#EEBC3D"> mdi-hazard-lights </v-icon>
-                </template>
-                Warnings ({{ selectedArtifactWarnings.length }})
-              </v-expansion-panel-header>
-            </template>
-            <span>View warnings</span>
-          </v-tooltip>
-          <v-expansion-panel-content>
-            <p
-              class="text-body-1"
-              v-for="warning in selectedArtifactWarnings"
-              :key="warning"
-            >
-              <v-divider />
-              {{ warning }}
-            </p>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+      <v-divider />
+
+      <div v-if="selectedArtifactWarnings.length > 0">
+        <v-row align="center">
+          <v-col>
+            <h2 class="text-h5">Warnings</h2>
+          </v-col>
+          <v-col class="flex-grow-0 mr-2">
+            <v-icon color="secondary">mdi-hazard-lights</v-icon>
+          </v-col>
+        </v-row>
+
+        <p
+          class="text-body-1"
+          v-for="warning in selectedArtifactWarnings"
+          :key="warning"
+        >
+          {{ warning }}
+        </p>
+      </div>
 
       <artifact-creator-modal
         title="Edit Artifact Contents"

@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
 import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
-import { appModule, projectModule } from "..";
+import { appModule, projectModule, viewportModule } from "..";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
 
@@ -51,6 +51,7 @@ export default class ErrorModule extends VuexModule {
     await projectModule.addOrUpdateTraceLinks(
       Object.values(payload.traces.added)
     );
+    await viewportModule.setArtifactTreeLayout();
   }
 
   @Action

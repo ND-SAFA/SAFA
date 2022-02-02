@@ -79,7 +79,7 @@ export default class ViewportModule extends VuexModule {
 
     await this.setGraphLayout(payload);
 
-    cyZoomReset();
+    cyCenterNodes();
   }
 
   @Action({ rawError: true })
@@ -90,7 +90,8 @@ export default class ViewportModule extends VuexModule {
     const layout = new TimGraphLayout();
     const payload = { layout, cyPromise: timTreeCyPromise };
 
-    await viewportModule.setGraphLayout(payload);
+    await this.setGraphLayout(payload);
+
     cyCenterNodes();
   }
 

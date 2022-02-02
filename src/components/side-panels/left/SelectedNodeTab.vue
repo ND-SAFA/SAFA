@@ -80,8 +80,10 @@
                 v-on="on"
                 v-bind="attrs"
                 disable-icon-rotate
-                expand-icon="mdi-hazard-lights"
               >
+                <template v-slot:actions>
+                  <v-icon color="#EEBC3D"> mdi-hazard-lights </v-icon>
+                </template>
                 Warnings ({{ selectedArtifactWarnings.length }})
               </v-expansion-panel-header>
             </template>

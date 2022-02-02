@@ -10,6 +10,7 @@ import {
   connectAndSubscribeToVersion,
   updateProjectThroughFlatFiles,
 } from "@/api/endpoints";
+import { setAndSubscribeToProject, setCreatedProject } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -57,6 +58,7 @@ export async function uploadNewProjectVersion(
         );
         if (setVersionIfSuccessful) {
           await navigateTo(Routes.ARTIFACT_TREE);
+          await setCreatedProject(res);
         }
       })
       .finally(() => {

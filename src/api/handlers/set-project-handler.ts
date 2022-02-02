@@ -10,7 +10,7 @@ import {
   viewportModule,
 } from "@/store";
 import { connectAndSubscribeToVersion } from "@/api/endpoints";
-import { disableDrawMode } from "@/cytoscape";
+import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
 import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 import { reloadTraceMatrices } from "./trace-matrix-handler";
 
@@ -36,13 +36,14 @@ export async function setAndSubscribeToProject(
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();
     await viewportModule.setArtifactTreeLayout();
+    cyCenterNodes();
   }
 
   disableDrawMode();
   deltaModule.clearDelta();
   appModule.closeSidePanels();
-  await reloadTraceMatrices();
   await subtreeModule.initializeProject(project);
+  await reloadTraceMatrices();
 }
 
 export async function clearProject(): Promise<void> {

@@ -32,10 +32,11 @@ export function setEdgeHandlesCore(
 /**
  * Returns the edge handle core.
  */
-export function getEdgeHandlesCore(): EdgeHandleCore {
+export function getEdgeHandlesCore(): EdgeHandleCore | undefined {
   if (edgeHandlesCore === undefined) {
-    throw Error("EdgeHandles has not been instantiated");
+    console.log("EdgeHandles has not been instantiated");
   }
+
   return edgeHandlesCore;
 }
 
@@ -43,14 +44,14 @@ export function getEdgeHandlesCore(): EdgeHandleCore {
  * Enables edge drawing mode.
  */
 export function enableDrawMode(): void {
-  getEdgeHandlesCore().enable();
-  getEdgeHandlesCore().enableDrawMode();
+  getEdgeHandlesCore()?.enable();
+  getEdgeHandlesCore()?.enableDrawMode();
 }
 
 /**
  * Disables edge drawing mode.
  */
 export function disableDrawMode(): void {
-  getEdgeHandlesCore().disableDrawMode();
-  getEdgeHandlesCore().disable();
+  getEdgeHandlesCore()?.disableDrawMode();
+  getEdgeHandlesCore()?.disable();
 }

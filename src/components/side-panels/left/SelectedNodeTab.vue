@@ -74,8 +74,8 @@
 
       <v-divider />
 
-      <div v-if="selectedArtifactWarnings.length > 0">
-        <v-row align="center">
+      <v-container v-if="selectedArtifactWarnings.length > 0">
+        <v-row align="center" class="debug">
           <v-col>
             <h2 class="text-h5">Warnings</h2>
           </v-col>
@@ -84,14 +84,24 @@
           </v-col>
         </v-row>
 
-        <p
-          class="text-body-1"
-          v-for="warning in selectedArtifactWarnings"
-          :key="warning"
-        >
-          {{ warning }}
-        </p>
-      </div>
+        <v-row>
+          <v-expansion-panels>
+            <v-expansion-panel
+              v-for="warning in selectedArtifactWarnings"
+              :key="warning"
+            >
+              <v-expansion-panel-header>
+                <div class="font-weight-bold">
+                  {{ warning[0] }}
+                </div>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                {{ warning[1] }}
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-row>
+      </v-container>
 
       <artifact-creator-modal
         title="Edit Artifact Contents"
@@ -161,11 +171,11 @@ export default Vue.extend({
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
     },
-    selectedArtifactWarnings(): string[] {
+    selectedArtifactWarnings(): [string, string][] {
       const id = this.selectedArtifact?.id || "";
 
       return (this.projectWarnings[id] || []).map(
-        ({ ruleMessage }) => ruleMessage
+        ({ ruleName, ruleMessage }) => [ruleName, ruleMessage]
       );
     },
   },

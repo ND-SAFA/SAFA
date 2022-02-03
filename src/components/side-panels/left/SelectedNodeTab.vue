@@ -72,9 +72,9 @@
         </v-col>
       </v-row>
 
-      <v-divider />
+      <v-divider class="mb-2" />
 
-      <v-container v-if="selectedArtifactWarnings.length > 0">
+      <div v-if="selectedArtifactWarnings.length > 0">
         <v-row align="center" class="debug">
           <v-col>
             <h2 class="text-h5">Warnings</h2>
@@ -84,24 +84,20 @@
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-expansion-panels>
-            <v-expansion-panel
-              v-for="warning in selectedArtifactWarnings"
-              :key="warning"
-            >
-              <v-expansion-panel-header>
-                <div class="font-weight-bold">
-                  {{ warning[0] }}
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                {{ warning[1] }}
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-row>
-      </v-container>
+        <v-expansion-panels>
+          <v-expansion-panel
+            v-for="warning in selectedArtifactWarnings"
+            :key="warning"
+          >
+            <v-expansion-panel-header class="text-body-1 font-weight-bold">
+              {{ warning.ruleName }}
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="text-body-1">
+              {{ warning.ruleMessage }}
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </div>
 
       <artifact-creator-modal
         title="Edit Artifact Contents"
@@ -117,7 +113,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, PanelType, ProjectWarnings } from "@/types";
+import { Artifact, ArtifactWarning, PanelType, ProjectWarnings } from "@/types";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import {
   appModule,
@@ -171,12 +167,10 @@ export default Vue.extend({
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
     },
-    selectedArtifactWarnings(): [string, string][] {
+    selectedArtifactWarnings(): ArtifactWarning[] {
       const id = this.selectedArtifact?.id || "";
 
-      return (this.projectWarnings[id] || []).map(
-        ({ ruleName, ruleMessage }) => [ruleName, ruleMessage]
-      );
+      return this.projectWarnings[id] || [];
     },
   },
   methods: {
@@ -198,3 +192,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+.v-expansion-panel::before {
+  box-shadow: none;
+}
+</style>

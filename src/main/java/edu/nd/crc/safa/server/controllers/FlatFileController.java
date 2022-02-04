@@ -14,9 +14,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
+import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class FlatFileController extends BaseController {
 
     private final ProjectService projectService;
     private final FileUploadService fileUploadService;
-    private final RevisionNotificationService revisionNotificationService;
+    private final NotificationService notificationService;
     private final FlatFileService flatFileService;
     private final ProjectRetrievalService projectRetrievalService;
 
@@ -45,12 +45,12 @@ public class FlatFileController extends BaseController {
                               ProjectVersionRepository projectVersionRepository,
                               ResourceBuilder resourceBuilder,
                               FileUploadService fileUploadService,
-                              RevisionNotificationService revisionNotificationService,
+                              NotificationService notificationService,
                               FlatFileService flatFileParser,
                               ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
-        this.revisionNotificationService = revisionNotificationService;
+        this.notificationService = notificationService;
         this.fileUploadService = fileUploadService;
         this.flatFileService = flatFileParser;
         this.projectRetrievalService = projectRetrievalService;
@@ -78,7 +78,7 @@ public class FlatFileController extends BaseController {
             project,
             projectVersion,
             files);
-        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
         return new ServerResponse(response);
     }
 
@@ -104,7 +104,7 @@ public class FlatFileController extends BaseController {
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
-        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
         return new ServerResponse(response);
     }
 

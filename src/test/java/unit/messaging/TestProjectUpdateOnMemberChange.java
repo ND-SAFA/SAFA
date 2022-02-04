@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
 /**
- * Provides a smoke test verifying that two users subscribed to the same version channel
- * are able to receive updates when the other commits them.
+ * Tests that notifications are sent to subscribed users when a member is
+ * added or removed from a project.
  */
 public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
 

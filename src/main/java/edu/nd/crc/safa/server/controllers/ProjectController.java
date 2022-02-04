@@ -90,7 +90,7 @@ public class ProjectController extends BaseController {
      * @return String with success message.
      * @throws SafaError Throws error if project with associated id is not found.
      */
-    @DeleteMapping(AppRoutes.Projects.projectById)
+    @DeleteMapping(AppRoutes.Projects.deleteProjectById)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();

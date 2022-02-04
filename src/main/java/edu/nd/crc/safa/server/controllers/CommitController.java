@@ -90,7 +90,7 @@ public class CommitController extends BaseController {
                 throw new SafaError(artifactError.getDescription());
             }
         }
-        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
     }
 
     private void commitTraces(ProjectVersion projectVersion,
@@ -114,6 +114,6 @@ public class CommitController extends BaseController {
                 throw new SafaError(traceError.getDescription());
             }
         }
-        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
     }
 }

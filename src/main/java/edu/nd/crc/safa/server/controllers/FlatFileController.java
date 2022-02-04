@@ -78,7 +78,7 @@ public class FlatFileController extends BaseController {
             project,
             projectVersion,
             files);
-        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
         return new ServerResponse(response);
     }
 
@@ -104,7 +104,7 @@ public class FlatFileController extends BaseController {
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
-        this.revisionNotificationService.broadcastUpdateProject(projectVersion);
+        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
         return new ServerResponse(response);
     }
 

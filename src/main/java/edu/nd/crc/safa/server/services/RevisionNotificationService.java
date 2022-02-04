@@ -21,7 +21,7 @@ public class RevisionNotificationService {
         return String.format("/topic/revisions/%s", projectVersion.getVersionId());
     }
 
-    public void broadcastUpdateProject(ProjectVersion projectVersion) {
+    public void broadUpdateProjectVersionMessage(ProjectVersion projectVersion) {
         String versionTopicDestination = getVersionTopic(projectVersion);
         ProjectWebSocketMessage update = new ProjectWebSocketMessage("excluded");
         messagingTemplate.convertAndSend(versionTopicDestination, update);

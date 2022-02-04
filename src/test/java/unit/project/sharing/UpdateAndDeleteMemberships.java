@@ -3,13 +3,8 @@ package unit.project.sharing;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
-
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 
 import org.json.JSONArray;
@@ -58,13 +53,7 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Delete project member
-        Optional<ProjectMembership> query = this.projectMembershipRepository.findByProjectAndMember(project,
-            this.otherUser);
-        String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteProjectMembership)
-            .withProjectMembership(query.get())
-            .get();
-        sendDelete(url, status().isNoContent());
+        removeMemberFromProject(project, this.otherUser.getEmail());
 
         // Step - Get members
         JSONObject response = getProjectMembers(project);

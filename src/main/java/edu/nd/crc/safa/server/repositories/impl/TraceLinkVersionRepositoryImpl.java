@@ -87,7 +87,6 @@ public class TraceLinkVersionRepositoryImpl
             Artifact sourceArtifact = assertAndFindArtifact(project, trace.sourceName);
             Artifact targetArtifact = assertAndFindArtifact(project, trace.targetName);
             traceLink = new TraceLink(sourceArtifact, targetArtifact);
-            System.out.println(traceLink);
             traceMatrixService.verifyOrCreateTraceMatrix(project,
                 sourceArtifact.getType(),
                 targetArtifact.getType());

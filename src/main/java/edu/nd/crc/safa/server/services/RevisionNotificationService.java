@@ -36,6 +36,5 @@ public class RevisionNotificationService {
         String versionTopicDestination = getProjectTopic(project);
         ProjectWebSocketMessage update = new ProjectWebSocketMessage(message);
         messagingTemplate.convertAndSend(versionTopicDestination, update);
-        System.out.println("SENDING PROJECT MESSAGE:" + message);
     }
 }

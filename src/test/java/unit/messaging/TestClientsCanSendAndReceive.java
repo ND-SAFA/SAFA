@@ -3,16 +3,17 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
-import unit.WebSocketBaseTest;
+import unit.ApplicationBaseTest;
 
 /**
  * Provides a smoke test verifying that two users subscribed to the same version channel
  * are able to receive updates when the other commits them.
  */
-public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
+public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
 
     @Test
     public void canSendAndReceiveMessagesBetweenClients() throws Exception {
@@ -24,18 +25,15 @@ public class TestClientsCanSendAndReceive extends WebSocketBaseTest {
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
-        String versionId = projectVersion.getVersionId().toString();
-        String projectId = projectVersion.getProject().getProjectId().toString();
+        Project project = projectVersion.getProject();
 
         // Step - Create two client and subscript to version
-        String topicSubscriptionDestination = String.format("/topic/revisions/%s", versionId);
-        String projectSubscriptionDestination = String.format("/topic/projects/%s", projectId);
         createNewConnection(clientOne)
-            .subscribe(clientOne, topicSubscriptionDestination)
-            .subscribe(clientOne, projectSubscriptionDestination);
+            .subscribeToProject(clientOne, project)
+            .subscribeToVersion(clientOne, projectVersion);
         createNewConnection(clientTwo)
-            .subscribe(clientTwo, topicSubscriptionDestination)
-            .subscribe(clientTwo, projectSubscriptionDestination);
+            .subscribeToProject(clientTwo, project)
+            .subscribeToVersion(clientTwo, projectVersion);
 
         // Step - Upload flat files
         this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);

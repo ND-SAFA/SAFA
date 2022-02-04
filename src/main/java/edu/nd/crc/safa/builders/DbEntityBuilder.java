@@ -22,6 +22,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
@@ -37,6 +38,7 @@ public class DbEntityBuilder extends BaseBuilder {
     final int majorVersion = 1;
     final int minorVersion = 1;
 
+    private final SafaUserRepository safaUserRepository;
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
@@ -57,14 +59,16 @@ public class DbEntityBuilder extends BaseBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ProjectRepository projectRepository,
+    public DbEntityBuilder(SafaUserRepository safaUserRepository,
+                           ProjectRepository projectRepository,
+                           ProjectMembershipRepository projectMembershipRepository,
                            ProjectVersionRepository projectVersionRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactRepository artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkVersionRepository traceLinkVersionRepository,
-                           ProjectMembershipRepository projectMembershipRepository) {
+                           TraceLinkVersionRepository traceLinkVersionRepository) {
+        this.safaUserRepository = safaUserRepository;
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;

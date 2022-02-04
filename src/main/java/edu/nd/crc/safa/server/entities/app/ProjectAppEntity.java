@@ -32,14 +32,18 @@ public class ProjectAppEntity {
     @NotNull
     public List<@Valid @NotNull TraceAppEntity> traces;
 
+    public List<ProjectMemberAppEntity> members;
+
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
+        this.members = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
-                            List<TraceAppEntity> traces) {
+                            List<TraceAppEntity> traces,
+                            List<ProjectMemberAppEntity> members) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
@@ -47,6 +51,15 @@ public class ProjectAppEntity {
         this.description = project.getDescription();
         this.artifacts = artifacts;
         this.traces = traces;
+        this.members = members;
+    }
+
+    public List<ProjectMemberAppEntity> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<ProjectMemberAppEntity> members) {
+        this.members = members;
     }
 
     public String getProjectId() {

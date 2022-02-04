@@ -14,10 +14,12 @@ import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,14 +38,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController extends BaseController {
 
     private final ProjectService projectService;
+    private final RevisionNotificationService revisionNotificationService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
-                             ProjectService projectService) {
+                             ProjectService projectService,
+                             RevisionNotificationService revisionNotificationService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
+        this.revisionNotificationService = revisionNotificationService;
     }
 
     /**
@@ -90,7 +95,7 @@ public class ProjectController extends BaseController {
      * @return String with success message.
      * @throws SafaError Throws error if project with associated id is not found.
      */
-    @DeleteMapping(AppRoutes.Projects.projectById)
+    @DeleteMapping(AppRoutes.Projects.deleteProjectById)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
@@ -113,6 +118,7 @@ public class ProjectController extends BaseController {
         this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
+        this.revisionNotificationService.broadUpdateProjectMessage(project, "members");
     }
 
     /**
@@ -141,6 +147,9 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
         //TODO: Check for project permission before deleting.
-        this.projectService.deleteProjectMemberById(projectMembershipId);
+        ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
+        if (projectMembership != null) {
+            this.revisionNotificationService.broadUpdateProjectMessage(projectMembership.getProject(), "members");
+        }
     }
 }

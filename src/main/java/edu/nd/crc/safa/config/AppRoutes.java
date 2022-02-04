@@ -13,7 +13,7 @@ public class AppRoutes {
 
     public static class Projects {
         private static final String projectPrefix = "/projects";
-        public static final String projectById = projectPrefix + "/{projectId}";
+        public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String addProjectMember = projectPrefix + "/{projectId}/members";
         public static final String getProjectMembers = projectPrefix + "/{projectId}/members";
         public static final String deleteProjectMembership = projectPrefix + "/members/{projectMembershipId}";

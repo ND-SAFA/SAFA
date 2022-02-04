@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
 import edu.nd.crc.safa.server.entities.api.ProjectWebSocketMessage;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,10 @@ public class RevisionNotificationService {
         this.messagingTemplate = template;
     }
 
+    public static String getProjectTopic(Project project) {
+        return String.format("/topic/projects/%s", project.getProjectId().toString());
+    }
+
     public static String getVersionTopic(ProjectVersion projectVersion) {
         return String.format("/topic/revisions/%s", projectVersion.getVersionId());
     }
@@ -25,5 +30,12 @@ public class RevisionNotificationService {
         String versionTopicDestination = getVersionTopic(projectVersion);
         ProjectWebSocketMessage update = new ProjectWebSocketMessage("excluded");
         messagingTemplate.convertAndSend(versionTopicDestination, update);
+    }
+
+    public void broadUpdateProjectMessage(Project project, String message) {
+        String versionTopicDestination = getProjectTopic(project);
+        ProjectWebSocketMessage update = new ProjectWebSocketMessage(message);
+        messagingTemplate.convertAndSend(versionTopicDestination, update);
+        System.out.println("SENDING PROJECT MESSAGE:" + message);
     }
 }

@@ -187,6 +187,7 @@ export default Vue.extend({
         projectId: project.projectId,
         description: project.description,
         name: project.name,
+        members: [],
         artifacts: [],
         traces: [],
       })

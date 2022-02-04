@@ -183,6 +183,7 @@ export default Vue.extend({
         projectId: "",
         name: this.name,
         description: this.description,
+        members: [], // TODO: Add current user as owner?
         artifacts: this.artifacts,
         traces: this.traces,
       };

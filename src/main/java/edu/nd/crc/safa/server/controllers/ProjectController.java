@@ -18,8 +18,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,17 +38,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController extends BaseController {
 
     private final ProjectService projectService;
-    private final RevisionNotificationService revisionNotificationService;
+    private final NotificationService notificationService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
                              ProjectService projectService,
-                             RevisionNotificationService revisionNotificationService) {
+                             NotificationService notificationService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
-        this.revisionNotificationService = revisionNotificationService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -118,7 +118,7 @@ public class ProjectController extends BaseController {
         this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
-        this.revisionNotificationService.broadUpdateProjectMessage(project, "members");
+        this.notificationService.broadUpdateProjectMessage(project, "members");
     }
 
     /**
@@ -149,7 +149,7 @@ public class ProjectController extends BaseController {
         //TODO: Check for project permission before deleting.
         ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
         if (projectMembership != null) {
-            this.revisionNotificationService.broadUpdateProjectMessage(projectMembership.getProject(), "members");
+            this.notificationService.broadUpdateProjectMessage(projectMembership.getProject(), "members");
         }
     }
 }

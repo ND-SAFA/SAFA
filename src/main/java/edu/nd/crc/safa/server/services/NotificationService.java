@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+/**
+ * Responsible for sending notifications to subscribers of certain topics.
+ */
 @Service
-public class RevisionNotificationService {
+public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public RevisionNotificationService(SimpMessagingTemplate template) {
+    public NotificationService(SimpMessagingTemplate template) {
         this.messagingTemplate = template;
     }
 

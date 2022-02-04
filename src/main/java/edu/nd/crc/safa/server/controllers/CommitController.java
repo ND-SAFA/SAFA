@@ -19,7 +19,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
+import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +37,7 @@ public class CommitController extends BaseController {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final RevisionNotificationService revisionNotificationService;
+    private final NotificationService notificationService;
 
     @Autowired
     public CommitController(ProjectRepository projectRepository,
@@ -45,12 +45,12 @@ public class CommitController extends BaseController {
                             ArtifactVersionRepository artifactVersionRepository,
                             TraceLinkVersionRepository traceLinkVersionRepository,
                             ResourceBuilder resourceBuilder,
-                            RevisionNotificationService revisionNotificationService
+                            NotificationService notificationService
     ) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.revisionNotificationService = revisionNotificationService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -90,7 +90,7 @@ public class CommitController extends BaseController {
                 throw new SafaError(artifactError.getDescription());
             }
         }
-        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
     }
 
     private void commitTraces(ProjectVersion projectVersion,
@@ -114,6 +114,6 @@ public class CommitController extends BaseController {
                 throw new SafaError(traceError.getDescription());
             }
         }
-        this.revisionNotificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
     }
 }

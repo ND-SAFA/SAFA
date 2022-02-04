@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.RevisionNotificationService;
+import edu.nd.crc.safa.server.services.NotificationService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,7 +91,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @return The test instance allowing for the builder pattern.
      */
     public WebSocketBaseTest subscribeToProject(String clientId, Project project) {
-        String projectSubscriptionDestination = RevisionNotificationService.getProjectTopic(project);
+        String projectSubscriptionDestination = NotificationService.getProjectTopic(project);
         return this.subscribe(clientId, projectSubscriptionDestination);
     }
 
@@ -103,7 +103,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @return The test instance allowing for the builder pattern.
      */
     public WebSocketBaseTest subscribeToVersion(String clientId, ProjectVersion projectVersion) {
-        String projectVersionSubscriptionDestination = RevisionNotificationService.getVersionTopic(projectVersion);
+        String projectVersionSubscriptionDestination = NotificationService.getVersionTopic(projectVersion);
         return this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 

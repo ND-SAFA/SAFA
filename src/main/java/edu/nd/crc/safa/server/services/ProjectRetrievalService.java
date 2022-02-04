@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,10 +8,9 @@ import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
@@ -90,10 +88,11 @@ public class ProjectRetrievalService {
                     && artifactIds.contains(t.targetId))
                 .collect(Collectors.toList());
 
-        Hashtable<String, ProjectRole> projectMembers = new Hashtable<>();
-        for (ProjectMembership pm : this.projectMembershipRepository.findByProject(projectVersion.getProject())) {
-            projectMembers.put(pm.getMember().getEmail(), pm.getRole());
-        }
+        List<ProjectMemberAppEntity> projectMembers =
+            this.projectMembershipRepository.findByProject(projectVersion.getProject())
+                .stream()
+                .map(ProjectMemberAppEntity::new)
+                .collect(Collectors.toList());
 
         return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers);
     }

@@ -1,13 +1,11 @@
 package edu.nd.crc.safa.server.entities.app;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
@@ -33,18 +31,19 @@ public class ProjectAppEntity {
 
     @NotNull
     public List<@Valid @NotNull TraceAppEntity> traces;
-    public Hashtable<String, ProjectRole> members;
+
+    public List<ProjectMemberAppEntity> members;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
-        this.members = new Hashtable<>();
+        this.members = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
                             List<TraceAppEntity> traces,
-                            Hashtable<String, ProjectRole> members) {
+                            List<ProjectMemberAppEntity> members) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
@@ -55,11 +54,11 @@ public class ProjectAppEntity {
         this.members = members;
     }
 
-    public Hashtable<String, ProjectRole> getMembers() {
+    public List<ProjectMemberAppEntity> getMembers() {
         return members;
     }
 
-    public void setMembers(Hashtable<String, ProjectRole> members) {
+    public void setMembers(List<ProjectMemberAppEntity> members) {
         this.members = members;
     }
 

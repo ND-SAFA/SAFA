@@ -1,4 +1,4 @@
-import { TraceLink } from "@/types";
+import { ProjectMembership, ProjectRole, TraceLink } from "@/types";
 import { Artifact } from "./artifact";
 
 /**
@@ -102,6 +102,10 @@ export interface Project extends ProjectIdentifier {
    * The project's traces.
    */
   traces: TraceLink[];
+  /**
+   * Map of project members and their role.
+   */
+  members: ProjectMembership[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

@@ -77,7 +77,7 @@ export interface ProjectVersionUpdate {
   /**
    * Whether the data modified is included in the Update.
    */
-  type: "included" | "excluded";
+  type: "excluded" | "members";
   /**
    * The traces updated.
    */

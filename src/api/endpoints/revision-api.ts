@@ -5,6 +5,7 @@ import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
 import { setCreatedProject } from "@/api/handlers/set-project-handler";
+import { getProjectMembers } from "@/api";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -137,10 +138,10 @@ export function connectAndSubscribeToVersion(
         const projectSubscription = `/topic/projects/${projectId}`;
         const versionSubscription = `/topic/revisions/${versionId}`;
         stompClient.subscribe(projectSubscription, async (frame) => {
-          await revisionMessageHandler(versionId, frame).then();
+          await projectMessageHandler(projectId, frame);
         });
-        stompClient.subscribe(versionSubscription, async (frame) => {
-          await revisionMessageHandler(versionId, frame);
+        stompClient.subscribe(versionSubscription, async () => {
+          await versionMessageHandler(versionId);
         });
         resolve();
       })
@@ -149,25 +150,31 @@ export function connectAndSubscribeToVersion(
 }
 
 /**
- * Handles revision messages.
+ * Handles revision messages related to versioned entities of the project.
  *
  * @param versionId - The project version ID of the revision.
+ */
+async function versionMessageHandler(versionId: string): Promise<void> {
+  getProjectVersion(versionId).then(setCreatedProject);
+}
+
+/**
+ * Handles revision messages.
+ *
+ * @param projectId - ID of project to update.
  * @param frame - The frame of the revision.
  */
-async function revisionMessageHandler(
-  versionId: string,
+async function projectMessageHandler(
+  projectId: string,
   frame: Frame
 ): Promise<void> {
-  const revision: ProjectVersionUpdate = JSON.parse(
+  const message: ProjectVersionUpdate = JSON.parse(
     frame.body
   ) as ProjectVersionUpdate;
 
-  switch (revision.type) {
-    case "included":
-      await projectModule.addOrUpdateArtifacts(revision.artifacts);
-      await projectModule.addOrUpdateTraceLinks(revision.traces);
-      break;
-    case "excluded":
-      getProjectVersion(versionId).then(setCreatedProject);
+  console.log("WEBSOCKET MESSAGE:", message);
+  switch (message.type) {
+    case "members":
+      return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
   }
 }

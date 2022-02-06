@@ -51,6 +51,7 @@ export function createProject(): Project {
     name: "Untitled",
     projectId: "",
     description: "",
+    members: [],
     artifacts: [],
     traces: [],
     projectVersion: undefined,

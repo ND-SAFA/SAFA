@@ -52,10 +52,12 @@ export default Vue.extend({
     return {
       hover: true,
       hoverColor: ThemeColors.menuHighlight,
-      selectedValue: this.definition.selectedItem || "",
     };
   },
   computed: {
+    selectedValue(): string {
+      return this.definition.selectedItem || "";
+    },
     disabled(): boolean {
       return this.definition.isDisabled !== undefined
         ? this.definition.isDisabled

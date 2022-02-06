@@ -6,6 +6,7 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
+    :has-delete="hasDeletePermission"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -47,6 +48,7 @@ import {
   Project,
   ProjectCreationResponse,
   ProjectIdentifier,
+  ProjectRole,
 } from "@/types";
 import {
   clearProject,
@@ -54,7 +56,7 @@ import {
   getProjects,
   saveOrUpdateProject,
 } from "@/api";
-import { logModule, projectModule } from "@/store";
+import { logModule, projectModule, sessionModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -109,6 +111,18 @@ export default Vue.extend({
           this.$emit("selected", this.projects[0], true);
         }
       }
+    },
+  },
+  computed: {
+    hasDeletePermission(): boolean {
+      const userEmail = sessionModule.authenticationToken.sub;
+      const projectMembershipQuery = projectModule.getProject.members.filter(
+        (m) => m.email === userEmail
+      );
+      if (projectMembershipQuery.length === 1) {
+        return projectMembershipQuery[0].role === ProjectRole.OWNER;
+      }
+      return false;
     },
   },
   methods: {
@@ -187,6 +201,7 @@ export default Vue.extend({
         projectId: project.projectId,
         description: project.description,
         name: project.name,
+        members: [],
         artifacts: [],
         traces: [],
       })

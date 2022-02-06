@@ -4,6 +4,7 @@ import type {
   ArtifactQueryFunction,
   Project,
   ProjectIdentifier,
+  ProjectMembership,
   TraceLink,
 } from "@/types";
 import { LinkValidator } from "@/types";
@@ -93,6 +94,14 @@ export default class ProjectModule extends VuexModule {
    */
   SAVE_PROJECT(project: Project): void {
     this.project = project;
+  }
+
+  @Mutation
+  /**
+   * Sets the members of current project.
+   */
+  SET_MEMBERS(members: ProjectMembership[]): void {
+    this.project.members = members;
   }
 
   @Mutation

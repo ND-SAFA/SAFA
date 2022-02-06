@@ -37,6 +37,7 @@ import {
   ButtonDefinition,
   ButtonType,
   EmptyLambda,
+  ListMenuDefinition,
   ProjectIdentifier,
   ProjectMembership,
   ProjectRole,
@@ -118,8 +119,8 @@ export default Vue.extend({
           buttonColor: "primary",
           buttonIsText: false,
           showSelectedValue: true,
-          selectedItem: this.member?.role,
-        },
+          selectedItem: this.userRole,
+        } as ListMenuDefinition,
       ];
     },
   },
@@ -128,6 +129,7 @@ export default Vue.extend({
       this.hasErrors = hasErrors;
     },
     clearData(): void {
+      console.log("CLEARING DATA");
       this.userEmail = "";
       this.userRole = undefined;
     },

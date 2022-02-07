@@ -186,7 +186,7 @@ public class ProjectService {
         Optional<ProjectMembership> currentUserMembershipQuery = this.projectMembershipRepository
             .findByProjectAndMember(project, currentUser);
         if (currentUserMembershipQuery.isPresent()) {
-            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) >= 0) {
+            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) > 0) {
                 throw new SafaError("Cannot add member with authorization greater that current user.");
             }
         } else {

@@ -29,6 +29,13 @@ public class PermissionService {
         this.safaUserService = safaUserService;
     }
 
+    public void requireOwnerPermission(Project project) throws SafaError {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        if (!hasOwnerPermission(project, currentUser)) {
+            throw new SafaError("User does not have edit permissions on project.");
+        }
+    }
+
     public void requireViewPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasViewingPermission(project, currentUser)) {
@@ -41,6 +48,10 @@ public class PermissionService {
         if (!hasEditPermission(project, currentUser)) {
             throw new SafaError("User does not have edit permissions on project.");
         }
+    }
+
+    private boolean hasOwnerPermission(Project project, SafaUser user) {
+        return hasPermissionOrGreater(project, user, ProjectRole.OWNER);
     }
 
     private boolean hasViewingPermission(Project project, SafaUser user) {

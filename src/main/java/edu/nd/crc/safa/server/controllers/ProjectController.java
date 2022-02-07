@@ -98,7 +98,7 @@ public class ProjectController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.deleteProjectById)
     @ResponseStatus(HttpStatus.OK)
     public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
         this.projectRepository.delete(project);
         return new ServerResponse("Project deleted successfully");
     }

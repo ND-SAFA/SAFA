@@ -57,6 +57,11 @@ public class ResourceBuilder {
         return this;
     }
 
+    public Project withOwnProject() throws SafaError {
+        this.permissionService.requireOwnerPermission(project);
+        return this.project;
+    }
+
     public Project withViewProject() throws SafaError {
         this.permissionService.requireViewPermission(project);
         return this.project;

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +56,20 @@ public class DocumentController extends BaseController {
         document.setProject(project);
         this.documentRepository.save(document);
         return new ServerResponse(document);
+    }
+
+    /**
+     * Returns the Documents associated with given specified project.
+     *
+     * @param projectId The UUID of the project whose documents are returned.
+     * @return List of project documents.
+     * @throws SafaError Throws error if authorized user does not have permission to view project.
+     */
+    @GetMapping(AppRoutes.Projects.getProjectDocuments)
+    public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
+        Project project = resourceBuilder.fetchProject(projectId).withViewProject();
+        List<Document> projectDocuments = this.documentRepository.findByProject(project);
+        return new ServerResponse(projectDocuments);
     }
 
     /**

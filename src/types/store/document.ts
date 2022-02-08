@@ -3,7 +3,7 @@ import { Artifact, TraceLink } from "@/types";
 /**
  * Defines the artifacts displayed in a document.
  */
-interface DocumentArtifacts {
+export interface DocumentArtifacts {
   /**
    * All artifacts in the project.
    */
@@ -18,7 +18,7 @@ interface DocumentArtifacts {
 /**
  * Defines the trace links displayed in a document.
  */
-interface DocumentTraces {
+export interface DocumentTraces {
   /**
    * All trace links in the project.
    */

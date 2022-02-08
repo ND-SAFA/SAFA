@@ -2,6 +2,7 @@ import {
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
+  DocumentType,
   MessageType,
   Project,
   ProjectDelta,
@@ -118,7 +119,7 @@ export function createDocument(artifactIds: string[] = []): ProjectDocument {
     documentId: "",
     projectId: "",
     name: "Default",
-    type: "",
+    type: DocumentType.ARTIFACT_TREE,
     artifactIds,
   };
 }

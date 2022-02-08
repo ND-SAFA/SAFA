@@ -1,11 +1,7 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
-import type {
-  TraceLink,
-  DocumentTraces,
-  LinkFinder,
-  LinkValidator,
-} from "@/types";
+import type { TraceLink, LinkFinder, LinkValidator } from "@/types";
+import { DocumentTraces } from "@/types";
 import { subtreeModule } from "@/store";
 import { getTraceId } from "@/util";
 

@@ -89,10 +89,10 @@ export default Vue.extend({
   },
   computed: {
     projectId(): string {
-      return projectModule.getProject.projectId;
+      return projectModule.projectId;
     },
     versionId(): string | undefined {
-      return projectModule.getProject.projectVersion?.versionId;
+      return projectModule.versionId;
     },
     artifactTypes(): string[] {
       return typeOptionsModule.artifactTypes;

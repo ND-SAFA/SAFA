@@ -117,9 +117,11 @@ import { Artifact, ArtifactWarning, PanelType, ProjectWarnings } from "@/types";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import {
   appModule,
+  artifactModule,
   artifactSelectionModule,
   errorModule,
   projectModule,
+  traceModule,
 } from "@/store";
 import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
 
@@ -143,9 +145,8 @@ export default Vue.extend({
     parents(): string[] {
       const selectedArtifact = this.selectedArtifact;
       if (selectedArtifact !== undefined) {
-        const traceLinks = projectModule.traceLinks;
-        const query = traceLinks.filter(
-          (l) => l.sourceName === selectedArtifact.name
+        const query = traceModule.traces.filter(
+          ({ sourceName }) => sourceName === selectedArtifact.name
         );
         return query.map((l) => l.targetName);
       } else {
@@ -155,9 +156,8 @@ export default Vue.extend({
     children(): string[] {
       const selectedArtifactName = this.selectedArtifactName;
       if (selectedArtifactName !== undefined) {
-        const traceLinks = projectModule.traceLinks;
-        const query = traceLinks.filter(
-          (l) => l.targetName === selectedArtifactName
+        const query = traceModule.traces.filter(
+          ({ targetName }) => targetName === selectedArtifactName
         );
         return query.map((l) => l.sourceName);
       } else {
@@ -178,7 +178,8 @@ export default Vue.extend({
       this.isArtifactCreatorOpen = true;
     },
     onArtifactClick(artifactName: string): void {
-      const artifact = projectModule.getArtifactByName(artifactName);
+      const artifact = artifactModule.getArtifactByName(artifactName);
+
       artifactSelectionModule.selectArtifact(artifact.id);
     },
     onDeleteArtifact(): void {

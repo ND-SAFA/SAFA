@@ -4,6 +4,7 @@ import {
   appModule,
   artifactSelectionModule,
   deltaModule,
+  documentModule,
   errorModule,
   projectModule,
   subtreeModule,
@@ -24,14 +25,14 @@ import { reloadTraceMatrices } from "./trace-matrix-handler";
 export async function setAndSubscribeToProject(
   project: Project
 ): Promise<void> {
-  const isDifferentProject =
-    projectModule.getProject.projectId !== project.projectId;
+  const isDifferentProject = projectModule.projectId !== project.projectId;
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
   artifactSelectionModule.clearSelections();
   projectModule.SAVE_PROJECT(project);
+  documentModule.initializeProject(project);
 
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();
@@ -65,7 +66,5 @@ export async function setCreatedProject(
  * Reloads the current project.
  */
 export async function reloadProject(): Promise<void> {
-  await loadVersionIfExistsHandler(
-    projectModule.getProject.projectVersion?.versionId
-  );
+  await loadVersionIfExistsHandler(projectModule.versionId);
 }

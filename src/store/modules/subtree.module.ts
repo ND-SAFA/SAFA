@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink, SubtreeMap, Project } from "@/types";
-import { projectModule } from "@/store";
+import { artifactModule, traceModule } from "@/store";
 import {
   artifactTreeCyPromise,
   createSubtreeMap,
@@ -45,7 +45,7 @@ export default class SubtreeModule extends VuexModule {
    */
   async updateSubtreeMap(): Promise<void> {
     artifactTreeCyPromise.then(async (cy) => {
-      const subtreeMap = await createSubtreeMap(cy, projectModule.artifacts);
+      const subtreeMap = await createSubtreeMap(cy, artifactModule.artifacts);
 
       this.SET_SUBTREE_MAP(subtreeMap);
     });
@@ -230,12 +230,10 @@ export default class SubtreeModule extends VuexModule {
     c: string
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootId: string, childId: string) => {
-      const traceLinks = projectModule.traceLinks;
-
-      const subtreeLinkCreator: (f: boolean) => SubtreeLink[] = (
+      const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
-        return traceLinks
+        return traceModule.traces
           .filter((link) => {
             const value = isIncoming ? link.targetId : link.sourceId;
             const oppoValue = isIncoming ? link.sourceId : link.targetId;

@@ -30,21 +30,26 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
-import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
+  TraceLink,
+  TraceLinkDisplayData,
+  Artifact,
+  CytoCoreGraph,
+} from "@/types";
+import {
+  artifactModule,
   artifactSelectionModule,
-  projectModule,
   subtreeModule,
+  traceModule,
   viewportModule,
 } from "@/store";
+import { artifactTreeGraph } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/approve-links-view";
 import ArtifactNode from "./ArtifactNode.vue";
-import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
   name: "artifact-tree",
@@ -66,19 +71,16 @@ export default Vue.extend({
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {
-      return projectModule.getArtifactsById;
+      return artifactModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
-      return projectModule.artifacts;
+      return artifactModule.artifacts;
     },
-    traces() {
-      return projectModule.getProject.traces;
+    traces(): TraceLink[] {
+      return traceModule.traces;
     },
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
-    },
-    project() {
-      return projectModule.getProject;
     },
     nodesInView(): string[] {
       return viewportModule.getNodesInView;

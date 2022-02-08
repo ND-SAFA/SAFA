@@ -23,24 +23,22 @@ export default Vue.extend({
       versionName: DEFAULT_VERSION_NAME,
     };
   },
+  mounted() {
+    this.setProjectName();
+  },
   computed: {
     project(): Project {
       return projectModule.getProject;
     },
-    containsProject(): boolean {
-      return this.project.projectId !== "";
-    },
-  },
-  mounted() {
-    this.setProjectName();
   },
   methods: {
     setProjectName() {
-      const project = this.project;
-      if (this.containsProject) {
-        this.projectName = project.name;
-        if (project.projectVersion !== undefined) {
-          this.versionName = versionToString(project.projectVersion);
+      const { name, projectVersion, projectId } = projectModule.getProject;
+
+      if (projectId) {
+        this.projectName = name;
+        if (projectVersion !== undefined) {
+          this.versionName = versionToString(projectVersion);
         }
       } else {
         this.projectName = DEFAULT_PROJECT_NAME;

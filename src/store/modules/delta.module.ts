@@ -1,9 +1,15 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
-import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
-import { appModule, projectModule, viewportModule } from "..";
+
+import type {
+  Artifact,
+  ProjectVersion,
+  ProjectDelta,
+  EntityModification,
+} from "@/types";
+import { ArtifactDeltaState, PanelType } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
+import { appModule, artifactModule, traceModule, viewportModule } from "..";
 
 @Module({ namespaced: true, name: "delta" })
 /**
@@ -45,10 +51,10 @@ export default class ErrorModule extends VuexModule {
    */
   async setDeltaPayload(payload: ProjectDelta): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    await projectModule.addOrUpdateArtifacts(
+    await artifactModule.addOrUpdateArtifacts(
       Object.values(payload.artifacts.added)
     );
-    await projectModule.addOrUpdateTraceLinks(
+    await traceModule.addOrUpdateTraceLinks(
       Object.values(payload.traces.added)
     );
     await viewportModule.setArtifactTreeLayout();

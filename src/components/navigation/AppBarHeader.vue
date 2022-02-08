@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType, EmptyLambda, Project } from "@/types";
+import { ButtonDefinition, ButtonType, EmptyLambda } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import {
@@ -74,8 +74,7 @@ export default Vue.extend({
       this.uploadVersionOpen = true;
     },
     onChangeVersion(): void {
-      const versionId = this.project.projectVersion?.versionId;
-      if (versionId !== undefined && versionId !== "") {
+      if (projectModule.versionId) {
         this.changeVersionOpen = true;
       } else {
         logModule.onWarning("Please select a project.");
@@ -83,17 +82,13 @@ export default Vue.extend({
     },
   },
   computed: {
-    project(): Project {
-      return projectModule.getProject;
-    },
     projectMenuItems(): CondensedMenuItem[] {
-      const isProjectDefined = this.project.projectId !== "";
       const options: CondensedMenuItem[] = [
         ["Open", this.onOpenProject],
         ["Create", () => navigateTo(Routes.PROJECT_CREATOR)],
         ["Settings", () => navigateTo(Routes.PROJECT_SETTINGS)],
       ];
-      return isProjectDefined ? options : options.slice(0, -1);
+      return projectModule.projectId ? options : options.slice(0, -1);
     },
     definitions(): ButtonDefinition[] {
       return [

@@ -1,6 +1,7 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
 import {
+  artifactModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
@@ -174,9 +175,8 @@ export default class ViewportModule extends VuexModule {
   get getNodesInView(): string[] {
     const subtree = artifactSelectionModule.getSelectedSubtreeIds;
     const ignoreTypes = artifactSelectionModule.getIgnoreTypes;
-    const artifacts = projectModule.artifacts;
 
-    return artifacts
+    return artifactModule.artifacts
       .filter(
         (a) => isInSubtree(subtree, a) && doesNotContainType(ignoreTypes, a)
       )

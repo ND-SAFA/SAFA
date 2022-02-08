@@ -25,6 +25,7 @@ import Vue from "vue";
 import { ButtonDefinition, ButtonType, Artifact } from "@/types";
 import { capitalize } from "@/util";
 import {
+  artifactModule,
   artifactSelectionModule,
   commitModule,
   projectModule,
@@ -75,7 +76,7 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return projectModule.artifacts;
+      return artifactModule.artifacts;
     },
     definitions(): ButtonDefinition[] {
       // is computed because needs to react to changes to menuItems

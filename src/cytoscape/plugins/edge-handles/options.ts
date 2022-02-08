@@ -1,4 +1,4 @@
-import { typeOptionsModule, projectModule } from "@/store";
+import { typeOptionsModule, traceModule } from "@/store";
 import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
@@ -21,7 +21,7 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
     }
 
     // If this link already exists, the link cannot be created.
-    const linkDoesNotExist = !projectModule.doesLinkExist(
+    const linkDoesNotExist = !traceModule.doesLinkExist(
       sourceNode.data().id,
       targetNode.data().id
     );

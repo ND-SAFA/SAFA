@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.entities.db.DocumentType;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -121,5 +123,15 @@ public class JsonBuilder extends BaseBuilder {
         trace.put("sourceName", sourceName);
         trace.put("targetName", targetName);
         return trace;
+    }
+
+    public JSONObject createDocument(String docName,
+                                     String description,
+                                     DocumentType documentType) {
+        JSONObject docJson = new JSONObject();
+        docJson.put("name", docName);
+        docJson.put("description", description);
+        docJson.put("type", documentType);
+        return docJson;
     }
 }

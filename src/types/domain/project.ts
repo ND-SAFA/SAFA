@@ -1,4 +1,4 @@
-import { ProjectMembership, ProjectRole, TraceLink } from "@/types";
+import { ProjectMembership, TraceLink } from "@/types";
 import { Artifact } from "./artifact";
 
 /**
@@ -87,6 +87,32 @@ export interface ProjectVersion {
 }
 
 /**
+ * Defines a specific document.
+ */
+export interface Document {
+  /**
+   * The id of this document.
+   */
+  documentId: string;
+  /**
+   * The id of the project associated with this document.
+   */
+  projectId: string;
+  /**
+   * The name of the document.
+   */
+  name: string;
+  /**
+   * The type of document.
+   */
+  type: string;
+  /**
+   * The ids of artifacts displayed within this document.
+   */
+  artifactIds: string[];
+}
+
+/**
  * Defines a versioned and parsed project.
  */
 export interface Project extends ProjectIdentifier {
@@ -94,6 +120,7 @@ export interface Project extends ProjectIdentifier {
    * The project's version.
    */
   projectVersion?: ProjectVersion;
+
   /**
    * The project's artifacts.
    */
@@ -102,10 +129,20 @@ export interface Project extends ProjectIdentifier {
    * The project's traces.
    */
   traces: TraceLink[];
+
   /**
    * Map of project members and their role.
    */
   members: ProjectMembership[];
+
+  /**
+   * The current document id.
+   */
+  currentDocumentId?: string;
+  /**
+   * The different documents for this project.
+   */
+  documents?: Document[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,5 +54,24 @@ public class DocumentController extends BaseController {
         document.setProject(project);
         this.documentRepository.save(document);
         return new ServerResponse(document);
+    }
+
+    /**
+     * Deletes the document specified by the given id.
+     *
+     * @param documentId The UUID of the document to delete.
+     * @throws SafaError Throws error is authorized user does not have edit permission.
+     */
+    @DeleteMapping(AppRoutes.Projects.deleteDocument)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
+        Optional<Document> documentOptional = this.documentRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            Document document = documentOptional.get();
+            resourceBuilder.setProject(document.getProject()).withEditProject();
+            this.documentRepository.delete(document);
+        } else {
+            throw new SafaError("Could not find document with given id:" + documentId);
+        }
     }
 }

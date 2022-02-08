@@ -25,7 +25,6 @@ import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
@@ -41,7 +40,6 @@ public class DbEntityBuilder extends BaseBuilder {
     final int majorVersion = 1;
     final int minorVersion = 1;
 
-    private final SafaUserRepository safaUserRepository;
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final DocumentRepository documentRepository;
@@ -64,8 +62,7 @@ public class DbEntityBuilder extends BaseBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(SafaUserRepository safaUserRepository,
-                           ProjectRepository projectRepository,
+    public DbEntityBuilder(ProjectRepository projectRepository,
                            ProjectMembershipRepository projectMembershipRepository,
                            ProjectVersionRepository projectVersionRepository,
                            DocumentRepository documentRepository,
@@ -74,7 +71,6 @@ public class DbEntityBuilder extends BaseBuilder {
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkVersionRepository traceLinkVersionRepository) {
-        this.safaUserRepository = safaUserRepository;
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.documentRepository = documentRepository;
@@ -89,6 +85,7 @@ public class DbEntityBuilder extends BaseBuilder {
     public void createEmptyData() {
         this.projects = new Hashtable<>();
         this.versions = new Hashtable<>();
+        this.documents = new Hashtable<>();
         this.artifactTypes = new Hashtable<>();
         this.artifacts = new Hashtable<>();
         this.bodies = new Hashtable<>();
@@ -97,6 +94,7 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
+        this.documentRepository.deleteAll();
         this.revisionNumber = 1;
     }
 

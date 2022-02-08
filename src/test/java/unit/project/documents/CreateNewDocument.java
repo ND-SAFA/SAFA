@@ -16,10 +16,7 @@ import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
 /**
- * Tests that the client is allowed to:
- * 1. Add new artifacts
- * 2. Modify existing artifacts
- * 3. Delete existing artifacts
+ * Tests that the client is create a new document for a project.
  */
 public class CreateNewDocument extends ApplicationBaseTest {
 

@@ -89,7 +89,7 @@ export interface ProjectVersion {
 /**
  * Defines a specific document.
  */
-export interface Document {
+export interface ProjectDocument {
   /**
    * The id of this document.
    */
@@ -142,7 +142,7 @@ export interface Project extends ProjectIdentifier {
   /**
    * The different documents for this project.
    */
-  documents?: Document[];
+  documents?: ProjectDocument[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

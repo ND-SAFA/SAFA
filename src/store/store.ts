@@ -15,6 +15,7 @@ import {
   ViewportModule,
   TypeOptionsModule,
   CommitModule,
+  DocumentModule,
 } from "./modules";
 
 Vue.use(Vuex);
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
     session: SessionModule,
     app: AppModule,
     project: ProjectModule,
+    document: DocumentModule,
     delta: DeltaModule,
     error: ErrorModule,
     typeOptions: TypeOptionsModule,
@@ -44,6 +46,7 @@ export const logModule = getModule(SnackbarModule, store);
 export const sessionModule = getModule(SessionModule, store);
 export const errorModule = getModule(ErrorModule, store);
 export const projectModule = getModule(ProjectModule, store);
+export const documentModule = getModule(DocumentModule, store);
 export const artifactSelectionModule = getModule(
   ArtifactSelectionModule,
   store

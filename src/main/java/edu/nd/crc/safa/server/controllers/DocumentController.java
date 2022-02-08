@@ -81,11 +81,15 @@ public class DocumentController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.deleteDocument)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
+        Document document = getDocumentById(documentId);
+        resourceBuilder.setProject(document.getProject()).withEditProject();
+        this.documentRepository.delete(document);
+    }
+
+    private Document getDocumentById(UUID documentId) throws SafaError {
         Optional<Document> documentOptional = this.documentRepository.findById(documentId);
         if (documentOptional.isPresent()) {
-            Document document = documentOptional.get();
-            resourceBuilder.setProject(document.getProject()).withEditProject();
-            this.documentRepository.delete(document);
+            return documentOptional.get();
         } else {
             throw new SafaError("Could not find document with given id:" + documentId);
         }

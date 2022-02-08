@@ -1,4 +1,4 @@
-import { Project } from "@/types";
+import { Project, ProjectDocument } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -8,12 +8,12 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function createOrUpdateDocument(
   project: Project,
-  document: Document
-): Promise<Document> {
+  document: ProjectDocument
+): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.createOrUpdateDocument, {
     projectId: project.projectId,
   });
-  return authHttpClient<Document>(url, {
+  return authHttpClient<ProjectDocument>(url, {
     method: "POST",
     body: JSON.stringify(document),
   });
@@ -25,11 +25,11 @@ export async function createOrUpdateDocument(
  */
 export async function retrieveProjectDocuments(
   project: Project
-): Promise<Document[]> {
+): Promise<ProjectDocument[]> {
   const url = fillEndpoint(Endpoint.getProjectDocuments, {
     projectId: project.projectId,
   });
-  return authHttpClient<Document[]>(url, {
+  return authHttpClient<ProjectDocument[]>(url, {
     method: "GET",
   });
 }
@@ -39,9 +39,9 @@ export async function retrieveProjectDocuments(
  * permissions on the project.
  * @param document The document to be deleted.
  */
-export async function deleteDocument(document: Document): Promise<void> {
+export async function deleteDocument(document: ProjectDocument): Promise<void> {
   const url = fillEndpoint(Endpoint.deleteDocument, {
-    documentId: document.documentURI,
+    documentId: document.documentId,
   });
   return authHttpClient<void>(url, {
     method: "DELETE",

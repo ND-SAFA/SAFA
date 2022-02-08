@@ -87,6 +87,14 @@ export interface ProjectVersion {
 }
 
 /**
+ * Enumerates the type of documents supported by SAFA
+ */
+export enum DocumentType {
+  ARTIFACT_TREE = "ARTIFACT_TREE",
+  FTA = "FTA",
+}
+
+/**
  * Defines a specific document.
  */
 export interface ProjectDocument {
@@ -105,7 +113,7 @@ export interface ProjectDocument {
   /**
    * The type of document.
    */
-  type: string;
+  type: DocumentType;
   /**
    * The ids of artifacts displayed within this document.
    */

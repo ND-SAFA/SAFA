@@ -21,13 +21,13 @@ export async function createOrUpdateDocument(
 
 /**
  * Returns list of documents associated with given project.
- * @param project The project whose documents are retrieved.
+ * @param projectId The UUID of the project whose documents are retrieved.
  */
-export async function retrieveProjectDocuments(
-  project: Project
+export async function getProjectDocuments(
+  projectId: string
 ): Promise<ProjectDocument[]> {
   const url = fillEndpoint(Endpoint.getProjectDocuments, {
-    projectId: project.projectId,
+    projectId,
   });
   return authHttpClient<ProjectDocument[]>(url, {
     method: "GET",

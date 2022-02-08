@@ -1,6 +1,11 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { Project, ProjectIdentifier, ProjectMembership } from "@/types";
+import type {
+  Project,
+  ProjectDocument,
+  ProjectIdentifier,
+  ProjectMembership,
+} from "@/types";
 import { createProject } from "@/util";
 
 @Module({ namespaced: true, name: "project" })
@@ -43,6 +48,14 @@ export default class ProjectModule extends VuexModule {
    */
   SET_MEMBERS(members: ProjectMembership[]): void {
     this.project.members = members;
+  }
+
+  @Mutation
+  /**
+   * Sets the current documents in the project.
+   */
+  SET_DOCUMENTS(documents: ProjectDocument[]): void {
+    this.project.documents = documents;
   }
 
   /**

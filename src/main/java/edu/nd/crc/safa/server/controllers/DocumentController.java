@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,14 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentController extends BaseController {
 
     private final DocumentRepository documentRepository;
+    private final NotificationService notificationService;
 
     @Autowired
     public DocumentController(ProjectRepository projectRepository,
                               ProjectVersionRepository projectVersionRepository,
                               ResourceBuilder resourceBuilder,
-                              DocumentRepository documentRepository) {
+                              DocumentRepository documentRepository,
+                              NotificationService notificationService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -57,6 +61,7 @@ public class DocumentController extends BaseController {
         Project project = resourceBuilder.fetchProject(projectId).withEditProject();
         document.setProject(project);
         this.documentRepository.save(document);
+        this.notificationService.broadUpdateProjectMessage(project, "documents");
         return new ServerResponse(document);
     }
 
@@ -71,6 +76,7 @@ public class DocumentController extends BaseController {
     public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
+        this.notificationService.broadUpdateProjectMessage(project, "documents");
         return new ServerResponse(projectDocuments);
     }
 
@@ -84,7 +90,9 @@ public class DocumentController extends BaseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         Document document = getDocumentById(documentId);
-        resourceBuilder.setProject(document.getProject()).withEditProject();
+        Project project = document.getProject();
+        resourceBuilder.setProject(project).withEditProject();
+        this.notificationService.broadUpdateProjectMessage(project, "documents");
         this.documentRepository.delete(document);
     }
 

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,11 +11,13 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
@@ -33,6 +36,7 @@ public class ProjectRetrievalService {
 
     private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
@@ -41,12 +45,14 @@ public class ProjectRetrievalService {
     @Autowired
     public ProjectRetrievalService(DocumentRepository documentRepository,
                                    TraceLinkVersionRepository traceLinkVersionRepository,
+                                   DocumentArtifactRepository documentArtifactRepository,
                                    ProjectMembershipRepository projectMembershipRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    CommitErrorRetrievalService commitErrorRetrievalService,
                                    WarningService warningService) {
         this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
+        this.documentArtifactRepository = documentArtifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
@@ -78,13 +84,22 @@ public class ProjectRetrievalService {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
             .getEntityVersionsInProjectVersion(projectVersion);
 
-        List<ArtifactAppEntity> artifacts =
-            artifactBodies
-                .stream()
-                .map(ArtifactAppEntity::new)
-                .collect(Collectors.toList());
-        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
-
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        List<String> artifactIds = new ArrayList<>();
+        for (ArtifactVersion artifactVersion : artifactBodies) {
+            ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
+            artifacts.add(artifactAppEntity);
+            artifactIds.add(artifactAppEntity.getId());
+            Artifact artifact = artifactVersion.getArtifact();
+            List<String> documentIds =
+                this.documentArtifactRepository
+                    .findByProjectVersionAndArtifact(projectVersion, artifact)
+                    .stream()
+                    .map(da -> da.getDocument().getDocumentId().toString())
+                    .collect(Collectors.toList());
+            artifactAppEntity.setDocumentIds(documentIds);
+        }
+        
         List<TraceAppEntity> traces =
             this.traceLinkVersionRepository
                 .getEntityVersionsInProjectVersion(projectVersion)

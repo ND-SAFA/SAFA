@@ -45,13 +45,15 @@ public class DocumentController extends BaseController {
     /**
      * Persists given document object as a new document a part of the specified project.
      *
-     * @param document The entity containing name, description, and type of document to be created.
+     * @param projectId The UUID of the project whose document is being accessed.
+     * @param document  The entity containing name, description, and type of document to be created.
+     * @return The updated or created document.
      * @throws SafaError Throws error if authorized user does not have edit permissions.
      */
-    @PostMapping(AppRoutes.Projects.createNewDocument)
+    @PostMapping(AppRoutes.Projects.createOrUpdateDocument)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewDocument(@PathVariable UUID projectId,
-                                            @RequestBody @Valid Document document) throws SafaError {
+    public ServerResponse createOrUpdateDocument(@PathVariable UUID projectId,
+                                                 @RequestBody @Valid Document document) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withEditProject();
         document.setProject(project);
         this.documentRepository.save(document);

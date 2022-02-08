@@ -37,7 +37,7 @@ public class CreateNewDocument extends ApplicationBaseTest {
         JSONObject docJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
         // Step - Send creation request.
-        String route = RouteBuilder.withRoute(AppRoutes.Projects.createNewDocument).withProject(project).get();
+        String route = RouteBuilder.withRoute(AppRoutes.Projects.createOrUpdateDocument).withProject(project).get();
         JSONObject response = sendPost(route, docJson, status().isCreated());
         JSONObject docCreated = response.getJSONObject("body");
 

@@ -10,3 +10,5 @@ export { default as SubtreeModule } from "./subtree.module";
 export { default as TypeOptionsModule } from "./typeOptions.module";
 export { default as CommitModule } from "./commit.module";
 export { default as DocumentModule } from "./document.module";
+export { default as ArtifactModule } from "./artifact.module";
+export { default as TraceModule } from "./trace.module";

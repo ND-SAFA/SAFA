@@ -23,6 +23,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * TODO: extract
    * Updates the current trace links in the project, preserving any that already existed.
    *
    * @param traceLinks - The trace links to set.
@@ -34,6 +35,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * TODO: extract
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.
@@ -54,6 +56,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * TODO: extract
    * Removes the given trace link.
    *
    * @param traceLink - The trace link to remove.
@@ -65,6 +68,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * TODO: extract
    * Deletes artifact and updates subtree map.
    */
   async deleteArtifactByName(artifactName: string): Promise<void> {
@@ -106,6 +110,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * TODO: extract
    * Updates the current trace links in the project, preserving any that already existed.
    *
    * @param traceLinks - The trace links to set.
@@ -120,6 +125,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * TODO: extract
    * Removes the given trace link.
    *
    * @param traceLink - The trace link to remove.
@@ -132,6 +138,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * TODO: extract
    * Deletes given artifact.
    *
    * @param artifactName - The artifact to remove.
@@ -144,6 +151,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * TODO: extract
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.
@@ -173,6 +181,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return The current project artifacts.
    */
   get artifacts(): Artifact[] {
@@ -180,6 +189,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return A function for finding an artifact by name.
    * @throws If exactly 1 artifact is found to match.
    */
@@ -192,6 +202,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return A function for finding an artifact by id.
    * @throws If exactly 1 artifact is found to match.
    */
@@ -204,6 +215,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return A collection of artifacts, keyed by their id.
    */
   get getArtifactsById(): Record<string, Artifact> {
@@ -213,6 +225,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return All trace links in the current project.
    */
   get traceLinks(): TraceLink[] {
@@ -220,6 +233,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return Returns a function to query a single trace link by the
    * source and target artifact ids.
    */
@@ -243,6 +257,7 @@ export default class ProjectModule extends VuexModule {
   }
 
   /**
+   * TODO: extract
    * @return A function that determines whether a link with the given source and target IDs exists.
    */
   get doesLinkExist(): LinkValidator {

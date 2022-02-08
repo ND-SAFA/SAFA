@@ -189,7 +189,7 @@ public class TestValidation extends BaseProjectJsonTest {
         List<JSONObject> artifacts,
         List<JSONObject> traces) throws Exception {
         // Step - Setup constants
-        String url = AppRoutes.Projects.projects;
+        String url = AppRoutes.Projects.createOrUpdateProjects;
         JSONObject projectJson = new JSONObject();
 
         // Step - Create project payload

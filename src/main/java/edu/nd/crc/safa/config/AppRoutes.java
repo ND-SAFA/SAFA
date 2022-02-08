@@ -19,7 +19,8 @@ public class AppRoutes {
         public static final String deleteProjectMembership = projectPrefix + "/members/{projectMembershipId}";
 
         // Project Controller
-        public static final String projects = projectPrefix;
+        public static final String createOrUpdateProjects = projectPrefix;
+        public static final String getUserProjects = projectPrefix;
 
         // Document Controller
         public static final String createOrUpdateDocument = projectPrefix + "/{projectId}/documents";

@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -35,6 +36,7 @@ public class Document implements Serializable {
         name = "project_id",
         nullable = false
     )
+    @JsonIgnore
     Project project;
 
     @Column(name = "document_type", nullable = false)

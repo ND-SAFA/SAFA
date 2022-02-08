@@ -139,7 +139,7 @@ public class VersionController extends BaseController {
      * @throws SafaError Throws error if no version is associated with given id.
      */
     @GetMapping(AppRoutes.Projects.getVersionById)
-    public ServerResponse getProjectById(@PathVariable UUID versionId) throws SafaError {
+    public ServerResponse getVersionById(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         ProjectEntities response = this.projectRetrievalService
             .retrieveAndCreateProjectResponse(projectVersion);

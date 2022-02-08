@@ -11,8 +11,11 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.RuleName;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectRetrievalService {
 
+    private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
@@ -35,11 +39,13 @@ public class ProjectRetrievalService {
     private final WarningService warningService;
 
     @Autowired
-    public ProjectRetrievalService(TraceLinkVersionRepository traceLinkVersionRepository,
+    public ProjectRetrievalService(DocumentRepository documentRepository,
+                                   TraceLinkVersionRepository traceLinkVersionRepository,
                                    ProjectMembershipRepository projectMembershipRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    CommitErrorRetrievalService commitErrorRetrievalService,
                                    WarningService warningService) {
+        this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
@@ -88,12 +94,15 @@ public class ProjectRetrievalService {
                     && artifactIds.contains(t.targetId))
                 .collect(Collectors.toList());
 
+        Project project = projectVersion.getProject();
         List<ProjectMemberAppEntity> projectMembers =
-            this.projectMembershipRepository.findByProject(projectVersion.getProject())
+            this.projectMembershipRepository.findByProject(project)
                 .stream()
                 .map(ProjectMemberAppEntity::new)
                 .collect(Collectors.toList());
 
-        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers);
+        List<Document> documents = this.documentRepository.findByProject(project);
+
+        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents);
     }
 }

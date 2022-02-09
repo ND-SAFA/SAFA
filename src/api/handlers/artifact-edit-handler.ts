@@ -1,5 +1,5 @@
 import { Artifact, ConfirmationType } from "@/types";
-import { logModule, projectModule } from "@/store";
+import { artifactModule, logModule, projectModule } from "@/store";
 import {
   createArtifact,
   updateArtifact,
@@ -22,7 +22,7 @@ export function createOrUpdateArtifactHandler(
   return new Promise((resolve, reject) => {
     const artifactPromise = isUpdate ? updateArtifact : createArtifact;
     artifactPromise(versionId, artifact)
-      .then(() => projectModule.addOrUpdateArtifacts([artifact]))
+      .then(() => artifactModule.addOrUpdateArtifacts([artifact]))
       .then(resolve)
       .catch(reject);
   });
@@ -38,8 +38,7 @@ export function deleteArtifactFromCurrentVersion(
   artifact: Artifact
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const versionId = projectModule.getProject.projectVersion?.versionId;
-    if (versionId === undefined) {
+    if (projectModule.versionId === undefined) {
       logModule.onWarning(
         "A project version must be selected to delete an artifact."
       );
@@ -53,7 +52,7 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(() => projectModule.deleteArtifactByName(artifact.name))
+            .then(() => artifactModule.deleteArtifactByName(artifact))
             .then(resolve)
             .catch(reject);
         }

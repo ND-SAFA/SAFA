@@ -8,7 +8,7 @@ import {
   TraceType,
 } from "@/types";
 import { getTraceId } from "@/util";
-import { projectModule, viewportModule } from "@/store";
+import { traceModule, viewportModule } from "@/store";
 import { createLink, reloadTraceMatrices } from "@/api";
 import { applyAutoMoveEvents } from "@/cytoscape/hooks";
 import { disableDrawMode } from "./edgeHandlesCore";
@@ -48,7 +48,7 @@ export function onArtifactTreeEdgeComplete(
     .then(async () => {
       addedEdge.remove();
 
-      await projectModule.addOrUpdateTraceLinks([traceLink]);
+      await traceModule.addOrUpdateTraceLinks([traceLink]);
       await reloadTraceMatrices();
 
       if (viewportModule.currentLayout) {

@@ -28,7 +28,8 @@ export const routerChecks: Record<string, RouterCheck> = {
     }
   },
   requireProjectForRoutes(to: Route, from: Route, next: NavigationGuardNext) {
-    const isProjectDefined = projectModule.getProject.projectId !== "";
+    const isProjectDefined = projectModule.projectId !== "";
+
     if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
       logModule.onWarning(
         "Project must be selected before approving trace links."

@@ -25,6 +25,10 @@ export interface Artifact {
    * The type of the artifact.
    */
   type: string;
+  /**
+   * The ids of documents that display this artifact.
+   */
+  documentIds?: string[];
 }
 
 /**

@@ -53,10 +53,10 @@
 </template>
 
 <script lang="ts">
-import { Artifact } from "@/types";
 import Vue from "vue";
+import { Artifact } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
-import { typeOptionsModule, projectModule, viewportModule } from "@/store";
+import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
 
 export default Vue.extend({
   name: "artifact-tab",
@@ -76,7 +76,8 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      const artifacts: Artifact[] = projectModule.artifacts;
+      const artifacts = artifactModule.artifacts;
+
       if (this.searchText !== "") {
         return artifacts.filter((a) => a.body.includes(this.searchText));
       } else {

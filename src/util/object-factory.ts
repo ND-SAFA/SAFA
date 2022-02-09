@@ -2,9 +2,11 @@ import {
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
+  DocumentType,
   MessageType,
   Project,
   ProjectDelta,
+  ProjectDocument,
   ProjectVersion,
   SessionModel,
   SnackbarMessage,
@@ -105,5 +107,19 @@ export function createDefaultTypeIcons(): Record<string, string> {
     hazard: "mdi-hazard-lights",
     environmentalassumption: "mdi-pine-tree-fire",
     default: "mdi-help",
+  };
+}
+
+/**
+ * @param artifactIds - The artifact ids visible in this document.
+ * @return An empty document.
+ */
+export function createDocument(artifactIds: string[] = []): ProjectDocument {
+  return {
+    documentId: "",
+    projectId: "",
+    name: "Default",
+    type: DocumentType.ARTIFACT_TREE,
+    artifactIds,
   };
 }

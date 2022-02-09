@@ -6,6 +6,7 @@ import { baseURL } from "@/api/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
 import { setCreatedProject } from "@/api/handlers/set-project-handler";
 import { getProjectMembers } from "@/api";
+import { getProjectDocuments } from "@/api/endpoints/document-api";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -172,9 +173,10 @@ async function projectMessageHandler(
     frame.body
   ) as ProjectVersionUpdate;
 
-  console.log("WEBSOCKET MESSAGE:", message);
   switch (message.type) {
     case "members":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
+    case "documents":
+      return getProjectDocuments(projectId).then(projectModule.SET_DOCUMENTS);
   }
 }

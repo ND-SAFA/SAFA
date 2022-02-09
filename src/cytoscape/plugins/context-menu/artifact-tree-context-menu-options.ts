@@ -6,6 +6,7 @@ import {
   subtreeModule,
   viewportModule,
   appModule,
+  artifactModule,
 } from "@/store";
 import { PanelType, Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape/plugins";
@@ -122,7 +123,9 @@ type ArtifactHandler = (a: Artifact) => void | Promise<void>;
 function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
-    const artifact = projectModule.getArtifactByName(artifactData.artifactName);
+    const artifact = artifactModule.getArtifactByName(
+      artifactData.artifactName
+    );
 
     handler(artifact);
   }

@@ -1,6 +1,8 @@
 /**
  * Enumerates the allowed trace link directions between artifact types.
  */
+import { TraceLink } from "@/types";
+
 export type ArtifactTypeDirections = Record<string, string[]>;
 
 /**
@@ -50,6 +52,11 @@ export interface ChannelSubscriptionId {
  * Returns whether a link exists from the given source to the given target ID.
  */
 export type LinkValidator = (sourceId: string, targetId: string) => boolean;
+
+/**
+ * Returns the trace link between the given artifact ids.
+ */
+export type LinkFinder = (sourceId: string, targetId: string) => TraceLink;
 
 /**
  * Defines a title and message for a confirmation dialog.

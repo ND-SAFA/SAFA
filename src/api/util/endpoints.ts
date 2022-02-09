@@ -39,6 +39,11 @@ export enum Endpoint {
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
 
+  //Documents
+  createOrUpdateDocument = "projects/:projectId/documents",
+  getProjectDocuments = "projects/:projectId/documents",
+  deleteDocument = "projects/documents/:documentId",
+
   //Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
 

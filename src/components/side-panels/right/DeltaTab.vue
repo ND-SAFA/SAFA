@@ -54,7 +54,7 @@
 <script lang="ts">
 import { Artifact, EntityModification, DeltaType } from "@/types";
 import Vue from "vue";
-import { deltaModule, projectModule } from "@/store";
+import { artifactModule, deltaModule } from "@/store";
 import {
   DeltaPanelNav,
   DeltaButtonGroup,
@@ -91,7 +91,7 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return projectModule.artifacts;
+      return artifactModule.artifacts;
     },
     addedArtifacts(): Record<string, Artifact> {
       return deltaModule.addedArtifacts;

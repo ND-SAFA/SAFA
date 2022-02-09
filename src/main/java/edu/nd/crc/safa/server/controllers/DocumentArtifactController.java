@@ -18,12 +18,11 @@ import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.NotificationService;
-import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,24 +35,17 @@ public class DocumentArtifactController extends BaseController {
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
 
-    private final ProjectService projectService;
-    private final NotificationService notificationService;
-
     @Autowired
     public DocumentArtifactController(ProjectRepository projectRepository,
                                       ProjectVersionRepository projectVersionRepository,
                                       DocumentRepository documentRepository,
                                       ArtifactRepository artifactRepository,
                                       DocumentArtifactRepository documentArtifactRepository,
-                                      ResourceBuilder resourceBuilder,
-                                      ProjectService projectService,
-                                      NotificationService notificationService) {
+                                      ResourceBuilder resourceBuilder) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;
-        this.projectService = projectService;
-        this.notificationService = notificationService;
     }
 
     /**
@@ -69,7 +61,7 @@ public class DocumentArtifactController extends BaseController {
     @PostMapping(AppRoutes.Projects.addArtifactsToDocument)
     public ServerResponse addArtifactToDocuments(@PathVariable UUID versionId,
                                                  @PathVariable UUID documentId,
-                                                 List<ArtifactAppEntity> artifacts
+                                                 @RequestBody List<ArtifactAppEntity> artifacts
     ) throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);

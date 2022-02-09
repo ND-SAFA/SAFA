@@ -30,7 +30,7 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
     DocumentArtifactRepository documentArtifactRepository;
 
     /**
-     * Verifies that a new document can be created for a project.
+     * Verifies that the response object contains
      */
     @Test
     public void testCreateNewDocument() throws Exception {
@@ -65,7 +65,7 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
         JSONArray artifactsJson = new JSONArray();
         artifactsJson.put(artifactJson);
 
-        // Step - Send creation request.
+        // Step - Request artifact is added to document
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.addArtifactsToDocument)
             .withVersion(projectVersion)
@@ -77,11 +77,12 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {
             JSONObject artifactAdded = artifactsAdded.getJSONObject(i);
-            JSONArray artifactDocuments = artifactAdded.getJSONArray("documents");
+            System.out.println("ARTIFACT UPDATE:" + artifactAdded);
+            JSONArray artifactDocuments = artifactAdded.getJSONArray("documentIds");
             assertThat(artifactDocuments.length()).isEqualTo(1);
             assertThat(artifactDocuments.get(0)).isEqualTo(document.getDocumentId().toString());
         }
-        
+
         // VP - Verify single document created for project
         List<DocumentArtifact> projectDocuments = this.documentArtifactRepository.findByDocument(document);
         assertThat(projectDocuments.size()).isEqualTo(1);

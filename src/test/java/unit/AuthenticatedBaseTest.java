@@ -3,7 +3,6 @@ package unit;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
@@ -53,13 +52,13 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     }
 
     public JSONObject sendPost(String routeName,
-                               JSONObject body,
+                               Object body,
                                ResultMatcher test) throws Exception {
         return sendPost(routeName, body, test, true);
     }
 
     public JSONObject sendPost(String routeName,
-                               JSONObject body,
+                               Object body,
                                ResultMatcher test,
                                boolean assertToken) throws Exception {
         MockHttpServletRequestBuilder request;
@@ -71,14 +70,6 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
             request = addJsonBody(post(routeName), body);
             return sendRequest(request, test);
         }
-    }
-
-    public JSONObject sendPut(String routeName,
-                              JSONObject body,
-                              ResultMatcher test) throws Exception {
-        assertTokenExists();
-        MockHttpServletRequestBuilder request = addJsonBody(put(routeName), body);
-        return sendRequest(request, test, this.token);
     }
 
     public void sendDelete(String routeName,

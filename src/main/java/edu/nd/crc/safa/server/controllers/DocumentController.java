@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
@@ -89,19 +88,10 @@ public class DocumentController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.deleteDocument)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
-        Document document = getDocumentById(documentId);
+        Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
         this.notificationService.broadUpdateProjectMessage(project, "documents");
         this.documentRepository.delete(document);
-    }
-
-    private Document getDocumentById(UUID documentId) throws SafaError {
-        Optional<Document> documentOptional = this.documentRepository.findById(documentId);
-        if (documentOptional.isPresent()) {
-            return documentOptional.get();
-        } else {
-            throw new SafaError("Could not find document with given id:" + documentId);
-        }
     }
 }

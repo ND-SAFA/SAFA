@@ -41,18 +41,18 @@ public class DocumentArtifact implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
-        name = "document_id",
-        nullable = false
-    )
-    Document document;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(
         name = "version_id",
         nullable = false
     )
     ProjectVersion projectVersion;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = "document_id",
+        nullable = false
+    )
+    Document document;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -62,6 +62,14 @@ public class DocumentArtifact implements Serializable {
     Artifact artifact;
 
     public DocumentArtifact() {
+    }
+
+    public DocumentArtifact(ProjectVersion projectVersion,
+                            Document document,
+                            Artifact artifact) {
+        this.projectVersion = projectVersion;
+        this.document = document;
+        this.artifact = artifact;
     }
 
     public ProjectVersion getProjectVersion() {

@@ -29,7 +29,7 @@ public class ArtifactAppEntity implements IAppEntity {
     @NotNull
     @NotEmpty
     public String type;
-    
+
     public List<String> documentIds;
 
     public ArtifactAppEntity() {
@@ -67,6 +67,10 @@ public class ArtifactAppEntity implements IAppEntity {
 
     public void setDocumentIds(List<String> documentIds) {
         this.documentIds = documentIds;
+    }
+
+    public void addDocumentId(String documentId) {
+        this.documentIds.add(documentId);
     }
 
     public String getId() {

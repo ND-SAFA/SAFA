@@ -75,7 +75,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected DocumentRepository documentRepository;
-    
+
     @Autowired
     protected ProjectService projectService;
 
@@ -101,7 +101,8 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
         jsonBuilder.createEmptyData();
     }
 
-    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request, JSONObject body) {
+    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request,
+                                                        Object body) {
         return request
             .content(body.toString())
             .contentType(MediaType.APPLICATION_JSON);

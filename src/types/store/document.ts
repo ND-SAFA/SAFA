@@ -6,8 +6,9 @@ import { Artifact, TraceLink } from "@/types";
 export interface DocumentArtifacts {
   /**
    * All artifacts in the project.
+   * If empty, the current artifacts will be preserved.
    */
-  artifacts: Artifact[];
+  artifacts?: Artifact[];
   /**
    * The artifacts that are visible in the current document.
    * If empty, all artifacts are made visible.
@@ -21,8 +22,9 @@ export interface DocumentArtifacts {
 export interface DocumentTraces {
   /**
    * All trace links in the project.
+   * If empty, the current traces will be preserved.
    */
-  traces: TraceLink[];
+  traces?: TraceLink[];
   /**
    * The artifacts that are visible in the current document.
    * If empty, all trace links are made visible.

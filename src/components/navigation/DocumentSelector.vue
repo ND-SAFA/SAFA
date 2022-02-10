@@ -10,7 +10,6 @@
     dark
     style="width: 200px"
     item-text="name"
-    item-value="name"
   >
     <template v-slot:item="{ item }">
       <v-row dense align="center">
@@ -19,6 +18,7 @@
         </v-col>
         <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
           <generic-icon-button
+            v-if="item.name !== 'Default'"
             icon-id="mdi-dots-horizontal"
             :tooltip="`Edit ${item.name}`"
           />
@@ -115,8 +115,12 @@ export default Vue.extend({
       get() {
         return documentModule.document;
       },
-      set(document: ProjectDocument) {
-        documentModule.SET_DOCUMENT(document);
+      set(documentName: string) {
+        const document = this.items.find(({ name }) => documentName === name);
+
+        if (document) {
+          documentModule.switchDocuments(document);
+        }
       },
     },
 

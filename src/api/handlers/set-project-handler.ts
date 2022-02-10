@@ -13,8 +13,26 @@ import { connectAndSubscribeToVersion } from "@/api/endpoints";
 import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
 import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 import { reloadTraceMatrices } from "./trace-matrix-handler";
-import { getProjectDocuments } from "@/api/endpoints/document-api";
 import { loadProjectDocuments } from "@/api";
+
+/**
+ * Resets graph state when some or all of a project gets reloaded.
+ * @param isDifferentProject - If true, all nodes will be unhidden and the viewport will be reset.
+ */
+export async function resetGraphFocus(
+  isDifferentProject = true
+): Promise<void> {
+  if (isDifferentProject) {
+    await subtreeModule.resetHiddenNodes();
+    await viewportModule.setArtifactTreeLayout();
+    cyCenterNodes();
+  }
+
+  disableDrawMode();
+  artifactSelectionModule.clearSelections();
+  deltaModule.clearDelta();
+  appModule.closeSidePanels();
+}
 
 /**
  1. Sets a new project.
@@ -35,16 +53,7 @@ export async function setAndSubscribeToProject(
 
   projectModule.initializeProject(project);
 
-  if (isDifferentProject) {
-    await subtreeModule.resetHiddenNodes();
-    await viewportModule.setArtifactTreeLayout();
-    cyCenterNodes();
-  }
-
-  disableDrawMode();
-  artifactSelectionModule.clearSelections();
-  deltaModule.clearDelta();
-  appModule.closeSidePanels();
+  await resetGraphFocus(isDifferentProject);
   await subtreeModule.initializeProject(project);
   await reloadTraceMatrices();
 }

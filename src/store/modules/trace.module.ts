@@ -24,7 +24,7 @@ export default class TraceModule extends VuexModule {
    * Initializes the trace links visible in the current document.
    */
   initializeTraces(documentTraces: DocumentTraces): void {
-    const { traces, currentArtifactIds } = documentTraces;
+    const { traces = this.projectTraces, currentArtifactIds } = documentTraces;
 
     this.SET_PROJECT_TRACES(traces);
     this.SET_CURRENT_TRACES(

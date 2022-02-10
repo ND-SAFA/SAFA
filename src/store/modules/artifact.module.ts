@@ -24,7 +24,8 @@ export default class ArtifactModule extends VuexModule {
    * Initializes the artifacts visible in the current document.
    */
   initializeArtifacts(documentArtifacts: DocumentArtifacts): void {
-    const { artifacts, currentArtifactIds } = documentArtifacts;
+    const { artifacts = this.projectArtifacts, currentArtifactIds } =
+      documentArtifacts;
 
     this.SET_PROJECT_ARTIFACTS(artifacts);
     this.SET_CURRENT_ARTIFACTS(

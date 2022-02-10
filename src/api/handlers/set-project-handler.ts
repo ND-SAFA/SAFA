@@ -17,6 +17,7 @@ import { loadProjectDocuments } from "@/api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
+ *
  * @param isDifferentProject - If true, all nodes will be unhidden and the viewport will be reset.
  */
 export async function resetGraphFocus(
@@ -50,9 +51,7 @@ export async function setAndSubscribeToProject(
 
   await connectAndSubscribeToVersion(projectId, versionId);
   await loadProjectDocuments(project);
-
   projectModule.initializeProject(project);
-
   await resetGraphFocus(isDifferentProject);
   await subtreeModule.initializeProject(project);
   await reloadTraceMatrices();

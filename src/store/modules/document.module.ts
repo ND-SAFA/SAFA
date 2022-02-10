@@ -61,7 +61,6 @@ export default class DocumentModule extends VuexModule {
     this.SET_DOCUMENT(document);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
-
     await resetGraphFocus();
   }
 

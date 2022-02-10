@@ -7,7 +7,7 @@
     </v-flex>
 
     <template v-slot:extension v-if="doShowGraphButtons">
-      <v-row class="pt-1" style="width: 100%">
+      <v-row dense class="pt-1 full-width">
         <v-col cols="4">
           <v-row dense align="center">
             <v-col class="flex-grow-0">

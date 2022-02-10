@@ -13,6 +13,10 @@ export default class DocumentModule extends VuexModule {
    * The currently visible document.
    */
   private currentDocument: ProjectDocument = createDocument();
+  /**
+   * All project documents.
+   */
+  private allDocuments: ProjectDocument[] = [this.currentDocument];
 
   @Action
   /**
@@ -20,15 +24,18 @@ export default class DocumentModule extends VuexModule {
    */
   initializeProject(project: Project): void {
     const {
-      currentDocumentId = "",
-      documents = [],
       artifacts,
       traces,
+      currentDocumentId = "",
+      documents = [],
     } = project;
 
+    const defaultDocument = createDocument(artifacts.map(({ id }) => id));
     const loadedDocument = documents.find(
       ({ documentId }) => documentId === currentDocumentId
     );
+
+    this.SET_ALL_DOCUMENTS([...documents, defaultDocument]);
 
     if (loadedDocument) {
       this.SET_DOCUMENT(loadedDocument);
@@ -41,10 +48,26 @@ export default class DocumentModule extends VuexModule {
         currentArtifactIds: loadedDocument.artifactIds,
       });
     } else {
-      this.SET_DOCUMENT(createDocument(artifacts.map(({ id }) => id)));
+      this.SET_DOCUMENT(defaultDocument);
       artifactModule.initializeArtifacts({ artifacts });
       traceModule.initializeTraces({ traces });
     }
+  }
+
+  @Action
+  /**
+   * Adds a new document.
+   */
+  addDocument(document: ProjectDocument): void {
+    this.SET_ALL_DOCUMENTS([...this.allDocuments, document]);
+  }
+
+  @Mutation
+  /**
+   * Sets the current document.
+   */
+  SET_ALL_DOCUMENTS(documents: ProjectDocument[]): void {
+    this.allDocuments = documents;
   }
 
   @Mutation
@@ -58,7 +81,23 @@ export default class DocumentModule extends VuexModule {
   /**
    * @return The current document.
    */
+  get projectDocuments(): ProjectDocument[] {
+    return this.allDocuments;
+  }
+
+  /**
+   * @return The current document.
+   */
   get document(): ProjectDocument {
     return this.currentDocument;
+  }
+
+  /**
+   * Returns whether the given document name already exists.
+   */
+  get doesDocumentExist(): (name: string) => boolean {
+    return (newName) => {
+      return !!this.projectDocuments.find(({ name }) => name === newName);
+    };
   }
 }

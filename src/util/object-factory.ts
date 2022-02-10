@@ -112,13 +112,17 @@ export function createDefaultTypeIcons(): Record<string, string> {
 
 /**
  * @param artifactIds - The artifact ids visible in this document.
+ * @param name - The document name.
  * @return An empty document.
  */
-export function createDocument(artifactIds: string[] = []): ProjectDocument {
+export function createDocument(
+  artifactIds: string[] = [],
+  name = "Default"
+): ProjectDocument {
   return {
     documentId: "",
     projectId: "",
-    name: "Default",
+    name,
     type: DocumentType.ARTIFACT_TREE,
     artifactIds,
   };

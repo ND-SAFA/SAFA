@@ -4,7 +4,6 @@ import {
   appModule,
   artifactSelectionModule,
   deltaModule,
-  documentModule,
   errorModule,
   projectModule,
   subtreeModule,
@@ -14,6 +13,7 @@ import { connectAndSubscribeToVersion } from "@/api/endpoints";
 import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
 import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 import { reloadTraceMatrices } from "./trace-matrix-handler";
+import { getProjectDocuments } from "@/api/endpoints/document-api";
 
 /**
  1. Sets a new project.
@@ -30,9 +30,10 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
-  artifactSelectionModule.clearSelections();
-  projectModule.SAVE_PROJECT(project);
-  documentModule.initializeProject(project);
+
+  const documents = await getProjectDocuments(projectId).catch(() => []);
+
+  projectModule.initializeProject({ ...project, documents });
 
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();
@@ -41,6 +42,7 @@ export async function setAndSubscribeToProject(
   }
 
   disableDrawMode();
+  artifactSelectionModule.clearSelections();
   deltaModule.clearDelta();
   appModule.closeSidePanels();
   await subtreeModule.initializeProject(project);

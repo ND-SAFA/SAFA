@@ -1,4 +1,4 @@
-import { Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
   Project,
@@ -7,6 +7,7 @@ import type {
   ProjectMembership,
 } from "@/types";
 import { createProject } from "@/util";
+import { documentModule } from "@/store";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -17,6 +18,24 @@ export default class ProjectModule extends VuexModule {
    * The currently loaded project.
    */
   private project = createProject();
+
+  @Action
+  /**
+   * Initializes the current project
+   */
+  initializeProject(project: Project): void {
+    this.SAVE_PROJECT(project);
+    documentModule.initializeProject(project);
+  }
+
+  @Action
+  /**
+   * Updates the project documents.
+   */
+  updateDocuments(documents: ProjectDocument[]): void {
+    this.SET_DOCUMENTS(documents);
+    documentModule.initializeProject(this.project);
+  }
 
   @Mutation
   /**

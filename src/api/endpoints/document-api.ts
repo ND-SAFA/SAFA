@@ -1,17 +1,17 @@
-import { Project, ProjectDocument } from "@/types";
+import { ProjectDocument } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * Creates given document under project specified.
- * @param project The project to create the document under.
+ * @param projectId - The project to create the document under.
  * @param document The document to be created.
  */
 export async function createOrUpdateDocument(
-  project: Project,
+  projectId: string,
   document: ProjectDocument
 ): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.createOrUpdateDocument, {
-    projectId: project.projectId,
+    projectId,
   });
   return authHttpClient<ProjectDocument>(url, {
     method: "POST",

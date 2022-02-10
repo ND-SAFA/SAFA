@@ -177,6 +177,6 @@ async function projectMessageHandler(
     case "members":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
     case "documents":
-      return getProjectDocuments(projectId).then(projectModule.SET_DOCUMENTS);
+      return getProjectDocuments(projectId).then(projectModule.updateDocuments);
   }
 }

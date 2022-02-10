@@ -20,6 +20,7 @@ import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -72,6 +73,20 @@ public class DocumentArtifactController extends BaseController {
             a.addDocumentId(document.getDocumentId().toString());
         }
         return new ServerResponse(artifacts);
+    }
+
+    @DeleteMapping(AppRoutes.Projects.removeArtifactFromDocument)
+    public void removeArtifactFromDocument(@PathVariable UUID versionId,
+                                           @PathVariable UUID documentId,
+                                           @PathVariable UUID artifactId) throws SafaError {
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        Document document = getDocumentById(this.documentRepository, documentId);
+        Artifact artifact = getArtifactById(artifactId);
+        Optional<DocumentArtifact> documentArtifactQuery =
+            this.documentArtifactRepository.findByProjectVersionAndDocumentAndArtifact(projectVersion,
+                document,
+                artifact);
+        documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {

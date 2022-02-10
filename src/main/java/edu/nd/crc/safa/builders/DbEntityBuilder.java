@@ -4,23 +4,11 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.server.entities.db.*;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -43,6 +31,7 @@ public class DbEntityBuilder extends BaseBuilder {
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
@@ -66,6 +55,7 @@ public class DbEntityBuilder extends BaseBuilder {
                            ProjectMembershipRepository projectMembershipRepository,
                            ProjectVersionRepository projectVersionRepository,
                            DocumentRepository documentRepository,
+                           DocumentArtifactRepository documentArtifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactRepository artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
@@ -74,6 +64,7 @@ public class DbEntityBuilder extends BaseBuilder {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.documentRepository = documentRepository;
+        this.documentArtifactRepository = documentArtifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
@@ -91,10 +82,11 @@ public class DbEntityBuilder extends BaseBuilder {
         this.bodies = new Hashtable<>();
         this.projectRepository.deleteAll();
         this.projectVersionRepository.deleteAll();
+        this.documentRepository.deleteAll();
+        this.documentArtifactRepository.deleteAll();
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
-        this.documentRepository.deleteAll();
         this.revisionNumber = 1;
     }
 
@@ -132,6 +124,20 @@ public class DbEntityBuilder extends BaseBuilder {
         addEntry(this.documents, projectName, docName, document);
         return this;
     }
+
+    public DbEntityBuilder newDocumentArtifact(String projectName,
+                                               int versionIndex,
+                                               String docName,
+                                               String artifactName) {
+        Project project = this.getProject(projectName);
+        ProjectVersion projectVersion = this.getProjectVersion(projectName, 0);
+        Document document = this.getDocument(projectName, docName);
+        Artifact artifact = this.getArtifact(projectName, artifactName);
+        DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
+        this.documentArtifactRepository.save(documentArtifact);
+        return this;
+    }
+
 
     public ProjectVersion newVersionWithReturn(String projectName) {
         this.newVersion(projectName);

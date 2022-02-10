@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -15,6 +16,10 @@ import org.springframework.stereotype.Repository;
 public interface DocumentArtifactRepository extends CrudRepository<DocumentArtifact, UUID> {
 
     List<DocumentArtifact> findByProjectVersionAndArtifact(ProjectVersion projectVersion, Artifact artifact);
+
+    Optional<DocumentArtifact> findByProjectVersionAndDocumentAndArtifact(ProjectVersion projectVersion,
+                                                                          Document document,
+                                                                          Artifact artifact);
 
     List<DocumentArtifact> findByDocument(Document document);
 }

@@ -44,6 +44,10 @@ export enum Endpoint {
   getProjectDocuments = "projects/:projectId/documents",
   deleteDocument = "projects/documents/:documentId",
 
+  //Document Artifacts
+  addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
+  removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
+
   //Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
 

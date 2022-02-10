@@ -1,4 +1,4 @@
-import { Project, ProjectDocument } from "@/types";
+import { Artifact, Project, ProjectDocument } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -42,6 +42,50 @@ export async function getProjectDocuments(
 export async function deleteDocument(document: ProjectDocument): Promise<void> {
   const url = fillEndpoint(Endpoint.deleteDocument, {
     documentId: document.documentId,
+  });
+  return authHttpClient<void>(url, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * Attaches the given artifact to specified document marked at the
+ * given version.
+ * @param versionId The id of the version to mark the addition to.
+ * @param documentId The id of the document to which the artifacts are added to.
+ * @param artifacts The artifacts being added to the document.
+ */
+export async function addArtifactToDocument(
+  versionId: string,
+  documentId: string,
+  artifacts: Artifact[]
+): Promise<Artifact[]> {
+  const url = fillEndpoint(Endpoint.addArtifactsToDocument, {
+    versionId,
+    documentId,
+  });
+  return authHttpClient<Artifact[]>(url, {
+    method: "POST",
+    body: JSON.stringify(artifacts),
+  });
+}
+
+/**
+ * Removed specified artifact from document marked at given
+ * version.
+ * @param versionId The version to mark the removal at.
+ * @param documentId The document to remove the artifacts to.
+ * @param artifactId The artifact to remove from the document.
+ */
+export async function removeArtifactFromDocument(
+  versionId: string,
+  documentId: string,
+  artifactId: string
+): Promise<void> {
+  const url = fillEndpoint(Endpoint.removeArtifactFromDocument, {
+    versionId,
+    documentId,
+    artifactId,
   });
   return authHttpClient<void>(url, {
     method: "DELETE",

@@ -19,12 +19,18 @@ public class AppRoutes {
         public static final String deleteProjectMembership = projectPrefix + "/members/{projectMembershipId}";
 
         // Project Controller
-        public static final String projects = projectPrefix;
+        public static final String createOrUpdateProjects = projectPrefix;
+        public static final String getUserProjects = projectPrefix;
 
         // Document Controller
         public static final String createOrUpdateDocument = projectPrefix + "/{projectId}/documents";
         public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";
         public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
+
+        // Document Artifact Controller
+        public static final String addArtifactsToDocument = projectPrefix + "versions/{versionId}/documents"
+            + "/{documentId}/artifacts";
+        public static final String removeArtifactFromDocument = addArtifactsToDocument + "/{artifactId}";
 
         // Trace Link Controller
         public static final String getGeneratedLinksInProjectVersion = projectPrefix

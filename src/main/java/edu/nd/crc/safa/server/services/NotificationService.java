@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.server.entities.api.ProjectWebSocketMessage;
+import edu.nd.crc.safa.server.entities.app.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -29,15 +30,16 @@ public class NotificationService {
         return String.format("/topic/revisions/%s", projectVersion.getVersionId());
     }
 
-    public void broadUpdateProjectVersionMessage(ProjectVersion projectVersion) {
+    public void broadUpdateProjectVersionMessage(ProjectVersion projectVersion,
+                                                 VersionMessage versionMessage) {
         String versionTopicDestination = getVersionTopic(projectVersion);
-        ProjectWebSocketMessage update = new ProjectWebSocketMessage("excluded");
-        messagingTemplate.convertAndSend(versionTopicDestination, update);
+        String message = versionMessage.toString();
+        messagingTemplate.convertAndSend(versionTopicDestination, message);
     }
 
-    public void broadUpdateProjectMessage(Project project, String message) {
+    public void broadUpdateProjectMessage(Project project, ProjectMessage projectMessage) {
         String versionTopicDestination = getProjectTopic(project);
-        ProjectWebSocketMessage update = new ProjectWebSocketMessage(message);
-        messagingTemplate.convertAndSend(versionTopicDestination, update);
+        String message = projectMessage.toString();
+        messagingTemplate.convertAndSend(versionTopicDestination, message);
     }
 }

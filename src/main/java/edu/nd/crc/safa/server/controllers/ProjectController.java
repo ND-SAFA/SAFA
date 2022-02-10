@@ -2,23 +2,18 @@ package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,29 +33,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController extends BaseController {
 
     private final ProjectService projectService;
-    private final NotificationService notificationService;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
-                             ProjectService projectService,
-                             NotificationService notificationService) {
+                             ProjectService projectService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.projectService = projectService;
-        this.notificationService = notificationService;
     }
 
     /**
      * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
-     * not specified are assumed to be removed if version is specified..
+     * not specified are assumed to be removed if version is specified.
      *
-     * @param project The project entity containing artifacts, traces, name, and decriptions.
+     * @param project The project entity containing artifacts, traces, name, and descriptions.
      * @return The project and associated entities created.
      * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
      *                   payload.
      */
-    @PostMapping(AppRoutes.Projects.projects)
+    @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
     @ResponseStatus(HttpStatus.CREATED)
     public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
@@ -82,8 +74,8 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping(AppRoutes.Projects.projects)
-    public ServerResponse getProjects() {
+    @GetMapping(AppRoutes.Projects.getUserProjects)
+    public ServerResponse getUserProjects() {
         List<Project> userProjects = projectService.getCurrentUserProjects();
         return new ServerResponse(userProjects);
     }
@@ -101,55 +93,5 @@ public class ProjectController extends BaseController {
         Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
         this.projectRepository.delete(project);
         return new ServerResponse("Project deleted successfully");
-    }
-
-    /**
-     * Adds specified user account with given email to project assigned with
-     * given role.
-     *
-     * @param projectId The UUID of the project which the member is being added to.
-     * @param request   The request containing project, member to add, and their given role.
-     */
-    @PostMapping(AppRoutes.Projects.addProjectMember)
-    public void addOrUpdateProjectMembership(@PathVariable UUID projectId,
-                                             @RequestBody ProjectMembershipRequest request)
-        throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        this.projectService.addOrUpdateProjectMembership(project,
-            request.getMemberEmail(),
-            request.getProjectRole());
-        this.notificationService.broadUpdateProjectMessage(project, "members");
-    }
-
-    /**
-     * Returns all members belonging to given project.
-     *
-     * @param projectId The project whose members are being retrieved.
-     * @return ServerResponse containing list of project members ships
-     */
-    @GetMapping(AppRoutes.Projects.getProjectMembers)
-    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
-            .stream()
-            .map(ProjectMemberAppEntity::new)
-            .collect(Collectors.toList());
-        return new ServerResponse(projectMemberships);
-    }
-
-    /**
-     * Deletes project membership effectively removing user from
-     * associated project
-     *
-     * @param projectMembershipId ID of the membership linking user and project.
-     */
-    @DeleteMapping(AppRoutes.Projects.deleteProjectMembership)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
-        //TODO: Check for project permission before deleting.
-        ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
-        if (projectMembership != null) {
-            this.notificationService.broadUpdateProjectMessage(projectMembership.getProject(), "members");
-        }
     }
 }

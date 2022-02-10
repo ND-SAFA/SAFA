@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.builders;
 
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -62,6 +63,11 @@ public class RouteBuilder {
 
     public RouteBuilder withTargetName(String sourceId) {
         this.path = this.path.replace("{targetId}", sourceId);
+        return this;
+    }
+
+    public RouteBuilder withArtifactId(Artifact artifact) {
+        this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
         return this;
     }
 

@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
@@ -90,16 +91,18 @@ public class CommitController extends BaseController {
                 throw new SafaError(artifactError.getDescription());
             }
         }
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
+        int totalChanged = changedArtifacts.size() + artifacts.getRemoved().size();
+        if (totalChanged > 0) {
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+        }
     }
 
     private void commitTraces(ProjectVersion projectVersion,
-                              ProjectChange<TraceAppEntity> artifacts) throws SafaError {
+                              ProjectChange<TraceAppEntity> traces) throws SafaError {
         List<TraceAppEntity> changedArtifacts = Stream.concat(
-                artifacts.getAdded().stream(),
-                artifacts.getModified().stream())
+                traces.getAdded().stream(),
+                traces.getModified().stream())
             .collect(Collectors.toList());
-        List<CommitError> errors = new ArrayList<>();
         for (TraceAppEntity artifact : changedArtifacts) {
             CommitError traceError = this.traceLinkVersionRepository.commitSingleEntityToProjectVersion(projectVersion,
                 artifact);
@@ -107,13 +110,16 @@ public class CommitController extends BaseController {
                 throw new SafaError(traceError.getDescription());
             }
         }
-        for (TraceAppEntity trace : artifacts.getRemoved()) {
+        for (TraceAppEntity trace : traces.getRemoved()) {
             CommitError traceError = this.traceLinkVersionRepository.deleteVersionEntityByBaseName(projectVersion,
                 trace.traceLinkId);
             if (traceError != null) {
                 throw new SafaError(traceError.getDescription());
             }
         }
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
+        int totalChanged = changedArtifacts.size() + traces.getRemoved().size();
+        if (totalChanged > 0) {
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.TRACES);
+        }
     }
 }

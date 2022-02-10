@@ -9,6 +9,7 @@ import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.app.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -78,7 +79,7 @@ public class FlatFileController extends BaseController {
             project,
             projectVersion,
             files);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.VERSION);
         return new ServerResponse(response);
     }
 
@@ -104,7 +105,7 @@ public class FlatFileController extends BaseController {
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.VERSION);
         return new ServerResponse(response);
     }
 

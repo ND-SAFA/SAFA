@@ -1,10 +1,15 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -71,6 +76,16 @@ public abstract class BaseController {
         ex.printStackTrace();
         SafaError wrapper = new SafaError("An unexpected server error occurred.", ex);
         return new ServerResponse(wrapper, ResponseCodes.FAILURE);
+    }
+
+    protected Document getDocumentById(DocumentRepository documentRepository,
+                                       UUID documentId) throws SafaError {
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            return documentOptional.get();
+        } else {
+            throw new SafaError("Could not find document with given id:" + documentId);
+        }
     }
 
     private String createValidationMessage(ObjectError error) {

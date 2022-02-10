@@ -23,7 +23,7 @@ public class AppRoutes {
 
         // Document Controller
         public static final String createOrUpdateDocument = projectPrefix + "/{projectId}/documents";
-        public static final String getProjectDocuments = projectPrefix + "{projectId}/documents";
+        public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";
         public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
 
         // Trace Link Controller

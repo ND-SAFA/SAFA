@@ -71,24 +71,6 @@ export interface TraceChange {
 }
 
 /**
- * Defines an update to traces and artifacts within a project version.
- */
-export interface ProjectVersionUpdate {
-  /**
-   * Whether the data modified is included in the Update.
-   */
-  type: "excluded" | "members" | "documents";
-  /**
-   * The traces updated.
-   */
-  traces: TraceLink[];
-  /**
-   * The artifacts updated.
-   */
-  artifacts: Artifact[];
-}
-
-/**
  * The response from parsing a file.
  */
 export interface ParseFileResponse {

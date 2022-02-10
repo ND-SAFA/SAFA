@@ -19,20 +19,3 @@ export enum VersionMessage {
   ARTIFACTS = "ARTIFACTS",
   TRACES = "TRACES",
 }
-/**
- * Defines an update to traces and artifacts within a project version.
- */
-export interface ProjectVersionUpdate {
-  /**
-   * Whether the data modified is included in the Update.
-   */
-  type: "VERSION" | "MEMBERS" | "DOCUMENTS" | "ARTIFACTS";
-  /**
-   * The traces updated.
-   */
-  traces: TraceLink[];
-  /**
-   * The artifacts updated.
-   */
-  artifacts: Artifact[];
-}

@@ -1,5 +1,8 @@
 <template>
-  <generic-cytoscape-controller :cyto-core-graph="cytoCoreGraph">
+  <generic-cytoscape-controller
+    :cyto-core-graph="cytoCoreGraph"
+    :class="isLoading ? 'artifact-tree' : 'artifact-tree visible'"
+  >
     <template v-slot:elements>
       <artifact-node
         v-for="artifact in artifacts"
@@ -37,6 +40,7 @@ import {
   CytoCoreGraph,
 } from "@/types";
 import {
+  appModule,
   artifactModule,
   artifactSelectionModule,
   subtreeModule,
@@ -67,6 +71,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    isLoading(): boolean {
+      return appModule.getIsLoading;
+    },
     cytoCoreGraph(): CytoCoreGraph {
       return artifactTreeGraph;
     },

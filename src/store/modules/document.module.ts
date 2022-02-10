@@ -2,7 +2,7 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 import type { Project, ProjectDocument } from "@/types";
 import { createDocument } from "@/util";
-import { artifactModule, traceModule } from "@/store";
+import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
 
 @Module({ namespaced: true, name: "document" })
@@ -58,10 +58,14 @@ export default class DocumentModule extends VuexModule {
   async switchDocuments(document: ProjectDocument): Promise<void> {
     const currentArtifactIds = document.artifactIds;
 
+    appModule.onLoadStart();
+
     this.SET_DOCUMENT(document);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
     await resetGraphFocus();
+
+    setTimeout(appModule.onLoadEnd, 1000);
   }
 
   @Action

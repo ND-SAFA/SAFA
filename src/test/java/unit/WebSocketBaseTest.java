@@ -32,6 +32,8 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * Provides an abstraction over the websocket connection enabling:
  * 1. connecting to server through websocket endpoint
  * 2. Reading messages in queue associated
+ * <p>
+ * TODO: Do I need to clear subscriptions?
  */
 public class WebSocketBaseTest extends AuthenticatedBaseTest {
 

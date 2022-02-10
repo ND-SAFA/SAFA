@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  */
 public class AuthenticatedBaseTest extends EntityBaseTest {
 
-    public static final String localUsername = "root-test-user@gmail.com";
+    public static final String currentUsername = "root-test-user@gmail.com";
     public static final String localPassword = "r{QjR3<Ec2eZV@?";
     public static SafaUser currentUser;
     protected String token;
@@ -40,9 +40,9 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     }
 
     public void defaultLogin() throws Exception {
-        createUser(localUsername, localPassword);
-        loginUser(localUsername, localPassword);
-        currentUser = safaUserService.getUserFromUsername(localUsername);
+        createUser(currentUsername, localPassword);
+        loginUser(currentUsername, localPassword);
+        currentUser = safaUserService.getUserFromUsername(currentUsername);
     }
 
     public JSONObject sendGet(String routeName,

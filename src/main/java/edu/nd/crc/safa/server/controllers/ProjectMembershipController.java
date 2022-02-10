@@ -10,6 +10,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -62,7 +63,7 @@ public class ProjectMembershipController extends BaseController {
         this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
-        this.notificationService.broadUpdateProjectMessage(project, "members");
+        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.MEMBERS);
     }
 
     /**
@@ -93,7 +94,9 @@ public class ProjectMembershipController extends BaseController {
         //TODO: Check for project permission before deleting.
         ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
         if (projectMembership != null) {
-            this.notificationService.broadUpdateProjectMessage(projectMembership.getProject(), "members");
+            this.notificationService.broadUpdateProjectMessage(
+                projectMembership.getProject(),
+                ProjectMessage.MEMBERS);
         }
     }
 }

@@ -9,6 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -18,12 +19,15 @@ import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,6 +39,7 @@ public class DocumentArtifactController extends BaseController {
     private final DocumentRepository documentRepository;
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
+    private final NotificationService notificationService;
 
     @Autowired
     public DocumentArtifactController(ProjectRepository projectRepository,
@@ -42,11 +47,13 @@ public class DocumentArtifactController extends BaseController {
                                       DocumentRepository documentRepository,
                                       ArtifactRepository artifactRepository,
                                       DocumentArtifactRepository documentArtifactRepository,
+                                      NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -76,6 +83,7 @@ public class DocumentArtifactController extends BaseController {
     }
 
     @DeleteMapping(AppRoutes.Projects.removeArtifactFromDocument)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeArtifactFromDocument(@PathVariable UUID versionId,
                                            @PathVariable UUID documentId,
                                            @PathVariable UUID artifactId) throws SafaError {
@@ -87,6 +95,7 @@ public class DocumentArtifactController extends BaseController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {

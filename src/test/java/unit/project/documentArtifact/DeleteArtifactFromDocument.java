@@ -3,6 +3,7 @@ package unit.project.documentArtifact;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
@@ -31,7 +32,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
      * Verifies that the response object contains
      */
     @Test
-    public void testCreateNewDocument() throws Exception {
+    public void testRemoveArtifactFromDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
@@ -68,8 +69,10 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
             .withArtifactId(artifact)
             .get();
         sendDelete(route, status().isNoContent());
-        
+
         // VP - Verify that artifact is no longer linked
+        List<DocumentArtifact> documentArtifactList = this.documentArtifactRepository.findByDocument(document);
+        assertThat(documentArtifactList.size()).isEqualTo(0);
 
         // VP - Verify that websocket message to update artifacts.
     }

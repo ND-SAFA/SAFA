@@ -8,6 +8,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.app.ProjectMessage;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
@@ -60,7 +61,7 @@ public class DocumentController extends BaseController {
         Project project = resourceBuilder.fetchProject(projectId).withEditProject();
         document.setProject(project);
         this.documentRepository.save(document);
-        this.notificationService.broadUpdateProjectMessage(project, "documents");
+        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         return new ServerResponse(document);
     }
 
@@ -75,7 +76,7 @@ public class DocumentController extends BaseController {
     public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        this.notificationService.broadUpdateProjectMessage(project, "documents");
+        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         return new ServerResponse(projectDocuments);
     }
 
@@ -91,7 +92,7 @@ public class DocumentController extends BaseController {
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
-        this.notificationService.broadUpdateProjectMessage(project, "documents");
+        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         this.documentRepository.delete(document);
     }
 }

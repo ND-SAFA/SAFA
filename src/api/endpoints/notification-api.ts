@@ -1,6 +1,6 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { ProjectVersionUpdate } from "@/types";
+import { ProjectMessage, VersionMessage } from "@/types";
 import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/util";
 import { getProjectVersion } from "@/api/endpoints/version-api";
@@ -141,8 +141,8 @@ export function connectAndSubscribeToVersion(
         stompClient.subscribe(projectSubscription, async (frame) => {
           await projectMessageHandler(projectId, frame);
         });
-        stompClient.subscribe(versionSubscription, async () => {
-          await versionMessageHandler(versionId);
+        stompClient.subscribe(versionSubscription, async (frame) => {
+          await versionMessageHandler(versionId, frame);
         });
         resolve();
       })
@@ -154,9 +154,23 @@ export function connectAndSubscribeToVersion(
  * Handles revision messages related to versioned entities of the project.
  *
  * @param versionId - The project version ID of the revision.
+ * @param frame - The frame received by the version websocket channel.
  */
-async function versionMessageHandler(versionId: string): Promise<void> {
-  getProjectVersion(versionId).then(setCreatedProject);
+async function versionMessageHandler(
+  versionId: string,
+  frame: Frame
+): Promise<void> {
+  const message: VersionMessage = frame.body as VersionMessage;
+  switch (message) {
+    case "VERSION":
+      return getProjectVersion(versionId).then(setCreatedProject);
+    case "ARTIFACTS":
+      //TODO: Updating with route to get artifacts in version.
+      return getProjectVersion(versionId).then(setCreatedProject);
+    case "TRACES":
+      ///TODO: Updating with route to get traces in version.
+      return getProjectVersion(versionId).then(setCreatedProject);
+  }
 }
 
 /**
@@ -169,14 +183,11 @@ async function projectMessageHandler(
   projectId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ProjectVersionUpdate = JSON.parse(
-    frame.body
-  ) as ProjectVersionUpdate;
-
-  switch (message.type) {
-    case "members":
+  const message: ProjectMessage = frame.body as ProjectMessage;
+  switch (message) {
+    case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
-    case "documents":
+    case "DOCUMENTS":
       return getProjectDocuments(projectId).then(projectModule.SET_DOCUMENTS);
   }
 }

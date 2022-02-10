@@ -28,7 +28,7 @@ public class AppRoutes {
         public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
 
         // Document Artifact Controller
-        public static final String addArtifactsToDocument = projectPrefix + "versions/{versionId}/documents"
+        public static final String addArtifactsToDocument = projectPrefix + "/versions/{versionId}/documents"
             + "/{documentId}/artifacts";
         public static final String removeArtifactFromDocument = addArtifactsToDocument + "/{artifactId}";
 

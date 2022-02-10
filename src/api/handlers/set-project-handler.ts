@@ -14,6 +14,7 @@ import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
 import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
 import { reloadTraceMatrices } from "./trace-matrix-handler";
 import { getProjectDocuments } from "@/api/endpoints/document-api";
+import { loadProjectDocuments } from "@/api";
 
 /**
  1. Sets a new project.
@@ -30,10 +31,9 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
+  await loadProjectDocuments(project);
 
-  const documents = await getProjectDocuments(projectId).catch(() => []);
-
-  projectModule.initializeProject({ ...project, documents });
+  projectModule.initializeProject(project);
 
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();

@@ -1,6 +1,20 @@
 import { documentModule, projectModule } from "@/store";
-import { ProjectDocument } from "@/types";
-import { createOrUpdateDocument } from "@/api/endpoints/document-api";
+import { Project, ProjectDocument } from "@/types";
+import {
+  createOrUpdateDocument,
+  getProjectDocuments,
+} from "@/api/endpoints/document-api";
+
+/**
+ * Adds documents to the given project object.
+ *
+ * @param project - The project to load documents for.
+ */
+export async function loadProjectDocuments(project: Project): Promise<void> {
+  project.documents = await getProjectDocuments(project.projectId).catch(
+    () => []
+  );
+}
 
 /**
  * Creates a new document.

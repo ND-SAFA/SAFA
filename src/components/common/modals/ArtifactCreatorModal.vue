@@ -46,7 +46,12 @@
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import { typeOptionsModule, logModule, projectModule } from "@/store";
+import {
+  typeOptionsModule,
+  logModule,
+  projectModule,
+  documentModule,
+} from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
@@ -140,14 +145,15 @@ export default Vue.extend({
   methods: {
     onSubmit(): void {
       // only called when isValid / button is enabled
+      const currentDocumentId = documentModule.document.documentId;
       const artifact: Artifact = {
         id: this.artifact?.id || "",
         name: this.name,
         type: this.type,
         summary: this.summary,
         body: this.body,
+        documentIds: currentDocumentId === "" ? [] : [currentDocumentId],
       };
-
       this.isLoading = true;
 
       if (this.versionId === undefined) {

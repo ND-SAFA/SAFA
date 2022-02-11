@@ -118,7 +118,12 @@ export default Vue.extend({
 
         this.nameCheckIsLoading = true;
         this.nameCheckTimer = setTimeout(() => {
-          isArtifactNameTaken(this.projectId, newName).then((res) => {
+          if (this.versionId === undefined) {
+            return logModule.onWarning(
+              "Please select a project version before creating an artifact."
+            );
+          }
+          isArtifactNameTaken(this.versionId, newName).then((res) => {
             this.nameCheckIsLoading = false;
             this.isNameValid = !res.artifactExists;
 

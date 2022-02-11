@@ -5,17 +5,17 @@ import { CommitBuilder } from "./commit-builder";
 /**
  * Returns whether the given artifact name already exists.
  *
- * @param projectId - The project to search within.
+ * @param versionId - The project version to search within.
  * @param artifactName - The artifact name to search for.
  *
  * @return Whether the artifact name is already taken.
  */
 export async function isArtifactNameTaken(
-  projectId: string,
+  versionId: string,
   artifactName: string
 ): Promise<ArtifactNameValidationResponse> {
   return authHttpClient<ArtifactNameValidationResponse>(
-    fillEndpoint(Endpoint.isArtifactNameTaken, { projectId, artifactName }),
+    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId, artifactName }),
     { method: "GET" }
   );
 }

@@ -25,7 +25,7 @@ export enum Endpoint {
 
   //Commits
   commit = "projects/versions/:versionId/commit",
-  isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
+  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/:artifactName",
 
   //Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",

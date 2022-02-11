@@ -82,10 +82,8 @@ export async function getRootNode(
   cy: CytoCore,
   currentNode?: SingularElementArgument,
   traversedNodes: string[] = []
-): Promise<SingularElementArgument> {
-  if (cy.nodes().length === 0) {
-    throw Error("Root node does not exist because no nodes are in view.");
-  }
+): Promise<SingularElementArgument | undefined> {
+  if (cy.nodes().length === 0) return;
 
   if (currentNode === undefined) {
     currentNode = getMostConnectedNode(cy);

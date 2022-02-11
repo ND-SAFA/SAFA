@@ -7,6 +7,7 @@ import {
   Project,
   ProjectDelta,
   ProjectDocument,
+  ProjectIdentifier,
   ProjectVersion,
   SessionModel,
   SnackbarMessage,
@@ -111,19 +112,22 @@ export function createDefaultTypeIcons(): Record<string, string> {
 }
 
 /**
+ * @param project - The associated project.
  * @param artifactIds - The artifact ids visible in this document.
  * @param name - The document name.
  * @return An empty document.
  */
 export function createDocument(
+  project: ProjectIdentifier = { projectId: "", name: "", description: "" },
   artifactIds: string[] = [],
   name = "Default"
 ): ProjectDocument {
   return {
     documentId: "",
-    projectId: "",
+    project,
     name,
     type: DocumentType.ARTIFACT_TREE,
     artifactIds,
+    description: "",
   };
 }

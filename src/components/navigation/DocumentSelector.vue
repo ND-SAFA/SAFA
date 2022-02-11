@@ -36,7 +36,7 @@
         title="Add Document"
         size="sm"
         :is-open="isCreateOpen"
-        @close="handleCreateClose"
+        @close="resetModalData"
       >
         <template v-slot:body>
           <v-text-field
@@ -46,6 +46,7 @@
             v-model="documentName"
             :error-messages="nameErrors"
           />
+          <artifact-input v-model="artifactIds" />
         </template>
         <template v-slot:actions>
           <v-spacer />
@@ -63,7 +64,7 @@
         title="Edit Document"
         size="sm"
         :is-open="isEditOpen"
-        @close="handleEditClose"
+        @close="resetModalData"
       >
         <template v-slot:body>
           <v-text-field
@@ -73,6 +74,7 @@
             v-model="documentName"
             :error-messages="nameErrors"
           />
+          <artifact-input v-model="artifactIds" />
         </template>
         <template v-slot:actions>
           <v-spacer />
@@ -94,17 +96,17 @@ import Vue from "vue";
 import { ProjectDocument } from "@/types";
 import { addNewDocument, editDocument } from "@/api";
 import { createDocument } from "@/util";
-import { documentModule } from "@/store";
-import { GenericIconButton } from "@/components/common";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
+import { artifactModule, documentModule, projectModule } from "@/store";
+import { ArtifactInput, GenericIconButton, GenericModal } from "@/components";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { GenericModal, GenericIconButton },
+  components: { GenericModal, GenericIconButton, ArtifactInput },
   data: () => ({
     isCreateOpen: false,
     isEditOpen: false,
     documentName: "",
+    artifactIds: [] as string[],
     editingDocument: undefined as ProjectDocument | undefined,
   }),
   computed: {
@@ -138,34 +140,44 @@ export default Vue.extend({
     },
   },
   methods: {
+    resetModalData() {
+      this.documentName = "";
+      this.artifactIds = [];
+      this.editingDocument = undefined;
+      this.isCreateOpen = false;
+      this.isEditOpen = false;
+    },
     handleCreateOpen() {
       this.isCreateOpen = true;
     },
-    handleCreateClose() {
-      this.isCreateOpen = false;
-    },
     handleAddDocument() {
-      addNewDocument(createDocument([], this.documentName));
-      this.handleCreateClose();
+      addNewDocument(
+        createDocument(
+          projectModule.getProject,
+          this.artifactIds,
+          this.documentName
+        )
+      );
+      this.resetModalData();
     },
 
     handleEditOpen(document: ProjectDocument) {
-      this.isEditOpen = true;
+      console.log(document.artifactIds);
       this.documentName = document.name;
       this.editingDocument = document;
-    },
-    handleEditClose() {
-      this.isEditOpen = false;
-      this.documentName = "";
-      this.editingDocument = undefined;
+      this.artifactIds = artifactModule.allArtifacts
+        .filter(({ id }) => document.artifactIds?.includes(id))
+        .map(({ id }) => id);
+      this.isEditOpen = true;
     },
     handleEditDocument() {
       if (this.editingDocument) {
         this.editingDocument.name = this.documentName;
+        this.editingDocument.artifactIds = this.artifactIds;
         editDocument(this.editingDocument);
       }
 
-      this.handleEditClose();
+      this.resetModalData();
     },
   },
 });

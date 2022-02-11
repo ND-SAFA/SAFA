@@ -33,7 +33,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType, EmptyLambda } from "@/types";
+import {
+  ButtonDefinition,
+  ButtonType,
+  EmptyLambda,
+  ProjectIdentifier,
+} from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import {
@@ -82,6 +87,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    project(): ProjectIdentifier {
+      return projectModule.getProject;
+    },
     projectMenuItems(): CondensedMenuItem[] {
       const options: CondensedMenuItem[] = [
         ["Open", this.onOpenProject],

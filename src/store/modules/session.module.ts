@@ -55,6 +55,7 @@ export default class SessionModule extends VuexModule {
 
   /**
    * @return The current authorization token if one exists.
+   * @throws If the token does not exist.
    */
   get getToken(): string {
     const token = this.session.token;
@@ -66,9 +67,14 @@ export default class SessionModule extends VuexModule {
 
   /**
    * Returns the decoded authentication token is one exists.
+   * @throws If the token does not exist.
    */
-  get authenticationToken(): AuthToken {
-    return jwt_decode(this.getToken) as AuthToken;
+  get authenticationToken(): AuthToken | undefined {
+    try {
+      return jwt_decode(this.getToken) as AuthToken;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   /**
@@ -81,10 +87,11 @@ export default class SessionModule extends VuexModule {
   /**
    * @returns Whether the current JWT token is empty or has passed its
    * expiration date.
+   * @throws If the token does not exist.
    */
   get isTokenExpired(): boolean {
-    return (
-      this.isTokenEmpty || Date.now() >= this.authenticationToken.exp * 1000
-    );
+    const expirationTime = (this.authenticationToken?.exp || 0) * 1000;
+
+    return this.isTokenEmpty || Date.now() >= expirationTime;
   }
 }

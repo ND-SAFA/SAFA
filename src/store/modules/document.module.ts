@@ -31,7 +31,11 @@ export default class DocumentModule extends VuexModule {
       documents = [],
     } = project;
 
-    const defaultDocument = createDocument(artifacts.map(({ id }) => id));
+    const defaultDocument = createDocument(
+      project,
+      artifacts.map(({ id }) => id)
+    );
+
     const loadedDocument = documents.find(
       ({ documentId }) => documentId === currentDocumentId
     );

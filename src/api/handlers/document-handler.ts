@@ -37,4 +37,8 @@ export async function addNewDocument(document: ProjectDocument): Promise<void> {
  */
 export async function editDocument(document: ProjectDocument): Promise<void> {
   await createOrUpdateDocument(projectModule.projectId, document);
+
+  if (documentModule.document === document) {
+    await documentModule.switchDocuments(document);
+  }
 }

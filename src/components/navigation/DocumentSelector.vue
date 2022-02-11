@@ -77,13 +77,24 @@
           <artifact-input v-model="artifactIds" />
         </template>
         <template v-slot:actions>
+          <v-btn
+            color="error"
+            :text="!confirmDelete"
+            :outlined="confirmDelete"
+            @click="handleDeleteDocument"
+          >
+            {{ confirmDelete ? "Delete" : "Delete Document" }}
+          </v-btn>
+          <v-btn outlined v-if="confirmDelete" @click="confirmDelete = false">
+            Cancel
+          </v-btn>
           <v-spacer />
           <v-btn
             color="primary"
             :disabled="!isDocumentValid"
             @click="handleEditDocument"
           >
-            Confirm
+            Confirm Edit
           </v-btn>
         </template>
       </generic-modal>
@@ -96,8 +107,14 @@ import Vue from "vue";
 import { ProjectDocument } from "@/types";
 import { addNewDocument, editDocument } from "@/api";
 import { createDocument } from "@/util";
-import { artifactModule, documentModule, projectModule } from "@/store";
+import {
+  artifactModule,
+  documentModule,
+  logModule,
+  projectModule,
+} from "@/store";
 import { ArtifactInput, GenericIconButton, GenericModal } from "@/components";
+import { deleteDocument } from "@/api/endpoints/document-api";
 
 export default Vue.extend({
   name: "DocumentSelector",
@@ -108,6 +125,7 @@ export default Vue.extend({
     documentName: "",
     artifactIds: [] as string[],
     editingDocument: undefined as ProjectDocument | undefined,
+    confirmDelete: false,
   }),
   computed: {
     items(): ProjectDocument[] {
@@ -146,7 +164,9 @@ export default Vue.extend({
       this.editingDocument = undefined;
       this.isCreateOpen = false;
       this.isEditOpen = false;
+      this.confirmDelete = false;
     },
+
     handleCreateOpen() {
       this.isCreateOpen = true;
     },
@@ -178,6 +198,25 @@ export default Vue.extend({
       }
 
       this.resetModalData();
+    },
+    handleDeleteDocument() {
+      if (!this.confirmDelete) {
+        this.confirmDelete = true;
+      } else if (this.editingDocument) {
+        deleteDocument(this.editingDocument)
+          .then(async (document) => {
+            logModule.onSuccess(
+              `Successfully deleted document: ${document.name}`
+            );
+            await documentModule.removeDocument(document);
+            this.resetModalData();
+          })
+          .catch(() => {
+            logModule.onError(
+              `Unable to delete document: ${this.documentName}`
+            );
+          });
+      }
     },
   },
 });

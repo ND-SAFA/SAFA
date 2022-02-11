@@ -39,11 +39,16 @@ export async function getProjectDocuments(
  * permissions on the project.
  * @param document The document to be deleted.
  */
-export async function deleteDocument(document: ProjectDocument): Promise<void> {
+export async function deleteDocument(
+  document: ProjectDocument
+): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.deleteDocument, {
     documentId: document.documentId,
   });
-  return authHttpClient<void>(url, {
+
+  await authHttpClient<void>(url, {
     method: "DELETE",
   });
+
+  return document;
 }

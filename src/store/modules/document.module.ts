@@ -77,7 +77,27 @@ export default class DocumentModule extends VuexModule {
    * Adds a new document.
    */
   addDocument(document: ProjectDocument): void {
-    this.SET_ALL_DOCUMENTS([...this.allDocuments, document]);
+    const documentCount = this.allDocuments.length;
+    const realDocuments = this.allDocuments.slice(0, documentCount - 1);
+    const defaultDocument = this.allDocuments[documentCount - 1];
+
+    this.SET_ALL_DOCUMENTS([...realDocuments, document, defaultDocument]);
+  }
+
+  @Action
+  /**
+   * Removes an existing document.
+   */
+  async removeDocument(document: ProjectDocument): Promise<void> {
+    const remainingDocuments = this.allDocuments.filter(
+      ({ documentId }) => documentId !== document.documentId
+    );
+
+    this.SET_ALL_DOCUMENTS(remainingDocuments);
+
+    if (this.currentDocument.documentId === document.documentId) {
+      await this.switchDocuments(remainingDocuments[0]);
+    }
   }
 
   @Mutation

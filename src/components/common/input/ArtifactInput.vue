@@ -82,7 +82,6 @@ export default Vue.extend({
   },
   watch: {
     value(currentValue: string[]) {
-      console.log({ currentValue });
       this.model = currentValue;
     },
     model(currentValue: string[]) {

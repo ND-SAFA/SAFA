@@ -45,11 +45,11 @@ export default class DocumentModule extends VuexModule {
     if (loadedDocument) {
       const currentArtifactIds = loadedDocument.artifactIds;
 
-      this.SET_DOCUMENT(loadedDocument);
+      this.SET_CURRENT_DOCUMENT(loadedDocument);
       artifactModule.initializeArtifacts({ artifacts, currentArtifactIds });
       traceModule.initializeTraces({ traces, currentArtifactIds });
     } else {
-      this.SET_DOCUMENT(defaultDocument);
+      this.SET_CURRENT_DOCUMENT(defaultDocument);
       artifactModule.initializeArtifacts({ artifacts });
       traceModule.initializeTraces({ traces });
     }
@@ -64,7 +64,7 @@ export default class DocumentModule extends VuexModule {
 
     appModule.onLoadStart();
 
-    this.SET_DOCUMENT(document);
+    this.SET_CURRENT_DOCUMENT(document);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
     await resetGraphFocus();
@@ -112,7 +112,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Sets the current document.
    */
-  SET_DOCUMENT(document: ProjectDocument): void {
+  SET_CURRENT_DOCUMENT(document: ProjectDocument): void {
     this.currentDocument = document;
   }
 

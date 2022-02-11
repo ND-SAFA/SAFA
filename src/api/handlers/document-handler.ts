@@ -35,6 +35,7 @@ export async function addNewDocument(
       createDocument(projectModule.getProject, artifactIds, documentName)
     );
     documentModule.addDocument(createdDocument);
+    await documentModule.switchDocuments(createdDocument);
   } else {
     logModule.onWarning(
       "Please select project version before creating document."

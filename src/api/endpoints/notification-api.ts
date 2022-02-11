@@ -170,8 +170,6 @@ async function versionMessageHandler(
       return getProjectVersion(versionId).then(setCreatedProject);
     case "ARTIFACTS":
       return getArtifactsInVersion(versionId).then((artifacts) => {
-        console.log("ARTIFACT NOTIFICATION");
-        console.log("ARTIFACT", artifacts[0]);
         artifactModule.addOrUpdateArtifacts(artifacts);
       });
     case "TRACES":

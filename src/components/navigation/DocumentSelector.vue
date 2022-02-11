@@ -106,13 +106,7 @@
 import Vue from "vue";
 import { ProjectDocument } from "@/types";
 import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
-import { createDocument } from "@/util";
-import {
-  artifactModule,
-  documentModule,
-  logModule,
-  projectModule,
-} from "@/store";
+import { artifactModule, documentModule, logModule } from "@/store";
 import { ArtifactInput, GenericIconButton, GenericModal } from "@/components";
 
 export default Vue.extend({
@@ -181,7 +175,6 @@ export default Vue.extend({
     },
 
     handleEditOpen(document: ProjectDocument) {
-      console.log(document.artifactIds);
       this.documentName = document.name;
       this.editingDocument = document;
       this.artifactIds = artifactModule.allArtifacts

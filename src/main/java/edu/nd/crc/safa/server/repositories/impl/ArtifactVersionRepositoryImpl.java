@@ -3,18 +3,23 @@ package edu.nd.crc.safa.server.repositories.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.DocumentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +37,12 @@ public class ArtifactVersionRepositoryImpl
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
+    DocumentArtifactRepository documentArtifactRepository;
+
+    @Autowired
+    DocumentRepository documentRepository;
 
     @Override
     public List<ArtifactVersion> getEntitiesInProject(Project project) {
@@ -81,9 +92,46 @@ public class ArtifactVersionRepositoryImpl
 
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);
-
+        createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
+        
         artifactAppEntity.setId(artifactId);
         return artifact;
+    }
+
+    private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
+                                           Artifact artifact,
+                                           List<String> incomingDocumentIds) {
+        List<String> persistedDocumentIds = documentArtifactRepository.findByProjectVersionAndArtifact(projectVersion, artifact)
+            .stream()
+            .map(da -> da.getDocument().getDocumentId().toString())
+            .collect(Collectors.toList());
+
+
+        List<String> newDocumentIds = incomingDocumentIds
+            .stream()
+            .filter(newDocumentId -> !persistedDocumentIds.contains(newDocumentId))
+            .collect(Collectors.toList());
+
+        for (String newDocumentId : newDocumentIds) {
+            Optional<Document> documentQuery = this.documentRepository.findById(UUID.fromString(newDocumentId));
+            if (documentQuery.isPresent()) {
+                Document document = documentQuery.get();
+                DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
+                this.documentArtifactRepository.save(documentArtifact);
+            }
+        }
+
+        List<String> removedDocumentIds = persistedDocumentIds
+            .stream()
+            .filter(persistedDocumentId -> !incomingDocumentIds.contains(persistedDocumentId))
+            .collect(Collectors.toList());
+
+        for (String removedDocumentId : removedDocumentIds) {
+            Optional<DocumentArtifact> documentArtifactQuery =
+                documentArtifactRepository.findByDocumentDocumentIdAndArtifact(UUID.fromString(removedDocumentId),
+                    artifact);
+            documentArtifactQuery.ifPresent(documentArtifactRepository::delete);
+        }
     }
 
     private Artifact createOrUpdateArtifact(Project project,

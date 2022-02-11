@@ -81,15 +81,47 @@ public class ProjectRetrievalService {
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
     public ProjectAppEntity retrieveApplicationEntity(ProjectVersion projectVersion) {
+
+        Project project = projectVersion.getProject();
+
+        // Versioned Entities
+        List<ArtifactAppEntity> artifacts = getArtifactInProjectVersion(projectVersion);
+        List<String> artifactIds = artifacts.stream().map(a -> a.getId()).collect(Collectors.toList());
+        List<TraceAppEntity> traces = getTracesInProjectVersion(projectVersion, artifactIds);
+
+        // Project Entities
+        List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
+        List<Document> documents = this.documentRepository.findByProject(project);
+
+        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents);
+    }
+
+    /**
+     * Returns the list of members in the given project.
+     *
+     * @param project The project whose members are being retrieved.
+     * @return The list of project member app entities.
+     */
+    public List<ProjectMemberAppEntity> getMembersInProject(Project project) {
+        return this.projectMembershipRepository.findByProject(project)
+            .stream()
+            .map(ProjectMemberAppEntity::new)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the current list of artifacts in the version given.
+     *
+     * @param projectVersion The version whose artifacts are retrieved.
+     * @return List of artifact app entities as saved in project version.
+     */
+    public List<ArtifactAppEntity> getArtifactInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
             .getEntityVersionsInProjectVersion(projectVersion);
-
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        List<String> artifactIds = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
             artifacts.add(artifactAppEntity);
-            artifactIds.add(artifactAppEntity.getId());
             Artifact artifact = artifactVersion.getArtifact();
             List<String> documentIds =
                 this.documentArtifactRepository
@@ -99,25 +131,24 @@ public class ProjectRetrievalService {
                     .collect(Collectors.toList());
             artifactAppEntity.setDocumentIds(documentIds);
         }
-        
-        List<TraceAppEntity> traces =
-            this.traceLinkVersionRepository
-                .getEntityVersionsInProjectVersion(projectVersion)
-                .stream()
-                .map(TraceAppEntity::new)
-                .filter(t -> artifactIds.contains(t.sourceId)
-                    && artifactIds.contains(t.targetId))
-                .collect(Collectors.toList());
+        return artifacts;
+    }
 
-        Project project = projectVersion.getProject();
-        List<ProjectMemberAppEntity> projectMembers =
-            this.projectMembershipRepository.findByProject(project)
-                .stream()
-                .map(ProjectMemberAppEntity::new)
-                .collect(Collectors.toList());
-
-        List<Document> documents = this.documentRepository.findByProject(project);
-
-        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents);
+    /**
+     * Returns the list of traces currently active in given version.
+     *
+     * @param projectVersion      The project version whose traces are returned if existing in it.
+     * @param existingArtifactIds List of artifact ids for those existing in given version.
+     * @return List of trace links existing in given version at the time of calling this.
+     */
+    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion,
+                                                          List<String> existingArtifactIds) {
+        return this.traceLinkVersionRepository
+            .getEntityVersionsInProjectVersion(projectVersion)
+            .stream()
+            .map(TraceAppEntity::new)
+            .filter(t -> existingArtifactIds.contains(t.sourceId)
+                && existingArtifactIds.contains(t.targetId))
+            .collect(Collectors.toList());
     }
 }

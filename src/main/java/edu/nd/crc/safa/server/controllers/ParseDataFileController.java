@@ -21,8 +21,11 @@ import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
 
@@ -49,17 +52,20 @@ public class ParseDataFileController extends BaseController {
     private final TraceFileParser traceFileParser;
 
     private final ArtifactRepository artifactRepository;
+    private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public ParseDataFileController(ProjectRepository projectRepository,
                                    ProjectVersionRepository projectVersionRepository,
                                    ResourceBuilder resourceBuilder,
                                    ArtifactRepository artifactRepository,
+                                   ArtifactVersionRepository artifactVersionRepository,
                                    ArtifactFileParser artifactFileParser,
                                    TraceFileParser traceFileParser) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
-        this.artifactRepository = artifactRepository;
         this.artifactFileParser = artifactFileParser;
+        this.artifactRepository = artifactRepository;
+        this.artifactVersionRepository = artifactVersionRepository;
         this.traceFileParser = traceFileParser;
     }
 
@@ -91,17 +97,27 @@ public class ParseDataFileController extends BaseController {
     /**
      * Returns flag `artifactExists` indicating whether artifact exists in the project.
      *
-     * @param projectId    UUID identifying unique project.
+     * @param versionId    The version id to check if the given artifact name is already in it.
      * @param artifactName The name / identifier of the artifact.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
-    public ServerResponse checkIfNameExists(@PathVariable UUID projectId,
+    public ServerResponse checkIfNameExists(@PathVariable UUID versionId,
                                             @PathVariable String artifactName) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(project, artifactName);
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        Optional<Artifact> artifactQuery =
+            this.artifactRepository.findByProjectAndName(projectVersion.getProject(), artifactName);
+        boolean artifactExists = false;
+        if (artifactQuery.isPresent()) {
+            String artifactId = artifactQuery.get().getArtifactId().toString();
+            Optional<ArtifactVersion> artifactVersionQuery =
+                this.artifactVersionRepository.getEntityVersionsInProjectVersionByVersionId(projectVersion, artifactId);
+            if (artifactVersionQuery.isPresent()) {
+                artifactExists = !artifactVersionQuery.get().getModificationType().equals(ModificationType.REMOVED);
+            }
+        }
         Map<String, Boolean> response = new HashMap<>();
-        response.put("artifactExists", artifactQuery.isPresent());
+        response.put("artifactExists", artifactExists);
         return new ServerResponse(response);
     }
 

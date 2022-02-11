@@ -44,7 +44,7 @@ export enum Endpoint {
   createNewRevisionVersion = "projects/:projectId/versions/revision",
 
   //Documents
-  createOrUpdateDocument = "projects/:projectId/documents",
+  createOrUpdateDocument = "projects/versions/:versionId/documents",
   getProjectDocuments = "projects/:projectId/documents",
   deleteDocument = "projects/documents/:documentId",
 

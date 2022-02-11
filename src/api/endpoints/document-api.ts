@@ -3,15 +3,15 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * Creates given document under project specified.
- * @param projectId - The project to create the document under.
+ * @param versionId - The version to mark the document as created.
  * @param document The document to be created.
  */
 export async function createOrUpdateDocument(
-  projectId: string,
+  versionId: string,
   document: ProjectDocument
 ): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.createOrUpdateDocument, {
-    projectId,
+    versionId,
   });
   return authHttpClient<ProjectDocument>(url, {
     method: "POST",

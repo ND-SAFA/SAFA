@@ -1,4 +1,4 @@
-import { documentModule, projectModule } from "@/store";
+import { documentModule, logModule, projectModule } from "@/store";
 import { Project, ProjectDocument } from "@/types";
 import {
   createOrUpdateDocument,
@@ -28,12 +28,18 @@ export async function addNewDocument(
   documentName: string,
   artifactIds: string[]
 ): Promise<void> {
-  const createdDocument = await createOrUpdateDocument(
-    projectModule.projectId,
-    createDocument(projectModule.getProject, artifactIds, documentName)
-  );
-
-  documentModule.addDocument(createdDocument);
+  const versionId = projectModule.getProject.projectVersion?.versionId;
+  if (versionId !== undefined) {
+    const createdDocument = await createOrUpdateDocument(
+      versionId,
+      createDocument(projectModule.getProject, artifactIds, documentName)
+    );
+    documentModule.addDocument(createdDocument);
+  } else {
+    logModule.onWarning(
+      "Please select project version before creating document."
+    );
+  }
 }
 
 /**
@@ -42,10 +48,17 @@ export async function addNewDocument(
  * @param document - The document to edit.
  */
 export async function editDocument(document: ProjectDocument): Promise<void> {
-  await createOrUpdateDocument(projectModule.projectId, document);
+  const versionId = projectModule.getProject.projectVersion?.versionId;
+  if (versionId !== undefined) {
+    await createOrUpdateDocument(projectModule.projectId, document);
 
-  if (documentModule.document === document) {
-    await documentModule.switchDocuments(document);
+    if (documentModule.document === document) {
+      await documentModule.switchDocuments(document);
+    }
+  } else {
+    logModule.onWarning(
+      "Please select a project version before editing a document."
+    );
   }
 }
 

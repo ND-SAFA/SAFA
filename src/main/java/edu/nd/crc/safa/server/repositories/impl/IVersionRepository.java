@@ -32,7 +32,7 @@ public interface IVersionRepository<
      *
      * @param projectVersion The version of the entity to retrieve.
      * @param entityId       The id of the base entity whose version is being retrieved.
-     * @return
+     * @return Optional of entity version at given project version.
      */
     Optional<VersionEntity> getEntityVersionsInProjectVersionByVersionId(ProjectVersion projectVersion,
                                                                          String entityId);

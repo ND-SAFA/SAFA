@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -124,25 +123,10 @@ public class VersionController extends BaseController {
      * @return String representing success message.
      * @throws SafaError Throws error if not version is associated with given id.
      */
-    @DeleteMapping(AppRoutes.Projects.getVersionById)
+    @DeleteMapping(AppRoutes.Projects.deleteVersionById)
     public ServerResponse deleteVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         this.projectVersionRepository.delete(projectVersion);
         return new ServerResponse("Project version deleted successfully");
-    }
-
-    /**
-     * Returns a project and associated artifacts at version associated with given id.
-     *
-     * @param versionId UUID of version whose artifacts and trace links are retrieved.
-     * @return ProjectCreationResponse containing artifacts, traces, and warnings of project at version specified.
-     * @throws SafaError Throws error if no version is associated with given id.
-     */
-    @GetMapping(AppRoutes.Projects.getVersionById)
-    public ServerResponse getVersionById(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        ProjectEntities response = this.projectRetrievalService
-            .retrieveAndCreateProjectResponse(projectVersion);
-        return new ServerResponse(response);
     }
 }

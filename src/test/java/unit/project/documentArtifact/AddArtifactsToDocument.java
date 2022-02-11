@@ -77,7 +77,6 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {
             JSONObject artifactAdded = artifactsAdded.getJSONObject(i);
-            System.out.println("ARTIFACT UPDATE:" + artifactAdded);
             JSONArray artifactDocuments = artifactAdded.getJSONArray("documentIds");
             assertThat(artifactDocuments.length()).isEqualTo(1);
             assertThat(artifactDocuments.get(0)).isEqualTo(document.getDocumentId().toString());

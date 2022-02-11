@@ -37,9 +37,14 @@ public class AppRoutes {
             + "/versions/{versionId}/links/generated";
         public static final String generateLinks = projectPrefix + "/links/generate";
 
+        // Retrieval of versioned entities
+        public static final String getProjectInVersion = projectPrefix + "/versions/{versionId}";
+        public static final String getArtifactsInVersion = getProjectInVersion + "/artifacts";
+        public static final String getTracesInVersion = getProjectInVersion + "/traces";
+        public static final String deleteVersionById = getProjectInVersion;
+
         // Version Controller
         public static final String getVersions = projectPrefix + "/{projectId}/versions";
-        public static final String getVersionById = projectPrefix + "/versions/{versionId}";
         public static final String getCurrentVersion = projectPrefix + "/{projectId}/versions/current";
         public static final String createNewMajorVersion = projectPrefix + "/{projectId}/versions/major";
         public static final String createNewMinorVersion = projectPrefix + "/{projectId}/versions/minor";

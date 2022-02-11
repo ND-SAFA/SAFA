@@ -52,6 +52,14 @@ public class Document implements Serializable {
     public Document() {
     }
 
+    public Document(Document document) {
+        this(document.project,
+            document.name,
+            document.description,
+            document.type);
+        this.documentId = document.getDocumentId();
+    }
+
     public Document(Project project, String name, String description, DocumentType type) {
         this.project = project;
         this.name = name;

@@ -1,16 +1,26 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -33,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentController extends BaseController {
 
     private final DocumentRepository documentRepository;
+    private final ArtifactRepository artifactRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
+
     private final NotificationService notificationService;
 
     @Autowired
@@ -40,29 +53,46 @@ public class DocumentController extends BaseController {
                               ProjectVersionRepository projectVersionRepository,
                               ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
+                              ArtifactRepository artifactRepository,
+                              DocumentArtifactRepository documentArtifactRepository,
                               NotificationService notificationService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
+        this.artifactRepository = artifactRepository;
+        this.documentArtifactRepository = documentArtifactRepository;
         this.notificationService = notificationService;
     }
 
     /**
      * Persists given document object as a new document a part of the specified project.
      *
-     * @param projectId The UUID of the project whose document is being accessed.
-     * @param document  The entity containing name, description, and type of document to be created.
+     * @param versionId         The UUID of the project version to who create the document and make
+     *                          the artifact additions to.
+     * @param documentAppEntity The entity containing name, description, and type of document to be created.
      * @return The updated or created document.
      * @throws SafaError Throws error if authorized user does not have edit permissions.
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateDocument)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateDocument(@PathVariable UUID projectId,
-                                                 @RequestBody @Valid Document document) throws SafaError {
-        Project project = resourceBuilder.fetchProject(projectId).withEditProject();
-        document.setProject(project);
+    public ServerResponse createOrUpdateDocument(@PathVariable UUID versionId,
+                                                 @RequestBody @Valid DocumentAppEntity documentAppEntity)
+        throws SafaError {
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        Project project = projectVersion.getProject();
+        documentAppEntity.setProject(projectVersion.getProject());
+
+        System.out.println("START");
+        Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
+        documentAppEntity.setDocumentId(document.getDocumentId());
+        this.createDocumentArtifactEntities(projectVersion, documentAppEntity.getArtifactIds(), document);
+        System.out.println("END");
+
         this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
-        return new ServerResponse(document);
+        if (documentAppEntity.getArtifactIds().size() > 0) {
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+        }
+        return new ServerResponse(documentAppEntity);
     }
 
     /**
@@ -76,8 +106,17 @@ public class DocumentController extends BaseController {
     public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
-        return new ServerResponse(projectDocuments);
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+                .stream()
+                .map(da -> da.getArtifact().getArtifactId().toString())
+                .collect(Collectors.toList());
+            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
+            documentAppEntities.add(documentAppEntity);
+
+        }
+        return new ServerResponse(documentAppEntities);
     }
 
     /**
@@ -94,5 +133,22 @@ public class DocumentController extends BaseController {
         resourceBuilder.setProject(project).withEditProject();
         this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         this.documentRepository.delete(document);
+    }
+
+    private void createDocumentArtifactEntities(ProjectVersion projectVersion,
+                                                List<String> artifactIds,
+                                                Document document) {
+        List<UUID> artifactUUIDs = artifactIds
+            .stream()
+            .map(UUID::fromString)
+            .collect(Collectors.toList());
+        for (UUID artifactId : artifactUUIDs) {
+            Optional<Artifact> artifactOptional = this.artifactRepository.findById(artifactId);
+            if (artifactOptional.isPresent()) {
+                Artifact artifact = artifactOptional.get();
+                DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
+                this.documentArtifactRepository.save(documentArtifact);
+            }
+        }
     }
 }

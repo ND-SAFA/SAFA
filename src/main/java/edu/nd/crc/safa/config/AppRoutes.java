@@ -23,7 +23,7 @@ public class AppRoutes {
         public static final String getUserProjects = projectPrefix;
 
         // Document Controller
-        public static final String createOrUpdateDocument = projectPrefix + "/{projectId}/documents";
+        public static final String createOrUpdateDocument = projectPrefix + "/versions/{versionId}/documents";
         public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";
         public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
 

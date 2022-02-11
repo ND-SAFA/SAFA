@@ -105,7 +105,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ProjectDocument } from "@/types";
-import { addNewDocument, editDocument } from "@/api";
+import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
 import { createDocument } from "@/util";
 import {
   artifactModule,
@@ -114,7 +114,6 @@ import {
   projectModule,
 } from "@/store";
 import { ArtifactInput, GenericIconButton, GenericModal } from "@/components";
-import { deleteDocument } from "@/api/endpoints/document-api";
 
 export default Vue.extend({
   name: "DocumentSelector",
@@ -171,14 +170,14 @@ export default Vue.extend({
       this.isCreateOpen = true;
     },
     handleAddDocument() {
-      addNewDocument(
-        createDocument(
-          projectModule.getProject,
-          this.artifactIds,
-          this.documentName
-        )
-      );
-      this.resetModalData();
+      addNewDocument(this.documentName, this.artifactIds)
+        .then(() => {
+          logModule.onSuccess(`Document created: ${this.documentName}`);
+          this.resetModalData();
+        })
+        .catch(() => {
+          logModule.onError(`Unable to create document: ${this.documentName}`);
+        });
     },
 
     handleEditOpen(document: ProjectDocument) {
@@ -194,21 +193,23 @@ export default Vue.extend({
       if (this.editingDocument) {
         this.editingDocument.name = this.documentName;
         this.editingDocument.artifactIds = this.artifactIds;
-        editDocument(this.editingDocument);
+        editDocument(this.editingDocument)
+          .then(() => {
+            logModule.onSuccess(`Document edited: ${this.documentName}`);
+            this.resetModalData();
+          })
+          .catch(() => {
+            logModule.onError(`Unable to edit document: ${this.documentName}`);
+          });
       }
-
-      this.resetModalData();
     },
     handleDeleteDocument() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else if (this.editingDocument) {
-        deleteDocument(this.editingDocument)
-          .then(async (document) => {
-            logModule.onSuccess(
-              `Successfully deleted document: ${document.name}`
-            );
-            await documentModule.removeDocument(document);
+        deleteAndSwitchDocuments(this.editingDocument)
+          .then(() => {
+            logModule.onSuccess(`Document Deleted: ${this.documentName}`);
             this.resetModalData();
           })
           .catch(() => {

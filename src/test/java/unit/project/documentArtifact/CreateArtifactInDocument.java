@@ -1,12 +1,10 @@
 package unit.project.documentArtifact;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -24,7 +22,7 @@ import unit.ApplicationBaseTest;
  * Tests that the client is able to add multiple artifact to some
  * specified document.
  */
-public class AddArtifactsToDocument extends ApplicationBaseTest {
+public class CreateArtifactInDocument extends ApplicationBaseTest {
 
     @Autowired
     DocumentArtifactRepository documentArtifactRepository;
@@ -33,7 +31,7 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
      * Verifies that the response object contains
      */
     @Test
-    public void testCreateNewDocument() throws Exception {
+    public void testCreateArtifactInDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
@@ -56,31 +54,21 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
         Document document = dbEntityBuilder.getDocument(projectName, docName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        // Step - Create request payload
+        // Step - Create new document payload
         JSONObject artifactJson = jsonBuilder
             .withProject(projectName, projectName, "")
             .withArtifactAndReturn(projectName, artifact.getArtifactId().toString(),
                 artifactName, artifactType,
                 artifactContent);
+        List<Object> documentIds = artifactJson.getJSONArray("documentIds").toList();
+        documentIds.add(document.getDocumentId().toString());
+        artifactJson.put("documentIds", documentIds);
         JSONArray requestPayload = new JSONArray();
         requestPayload.put(artifactJson);
 
-        // Step - Request artifact is added to document
-        String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.addArtifactsToDocument)
-            .withVersion(projectVersion)
-            .withDocument(document)
-            .get();
-        JSONObject response = sendPost(route, requestPayload, status().isOk());
-        JSONArray artifactsAdded = response.getJSONArray("body");
-
-        // VP - Verify that response object contains name, description, and type
-        for (int i = 0; i < artifactsAdded.length(); i++) {
-            JSONObject artifactAdded = artifactsAdded.getJSONObject(i);
-            JSONArray artifactDocuments = artifactAdded.getJSONArray("documentIds");
-            assertThat(artifactDocuments.length()).isEqualTo(1);
-            assertThat(artifactDocuments.get(0)).isEqualTo(document.getDocumentId().toString());
-        }
+        // Step -
+        CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withModifiedArtifact(artifactJson);
+        commit(commitBuilder);
 
         // VP - Verify single document created for project
         List<DocumentArtifact> projectDocuments = this.documentArtifactRepository.findByDocument(document);

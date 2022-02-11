@@ -1,21 +1,5 @@
-import { ProjectCreationResponse, ProjectVersion } from "@/types";
+import { ProjectVersion } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
-
-/**
- * Gets a specific version of a project.
- *
- * @param versionId - The project version ID to get.
- *
- * @return The matching project.
- */
-export async function getProjectVersion(
-  versionId: string
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    fillEndpoint(Endpoint.projectVersion, { versionId }),
-    { method: "GET" }
-  );
-}
 
 /**
  * Gets all versions of the given project.

@@ -1,9 +1,13 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectMessage, VersionMessage } from "@/types";
-import { projectModule, logModule } from "@/store";
+import { projectModule, logModule, artifactModule, traceModule } from "@/store";
 import { baseURL } from "@/api/util";
-import { getProjectVersion } from "@/api/endpoints/version-api";
+import {
+  getArtifactsInVersion,
+  getProjectVersion,
+  getTracesInVersion,
+} from "@/api/endpoints/entity-retrieval-api";
 import { setCreatedProject } from "@/api/handlers/set-project-handler";
 import { getProjectMembers } from "@/api";
 import { getProjectDocuments } from "@/api/endpoints/document-api";
@@ -165,11 +169,12 @@ async function versionMessageHandler(
     case "VERSION":
       return getProjectVersion(versionId).then(setCreatedProject);
     case "ARTIFACTS":
-      //TODO: Updating with route to get artifacts in version.
-      return getProjectVersion(versionId).then(setCreatedProject);
+      return getArtifactsInVersion(versionId).then((artifacts) => {
+        console.log("ARTIFACT", artifacts[0]);
+        artifactModule.addOrUpdateArtifacts(artifacts);
+      });
     case "TRACES":
-      ///TODO: Updating with route to get traces in version.
-      return getProjectVersion(versionId).then(setCreatedProject);
+      return getTracesInVersion(versionId).then(traceModule.SET_PROJECT_TRACES);
   }
 }
 

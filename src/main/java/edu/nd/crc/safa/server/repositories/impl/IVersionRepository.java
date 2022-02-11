@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.repositories.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.EntityDelta;
@@ -25,6 +26,16 @@ public interface IVersionRepository<
      * @return List of entities in project version.
      */
     List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
+
+    /**
+     * Returns the version of the entity specified by entity id in given project version.
+     *
+     * @param projectVersion The version of the entity to retrieve.
+     * @param entityId       The id of the base entity whose version is being retrieved.
+     * @return
+     */
+    Optional<VersionEntity> getEntityVersionsInProjectVersionByVersionId(ProjectVersion projectVersion,
+                                                                         String entityId);
 
     /**
      * Saves the state of given app entity to given project version.

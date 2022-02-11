@@ -50,7 +50,7 @@ public class AppRoutes {
 
         // Artifact Controller
         public static final String checkIfArtifactExists = projectPrefix
-            + "/{projectId}/artifacts/validate/{artifactName}";
+            + "/versions/{versionId}/artifacts/validate/{artifactName}";
         public static final String calculateProjectDelta = projectPrefix
             + "/delta/{baselineVersionId}/{targetVersionId}";
 

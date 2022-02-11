@@ -111,29 +111,55 @@ public class TestArtifactController extends ApplicationBaseTest {
     @Test
     public void testArtifactExists() throws Exception {
         String projectName = "test-project";
+
         String artifactName = "RE-10";
         String artifactType = "requirement";
-        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
+        String artifactSummary = "This is an artifact summary";
+        String artifactBody = "This is an artifact body";
+
+        // Step - Create project and new version.
+        ProjectVersion projectVersion = dbEntityBuilder
+            .newProject(projectName)
+            .newVersionWithReturn(projectName);
+
+        // VP - Verify that status is okay and artifact does not exist
         String url = RouteBuilder
             .withRoute(AppRoutes.Projects.checkIfArtifactExists)
-            .withProject(project)
+            .withVersion(projectVersion)
             .withArtifactName(artifactName)
             .get();
 
-        // VP - Verify that status is okay and artifact does not exist
         JSONObject response = sendGet(url, status().isOk());
         boolean artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
         assertThat(artifactExists).isFalse();
 
         // Step - Create artifact
-        dbEntityBuilder
+        Artifact artifact = dbEntityBuilder
             .newType(projectName, artifactType)
-            .newArtifact(projectName, artifactType, artifactName);
+            .newArtifactAndBody(projectName, artifactType, artifactName, artifactSummary, artifactBody)
+            .getArtifact(projectName, artifactName);
 
         // VP - Verify that status is okay and artifact does not exist
         response = sendGet(url, status().isOk());
         artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
         assertThat(artifactExists).isTrue();
+
+        // Step - Delete artifact
+        JSONObject artifactJson = this.jsonBuilder
+            .withProject(projectName, projectName, "")
+            .withArtifactAndReturn(
+                projectName,
+                artifact.getArtifactId().toString(),
+                artifactName,
+                artifactType,
+                artifactBody);
+        CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactJson);
+        commit(commitBuilder);
+
+        // VP - Verify that artifact no longer exists.
+        response = sendGet(url, status().isOk());
+        artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
+        assertThat(artifactExists).isFalse();
     }
 
     private Pair<ProjectVersion, JSONObject> createArtifact(String projectName,

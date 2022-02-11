@@ -76,7 +76,6 @@ public class DocumentController extends BaseController {
     public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         return new ServerResponse(projectDocuments);
     }
 

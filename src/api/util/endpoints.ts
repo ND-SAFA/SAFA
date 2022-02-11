@@ -31,8 +31,12 @@ export enum Endpoint {
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
 
-  //Versions
+  //Entity Retrieval
   projectVersion = "projects/versions/:versionId",
+  getArtifactsInVersion = "projects/versions/:versionId/artifacts",
+  getTracesInVersion = "projects/versions/:versionId/traces",
+
+  //Versions
   getProjectVersions = "projects/:projectId/versions",
   getCurrentVersion = "projects/:projectId/versions/current",
   createNewMajorVersion = "projects/:projectId/versions/major",

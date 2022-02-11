@@ -42,6 +42,7 @@ export default class ArtifactModule extends VuexModule {
    */
   async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
     const newIds = newArtifacts.map(({ id }) => id);
+    console.log("NEW ARTIFACT IDS:", newIds);
     const createNewArtifacts = (currentArtifacts: Artifact[]) => [
       ...currentArtifacts.filter(({ id }) => !newIds.includes(id)),
       ...newArtifacts,
@@ -84,6 +85,7 @@ export default class ArtifactModule extends VuexModule {
    */
   SET_PROJECT_ARTIFACTS(artifacts: Artifact[]): void {
     this.projectArtifacts = artifacts;
+    console.log("SETTING ARTIFACTS IN STORE:", artifacts);
   }
 
   @Mutation

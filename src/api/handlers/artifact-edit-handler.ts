@@ -21,10 +21,7 @@ export function createOrUpdateArtifactHandler(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const artifactPromise = isUpdate ? updateArtifact : createArtifact;
-    artifactPromise(versionId, artifact)
-      .then(() => artifactModule.addOrUpdateArtifacts([artifact]))
-      .then(resolve)
-      .catch(reject);
+    artifactPromise(versionId, artifact).then(resolve).catch(reject);
   });
 }
 

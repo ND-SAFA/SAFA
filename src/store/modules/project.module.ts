@@ -7,7 +7,7 @@ import type {
   ProjectMembership,
 } from "@/types";
 import { createProject } from "@/util";
-import { documentModule } from "@/store";
+import { documentModule, logModule } from "@/store";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -96,6 +96,18 @@ export default class ProjectModule extends VuexModule {
    */
   get versionId(): string | undefined {
     return this.project.projectVersion?.versionId;
+  }
+
+  /**
+   * Returns the version ID, and logs an error if there isnt one.
+   * @return The current version id.
+   */
+  get versionIdWithLog(): string | undefined {
+    if (!this.versionId) {
+      logModule.onWarning("Please select a project version.");
+    }
+
+    return this.versionId;
   }
 
   /**

@@ -19,10 +19,11 @@ export function createOrUpdateArtifactHandler(
   artifact: Artifact,
   isUpdate: boolean
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const artifactPromise = isUpdate ? updateArtifact : createArtifact;
-    artifactPromise(versionId, artifact).then(resolve).catch(reject);
-  });
+  if (isUpdate) {
+    return updateArtifact(versionId, artifact);
+  } else {
+    return createArtifact(versionId, artifact);
+  }
 }
 
 /**
@@ -35,10 +36,7 @@ export function deleteArtifactFromCurrentVersion(
   artifact: Artifact
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (projectModule.versionId === undefined) {
-      logModule.onWarning(
-        "A project version must be selected to delete an artifact."
-      );
+    if (!projectModule.versionIdWithLog) {
       return resolve();
     }
 

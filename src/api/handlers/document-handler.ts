@@ -1,4 +1,4 @@
-import { documentModule, logModule, projectModule } from "@/store";
+import { documentModule, projectModule } from "@/store";
 import { Project, ProjectDocument } from "@/types";
 import {
   createOrUpdateDocument,
@@ -6,13 +6,16 @@ import {
   getProjectDocuments,
 } from "@/api/endpoints/document-api";
 import { createDocument } from "@/util";
+import { reloadArtifactsHandler } from "@/api";
 
 /**
  * Adds documents to the given project object.
  *
  * @param project - The project to load documents for.
  */
-export async function loadProjectDocuments(project: Project): Promise<void> {
+export async function loadProjectDocuments(
+  project: Project = projectModule.getProject
+): Promise<void> {
   project.documents = await getProjectDocuments(project.projectId).catch(
     () => []
   );
@@ -28,19 +31,16 @@ export async function addNewDocument(
   documentName: string,
   artifactIds: string[]
 ): Promise<void> {
-  const versionId = projectModule.getProject.projectVersion?.versionId;
-  if (versionId !== undefined) {
-    const createdDocument = await createOrUpdateDocument(
-      versionId,
-      createDocument(projectModule.getProject, artifactIds, documentName)
-    );
-    documentModule.addDocument(createdDocument);
-    await documentModule.switchDocuments(createdDocument);
-  } else {
-    logModule.onWarning(
-      "Please select project version before creating document."
-    );
-  }
+  const versionId = projectModule.versionIdWithLog;
+
+  if (!versionId) return;
+
+  const createdDocument = await createOrUpdateDocument(
+    versionId,
+    createDocument(projectModule.getProject, artifactIds, documentName)
+  );
+
+  await documentModule.addDocument(createdDocument);
 }
 
 /**
@@ -49,17 +49,14 @@ export async function addNewDocument(
  * @param document - The document to edit.
  */
 export async function editDocument(document: ProjectDocument): Promise<void> {
-  const versionId = projectModule.getProject.projectVersion?.versionId;
-  if (versionId !== undefined) {
-    await createOrUpdateDocument(projectModule.projectId, document);
+  const versionId = projectModule.versionIdWithLog;
 
-    if (documentModule.document === document) {
-      await documentModule.switchDocuments(document);
-    }
-  } else {
-    logModule.onWarning(
-      "Please select a project version before editing a document."
-    );
+  if (!versionId) return;
+
+  await createOrUpdateDocument(versionId, document);
+
+  if (documentModule.document === document) {
+    await documentModule.switchDocuments(document);
   }
 }
 
@@ -73,4 +70,26 @@ export async function deleteAndSwitchDocuments(
 ): Promise<void> {
   await deleteDocument(document);
   await documentModule.removeDocument(document);
+}
+
+/**
+ * Updates the artifact IDs for the currently loaded document,
+ * and then reloads the project artifacts.
+ */
+export async function reloadDocumentArtifacts(): Promise<void> {
+  const currentDocument = documentModule.document;
+
+  if (currentDocument.documentId) {
+    (await getProjectDocuments(projectModule.projectId)).forEach(
+      (updatedDocument) => {
+        if (updatedDocument.documentId !== currentDocument.documentId) return;
+
+        currentDocument.artifactIds = updatedDocument.artifactIds;
+      }
+    );
+  }
+
+  if (!projectModule.versionId) return;
+
+  await reloadArtifactsHandler(projectModule.versionId);
 }

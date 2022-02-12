@@ -11,7 +11,7 @@ import {
 } from "@/store";
 import { connectAndSubscribeToVersion } from "@/api/endpoints";
 import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
-import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
+import { loadVersionIfExistsHandler } from "./load-version-handler";
 import { reloadTraceMatrices } from "./trace-matrix-handler";
 import { loadProjectDocuments } from "@/api";
 

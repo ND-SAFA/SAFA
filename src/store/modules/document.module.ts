@@ -15,6 +15,10 @@ export default class DocumentModule extends VuexModule {
    */
   private currentDocument: ProjectDocument = createDocument();
   /**
+   * The base document with all artifacts.
+   */
+  private baseDocument: ProjectDocument = createDocument();
+  /**
    * All project documents.
    */
   private allDocuments: ProjectDocument[] = [this.currentDocument];
@@ -40,7 +44,8 @@ export default class DocumentModule extends VuexModule {
       ({ documentId }) => documentId === currentDocumentId
     );
 
-    this.SET_ALL_DOCUMENTS([...documents, defaultDocument]);
+    this.SET_ALL_DOCUMENTS(documents);
+    this.SET_BASE_DOCUMENT(defaultDocument);
 
     if (loadedDocument) {
       const currentArtifactIds = loadedDocument.artifactIds;
@@ -76,12 +81,10 @@ export default class DocumentModule extends VuexModule {
   /**
    * Adds a new document.
    */
-  addDocument(document: ProjectDocument): void {
-    const documentCount = this.allDocuments.length;
-    const realDocuments = this.allDocuments.slice(0, documentCount - 1);
-    const defaultDocument = this.allDocuments[documentCount - 1];
+  async addDocument(document: ProjectDocument): Promise<void> {
+    this.SET_ALL_DOCUMENTS([...this.allDocuments, document]);
 
-    this.SET_ALL_DOCUMENTS([...realDocuments, document, defaultDocument]);
+    await this.switchDocuments(document);
   }
 
   @Action
@@ -96,7 +99,7 @@ export default class DocumentModule extends VuexModule {
     this.SET_ALL_DOCUMENTS(remainingDocuments);
 
     if (this.currentDocument.documentId === document.documentId) {
-      await this.switchDocuments(remainingDocuments[0]);
+      await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
     }
   }
 
@@ -116,11 +119,19 @@ export default class DocumentModule extends VuexModule {
     this.currentDocument = document;
   }
 
+  @Mutation
+  /**
+   * Sets the current document.
+   */
+  SET_BASE_DOCUMENT(document: ProjectDocument): void {
+    this.baseDocument = document;
+  }
+
   /**
    * @return The current document.
    */
   get projectDocuments(): ProjectDocument[] {
-    return this.allDocuments;
+    return [...this.allDocuments, this.baseDocument];
   }
 
   /**
@@ -128,6 +139,13 @@ export default class DocumentModule extends VuexModule {
    */
   get document(): ProjectDocument {
     return this.currentDocument;
+  }
+
+  /**
+   * @return The default document.
+   */
+  get defaultDocument(): ProjectDocument {
+    return this.baseDocument;
   }
 
   /**

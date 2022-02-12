@@ -1,16 +1,16 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectMessage, VersionMessage } from "@/types";
-import { projectModule, logModule, artifactModule, traceModule } from "@/store";
+import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/util";
-import {
-  getArtifactsInVersion,
-  getProjectVersion,
-  getTracesInVersion,
-} from "@/api/endpoints/entity-retrieval-api";
+import { getProjectVersion } from "@/api/endpoints/entity-retrieval-api";
 import { setCreatedProject } from "@/api/handlers/set-project-handler";
-import { getProjectMembers } from "@/api";
 import { getProjectDocuments } from "@/api/endpoints/document-api";
+import {
+  getProjectMembers,
+  reloadArtifactsHandler,
+  reloadTracesHandler,
+} from "@/api";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -169,11 +169,9 @@ async function versionMessageHandler(
     case "VERSION":
       return getProjectVersion(versionId).then(setCreatedProject);
     case "ARTIFACTS":
-      return getArtifactsInVersion(versionId).then((artifacts) => {
-        artifactModule.addOrUpdateArtifacts(artifacts);
-      });
+      return reloadArtifactsHandler(versionId);
     case "TRACES":
-      return getTracesInVersion(versionId).then(traceModule.SET_PROJECT_TRACES);
+      return reloadTracesHandler(versionId);
   }
 }
 

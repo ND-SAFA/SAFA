@@ -5,6 +5,7 @@ import {
   updateArtifact,
   deleteArtifactBody,
 } from "@/api/commits";
+import { reloadDocumentArtifacts, reloadTraceMatrices } from "@/api";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -14,15 +15,17 @@ import {
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
  */
-export function createOrUpdateArtifactHandler(
+export async function createOrUpdateArtifactHandler(
   versionId: string,
   artifact: Artifact,
   isUpdate: boolean
 ): Promise<void> {
   if (isUpdate) {
-    return updateArtifact(versionId, artifact);
+    await updateArtifact(versionId, artifact);
   } else {
-    return createArtifact(versionId, artifact);
+    await createArtifact(versionId, artifact);
+    await reloadDocumentArtifacts();
+    await reloadTraceMatrices();
   }
 }
 

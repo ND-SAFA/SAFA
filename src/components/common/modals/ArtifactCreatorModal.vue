@@ -45,11 +45,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, Artifact } from "@/types";
-import {
-  createOrUpdateArtifactHandler,
-  isArtifactNameTaken,
-  reloadDocumentArtifacts,
-} from "@/api";
+import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
 import {
   typeOptionsModule,
   logModule,
@@ -166,10 +162,6 @@ export default Vue.extend({
 
       createOrUpdateArtifactHandler(versionId, artifact, isUpdate)
         .then(async () => {
-          if (!isUpdate) {
-            await reloadDocumentArtifacts();
-          }
-
           this.$emit("close");
         })
         .catch((e) => {

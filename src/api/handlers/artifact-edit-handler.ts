@@ -1,11 +1,17 @@
 import { Artifact, ConfirmationType } from "@/types";
-import { artifactModule, logModule, projectModule } from "@/store";
+import {
+  artifactModule,
+  logModule,
+  projectModule,
+  viewportModule,
+} from "@/store";
 import {
   createArtifact,
   updateArtifact,
   deleteArtifactBody,
 } from "@/api/commits";
 import { reloadDocumentArtifacts, reloadTraceMatrices } from "@/api";
+import { cyCenterNodes } from "@/cytoscape";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -26,6 +32,8 @@ export async function createOrUpdateArtifactHandler(
     await createArtifact(versionId, artifact);
     await reloadDocumentArtifacts();
     await reloadTraceMatrices();
+    await viewportModule.setArtifactTreeLayout();
+    cyCenterNodes();
   }
 }
 

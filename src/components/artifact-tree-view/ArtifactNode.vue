@@ -94,14 +94,9 @@ export default Vue.extend({
       }
 
       const artifactId: string = this.artifactDefinition.id;
-      const addedArtifacts: Record<string, Artifact> =
-        deltaModule.addedArtifacts;
-      const removedArtifacts: Record<string, Artifact> =
-        deltaModule.removedArtifacts;
-      const modifiedArtifacts: Record<
-        string,
-        EntityModification<Artifact>
-      > = deltaModule.modifiedArtifacts;
+      const addedArtifacts = deltaModule.addedArtifacts;
+      const removedArtifacts = deltaModule.removedArtifacts;
+      const modifiedArtifacts = deltaModule.modifiedArtifacts;
 
       if (artifactId in addedArtifacts) {
         this.setAddedData(addedArtifacts[artifactId]);

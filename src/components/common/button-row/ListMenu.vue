@@ -91,7 +91,7 @@ export default Vue.extend({
   methods: {
     onItemClick(itemIndex: number, value: string): void {
       this.$props.definition.menuHandlers[itemIndex]("payload");
-      this.selectedValue = value;
+      this.definition.selectedItem = value;
     },
   },
 });

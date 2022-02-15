@@ -154,6 +154,11 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.fileSelectorOpen = false;
       this.currentStep = this.startStep;
+      if (this.project?.name) {
+        Vue.set(this.localSteps, 0, [this.project.name, true]);
+      } else {
+        Vue.set(this.localSteps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
+      }
       this.$emit("update:loading", false);
     },
     onClose() {

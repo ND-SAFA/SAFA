@@ -31,7 +31,12 @@ export default class SnackbarModule extends VuexModule {
    *
    * @param error - The error encountered.
    */
-  onServerError({ message, errors }: APIErrorBody): void {
+  onServerError(error: APIErrorBody | undefined): void {
+    const { message, errors } = error || {
+      message: "An unexpected error occurred.",
+      errors: [],
+    };
+
     this.SET_MESSAGE({
       message,
       type: MessageType.ERROR,

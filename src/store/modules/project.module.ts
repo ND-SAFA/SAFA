@@ -7,7 +7,14 @@ import type {
   ProjectMembership,
 } from "@/types";
 import { createProject } from "@/util";
-import { documentModule, logModule } from "@/store";
+import {
+  artifactModule,
+  documentModule,
+  logModule,
+  subtreeModule,
+  traceModule,
+} from "@/store";
+import { Artifact, TraceLink } from "@/types";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -23,18 +30,43 @@ export default class ProjectModule extends VuexModule {
   /**
    * Initializes the current project
    */
-  initializeProject(project: Project): void {
+  async initializeProject(project: Project): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
+    await subtreeModule.initializeProject(project);
   }
 
   @Action
   /**
    * Updates the project documents.
    */
-  updateDocuments(documents: ProjectDocument[]): void {
+  async updateDocuments(documents: ProjectDocument[]): Promise<void> {
     this.SET_DOCUMENTS(documents);
-    documentModule.initializeProject(this.project);
+    await documentModule.updateDocuments(documents);
+  }
+
+  @Action
+  /**
+   * Updates the current artifacts in the project, preserving any that already existed.
+   *
+   * @param artifacts - The artifacts to set.
+   */
+  async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
+    this.SET_ARTIFACTS(newArtifacts);
+    await artifactModule.addOrUpdateArtifacts(newArtifacts);
+    await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
+   * Updates the current trace links in the project, preserving any that already existed.
+   *
+   * @param traceLinks - The trace links to set.
+   */
+  async addOrUpdateTraceLinks(newTraces: TraceLink[]): Promise<void> {
+    this.SET_TRACES(newTraces);
+    await traceModule.addOrUpdateTraceLinks(newTraces);
+    await subtreeModule.updateSubtreeMap();
   }
 
   @Mutation
@@ -67,6 +99,22 @@ export default class ProjectModule extends VuexModule {
    */
   SET_MEMBERS(members: ProjectMembership[]): void {
     this.project.members = members;
+  }
+
+  @Mutation
+  /**
+   * Sets the current artifacts in the project.
+   */
+  SET_ARTIFACTS(artifacts: Artifact[]): void {
+    this.project.artifacts = artifacts;
+  }
+
+  @Mutation
+  /**
+   * Sets the current trace links in the project.
+   */
+  SET_TRACES(traces: TraceLink[]): void {
+    this.project.traces = traces;
   }
 
   @Mutation

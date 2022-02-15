@@ -1,6 +1,16 @@
-import { appModule, traceModule, viewportModule } from "@/store";
+import {
+  appModule,
+  documentModule,
+  projectModule,
+  subtreeModule,
+  viewportModule,
+} from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { getProjectVersion, getTracesInVersion } from "@/api/endpoints";
+import {
+  getArtifactsInVersion,
+  getProjectVersion,
+  getTracesInVersion,
+} from "@/api/endpoints";
 import {
   reloadDocumentArtifacts,
   reloadTraceMatrices,
@@ -34,7 +44,10 @@ export async function loadVersionIfExistsHandler(
  * @param versionId - The project version ID of the revision.
  */
 export async function reloadArtifactsHandler(versionId: string): Promise<void> {
-  await reloadDocumentArtifacts(versionId);
+  const artifacts = await getArtifactsInVersion(versionId);
+
+  await projectModule.addOrUpdateArtifacts(artifacts);
+  await reloadDocumentArtifacts();
   await reloadTraceMatrices();
 
   await viewportModule.setArtifactTreeLayout();
@@ -50,6 +63,6 @@ export async function reloadArtifactsHandler(versionId: string): Promise<void> {
 export async function reloadTracesHandler(versionId: string): Promise<void> {
   const traces = await getTracesInVersion(versionId);
 
-  await traceModule.addOrUpdateTraceLinks(traces);
+  await projectModule.addOrUpdateTraceLinks(traces);
   await reloadTraceMatrices();
 }

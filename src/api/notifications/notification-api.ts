@@ -5,9 +5,9 @@ import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/util";
 import {
   getProjectMembers,
-  getProjectDocuments,
   setCreatedProject,
   getProjectVersion,
+  reloadDocumentArtifacts,
 } from "@/api";
 import {
   reloadArtifactsHandler,
@@ -167,7 +167,7 @@ async function versionMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: VersionMessage = frame.body as VersionMessage;
-  console.log(message);
+
   switch (message) {
     case "VERSION":
       return getProjectVersion(versionId).then(setCreatedProject);
@@ -193,6 +193,6 @@ async function projectMessageHandler(
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
     case "DOCUMENTS":
-      return getProjectDocuments(projectId).then(projectModule.SET_DOCUMENTS);
+      return reloadDocumentArtifacts(projectId);
   }
 }

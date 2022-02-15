@@ -53,14 +53,18 @@ export async function setAndSubscribeToProject(
 
   await connectAndSubscribeToVersion(projectId, versionId);
   await loadProjectDocuments(project);
-  projectModule.initializeProject(project);
+  await projectModule.initializeProject(project);
   await resetGraphFocus(isDifferentProject);
-  await subtreeModule.initializeProject(project);
   await reloadTraceMatrices();
 }
 
+/**
+ * Clears project store data.
+ */
 export async function clearProject(): Promise<void> {
-  await setAndSubscribeToProject(createProject());
+  const project = createProject();
+
+  await projectModule.initializeProject(project);
 }
 
 /**

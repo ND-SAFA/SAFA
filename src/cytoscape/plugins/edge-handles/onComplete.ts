@@ -8,9 +8,7 @@ import {
   TraceType,
 } from "@/types";
 import { getTraceId } from "@/util";
-import { traceModule, viewportModule } from "@/store";
-import { createLink, reloadTraceMatrices } from "@/api";
-import { applyAutoMoveEvents } from "@/cytoscape/hooks";
+import { createLink } from "@/api";
 import { disableDrawMode } from "./edgeHandlesCore";
 
 /**

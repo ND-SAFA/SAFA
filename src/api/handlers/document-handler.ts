@@ -6,7 +6,6 @@ import {
   getProjectDocuments,
 } from "@/api/endpoints/document-api";
 import { createDocument } from "@/util";
-import { getArtifactsInVersion } from "@/api";
 
 /**
  * Adds documents to the given project object.
@@ -73,28 +72,18 @@ export async function deleteAndSwitchDocuments(
 }
 
 /**
- * Updates the artifact IDs for the currently loaded document.
+ * Updates the artifact IDs for the all documents.
  *
- * @param versionId - The project version ID of the revision.
+ * @param projectId - The project to load documents for.
  */
 export async function reloadDocumentArtifacts(
-  versionId: string
+  projectId = projectModule.projectId
 ): Promise<void> {
-  const currentDocument = documentModule.document;
+  const documents = await getProjectDocuments(projectId);
 
-  if (currentDocument.documentId) {
-    (await getProjectDocuments(projectModule.projectId)).forEach(
-      (updatedDocument) => {
-        if (updatedDocument.documentId !== currentDocument.documentId) return;
+  await documentModule.updateDocuments(documents);
 
-        currentDocument.artifactIds = updatedDocument.artifactIds;
-      }
-    );
-  }
-
-  const artifacts = await getArtifactsInVersion(versionId);
-
-  documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
-
-  await artifactModule.addOrUpdateArtifacts(artifacts);
+  documentModule.defaultDocument.artifactIds = artifactModule.allArtifacts.map(
+    ({ id }) => id
+  );
 }

@@ -76,47 +76,57 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.score = 0;
     }
 
-    public TraceLinkVersion(ProjectVersion projectVersion,
-                            ModificationType modificationType,
-                            TraceLink traceLink) {
-        this();
-        this.projectVersion = projectVersion;
-        this.modificationType = modificationType;
-        this.traceLink = traceLink;
-        this.traceType = TraceType.MANUAL;
-        this.approvalStatus = TraceApproval.APPROVED;
-        this.score = 1;
+    public static TraceLinkVersion createGeneratedLinkWithVersionAndModification(ProjectVersion projectVersion,
+                                                                                 ModificationType modificationType,
+                                                                                 TraceLink traceLink,
+                                                                                 double score) {
+        TraceLinkVersion traceLinkVersion = new TraceLinkVersion();
+        traceLinkVersion.projectVersion = projectVersion;
+        traceLinkVersion.modificationType = modificationType;
+        traceLinkVersion.traceLink = traceLink;
+        traceLinkVersion.score = score;
+        traceLinkVersion.traceType = TraceType.GENERATED;
+        traceLinkVersion.approvalStatus = TraceApproval.UNREVIEWED;
+
+        return traceLinkVersion;
     }
 
-    public TraceLinkVersion(ProjectVersion projectVersion,
-                            ModificationType modificationType,
-                            TraceLink traceLink,
-                            double score) {
-        this();
-        this.projectVersion = projectVersion;
-        this.modificationType = modificationType;
-        this.traceLink = traceLink;
-        this.score = score;
-        this.traceType = TraceType.GENERATED;
-        this.approvalStatus = TraceApproval.UNREVIEWED;
-    }
-
-    public TraceLinkVersion(TraceAppEntity traceAppEntity) {
-        this();
-        this.traceType = traceAppEntity.traceType == null ? TraceType.MANUAL : traceAppEntity.traceType;
-        this.approvalStatus = traceAppEntity.approvalStatus == null ? getDefaultApprovalStatus(this.traceType) :
+    public static TraceLinkVersion createLinkWithVersionAndModificationAndTraceAppEntity(
+        ProjectVersion projectVersion,
+        ModificationType modificationType,
+        TraceLink traceLink,
+        TraceAppEntity traceAppEntity) {
+        TraceLinkVersion traceLinkVersion = new TraceLinkVersion();
+        traceLinkVersion.traceType = traceAppEntity.traceType == null ? TraceType.MANUAL : traceAppEntity.traceType;
+        traceLinkVersion.approvalStatus = traceAppEntity.approvalStatus == null
+            ? getDefaultApprovalStatus(traceLinkVersion.traceType) :
             traceAppEntity.approvalStatus;
-        this.score = traceAppEntity.score == 0 ? this.score : traceAppEntity.score;
+        traceLinkVersion.score = traceAppEntity.score == 0 ? traceLinkVersion.score : traceAppEntity.score;
+        traceLinkVersion.projectVersion = projectVersion;
+        traceLinkVersion.modificationType = modificationType;
+        traceLinkVersion.traceLink = traceLink;
+
+        return traceLinkVersion;
     }
 
-    public TraceLinkVersion(ProjectVersion projectVersion,
-                            ModificationType modificationType,
-                            TraceLink traceLink,
-                            TraceAppEntity traceAppEntity) {
-        this(traceAppEntity);
-        this.projectVersion = projectVersion;
-        this.modificationType = modificationType;
-        this.traceLink = traceLink;
+    public static TraceLinkVersion createManualLinkWithVersionAndModification(ProjectVersion projectVersion,
+                                                                              ModificationType modificationType,
+                                                                              TraceLink traceLink) {
+        TraceLinkVersion traceLinkVersion = new TraceLinkVersion();
+        traceLinkVersion.projectVersion = projectVersion;
+        traceLinkVersion.modificationType = modificationType;
+        traceLinkVersion.traceLink = traceLink;
+        traceLinkVersion.traceType = TraceType.MANUAL;
+        traceLinkVersion.approvalStatus = TraceApproval.APPROVED;
+        traceLinkVersion.score = 1;
+        return traceLinkVersion;
+    }
+
+    private static TraceApproval getDefaultApprovalStatus(TraceType traceType) {
+        if (traceType == TraceType.MANUAL) {
+            return TraceApproval.APPROVED;
+        }
+        return TraceApproval.UNREVIEWED;
     }
 
     public UUID getTraceLinkVersionId() {
@@ -133,13 +143,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public void setTraceLink(TraceLink traceLink) {
         this.traceLink = traceLink;
-    }
-
-    private TraceApproval getDefaultApprovalStatus(TraceType traceType) {
-        if (traceType == TraceType.MANUAL) {
-            return TraceApproval.APPROVED;
-        }
-        return TraceApproval.UNREVIEWED;
     }
 
     public TraceType getTraceType() {

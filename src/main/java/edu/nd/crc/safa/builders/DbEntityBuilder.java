@@ -265,7 +265,7 @@ public class DbEntityBuilder extends BaseBuilder {
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
-        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+        TraceLinkVersion traceLinkVersion = TraceLinkVersion.createManualLinkWithVersionAndModification(
             projectVersion,
             ModificationType.ADDED,
             traceLink
@@ -285,7 +285,7 @@ public class DbEntityBuilder extends BaseBuilder {
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
-        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+        TraceLinkVersion traceLinkVersion = TraceLinkVersion.createGeneratedLinkWithVersionAndModification(
             projectVersion,
             ModificationType.ADDED,
             traceLink,

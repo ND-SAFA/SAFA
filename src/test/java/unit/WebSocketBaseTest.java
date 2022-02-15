@@ -121,6 +121,10 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      */
     public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
         String response = getNextMessage(clientId);
+        return toClass(response, targetClass);
+    }
+
+    public <T> T toClass(String response, Class<T> targetClass) throws JsonProcessingException {
         return mapper.readValue(response, targetClass);
     }
 

@@ -17,20 +17,20 @@ public class DefaultTreeRules {
 
     public static Rule atLeastOneRequirementOrDesignOrProcessForRequirement() {
         return new Rule("Missing child",
-            "Requirement should have at least one child requirement, design or process",
+            "Requirement should have at least one child requirement, design, or process.",
             "at-least-one(Requirement, child, Requirement) || at-least-one(Requirement, child, Design) || "
                 + "at-least-one(Requirement, child, Process)");
     }
 
     public static Rule requirementHasNoPackageLinks() {
         return new Rule("Missing child",
-            "Requirements must not have package children",
+            "Requirements must not have package children.",
             "exactly-n(0, Requirement, child, Package)");
     }
 
     public static Rule atLeastOnePackageForDesigns() {
         return new Rule("Missing child",
-            "Design Definitions should have at least one child package",
-            "at-least-one(DesignDefinition, child, Package)");
+            "Design Definitions should have at least one child package.",
+            "at-least-one(Designs, child, Package)");
     }
 }

@@ -81,12 +81,10 @@ public class DocumentController extends BaseController {
         Project project = projectVersion.getProject();
         documentAppEntity.setProject(projectVersion.getProject());
 
-        System.out.println("START");
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
         documentAppEntity.setDocumentId(document.getDocumentId());
         this.createDocumentArtifactEntities(projectVersion, documentAppEntity.getArtifactIds(), document);
-        System.out.println("END");
 
         this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
         if (documentAppEntity.getArtifactIds().size() > 0) {

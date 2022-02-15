@@ -59,14 +59,20 @@ public class TraceLinkVersionRepositoryImpl
                                                                 TraceAppEntity traceAppEntity) {
         switch (modificationType) {
             case ADDED:
-                return new TraceLinkVersion(projectVersion,
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
                     ModificationType.ADDED,
                     traceLink,
                     traceAppEntity);
+            case MODIFIED:
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
+                    ModificationType.MODIFIED,
+                    traceLink,
+                    traceAppEntity);
             case REMOVED:
-                return new TraceLinkVersion(projectVersion,
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
                     ModificationType.REMOVED,
-                    traceLink);
+                    traceLink,
+                    traceAppEntity);
             default:
                 throw new RuntimeException("Missing case in delta service.");
         }
@@ -140,7 +146,8 @@ public class TraceLinkVersionRepositoryImpl
     @Override
     public TraceLinkVersion createRemovedVersionEntity(ProjectVersion projectVersion,
                                                        TraceLink traceLink) {
-        return new TraceLinkVersion(
+        //TODO: Need to remove assumption that removed links are manual
+        return TraceLinkVersion.createManualLinkWithVersionAndModification(
             projectVersion,
             ModificationType.REMOVED,
             traceLink

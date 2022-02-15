@@ -2,7 +2,6 @@ package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -81,10 +80,7 @@ public class VersionedEntityRetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.getTracesInVersion)
     public ServerResponse getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        List<ArtifactAppEntity> artifacts = this.projectRetrievalService.getArtifactInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
-        List<TraceAppEntity> traces = this.projectRetrievalService.getTracesInProjectVersion(
-            projectVersion, artifactIds);
+        List<TraceAppEntity> traces = this.projectRetrievalService.getTracesInProjectVersion(projectVersion);
         return new ServerResponse(traces);
     }
 }

@@ -134,6 +134,15 @@ public class ProjectRetrievalService {
         return artifacts;
     }
 
+    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion) {
+        List<ArtifactAppEntity> projectVersionArtifacts = getArtifactInProjectVersion(projectVersion);
+        List<String> projectVersionArtifactIds = projectVersionArtifacts
+            .stream()
+            .map(ArtifactAppEntity::getId)
+            .collect(Collectors.toList());
+        return getTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
+    }
+
     /**
      * Returns the list of traces currently active in given version.
      *

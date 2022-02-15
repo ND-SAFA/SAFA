@@ -138,7 +138,7 @@ public class SmokeTests extends ApplicationBaseTest {
         assertThat(violatedRules.size()).isEqualTo(1);
         assertThat(violatedRules.get(targetId).size()).isEqualTo(2);
         String targetRule = violatedRules.get(targetId).get(0).toString();
-        assertThat(targetRule).contains("design or process");
+        assertThat(targetRule).contains("design").contains("process");
         targetRule = violatedRules.get(targetId).get(1).toString();
         assertThat(targetRule).contains("must not have package children");
     }

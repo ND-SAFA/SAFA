@@ -16,39 +16,46 @@ import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.ApplicationBaseTest;
 
 /**
  * Tests that generated trace links are able to be reviewed.
  */
-public class TestLinkApproval extends ApplicationBaseTest {
+public class TestLinkApproval extends TraceBaseTest {
 
     @Test
-    public void testGetGeneratedLinks() throws Exception {
+    public void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
+        String artifactSummary = "This is a summary.";
+        String artifactBody = "This is a body.";
         double score = 0.2;
 
-        dbEntityBuilder
+        // Step - Create project, version, source/target artifacts, and generated link between them.
+        Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newType(projectName, "A")
             .newType(projectName, "B")
-            .newArtifact(projectName, "A", sourceName)
-            .newArtifact(projectName, "B", targetName)
-            .newGeneratedTraceLink(projectName, sourceName, targetName, score, 0);
+            .newArtifactAndBody(projectName, "A", sourceName, artifactSummary, artifactBody)
+            .newArtifactAndBody(projectName, "B", targetName, artifactSummary, artifactBody)
+            .newGeneratedTraceLink(projectName, sourceName, targetName, score, 0)
+            .getProject(projectName);
 
+        // Step - Get generated links for project version
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
         JSONObject response = sendGet(url, status().isOk());
         JSONArray links = response.getJSONArray("body");
+
+        // VP - Verify that single generated link is returned.
         assertThat(links.length()).isEqualTo(1);
+
+        // VP - Verify that link is the same as the one created.
         assertThat(links.getJSONObject(0).getString("sourceName")).isEqualTo(sourceName);
         assertThat(links.getJSONObject(0).getString("targetName")).isEqualTo(targetName);
     }
@@ -195,29 +202,5 @@ public class TestLinkApproval extends ApplicationBaseTest {
 
         // VP - Verify that link created
         assertTraceExists(project, sourceName, targetName);
-    }
-
-    private void assertTraceExists(Project project, String sourceName, String targetName) {
-        assertTraceStatus(project, sourceName, targetName, true);
-    }
-
-    private void assertTraceDoesNotExist(Project project, String sourceName, String targetName) {
-        assertTraceStatus(project, sourceName, targetName, false);
-    }
-
-    private void assertTraceStatus(Project project, String sourceName, String targetName, boolean exists) {
-        Optional<TraceLink> traceLinkQuery =
-            this.traceLinkRepository.getByProjectAndSourceAndTarget(project,
-                sourceName,
-                targetName);
-        assertThat(traceLinkQuery.isPresent()).isEqualTo(exists);
-    }
-
-    private String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
-
-        return RouteBuilder
-            .withRoute(AppRoutes.Projects.getGeneratedLinksInProjectVersion)
-            .withVersion(projectVersion)
-            .get();
     }
 }

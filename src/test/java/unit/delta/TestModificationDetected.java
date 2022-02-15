@@ -64,16 +64,29 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .getArtifacts()
             .stream().map(a -> a.name)
             .collect(Collectors.toList());
+
+        // VP - Verify added artifact does not exist in before version.
         assertThat(beforeArtifactNames.contains("D12")).isFalse();
         assertThat(beforeArtifactNames.contains("D7")).isTrue();
+
+        // VP - Verify that no artifacts were added to before version.
         assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+
+        // Step - Collect list of artifact names in the after version.
         ProjectAppEntity afterAppEntity = this.projectRetrievalService.retrieveApplicationEntity(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
-            .stream().map(a -> a.name)
+            .stream()
+            .map(a -> a.name)
             .collect(Collectors.toList());
-        assertThat(afterArtifactNames.contains("D12")).isTrue();
+
+        // VP - Verify that artifact removed in after version is not returned.
         assertThat(afterArtifactNames.contains("D7")).isFalse();
+
+        // VP - Verify that artifact added in after version is retrieved.
+        assertThat(afterArtifactNames.contains("D12")).isTrue();
+
+        // VP - Verify that no extra artifacts where created.
         assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // VP - Verify that trace link changes are detected

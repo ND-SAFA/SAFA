@@ -1,7 +1,7 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { TraceLink, LinkFinder, LinkValidator } from "@/types";
-import { DocumentTraces } from "@/types";
+import type { LinkFinder, LinkValidator, TraceLink } from "@/types";
+import { DocumentTraces, TraceApproval } from "@/types";
 import { subtreeModule, viewportModule } from "@/store";
 import { getTraceId } from "@/util";
 import { applyAutoMoveEvents, artifactTreeCyPromise } from "@/cytoscape";
@@ -112,6 +112,15 @@ export default class TraceModule extends VuexModule {
    */
   get traces(): TraceLink[] {
     return this.currentTraces;
+  }
+
+  /**
+   * @return All non-declined trace links.
+   */
+  get nonDeclinedTraces(): TraceLink[] {
+    return this.currentTraces.filter(
+      (t) => t.approvalStatus != TraceApproval.DECLINED
+    );
   }
 
   /**

@@ -25,7 +25,6 @@
 
       <v-card-actions
         v-if="actionsHeight > 0"
-        class="grey lighten-1"
         dense
         :style="`height: ${actionsHeight}px`"
       >

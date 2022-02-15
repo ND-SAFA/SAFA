@@ -28,7 +28,7 @@ export interface Artifact {
   /**
    * The ids of documents that display this artifact.
    */
-  documentIds?: string[];
+  documentIds: string[];
 }
 
 /**

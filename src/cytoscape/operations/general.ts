@@ -68,17 +68,11 @@ export function cyZoomOut(cyPromise: CyPromise = artifactTreeCyPromise): void {
  *
  * @param cyPromise - The cy instance.
  */
-export function cyCenterNodes(cyPromise: CyPromise = timTreeCyPromise): void {
+export function cyCenterNodes(
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
   cyPromise.then((cy) => {
-    appModule.SET_IS_LOADING(true);
-
-    setTimeout(() => {
-      cy.animate({
-        center: { eles: cy.nodes() },
-        duration: ANIMATION_DURATION,
-        complete: () => appModule.SET_IS_LOADING(false),
-      });
-    }, 250);
+    cy.center(cy.nodes());
   });
 }
 

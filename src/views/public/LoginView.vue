@@ -8,7 +8,7 @@
         :error-messages="isError ? ['Invalid username or password'] : []"
         @keydown.enter="handleLogin"
       />
-      <password-field v-model="password" @submit="handleLogin" />
+      <password-field v-model="password" @enter="handleLogin" />
     </template>
 
     <template v-slot:actions>

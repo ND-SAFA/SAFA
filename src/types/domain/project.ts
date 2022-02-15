@@ -103,13 +103,17 @@ export interface ProjectDocument {
    */
   documentId: string;
   /**
-   * The id of the project associated with this document.
+   * The project associated with this document.
    */
-  projectId: string;
+  project: ProjectIdentifier;
   /**
    * The name of the document.
    */
   name: string;
+  /**
+   * The description of the document.
+   */
+  description: string;
   /**
    * The type of document.
    */

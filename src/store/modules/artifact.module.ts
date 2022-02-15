@@ -3,7 +3,11 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import type { Artifact, ArtifactQueryFunction } from "@/types";
 import { DocumentArtifacts } from "@/types";
 import { getSingleQueryResult } from "@/util";
-import { artifactSelectionModule, subtreeModule } from "@/store";
+import {
+  artifactSelectionModule,
+  documentModule,
+  subtreeModule,
+} from "@/store";
 
 @Module({ namespaced: true, name: "artifact" })
 /**
@@ -24,7 +28,8 @@ export default class ArtifactModule extends VuexModule {
    * Initializes the artifacts visible in the current document.
    */
   initializeArtifacts(documentArtifacts: DocumentArtifacts): void {
-    const { artifacts, currentArtifactIds } = documentArtifacts;
+    const { artifacts = this.projectArtifacts, currentArtifactIds } =
+      documentArtifacts;
 
     this.SET_PROJECT_ARTIFACTS(artifacts);
     this.SET_CURRENT_ARTIFACTS(
@@ -42,14 +47,19 @@ export default class ArtifactModule extends VuexModule {
    */
   async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
     const newIds = newArtifacts.map(({ id }) => id);
-    console.log("NEW ARTIFACT IDS:", newIds);
-    const createNewArtifacts = (currentArtifacts: Artifact[]) => [
-      ...currentArtifacts.filter(({ id }) => !newIds.includes(id)),
+    const visibleIds = documentModule.document.artifactIds;
+
+    const updatedArtifacts = [
+      ...this.projectArtifacts.filter(({ id }) => !newIds.includes(id)),
       ...newArtifacts,
     ];
 
-    this.SET_PROJECT_ARTIFACTS(createNewArtifacts(this.projectArtifacts));
-    this.SET_CURRENT_ARTIFACTS(createNewArtifacts(this.currentArtifacts));
+    const visibleArtifacts = updatedArtifacts.filter(({ id }) =>
+      visibleIds.includes(id)
+    );
+
+    this.SET_PROJECT_ARTIFACTS(updatedArtifacts);
+    this.SET_CURRENT_ARTIFACTS(visibleArtifacts);
 
     await subtreeModule.updateSubtreeMap();
 
@@ -85,7 +95,6 @@ export default class ArtifactModule extends VuexModule {
    */
   SET_PROJECT_ARTIFACTS(artifacts: Artifact[]): void {
     this.projectArtifacts = artifacts;
-    console.log("SETTING ARTIFACTS IN STORE:", artifacts);
   }
 
   @Mutation

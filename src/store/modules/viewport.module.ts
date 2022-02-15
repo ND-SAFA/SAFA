@@ -114,9 +114,11 @@ export default class ViewportModule extends VuexModule {
    */
   centerOnRootNode(cyPromise: Promise<CytoCore> = artifactTreeCyPromise): void {
     cyPromise.then((cy) => {
-      getRootNode(cy)
-        .then((rootNode) => this.centerOnArtifacts([rootNode.data()?.id]))
-        .catch((e) => console.warn(e.message));
+      getRootNode(cy).then((rootNode) => {
+        if (!rootNode) return;
+
+        this.centerOnArtifacts([rootNode.data()?.id]);
+      });
     });
   }
 

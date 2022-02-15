@@ -129,7 +129,6 @@ export default Vue.extend({
       this.hasErrors = hasErrors;
     },
     clearData(): void {
-      console.log("CLEARING DATA");
       this.userEmail = "";
       this.userRole = undefined;
     },

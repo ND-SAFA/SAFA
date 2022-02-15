@@ -6,6 +6,15 @@ $color-border: #888888;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
+.artifact-tree {
+  opacity: 0;
+
+  &.visible {
+    transition: opacity 0.25s ease-in-out;
+    opacity: 100;
+  }
+}
+
 .artifact-container {
   display: flex;
   flex-direction: column;

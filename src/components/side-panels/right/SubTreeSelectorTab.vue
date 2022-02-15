@@ -14,7 +14,7 @@
         />
       </v-row>
       <v-row>
-        <v-list class="search-container">
+        <v-list class="search-container full-width">
           <v-list-group
             v-for="type in artifactTypes"
             :key="type"

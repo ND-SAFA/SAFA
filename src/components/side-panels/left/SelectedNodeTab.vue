@@ -3,7 +3,14 @@
     <div v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
-          <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <h1 v-on="on" v-bind="attrs" class="text-h4 artifact-title">
+                {{ selectedArtifact.name }}
+              </h1>
+            </template>
+            {{ selectedArtifact.name }}
+          </v-tooltip>
         </v-col>
         <v-col>
           <v-row justify="end" class="mr-1">
@@ -197,5 +204,10 @@ export default Vue.extend({
 <style scoped>
 .v-expansion-panel::before {
   box-shadow: none;
+}
+.artifact-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 135px;
 }
 </style>

@@ -75,11 +75,9 @@ export default Vue.extend({
       navigateTo(Routes.ARTIFACT_TREE);
     },
     loadGeneratedLinks() {
-      const versionId = projectModule.versionId;
+      const versionId = projectModule.versionIdWithLog;
 
-      if (!versionId) {
-        return logModule.onWarning("No project has been selected");
-      }
+      if (!versionId) return;
 
       getGeneratedLinks(versionId).then((links) => {
         links.forEach((link) => {

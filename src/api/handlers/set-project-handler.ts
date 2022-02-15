@@ -4,16 +4,38 @@ import {
   appModule,
   artifactSelectionModule,
   deltaModule,
-  documentModule,
   errorModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { connectAndSubscribeToVersion } from "@/api/endpoints";
+import {
+  connectAndSubscribeToVersion,
+  reloadTraceMatrices,
+  loadVersionIfExistsHandler,
+  loadProjectDocuments,
+} from "@/api";
 import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
-import { loadVersionIfExistsHandler } from "./load-version-if-exists-handler";
-import { reloadTraceMatrices } from "./trace-matrix-handler";
+
+/**
+ * Resets graph state when some or all of a project gets reloaded.
+ *
+ * @param isDifferentProject - If true, all nodes will be unhidden and the viewport will be reset.
+ */
+export async function resetGraphFocus(
+  isDifferentProject = true
+): Promise<void> {
+  if (isDifferentProject) {
+    await subtreeModule.resetHiddenNodes();
+    await viewportModule.setArtifactTreeLayout();
+    cyCenterNodes();
+  }
+
+  disableDrawMode();
+  artifactSelectionModule.clearSelections();
+  deltaModule.clearDelta();
+  appModule.closeSidePanels();
+}
 
 /**
  1. Sets a new project.
@@ -30,25 +52,19 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
-  artifactSelectionModule.clearSelections();
-  projectModule.SAVE_PROJECT(project);
-  documentModule.initializeProject(project);
-
-  if (isDifferentProject) {
-    await subtreeModule.resetHiddenNodes();
-    await viewportModule.setArtifactTreeLayout();
-    cyCenterNodes();
-  }
-
-  disableDrawMode();
-  deltaModule.clearDelta();
-  appModule.closeSidePanels();
-  await subtreeModule.initializeProject(project);
+  await loadProjectDocuments(project);
+  await projectModule.initializeProject(project);
+  await resetGraphFocus(isDifferentProject);
   await reloadTraceMatrices();
 }
 
+/**
+ * Clears project store data.
+ */
 export async function clearProject(): Promise<void> {
-  await setAndSubscribeToProject(createProject());
+  const project = createProject();
+
+  await projectModule.initializeProject(project);
 }
 
 /**

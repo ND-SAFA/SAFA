@@ -3,15 +3,15 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * Creates given document under project specified.
- * @param project The project to create the document under.
+ * @param versionId - The version to mark the document as created.
  * @param document The document to be created.
  */
 export async function createOrUpdateDocument(
-  project: Project,
+  versionId: string,
   document: ProjectDocument
 ): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.createOrUpdateDocument, {
-    projectId: project.projectId,
+    versionId,
   });
   return authHttpClient<ProjectDocument>(url, {
     method: "POST",
@@ -39,13 +39,18 @@ export async function getProjectDocuments(
  * permissions on the project.
  * @param document The document to be deleted.
  */
-export async function deleteDocument(document: ProjectDocument): Promise<void> {
+export async function deleteDocument(
+  document: ProjectDocument
+): Promise<ProjectDocument> {
   const url = fillEndpoint(Endpoint.deleteDocument, {
     documentId: document.documentId,
   });
-  return authHttpClient<void>(url, {
+
+  await authHttpClient<void>(url, {
     method: "DELETE",
   });
+
+  return document;
 }
 
 /**

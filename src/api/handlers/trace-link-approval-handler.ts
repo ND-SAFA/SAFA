@@ -19,7 +19,6 @@ export async function approveLinkAPIHandler(
       onSuccess();
     }
 
-    await artifactSelectionModule.selectArtifact(link.sourceId);
     await traceModule.addOrUpdateTraceLinks([link]);
   });
 }
@@ -41,7 +40,6 @@ export async function declineLinkAPIHandler(
       onSuccess();
     }
 
-    await artifactSelectionModule.selectArtifact(link.sourceId);
     await traceModule.deleteTraceLink(link);
   });
 }

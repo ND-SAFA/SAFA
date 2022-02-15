@@ -9,11 +9,13 @@ import {
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { connectAndSubscribeToVersion } from "@/api/endpoints";
+import {
+  connectAndSubscribeToVersion,
+  reloadTraceMatrices,
+  loadVersionIfExistsHandler,
+  loadProjectDocuments,
+} from "@/api";
 import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
-import { loadVersionIfExistsHandler } from "./load-version-handler";
-import { reloadTraceMatrices } from "./trace-matrix-handler";
-import { loadProjectDocuments } from "@/api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.

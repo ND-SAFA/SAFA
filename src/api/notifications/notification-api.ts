@@ -3,14 +3,16 @@ import Stomp, { Client, Frame } from "webstomp-client";
 import { ProjectMessage, VersionMessage } from "@/types";
 import { projectModule, logModule } from "@/store";
 import { baseURL } from "@/api/util";
-import { getProjectVersion } from "@/api/endpoints/entity-retrieval-api";
-import { setCreatedProject } from "@/api/handlers/set-project-handler";
-import { getProjectDocuments } from "@/api/endpoints/document-api";
 import {
   getProjectMembers,
+  getProjectDocuments,
+  setCreatedProject,
+  getProjectVersion,
+} from "@/api";
+import {
   reloadArtifactsHandler,
   reloadTracesHandler,
-} from "@/api";
+} from "./load-version-handler";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -165,6 +167,7 @@ async function versionMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: VersionMessage = frame.body as VersionMessage;
+  console.log(message);
   switch (message) {
     case "VERSION":
       return getProjectVersion(versionId).then(setCreatedProject);

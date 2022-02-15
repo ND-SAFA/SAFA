@@ -14,7 +14,7 @@
       <v-container>
         <v-row>
           <v-container>
-            <v-row style="width: 100%">
+            <v-row class="full-width">
               <slot name="before-rows" />
             </v-row>
             <v-row>

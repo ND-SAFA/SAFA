@@ -2,7 +2,7 @@
   <v-container>
     <v-card outlined elevation="1">
       <v-row>
-        <v-stepper v-model="currentStep" style="width: 100%" alt-labels>
+        <v-stepper v-model="currentStep" class="full-width" alt-labels>
           <v-stepper-header>
             <template v-for="(stepName, stepIndex) in stepNames">
               <v-stepper-step

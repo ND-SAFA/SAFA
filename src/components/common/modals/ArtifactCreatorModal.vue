@@ -158,8 +158,6 @@ export default Vue.extend({
 
       const isUpdate = this.artifact !== undefined;
 
-      console.log(documentModule.document, artifact);
-
       createOrUpdateArtifactHandler(versionId, artifact, isUpdate)
         .then(async () => {
           this.$emit("close");

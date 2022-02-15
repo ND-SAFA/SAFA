@@ -14,9 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { sessionModule } from "@/store";
-import { loadLastProject, logout } from "@/api";
-import { Routes } from "@/router";
+import { verifyAuthentication } from "@/api";
 import { Snackbar } from "@/components";
 
 export default Vue.extend({
@@ -25,14 +23,7 @@ export default Vue.extend({
     Snackbar,
   },
   async mounted() {
-    const isAuthorized = await sessionModule.hasAuthorization();
-    const location = window.location.href;
-
-    if (!isAuthorized) {
-      await logout();
-    } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
-      await loadLastProject();
-    }
+    await verifyAuthentication();
   },
 });
 </script>

@@ -47,13 +47,6 @@ export function onArtifactTreeEdgeComplete(
   createLink(traceLink)
     .then(async () => {
       addedEdge.remove();
-
-      await traceModule.addOrUpdateTraceLinks([traceLink]);
-      await reloadTraceMatrices();
-
-      if (viewportModule.currentLayout) {
-        applyAutoMoveEvents(cy, viewportModule.currentLayout);
-      }
     })
     .catch((e) => console.error(e));
 }

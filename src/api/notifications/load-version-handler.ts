@@ -1,18 +1,12 @@
-import {
-  appModule,
-  artifactModule,
-  documentModule,
-  traceModule,
-} from "@/store";
+import { appModule, traceModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
+import { getProjectVersion, getTracesInVersion } from "@/api/endpoints";
 import {
-  getArtifactsInVersion,
-  getProjectVersion,
-  getTracesInVersion,
-} from "@/api/endpoints";
-import { setCreatedProject } from "./set-project-handler";
-import { Frame } from "webstomp-client";
-import { VersionMessage } from "@/types";
+  reloadDocumentArtifacts,
+  reloadTraceMatrices,
+  setCreatedProject,
+} from "@/api";
+import { cyCenterNodes } from "@/cytoscape";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -34,19 +28,21 @@ export async function loadVersionIfExistsHandler(
 }
 
 /**
+ * Call this function whenever artifacts need to be re-downloaded.
  * Reloads project artifacts for the given version.
  *
  * @param versionId - The project version ID of the revision.
  */
 export async function reloadArtifactsHandler(versionId: string): Promise<void> {
-  const artifacts = await getArtifactsInVersion(versionId);
+  await reloadDocumentArtifacts(versionId);
+  await reloadTraceMatrices();
 
-  documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
-
-  await artifactModule.addOrUpdateArtifacts(artifacts);
+  await viewportModule.setArtifactTreeLayout();
+  cyCenterNodes();
 }
 
 /**
+ * Call this function whenever trace links need to be re-downloaded.
  * Reloads project traces for the given version.
  *
  * @param versionId - The project version ID of the revision.
@@ -55,4 +51,5 @@ export async function reloadTracesHandler(versionId: string): Promise<void> {
   const traces = await getTracesInVersion(versionId);
 
   await traceModule.addOrUpdateTraceLinks(traces);
+  await reloadTraceMatrices();
 }

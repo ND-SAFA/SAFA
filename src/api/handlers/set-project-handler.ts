@@ -15,7 +15,7 @@ import {
   loadVersionIfExistsHandler,
   loadProjectDocuments,
 } from "@/api";
-import { cyCenterNodes, disableDrawMode } from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -28,7 +28,6 @@ export async function resetGraphFocus(
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();
     await viewportModule.setArtifactTreeLayout();
-    cyCenterNodes();
   }
 
   disableDrawMode();

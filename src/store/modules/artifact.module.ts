@@ -45,15 +45,8 @@ export default class ArtifactModule extends VuexModule {
    *
    * @param artifacts - The artifacts to set.
    */
-  async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
-    const newIds = newArtifacts.map(({ id }) => id);
+  async addOrUpdateArtifacts(updatedArtifacts: Artifact[]): Promise<void> {
     const visibleIds = documentModule.document.artifactIds;
-
-    const updatedArtifacts = [
-      ...this.projectArtifacts.filter(({ id }) => !newIds.includes(id)),
-      ...newArtifacts,
-    ];
-
     const visibleArtifacts = updatedArtifacts.filter(({ id }) =>
       visibleIds.includes(id)
     );
@@ -66,7 +59,7 @@ export default class ArtifactModule extends VuexModule {
     const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
 
     if (selectedArtifact !== undefined) {
-      const query = newArtifacts.filter(
+      const query = updatedArtifacts.filter(
         ({ name }) => name === selectedArtifact.name
       );
       if (query.length > 0) {

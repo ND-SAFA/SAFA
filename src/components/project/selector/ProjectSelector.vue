@@ -71,7 +71,7 @@ import { projectSelectorHeaders } from "./headers";
  * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
-  name: "ProjectSelector",
+  name: "project-selector",
   components: {
     GenericSelector,
     ProjectIdentifierModal,

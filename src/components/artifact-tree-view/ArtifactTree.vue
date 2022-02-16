@@ -11,7 +11,7 @@
         :opacity="getArtifactOpacity(artifact.id)"
       />
       <generic-graph-link
-        v-for="traceLink in traces"
+        v-for="traceLink in nonDeclinedTraces"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
@@ -83,8 +83,8 @@ export default Vue.extend({
     artifacts(): Artifact[] {
       return artifactModule.artifacts;
     },
-    traces(): TraceLink[] {
-      return traceModule.traces;
+    nonDeclinedTraces(): TraceLink[] {
+      return traceModule.nonDeclinedTraces;
     },
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;

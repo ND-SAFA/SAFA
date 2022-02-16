@@ -1,10 +1,9 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { TraceLink, LinkFinder, LinkValidator } from "@/types";
-import { DocumentTraces } from "@/types";
-import { subtreeModule, viewportModule } from "@/store";
+import type { LinkFinder, LinkValidator, TraceLink } from "@/types";
+import { DocumentTraces, TraceApproval } from "@/types";
+import { documentModule, subtreeModule } from "@/store";
 import { getTraceId } from "@/util";
-import { applyAutoMoveEvents, artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "trace" })
 /**
@@ -45,25 +44,15 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLinks - The trace links to set.
    */
-  async addOrUpdateTraceLinks(newTraces: TraceLink[]): Promise<void> {
-    const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
-    const createNewLinks = (currentTraces: TraceLink[]) => [
-      ...currentTraces.filter(
-        ({ traceLinkId }) => !newIds.includes(traceLinkId)
-      ),
-      ...newTraces,
-    ];
+  async addOrUpdateTraceLinks(updatedTraces: TraceLink[]): Promise<void> {
+    const visibleIds = documentModule.document.artifactIds;
+    const visibleTraces = updatedTraces.filter(
+      ({ sourceId, targetId }) =>
+        visibleIds.includes(sourceId) && visibleIds.includes(targetId)
+    );
 
-    this.SET_PROJECT_TRACES(createNewLinks(this.projectTraces));
-    this.SET_CURRENT_TRACES(createNewLinks(this.currentTraces));
-
-    await subtreeModule.updateSubtreeMap();
-
-    artifactTreeCyPromise.then((cy) => {
-      if (viewportModule.currentLayout) {
-        applyAutoMoveEvents(cy, viewportModule.currentLayout);
-      }
-    });
+    this.SET_PROJECT_TRACES(updatedTraces);
+    this.SET_CURRENT_TRACES(visibleTraces);
   }
 
   @Action
@@ -112,6 +101,15 @@ export default class TraceModule extends VuexModule {
    */
   get traces(): TraceLink[] {
     return this.currentTraces;
+  }
+
+  /**
+   * @return All non-declined trace links.
+   */
+  get nonDeclinedTraces(): TraceLink[] {
+    return this.currentTraces.filter(
+      (t) => t.approvalStatus != TraceApproval.DECLINED
+    );
   }
 
   /**

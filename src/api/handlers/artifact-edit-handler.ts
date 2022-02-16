@@ -1,5 +1,5 @@
 import { Artifact, ConfirmationType } from "@/types";
-import { artifactModule, logModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import {
   createArtifact,
   updateArtifact,
@@ -47,7 +47,7 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(() => artifactModule.deleteArtifactByName(artifact))
+            .then(() => projectModule.deleteArtifactByName(artifact))
             .then(resolve)
             .catch(reject);
         }

@@ -3,11 +3,7 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import type { Artifact, ArtifactQueryFunction } from "@/types";
 import { DocumentArtifacts } from "@/types";
 import { getSingleQueryResult } from "@/util";
-import {
-  artifactSelectionModule,
-  documentModule,
-  subtreeModule,
-} from "@/store";
+import { artifactSelectionModule, documentModule } from "@/store";
 
 @Module({ namespaced: true, name: "artifact" })
 /**
@@ -54,8 +50,6 @@ export default class ArtifactModule extends VuexModule {
     this.SET_PROJECT_ARTIFACTS(updatedArtifacts);
     this.SET_CURRENT_ARTIFACTS(visibleArtifacts);
 
-    await subtreeModule.updateSubtreeMap();
-
     const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
 
     if (selectedArtifact !== undefined) {
@@ -78,8 +72,6 @@ export default class ArtifactModule extends VuexModule {
 
     this.SET_PROJECT_ARTIFACTS(removeArtifact(this.projectArtifacts));
     this.SET_CURRENT_ARTIFACTS(removeArtifact(this.currentArtifacts));
-
-    await subtreeModule.updateSubtreeMap();
   }
 
   @Mutation

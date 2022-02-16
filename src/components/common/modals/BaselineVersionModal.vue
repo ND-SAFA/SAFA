@@ -19,9 +19,6 @@ import { logModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 import { loadVersionIfExistsHandler } from "@/api";
 
-const PROJECT_SELECTION_STEP = 1;
-const VERSION_SELECTION_STEP = 2;
-
 /**
  * Stepper for setting the current project and version.
  *
@@ -58,10 +55,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      currentStep:
-        this.project === undefined
-          ? PROJECT_SELECTION_STEP
-          : VERSION_SELECTION_STEP,
+      currentStep: this.project === undefined ? 1 : 2,
       selectedVersion: undefined as ProjectVersion | undefined,
       selectedProject: this.project,
       isLoading: false,
@@ -69,9 +63,7 @@ export default Vue.extend({
   },
   computed: {
     startStep(): number {
-      return this.project === undefined
-        ? PROJECT_SELECTION_STEP
-        : VERSION_SELECTION_STEP;
+      return this.project === undefined ? 1 : 2;
     },
   },
   watch: {
@@ -84,7 +76,7 @@ export default Vue.extend({
     project(newProject: ProjectIdentifier | undefined): void {
       if (newProject !== undefined) {
         this.selectedProject = newProject;
-        this.currentStep = VERSION_SELECTION_STEP;
+        this.currentStep = 2;
       }
     },
   },

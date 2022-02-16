@@ -134,9 +134,7 @@ export default Vue.extend({
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
-        this.$emit("selected", project);
-      });
+      this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
       this.selected = newProject;
     },

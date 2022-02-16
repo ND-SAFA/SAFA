@@ -1,22 +1,11 @@
-import {
-  appModule,
-  documentModule,
-  projectModule,
-  subtreeModule,
-  viewportModule,
-} from "@/store";
+import { appModule, projectModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import {
   getArtifactsInVersion,
   getProjectVersion,
   getTracesInVersion,
 } from "@/api/endpoints";
-import {
-  reloadDocumentArtifacts,
-  reloadTraceMatrices,
-  setCreatedProject,
-} from "@/api";
-import { cyCenterNodes } from "@/cytoscape";
+import { reloadTraceMatrices, setCreatedProject } from "@/api";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -47,11 +36,8 @@ export async function reloadArtifactsHandler(versionId: string): Promise<void> {
   const artifacts = await getArtifactsInVersion(versionId);
 
   await projectModule.addOrUpdateArtifacts(artifacts);
-  await reloadDocumentArtifacts();
   await reloadTraceMatrices();
-
   await viewportModule.setArtifactTreeLayout();
-  cyCenterNodes();
 }
 
 /**

@@ -76,9 +76,8 @@ export default Vue.extend({
       const currentProject = projectModule.getProject;
       const currentVersion = currentProject.projectVersion;
       if (open && currentProject.projectId) {
-        if (currentProject.projectId) {
-          this.selectedProject = currentProject;
-        }
+        this.selectedProject = currentProject;
+
         if (currentVersion?.versionId) {
           this.selectedVersion = currentVersion;
         }

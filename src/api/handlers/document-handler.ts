@@ -1,5 +1,5 @@
 import { artifactModule, documentModule, projectModule } from "@/store";
-import { Project, ProjectDocument } from "@/types";
+import { Artifact, Project, ProjectDocument } from "@/types";
 import {
   createOrUpdateDocument,
   deleteDocument,
@@ -75,15 +75,15 @@ export async function deleteAndSwitchDocuments(
  * Updates the artifact IDs for the all documents.
  *
  * @param projectId - The project to load documents for.
+ * @param artifacts - The full list of artifacts.
  */
 export async function reloadDocumentArtifacts(
-  projectId = projectModule.projectId
+  projectId = projectModule.projectId,
+  artifacts: Artifact[] = projectModule.getProject.artifacts
 ): Promise<void> {
   const documents = await getProjectDocuments(projectId);
 
   await documentModule.updateDocuments(documents);
 
-  documentModule.defaultDocument.artifactIds = artifactModule.allArtifacts.map(
-    ({ id }) => id
-  );
+  documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
 }

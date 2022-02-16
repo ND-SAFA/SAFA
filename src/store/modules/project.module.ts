@@ -15,6 +15,7 @@ import {
   traceModule,
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
+import { reloadDocumentArtifacts } from "@/api";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -52,8 +53,15 @@ export default class ProjectModule extends VuexModule {
    * @param artifacts - The artifacts to set.
    */
   async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
-    this.SET_ARTIFACTS(newArtifacts);
-    await artifactModule.addOrUpdateArtifacts(newArtifacts);
+    const newIds = newArtifacts.map(({ id }) => id);
+    const updatedArtifacts = [
+      ...this.project.artifacts.filter(({ id }) => !newIds.includes(id)),
+      ...newArtifacts,
+    ];
+
+    this.SET_ARTIFACTS(updatedArtifacts);
+    await reloadDocumentArtifacts();
+    await artifactModule.addOrUpdateArtifacts(updatedArtifacts);
     await subtreeModule.updateSubtreeMap();
   }
 
@@ -64,8 +72,16 @@ export default class ProjectModule extends VuexModule {
    * @param traceLinks - The trace links to set.
    */
   async addOrUpdateTraceLinks(newTraces: TraceLink[]): Promise<void> {
-    this.SET_TRACES(newTraces);
-    await traceModule.addOrUpdateTraceLinks(newTraces);
+    const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
+    const updatedTraces = [
+      ...this.project.traces.filter(
+        ({ traceLinkId }) => !newIds.includes(traceLinkId)
+      ),
+      ...newTraces,
+    ];
+
+    this.SET_TRACES(updatedTraces);
+    await traceModule.addOrUpdateTraceLinks(updatedTraces);
     await subtreeModule.updateSubtreeMap();
   }
 

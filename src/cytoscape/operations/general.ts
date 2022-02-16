@@ -1,12 +1,12 @@
 import { CyPromise, LayoutPayload } from "@/types";
-import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
+import { artifactTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { appModule, logModule } from "@/store";
+import { appModule, logModule, viewportModule } from "@/store";
 import { areArraysEqual } from "@/util";
 
 /**

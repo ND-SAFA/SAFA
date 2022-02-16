@@ -2,7 +2,7 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { LinkFinder, LinkValidator, TraceLink } from "@/types";
 import { DocumentTraces, TraceApproval } from "@/types";
-import { subtreeModule, viewportModule } from "@/store";
+import { documentModule, subtreeModule, viewportModule } from "@/store";
 import { getTraceId } from "@/util";
 import { applyAutoMoveEvents, artifactTreeCyPromise } from "@/cytoscape";
 
@@ -45,19 +45,15 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLinks - The trace links to set.
    */
-  async addOrUpdateTraceLinks(newTraces: TraceLink[]): Promise<void> {
-    const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
-    const createNewLinks = (currentTraces: TraceLink[]) => [
-      ...currentTraces.filter(
-        ({ traceLinkId }) => !newIds.includes(traceLinkId)
-      ),
-      ...newTraces,
-    ];
+  async addOrUpdateTraceLinks(updatedTraces: TraceLink[]): Promise<void> {
+    const visibleIds = documentModule.document.artifactIds;
+    const visibleTraces = updatedTraces.filter(
+      ({ sourceId, targetId }) =>
+        visibleIds.includes(sourceId) && visibleIds.includes(targetId)
+    );
 
-    this.SET_PROJECT_TRACES(createNewLinks(this.projectTraces));
-    this.SET_CURRENT_TRACES(createNewLinks(this.currentTraces));
-
-    await subtreeModule.updateSubtreeMap();
+    this.SET_PROJECT_TRACES(updatedTraces);
+    this.SET_CURRENT_TRACES(visibleTraces);
 
     artifactTreeCyPromise.then((cy) => {
       if (viewportModule.currentLayout) {

@@ -2,9 +2,8 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { LinkFinder, LinkValidator, TraceLink } from "@/types";
 import { DocumentTraces, TraceApproval } from "@/types";
-import { documentModule, subtreeModule, viewportModule } from "@/store";
+import { documentModule, subtreeModule } from "@/store";
 import { getTraceId } from "@/util";
-import { applyAutoMoveEvents, artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "trace" })
 /**
@@ -54,12 +53,6 @@ export default class TraceModule extends VuexModule {
 
     this.SET_PROJECT_TRACES(updatedTraces);
     this.SET_CURRENT_TRACES(visibleTraces);
-
-    artifactTreeCyPromise.then((cy) => {
-      if (viewportModule.currentLayout) {
-        applyAutoMoveEvents(cy, viewportModule.currentLayout);
-      }
-    });
   }
 
   @Action

@@ -6,6 +6,7 @@ import {
   getTracesInVersion,
 } from "@/api/endpoints";
 import { reloadTraceMatrices, setCreatedProject } from "@/api";
+import { applyAutoMoveEvents, artifactTreeCyPromise } from "@/cytoscape";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -51,4 +52,10 @@ export async function reloadTracesHandler(versionId: string): Promise<void> {
 
   await projectModule.addOrUpdateTraceLinks(traces);
   await reloadTraceMatrices();
+
+  artifactTreeCyPromise.then((cy) => {
+    if (viewportModule.currentLayout) {
+      applyAutoMoveEvents(cy, viewportModule.currentLayout);
+    }
+  });
 }

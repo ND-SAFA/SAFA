@@ -35,10 +35,14 @@ export async function loadVersionIfExistsHandler(
  */
 export async function reloadArtifactsHandler(versionId: string): Promise<void> {
   const artifacts = await getArtifactsInVersion(versionId);
+  const currentArtifactCount = projectModule.getProject.artifacts.length;
 
   await projectModule.addOrUpdateArtifacts(artifacts);
   await reloadTraceMatrices();
-  await viewportModule.setArtifactTreeLayout();
+
+  if (artifacts.length > currentArtifactCount) {
+    await viewportModule.setArtifactTreeLayout();
+  }
 }
 
 /**

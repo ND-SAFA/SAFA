@@ -67,6 +67,18 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * Deletes the artifact with the given name.
+   */
+  async deleteArtifactByName(artifact: Artifact): Promise<void> {
+    this.SET_ARTIFACTS(
+      this.project.artifacts.filter(({ name }) => name !== artifact.name)
+    );
+    await artifactModule.deleteArtifactByName(artifact);
+    await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
    * Updates the current trace links in the project, preserving any that already existed.
    *
    * @param traceLinks - The trace links to set.

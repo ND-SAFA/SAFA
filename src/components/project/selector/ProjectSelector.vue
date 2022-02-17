@@ -134,9 +134,7 @@ export default Vue.extend({
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
-        this.$emit("selected", project);
-      });
+      this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
@@ -168,7 +166,6 @@ export default Vue.extend({
       this.deleteProjectDialogue = false;
     },
     onConfirmDeleteProject(project: ProjectIdentifier) {
-      this.isLoading = true;
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
@@ -181,6 +178,7 @@ export default Vue.extend({
         .finally(() => (this.isLoading = false));
     },
     deleteProjectHandler(project: ProjectIdentifier) {
+      this.isLoading = true;
       deleteProject(project.projectId)
         .then(async () => {
           logModule.onSuccess(`${project.name} successfully deleted.`);

@@ -74,7 +74,6 @@
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
 import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
-import { DataItem, ProjectVersion } from "@/types";
 
 /**
  * Displays a generic selector.
@@ -155,7 +154,7 @@ export default Vue.extend({
     },
   },
   mounted() {
-    if (this.items.length > 0) {
+    if (this.selected.length === 0 && this.items.length > 0) {
       this.selected = [this.items[0]];
       this.$emit("item:select", { item: this.items[0], value: true });
     }

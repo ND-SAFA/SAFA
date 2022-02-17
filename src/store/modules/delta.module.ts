@@ -51,12 +51,14 @@ export default class ErrorModule extends VuexModule {
    */
   async setDeltaPayload(payload: ProjectDelta): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    await projectModule.addOrUpdateArtifacts(
-      Object.values(payload.artifacts.added)
-    );
-    await projectModule.addOrUpdateTraceLinks(
-      Object.values(payload.traces.added)
-    );
+    await projectModule.addOrUpdateArtifacts([
+      ...Object.values(payload.artifacts.added),
+      ...Object.values(payload.artifacts.removed),
+    ]);
+    await projectModule.addOrUpdateTraceLinks([
+      ...Object.values(payload.traces.added),
+      ...Object.values(payload.traces.removed),
+    ]);
     await viewportModule.setArtifactTreeLayout();
   }
 

@@ -4,7 +4,7 @@ import {
   ProjectVersion,
   ProjectCreationResponse,
 } from "@/types";
-import { logModule } from "@/store";
+import { logModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import {
   connectAndSubscribeToVersion,
@@ -59,6 +59,7 @@ export async function uploadNewProjectVersion(
         if (setVersionIfSuccessful) {
           await navigateTo(Routes.ARTIFACT_TREE);
           await setCreatedProject(res);
+          await viewportModule.setArtifactTreeLayout();
         }
       })
       .finally(() => {

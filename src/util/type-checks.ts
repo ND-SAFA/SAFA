@@ -46,8 +46,8 @@ export function isArtifact(obj: any): obj is Artifact {
  */
 export function isTraceFile(file: ProjectFile): file is TraceFile {
   return (
-    "source" in file &&
-    "target" in file &&
+    "sourceId" in file &&
+    "targetId" in file &&
     "isGenerated" in file &&
     "traces" in file
   );

@@ -58,6 +58,7 @@ export default Vue.extend({
   },
   computed: {
     isTracePanel(): boolean {
+      console.log(isTracePanel(this.panel), this.panel);
       return isTracePanel(this.panel);
     },
     isValid(): boolean {

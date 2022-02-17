@@ -107,7 +107,7 @@ export default Vue.extend({
       if (isOpen) {
         this.fetchProjects();
         if (this.projects.length === 1) {
-          this.$emit("selected", this.projects[0], true);
+          this.$emit("selected", this.projects[0], false);
         }
       }
     },

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -32,14 +33,22 @@ public class ProjectAppEntity {
     @NotNull
     public List<@Valid @NotNull TraceAppEntity> traces;
 
+    public List<ProjectMemberAppEntity> members;
+
+    public List<Document> documents;
+
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.documents = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
-                            List<TraceAppEntity> traces) {
+                            List<TraceAppEntity> traces,
+                            List<ProjectMemberAppEntity> members,
+                            List<Document> documents) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
@@ -47,6 +56,24 @@ public class ProjectAppEntity {
         this.description = project.getDescription();
         this.artifacts = artifacts;
         this.traces = traces;
+        this.members = members;
+        this.documents = documents;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
+    }
+
+    public List<ProjectMemberAppEntity> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<ProjectMemberAppEntity> members) {
+        this.members = members;
     }
 
     public String getProjectId() {

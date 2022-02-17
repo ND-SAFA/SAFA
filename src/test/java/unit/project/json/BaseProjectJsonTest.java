@@ -29,7 +29,7 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
 
     protected JSONObject postProjectJson(JSONObject projectJson,
                                          ResultMatcher expectedStatus) throws Exception {
-        return sendPost(AppRoutes.Projects.projects, projectJson, expectedStatus);
+        return sendPost(AppRoutes.Projects.createOrUpdateProjects, projectJson, expectedStatus);
     }
 
     /**

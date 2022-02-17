@@ -41,7 +41,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @Column
     UUID entityVersionId;
 
-    @Column(name = "modification_type")
+    @Column(name = "modification_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     ModificationType modificationType;
 
@@ -61,7 +61,10 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @Column(name = "summary", nullable = false)
     String summary;
 
-    @Column(name = "content", length = ProjectVariables.ARTIFACT_CONTENT_LENGTH, nullable = false)
+    @Column(name = "content",
+        length = ProjectVariables.ARTIFACT_CONTENT_LENGTH,
+        nullable = false,
+        columnDefinition = "TEXT")
     String content;
 
     public ArtifactVersion() {

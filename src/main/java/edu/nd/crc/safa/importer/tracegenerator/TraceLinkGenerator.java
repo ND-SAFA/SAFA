@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
@@ -18,9 +17,9 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,26 +33,33 @@ public class TraceLinkGenerator {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
     public TraceLinkGenerator(TraceLinkVersionRepository traceLinkVersionRepository,
-                              ArtifactVersionRepository artifactVersionRepository) {
+                              ArtifactVersionRepository artifactVersionRepository,
+                              ProjectRetrievalService projectRetrievalService) {
         this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
+        this.projectRetrievalService = projectRetrievalService;
     }
 
     public List<TraceAppEntity> generateTraceLinksToFile(ProjectVersion projectVersion,
                                                          Pair<ArtifactType, ArtifactType> artifactTypes) {
+        String DELIMITER = "*";
         List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
+        List<String> approvedLinks = projectRetrievalService
+            .getTracesInProjectVersion(projectVersion)
+            .stream()
+            .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
+            .map(link -> link.sourceName + DELIMITER + link.targetName)
+            .collect(Collectors.toList());
+
         return generatedLinks
             .stream()
             .filter(t -> {
-                Optional<TraceLinkVersion> alreadyApprovedLink =
-                    this.traceLinkVersionRepository.findByProjectVersionAndSourceAndTarget(projectVersion, t.sourceName,
-                        t.targetName);
-                return alreadyApprovedLink
-                    .map(traceLinkVersion -> traceLinkVersion.getApprovalStatus() != TraceApproval.APPROVED)
-                    .orElse(true);
+                String tId = t.sourceName + DELIMITER + t.targetName;
+                return !approvedLinks.contains(tId);
             })
             .collect(Collectors.toList());
     }

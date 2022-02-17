@@ -16,6 +16,8 @@ import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.server.services.TraceMatrixService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +36,12 @@ public class TraceLinkVersionRepositoryImpl
     @Autowired
     ArtifactRepository artifactRepository;
 
+    @Autowired
+    TraceMatrixRepository traceMatrixRepository;
+
+    @Autowired
+    TraceMatrixService traceMatrixService;
+
     @Override
     public List<TraceLinkVersion> getEntitiesInProject(Project project) {
         return traceLinkVersionRepository.findByProjectVersionProject(project);
@@ -51,14 +59,20 @@ public class TraceLinkVersionRepositoryImpl
                                                                 TraceAppEntity traceAppEntity) {
         switch (modificationType) {
             case ADDED:
-                return new TraceLinkVersion(projectVersion,
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
                     ModificationType.ADDED,
                     traceLink,
                     traceAppEntity);
+            case MODIFIED:
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
+                    ModificationType.MODIFIED,
+                    traceLink,
+                    traceAppEntity);
             case REMOVED:
-                return new TraceLinkVersion(projectVersion,
+                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
                     ModificationType.REMOVED,
-                    traceLink);
+                    traceLink,
+                    traceAppEntity);
             default:
                 throw new RuntimeException("Missing case in delta service.");
         }
@@ -79,6 +93,9 @@ public class TraceLinkVersionRepositoryImpl
             Artifact sourceArtifact = assertAndFindArtifact(project, trace.sourceName);
             Artifact targetArtifact = assertAndFindArtifact(project, trace.targetName);
             traceLink = new TraceLink(sourceArtifact, targetArtifact);
+            traceMatrixService.verifyOrCreateTraceMatrix(project,
+                sourceArtifact.getType(),
+                targetArtifact.getType());
             this.traceLinkRepository.save(traceLink);
         } else {
             traceLink = traceLinkOptional.get();
@@ -129,7 +146,8 @@ public class TraceLinkVersionRepositoryImpl
     @Override
     public TraceLinkVersion createRemovedVersionEntity(ProjectVersion projectVersion,
                                                        TraceLink traceLink) {
-        return new TraceLinkVersion(
+        //TODO: Need to remove assumption that removed links are manual
+        return TraceLinkVersion.createManualLinkWithVersionAndModification(
             projectVersion,
             ModificationType.REMOVED,
             traceLink

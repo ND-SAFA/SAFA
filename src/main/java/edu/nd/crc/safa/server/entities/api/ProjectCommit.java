@@ -16,7 +16,6 @@ public class ProjectCommit {
     public ProjectCommit() {
         artifacts = new ProjectChange<>();
         traces = new ProjectChange<>();
-
     }
 
     public ProjectCommit(ProjectVersion commitVersion) {

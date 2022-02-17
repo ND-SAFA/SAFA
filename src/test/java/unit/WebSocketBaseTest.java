@@ -9,6 +9,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.services.NotificationService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,8 +32,10 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * Provides an abstraction over the websocket connection enabling:
  * 1. connecting to server through websocket endpoint
  * 2. Reading messages in queue associated
+ * <p>
+ * TODO: Do I need to clear subscriptions?
  */
-public class WebSocketBaseTest extends ApplicationBaseTest {
+public class WebSocketBaseTest extends AuthenticatedBaseTest {
 
     static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
     private static ObjectMapper mapper;
@@ -61,20 +66,92 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
         idToQueue = new HashMap<>();
     }
 
-    public WebSocketBaseTest createNewConnection(String id) throws Exception {
-        assertTokenExists();
+    /**
+     * Creates a new stomp session and stores connection for given client id.
+     *
+     * @param clientId User specified unique identifier for a client.
+     * @return Current object allowing for builder pattern.
+     * @throws Exception Throws error if a problem occurs connecting to stomp endpoint.
+     */
+    public WebSocketBaseTest createNewConnection(String clientId) throws Exception {
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         StompSession session = stompClient
             .connect(String.format(WEBSOCKET_URI, port),
                 new StompSessionHandlerAdapter() {
                 })
             .get(1, SECONDS);
-        idToSession.put(id, session);
-        idToQueue.put(id, new LinkedBlockingDeque<>());
+        idToSession.put(clientId, session);
+        idToQueue.put(clientId, new LinkedBlockingDeque<>());
         return this;
     }
 
-    public WebSocketBaseTest subscribe(String id, String topic) {
+    /**
+     * Subscribes client with associated id to the given project.
+     *
+     * @param clientId The ID given to client subscribing to project version.
+     * @param project  The project to listen updates to.
+     * @return The test instance allowing for the builder pattern.
+     */
+    public WebSocketBaseTest subscribeToProject(String clientId, Project project) {
+        String projectSubscriptionDestination = NotificationService.getProjectTopic(project);
+        return this.subscribe(clientId, projectSubscriptionDestination);
+    }
+
+    /**
+     * Subscribes client with associated id to the given project version.
+     *
+     * @param clientId       The ID given to client subscribing to project version.
+     * @param projectVersion The project version to listen updates to.
+     * @return The test instance allowing for the builder pattern.
+     */
+    public WebSocketBaseTest subscribeToVersion(String clientId, ProjectVersion projectVersion) {
+        String projectVersionSubscriptionDestination = NotificationService.getVersionTopic(projectVersion);
+        return this.subscribe(clientId, projectVersionSubscriptionDestination);
+    }
+
+    /**
+     * Returns the next message in the queue associated with given client id.
+     *
+     * @param clientId    The Id of the client whose queue we're reading.
+     * @param targetClass The target class which to map the message into.
+     * @param <T>         The type of class to be returned.
+     * @return
+     * @throws InterruptedException    Throws error if problem occurs with thread when reading message.
+     * @throws JsonProcessingException Throws error if cannot parse message into target class.
+     */
+    public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
+        String response = getNextMessage(clientId);
+        return toClass(response, targetClass);
+    }
+
+    public <T> T toClass(String response, Class<T> targetClass) throws JsonProcessingException {
+        return mapper.readValue(response, targetClass);
+    }
+
+    /**
+     * Returns the next message in the queue associated with given client id.
+     *
+     * @param clientId The ID given to the client whose queue message is returned.
+     * @return The next message in the queue.
+     * @throws InterruptedException
+     */
+    public String getNextMessage(String clientId) throws InterruptedException {
+        return idToQueue.get(clientId).poll(TIME_TO_POLL_SECONDS, SECONDS);
+    }
+
+    /**
+     * Returns the number of messages in the websocket queue.
+     *
+     * @param clientId The id given to the client whose queue we're reading.
+     * @return int representing the number of messages in the queue.
+     * @throws InterruptedException Throws error if some thread error occurs.
+     */
+    public int getQueueSize(String clientId) throws InterruptedException {
+        Thread.sleep(750);
+        return idToQueue.get(clientId).size();
+    }
+
+    private WebSocketBaseTest subscribe(String id, String topic) {
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
                 return byte[].class;
@@ -85,19 +162,5 @@ public class WebSocketBaseTest extends ApplicationBaseTest {
             }
         });
         return this;
-    }
-
-    public <T> T getNextMessage(String id, Class<T> tClass) throws InterruptedException, JsonProcessingException {
-        String response = getNextMessage(id);
-        return mapper.readValue(response, tClass);
-    }
-
-    public String getNextMessage(String id) throws InterruptedException {
-        return idToQueue.get(id).poll(TIME_TO_POLL_SECONDS, SECONDS);
-    }
-
-    public int getQueueSize(String id) throws InterruptedException {
-        Thread.sleep(750);
-        return idToQueue.get(id).size();
     }
 }

@@ -11,7 +11,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.repositories.impl.IVersionRepository;
 
 import org.springframework.data.repository.CrudRepository;
@@ -29,12 +28,6 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
         return findByProjectVersionProjectAndApprovalStatus(project, TraceApproval.APPROVED);
     }
 
-    default List<TraceLinkVersion> getGeneratedLinks(ProjectVersion projectVersion) {
-        return findByProjectVersionAndTraceType(projectVersion, TraceType.GENERATED);
-    }
-
-    List<TraceLinkVersion> findByProjectVersionAndTraceType(ProjectVersion projectVersion, TraceType traceType);
-
     default List<TraceLinkVersion> getProjectLinks(Project project) {
         return findByProjectVersionProject(project);
     }
@@ -47,6 +40,8 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
     List<TraceLinkVersion> findByProjectVersionProject(Project project);
 
     List<TraceLinkVersion> findByTraceLink(TraceLink traceLink);
+
+    List<TraceLinkVersion> findByTraceLinkTraceLinkId(UUID traceLinkId);
 
     Optional<TraceLinkVersion> findByTraceLinkSourceArtifactAndTraceLinkTargetArtifactAndApprovalStatus(
         Artifact sourceArtifact,

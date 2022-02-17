@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.builders;
 
+import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -26,6 +28,11 @@ public class RouteBuilder {
 
     public RouteBuilder withProject(Project project) {
         this.path = this.path.replace("{projectId}", project.getProjectId().toString());
+        return this;
+    }
+
+    public RouteBuilder withDocument(Document document) {
+        this.path = this.path.replace("{documentId}", document.getDocumentId().toString());
         return this;
     }
 
@@ -59,6 +66,11 @@ public class RouteBuilder {
         return this;
     }
 
+    public RouteBuilder withArtifactId(Artifact artifact) {
+        this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
+        return this;
+    }
+
     public RouteBuilder withArtifactName(String artifactName) {
         this.path = this.path.replace("{artifactName}", artifactName);
         return this;
@@ -66,6 +78,21 @@ public class RouteBuilder {
 
     public RouteBuilder withProjectMembership(ProjectMembership projectMembership) {
         this.path = this.path.replace("{projectMembershipId}", projectMembership.getMembershipId().toString());
+        return this;
+    }
+
+    public RouteBuilder withSourceArtifactTypeName(String sourceArtifactTypeName) {
+        this.path = this.path.replace("{sourceArtifactTypeName}", sourceArtifactTypeName);
+        return this;
+    }
+
+    public RouteBuilder withTargetArtifactTypeName(String targetArtifactTypeName) {
+        this.path = this.path.replace("{targetArtifactTypeName}", targetArtifactTypeName);
+        return this;
+    }
+
+    public RouteBuilder withTraceMatrixId(String traceMatrixId) {
+        this.path = this.path.replace("{traceMatrixId}", traceMatrixId);
         return this;
     }
 

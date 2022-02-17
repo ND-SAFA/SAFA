@@ -46,7 +46,12 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withModifiedTrace(TraceLinkVersion traceLinkVersion) {
-        this.projectCommit.getTraces().getModified().add(new TraceAppEntity(traceLinkVersion));
+        this.withModifiedTrace(new TraceAppEntity(traceLinkVersion));
+        return this;
+    }
+
+    public CommitBuilder withModifiedTrace(TraceAppEntity traceAppEntity) {
+        this.projectCommit.getTraces().getModified().add(traceAppEntity);
         return this;
     }
 

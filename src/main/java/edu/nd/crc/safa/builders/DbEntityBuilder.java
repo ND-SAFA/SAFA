@@ -7,6 +7,9 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -19,6 +22,8 @@ import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -39,6 +44,8 @@ public class DbEntityBuilder extends BaseBuilder {
 
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
@@ -47,7 +54,8 @@ public class DbEntityBuilder extends BaseBuilder {
     private final ProjectMembershipRepository projectMembershipRepository;
 
     Hashtable<String, Project> projects;
-    Hashtable<String, Hashtable<Integer, ProjectVersion>> projectVersions;
+    Hashtable<String, Hashtable<Integer, ProjectVersion>> versions;
+    Hashtable<String, Hashtable<String, Document>> documents;
     Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
     Hashtable<String, Hashtable<String, Artifact>> artifacts;
     Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactVersion>>> bodies;
@@ -58,15 +66,19 @@ public class DbEntityBuilder extends BaseBuilder {
 
     @Autowired
     public DbEntityBuilder(ProjectRepository projectRepository,
+                           ProjectMembershipRepository projectMembershipRepository,
                            ProjectVersionRepository projectVersionRepository,
+                           DocumentRepository documentRepository,
+                           DocumentArtifactRepository documentArtifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
                            ArtifactRepository artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkVersionRepository traceLinkVersionRepository,
-                           ProjectMembershipRepository projectMembershipRepository) {
+                           TraceLinkVersionRepository traceLinkVersionRepository) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
+        this.documentRepository = documentRepository;
+        this.documentArtifactRepository = documentArtifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
@@ -77,12 +89,15 @@ public class DbEntityBuilder extends BaseBuilder {
 
     public void createEmptyData() {
         this.projects = new Hashtable<>();
-        this.projectVersions = new Hashtable<>();
+        this.versions = new Hashtable<>();
+        this.documents = new Hashtable<>();
         this.artifactTypes = new Hashtable<>();
         this.artifacts = new Hashtable<>();
         this.bodies = new Hashtable<>();
         this.projectRepository.deleteAll();
         this.projectVersionRepository.deleteAll();
+        this.documentRepository.deleteAll();
+        this.documentArtifactRepository.deleteAll();
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
@@ -106,10 +121,34 @@ public class DbEntityBuilder extends BaseBuilder {
         this.projectRepository.save(project);
         this.projectMembershipRepository.save(new ProjectMembership(project, owner, ProjectRole.OWNER));
         this.projects.put(name, project);
-        this.projectVersions.put(name, new Hashtable<>());
+        this.versions.put(name, new Hashtable<>());
         this.artifactTypes.put(name, new Hashtable<>());
         this.artifacts.put(name, new Hashtable<>());
         this.bodies.put(name, new Hashtable<>());
+        return this;
+    }
+
+    public DbEntityBuilder newDocument(String projectName,
+                                       String docName,
+                                       String docDescription,
+                                       DocumentType docType) {
+        Project project = this.getProject(projectName);
+        Document document = new Document(project, docName, docDescription, docType);
+        this.documentRepository.save(document);
+        addEntry(this.documents, projectName, docName, document);
+        return this;
+    }
+
+    public DbEntityBuilder newDocumentArtifact(String projectName,
+                                               int versionIndex,
+                                               String docName,
+                                               String artifactName) {
+        Project project = this.getProject(projectName);
+        ProjectVersion projectVersion = this.getProjectVersion(projectName, 0);
+        Document document = this.getDocument(projectName, docName);
+        Artifact artifact = this.getArtifact(projectName, artifactName);
+        DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
+        this.documentArtifactRepository.save(documentArtifact);
         return this;
     }
 
@@ -126,7 +165,7 @@ public class DbEntityBuilder extends BaseBuilder {
             this.minorVersion,
             this.revisionNumber++);
         this.projectVersionRepository.save(projectVersion);
-        addEntry(this.projectVersions, projectName, projectVersion);
+        addEntry(this.versions, projectName, projectVersion);
         return this;
     }
 
@@ -226,7 +265,7 @@ public class DbEntityBuilder extends BaseBuilder {
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
-        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+        TraceLinkVersion traceLinkVersion = TraceLinkVersion.createManualLinkWithVersionAndModification(
             projectVersion,
             ModificationType.ADDED,
             traceLink
@@ -246,7 +285,7 @@ public class DbEntityBuilder extends BaseBuilder {
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
-        TraceLinkVersion traceLinkVersion = new TraceLinkVersion(
+        TraceLinkVersion traceLinkVersion = TraceLinkVersion.createGeneratedLinkWithVersionAndModification(
             projectVersion,
             ModificationType.ADDED,
             traceLink,
@@ -282,15 +321,21 @@ public class DbEntityBuilder extends BaseBuilder {
         return this.projects.get(projectName);
     }
 
-    public ProjectVersion getProjectVersion(String projectName, int index) {
-        assertProjectExists(this.projectVersions, projectName);
-        assertEntityExists(this.projectVersions.get(projectName), "Project index", index);
-        return this.projectVersions.get(projectName).get(index);
+    public ProjectVersion getProjectVersion(String projectName, int versionIndex) {
+        assertProjectExists(this.versions, projectName);
+        assertEntityExists(this.versions.get(projectName), versionIndex, "Project index");
+        return this.versions.get(projectName).get(versionIndex);
+    }
+
+    public Document getDocument(String projectName, String docName) {
+        assertProjectExists(this.documents, projectName);
+        assertEntityExists(this.documents.get(projectName), docName, "Document");
+        return this.documents.get(projectName).get(docName);
     }
 
     public List<ProjectVersion> getProjectVersions(String projectName) {
-        assertProjectExists(this.projectVersions, projectName);
-        return new ArrayList<>(this.projectVersions.get(projectName).values());
+        assertProjectExists(this.versions, projectName);
+        return new ArrayList<>(this.versions.get(projectName).values());
     }
 
     public Artifact getArtifact(String projectName, String artifactName) {
@@ -309,8 +354,8 @@ public class DbEntityBuilder extends BaseBuilder {
     public ArtifactVersion getArtifactBody(String projectName, String artifactName, int versionIndex) {
         assertProjectExists(this.bodies, projectName);
         Hashtable<String, Hashtable<Long, ArtifactVersion>> project = this.bodies.get(projectName);
-        assertEntityExists(project, "Artifact", artifactName);
-        assertEntityExists(project.get(artifactName), "Version Index", (long) versionIndex);
+        assertEntityExists(project, artifactName, "Artifact");
+        assertEntityExists(project.get(artifactName), (long) versionIndex, "Version Index");
         return this.bodies.get(projectName).get(artifactName).get((long) versionIndex);
     }
 
@@ -325,7 +370,7 @@ public class DbEntityBuilder extends BaseBuilder {
 
     public ArtifactType getType(String projectName, String typeName) {
         assertProjectExists(this.artifactTypes, projectName);
-        assertEntityExists(this.artifactTypes.get(projectName), "ArtifactType", typeName);
+        assertEntityExists(this.artifactTypes.get(projectName), typeName, "ArtifactType");
         return this.artifactTypes.get(projectName).get(typeName);
     }
 
@@ -335,10 +380,20 @@ public class DbEntityBuilder extends BaseBuilder {
     }
 
     private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {
-        assertEntityExists(table, "Project", projectName);
+        assertEntityExists(table, projectName, "Project");
     }
 
-    private <T, K> void assertEntityExists(Hashtable<K, T> table, String entityName, K keyName) {
+    /**
+     * Asserts that the given table has specified keyName. Otherwise, an error is thrown signalling that
+     * given entityName is missing.
+     *
+     * @param table      The table containing the records to check
+     * @param keyName    The name of the key to check the table for.
+     * @param entityName The name of the entity to print if the key is missing.
+     * @param <T>        The value of the table.
+     * @param <K>        The Type of Key used to index into the table.
+     */
+    private <T, K> void assertEntityExists(Hashtable<K, T> table, K keyName, String entityName) {
         if (!table.containsKey(keyName)) {
             throw new RuntimeException(String.format("[%s: %s] has not been created.", keyName, entityName));
         }

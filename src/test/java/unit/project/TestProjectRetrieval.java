@@ -15,8 +15,8 @@ import unit.ApplicationBaseTest;
  */
 public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
-    public void getProjectsEmpty() throws Exception {
-        JSONObject response = sendGet(AppRoutes.Projects.projects, status().isOk());
+    public void retrieveNoProjects() throws Exception {
+        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(0);
     }
 
@@ -26,7 +26,7 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void getProjectsMultiple() throws Exception {
+    public void retrieveMultipleProjects() throws Exception {
         SafaUser otherUser = new SafaUser();
         otherUser.setEmail("doesNotExist@gmail.com");
         otherUser.setPassword("somePassword");
@@ -36,7 +36,8 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("firstProject")
             .newProject("secondProject")
             .newProject("other project", otherUser);
-        JSONObject response = sendGet(AppRoutes.Projects.projects, status().isOk());
+        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
         assertThat(response.getJSONArray("body").length()).isEqualTo(2);
     }
+
 }

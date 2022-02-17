@@ -28,7 +28,7 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
         createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONObject response = sendGet(AppRoutes.Projects.projects, status().is2xxSuccessful());
+        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().is2xxSuccessful());
 
         // VP - Verify that shared project is visible
         assertThat(response.getJSONArray("body").length()).isEqualTo(1);

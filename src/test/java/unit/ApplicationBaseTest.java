@@ -10,21 +10,25 @@ import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Testing layer for encapsulating application logic.
  */
-public class ApplicationBaseTest extends AuthenticatedBaseTest {
+public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
     protected ProjectRetrievalService projectRetrievalService;
@@ -59,12 +63,16 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
     }
 
     public void commit(CommitBuilder commitBuilder) throws Exception {
+        commitWithStatus(commitBuilder, status().is2xxSuccessful());
+    }
+
+    public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.commitChange)
             .withVersion(commitVersion)
             .get();
-        sendPost(route, commitBuilder.asJson(), status().is2xxSuccessful());
+        return sendPost(route, commitBuilder.asJson(), expectedStatus);
     }
 
     /**
@@ -108,5 +116,22 @@ public class ApplicationBaseTest extends AuthenticatedBaseTest {
             return artifactOptional.get().getArtifactId().toString();
         }
         throw new RuntimeException("Could not find artifact with name:" + artifactName);
+    }
+
+    protected JSONObject shareProject(Project project,
+                                      String email,
+                                      ProjectRole role,
+                                      ResultMatcher httpResult) throws Exception {
+        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
+        String url = RouteBuilder.withRoute(AppRoutes.Projects.addProjectMember).withProject(project).get();
+        return sendPost(url, toJson(request), httpResult);
+    }
+
+    protected JSONObject getProjectMembers(Project project) throws Exception {
+        String url = RouteBuilder
+            .withRoute(AppRoutes.Projects.getProjectMembers)
+            .withProject(project)
+            .get();
+        return sendGet(url, status().is2xxSuccessful());
     }
 }

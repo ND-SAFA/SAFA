@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -73,6 +74,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ProjectMembershipRepository projectMembershipRepository;
 
     @Autowired
+    protected DocumentRepository documentRepository;
+
+    @Autowired
     protected ProjectService projectService;
 
     @Autowired
@@ -97,7 +101,8 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
         jsonBuilder.createEmptyData();
     }
 
-    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request, JSONObject body) {
+    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request,
+                                                        Object body) {
         return request
             .content(body.toString())
             .contentType(MediaType.APPLICATION_JSON);

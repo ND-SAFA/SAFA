@@ -71,7 +71,8 @@ public abstract class GenericVersionRepository<
     abstract Optional<BaseEntity> findBaseEntityByName(Project project, String name);
 
     /**
-     * Creates and missing auxiliary types used in app entity.
+     * Finds base entity associated with given app entity if an entity exists.
+     * Otherwise, creates the base entity along with any missing auxiliary objects.
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
@@ -124,6 +125,27 @@ public abstract class GenericVersionRepository<
         Hashtable<String, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
         return this.retrieveEntitiesAtProjectVersion(projectVersion, entityHashTable);
+    }
+
+    /**
+     * Calculates contents of each artifact at given version and returns bodies at version.
+     *
+     * @param projectVersion - The version of the artifact bodies that are returned
+     * @return list of artifact bodies in project at given version
+     */
+    @Override
+    public Optional<VersionEntity> getEntityVersionsInProjectVersionByVersionId(
+        ProjectVersion projectVersion,
+        String entityId) {
+        List<VersionEntity> versionEntities = this.getEntitiesInProject(projectVersion.getProject())
+            .stream()
+            .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
+            .collect(Collectors.toList());
+        Hashtable<String, List<VersionEntity>> entityHashTable = new Hashtable<>();
+        entityHashTable.put(entityId, versionEntities);
+        List<VersionEntity> currentVersionQuery = this.retrieveEntitiesAtProjectVersion(projectVersion,
+            entityHashTable);
+        return currentVersionQuery.size() == 0 ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
 
     /**
@@ -327,11 +349,12 @@ public abstract class GenericVersionRepository<
     private List<VersionEntity> retrieveEntitiesAtProjectVersion(
         ProjectVersion projectVersion,
         Hashtable<String, List<VersionEntity>> entityVersionsByName) {
-        List<VersionEntity> versionEntities = new ArrayList<>();
+        List<VersionEntity> entityVersionsAtProjectVersion = new ArrayList<>();
+
         for (String entityName : entityVersionsByName.keySet()) {
-            List<VersionEntity> entityVersions = entityVersionsByName.get(entityName);
+            List<VersionEntity> allEntityVersion = entityVersionsByName.get(entityName);
             VersionEntity latest = null;
-            for (VersionEntity body : entityVersions) {
+            for (VersionEntity body : allEntityVersion) {
                 if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
                     if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
                         latest = body;
@@ -340,10 +363,10 @@ public abstract class GenericVersionRepository<
             }
 
             if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
-                versionEntities.add(latest);
+                entityVersionsAtProjectVersion.add(latest);
             }
         }
-        return versionEntities;
+        return entityVersionsAtProjectVersion;
     }
 
     private Hashtable<String, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {

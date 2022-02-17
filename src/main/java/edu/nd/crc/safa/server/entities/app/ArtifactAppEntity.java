@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.server.entities.app;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -28,11 +30,14 @@ public class ArtifactAppEntity implements IAppEntity {
     @NotEmpty
     public String type;
 
+    public List<String> documentIds;
+
     public ArtifactAppEntity() {
         this.id = "";
         this.name = "";
         this.body = "";
         this.summary = "";
+        this.documentIds = new ArrayList<>();
     }
 
     public ArtifactAppEntity(String artifactId,
@@ -40,6 +45,7 @@ public class ArtifactAppEntity implements IAppEntity {
                              String name,
                              String summary,
                              String body) {
+        this();
         this.id = artifactId;
         this.type = type;
         this.name = name;
@@ -53,6 +59,18 @@ public class ArtifactAppEntity implements IAppEntity {
             body.getName(),
             body.getSummary(),
             body.getContent());
+    }
+
+    public List<String> getDocumentIds() {
+        return documentIds;
+    }
+
+    public void setDocumentIds(List<String> documentIds) {
+        this.documentIds = documentIds;
+    }
+
+    public void addDocumentId(String documentId) {
+        this.documentIds.add(documentId);
     }
 
     public String getId() {
@@ -93,11 +111,6 @@ public class ArtifactAppEntity implements IAppEntity {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public ArtifactAppEntity withName(String name) {
-        this.name = name;
-        return this;
     }
 
     public String toString() {

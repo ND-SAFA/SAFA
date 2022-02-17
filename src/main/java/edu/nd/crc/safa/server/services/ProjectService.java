@@ -186,7 +186,7 @@ public class ProjectService {
         Optional<ProjectMembership> currentUserMembershipQuery = this.projectMembershipRepository
             .findByProjectAndMember(project, currentUser);
         if (currentUserMembershipQuery.isPresent()) {
-            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) >= 0) {
+            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) > 0) {
                 throw new SafaError("Cannot add member with authorization greater that current user.");
             }
         } else {
@@ -231,10 +231,16 @@ public class ProjectService {
      * associated project
      *
      * @param projectMembershipId ID of the membership linking user and project.
+     * @return ProjectMembers The membership object identified by given id, or null if none found.
      */
-    public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) {
+    public ProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
         Optional<ProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findById(projectMembershipId);
-        projectMembershipQuery.ifPresent(this.projectMembershipRepository::delete);
+        if (projectMembershipQuery.isPresent()) {
+            ProjectMembership projectMembership = projectMembershipQuery.get();
+            this.projectMembershipRepository.delete(projectMembership);
+            return projectMembership;
+        }
+        return null;
     }
 }

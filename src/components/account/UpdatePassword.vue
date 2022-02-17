@@ -5,12 +5,18 @@
       label="Current Password"
       v-model="oldPassword"
       :errors="passwordErrors"
+      data-cy="input-current-password"
     />
-    <password-field label="New Password" v-model="newPassword" />
+    <password-field
+      label="New Password"
+      v-model="newPassword"
+      data-cy="input-new-password"
+    />
     <v-btn
       :disabled="!oldPassword || !newPassword"
       outlined
       @click="handleEditPassword"
+      data-cy="button-update-password"
     >
       Update Password
     </v-btn>

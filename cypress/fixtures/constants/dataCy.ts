@@ -35,6 +35,14 @@ export enum DataCy {
   passwordInput = "input-password",
   loginButton = "button-login",
 
+  // Account Editing
+  passwordCurrentInput = "input-current-password",
+  passwordNewInput = "input-new-password",
+  passwordChangeButton = "button-update-password",
+  accountDeletePasswordInput = "input-delete-password",
+  accountDeleteButton = "button-delete-my-account",
+  popUpAcceptButton = "button-i-accept",
+
   // Snackbar
 
   snackbarInfo = "snackbar-info",

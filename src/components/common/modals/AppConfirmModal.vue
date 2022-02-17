@@ -10,7 +10,9 @@
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn color="primary" @click="handleConfirm"> I accept </v-btn>
+      <v-btn color="primary" @click="handleConfirm" data-cy="button-i-accept">
+        I accept
+      </v-btn>
     </template>
   </generic-modal>
 </template>

@@ -1,6 +1,7 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
 import {
+  appModule,
   artifactModule,
   artifactSelectionModule,
   projectModule,
@@ -16,10 +17,9 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
   cyIfNotAnimated,
-  cyZoomReset,
-  cyCenterNodes,
   cyCreateLayout,
   cyCenterOnArtifacts,
+  cyCenterNodes,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -79,8 +79,6 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: artifactTreeCyPromise };
 
     await this.setGraphLayout(payload);
-
-    cyCenterNodes();
   }
 
   @Action({ rawError: true })
@@ -92,8 +90,6 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: timTreeCyPromise };
 
     await this.setGraphLayout(payload);
-
-    cyCenterNodes();
   }
 
   @Action
@@ -101,9 +97,12 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
-    this.SET_LAYOUT(layoutPayload.layout);
+    appModule.onLoadStart();
 
+    this.SET_LAYOUT(layoutPayload.layout);
     cyCreateLayout(layoutPayload);
+
+    setTimeout(appModule.onLoadEnd, 200);
   }
 
   @Action

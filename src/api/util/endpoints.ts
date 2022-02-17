@@ -25,19 +25,32 @@ export enum Endpoint {
 
   //Commits
   commit = "projects/versions/:versionId/commit",
-  isArtifactNameTaken = "projects/:projectId/artifacts/validate/:artifactName",
+  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/:artifactName",
 
   //Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
 
-  //Versions
+  //Entity Retrieval
   projectVersion = "projects/versions/:versionId",
+  getArtifactsInVersion = "projects/versions/:versionId/artifacts",
+  getTracesInVersion = "projects/versions/:versionId/traces",
+
+  //Versions
   getProjectVersions = "projects/:projectId/versions",
   getCurrentVersion = "projects/:projectId/versions/current",
   createNewMajorVersion = "projects/:projectId/versions/major",
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
+
+  //Documents
+  createOrUpdateDocument = "projects/versions/:versionId/documents",
+  getProjectDocuments = "projects/:projectId/documents",
+  deleteDocument = "projects/documents/:documentId",
+
+  //Document Artifacts
+  addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
+  removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
 
   //Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
@@ -45,6 +58,11 @@ export enum Endpoint {
   //Parse Entities
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
+
+  //Trace Matrices
+  createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
+  deleteTraceMatrix = "projects/matrices/:traceMatrixId",
+  retrieveTraceMatrices = "projects/:projectId/matrices",
 }
 
 /**

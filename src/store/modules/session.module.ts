@@ -1,15 +1,8 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import jwt_decode from "jwt-decode";
-import type { SessionModel, UserModel } from "@/types";
+import type { SessionModel } from "@/types";
 import { AuthToken } from "@/types";
-import {
-  getCurrentVersion,
-  getProjects,
-  loginUser,
-  loadVersionIfExistsHandler,
-} from "@/api";
-import { navigateTo, Routes } from "@/router";
-import { logModule, deltaModule, projectModule, subtreeModule } from "@/store";
+import { logModule } from "@/store";
 import { createSession } from "@/util";
 
 @Module({ namespaced: true, name: "session" })
@@ -22,48 +15,12 @@ export default class SessionModule extends VuexModule {
    */
   private session = createSession();
 
-  @Action({ rawError: true })
+  @Action
   /**
-   * Attempts to log a user in.
-   *
-   * @throws Error - Login failed.
+   * Updates the current session object.
    */
-  async login(user: UserModel): Promise<void> {
-    const session = await loginUser(user);
-
-    this.SET_SESSION(session);
-  }
-
-  @Action({ rawError: true })
-  /**
-   * Loads the last stored project.
-   */
-  async loadLastProject(): Promise<void> {
-    const projects = await getProjects();
-
-    if (projects.length) {
-      const versionId = (await getCurrentVersion(projects[0].projectId))
-        .versionId;
-
-      this.SET_SESSION({ ...this.session, versionId });
-
-      await loadVersionIfExistsHandler(versionId);
-    } else {
-      await navigateTo(Routes.PROJECT_CREATOR);
-    }
-  }
-
-  @Action({ rawError: true })
-  /**
-   * Attempts to log a user out.
-   */
-  async logout(): Promise<void> {
-    this.SET_SESSION(createSession());
-
-    await navigateTo(Routes.LOGIN_ACCOUNT);
-    await projectModule.clearProject();
-    deltaModule.clearDelta();
-    subtreeModule.clearSubtrees();
+  async updateSession(session: Partial<SessionModel>): Promise<void> {
+    this.SET_SESSION({ ...this.session, ...session });
   }
 
   @Action({ rawError: true })
@@ -98,6 +55,7 @@ export default class SessionModule extends VuexModule {
 
   /**
    * @return The current authorization token if one exists.
+   * @throws If the token does not exist.
    */
   get getToken(): string {
     const token = this.session.token;
@@ -109,9 +67,14 @@ export default class SessionModule extends VuexModule {
 
   /**
    * Returns the decoded authentication token is one exists.
+   * @throws If the token does not exist.
    */
-  get authenticationToken(): AuthToken {
-    return jwt_decode(this.getToken) as AuthToken;
+  get authenticationToken(): AuthToken | undefined {
+    try {
+      return jwt_decode(this.getToken) as AuthToken;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   /**
@@ -124,10 +87,11 @@ export default class SessionModule extends VuexModule {
   /**
    * @returns Whether the current JWT token is empty or has passed its
    * expiration date.
+   * @throws If the token does not exist.
    */
   get isTokenExpired(): boolean {
-    return (
-      this.isTokenEmpty || Date.now() >= this.authenticationToken.exp * 1000
-    );
+    const expirationTime = (this.authenticationToken?.exp || 0) * 1000;
+
+    return this.isTokenEmpty || Date.now() >= expirationTime;
   }
 }

@@ -74,7 +74,6 @@
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
 import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
-import { DataItem, ProjectVersion } from "@/types";
 
 /**
  * Displays a generic selector.
@@ -121,7 +120,7 @@ export default Vue.extend({
       required: false,
       default: true,
     },
-    canDeleteFirstItem: {
+    canDeleteLastItem: {
       type: Boolean,
       required: false,
       default: true,
@@ -148,15 +147,14 @@ export default Vue.extend({
       this.selected = [];
       this.search = "";
     },
-    isDeleteEnabled(item: DataItem<ProjectVersion>): boolean {
-      return (
-        this.hasDelete &&
-        (this.canDeleteFirstItem || item.item !== this.items[0].item)
-      );
+    isDeleteEnabled(item: DataItemProps): boolean {
+      const isNotLastItem = this.items.indexOf(item) !== this.items.length - 1;
+
+      return this.hasDelete && (this.canDeleteLastItem || isNotLastItem);
     },
   },
   mounted() {
-    if (this.items.length > 0) {
+    if (this.selected.length === 0 && this.items.length > 0) {
       this.selected = [this.items[0]];
       this.$emit("item:select", { item: this.items[0], value: true });
     }

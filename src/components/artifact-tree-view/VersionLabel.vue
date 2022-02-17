@@ -1,6 +1,6 @@
 <template>
   <v-row justify="end">
-    <h1 v-if="containsProject" class="text-h5 white--text">
+    <h1 v-if="projectExists" class="text-h5 white--text">
       {{ projectName }}@{{ versionName }}
     </h1>
     <h1 v-else class="text-h5 white--text">No Project Selected</h1>
@@ -23,24 +23,25 @@ export default Vue.extend({
       versionName: DEFAULT_VERSION_NAME,
     };
   },
+  mounted() {
+    this.setProjectName();
+  },
   computed: {
     project(): Project {
       return projectModule.getProject;
     },
-    containsProject(): boolean {
-      return this.project.projectId !== "";
-    },
-  },
-  mounted() {
-    this.setProjectName();
   },
   methods: {
+    projectExists(): boolean {
+      return projectModule.isProjectDefined;
+    },
     setProjectName() {
-      const project = this.project;
-      if (this.containsProject) {
-        this.projectName = project.name;
-        if (project.projectVersion !== undefined) {
-          this.versionName = versionToString(project.projectVersion);
+      const { name, projectVersion, projectId } = projectModule.getProject;
+
+      if (projectId) {
+        this.projectName = name;
+        if (projectVersion !== undefined) {
+          this.versionName = versionToString(projectVersion);
         }
       } else {
         this.projectName = DEFAULT_PROJECT_NAME;

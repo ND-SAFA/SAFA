@@ -8,14 +8,26 @@
     @close="onClose"
   >
     <template v-slot:body>
-      <v-container>
+      <v-container class="mt-2">
         <v-row justify="center">
-          <v-btn outlined text color="primary" @click="() => onClick('major')">
+          <v-btn
+            outlined
+            text
+            block
+            color="primary"
+            @click="() => onClick('major')"
+          >
             New Major Version: {{ nextVersion("major") }}
           </v-btn>
         </v-row>
         <v-row justify="center" class="mt-5">
-          <v-btn outlined text color="primary" @click="() => onClick('minor')">
+          <v-btn
+            outlined
+            text
+            block
+            color="primary"
+            @click="() => onClick('minor')"
+          >
             New Minor Version: {{ nextVersion("minor") }}
           </v-btn>
         </v-row>
@@ -23,6 +35,7 @@
           <v-btn
             outlined
             text
+            block
             color="primary"
             @click="() => onClick('revision')"
           >

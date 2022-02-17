@@ -1,14 +1,14 @@
 <template>
   <v-row v-if="isOpen" class="my-3" align="center">
-    <v-col cols="10">
+    <v-col cols="9">
       <div class="d-flex" style="width: min-content">
         <button-row :definitions="[sourceDefinition]" />
         <v-icon class="mx-2">mdi-arrow-right</v-icon>
         <button-row :definitions="[targetDefinition]" />
       </div>
     </v-col>
-    <v-col cols="2">
-      <v-btn @click="onSubmit" color="primary"> Create Link</v-btn>
+    <v-col cols="3">
+      <v-btn @click="onSubmit" color="primary" class="ml-10">Create Link</v-btn>
     </v-col>
   </v-row>
 </template>

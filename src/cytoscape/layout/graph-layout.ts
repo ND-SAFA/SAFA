@@ -7,6 +7,9 @@ import {
   CytoEventHandlers,
 } from "@/types";
 
+/**
+ * Defines a graph layout.
+ */
 export default class GraphLayout implements IGraphLayout {
   klaySettings: KlayLayoutSettings;
   preLayoutHooks: LayoutHook[];
@@ -30,22 +33,39 @@ export default class GraphLayout implements IGraphLayout {
     this.autoMoveHandlers = autoMoveHandlers;
   }
 
+  /**
+   * Creates the layout.
+   *
+   * @param cy - The cy instance.
+   */
   createLayout(cy: CytoCore): void {
     this.preLayoutHook(cy);
+
     cy.layout({
       name: "klay",
       klay: this.klaySettings,
     }).run();
+
     this.postLayoutHook(cy);
   }
 
-  preLayoutHook(cy: CytoCore): void {
+  /**
+   * Runs pre-layout hooks.
+   *
+   * @param cy - The cy instance.
+   */
+  private preLayoutHook(cy: CytoCore): void {
     for (const preHook of this.preLayoutHooks) {
       preHook(cy, this);
     }
   }
 
-  postLayoutHook(cy: CytoCore): void {
+  /**
+   * Runs post-layout hooks.
+   *
+   * @param cy - The cy instance.
+   */
+  private postLayoutHook(cy: CytoCore): void {
     for (const postHook of this.postLayoutHooks) {
       postHook(cy, this);
     }

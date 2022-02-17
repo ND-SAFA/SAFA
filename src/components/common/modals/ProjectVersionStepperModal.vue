@@ -154,6 +154,11 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.fileSelectorOpen = false;
       this.currentStep = this.startStep;
+      if (this.project?.name) {
+        Vue.set(this.localSteps, 0, [this.project.name, true]);
+      } else {
+        Vue.set(this.localSteps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
+      }
       this.$emit("update:loading", false);
     },
     onClose() {
@@ -162,12 +167,12 @@ export default Vue.extend({
       this.$emit("close");
     },
     selectProject(project: ProjectIdentifier, goToNextStep = false) {
-      this.selectedProject = project;
+      if (this.currentStep === 1) {
+        this.selectedProject = project;
 
-      Vue.set(this.localSteps, 0, [project.name, true]);
+        Vue.set(this.localSteps, 0, [project.name, true]);
 
-      if (goToNextStep && this.currentStep == 0) {
-        this.currentStep++;
+        if (goToNextStep) this.currentStep++;
       }
     },
     unselectProject() {

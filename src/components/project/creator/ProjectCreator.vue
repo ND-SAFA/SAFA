@@ -83,8 +83,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
-import { saveOrUpdateProject } from "@/api";
-import { appModule, projectModule } from "@/store";
+import { saveOrUpdateProject, setCreatedProject } from "@/api";
+import { appModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./uploaders";
@@ -137,7 +137,7 @@ export default Vue.extend({
       saveOrUpdateProject(this.project)
         .then(async (res) => {
           await navigateTo(Routes.ARTIFACT_TREE);
-          await projectModule.setProjectCreationResponse(res);
+          await setCreatedProject(res);
         })
         .then(() => this.clearData())
         .finally(() => {
@@ -183,6 +183,7 @@ export default Vue.extend({
         projectId: "",
         name: this.name,
         description: this.description,
+        members: [], // TODO: Add current user as owner?
         artifacts: this.artifacts,
         traces: this.traces,
       };

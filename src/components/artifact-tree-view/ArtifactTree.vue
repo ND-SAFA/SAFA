@@ -1,5 +1,8 @@
 <template>
-  <generic-cytoscape-controller :cyto-core-graph="cytoCoreGraph">
+  <generic-cytoscape-controller
+    :cyto-core-graph="cytoCoreGraph"
+    :class="isLoading ? 'artifact-tree' : 'artifact-tree visible'"
+  >
     <template v-slot:elements>
       <artifact-node
         v-for="artifact in artifacts"
@@ -8,14 +11,14 @@
         :opacity="getArtifactOpacity(artifact.id)"
       />
       <generic-graph-link
-        v-for="traceLink in traces"
-        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        v-for="traceLink in nonDeclinedTraces"
+        :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
       />
       <generic-graph-link
         v-for="traceLink in subtreeLinks"
-        :key="`${traceLink.sourceId}-${traceLink.targetId}`"
+        :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
       />
       <trace-link-approval-modal
@@ -30,21 +33,27 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, TraceLinkDisplayData, Artifact } from "@/types";
-import { CytoCoreGraph } from "@/types/cytoscape/core";
 import {
+  TraceLink,
+  TraceLinkDisplayData,
+  Artifact,
+  CytoCoreGraph,
+} from "@/types";
+import {
+  appModule,
+  artifactModule,
   artifactSelectionModule,
-  projectModule,
   subtreeModule,
+  traceModule,
   viewportModule,
 } from "@/store";
+import { artifactTreeGraph } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/approve-links-view";
 import ArtifactNode from "./ArtifactNode.vue";
-import { artifactTreeGraph } from "@/cytoscape";
 
 export default Vue.extend({
   name: "artifact-tree",
@@ -62,23 +71,23 @@ export default Vue.extend({
     };
   },
   computed: {
+    isLoading(): boolean {
+      return appModule.getIsLoading;
+    },
     cytoCoreGraph(): CytoCoreGraph {
       return artifactTreeGraph;
     },
     artifactHashMap(): Record<string, Artifact> {
-      return projectModule.getArtifactsById;
+      return artifactModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
-      return projectModule.artifacts;
+      return artifactModule.artifacts;
     },
-    traces() {
-      return projectModule.getProject.traces;
+    nonDeclinedTraces(): TraceLink[] {
+      return traceModule.nonDeclinedTraces;
     },
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
-    },
-    project() {
-      return projectModule.getProject;
     },
     nodesInView(): string[] {
       return viewportModule.getNodesInView;

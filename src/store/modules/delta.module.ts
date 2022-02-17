@@ -1,8 +1,15 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, ProjectVersion, ProjectDelta } from "@/types";
-import { ArtifactDeltaState, EntityModification, PanelType } from "@/types";
-import { appModule, projectModule, subtreeModule } from "..";
+
+import type {
+  Artifact,
+  ProjectVersion,
+  ProjectDelta,
+  EntityModification,
+} from "@/types";
+import { ArtifactDeltaState, PanelType } from "@/types";
 import { createProjectDelta } from "@/util";
+import { disableDrawMode } from "@/cytoscape";
+import { appModule, projectModule, viewportModule } from "..";
 
 @Module({ namespaced: true, name: "delta" })
 /**
@@ -30,6 +37,10 @@ export default class ErrorModule extends VuexModule {
    */
   setIsDeltaViewEnabled(isDeltaViewEnabled: boolean): void {
     this.SET_DELTA_IN_VIEW(isDeltaViewEnabled);
+
+    if (isDeltaViewEnabled) {
+      disableDrawMode();
+    }
   }
 
   @Action
@@ -40,13 +51,15 @@ export default class ErrorModule extends VuexModule {
    */
   async setDeltaPayload(payload: ProjectDelta): Promise<void> {
     this.SET_DELTA_PAYLOAD(payload);
-    await projectModule.addOrUpdateArtifacts(
-      Object.values(payload.artifacts.added)
-    );
-    await projectModule.addOrUpdateTraceLinks(
-      Object.values(payload.traces.added)
-    );
-    await subtreeModule.updateSubtreeMap();
+    await projectModule.addOrUpdateArtifacts([
+      ...Object.values(payload.artifacts.added),
+      ...Object.values(payload.artifacts.removed),
+    ]);
+    await projectModule.addOrUpdateTraceLinks([
+      ...Object.values(payload.traces.added),
+      ...Object.values(payload.traces.removed),
+    ]);
+    await viewportModule.setArtifactTreeLayout();
   }
 
   @Action
@@ -66,6 +79,7 @@ export default class ErrorModule extends VuexModule {
   clearDelta(): void {
     this.SET_DELTA_PAYLOAD(createProjectDelta());
     this.SET_DELTA_IN_VIEW(false);
+    this.setIsDeltaViewEnabled(false);
     appModule.closePanel(PanelType.right);
   }
 

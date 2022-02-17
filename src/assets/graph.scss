@@ -3,20 +3,30 @@ $color-added: #81c784;
 $color-removed: #e57373;
 $color-modified: #64b5f6;
 $color-border: #888888;
-$border-radius: 8px;
+$graph-border-width: 1px;
+$graph-border-radius: 8px;
+
+.artifact-tree {
+  opacity: 0;
+
+  &.visible {
+    transition: opacity 0.25s ease-in-out;
+    opacity: 100;
+  }
+}
 
 .artifact-container {
   display: flex;
   flex-direction: column;
   white-space: nowrap;
   overflow: hidden;
-  border-radius: $border-radius;
-  border: 1px solid $color-border;
+  border-radius: $graph-border-radius;
+  border: $graph-border-width solid $color-border;
 }
 
 .artifact-header {
   text-align: center;
-  border-bottom: 1px solid $color-border;
+  border-bottom: $graph-border-width solid $color-border;
   margin: 0 5px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -35,7 +45,7 @@ $border-radius: 8px;
 }
 
 .artifact-footer {
-  height:25px;
+  height: 25px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -46,8 +56,7 @@ $border-radius: 8px;
   }
 
   & > :nth-child(2) {
-    border-top-left-radius: $border-radius;
-
+    border-top-left-radius: $graph-border-radius;
   }
 
   & > div > span {

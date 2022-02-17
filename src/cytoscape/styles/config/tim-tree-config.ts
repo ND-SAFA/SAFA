@@ -12,11 +12,10 @@ export const TIM_EDGE_X_MARGIN = 10;
 export const TIM_NODE_SHAPE = "round-rectangle";
 export const TIM_NODE_HEIGHT = 100;
 export const TIM_NODE_WIDTH = 200;
-export const TIM_NODE_BACKGROUND_COLOR = "white";
-export const TIM_NODE_BORDER_WIDTH = "1";
+export const TIM_NODE_COLOR = "transparent";
+export const TIM_NODE_BORDER_WIDTH = 0;
 
 /**
  * Graph
  */
-export const DEFAULT_TIM_TREE_ZOOM = 3;
 export const TIM_GRAPH_NODE_SPACING = 50;

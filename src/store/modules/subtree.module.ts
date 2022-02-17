@@ -1,7 +1,12 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { SubtreeLink, SubtreeMap, SetOpacityRequest } from "@/types";
-import { projectModule } from "@/store";
-import { artifactTreeCyPromise, createSubtreeMap } from "@/cytoscape";
+import type { SubtreeLink, SubtreeMap, Project } from "@/types";
+import { artifactModule, traceModule } from "@/store";
+import {
+  artifactTreeCyPromise,
+  createSubtreeMap,
+  cyDisplayAll,
+  cySetDisplay,
+} from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -28,35 +33,68 @@ export default class SubtreeModule extends VuexModule {
    */
   private collapsedParentNodes: string[] = [];
 
+  /**
+   * The amount of child nodes that a node must have greater than or equal to
+   * for the node to have its children automatically hidden.
+   */
+  private autoCollapseSubtreeSize = 5;
+
   @Action
   /**
    * Recalculates the subtree map of project artifacts and updates store.
    */
   async updateSubtreeMap(): Promise<void> {
-    const cy = await artifactTreeCyPromise;
-    const subtreeMap = await createSubtreeMap(cy, projectModule.artifacts);
+    artifactTreeCyPromise.then(async (cy) => {
+      const subtreeMap = await createSubtreeMap(cy, artifactModule.artifacts);
 
-    this.SET_SUBTREE_MAP(subtreeMap);
+      this.SET_SUBTREE_MAP(subtreeMap);
+    });
   }
 
   @Action
   /**
    * Resets hidden nodes.
    */
-  resetHiddenNodes(): void {
+  async resetHiddenNodes(): Promise<void> {
     this.SET_COLLAPSED_PARENT_NODES([]);
     this.SET_HIDDEN_SUBTREE_NODES([]);
+    cyDisplayAll();
   }
 
   @Action
   /**
    * Clears all data.
    */
-  clearSubtrees(): void {
+  async clearSubtrees(): Promise<void> {
     this.SET_SUBTREE_MAP({});
     this.SET_SUBTREE_LINKS([]);
-    this.SET_COLLAPSED_PARENT_NODES([]);
-    this.SET_HIDDEN_SUBTREE_NODES([]);
+    await this.resetHiddenNodes();
+  }
+
+  @Action
+  /**
+   * Updates the subtree map, and hides all subtrees greater than the set threshold.
+   */
+  async initializeProject(project: Project): Promise<void> {
+    const artifactIds = project.artifacts.map(({ id }) => id).reverse();
+    const childrenPerArtifact = project.traces
+      .map(({ targetId }) => targetId)
+      .reduce(
+        (acc, id) => ({ ...acc, [id]: (acc[id] || 0) + 1 }),
+        {} as Record<string, number>
+      );
+
+    await this.updateSubtreeMap();
+
+    for (const id of artifactIds) {
+      if (this.hiddenSubtreeNodes.includes(id)) continue;
+
+      const childCount = childrenPerArtifact[id] || 0;
+
+      if (childCount >= this.autoCollapseSubtreeSize) {
+        await this.hideSubtree(id);
+      }
+    }
   }
 
   @Action
@@ -71,6 +109,9 @@ export default class SubtreeModule extends VuexModule {
   async hideSubtree(rootId: string): Promise<void> {
     const childrenInSubtree = this.getSubtreeByArtifactId(rootId);
     const nodesInSubtree = [...childrenInSubtree, rootId];
+    const visibleChildren = childrenInSubtree.filter(
+      (id) => !this.hiddenSubtreeNodes.includes(id)
+    );
 
     for (const childId of childrenInSubtree) {
       const newSubtreeLinks = this.createSubtreeLinks(
@@ -80,17 +121,14 @@ export default class SubtreeModule extends VuexModule {
       );
 
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
-      this.SET_HIDDEN_SUBTREE_NODES([
-        ...this.hiddenSubtreeNodes,
-        ...childrenInSubtree,
-      ]);
-      this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
-
-      await this.setProjectEntityVisibility({
-        targetArtifactIds: this.hiddenSubtreeNodes,
-        visible: false,
-      });
     }
+
+    this.SET_HIDDEN_SUBTREE_NODES([
+      ...this.hiddenSubtreeNodes,
+      ...visibleChildren,
+    ]);
+    this.SET_COLLAPSED_PARENT_NODES([...this.collapsedParentNodes, rootId]);
+    cySetDisplay(visibleChildren, false);
   }
 
   @Action
@@ -112,41 +150,7 @@ export default class SubtreeModule extends VuexModule {
     this.SET_COLLAPSED_PARENT_NODES(
       this.collapsedParentNodes.filter((n) => n !== rootId)
     );
-    await this.setProjectEntityVisibility({
-      targetArtifactIds: subtreeNodes,
-      visible: true,
-    });
-  }
-
-  @Action
-  /**
-   * Set the visibility of nodes and edges related to given list of artifact names.
-   * A node is related if it represents one of the target artifacts.
-   * An edge is related if either source or target is an artifact in target
-   * list.
-   *
-   * @param request Contains the target set of artifact names and whether they should be visible.
-   */
-  async setProjectEntityVisibility(request: SetOpacityRequest): Promise<void> {
-    const { targetArtifactIds, visible } = request;
-    const display = visible ? "element" : "none";
-    const cy = await artifactTreeCyPromise;
-
-    const targetNodes = cy
-      .nodes()
-      .filter((n) => targetArtifactIds.includes(n.data().id));
-
-    targetNodes.style({ display });
-
-    const targetLinks = cy
-      .edges()
-      .filter(
-        (e) =>
-          targetArtifactIds.includes(e.target().data().id) ||
-          targetArtifactIds.includes(e.source().data().id)
-      );
-
-    targetLinks.style({ display });
+    cySetDisplay(subtreeNodes, true);
   }
 
   @Mutation
@@ -200,9 +204,7 @@ export default class SubtreeModule extends VuexModule {
    * @returns the pre-computed artifacts in the subtree of root specified.
    */
   get getSubtreeByArtifactId(): (n: string) => string[] {
-    return (artifactId: string) => {
-      return this.getSubtreeMap[artifactId] || [];
-    };
+    return (artifactId: string) => this.getSubtreeMap[artifactId] || [];
   }
 
   /**
@@ -228,12 +230,10 @@ export default class SubtreeModule extends VuexModule {
     c: string
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootId: string, childId: string) => {
-      const traceLinks = projectModule.traceLinks;
-
-      const subtreeLinkCreator: (f: boolean) => SubtreeLink[] = (
+      const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
-        return traceLinks
+        return traceModule.traces
           .filter((link) => {
             const value = isIncoming ? link.targetId : link.sourceId;
             const oppoValue = isIncoming ? link.sourceId : link.targetId;
@@ -242,6 +242,7 @@ export default class SubtreeModule extends VuexModule {
           .map((link) => {
             const base: SubtreeLink = {
               ...link,
+              traceLinkId: link.traceLinkId + "-phantom",
               type: "SUBTREE",
               rootNode: rootId,
             };

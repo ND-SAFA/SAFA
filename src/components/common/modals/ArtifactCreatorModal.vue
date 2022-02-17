@@ -46,7 +46,12 @@
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, Artifact } from "@/types";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
-import { logModule, projectModule } from "@/store";
+import {
+  typeOptionsModule,
+  logModule,
+  projectModule,
+  documentModule,
+} from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 const DEFAULT_NAME_HINT = "Please select an identifier for the artifact";
@@ -89,13 +94,13 @@ export default Vue.extend({
   },
   computed: {
     projectId(): string {
-      return projectModule.getProject.projectId;
+      return projectModule.projectId;
     },
     versionId(): string | undefined {
-      return projectModule.getProject.projectVersion?.versionId;
+      return projectModule.versionIdWithLog;
     },
     artifactTypes(): string[] {
-      return projectModule.getArtifactTypes;
+      return typeOptionsModule.artifactTypes;
     },
     isValid(): boolean {
       return this.isNameValid && this.body !== "" && this.type !== "";
@@ -118,7 +123,9 @@ export default Vue.extend({
 
         this.nameCheckIsLoading = true;
         this.nameCheckTimer = setTimeout(() => {
-          isArtifactNameTaken(this.projectId, newName).then((res) => {
+          if (!this.versionId) return;
+
+          isArtifactNameTaken(this.versionId, newName).then((res) => {
             this.nameCheckIsLoading = false;
             this.isNameValid = !res.artifactExists;
 
@@ -134,31 +141,34 @@ export default Vue.extend({
   },
   methods: {
     onSubmit(): void {
-      // only called when isValid / button is enabled
+      const versionId = this.versionId;
+      const { documentId } = documentModule.document;
       const artifact: Artifact = {
         id: this.artifact?.id || "",
         name: this.name,
         type: this.type,
         summary: this.summary,
         body: this.body,
+        documentIds: documentId ? [documentId] : [],
       };
+
+      if (!versionId) return;
 
       this.isLoading = true;
 
-      if (this.versionId === undefined) {
-        logModule.onWarning("Please select a project version.");
-        return;
-      }
       const isUpdate = this.artifact !== undefined;
-      createOrUpdateArtifactHandler(this.versionId, artifact, isUpdate)
-        .then(() => {
+
+      createOrUpdateArtifactHandler(versionId, artifact, isUpdate)
+        .then(async () => {
           this.$emit("close");
         })
         .catch((e) => {
           logModule.onDevError(e);
           logModule.onWarning("Unable to create artifact.");
         })
-        .finally(() => (this.isLoading = false));
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
 });

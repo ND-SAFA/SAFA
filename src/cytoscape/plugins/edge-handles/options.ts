@@ -1,4 +1,4 @@
-import { projectModule } from "@/store";
+import { typeOptionsModule, traceModule } from "@/store";
 import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
@@ -12,7 +12,6 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
    *
    * @param sourceNode - The source node on the graph.
    * @param targetNode - The target node on the graph.
-   *
    * @returns Whether the two nodes can be traced.
    */
   canConnect(sourceNode: NodeSingular, targetNode: NodeSingular): boolean {
@@ -22,7 +21,7 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
     }
 
     // If this link already exists, the link cannot be created.
-    const linkDoesNotExist = !projectModule.doesLinkExist(
+    const linkDoesNotExist = !traceModule.doesLinkExist(
       sourceNode.data().id,
       targetNode.data().id
     );
@@ -31,7 +30,7 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
     const isNotSameNode = !sourceNode.same(targetNode);
 
     // If the link is not between allowed artifact directions, thee link cannot be created.
-    const linkIsAllowedByType = projectModule.isLinkAllowedByType(
+    const linkIsAllowedByType = typeOptionsModule.isLinkAllowedByType(
       sourceNode.data().artifactType,
       targetNode.data().artifactType
     );
@@ -45,7 +44,6 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
    *
    * @param sourceNode - The source node on the graph.
    * @param targetNode - The target node on the graph.
-   *
    * @returns The created edge.
    */
   edgeParams(

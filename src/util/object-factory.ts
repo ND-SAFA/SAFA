@@ -2,9 +2,12 @@ import {
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
+  DocumentType,
   MessageType,
   Project,
   ProjectDelta,
+  ProjectDocument,
+  ProjectIdentifier,
   ProjectVersion,
   SessionModel,
   SnackbarMessage,
@@ -51,6 +54,7 @@ export function createProject(): Project {
     name: "Untitled",
     projectId: "",
     description: "",
+    members: [],
     artifacts: [],
     traces: [],
     projectVersion: undefined,
@@ -76,7 +80,7 @@ export function createProjectDelta(): ProjectDelta {
 }
 
 /**
- * @return An empty commit.
+ * @returns An empty commit.
  */
 export function createCommit(version: ProjectVersion): Commit {
   return {
@@ -91,5 +95,39 @@ export function createCommit(version: ProjectVersion): Commit {
       removed: [],
       modified: [],
     },
+  };
+}
+
+/**
+ * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
+ */
+export function createDefaultTypeIcons(): Record<string, string> {
+  return {
+    requirement: "mdi-clipboard-text",
+    design: "mdi-math-compass",
+    hazard: "mdi-hazard-lights",
+    environmentalassumption: "mdi-pine-tree-fire",
+    default: "mdi-help",
+  };
+}
+
+/**
+ * @param project - The associated project.
+ * @param artifactIds - The artifact ids visible in this document.
+ * @param name - The document name.
+ * @return An empty document.
+ */
+export function createDocument(
+  project: ProjectIdentifier = { projectId: "", name: "", description: "" },
+  artifactIds: string[] = [],
+  name = "Default"
+): ProjectDocument {
+  return {
+    documentId: "",
+    project,
+    name,
+    type: DocumentType.ARTIFACT_TREE,
+    artifactIds,
+    description: "",
   };
 }

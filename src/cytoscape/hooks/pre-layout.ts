@@ -1,16 +1,26 @@
-import { CytoCore, LayoutHook } from "@/types";
 import { EdgeSingular } from "cytoscape";
+
+import { CytoCore, LayoutHook } from "@/types";
 import {
   artifactHtml as nodeHTML,
-  nodeWarningHtml,
   GENERATED_LINK_SELECTOR,
   GENERATED_TRACE_MAX_WIDTH,
 } from "@/cytoscape/styles";
 
+/**
+ * Applies HTML overlays to the graph nodes.
+ *
+ * @param cy - The cy instance.
+ */
 export const applyNodeHtml: LayoutHook = (cy: CytoCore): void => {
-  cy.nodeHtmlLabel([nodeHTML, nodeWarningHtml]);
+  cy.nodeHtmlLabel([nodeHTML]);
 };
 
+/**
+ * Applies style changes to graph links.
+ *
+ * @param cy - The cy instance.
+ */
 export const applyOpacityToGeneratedLinks: LayoutHook = (
   cy: CytoCore
 ): void => {
@@ -21,6 +31,7 @@ export const applyOpacityToGeneratedLinks: LayoutHook = (
     });
   });
 };
+
 /**
  * Validates and stores elements in layout objects applying custom styling as needed.
  */

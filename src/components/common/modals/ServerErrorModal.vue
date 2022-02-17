@@ -10,7 +10,7 @@
       <v-list disabled>
         <v-list-item v-for="(error, errorIndex) in errors" :key="errorIndex">
           <v-list-item-content class="pa-0">
-            <code class="word-break-all">
+            <code style="word-break: break-all">
               {{ error }}
             </code>
           </v-list-item-content>

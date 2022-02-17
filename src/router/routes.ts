@@ -16,7 +16,7 @@ export enum Routes {
 
 export const routesWithRequiredProject: string[] = [
   Routes.TRACE_LINK,
-  // TODO: Add after testing Routes.PROJECT_SETTINGS,
+  Routes.PROJECT_SETTINGS,
 ];
 
 export const routesPublic: string[] = [

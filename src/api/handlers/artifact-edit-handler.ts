@@ -4,7 +4,7 @@ import {
   createArtifact,
   updateArtifact,
   deleteArtifactBody,
-} from "@/api/endpoints";
+} from "@/api/commits";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -14,18 +14,16 @@ import {
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
  */
-export function createOrUpdateArtifactHandler(
+export async function createOrUpdateArtifactHandler(
   versionId: string,
   artifact: Artifact,
   isUpdate: boolean
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const artifactPromise = isUpdate ? updateArtifact : createArtifact;
-    artifactPromise(versionId, artifact)
-      .then(() => projectModule.addOrUpdateArtifacts([artifact]))
-      .then(resolve)
-      .catch(reject);
-  });
+  if (isUpdate) {
+    await updateArtifact(versionId, artifact);
+  } else {
+    await createArtifact(versionId, artifact);
+  }
 }
 
 /**
@@ -38,11 +36,7 @@ export function deleteArtifactFromCurrentVersion(
   artifact: Artifact
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const versionId = projectModule.getProject.projectVersion?.versionId;
-    if (versionId === undefined) {
-      logModule.onWarning(
-        "A project version must be selected to delete an artifact."
-      );
+    if (!projectModule.versionIdWithLog) {
       return resolve();
     }
 
@@ -53,7 +47,7 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(() => projectModule.deleteArtifactByName(artifact.name))
+            .then(() => projectModule.deleteArtifactByName(artifact))
             .then(resolve)
             .catch(reject);
         }

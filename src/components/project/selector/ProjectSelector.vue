@@ -6,6 +6,7 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
+    :has-delete="hasDeletePermission"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -47,9 +48,15 @@ import {
   Project,
   ProjectCreationResponse,
   ProjectIdentifier,
+  ProjectRole,
 } from "@/types";
-import { deleteProject, getProjects, saveOrUpdateProject } from "@/api";
-import { logModule, projectModule } from "@/store";
+import {
+  clearProject,
+  deleteProject,
+  getProjects,
+  saveOrUpdateProject,
+} from "@/api";
+import { logModule, projectModule, sessionModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -64,7 +71,7 @@ import { projectSelectorHeaders } from "./headers";
  * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
-  name: "ProjectSelector",
+  name: "project-selector",
   components: {
     GenericSelector,
     ProjectIdentifierModal,
@@ -106,6 +113,18 @@ export default Vue.extend({
       }
     },
   },
+  computed: {
+    hasDeletePermission(): boolean {
+      const userEmail = sessionModule.authenticationToken?.sub || "";
+      const projectMembershipQuery = projectModule.getProject.members.filter(
+        (m) => m.email === userEmail
+      );
+      if (projectMembershipQuery.length === 1) {
+        return projectMembershipQuery[0].role === ProjectRole.OWNER;
+      }
+      return false;
+    },
+  },
   methods: {
     onUpdateProject(project: ProjectIdentifier) {
       this.isLoading = true;
@@ -115,9 +134,7 @@ export default Vue.extend({
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
       this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject).then((project: Project) => {
-        this.$emit("selected", project);
-      });
+      this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
       this.selected = newProject;
     },
@@ -149,7 +166,6 @@ export default Vue.extend({
       this.deleteProjectDialogue = false;
     },
     onConfirmDeleteProject(project: ProjectIdentifier) {
-      this.isLoading = true;
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
@@ -162,6 +178,7 @@ export default Vue.extend({
         .finally(() => (this.isLoading = false));
     },
     deleteProjectHandler(project: ProjectIdentifier) {
+      this.isLoading = true;
       deleteProject(project.projectId)
         .then(async () => {
           logModule.onSuccess(`${project.name} successfully deleted.`);
@@ -172,7 +189,7 @@ export default Vue.extend({
 
           if (project.name === projectModule.getProject.name) {
             // Clear the current project if it has been deleted.
-            await projectModule.clearProject();
+            await clearProject();
           }
         })
         .finally(() => (this.isLoading = false));
@@ -182,6 +199,7 @@ export default Vue.extend({
         projectId: project.projectId,
         description: project.description,
         name: project.name,
+        members: [],
         artifacts: [],
         traces: [],
       })

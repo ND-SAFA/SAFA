@@ -46,8 +46,13 @@ import {
   declineLinkAPIHandler,
   getGeneratedLinks,
 } from "@/api";
-import { TraceApproval, TraceLink, Artifact } from "@/types/domain";
-import { logModule, projectModule } from "@/store";
+import {
+  TraceApproval,
+  TraceLink,
+  Artifact,
+  ProjectVersion,
+} from "@/types/domain";
+import { artifactModule, projectModule } from "@/store";
 import { ApprovalSection, PrivatePage } from "@/components";
 import { navigateTo, Routes } from "@/router";
 import { EmptyLambda } from "@/types";
@@ -62,12 +67,22 @@ export default Vue.extend({
       approvedLinks: [] as TraceLink[],
     };
   },
+  watch: {
+    projectVersion(newVersion: ProjectVersion) {
+      if (newVersion) {
+        this.loadGeneratedLinks();
+      }
+    },
+  },
   computed: {
     projectId(): string {
-      return projectModule.getProject.projectId;
+      return projectModule.projectId;
     },
     artifactHashmap(): Record<string, Artifact> {
-      return projectModule.getArtifactsById;
+      return artifactModule.getArtifactsById;
+    },
+    projectVersion(): ProjectVersion | undefined {
+      return projectModule.getProject.projectVersion;
     },
   },
   methods: {
@@ -75,11 +90,14 @@ export default Vue.extend({
       navigateTo(Routes.ARTIFACT_TREE);
     },
     loadGeneratedLinks() {
-      const versionId = projectModule.getProject.projectVersion?.versionId;
-      if (versionId === undefined || versionId === "") {
-        return logModule.onWarning("No project has been selected");
-      }
+      const versionId = projectModule.versionIdWithLog;
+
+      if (!versionId) return;
+
       getGeneratedLinks(versionId).then((links) => {
+        this.links = [];
+        this.approvedLinks = [];
+        this.declinedLinks = [];
         links.forEach((link) => {
           switch (link.approvalStatus) {
             case TraceApproval.UNREVIEWED:

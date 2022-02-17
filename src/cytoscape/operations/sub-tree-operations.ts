@@ -6,7 +6,6 @@ import { SingularElementArgument, EdgeCollection } from "cytoscape";
  *
  * @param cy - The cytoscape instance to operate on.
  * @param artifacts - The current artifacts.
- *
  * @return The computed subtree map.
  */
 export function createSubtreeMap(
@@ -27,6 +26,7 @@ export function createSubtreeMap(
  * @param cy - The cytoscape instance to operate on.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
  * @param subtreeMapCache - A cache of previously calculated subtrees.
+ * @return The child ids in the subtree.
  */
 function getSubtree(
   cy: CytoCore,
@@ -59,7 +59,6 @@ function getSubtree(
  *
  * @param cy - The cytoscape instance to operate on.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
- *
  * @return The computed child artifact ids.
  */
 function getChildren(cy: CytoCore, artifactId: string): string[] {
@@ -74,25 +73,20 @@ function getChildren(cy: CytoCore, artifactId: string): string[] {
  * Starting at the node with most edges, its parent is followed until no
  * more exist. If a loop is encountered, then the first repeated node is returned.
  *
- * @param cyPromise - A promise returning cytoscape whose root node is returned.
+ * @param cy - The cy instance.
  * @param currentNode - Defines where we are in the tree during recursion.
  * @param traversedNodes - A list of all traversed node IDs to avoid loops.
- *
  * @return The root node.
  */
 export async function getRootNode(
-  cyPromise: Promise<CytoCore>,
+  cy: CytoCore,
   currentNode?: SingularElementArgument,
   traversedNodes: string[] = []
-): Promise<SingularElementArgument> {
-  const cyCore = await cyPromise;
-
-  if (cyCore.nodes().length === 0) {
-    throw Error("Root node does not exist because no nodes are in view.");
-  }
+): Promise<SingularElementArgument | undefined> {
+  if (cy.nodes().length === 0) return;
 
   if (currentNode === undefined) {
-    currentNode = getMostConnectedNode(cyCore);
+    currentNode = getMostConnectedNode(cy);
   }
 
   // Avoid getting stuck in cycles.
@@ -102,14 +96,14 @@ export async function getRootNode(
     traversedNodes.push(currentNode.id());
   }
 
-  const edgesOutOfNode: EdgeCollection = cyCore
+  const edgesOutOfNode: EdgeCollection = cy
     .edges()
     .filter((e) => e.target() === currentNode);
 
   if (edgesOutOfNode.length === 0) {
     return currentNode;
   } else {
-    return getRootNode(cyPromise, edgesOutOfNode[0].source(), traversedNodes);
+    return getRootNode(cy, edgesOutOfNode[0].source(), traversedNodes);
   }
 }
 
@@ -117,6 +111,7 @@ export async function getRootNode(
  * Returns the node in given Cytoscape instance with the most connected edges.
  *
  * @param cy - The cytoscape instance to operate on.
+ * @return The found node.
  */
 function getMostConnectedNode(cy: CytoCore): SingularElementArgument {
   const counts: Record<string, number> = {};

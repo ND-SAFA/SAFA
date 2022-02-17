@@ -7,6 +7,7 @@
     <v-expansion-panel-content>
       <artifact-delta-button
         v-for="(name, nameIndex) in names"
+        class="mr-1 mb-1"
         :key="name"
         :name="name"
         :deltaType="deltaType"

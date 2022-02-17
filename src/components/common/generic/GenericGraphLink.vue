@@ -26,27 +26,26 @@ export default Vue.extend({
   },
   computed: {
     selector() {
-      const { sourceId, targetId } = this.traceDefinition;
-      const id = `${sourceId}-${targetId}`;
+      const { traceLinkId } = this.traceDefinition;
 
-      return deltaModule.getTraceDeltaType(id);
+      return deltaModule.getTraceDeltaType(traceLinkId);
     },
     definition() {
-      const { sourceId, targetId } = this.traceDefinition;
-      const id = `${sourceId}-${targetId}`;
+      const { sourceId, targetId, traceLinkId } = this.traceDefinition;
       const count = this.count ? this.count : 1;
-      const traceType = deltaModule.getTraceDeltaType(id);
+      const deltaType = deltaModule.getTraceDeltaType(traceLinkId);
 
       return {
         data: {
           ...this.traceDefinition,
-          id,
+          id: traceLinkId,
           // Reversed to show arrow toward parent.
           source: targetId,
           target: sourceId,
           count,
+          deltaType,
         },
-        classes: [`eh-delta-${traceType}`],
+        classes: sourceId === targetId ? ["loop"] : [],
       };
     },
   },

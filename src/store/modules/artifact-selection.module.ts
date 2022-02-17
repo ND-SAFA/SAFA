@@ -1,7 +1,8 @@
-import { appModule, projectModule, viewportModule } from "@/store";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+
 import type { Artifact, FilterAction } from "@/types";
 import { PanelType } from "@/types";
+import { appModule, artifactModule, viewportModule } from "@/store";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**
@@ -51,21 +52,12 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * Sets the given artifact as selected.
    *
-   * @param artifact - The artifact to select.
+   * @param artifactId - The artifact to select.
    */
-  async selectArtifact(artifact: Artifact): Promise<void> {
-    this.SELECT_ARTIFACT(artifact.id);
+  async selectArtifact(artifactId: string): Promise<void> {
+    this.SELECT_ARTIFACT(artifactId);
     appModule.openPanel(PanelType.left);
-    await viewportModule.centerOnArtifacts([artifact.id]);
-  }
-
-  @Action
-  /**
-   * Unselects any selected artifact and closes the left app panel.
-   */
-  unselectArtifact(): void {
-    this.UNSELECT_ARTIFACT();
-    appModule.closePanel(PanelType.left);
+    viewportModule.centerOnArtifacts([artifactId]);
   }
 
   @Action
@@ -73,8 +65,9 @@ export default class ArtifactSelectionModule extends VuexModule {
    * Clears any selected artifact(s) in artifact tree.
    */
   clearSelections(): void {
-    this.unselectArtifact();
     this.SET_SELECTED_SUBTREE([]);
+    this.UNSELECT_ARTIFACT();
+    appModule.closePanel(PanelType.left);
   }
 
   @Mutation
@@ -128,11 +121,29 @@ export default class ArtifactSelectionModule extends VuexModule {
   }
 
   /**
+   * @return The currently selected artifact id.
+   */
+  get getSelectedArtifactId(): string {
+    return this.selectedArtifactId;
+  }
+
+  /**
+   * @return Whether there is a currently selected artifact.
+   */
+  get isArtifactSelected(): boolean {
+    return this.selectedArtifactId !== "";
+  }
+
+  /**
    * @return The currently selected artifact.
    */
   get getSelectedArtifact(): Artifact | undefined {
     if (this.selectedArtifactId !== "") {
-      return projectModule.getArtifactById(this.selectedArtifactId);
+      try {
+        return artifactModule.getArtifactById(this.selectedArtifactId);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 

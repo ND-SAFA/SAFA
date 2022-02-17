@@ -8,7 +8,7 @@
         :error-messages="isError ? ['Invalid username or password'] : []"
         @keydown.enter="handleLogin"
       />
-      <password-field v-model="password" @submit="handleLogin" />
+      <password-field v-model="password" @enter="handleLogin" />
     </template>
 
     <template v-slot:actions>
@@ -49,7 +49,8 @@
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { sessionModule } from "@/store";
+import { loadLastProject } from "@/api";
+import { login } from "@/api/handlers/session-handler";
 
 /**
  * Presents the login page.
@@ -69,18 +70,17 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      sessionModule
-        .login({
-          email: this.email,
-          password: this.password,
-        })
+      login({
+        email: this.email,
+        password: this.password,
+      })
         .then(async () => {
           this.isLoading = false;
 
           if (goToPage && goToPage !== Routes.ARTIFACT_TREE) {
             await navigateTo(goToPage);
           } else {
-            await sessionModule.loadLastProject();
+            await loadLastProject();
           }
         })
         .catch(() => {

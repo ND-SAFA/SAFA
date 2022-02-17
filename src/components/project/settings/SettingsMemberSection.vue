@@ -52,7 +52,7 @@ import {
 import { GenericSelector } from "@/components";
 import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
-import { appModule, logModule, sessionModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
@@ -67,7 +67,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      members: [] as ProjectMembership[],
       memberToEdit: undefined as ProjectMembership | undefined,
       isLoading: false,
       isNewOpen: false,
@@ -76,14 +75,15 @@ export default Vue.extend({
   },
   computed: {
     isAdmin(): boolean {
-      const userEmail = sessionModule.authenticationToken.sub;
+      const userEmail = sessionModule.authenticationToken?.sub || "";
       const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-
-      return (
-        this.members.filter(
-          (m) => m.email === userEmail && allowedRoles.includes(m.role)
-        ).length > 0
+      const userQuery = this.project.members.filter(
+        (m) => m.email === userEmail
       );
+      return userQuery.length === 1 && allowedRoles.includes(userQuery[0].role);
+    },
+    members(): ProjectMembership[] {
+      return this.project.members;
     },
     hasDescription(): boolean {
       const description = this.project.description;
@@ -101,14 +101,6 @@ export default Vue.extend({
         { text: "Actions", value: "actions", sortable: false },
       ];
     },
-  },
-  watch: {
-    project() {
-      this.retrieveMembers();
-    },
-  },
-  created() {
-    this.retrieveMembers();
   },
   methods: {
     async retrieveMembers(): Promise<void> {
@@ -133,18 +125,15 @@ export default Vue.extend({
         statusCallback: async (isConfirmed: boolean) => {
           if (isConfirmed) {
             await deleteProjectMember(member);
-            await this.retrieveMembers();
           }
         },
       });
     },
     async onConfirmAdd(): Promise<void> {
       this.isNewOpen = false;
-      await this.retrieveMembers();
     },
     async onConfirmEdit(): Promise<void> {
       this.isEditOpen = false;
-      await this.retrieveMembers();
     },
   },
 });

@@ -20,6 +20,7 @@
       >
         <v-btn
           text
+          block
           class="text-none"
           :color="itemColor"
           @click="() => onItemClick(itemIndex, item)"
@@ -51,10 +52,12 @@ export default Vue.extend({
     return {
       hover: true,
       hoverColor: ThemeColors.menuHighlight,
-      selectedValue: this.definition.selectedItem || "",
     };
   },
   computed: {
+    selectedValue(): string {
+      return this.definition.selectedItem || "";
+    },
     disabled(): boolean {
       return this.definition.isDisabled !== undefined
         ? this.definition.isDisabled
@@ -88,7 +91,7 @@ export default Vue.extend({
   methods: {
     onItemClick(itemIndex: number, value: string): void {
       this.$props.definition.menuHandlers[itemIndex]("payload");
-      this.selectedValue = value;
+      this.definition.selectedItem = value;
     },
   },
 });

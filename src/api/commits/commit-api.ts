@@ -1,5 +1,5 @@
 import { Commit } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/endpoints/util";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
  * Sends commit to backend to be saved to the database.

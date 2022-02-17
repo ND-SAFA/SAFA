@@ -6,6 +6,7 @@ import {
   ARTIFACT_SHAPE,
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_BORDER_WIDTH,
+  ARTIFACT_COLOR,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import {
   TRACE_COLOR,
@@ -36,6 +37,30 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
+    selector: "edge[deltaType='added']",
+    style: {
+      "target-arrow-color": ThemeColors.artifactAdded,
+      "source-arrow-color": ThemeColors.artifactAdded,
+      "line-color": ThemeColors.artifactAdded,
+    },
+  },
+  {
+    selector: "edge[deltaType='modified']",
+    style: {
+      "target-arrow-color": ThemeColors.artifactModified,
+      "source-arrow-color": ThemeColors.artifactModified,
+      "line-color": ThemeColors.artifactModified,
+    },
+  },
+  {
+    selector: "edge[deltaType='removed']",
+    style: {
+      "target-arrow-color": ThemeColors.artifactRemoved,
+      "source-arrow-color": ThemeColors.artifactRemoved,
+      "line-color": ThemeColors.artifactRemoved,
+    },
+  },
+  {
     selector: GENERATED_LINK_SELECTOR,
     style: {
       "line-color": GENERATED_TRACE_COLOR,
@@ -55,20 +80,21 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "line-style": "solid",
     },
   },
+
   {
     selector: "node",
     style: {
       padding: ARTIFACT_PADDING,
-      "background-color": ThemeColors.artifactDefault,
+      "background-color": "white",
       shape: ARTIFACT_SHAPE,
       width: ARTIFACT_WIDTH + "px",
       height: ARTIFACT_HEIGHT + "px",
       "border-style": ARTIFACT_BORDER_STYLE,
       "border-width": ARTIFACT_BORDER_WIDTH,
-      "border-color": "white",
+      "border-color": ARTIFACT_COLOR,
       "text-wrap": "ellipsis",
     },
-  } as CytoStyleSheet,
+  },
   {
     selector: "node[?isSelected]",
     style: {

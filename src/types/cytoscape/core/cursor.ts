@@ -51,6 +51,10 @@ export enum CSSCursor {
    */
   GRAB = "grab",
   /**
+   * Something can be grabbed (dragged to be moved).
+   */
+  GRABBING = "grabbing",
+  /**
    * The text can be selected. Typically the shape of an I-beam.
    */
   TEXT = "text",

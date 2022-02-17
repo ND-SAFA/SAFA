@@ -2,6 +2,9 @@ import { HtmlDefinition } from "@/types";
 import { TimNodeData } from "@/types/components/tim-tree";
 import { TIM_NODE_HEIGHT, TIM_NODE_WIDTH } from "@/cytoscape";
 
+/**
+ * Defines tim node html.
+ */
 export const timNodeHtml: HtmlDefinition<TimNodeData> = {
   query: "node",
   halign: "center",

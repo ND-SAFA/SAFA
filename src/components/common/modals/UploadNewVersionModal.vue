@@ -3,6 +3,7 @@
     v-model="currentStep"
     title="Upload Flat Files"
     :is-open="isOpen"
+    :startStep="startStep"
     :after-steps="[['Upload Files', filesSelected.length > 0]]"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
@@ -41,6 +42,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { uploadNewProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common/generic";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
+import { projectModule } from "@/store";
 
 /**
  * Modal for uploading a new version.
@@ -68,6 +70,26 @@ export default Vue.extend({
       isLoading: false,
       setAsNewVersion: true,
     };
+  },
+  watch: {
+    isOpen(open: boolean) {
+      const currentProject = projectModule.getProject;
+      const currentVersion = currentProject.projectVersion;
+
+      if (open && currentProject.projectId) {
+        this.selectedProject = currentProject;
+        this.currentStep = 2;
+
+        if (currentVersion?.versionId) {
+          this.selectedVersion = currentVersion;
+        }
+      }
+    },
+  },
+  computed: {
+    startStep(): number {
+      return this.selectedProject === undefined ? 1 : 2;
+    },
   },
   methods: {
     onClose() {

@@ -5,8 +5,8 @@ import {
   TIM_EDGE_STYLE,
   TIM_EDGE_WIDTH,
   TIM_EDGE_X_MARGIN,
-  TIM_NODE_BACKGROUND_COLOR,
   TIM_NODE_BORDER_WIDTH,
+  TIM_NODE_COLOR,
   TIM_NODE_HEIGHT,
   TIM_NODE_SHAPE,
   TIM_NODE_WIDTH,
@@ -24,14 +24,20 @@ export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
+    selector: ".loop",
+    style: {
+      "control-point-step-size": 120,
+    },
+  },
+  {
     selector: "node",
     style: {
       shape: TIM_NODE_SHAPE,
       width: TIM_NODE_WIDTH,
       height: TIM_NODE_HEIGHT,
-      backgroundColor: TIM_NODE_BACKGROUND_COLOR,
+      backgroundColor: "white",
       "border-width": TIM_NODE_BORDER_WIDTH,
-      "border-color": "white",
+      "border-color": TIM_NODE_COLOR,
     },
   },
 ];

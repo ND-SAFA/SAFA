@@ -1,12 +1,19 @@
 <template>
   <v-container>
-    <v-container v-if="selectedArtifact !== undefined">
+    <div v-if="selectedArtifact !== undefined">
       <v-row align="center">
         <v-col>
-          <h1 class="text-h4">{{ selectedArtifact.name }}</h1>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <h1 v-on="on" v-bind="attrs" class="text-h4 artifact-title">
+                {{ selectedArtifact.name }}
+              </h1>
+            </template>
+            {{ selectedArtifact.name }}
+          </v-tooltip>
         </v-col>
         <v-col>
-          <v-row justify="end">
+          <v-row justify="end" class="mr-1">
             <generic-icon-button
               tooltip="Edit"
               icon-id="mdi-pencil"
@@ -72,20 +79,32 @@
         </v-col>
       </v-row>
 
-      <v-divider />
+      <v-divider class="mb-2" />
 
-      <v-row justify="center" v-if="selectedArtifactWarnings !== undefined">
-        <v-col class="flex-grow-0 my-1">
-          <v-icon color="secondary"> mdi-hazard-lights </v-icon>
-        </v-col>
-      </v-row>
+      <div v-if="selectedArtifactWarnings.length > 0">
+        <v-row align="center" class="debug">
+          <v-col>
+            <h2 class="text-h5">Warnings</h2>
+          </v-col>
+          <v-col class="flex-grow-0 mr-2">
+            <v-icon color="secondary">mdi-hazard-lights</v-icon>
+          </v-col>
+        </v-row>
 
-      <p
-        class="text-body-2 font-italic"
-        v-if="selectedArtifactWarnings !== undefined"
-      >
-        {{ selectedArtifactWarnings }}
-      </p>
+        <v-expansion-panels>
+          <v-expansion-panel
+            v-for="warning in selectedArtifactWarnings"
+            :key="warning"
+          >
+            <v-expansion-panel-header class="text-body-1 font-weight-bold">
+              {{ warning.ruleName }}
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="text-body-1">
+              {{ warning.ruleMessage }}
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </div>
 
       <artifact-creator-modal
         title="Edit Artifact Contents"
@@ -93,21 +112,23 @@
         :artifact="selectedArtifact"
         @close="isArtifactCreatorOpen = false"
       />
-    </v-container>
+    </div>
 
-    <p v-else>No artifact selected</p>
+    <p v-else class="text-body-1">No artifact is selected.</p>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, PanelType, ProjectWarnings } from "@/types";
+import { Artifact, ArtifactWarning, PanelType, ProjectWarnings } from "@/types";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import {
   appModule,
+  artifactModule,
   artifactSelectionModule,
   errorModule,
   projectModule,
+  traceModule,
 } from "@/store";
 import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
 
@@ -131,9 +152,8 @@ export default Vue.extend({
     parents(): string[] {
       const selectedArtifact = this.selectedArtifact;
       if (selectedArtifact !== undefined) {
-        const traceLinks = projectModule.traceLinks;
-        const query = traceLinks.filter(
-          (l) => l.sourceName === selectedArtifact.name
+        const query = traceModule.traces.filter(
+          ({ sourceName }) => sourceName === selectedArtifact.name
         );
         return query.map((l) => l.targetName);
       } else {
@@ -143,9 +163,8 @@ export default Vue.extend({
     children(): string[] {
       const selectedArtifactName = this.selectedArtifactName;
       if (selectedArtifactName !== undefined) {
-        const traceLinks = projectModule.traceLinks;
-        const query = traceLinks.filter(
-          (l) => l.targetName === selectedArtifactName
+        const query = traceModule.traces.filter(
+          ({ targetName }) => targetName === selectedArtifactName
         );
         return query.map((l) => l.sourceName);
       } else {
@@ -155,14 +174,10 @@ export default Vue.extend({
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
     },
-    selectedArtifactWarnings(): string | undefined {
-      if (
-        this.selectedArtifact !== undefined &&
-        this.selectedArtifact.name in this.projectWarnings
-      ) {
-        return this.projectWarnings[this.selectedArtifact.name][0].ruleMessage;
-      }
-      return undefined;
+    selectedArtifactWarnings(): ArtifactWarning[] {
+      const id = this.selectedArtifact?.id || "";
+
+      return this.projectWarnings[id] || [];
     },
   },
   methods: {
@@ -170,8 +185,9 @@ export default Vue.extend({
       this.isArtifactCreatorOpen = true;
     },
     onArtifactClick(artifactName: string): void {
-      const artifactQuery = projectModule.getArtifactByName(artifactName);
-      artifactSelectionModule.selectArtifact(artifactQuery);
+      const artifact = artifactModule.getArtifactByName(artifactName);
+
+      artifactSelectionModule.selectArtifact(artifact.id);
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
@@ -184,3 +200,14 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+.v-expansion-panel::before {
+  box-shadow: none;
+}
+.artifact-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 135px;
+}
+</style>

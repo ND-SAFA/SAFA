@@ -1,8 +1,16 @@
-import { EmptyLambda, ProjectIdentifier, ProjectVersion } from "@/types";
-import { logModule, projectModule } from "@/store";
-import { updateProjectThroughFlatFiles } from "@/api/endpoints/project-api";
-import { ProjectCreationResponse } from "@/types";
+import {
+  EmptyLambda,
+  ProjectIdentifier,
+  ProjectVersion,
+  ProjectCreationResponse,
+} from "@/types";
+import { logModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
+import {
+  connectAndSubscribeToVersion,
+  updateProjectThroughFlatFiles,
+} from "@/api/endpoints";
+import { setAndSubscribeToProject, setCreatedProject } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -37,12 +45,10 @@ export async function uploadNewProjectVersion(
       formData.append("files", file);
     });
     if (setVersionIfSuccessful) {
-      await projectModule
-        .subscribeToVersion({
-          projectId: selectedProject.projectId,
-          versionId: selectedVersion.versionId,
-        })
-        .catch((e) => logModule.onError(e.message));
+      connectAndSubscribeToVersion(
+        selectedProject.projectId,
+        selectedVersion.versionId
+      ).catch((e) => logModule.onError(e.message));
     }
 
     updateProjectThroughFlatFiles(selectedVersion.versionId, formData)
@@ -52,6 +58,8 @@ export async function uploadNewProjectVersion(
         );
         if (setVersionIfSuccessful) {
           await navigateTo(Routes.ARTIFACT_TREE);
+          await setCreatedProject(res);
+          await viewportModule.setArtifactTreeLayout();
         }
       })
       .finally(() => {

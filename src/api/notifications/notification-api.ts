@@ -1,11 +1,20 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { ProjectVersionUpdate } from "@/types";
+import { ProjectMessage, VersionMessage } from "@/types";
 import { projectModule, logModule } from "@/store";
-import { baseURL } from "@/api/endpoints/util";
-import { getProjectVersion } from "@/api/endpoints/version-api";
+import { baseURL } from "@/api/util";
+import {
+  getProjectMembers,
+  setCreatedProject,
+  getProjectVersion,
+  reloadDocumentArtifacts,
+} from "@/api";
+import {
+  reloadArtifactsHandler,
+  reloadTracesHandler,
+} from "./load-version-handler";
 
-const WEBSOCKET_URL = `${baseURL}/websocket`;
+const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
 let stompClient: Client;
 
@@ -26,7 +35,7 @@ let currentReconnectAttempts = 0;
 function getStompClient(reconnect = false): Client {
   if (sock === undefined || stompClient === undefined || reconnect) {
     try {
-      sock = new SockJS(WEBSOCKET_URL, { DEBUG: false });
+      sock = new SockJS(WEBSOCKET_URL(), { DEBUG: false });
       sock.onclose = () => {
         logModule.onDevMessage("Closing WebSocket.");
         connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then();
@@ -72,7 +81,7 @@ function connect(
 
     currentReconnectAttempts++;
     stomp.connect(
-      { host: WEBSOCKET_URL },
+      { host: WEBSOCKET_URL() },
       () => {
         if (currentReconnectAttempts > 1) {
           logModule.onSuccess("Web Socket reconnected to server.");
@@ -125,16 +134,21 @@ export function connectAndSubscribeToVersion(
   versionId: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (!projectId || !versionId) {
+      resolve();
+      return;
+    }
+
     connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME)
       .then(() => {
         clearSubscriptions();
         const projectSubscription = `/topic/projects/${projectId}`;
         const versionSubscription = `/topic/revisions/${versionId}`;
         stompClient.subscribe(projectSubscription, async (frame) => {
-          await revisionMessageHandler(versionId, frame).then();
+          await projectMessageHandler(projectId, frame);
         });
         stompClient.subscribe(versionSubscription, async (frame) => {
-          await revisionMessageHandler(versionId, frame);
+          await versionMessageHandler(versionId, frame);
         });
         resolve();
       })
@@ -143,27 +157,42 @@ export function connectAndSubscribeToVersion(
 }
 
 /**
- * Handles revision messages.
+ * Handles revision messages related to versioned entities of the project.
  *
  * @param versionId - The project version ID of the revision.
- * @param frame - The frame of the revision.
+ * @param frame - The frame received by the version websocket channel.
  */
-async function revisionMessageHandler(
+async function versionMessageHandler(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const revision: ProjectVersionUpdate = JSON.parse(
-    frame.body
-  ) as ProjectVersionUpdate;
+  const message: VersionMessage = frame.body as VersionMessage;
 
-  switch (revision.type) {
-    case "included":
-      await projectModule.addOrUpdateArtifacts(revision.artifacts);
-      await projectModule.addOrUpdateTraceLinks(revision.traces);
-      break;
-    case "excluded":
-      getProjectVersion(versionId).then(
-        projectModule.setProjectCreationResponse
-      );
+  switch (message) {
+    case "VERSION":
+      return getProjectVersion(versionId).then(setCreatedProject);
+    case "ARTIFACTS":
+      return reloadArtifactsHandler(versionId);
+    case "TRACES":
+      return reloadTracesHandler(versionId);
+  }
+}
+
+/**
+ * Handles revision messages.
+ *
+ * @param projectId - ID of project to update.
+ * @param frame - The frame of the revision.
+ */
+async function projectMessageHandler(
+  projectId: string,
+  frame: Frame
+): Promise<void> {
+  const message: ProjectMessage = frame.body as ProjectMessage;
+  switch (message) {
+    case "MEMBERS":
+      return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
+    case "DOCUMENTS":
+      return reloadDocumentArtifacts(projectId);
   }
 }

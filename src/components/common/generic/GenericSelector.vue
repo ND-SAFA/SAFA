@@ -74,7 +74,6 @@
 import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
 import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
-import { DataItem, ProjectVersion } from "@/types";
 
 /**
  * Displays a generic selector.

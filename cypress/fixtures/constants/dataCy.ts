@@ -49,7 +49,7 @@ export enum DataCy {
   passwordChangeButton = "button-update-password",
   accountDeletePasswordInput = "input-delete-password",
   accountDeleteButton = "button-delete-my-account",
-  popUpAcceptButton = "button-i-accept",
+  popUpAcceptButton = "button-confirm-modal",
 
   // Snackbar
 

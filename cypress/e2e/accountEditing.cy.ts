@@ -7,7 +7,7 @@ describe("Account Editing", () => {
       editUser.password
     );
     cy.visit("/account").login(editUser.email, editUser.password);
-    cy.location("pathname", { timeout: 5000 }).should("equal", "/account");
+    cy.location("pathname", { timeout: 10000 }).should("equal", "/account");
   });
 
   describe("Password Change", () => {

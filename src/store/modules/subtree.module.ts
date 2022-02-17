@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink, SubtreeMap, Project } from "@/types";
-import { artifactModule, traceModule } from "@/store";
+import { artifactModule, subtreeModule, traceModule } from "@/store";
 import {
   artifactTreeCyPromise,
   createSubtreeMap,
@@ -69,6 +69,23 @@ export default class SubtreeModule extends VuexModule {
     this.SET_SUBTREE_MAP({});
     this.SET_SUBTREE_LINKS([]);
     await this.resetHiddenNodes();
+  }
+
+  @Action
+  /**
+   * Temporarily removes all hidden nodes, runs the callback, then restores the hidden nodes.
+   */
+  async restoreHiddenNodesAfter(cb: () => Promise<void>): Promise<void> {
+    const collapsedParents = this.collapsedParentNodes;
+
+    await this.resetHiddenNodes();
+    await cb();
+
+    for (const id of collapsedParents) {
+      if (this.hiddenSubtreeNodes.includes(id)) continue;
+
+      await this.hideSubtree(id);
+    }
   }
 
   @Action

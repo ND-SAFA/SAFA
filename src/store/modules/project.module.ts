@@ -97,6 +97,22 @@ export default class ProjectModule extends VuexModule {
     await subtreeModule.updateSubtreeMap();
   }
 
+  @Action
+  /**
+   * Deletes the given trace link.
+   *
+   * @param traceLink - The trace link to remove.
+   */
+  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+    this.SET_TRACES(
+      this.project.traces.filter(
+        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+      )
+    );
+    await traceModule.deleteTraceLink(traceLink);
+    await subtreeModule.updateSubtreeMap();
+  }
+
   @Mutation
   /**
    * Sets a new project.

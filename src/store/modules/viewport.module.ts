@@ -4,9 +4,7 @@ import {
   appModule,
   artifactModule,
   artifactSelectionModule,
-  projectModule,
   subtreeModule,
-  viewportModule,
 } from "@/store";
 import {
   artifactTreeCyPromise,
@@ -19,7 +17,7 @@ import {
   cyIfNotAnimated,
   cyCreateLayout,
   cyCenterOnArtifacts,
-  cyCenterNodes,
+  cyApplyAutomove,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -52,7 +50,7 @@ export default class ViewportModule extends VuexModule {
       artifact.id,
     ];
 
-    await artifactSelectionModule.selectArtifact(artifact.id);
+    artifactSelectionModule.selectArtifact(artifact.id);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",
@@ -148,6 +146,16 @@ export default class ViewportModule extends VuexModule {
    */
   deselectArtifacts(): void {
     this.SET_CURRENT_COLLECTION([]);
+  }
+
+  @Action
+  /**
+   * Resets all automove events.
+   */
+  applyAutomove(): void {
+    if (this.currentLayout) {
+      cyApplyAutomove(this.currentLayout);
+    }
   }
 
   @Mutation

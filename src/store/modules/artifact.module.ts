@@ -57,7 +57,7 @@ export default class ArtifactModule extends VuexModule {
         ({ name }) => name === selectedArtifact.name
       );
       if (query.length > 0) {
-        await artifactSelectionModule.selectArtifact(query[0].id);
+        artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
   }

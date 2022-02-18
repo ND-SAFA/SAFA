@@ -1,4 +1,4 @@
-import { artifactModule, documentModule, projectModule } from "@/store";
+import { documentModule, projectModule } from "@/store";
 import { Artifact, Project, ProjectDocument } from "@/types";
 import {
   createOrUpdateDocument,

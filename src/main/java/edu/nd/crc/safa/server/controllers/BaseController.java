@@ -7,7 +7,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.ResponseCodes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -42,14 +42,14 @@ public abstract class BaseController {
 
     @ExceptionHandler(SafaError.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleServerError(SafaError exception) {
+    public SafaResponse handleServerError(SafaError exception) {
         exception.printError();
-        return new ServerResponse(exception, ResponseCodes.FAILURE);
+        return new SafaResponse(exception, ResponseCodes.FAILURE);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleValidationError(MethodArgumentNotValidException exception) {
+    public SafaResponse handleValidationError(MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder errorMessage = new StringBuilder();
         for (ObjectError error : bindingResult.getAllErrors()) {
@@ -57,25 +57,25 @@ public abstract class BaseController {
         }
         SafaError error = new SafaError(errorMessage.toString());
         error.setDetails(exception.getMessage());
-        return new ServerResponse(error, ResponseCodes.FAILURE);
+        return new SafaResponse(error, ResponseCodes.FAILURE);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+    public SafaResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
         SafaError error = new SafaError(errorMessage, exception);
         error.setDetails(exception.getMessage());
-        return new ServerResponse(error, ResponseCodes.FAILURE);
+        return new SafaResponse(error, ResponseCodes.FAILURE);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerResponse handleGenericError(Exception ex) {
+    public SafaResponse handleGenericError(Exception ex) {
         ex.printStackTrace();
         SafaError wrapper = new SafaError("An unexpected server error occurred.", ex);
-        return new ServerResponse(wrapper, ResponseCodes.FAILURE);
+        return new SafaResponse(wrapper, ResponseCodes.FAILURE);
     }
 
     protected Document getDocumentById(DocumentRepository documentRepository,

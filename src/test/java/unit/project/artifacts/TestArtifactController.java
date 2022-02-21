@@ -153,7 +153,9 @@ public class TestArtifactController extends ApplicationBaseTest {
                 artifactName,
                 artifactType,
                 artifactBody);
-        CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactJson);
+        CommitBuilder commitBuilder = CommitBuilder
+            .withVersion(projectVersion)
+            .withRemovedArtifact(artifactJson);
         commit(commitBuilder);
 
         // VP - Verify that artifact no longer exists.

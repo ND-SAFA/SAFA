@@ -7,7 +7,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -49,11 +49,11 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @throws SafaError Throws error if no version is associated with given id.
      */
     @GetMapping(AppRoutes.Projects.getProjectInVersion)
-    public ServerResponse getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
+    public SafaResponse getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         ProjectEntities response = this.projectRetrievalService
             .retrieveAndCreateProjectResponse(projectVersion);
-        return new ServerResponse(response);
+        return new SafaResponse(response);
     }
 
     /**
@@ -64,10 +64,10 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @throws SafaError Throws error is user does not have read permission on the project.
      */
     @GetMapping(AppRoutes.Projects.getArtifactsInVersion)
-    public ServerResponse getArtifactsInVersion(@PathVariable UUID versionId) throws SafaError {
+    public SafaResponse getArtifactsInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<ArtifactAppEntity> artifacts = this.projectRetrievalService.getArtifactInProjectVersion(projectVersion);
-        return new ServerResponse(artifacts);
+        return new SafaResponse(artifacts);
     }
 
     /**
@@ -78,9 +78,9 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @throws SafaError Throws error is authorized user does not have read permission on the project.
      */
     @GetMapping(AppRoutes.Projects.getTracesInVersion)
-    public ServerResponse getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
+    public SafaResponse getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<TraceAppEntity> traces = this.projectRetrievalService.getTracesInProjectVersion(projectVersion);
-        return new ServerResponse(traces);
+        return new SafaResponse(traces);
     }
 }

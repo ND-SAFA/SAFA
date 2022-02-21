@@ -8,7 +8,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -54,7 +54,7 @@ public class ProjectController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
+    public SafaResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
@@ -66,7 +66,7 @@ public class ProjectController extends BaseController {
             response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
         }
 
-        return new ServerResponse(response);
+        return new SafaResponse(response);
     }
 
     /**
@@ -75,9 +75,9 @@ public class ProjectController extends BaseController {
      * @return List of project identifiers.
      */
     @GetMapping(AppRoutes.Projects.getUserProjects)
-    public ServerResponse getUserProjects() {
+    public SafaResponse getUserProjects() {
         List<Project> userProjects = projectService.getCurrentUserProjects();
-        return new ServerResponse(userProjects);
+        return new SafaResponse(userProjects);
     }
 
     /**
@@ -89,9 +89,9 @@ public class ProjectController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.deleteProjectById)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
+    public SafaResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
         this.projectRepository.delete(project);
-        return new ServerResponse("Project deleted successfully");
+        return new SafaResponse("Project deleted successfully");
     }
 }

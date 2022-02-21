@@ -1,16 +1,16 @@
 package edu.nd.crc.safa.server.entities.api;
 
 //TODO: Remove this and replace with actual http codes
-public class ServerResponse {
+public class SafaResponse {
     private Object body;
     private int status;
 
-    public ServerResponse(Object body) {
+    public SafaResponse(Object body) {
         this.body = body;
         this.status = ResponseCodes.SUCCESS;
     }
 
-    public ServerResponse(Object body, int errorCode) {
+    public SafaResponse(Object body, int errorCode) {
         this.body = body;
         this.status = errorCode;
     }

@@ -8,8 +8,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.app.VersionedEntities;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
+import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
@@ -67,7 +67,7 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse updateProjectVersionFromFlatFiles(
+    public SafaResponse updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
@@ -79,8 +79,8 @@ public class FlatFileController extends BaseController {
             project,
             projectVersion,
             files);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.VERSION);
-        return new ServerResponse(response);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        return new SafaResponse(response);
     }
 
     /**
@@ -92,7 +92,7 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
+    public SafaResponse createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
             throw new SafaError("Could not create project because no files were received.");
         }
@@ -105,8 +105,8 @@ public class FlatFileController extends BaseController {
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.VERSION);
-        return new ServerResponse(response);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        return new SafaResponse(response);
     }
 
     /**

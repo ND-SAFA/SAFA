@@ -64,11 +64,10 @@ public abstract class GenericVersionRepository<
                                                                AppEntity appEntity);
 
     /**
-     * @param project The project to search for base entity.
-     * @param name    The name of the base entity.
+     * @param baseEntityId The name of the base entity.
      * @return Returns the base entity in given project with given name.
      */
-    abstract Optional<BaseEntity> findBaseEntityByName(Project project, String name);
+    abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
 
     /**
      * Finds base entity associated with given app entity if an entity exists.
@@ -157,49 +156,60 @@ public abstract class GenericVersionRepository<
      * @return String representing parser error if one occurred.
      */
     @Override
-    public CommitError commitSingleEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) {
-        return commitErrorHandler(projectVersion, () -> {
+    public Pair<VersionEntity, CommitError> commitSingleEntityToProjectVersion(ProjectVersion projectVersion,
+                                                                               AppEntity appEntity) {
+        VersionAction<VersionEntity> versionAction = () -> {
             Pair<BaseEntity, VersionEntity> entities = this
                 .createVersionEntityFromAppEntity(projectVersion, appEntity);
             VersionEntity artifactVersion = entities.getValue1();
             if (artifactVersion == null) {
-                return;
+                return Optional.empty();
             }
             saveOrOverrideVersionEntity(projectVersion, artifactVersion);
-        }, appEntity.getId());
+            return Optional.of(artifactVersion);
+        };
+        return commitErrorHandler(projectVersion, versionAction, appEntity.getId());
     }
 
     @Override
-    public List<CommitError> commitAllEntitiesInProjectVersion(ProjectVersion projectVersion,
-                                                               List<AppEntity> appEntities) throws SafaError {
-        Pair<List<VersionEntity>, List<CommitError>> response = this
+    public List<Pair<VersionEntity, CommitError>> commitAllEntitiesInProjectVersion(ProjectVersion projectVersion,
+                                                                                    List<AppEntity> appEntities) {
+        List<Pair<VersionEntity, CommitError>> versionEntityPayloads = this
             .calculateVersionEntitiesFromAppEntities(projectVersion, appEntities);
-        List<CommitError> errors = response.getValue1();
-        for (VersionEntity body : response.getValue0()) {
-            CommitError error = commitErrorHandler(projectVersion, () -> {
-                this.saveOrOverrideVersionEntity(projectVersion, body);
-            });
-            errors.add(error);
-        }
-        return errors.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return versionEntityPayloads
+            .stream()
+            .map(payload -> {
+                VersionEntity versionEntity = payload.getValue0();
+                VersionAction<VersionEntity> versionAction = () -> {
+                    if (versionEntity != null) {
+                        this.saveOrOverrideVersionEntity(projectVersion, versionEntity);
+                        return Optional.of(versionEntity);
+                    } else {
+                        return Optional.empty();
+                    }
+                };
+                return commitErrorHandler(projectVersion, versionAction);
+            })
+            .collect(Collectors.toList());
     }
 
     @Override
-    public CommitError deleteVersionEntityByBaseName(
+    public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityName) {
-        return commitErrorHandler(projectVersion,
-            () -> {
-                Project project = projectVersion.getProject();
-                Optional<BaseEntity> baseEntityOptional = this
-                    .findBaseEntityByName(project, baseEntityName);
+        String baseEntityId) {
+        VersionAction<VersionEntity> versionAction = () -> {
+            Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
-                if (baseEntityOptional.isPresent()) {
-                    BaseEntity baseEntity = baseEntityOptional.get();
-                    VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
-                    this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
-                }
-            });
+            if (baseEntityOptional.isPresent()) {
+                BaseEntity baseEntity = baseEntityOptional.get();
+                VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
+                this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
+                return Optional.of(removedVersionEntity);
+            } else {
+                return Optional.empty();
+            }
+        };
+        return commitErrorHandler(projectVersion, versionAction);
     }
 
     @Override
@@ -264,18 +274,24 @@ public abstract class GenericVersionRepository<
         return new Triplet<>(beforeEntity, afterEntity, modificationType);
     }
 
-    private CommitError commitErrorHandler(ProjectVersion projectVersion,
-                                           VersionAction versionAction) {
+    private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
+                                                                VersionAction versionAction) {
         return commitErrorHandler(projectVersion, versionAction, "unknown");
     }
 
-    private CommitError commitErrorHandler(ProjectVersion projectVersion,
-                                           VersionAction versionAction,
-                                           String entityName) {
+    private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
+                                                                VersionAction<VersionEntity> versionAction,
+                                                                String entityName) {
         String errorDescription = null;
+        VersionEntity versionEntity = null;
+        CommitError commitError = null;
         try {
-            versionAction.action();
-            return null;
+            Optional<VersionEntity> versionEntityOptional = versionAction.action();
+            if (versionEntityOptional.isPresent()) {
+                versionEntity = versionEntityOptional.get();
+            } else {
+                errorDescription = "Could not find a version entity of {" + entityName + "}";
+            }
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
             errorDescription =
@@ -284,9 +300,9 @@ public abstract class GenericVersionRepository<
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {
-            return new CommitError(projectVersion, errorDescription);
+            commitError = new CommitError(projectVersion, errorDescription);
         }
-        return null;
+        return new Pair<>(versionEntity, commitError);
     }
 
     /**
@@ -394,16 +410,17 @@ public abstract class GenericVersionRepository<
         return this.getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
     }
 
-    private Pair<List<VersionEntity>, List<CommitError>> calculateVersionEntitiesFromAppEntities(
+    private List<Pair<VersionEntity, CommitError>> calculateVersionEntitiesFromAppEntities(
         ProjectVersion projectVersion,
         List<AppEntity> appEntities) {
 
         List<String> processedAppEntities = new ArrayList<>();
         List<VersionEntity> updatedVersionEntities = new ArrayList<>();
         List<CommitError> commitErrors = new ArrayList<>();
+        List<Pair<VersionEntity, CommitError>> response = new ArrayList<>();
 
         for (AppEntity appEntity : appEntities) {
-            CommitError commitError = commitErrorHandler(projectVersion, () -> {
+            VersionAction<VersionEntity> versionAction = () -> {
                 Pair<BaseEntity, VersionEntity> entities = this
                     .createVersionEntityFromAppEntity(projectVersion, appEntity);
                 BaseEntity baseEntity = entities.getValue0();
@@ -416,21 +433,25 @@ public abstract class GenericVersionRepository<
                 String entityId = baseEntity.getBaseEntityId();
                 appEntity.setId(entityId);
                 processedAppEntities.add(entityId);
-            }, appEntity.getId());
-            commitErrors.add(commitError);
+
+                return versionEntity == null ? Optional.empty() : Optional.of(versionEntity);
+            };
+            Pair<VersionEntity, CommitError> commitResponse = commitErrorHandler(projectVersion, versionAction,
+                appEntity.getId());
+            response.add(commitResponse);
         }
 
-        List<VersionEntity> removedArtifactBodies = this.getBaseEntitiesInProject(
+        List<Pair<VersionEntity, CommitError>> removedArtifactBodies = this.getBaseEntitiesInProject(
                 projectVersion.getProject())
             .stream()
             .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
             .map(baseEntity -> this.calculateVersionEntityFromAppEntity(projectVersion, baseEntity, null))
             .filter(Objects::nonNull)
+            .map(versionEntity -> new Pair<VersionEntity, CommitError>(versionEntity, null))
             .collect(Collectors.toList());
 
-        List<VersionEntity> allArtifactBodies = new ArrayList<>(updatedVersionEntities);
-        allArtifactBodies.addAll(removedArtifactBodies);
-        return new Pair<>(allArtifactBodies, commitErrors);
+        response.addAll(removedArtifactBodies);
+        return response;
     }
 
     private Pair<BaseEntity, VersionEntity> createVersionEntityFromAppEntity(

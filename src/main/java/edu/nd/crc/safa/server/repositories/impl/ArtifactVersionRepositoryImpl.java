@@ -93,7 +93,7 @@ public class ArtifactVersionRepositoryImpl
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
-        
+
         artifactAppEntity.setId(artifactId);
         return artifact;
     }
@@ -197,8 +197,8 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public Optional<Artifact> findBaseEntityByName(Project project, String name) {
-        return this.artifactRepository.findByProjectAndName(project, name);
+    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
+        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
     }
 
     @Override

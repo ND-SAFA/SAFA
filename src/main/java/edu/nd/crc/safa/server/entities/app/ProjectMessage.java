@@ -7,12 +7,12 @@ package edu.nd.crc.safa.server.entities.app;
 public class ProjectMessage {
 
     String user;
-    ProjectEntities type;
+    ProjectEntityTypes type;
 
     public ProjectMessage() {
     }
 
-    public ProjectMessage(String user, ProjectEntities type) {
+    public ProjectMessage(String user, ProjectEntityTypes type) {
         this.user = user;
         this.type = type;
     }
@@ -25,11 +25,11 @@ public class ProjectMessage {
         this.user = user;
     }
 
-    public ProjectEntities getType() {
+    public ProjectEntityTypes getType() {
         return type;
     }
 
-    public void setType(ProjectEntities type) {
+    public void setType(ProjectEntityTypes type) {
         this.type = type;
     }
 

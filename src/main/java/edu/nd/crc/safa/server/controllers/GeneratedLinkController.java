@@ -8,7 +8,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -56,14 +56,14 @@ public class GeneratedLinkController extends BaseController {
      * @throws SafaError If user does not have permissions to access this project.
      */
     @GetMapping(value = AppRoutes.Projects.getGeneratedLinksInProjectVersion)
-    public ServerResponse getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
+    public SafaResponse getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<TraceAppEntity> generatedTracesInVersion =
             this.projectRetrievalService.getTracesInProjectVersion(projectVersion)
                 .stream()
                 .filter(t -> t.traceType.equals(TraceType.GENERATED))
                 .collect(Collectors.toList());
-        return new ServerResponse(generatedTracesInVersion);
+        return new SafaResponse(generatedTracesInVersion);
     }
 
     /**
@@ -73,10 +73,10 @@ public class GeneratedLinkController extends BaseController {
      * @return Returns list of trace app entities
      */
     @PostMapping(value = AppRoutes.Projects.generateLinks)
-    public ServerResponse generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
+    public SafaResponse generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();
-        return new ServerResponse(traceLinkGenerator.generateLinksBetweenArtifactAppEntities(sourceArtifacts,
+        return new SafaResponse(traceLinkGenerator.generateLinksBetweenArtifactAppEntities(sourceArtifacts,
             targetArtifacts));
     }
 }

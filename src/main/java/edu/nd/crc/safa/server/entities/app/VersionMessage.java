@@ -7,12 +7,12 @@ package edu.nd.crc.safa.server.entities.app;
 public class VersionMessage {
 
     String user;
-    VersionedEntities type;
+    VersionEntityTypes type;
 
     public VersionMessage() {
     }
 
-    public VersionMessage(String user, VersionedEntities type) {
+    public VersionMessage(String user, VersionEntityTypes type) {
         this.user = user;
         this.type = type;
     }
@@ -25,11 +25,11 @@ public class VersionMessage {
         this.user = user;
     }
 
-    public VersionedEntities getType() {
+    public VersionEntityTypes getType() {
         return type;
     }
 
-    public void setType(VersionedEntities type) {
+    public void setType(VersionEntityTypes type) {
         this.type = type;
     }
 

@@ -8,8 +8,8 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.app.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.SafaResponse;
+import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -63,7 +63,7 @@ public class ProjectMembershipController extends BaseController {
         this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntities.MEMBERS);
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.MEMBERS);
     }
 
     /**
@@ -73,13 +73,13 @@ public class ProjectMembershipController extends BaseController {
      * @return ServerResponse containing list of project members ships
      */
     @GetMapping(AppRoutes.Projects.getProjectMembers)
-    public ServerResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
+    public SafaResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
             .stream()
             .map(ProjectMemberAppEntity::new)
             .collect(Collectors.toList());
-        return new ServerResponse(projectMemberships);
+        return new SafaResponse(projectMemberships);
     }
 
     /**
@@ -96,7 +96,7 @@ public class ProjectMembershipController extends BaseController {
         if (projectMembership != null) {
             this.notificationService.broadUpdateProjectMessage(
                 projectMembership.getProject(),
-                ProjectEntities.MEMBERS);
+                ProjectEntityTypes.MEMBERS);
         }
     }
 }

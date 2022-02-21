@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.server.services;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.app.ProjectEntities;
+import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.VersionMessage;
-import edu.nd.crc.safa.server.entities.app.VersionedEntities;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -39,27 +39,27 @@ public class NotificationService {
     /**
      * Notifies all subscribers of given version to update the defined project entity.
      *
-     * @param projectVersion    The version whose subscribers will be notified of update.
-     * @param versionedEntities The versioned entities to update.
+     * @param projectVersion     The version whose subscribers will be notified of update.
+     * @param versionEntityTypes The versioned entities to update.
      */
     public void broadUpdateProjectVersionMessage(ProjectVersion projectVersion,
-                                                 VersionedEntities versionedEntities) {
+                                                 VersionEntityTypes versionEntityTypes) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
         String versionTopicDestination = getVersionTopic(projectVersion);
-        VersionMessage message = new VersionMessage(safaUser.getEmail(), versionedEntities);
+        VersionMessage message = new VersionMessage(safaUser.getEmail(), versionEntityTypes);
         messagingTemplate.convertAndSend(versionTopicDestination, message);
     }
 
     /**
      * Notifies all subscribers of given project to update the defined project entity.
      *
-     * @param project         The project whose subscribers will be notified of update.
-     * @param projectEntities The project entities to update.
+     * @param project            The project whose subscribers will be notified of update.
+     * @param projectEntityTypes The project entities to update.
      */
-    public void broadUpdateProjectMessage(Project project, ProjectEntities projectEntities) {
+    public void broadUpdateProjectMessage(Project project, ProjectEntityTypes projectEntityTypes) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
         String versionTopicDestination = getProjectTopic(project);
-        ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntities);
+        ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntityTypes);
         messagingTemplate.convertAndSend(versionTopicDestination, message);
     }
 }

@@ -12,8 +12,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.ProjectEntities;
+import edu.nd.crc.safa.server.entities.app.VersionedEntities;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -86,9 +86,9 @@ public class DocumentController extends BaseController {
         documentAppEntity.setDocumentId(document.getDocumentId());
         this.createDocumentArtifactEntities(projectVersion, documentAppEntity.getArtifactIds(), document);
 
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntities.DOCUMENTS);
         if (documentAppEntity.getArtifactIds().size() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.ARTIFACTS);
         }
         return new ServerResponse(documentAppEntity);
     }
@@ -129,7 +129,7 @@ public class DocumentController extends BaseController {
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntities.DOCUMENTS);
         this.documentRepository.delete(document);
     }
 

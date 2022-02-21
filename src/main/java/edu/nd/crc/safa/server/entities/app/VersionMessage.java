@@ -1,23 +1,36 @@
 package edu.nd.crc.safa.server.entities.app;
 
 /**
- * Responsible for enumerating all the possible messages for
- * updating versioned entities.
+ * Container for the versioned entity to update
+ * along with the initiator.
  */
-public enum VersionMessage {
-    VERSION {
-        public String toString() {
-            return "VERSION";
-        }
-    },
-    ARTIFACTS {
-        public String toString() {
-            return "ARTIFACTS";
-        }
-    },
-    TRACES {
-        public String toString() {
-            return "TRACES";
-        }
+public class VersionMessage {
+
+    String user;
+    VersionedEntities type;
+
+    public VersionMessage() {
     }
+
+    public VersionMessage(String user, VersionedEntities type) {
+        this.user = user;
+        this.type = type;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public VersionedEntities getType() {
+        return type;
+    }
+
+    public void setType(VersionedEntities type) {
+        this.type = type;
+    }
+
 }

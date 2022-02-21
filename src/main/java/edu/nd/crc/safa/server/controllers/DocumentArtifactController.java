@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.VersionedEntities;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -95,7 +95,7 @@ public class DocumentArtifactController extends BaseController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.ARTIFACTS);
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {

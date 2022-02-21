@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.VersionedEntities;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
@@ -93,7 +93,7 @@ public class CommitController extends BaseController {
         }
         int totalChanged = changedArtifacts.size() + artifacts.getRemoved().size();
         if (totalChanged > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.ARTIFACTS);
         }
     }
 
@@ -119,7 +119,7 @@ public class CommitController extends BaseController {
         }
         int totalChanged = changedArtifacts.size() + traces.getRemoved().size();
         if (totalChanged > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.TRACES);
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionedEntities.TRACES);
         }
     }
 }

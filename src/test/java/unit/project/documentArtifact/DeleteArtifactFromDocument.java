@@ -9,6 +9,7 @@ import java.util.Optional;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.VersionedEntities;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -80,7 +81,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactList.size()).isEqualTo(0);
 
         // VP - Verify that websocket message to update artifacts.
-        String message = getNextMessage(currentUsername);
-        assertThat(message).isEqualTo(VersionMessage.ARTIFACTS.toString());
+        VersionMessage message = getNextMessage(currentUsername, VersionMessage.class);
+        assertThat(message.getType()).isEqualTo(VersionedEntities.ARTIFACTS);
     }
 }

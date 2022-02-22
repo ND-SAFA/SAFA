@@ -155,8 +155,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public Optional<TraceLink> findBaseEntityByName(Project project, String name) {
-        return this.traceLinkRepository.findById(UUID.fromString(name));
+    public Optional<TraceLink> findBaseEntityById(String baseEntityId) {
+        return this.traceLinkRepository.findById(UUID.fromString(baseEntityId));
     }
 
     @Override

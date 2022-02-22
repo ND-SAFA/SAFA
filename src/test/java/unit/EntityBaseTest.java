@@ -8,7 +8,9 @@ import java.util.List;
 import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
+import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.repositories.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
@@ -25,6 +27,7 @@ import edu.nd.crc.safa.server.services.ProjectService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +97,18 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    TestUtil testUtil;
+
+    public static JSONObject jsonCreator(String content) {
+        System.out.println("CONTENT:" + content);
+        return content.length() == 0 ? new JSONObject() : new JSONObject(content);
+    }
+
+    public static JSONArray arrayCreator(String content) {
+        return content.length() == 0 ? new JSONArray() : new JSONArray(content);
+    }
+
     @BeforeEach
     public void createNewBuilders() {
         dbEntityBuilder.createEmptyData();
@@ -108,24 +123,37 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
             .contentType(MediaType.APPLICATION_JSON);
     }
 
-
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
-                                  ResultMatcher test,
-                                  String authorizationToken
-    ) throws Exception {
-        MockHttpServletRequestBuilder authorizedRequest = request.header("Authorization", authorizationToken);
-        return sendRequest(authorizedRequest, test);
+                                  ResultMatcher test) throws Exception {
+        return sendRequestWithCreator(request, test, "", EntityBaseTest::jsonCreator);
     }
 
     public JSONObject sendRequest(MockHttpServletRequestBuilder request,
-                                  ResultMatcher test) throws Exception {
+                                  ResultMatcher test,
+                                  String authorizationToken) throws Exception {
+        return sendRequestWithCreator(request, test, authorizationToken, EntityBaseTest::jsonCreator);
+    }
+
+    public <T> T sendRequestWithCreator(MockHttpServletRequestBuilder request,
+                                        ResultMatcher test,
+                                        String authorizationToken,
+                                        StringCreator<T> stringCreator) throws Exception {
+        if (!authorizationToken.equals("")) {
+            request = request.header("Authorization", authorizationToken);
+        }
+        return sendRequestWithResponse(request, test, stringCreator);
+    }
+
+    public <T> T sendRequestWithResponse(MockHttpServletRequestBuilder request,
+                                         ResultMatcher test,
+                                         StringCreator<T> stringCreator) throws Exception {
 
         MvcResult response = mockMvc
             .perform(request)
             .andExpect(test)
             .andReturn();
 
-        return TestUtil.apiResponseAsJson(response);
+        return testUtil.apiResponseAsJsonObject(response, stringCreator);
     }
 
     public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)

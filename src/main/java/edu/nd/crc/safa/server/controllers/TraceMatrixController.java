@@ -10,7 +10,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
@@ -54,7 +53,7 @@ public class TraceMatrixController extends BaseController {
      * @throws SafaError Throws error if project with ID is not found.
      */
     @GetMapping(AppRoutes.Projects.getTraceMatrices)
-    public ServerResponse getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
+    public Map<String, List<String>> getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<TraceMatrix> projectTraceMatrices = traceMatrixRepository.findByProject(project);
         Map<String, List<String>> traceLinkDirections = new Hashtable<>();
@@ -75,7 +74,7 @@ public class TraceMatrixController extends BaseController {
                 traceLinkDirections.put(at.getName(), new ArrayList<>());
             }
         }
-        return new ServerResponse(traceLinkDirections);
+        return traceLinkDirections;
     }
 
     /**

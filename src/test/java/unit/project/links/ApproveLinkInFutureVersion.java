@@ -44,8 +44,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
 
         // Step - Get generated links
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONObject response = sendGet(url, status().isOk());
-        JSONArray links = response.getJSONArray("body");
+        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
         JSONObject link = links.getJSONObject(0);
 
         // Step - Set link to approved

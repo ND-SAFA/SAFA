@@ -10,10 +10,12 @@ import java.util.Optional;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -51,24 +53,45 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         return sendRequest(get(routeName), test, this.token);
     }
 
-    public JSONObject sendPost(String routeName,
-                               Object body,
-                               ResultMatcher test) throws Exception {
-        return sendPost(routeName, body, test, true);
+    public JSONArray sendGetWithArrayResponse(String routeName,
+                                              ResultMatcher test) throws Exception {
+        assertTokenExists();
+        return sendRequestWithCreator(get(routeName), test, this.token, EntityBaseTest::arrayCreator);
     }
 
     public JSONObject sendPost(String routeName,
                                Object body,
-                               ResultMatcher test,
-                               boolean assertToken) throws Exception {
+                               ResultMatcher test) throws Exception {
+        return sendPost(routeName, body, test, true, EntityBaseTest::jsonCreator);
+    }
+
+    public JSONArray sendPostWithArrayResponse(String routeName,
+                                               Object body,
+                                               ResultMatcher test) throws Exception {
+        return sendPost(routeName, body, test, true, EntityBaseTest::arrayCreator);
+    }
+
+    public void sendPost(String routeName,
+                         Object body,
+                         ResultMatcher test,
+                         boolean assertToken) throws Exception {
+        sendPost(routeName, body, test, assertToken, JSONObject::new);
+    }
+
+    public <T> T sendPost(String routeName,
+                          Object body,
+                          ResultMatcher test,
+                          boolean assertToken,
+                          StringCreator<T> stringCreator) throws Exception {
         MockHttpServletRequestBuilder request;
         if (assertToken) {
             assertTokenExists();
             request = addJsonBody(post(routeName), body);
-            return sendRequest(request, test, this.token);
+            return sendRequestWithCreator(request, test, this.token, stringCreator);
         } else {
+            //TODO: Create better way to omit authentication token
             request = addJsonBody(post(routeName), body);
-            return sendRequest(request, test);
+            return sendRequestWithCreator(request, test, "", stringCreator);
         }
     }
 
@@ -89,12 +112,11 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
      *
      * @param email    The id for the account.
      * @param password The password associated with account created.
-     * @return The response object of the creation endpoint.
      * @throws Exception Throws exception if problems occurs with Http request.
      */
-    public JSONObject createUser(String email, String password) throws Exception {
+    public void createUser(String email, String password) throws Exception {
         SafaUser user = new SafaUser(email, password);
-        return sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(), false);
+        sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(), false);
     }
 
     public void loginUser(String email, String password) throws Exception {
@@ -113,19 +135,31 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject user = new JSONObject();
         user.put("email", email);
         user.put("password", password);
-        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user), test);
+        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user),
+            test);
         if (setToken) {
             this.token = response.getString("token");
         }
     }
 
     public void removeMemberFromProject(Project project, String username) throws Exception {
-        Optional<SafaUser> safaUser = this.safaUserRepository.findByEmail(username);
-        Optional<ProjectMembership> query = this.projectMembershipRepository.findByProjectAndMember(project,
-            safaUser.get());
+        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(username);
+        if (safaUserOptional.isEmpty()) {
+            throw new SafaError("Could not find user with name: " + username);
+        }
+        Optional<ProjectMembership> projectMembershipOptional = this.projectMembershipRepository.findByProjectAndMember(
+            project,
+            safaUserOptional.get());
+        if (projectMembershipOptional.isEmpty()) {
+            String errorMessage = String.format("Could not find membership between {%s} and {%s}.",
+                username,
+                project.getName());
+            throw new SafaError(errorMessage);
+
+        }
         String url = RouteBuilder
             .withRoute(AppRoutes.Projects.deleteProjectMembership)
-            .withProjectMembership(query.get())
+            .withProjectMembership(projectMembershipOptional.get())
             .get();
         sendDelete(url, status().isNoContent());
     }

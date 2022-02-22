@@ -11,9 +11,8 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -69,13 +68,13 @@ public class DocumentController extends BaseController {
      * @param versionId         The UUID of the project version to who create the document and make
      *                          the artifact additions to.
      * @param documentAppEntity The entity containing name, description, and type of document to be created.
-     * @return The updated or created document.
+     * @return DocumentAppEntity The updated or created document.
      * @throws SafaError Throws error if authorized user does not have edit permissions.
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateDocument)
     @ResponseStatus(HttpStatus.CREATED)
-    public ServerResponse createOrUpdateDocument(@PathVariable UUID versionId,
-                                                 @RequestBody @Valid DocumentAppEntity documentAppEntity)
+    public DocumentAppEntity createOrUpdateDocument(@PathVariable UUID versionId,
+                                                    @RequestBody @Valid DocumentAppEntity documentAppEntity)
         throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
@@ -86,11 +85,11 @@ public class DocumentController extends BaseController {
         documentAppEntity.setDocumentId(document.getDocumentId());
         this.createDocumentArtifactEntities(projectVersion, documentAppEntity.getArtifactIds(), document);
 
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
         if (documentAppEntity.getArtifactIds().size() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionMessage.ARTIFACTS);
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
-        return new ServerResponse(documentAppEntity);
+        return documentAppEntity;
     }
 
     /**
@@ -101,7 +100,7 @@ public class DocumentController extends BaseController {
      * @throws SafaError Throws error if authorized user does not have permission to view project.
      */
     @GetMapping(AppRoutes.Projects.getProjectDocuments)
-    public ServerResponse getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
+    public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
         List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
@@ -114,7 +113,7 @@ public class DocumentController extends BaseController {
             documentAppEntities.add(documentAppEntity);
 
         }
-        return new ServerResponse(documentAppEntities);
+        return documentAppEntities;
     }
 
     /**
@@ -129,7 +128,7 @@ public class DocumentController extends BaseController {
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
-        this.notificationService.broadUpdateProjectMessage(project, ProjectMessage.DOCUMENTS);
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
         this.documentRepository.delete(document);
     }
 

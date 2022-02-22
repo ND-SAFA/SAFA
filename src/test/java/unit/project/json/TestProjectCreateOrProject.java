@@ -33,7 +33,6 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         JSONObject projectJson = createBaseProjectJson();
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
-            .getJSONObject("body")
             .getJSONObject("project")
             .getString("projectId");
         Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
@@ -50,11 +49,9 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         JSONObject projectJson = createBaseProjectJson();
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
-            .getJSONObject("body")
             .getJSONObject("project")
             .getString("projectId");
         String versionId = responseContent
-            .getJSONObject("body")
             .getJSONObject("projectVersion")
             .getString("versionId");
         Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));

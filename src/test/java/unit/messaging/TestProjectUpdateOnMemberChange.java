@@ -3,6 +3,7 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.ProjectMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
@@ -34,18 +35,18 @@ public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
         createNewConnection(currentUsername)
             .subscribeToProject(currentUsername, project);
 
-        // Step - Upload flat files
+        // Step - Add member to project
         shareProject(project, projectMemberUsername, ProjectRole.VIEWER, status().isOk());
 
-        // VP - Artifact and traces received
-        String message = getNextMessage(currentUsername);
-        assertThat(message).isEqualTo(ProjectMessage.MEMBERS.toString());
+        // VP - New member notification is received.
+        ProjectMessage message = getNextMessage(currentUsername, ProjectMessage.class);
+        assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
 
         // Step - Remove member from project
         removeMemberFromProject(project, projectMemberUsername);
 
         // VP - Verify that message is sent to update members after deletion
-        message = getNextMessage(currentUsername);
-        assertThat(message).isEqualTo(ProjectMessage.MEMBERS.toString());
+        message = getNextMessage(currentUsername, ProjectMessage.class);
+        assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
     }
 }

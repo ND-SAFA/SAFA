@@ -51,4 +51,8 @@ public class ProjectChange<T> {
     public void setModified(List<T> modified) {
         this.modified = modified;
     }
+
+    public int getSize() {
+        return this.added.size() + this.modified.size() + this.removed.size();
+    }
 }

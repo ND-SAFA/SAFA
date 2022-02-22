@@ -17,7 +17,6 @@ import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.ServerResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -79,8 +78,8 @@ public class ParseDataFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse parseArtifactFile(@PathVariable String artifactType,
-                                            @RequestParam MultipartFile file) {
+    public ParseArtifactFileResponse parseArtifactFile(@PathVariable String artifactType,
+                                                       @RequestParam MultipartFile file) {
         ParseArtifactFileResponse response = new ParseArtifactFileResponse();
         tryParseFile(response, () -> {
             CSVParser fileCSV = artifactFileParser.readArtifactFile(file);
@@ -91,7 +90,7 @@ public class ParseDataFileController extends BaseController {
                     fileCSV);
             response.setArtifacts(artifacts);
         });
-        return new ServerResponse(response);
+        return response;
     }
 
     /**
@@ -102,8 +101,8 @@ public class ParseDataFileController extends BaseController {
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
     @GetMapping(AppRoutes.Projects.checkIfArtifactExists)
-    public ServerResponse checkIfNameExists(@PathVariable UUID versionId,
-                                            @PathVariable String artifactName) throws SafaError {
+    public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
+                                                  @PathVariable String artifactName) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         Optional<Artifact> artifactQuery =
             this.artifactRepository.findByProjectAndName(projectVersion.getProject(), artifactName);
@@ -118,7 +117,7 @@ public class ParseDataFileController extends BaseController {
         }
         Map<String, Boolean> response = new HashMap<>();
         response.put("artifactExists", artifactExists);
-        return new ServerResponse(response);
+        return response;
     }
 
     /**
@@ -129,7 +128,7 @@ public class ParseDataFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.parseTraceFile)
     @ResponseStatus(HttpStatus.OK)
-    public ServerResponse parseTraceFile(@RequestParam MultipartFile file) {
+    public ParseTraceFileResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();
         tryParseFile(response, () -> {
             CSVParser fileCSV = traceFileParser.readTraceFile(file);
@@ -140,7 +139,7 @@ public class ParseDataFileController extends BaseController {
             response.setTraces(parseResponse.getValue0());
             response.setErrors(errors);
         });
-        return new ServerResponse(response);
+        return response;
     }
 
     private void tryParseFile(ParseFileResponse response, FileParser fileParser) {

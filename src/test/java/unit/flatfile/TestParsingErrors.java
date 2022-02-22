@@ -24,14 +24,10 @@ public class TestParsingErrors extends ApplicationBaseTest {
         // Step 1 - Upload flat files
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_2);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
-
-        // VP - Verify that error occurred.
-        assertThat(responseContent.getInt("status")).isEqualTo(1);
+        JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
         // VP - Verify that message contains constraint
-        JSONObject body = responseContent.getJSONObject("body");
-        String message = body.getString("message");
+        String message = responseBody.getString("message");
         assertThat(message).matches(".*unknown type.*Requirements.*[\\s\\S]");
     }
 
@@ -41,13 +37,10 @@ public class TestParsingErrors extends ApplicationBaseTest {
         // Step 1 - Upload flat files
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_3);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
-
-        // VP - Verify that no error occurred.
-        assertThat(responseContent.getInt("status")).isEqualTo(0);
+        JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
 
         // VP - Verify that message contains artifact that failed constraint
-        JSONObject errors = responseContent.getJSONObject("body").getJSONObject("errors");
+        JSONObject errors = responseBody.getJSONObject("errors");
         JSONArray artifactErrors = errors.getJSONArray("artifacts");
         assertThat(artifactErrors.length()).isEqualTo(1);
 

@@ -10,6 +10,8 @@ import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import org.javatuples.Pair;
+
 /**
  * Defines interface that all repositories related to versioned entities.
  *
@@ -45,7 +47,8 @@ public interface IVersionRepository<
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
-    CommitError commitSingleEntityToProjectVersion(ProjectVersion projectVersion, AppEntity appEntity) throws SafaError;
+    Pair<VersionEntity, CommitError> commitSingleEntityToProjectVersion(ProjectVersion projectVersion,
+                                                                        AppEntity appEntity) throws SafaError;
 
     /**
      * Saves given application entities to given version, saving removal entities for entities present in previous
@@ -56,8 +59,9 @@ public interface IVersionRepository<
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
-    List<CommitError> commitAllEntitiesInProjectVersion(ProjectVersion projectVersion,
-                                                        List<AppEntity> appEntities) throws SafaError;
+    List<Pair<VersionEntity, CommitError>> commitAllEntitiesInProjectVersion(
+        ProjectVersion projectVersion,
+        List<AppEntity> appEntities) throws SafaError;
 
     /**
      * Deletes entity version with given name and commits to given project version.
@@ -66,7 +70,7 @@ public interface IVersionRepository<
      * @param baseEntityName The name of the base entity whose removal is committed to given version.
      * @return CommitError if error occurred while deleting entity, null otherwise.
      */
-    CommitError deleteVersionEntityByBaseName(
+    Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
         String baseEntityName);
 

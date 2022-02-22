@@ -1,18 +1,36 @@
 package edu.nd.crc.safa.server.entities.app;
 
 /**
- * Responsible for enumerating all the possible messages for
- * updating project metadata.
+ * Container for the project entity to update
+ * along with the initiator.
  */
-public enum ProjectMessage {
-    DOCUMENTS {
-        public String toString() {
-            return "DOCUMENTS";
-        }
-    },
-    MEMBERS {
-        public String toString() {
-            return "MEMBERS";
-        }
+public class ProjectMessage {
+
+    String user;
+    ProjectEntityTypes type;
+
+    public ProjectMessage() {
     }
+
+    public ProjectMessage(String user, ProjectEntityTypes type) {
+        this.user = user;
+        this.type = type;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public ProjectEntityTypes getType() {
+        return type;
+    }
+
+    public void setType(ProjectEntityTypes type) {
+        this.type = type;
+    }
+
 }

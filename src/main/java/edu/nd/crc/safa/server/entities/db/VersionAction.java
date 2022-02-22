@@ -1,8 +1,10 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import java.util.Optional;
+
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
-public interface VersionAction {
+public interface VersionAction<VersionEntity> {
 
-    void action() throws SafaError;
+    Optional<VersionEntity> action() throws SafaError;
 }

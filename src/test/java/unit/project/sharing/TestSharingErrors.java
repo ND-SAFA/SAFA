@@ -35,7 +35,7 @@ public class TestSharingErrors extends BaseSharingTest {
         JSONObject response = shareProject(project, nonUserEmail, ProjectRole.VIEWER, status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account
-        String error = response.getJSONObject("body").getString("message");
+        String error = response.getString("message");
         assertThat(error).matches(".*user.*exists.*email.*[\\s\\S]");
     }
 }

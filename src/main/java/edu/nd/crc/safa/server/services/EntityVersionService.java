@@ -5,13 +5,16 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,18 +46,19 @@ public class EntityVersionService {
      *
      * @param projectVersion   The ProjectVersion associated with calculated artifact changes.
      * @param projectArtifacts List of artifact's in a project whose version will be stored.
-     * @return List of commit errors occurring while attempting to commit artifacts.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    public List<CommitError> commitVersionArtifacts(ProjectVersion projectVersion,
-                                                    List<ArtifactAppEntity> projectArtifacts) throws SafaError {
-        List<CommitError> commitErrors = this.artifactVersionRepository
+    public void commitVersionArtifacts(ProjectVersion projectVersion,
+                                       List<ArtifactAppEntity> projectArtifacts) throws SafaError {
+        List<Pair<ArtifactVersion, CommitError>> commitResponse = this.artifactVersionRepository
             .commitAllEntitiesInProjectVersion(projectVersion, projectArtifacts);
-        for (CommitError commitError : commitErrors) {
-            commitError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
-            this.commitErrorRepository.save(commitError);
+        for (Pair<ArtifactVersion, CommitError> commitPayload : commitResponse) {
+            CommitError commitError = commitPayload.getValue1();
+            if (commitError != null) {
+                commitError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
+                this.commitErrorRepository.save(commitError);
+            }
         }
-        return commitErrors;
     }
 
     /**
@@ -63,18 +67,19 @@ public class EntityVersionService {
      *
      * @param projectVersion The ProjectVersion associated with calculated artifact changes.
      * @param traces         List of artifact's in a project whose version will be stored.
-     * @return List of errors occurring while committing traces.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    public List<CommitError> commitVersionTraces(ProjectVersion projectVersion,
-                                                 List<TraceAppEntity> traces) throws SafaError {
-        List<CommitError> commitErrors = this.traceLinkVersionRepository
+    public void commitVersionTraces(ProjectVersion projectVersion,
+                                    List<TraceAppEntity> traces) throws SafaError {
+        List<Pair<TraceLinkVersion, CommitError>> commitResponse = this.traceLinkVersionRepository
             .commitAllEntitiesInProjectVersion(projectVersion, traces);
 
-        for (CommitError commitError : commitErrors) {
-            commitError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);
-            this.commitErrorRepository.save(commitError);
+        for (Pair<TraceLinkVersion, CommitError> payload : commitResponse) {
+            CommitError commitError = payload.getValue1();
+            if (commitError != null) {
+                commitError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);
+                this.commitErrorRepository.save(commitError);
+            }
         }
-        return commitErrors;
     }
 }

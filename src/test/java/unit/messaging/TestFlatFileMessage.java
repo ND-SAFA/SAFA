@@ -3,6 +3,7 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -31,7 +32,7 @@ public class TestFlatFileMessage extends ApplicationBaseTest {
 
         // VP - Verify that single message sent
         assertThat(getQueueSize(clientId)).isEqualTo(1);
-        String message = getNextMessage(clientId);
-        assertThat(message).isEqualTo(VersionMessage.VERSION.toString());
+        VersionMessage message = getNextMessage(clientId, VersionMessage.class);
+        assertThat(message.getType()).isEqualTo(VersionEntityTypes.VERSION);
     }
 }

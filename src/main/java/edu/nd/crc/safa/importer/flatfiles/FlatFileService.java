@@ -81,8 +81,7 @@ public class FlatFileService {
 
     private void parseValidateSaveTraces(ProjectVersion projectVersion, JSONObject timFileJson) throws SafaError {
         List<TraceAppEntity> traces = traceFileParser.parseTraceFiles(projectVersion, timFileJson);
-        List<CommitError> traceErrors = this.entityVersionService.commitVersionTraces(projectVersion, traces);
-        this.commitErrorRepository.saveAll(traceErrors);
+        this.entityVersionService.commitVersionTraces(projectVersion, traces);
     }
 
     private void parseValidateSaveArtifacts(ProjectVersion projectVersion, JSONObject timFileJson) throws SafaError {
@@ -92,10 +91,8 @@ public class FlatFileService {
         Pair<List<ArtifactAppEntity>, List<CommitError>> validationResponse = artifactFileParser
             .validateArtifacts(projectVersion, artifacts);
         List<CommitError> errors = new ArrayList<>(validationResponse.getValue1());
-        List<CommitError> artifactErrors = this.entityVersionService.commitVersionArtifacts(projectVersion,
-            validationResponse.getValue0());
-        errors.addAll(artifactErrors);
-
         this.commitErrorRepository.saveAll(errors);
+        this.entityVersionService.commitVersionArtifacts(projectVersion,
+            validationResponse.getValue0());
     }
 }

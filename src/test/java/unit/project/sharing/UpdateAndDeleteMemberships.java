@@ -32,7 +32,7 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
         shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
 
         // Step - Get project members
-        JSONObject response = getProjectMembers(project);
+        JSONArray response = getProjectMembers(project);
 
         // VP - Verify that new role is reflected
         JSONObject membership = getMembershipWithEmail(response, otherUserEmail);
@@ -56,16 +56,14 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
         removeMemberFromProject(project, this.otherUser.getEmail());
 
         // Step - Get members
-        JSONObject response = getProjectMembers(project);
+        JSONArray members = getProjectMembers(project);
 
         // VP - Verify that member is not in list
-        JSONArray members = response.getJSONArray("body");
         assertThat(members.length()).isEqualTo(1);
         assertThat(members.getJSONObject(0).getString("email")).isEqualTo(currentUser.getEmail());
     }
 
-    private JSONObject getMembershipWithEmail(JSONObject response, String email) throws SafaError {
-        JSONArray memberships = response.getJSONArray("body");
+    private JSONObject getMembershipWithEmail(JSONArray memberships, String email) throws SafaError {
         for (int i = 0; i < memberships.length(); i++) {
             JSONObject membership = memberships.getJSONObject(i);
             if (membership.getString("email").equals(email)) {

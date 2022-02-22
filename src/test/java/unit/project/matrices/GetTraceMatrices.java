@@ -38,10 +38,9 @@ public class GetTraceMatrices extends TraceMatrixBaseTest {
             .withRoute(AppRoutes.Projects.getTraceMatrices)
             .withProject(project)
             .get();
-        JSONObject response = sendGet(route, status().isOk());
+        JSONObject projectMatrices = sendGet(route, status().isOk());
 
         // VP - Assert that no matrix exists for project.
-        JSONObject projectMatrices = response.getJSONObject("body");
         assertThat(projectMatrices.has(sourceArtifactTypeName)).isTrue();
         JSONArray targetArtifactTypes = projectMatrices.getJSONArray(sourceArtifactTypeName);
         assertThat(targetArtifactTypes.get(0)).isEqualTo(targetArtifactTypeName);

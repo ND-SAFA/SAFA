@@ -38,7 +38,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .get();
         JSONObject response = sendGet(route, status().isOk());
-        JSONObject projectJson = response.getJSONObject("body").getJSONObject("project");
+        JSONObject projectJson = response.getJSONObject("project");
 
         // VP - Verify that documents has empty list
         assertThat(projectJson.getJSONArray("documents").length()).isEqualTo(0);
@@ -51,7 +51,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
 
         // VP - Verify that project meta data contains a single document
         response = sendGet(route, status().isOk());
-        projectJson = response.getJSONObject("body").getJSONObject("project");
+        projectJson = response.getJSONObject("project");
         JSONArray documentsJson = projectJson.getJSONArray("documents");
         assertThat(documentsJson.length()).isEqualTo(1);
 

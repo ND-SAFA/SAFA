@@ -23,6 +23,13 @@ public class ProjectCommit {
         this.commitVersion = commitVersion;
     }
 
+    public ProjectCommit(ProjectVersion projectVersion, ProjectChange<ArtifactAppEntity> artifacts,
+                         ProjectChange<TraceAppEntity> traces) {
+        this.commitVersion = projectVersion;
+        this.artifacts = artifacts;
+        this.traces = traces;
+    }
+
     public ProjectVersion getCommitVersion() {
         return commitVersion;
     }

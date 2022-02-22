@@ -35,7 +35,7 @@ public class TestValidation extends BaseProjectJsonTest {
             .getPayload(projectName);
 
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
-        String errorMessage = response.getJSONObject("body").getString("message");
+        String errorMessage = response.getString("message");
         assertThat(errorMessage).contains("Invalid ProjectVersion");
     }
 
@@ -65,7 +65,7 @@ public class TestValidation extends BaseProjectJsonTest {
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
 
         // VP - Verify that the error message is about project version id
-        String errorMessage = response.getJSONObject("body").getString("message");
+        String errorMessage = response.getString("message");
         assertThat(errorMessage).matches(".*versionId.*not.*null[\\s\\S]");
     }
 
@@ -94,7 +94,7 @@ public class TestValidation extends BaseProjectJsonTest {
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
 
         // VP - Verify that minor version is the error received
-        String errorMessage = response.getJSONObject("body").getString("message");
+        String errorMessage = response.getString("message");
         assertThat(errorMessage).contains("minorVersion").contains("greater than 0");
     }
 
@@ -106,9 +106,7 @@ public class TestValidation extends BaseProjectJsonTest {
     @Test
     public void testProjectIdentifierValidation() throws Exception {
         JSONObject response = buildProjectValidationRequest(null, new ArrayList<>(), new ArrayList<>());
-        JSONObject body = response.getJSONObject("body");
-        assertThat(response.getNumber("status")).isEqualTo(1);
-        assertThat(body.getString("message")).matches(".*name.*not.*null[\\s\\S]");
+        assertThat(response.getString("message")).matches(".*name.*not.*null[\\s\\S]");
     }
 
     /**
@@ -126,15 +124,13 @@ public class TestValidation extends BaseProjectJsonTest {
             .withArtifactAndReturn(projectName, "", "RE-1", "", "");
 
         // Step - Send creation request
-        JSONObject response = buildProjectValidationRequest(
+        JSONObject responseBody = buildProjectValidationRequest(
             "artifact-validation",
             List.of(invalidArtifact),
             new ArrayList<>());
 
         // VP - Assert that message indicates that artifact validation was triggered.
-        JSONObject body = response.getJSONObject("body");
-        assertThat(response.getNumber("status")).isEqualTo(1);
-        assertThat(body.getString("message")).contains("artifacts").contains("type");
+        assertThat(responseBody.getString("message")).contains("artifacts").contains("type");
     }
 
     /**
@@ -160,9 +156,7 @@ public class TestValidation extends BaseProjectJsonTest {
             List.of(invalidTrace));
 
         // Step - Assert that message indicates that artifact validation was triggered.
-        JSONObject body = response.getJSONObject("body");
-        assertThat(response.getNumber("status")).isEqualTo(1);
-        assertThat(body.getString("message")).matches(".*source.*not.*empty[\\s\\S]");
+        assertThat(response.getString("message")).matches(".*source.*not.*empty[\\s\\S]");
     }
 
     private JSONObject buildProjectValidationRequest(

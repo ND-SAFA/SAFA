@@ -172,7 +172,7 @@ async function versionMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: VersionMessage = JSON.parse(frame.body) as VersionMessage;
-  if (sessionModule.authenticationToken?.sub !== message.user) {
+  if (sessionModule.userEmail !== message.user) {
     switch (message.type) {
       case "VERSION":
         return getProjectVersion(versionId).then(setCreatedProject);
@@ -195,7 +195,7 @@ async function projectMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: ProjectMessage = JSON.parse(frame.body) as ProjectMessage;
-  if (sessionModule.authenticationToken?.sub !== message.user) {
+  if (sessionModule.userEmail !== message.user) {
     switch (message.type) {
       case "MEMBERS":
         return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);

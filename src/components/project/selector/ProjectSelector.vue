@@ -114,7 +114,7 @@ export default Vue.extend({
   },
   computed: {
     hasDeletePermission(): boolean {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
+      const userEmail = sessionModule.userEmail;
       const projectMembershipQuery = projectModule.getProject.members.filter(
         (m) => m.email === userEmail
       );

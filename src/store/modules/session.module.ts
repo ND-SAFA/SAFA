@@ -78,6 +78,14 @@ export default class SessionModule extends VuexModule {
   }
 
   /**
+   * Returns the authenticated user, if one exists.
+   * @throws If the token does not exist.
+   */
+  get userEmail(): string {
+    return this.authenticationToken?.sub || "";
+  }
+
+  /**
    * @return Whether a valid Authorization token is stored in module
    */
   get isTokenEmpty(): boolean {

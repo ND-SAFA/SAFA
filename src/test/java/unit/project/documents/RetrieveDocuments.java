@@ -9,7 +9,6 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
@@ -37,8 +36,7 @@ public class RetrieveDocuments extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.getProjectDocuments)
             .withProject(project)
             .get();
-        JSONObject response = sendGet(route, status().isOk());
-        JSONArray documents = response.getJSONArray("body");
+        JSONArray documents = sendGetWithArrayResponse(route, status().isOk());
 
         // VP - Verify that no documents are returned
         assertThat(documents.length()).isEqualTo(0);
@@ -49,8 +47,7 @@ public class RetrieveDocuments extends ApplicationBaseTest {
             .newDocument(projectName, docNameTwo, docDescription, docType);
 
         // Step - Retrieve project documents
-        response = sendGet(route, status().isOk());
-        documents = response.getJSONArray("body");
+        documents = sendGetWithArrayResponse(route, status().isOk());
 
         // VP - Verify that no documents are associated with project
         assertThat(documents.length()).isEqualTo(2);

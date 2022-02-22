@@ -42,8 +42,7 @@ public class CreateNewDocument extends ApplicationBaseTest {
                 .withRoute(AppRoutes.Projects.createOrUpdateDocument)
                 .withVersion(projectVersion)
                 .get();
-        JSONObject response = sendPost(route, docJson, status().isCreated());
-        JSONObject docCreated = response.getJSONObject("body");
+        JSONObject docCreated = sendPost(route, docJson, status().isCreated());
 
         // VP - Verify that response object contains name, description, and type
         assertThat(docCreated.getString("name")).isEqualTo(docName);

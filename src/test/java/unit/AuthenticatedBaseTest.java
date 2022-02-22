@@ -53,6 +53,11 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         return sendRequest(get(routeName), test, this.token);
     }
 
+    public JSONArray sendGetWithArrayResponse(String routeName,
+                                              ResultMatcher test) throws Exception {
+        assertTokenExists();
+        return sendRequestWithCreator(get(routeName), test, this.token, EntityBaseTest::arrayCreator);
+    }
 
     public JSONObject sendPost(String routeName,
                                Object body,

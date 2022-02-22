@@ -14,5 +14,10 @@ public enum ProjectEntityTypes {
         public String toString() {
             return "MEMBERS";
         }
+    },
+    TYPES {
+        public String toString() {
+            return "TYPES";
+        }
     }
 }

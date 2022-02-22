@@ -12,10 +12,12 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.DocumentRepository;
@@ -38,6 +40,7 @@ public class ProjectRetrievalService {
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
@@ -48,12 +51,14 @@ public class ProjectRetrievalService {
                                    DocumentArtifactRepository documentArtifactRepository,
                                    ProjectMembershipRepository projectMembershipRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
+                                   ArtifactTypeRepository artifactTypeRepository,
                                    CommitErrorRetrievalService commitErrorRetrievalService,
                                    WarningService warningService) {
         this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.documentArtifactRepository = documentArtifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
@@ -86,14 +91,17 @@ public class ProjectRetrievalService {
 
         // Versioned Entities
         List<ArtifactAppEntity> artifacts = getArtifactInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts.stream().map(a -> a.getId()).collect(Collectors.toList());
+        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
         List<TraceAppEntity> traces = getTracesInProjectVersion(projectVersion, artifactIds);
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
         List<Document> documents = this.documentRepository.findByProject(project);
 
-        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents);
+        // Artifact types
+        List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
+
+        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents, artifactTypes);
     }
 
     /**

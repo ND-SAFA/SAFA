@@ -1,6 +1,7 @@
 import { Artifact, ArtifactNameValidationResponse } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "./commit-builder";
+import { artifactModule, projectModule } from "@/store";
 
 /**
  * Returns whether the given artifact name already exists.
@@ -29,7 +30,10 @@ export async function isArtifactNameTaken(
 export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
-    .save();
+    .save()
+    .then(() => {
+      projectModule.deleteArtifactByName(artifact);
+    });
 }
 
 /**
@@ -44,7 +48,12 @@ export async function createArtifact(
   versionId: string,
   artifact: Artifact
 ): Promise<void> {
-  return CommitBuilder.withCurrentVersion().withNewArtifact(artifact).save();
+  return CommitBuilder.withCurrentVersion()
+    .withNewArtifact(artifact)
+    .save()
+    .then((commit) => {
+      projectModule.addOrUpdateArtifacts(commit.artifacts.added);
+    });
 }
 
 /**
@@ -61,5 +70,8 @@ export async function updateArtifact(
 ): Promise<void> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
-    .save();
+    .save()
+    .then((commit) => {
+      projectModule.addOrUpdateArtifacts(commit.artifacts.modified);
+    });
 }

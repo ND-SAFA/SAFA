@@ -65,7 +65,7 @@ export default Vue.extend({
         type,
         allowedTypes,
         label: this.getTypeLabel(type),
-        icon: typeOptionsModule.getArtifactTypeIcon(type),
+        icon,
         iconIndex: this.icons.indexOf(icon),
       };
     });

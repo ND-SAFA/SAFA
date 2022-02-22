@@ -7,7 +7,7 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
@@ -18,8 +18,8 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
     @Test
     public void getEmptyVersions() throws Exception {
         Project project = dbEntityBuilder.newProjectWithReturn("test-project");
-        JSONObject response = sendGet(createRouteName(project), status().isOk());
-        assertThat(response.getJSONArray("body").length()).isEqualTo(0);
+        JSONArray response = sendGetWithArrayResponse(createRouteName(project), status().isOk());
+        assertThat(response.length()).isEqualTo(0);
     }
 
     @Test
@@ -30,8 +30,8 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
             .newVersion(projectName)
             .newVersion(projectName);
         Project project = dbEntityBuilder.getProject("test-project");
-        JSONObject response = sendGet(createRouteName(project), status().isOk());
-        assertThat(response.getJSONArray("body").length()).isEqualTo(2);
+        JSONArray response = sendGetWithArrayResponse(createRouteName(project), status().isOk());
+        assertThat(response.length()).isEqualTo(2);
     }
 
     private String createRouteName(Project project) {

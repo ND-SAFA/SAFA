@@ -8,7 +8,6 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -54,19 +53,21 @@ public class ProjectController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
     @ResponseStatus(HttpStatus.CREATED)
-    public SafaResponse createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
+    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
-        ProjectEntities response;
+        ProjectEntities projectEntities;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            response = this.projectService.createNewProjectWithVersion(payloadProject, payloadProjectVersion, project);
+            projectEntities = this.projectService.createNewProjectWithVersion(
+                payloadProject, payloadProjectVersion, project);
         } else {
             this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
-            response = this.projectService.updateProjectAtVersion(payloadProject, payloadProjectVersion, project);
+            projectEntities = this.projectService.updateProjectAtVersion(
+                payloadProject, payloadProjectVersion, project);
         }
-
-        return new SafaResponse(response);
+        System.out.println("RESPONSE:" + projectEntities);
+        return projectEntities;
     }
 
     /**
@@ -75,23 +76,20 @@ public class ProjectController extends BaseController {
      * @return List of project identifiers.
      */
     @GetMapping(AppRoutes.Projects.getUserProjects)
-    public SafaResponse getUserProjects() {
-        List<Project> userProjects = projectService.getCurrentUserProjects();
-        return new SafaResponse(userProjects);
+    public List<Project> getUserProjects() {
+        return projectService.getCurrentUserProjects();
     }
 
     /**
      * Deletes project with associated projectId.
      *
      * @param projectId UUID of project to delete.
-     * @return String with success message.
      * @throws SafaError Throws error if project with associated id is not found.
      */
     @DeleteMapping(AppRoutes.Projects.deleteProjectById)
     @ResponseStatus(HttpStatus.OK)
-    public SafaResponse deleteProject(@PathVariable UUID projectId) throws SafaError {
+    public void deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
         this.projectRepository.delete(project);
-        return new SafaResponse("Project deleted successfully");
     }
 }

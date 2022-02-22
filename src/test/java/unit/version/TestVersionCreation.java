@@ -36,8 +36,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .getProject(projectName);
         String routeName =
             RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
-        JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
-        JSONObject projectVersionJson = response.getJSONObject("body");
+        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 
         // VP - Verify that the correct version numbers appear
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
@@ -57,8 +56,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMinorVersion).withProject(project).get();
 
-        JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
-        JSONObject projectVersionJson = response.getJSONObject("body");
+        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
         assertThat(projectVersionJson.get("minorVersion")).isEqualTo(2);
@@ -77,8 +75,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .getProject(projectName);
         String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMajorVersion).withProject(project).get();
 
-        JSONObject response = sendPost(routeName, new JSONObject(), status().isCreated());
-        JSONObject projectVersionJson = response.getJSONObject("body");
+        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(2);
         assertThat(projectVersionJson.get("minorVersion")).isEqualTo(1);

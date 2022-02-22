@@ -58,10 +58,7 @@ public class ParseBaseTest extends ApplicationBaseTest {
             ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName);
         JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
 
-        // VP - Verify that error occurred.
-        assertThat(responseContent.getInt("status")).isEqualTo(0);
-
         // Step - Extract artifact and errors from body
-        return responseContent.getJSONObject("body");
+        return responseContent;
     }
 }

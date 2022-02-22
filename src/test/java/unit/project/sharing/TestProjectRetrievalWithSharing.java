@@ -7,7 +7,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,11 +27,10 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
         createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().is2xxSuccessful());
+        JSONArray projects = sendGetWithArrayResponse(AppRoutes.Projects.createOrUpdateProjects, status().is2xxSuccessful());
 
         // VP - Verify that shared project is visible
-        assertThat(response.getJSONArray("body").length()).isEqualTo(1);
-        JSONArray projects = response.getJSONArray("body");
+        assertThat(projects.length()).isEqualTo(1);
         assertThat(projects.getJSONObject(0).getString("name")).isEqualTo(projectName);
     }
 
@@ -44,11 +42,10 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONObject response = getProjectMembers(project);
+        JSONArray members = getProjectMembers(project);
 
         // VP - Verify that shared project is visible
-        assertThat(response.getJSONArray("body").length()).isEqualTo(2);
-        JSONArray members = response.getJSONArray("body");
+        assertThat(members.length()).isEqualTo(2);
         String otherUserEmail = "doesNotExist@gmail.com";
         assertThat(members.getJSONObject(1).getString("email")).isEqualTo(otherUserEmail);
     }

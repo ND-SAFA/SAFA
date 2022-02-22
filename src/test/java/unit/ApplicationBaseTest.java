@@ -19,6 +19,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -127,11 +128,11 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         return sendPost(url, toJson(request), httpResult);
     }
 
-    protected JSONObject getProjectMembers(Project project) throws Exception {
+    protected JSONArray getProjectMembers(Project project) throws Exception {
         String url = RouteBuilder
             .withRoute(AppRoutes.Projects.getProjectMembers)
             .withProject(project)
             .get();
-        return sendGet(url, status().is2xxSuccessful());
+        return sendGetWithArrayResponse(url, status().is2xxSuccessful());
     }
 }

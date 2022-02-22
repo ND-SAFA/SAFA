@@ -8,7 +8,6 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -73,13 +72,12 @@ public class ProjectMembershipController extends BaseController {
      * @return ServerResponse containing list of project members ships
      */
     @GetMapping(AppRoutes.Projects.getProjectMembers)
-    public SafaResponse getProjectMembers(@PathVariable UUID projectId) throws SafaError {
+    public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        List<ProjectMemberAppEntity> projectMemberships = this.projectService.getProjectMembers(project)
+        return this.projectService.getProjectMembers(project)
             .stream()
             .map(ProjectMemberAppEntity::new)
             .collect(Collectors.toList());
-        return new SafaResponse(projectMemberships);
     }
 
     /**

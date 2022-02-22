@@ -49,8 +49,7 @@ public class TestLinkApproval extends TraceBaseTest {
 
         // Step - Get generated links for project version
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONObject response = sendGet(url, status().isOk());
-        JSONArray links = response.getJSONArray("body");
+        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
 
         // VP - Verify that single generated link is returned.
         assertThat(links.length()).isEqualTo(1);
@@ -137,8 +136,7 @@ public class TestLinkApproval extends TraceBaseTest {
 
         // Step - Get all trace links that were generated.
         String url = getGeneratedLinkEndpoint(projectVersion);
-        JSONObject getGeneratedLinksResponse = sendGet(url, status().isOk());
-        JSONArray links = getGeneratedLinksResponse.getJSONArray("body");
+        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
         int numberOfLinks = links.length();
 
         // Step - Construct list of artifact app entities from the generated links
@@ -161,12 +159,12 @@ public class TestLinkApproval extends TraceBaseTest {
         // Send to generate route
         String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.generateLinks).get();
 
-        JSONObject body = new JSONObject();
-        body.put("sourceArtifacts", sourceArtifacts);
-        body.put("targetArtifacts", targetArtifacts);
+        JSONObject generateTraceLinkBody = new JSONObject();
+        generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
+        generateTraceLinkBody.put("targetArtifacts", targetArtifacts);
 
-        JSONObject generateLinksResponse = sendPost(generateRoute, body, status().is2xxSuccessful());
-        JSONArray generatedLinks = generateLinksResponse.getJSONArray("body");
+        JSONArray generatedLinks = sendPostWithArrayResponse(generateRoute, generateTraceLinkBody,
+            status().is2xxSuccessful());
 
         // VP - Verify that same number of links were generated.
         assertThat(generatedLinks.length()).isEqualTo(numberOfLinks);

@@ -56,7 +56,8 @@ public class TestSafaUserController extends ApplicationBaseTest {
         String password = "r{QjR3<Ec2eZV@?";
         createUser(email, password);
         loginUser(email, password, status().isOk());
-        sendGet(AppRoutes.Projects.createOrUpdateProjects, status().is2xxSuccessful());
+        sendGetWithArrayResponse(AppRoutes.Projects.createOrUpdateProjects,
+            status().is2xxSuccessful());
     }
 
     @Test

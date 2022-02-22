@@ -130,7 +130,7 @@ public class TestArtifactController extends ApplicationBaseTest {
             .get();
 
         JSONObject response = sendGet(url, status().isOk());
-        boolean artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
+        boolean artifactExists = response.getBoolean("artifactExists");
         assertThat(artifactExists).isFalse();
 
         // Step - Create artifact
@@ -141,7 +141,7 @@ public class TestArtifactController extends ApplicationBaseTest {
 
         // VP - Verify that status is okay and artifact does not exist
         response = sendGet(url, status().isOk());
-        artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
+        artifactExists = response.getBoolean("artifactExists");
         assertThat(artifactExists).isTrue();
 
         // Step - Delete artifact
@@ -160,7 +160,7 @@ public class TestArtifactController extends ApplicationBaseTest {
 
         // VP - Verify that artifact no longer exists.
         response = sendGet(url, status().isOk());
-        artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
+        artifactExists = response.getBoolean("artifactExists");
         assertThat(artifactExists).isFalse();
     }
 

@@ -50,7 +50,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject("body");
+        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 

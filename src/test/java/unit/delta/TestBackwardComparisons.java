@@ -33,8 +33,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .get();
-        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
-            "body");
+        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk());
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
@@ -77,8 +76,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk()).getJSONObject(
-            "body");
+        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk());
 
 
         // VP - Verify that no changes are detected in artifacts

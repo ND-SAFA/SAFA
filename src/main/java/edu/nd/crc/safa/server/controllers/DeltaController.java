@@ -5,7 +5,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.SafaResponse;
+import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
@@ -42,10 +42,10 @@ public class DeltaController extends BaseController {
      * @throws SafaError Throws error if baseline or target version is not found.
      */
     @GetMapping(AppRoutes.Projects.calculateProjectDelta)
-    public SafaResponse calculateProjectDelta(@PathVariable UUID baselineVersionId,
+    public ProjectDelta calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                               @PathVariable UUID targetVersionId) throws SafaError {
         ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId).withViewVersion();
         ProjectVersion targetVersion = this.resourceBuilder.fetchVersion(targetVersionId).withViewVersion();
-        return new SafaResponse(this.deltaService.calculateProjectDelta(baselineVersion, targetVersion));
+        return this.deltaService.calculateProjectDelta(baselineVersion, targetVersion);
     }
 }

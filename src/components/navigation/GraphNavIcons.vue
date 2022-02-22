@@ -114,6 +114,12 @@ export default Vue.extend({
           icon: "mdi-graphql",
         },
         {
+          type: ButtonType.ICON,
+          handler: viewportModule.setArtifactTreeLayout,
+          label: "Reformat Graph",
+          icon: "mdi-refresh",
+        },
+        {
           type: ButtonType.CHECKMARK_MENU,
           label: "Filter Artifacts",
           icon: "mdi-filter",

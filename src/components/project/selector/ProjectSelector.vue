@@ -45,7 +45,6 @@
 import Vue from "vue";
 import {
   DataItem,
-  Project,
   ProjectCreationResponse,
   ProjectIdentifier,
   ProjectRole,
@@ -108,7 +107,7 @@ export default Vue.extend({
       if (isOpen) {
         this.fetchProjects();
         if (this.projects.length === 1) {
-          this.$emit("selected", this.projects[0], true);
+          this.$emit("selected", this.projects[0], false);
         }
       }
     },
@@ -127,16 +126,12 @@ export default Vue.extend({
   },
   methods: {
     onUpdateProject(project: ProjectIdentifier) {
-      this.isLoading = true;
       this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
-      this.selected = project;
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
-      this.isLoading = true;
       this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
-      this.selected = newProject;
     },
     onCloseProjectEdit() {
       this.editProjectDialogue = false;
@@ -194,7 +189,9 @@ export default Vue.extend({
         })
         .finally(() => (this.isLoading = false));
     },
-    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<Project> {
+    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<void> {
+      this.isLoading = true;
+
       return saveOrUpdateProject({
         projectId: project.projectId,
         description: project.description,
@@ -203,16 +200,14 @@ export default Vue.extend({
         artifacts: [],
         traces: [],
       })
-        .then((res: ProjectCreationResponse) => {
-          const project = res.project;
-          projectModule.SET_PROJECT_IDENTIFIER(project);
+        .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId
           );
 
           this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          this.selected = project;
           this.$emit("selected", project, true);
-          return project;
         })
         .finally(() => {
           this.isLoading = false;

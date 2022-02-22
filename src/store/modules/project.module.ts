@@ -34,7 +34,11 @@ export default class ProjectModule extends VuexModule {
   async initializeProject(project: Project): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
-    await subtreeModule.initializeProject(project);
+
+    await setTimeout(async () => {
+      // Not sure why this needs any wait, but it doesnt work without it.
+      await subtreeModule.initializeProject(project);
+    }, 100);
   }
 
   @Action
@@ -94,6 +98,22 @@ export default class ProjectModule extends VuexModule {
 
     this.SET_TRACES(updatedTraces);
     await traceModule.addOrUpdateTraceLinks(updatedTraces);
+    await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
+   * Deletes the given trace link.
+   *
+   * @param traceLink - The trace link to remove.
+   */
+  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+    this.SET_TRACES(
+      this.project.traces.filter(
+        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+      )
+    );
+    await traceModule.deleteTraceLink(traceLink);
     await subtreeModule.updateSubtreeMap();
   }
 

@@ -9,7 +9,12 @@ import type {
 import { ArtifactDeltaState, PanelType } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
-import { appModule, projectModule, viewportModule } from "..";
+import {
+  appModule,
+  projectModule,
+  subtreeModule,
+  viewportModule,
+} from "@/store";
 
 @Module({ namespaced: true, name: "delta" })
 /**
@@ -59,7 +64,9 @@ export default class ErrorModule extends VuexModule {
       ...Object.values(payload.traces.added),
       ...Object.values(payload.traces.removed),
     ]);
-    await viewportModule.setArtifactTreeLayout();
+    await subtreeModule.restoreHiddenNodesAfter(
+      viewportModule.setArtifactTreeLayout
+    );
   }
 
   @Action

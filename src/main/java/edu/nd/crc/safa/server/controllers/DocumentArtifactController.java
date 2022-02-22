@@ -7,7 +7,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.SafaResponse;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -67,9 +66,9 @@ public class DocumentArtifactController extends BaseController {
      * @throws SafaError Throws error if authorized user does not have edit permission on project
      */
     @PostMapping(AppRoutes.Projects.addArtifactsToDocument)
-    public SafaResponse addArtifactToDocuments(@PathVariable UUID versionId,
-                                               @PathVariable UUID documentId,
-                                               @RequestBody List<ArtifactAppEntity> artifacts
+    public List<ArtifactAppEntity> addArtifactToDocuments(@PathVariable UUID versionId,
+                                                          @PathVariable UUID documentId,
+                                                          @RequestBody List<ArtifactAppEntity> artifacts
     ) throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
@@ -79,7 +78,7 @@ public class DocumentArtifactController extends BaseController {
             this.documentArtifactRepository.save(documentArtifact);
             a.addDocumentId(document.getDocumentId().toString());
         }
-        return new SafaResponse(artifacts);
+        return artifacts;
     }
 
     @DeleteMapping(AppRoutes.Projects.removeArtifactFromDocument)

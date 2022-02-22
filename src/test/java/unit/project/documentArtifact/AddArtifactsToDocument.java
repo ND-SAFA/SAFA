@@ -71,8 +71,7 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withDocument(document)
             .get();
-        JSONObject response = sendPost(route, requestPayload, status().isOk());
-        JSONArray artifactsAdded = response.getJSONArray("body");
+        JSONArray artifactsAdded = sendPostWithArrayResponse(route, requestPayload, status().isOk());
 
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {

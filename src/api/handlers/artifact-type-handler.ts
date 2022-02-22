@@ -7,7 +7,9 @@ import { projectModule } from "@/store";
  *
  * @param artifactType - The artifact type to add or edit.
  */
-export async function artifactTypeChangeHandler(artifactType: ArtifactType) {
+export async function artifactTypeChangeHandler(
+  artifactType: ArtifactType
+): Promise<void> {
   const updatedArtifactType = await createOrUpdateArtifactType(
     projectModule.projectId,
     artifactType

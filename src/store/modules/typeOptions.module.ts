@@ -119,7 +119,14 @@ export default class TypeOptionsModule extends VuexModule {
    * @returns All possible artifact type icons.
    */
   get allArtifactTypeIcons(): string[] {
-    return Object.values(createDefaultTypeIcons(this.allArtifactTypes));
+    // return Object.values(createDefaultTypeIcons(this.allArtifactTypes));
+    return [
+      "mdi-clipboard-text",
+      "mdi-math-compass",
+      "mdi-hazard-lights",
+      "mdi-pine-tree-fire",
+      "mdi-help",
+    ];
   }
 
   /**

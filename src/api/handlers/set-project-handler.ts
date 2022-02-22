@@ -51,8 +51,6 @@ export async function setAndSubscribeToProject(
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
 
-  // project.artifactTypes = await getProjectArtifactTypes(projectId);
-
   await connectAndSubscribeToVersion(projectId, versionId);
   await projectModule.initializeProject(project);
   await resetGraphFocus(isDifferentProject);

@@ -1,5 +1,4 @@
 import { APIOptions } from "@/types";
-import { isAPIError } from "@/util";
 import { logModule, sessionModule } from "@/store";
 import { baseURL } from "./endpoints";
 import { logout } from "@/api/handlers";
@@ -42,32 +41,32 @@ export default async function authHttpClient<T>(
     };
   }
 
-  const res = await fetch(URL, options);
+  const fetchResponse = await fetch(URL, options);
 
-  if (res.status === 403) {
-    const message = "Session has timed out. Please log back in.";
-    logModule.onWarning(message);
-    await logout();
-    throw Error(message);
-  }
-
-  if (res.status === 204) {
-    // TODO: will be removed in the next PR containing the proper use of http codes.
-    return {} as T;
-  }
-  const resContent = await res.text();
-
-  if (resContent === "") {
-    return {} as T;
+  let message;
+  let resContent;
+  switch (fetchResponse.status) {
+    case 403:
+      message = "Session has timed out. Please log back in.";
+      logModule.onWarning(message);
+      await logout();
+      throw Error(message);
+    case 204:
+      return {} as T;
+    default:
+      resContent = await fetchResponse.text();
+      if (resContent === "") {
+        return {} as T;
+      }
   }
 
   const resJson = JSON.parse(resContent);
 
-  if (!res.ok || isAPIError(resJson)) {
-    logModule.onServerError(resJson.body);
+  if (!fetchResponse.ok) {
+    logModule.onServerError(resJson);
 
-    throw Error(resJson.body.message);
+    throw Error(resJson.message);
   } else {
-    return resJson.body;
+    return resJson;
   }
 }

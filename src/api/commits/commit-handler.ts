@@ -7,29 +7,23 @@ import { persistCommit } from "./commit-api";
  *
  * @param commit - The commit to save.
  */
-export async function saveCommit(commit: Commit): Promise<void> {
+export async function saveCommit(commit: Commit): Promise<Commit> {
   await commitModule.saveCommit(commit);
-  await persistCommit(commit);
+  return await persistCommit(commit);
 }
 
 /**
  * Undoes the last commit.
  */
-export async function undoCommit(): Promise<void> {
+export async function undoCommit(): Promise<Commit> {
   const commit = await commitModule.undoCommit();
-
-  if (commit) {
-    await persistCommit(commit);
-  }
+  return await persistCommit(commit);
 }
 
 /**
  * Reattempts the last undone commit.
  */
-export async function redoCommit(): Promise<void> {
+export async function redoCommit(): Promise<Commit> {
   const commit = await commitModule.redoCommit();
-
-  if (commit) {
-    await saveCommit(commit);
-  }
+  return await saveCommit(commit);
 }

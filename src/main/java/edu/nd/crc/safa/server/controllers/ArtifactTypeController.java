@@ -64,9 +64,10 @@ public class ArtifactTypeController extends BaseController {
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateArtifactType)
-    public ArtifactType createArtifactType(@PathVariable UUID projectId,
-                                           @RequestBody ArtifactType artifactType) throws SafaError {
+    public ArtifactType createOrUpdateArtifactType(@PathVariable UUID projectId,
+                                                   @RequestBody ArtifactType artifactType) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        artifactType.setProject(project);
         this.artifactTypeRepository.save(artifactType);
         this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.TYPES);
         return artifactType;

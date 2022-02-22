@@ -14,6 +14,7 @@ import javax.persistence.UniqueConstraint;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.config.DefaultArtifactTypeIcons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -44,11 +45,12 @@ public class ArtifactType implements Serializable {
         name = "project_id",
         nullable = false
     )
+    @JsonIgnore
     Project project;
 
     @Column(name = "name", nullable = false)
     String name;
-    
+
     @Column(name = "icon", nullable = false)
     String icon;
 

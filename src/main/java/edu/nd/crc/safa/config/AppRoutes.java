@@ -22,6 +22,11 @@ public class AppRoutes {
         public static final String createOrUpdateProjects = projectPrefix;
         public static final String getUserProjects = projectPrefix;
 
+        // Artifact Type Controller
+        public static final String getProjectArtifactTypes = projectPrefix + "/{projectId}/artifactTypes";
+        public static final String createOrUpdateArtifactType = getProjectArtifactTypes;
+        public static final String deleteArtifactType = projectPrefix + "/artifactTypes/{typeId}";
+
         // Document Controller
         public static final String createOrUpdateDocument = projectPrefix + "/versions/{versionId}/documents";
         public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";

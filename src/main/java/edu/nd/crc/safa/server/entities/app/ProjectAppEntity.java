@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -36,19 +37,23 @@ public class ProjectAppEntity {
     public List<ProjectMemberAppEntity> members;
 
     public List<Document> documents;
+    
+    public List<ArtifactType> artifactTypes;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
         this.members = new ArrayList<>();
         this.documents = new ArrayList<>();
+        this.artifactTypes = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
                             List<TraceAppEntity> traces,
                             List<ProjectMemberAppEntity> members,
-                            List<Document> documents) {
+                            List<Document> documents,
+                            List<ArtifactType> artifactTypes) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
         this.projectVersion = projectVersion;
@@ -58,6 +63,15 @@ public class ProjectAppEntity {
         this.traces = traces;
         this.members = members;
         this.documents = documents;
+        this.artifactTypes = artifactTypes;
+    }
+
+    public List<ArtifactType> getArtifactTypes() {
+        return artifactTypes;
+    }
+
+    public void setArtifactTypes(List<ArtifactType> artifactTypes) {
+        this.artifactTypes = artifactTypes;
     }
 
     public List<Document> getDocuments() {

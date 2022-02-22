@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.config.DefaultArtifactTypeIcons;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -47,6 +48,9 @@ public class ArtifactType implements Serializable {
 
     @Column(name = "name", nullable = false)
     String name;
+    
+    @Column(name = "icon", nullable = false)
+    String icon;
 
     public ArtifactType() {
     }
@@ -54,6 +58,15 @@ public class ArtifactType implements Serializable {
     public ArtifactType(Project project, String name) {
         this.project = project;
         this.name = name;
+        this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String toString() {
@@ -64,12 +77,20 @@ public class ArtifactType implements Serializable {
         return this.typeId;
     }
 
+    public void setTypeId(UUID typeId) {
+        this.typeId = typeId;
+    }
+
     public String getName() {
         return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Project getProject() {
+        return this.project;
     }
 
     public void setProject(Project project) {

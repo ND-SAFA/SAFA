@@ -199,9 +199,7 @@ export default Vue.extend({
         projectId: project.projectId,
         description: project.description,
         name: project.name,
-        members: [],
-        artifacts: [],
-        traces: [],
+        // The following fields included for typescript reasons.
       })
         .then((res: ProjectCreationResponse) => {
           const project = res.project;

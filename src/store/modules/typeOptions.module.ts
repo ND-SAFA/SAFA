@@ -3,10 +3,13 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { ArtifactTypeDirections, LabeledArtifactDirection } from "@/types";
 import { ArtifactDirection, ArtifactTypeIcons } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
+import { projectModule } from "@/store";
+import { createOrUpdateArtifactType } from "@/api/endpoints/artifact-type-api";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
- * This module tracks the directions of links between artifacts that are allowed, and the icons for each type.
+ * This module tracks the directions of links between artifacts that are
+ * allowed, and the icons for each type.
  */
 export default class TypeOptionsModule extends VuexModule {
   /**
@@ -16,7 +19,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * A mapping of the icons for each artifact type.
    */
-  private artifactTypeIcons: ArtifactTypeIcons = createDefaultTypeIcons();
+  private artifactTypeIcons: ArtifactTypeIcons = createDefaultTypeIcons([]);
 
   @Action
   /**
@@ -90,7 +93,9 @@ export default class TypeOptionsModule extends VuexModule {
    * @returns All possible artifact type icons.
    */
   get allArtifactTypeIcons(): string[] {
-    return Object.values(createDefaultTypeIcons());
+    return Object.values(
+      createDefaultTypeIcons(projectModule.getProject.artifactTypes)
+    );
   }
 
   /**

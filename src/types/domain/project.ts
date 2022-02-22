@@ -1,5 +1,6 @@
-import { ProjectMembership, TraceLink } from "@/types";
+import { ArtifactType, ProjectMembership, TraceLink } from "@/types";
 import { Artifact } from "./artifact";
+import ArtifactTypeNode from "@/components/project/creator/tim-tree-view/ArtifactTypeNode.vue";
 
 /**
  * Enumerates the states of parsing.
@@ -154,7 +155,12 @@ export interface Project extends ProjectIdentifier {
   /**
    * The different documents for this project.
    */
-  documents?: ProjectDocument[];
+  documents: ProjectDocument[];
+
+  /**
+   * The artifact types present in the project.
+   */
+  artifactTypes: ArtifactType[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

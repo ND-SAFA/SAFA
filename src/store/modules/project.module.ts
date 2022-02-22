@@ -1,18 +1,20 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
+  ArtifactType,
   Project,
   ProjectDocument,
   ProjectIdentifier,
   ProjectMembership,
 } from "@/types";
-import { createProject } from "@/util";
+import { createDefaultTypeIcons, createProject } from "@/util";
 import {
   artifactModule,
   documentModule,
   logModule,
   subtreeModule,
   traceModule,
+  typeOptionsModule,
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
 import { reloadDocumentArtifacts } from "@/api";
@@ -34,7 +36,13 @@ export default class ProjectModule extends VuexModule {
   async initializeProject(project: Project): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
-    await subtreeModule.initializeProject(project);
+    typeOptionsModule.SET_TYPE_ICONS(
+      createDefaultTypeIcons(project.artifactTypes)
+    );
+    await setTimeout(async () => {
+      // Not sure why this needs any wait, but it doesnt work without it.
+      await subtreeModule.initializeProject(project);
+    }, 100);
   }
 
   @Action
@@ -97,6 +105,30 @@ export default class ProjectModule extends VuexModule {
     await subtreeModule.updateSubtreeMap();
   }
 
+  @Action
+  /**
+   * Deletes the given trace link.
+   *
+   * @param traceLink - The trace link to remove.
+   */
+  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+    this.SET_TRACES(
+      this.project.traces.filter(
+        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+      )
+    );
+    await traceModule.deleteTraceLink(traceLink);
+    await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  addOrUpdateArtifactType(artifactType: ArtifactType): void {
+    const unaffectedTypes = this.project.artifactTypes.filter(
+      (a) => a.typeId !== artifactType.typeId
+    );
+    this.SET_ARTIFACT_TYPES([...unaffectedTypes, artifactType]);
+  }
+
   @Mutation
   /**
    * Sets a new project.
@@ -151,6 +183,14 @@ export default class ProjectModule extends VuexModule {
    */
   SET_DOCUMENTS(documents: ProjectDocument[]): void {
     this.project.documents = documents;
+  }
+
+  @Mutation
+  /**
+   * Sets the current artifact type in the project.
+   */
+  SET_ARTIFACT_TYPES(artifactTypes: ArtifactType[]): void {
+    this.project.artifactTypes = artifactTypes;
   }
 
   /**

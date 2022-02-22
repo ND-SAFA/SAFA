@@ -48,8 +48,8 @@ public class AttemptToCreateLoop extends TraceMatrixBaseTest {
             .withTraceAndReturn(projectName, targetArtifactName, sourceArtifactName);
         CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withAddedTrace(traceJson);
 
-        JSONObject response = commitWithStatus(commitBuilder, status().is4xxClientError());
-        String errorMessage = response.getJSONObject("body").getString("message");
+        JSONObject responseBody = commitWithStatus(commitBuilder, status().is4xxClientError());
+        String errorMessage = responseBody.getString("message");
         assertThat(errorMessage).matches(".*direction.*");
     }
 }

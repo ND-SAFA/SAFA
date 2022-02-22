@@ -24,7 +24,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
         String routeName =
             RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
-        assertThat(response.getJSONObject("body").getString("message")).contains("initial version");
+        assertThat(response.getString("message")).contains("initial version");
     }
 
     @Test

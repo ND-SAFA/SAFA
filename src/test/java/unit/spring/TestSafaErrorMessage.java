@@ -32,15 +32,7 @@ public class TestSafaErrorMessage extends ApplicationBaseTest {
         JSONObject obj = sendGet(routeName, status().isBadRequest());
 
         //Verification Points
-        Integer responseStatus = (Integer) obj.get("status");
-
-        assertThat(responseStatus).isNotNull();
-        assertThat(responseStatus).isEqualTo(1);
-
-        JSONObject body = obj.getJSONObject("body");
-        assertThat(body).isNotNull();
-
-        Object error = body.get("message");
+        Object error = obj.get("message");
         assertThat(error).isNotNull();
     }
 }

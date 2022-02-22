@@ -35,12 +35,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         String routeName = AppRoutes.Projects.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
-
-        // VP 1 - Server response is 200 - okay
-        assertThat(responseContent.get("status")).as("status is set").isEqualTo(0);
-        JSONObject responseBody = responseContent.getJSONObject("body");
-        assertThat(responseBody).as("response body is non-null").isNotNull();
+        JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
 
         // Step - Get JSON Response
         JSONObject projectJson = responseBody.getJSONObject("project");

@@ -1,4 +1,4 @@
-import { CyPromise, LayoutPayload } from "@/types";
+import { CyPromise, IGraphLayout, LayoutPayload } from "@/types";
 import { artifactTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
@@ -8,6 +8,7 @@ import {
 } from "@/cytoscape/styles";
 import { appModule, logModule, viewportModule } from "@/store";
 import { areArraysEqual } from "@/util";
+import { applyAutoMoveEvents } from "@/cytoscape";
 
 /**
  * Runs the given callback if cy is not animated.
@@ -84,6 +85,34 @@ export function cyCenterNodes(
 export function cyCreateLayout(layoutPayload: LayoutPayload): void {
   layoutPayload.cyPromise.then((cy) => {
     layoutPayload.layout.createLayout(cy);
+  });
+}
+
+/**
+ * Re-applies automove to all nodes.
+ *
+ * @param layout - The graph layout.
+ * @param cyPromise - The cy instance.
+ */
+export function cyApplyAutomove(
+  layout: IGraphLayout,
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  cyPromise.then((cy) => {
+    applyAutoMoveEvents(cy, layout);
+  });
+}
+
+/**
+ * Re-moves automove from all nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyRemoveAutomove(
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  cyPromise.then((cy) => {
+    cy.automove("destroy");
   });
 }
 

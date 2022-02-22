@@ -49,9 +49,8 @@ export async function approveLink(traceLink: TraceLink): Promise<void> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
-    .then((commit) => {
-      projectModule.addOrUpdateTraceLinks(commit.traces.modified);
-    });
+    .then(async ({ traces }) => traces.modified)
+    .then(projectModule.addOrUpdateTraceLinks);
 }
 
 /**
@@ -64,9 +63,8 @@ export async function declineLink(traceLink: TraceLink): Promise<void> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
-    .then((commit) => {
-      projectModule.addOrUpdateTraceLinks(commit.traces.modified);
-    });
+    .then(async ({ traces }) => traces.modified)
+    .then(projectModule.addOrUpdateTraceLinks);
 }
 
 /**
@@ -81,7 +79,6 @@ export async function createLink(traceLink: TraceLink): Promise<void> {
   return CommitBuilder.withCurrentVersion()
     .withNewTraceLink(traceLink)
     .save()
-    .then((commit) => {
-      projectModule.addOrUpdateTraceLinks(commit.traces.added);
-    });
+    .then(async ({ traces }) => traces.added)
+    .then(projectModule.addOrUpdateTraceLinks);
 }

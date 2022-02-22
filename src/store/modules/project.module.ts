@@ -7,7 +7,7 @@ import type {
   ProjectIdentifier,
   ProjectMembership,
 } from "@/types";
-import { createDefaultTypeIcons, createProject } from "@/util";
+import { createProject } from "@/util";
 import {
   artifactModule,
   documentModule,
@@ -36,9 +36,8 @@ export default class ProjectModule extends VuexModule {
   async initializeProject(project: Project): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
-    typeOptionsModule.SET_TYPE_ICONS(
-      createDefaultTypeIcons(project.artifactTypes)
-    );
+    typeOptionsModule.initializeTypeIcons(project.artifactTypes);
+
     await setTimeout(async () => {
       // Not sure why this needs any wait, but it doesnt work without it.
       await subtreeModule.initializeProject(project);
@@ -122,6 +121,11 @@ export default class ProjectModule extends VuexModule {
   }
 
   @Action
+  /**
+   * Adds a new artifact type.
+   *
+   * @param artifactType - The artifact type to add.
+   */
   addOrUpdateArtifactType(artifactType: ArtifactType): void {
     const unaffectedTypes = this.project.artifactTypes.filter(
       (a) => a.typeId !== artifactType.typeId

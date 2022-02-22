@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import {
   deltaModule,
   errorModule,
@@ -13,14 +14,10 @@ import {
   Artifact,
   ArtifactWarning,
   ProjectWarnings,
-  AddedArtifact,
   ArtifactDeltaState,
-  ModifiedArtifact,
-  RemovedArtifact,
   ArtifactCytoCoreElement,
   EntityModification,
 } from "@/types";
-import Vue, { PropType } from "vue";
 
 export default Vue.extend({
   name: "artifact",
@@ -63,15 +60,9 @@ export default Vue.extend({
     },
   },
   computed: {
-    selectedArtifact(): Artifact | undefined {
-      return artifactSelectionModule.getSelectedArtifact;
-    },
     isSelected(): boolean {
-      const selectedArtifact = this.selectedArtifact;
-
-      return (
-        selectedArtifact !== undefined &&
-        selectedArtifact.id === this.artifactDefinition.id
+      return artifactSelectionModule.isArtifactInSelectedGroup(
+        this.artifactDefinition.id
       );
     },
     isDeltaViewEnabled(): boolean {

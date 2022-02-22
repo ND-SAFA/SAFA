@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { SubtreeLink, SubtreeMap, Project } from "@/types";
-import { artifactModule, traceModule } from "@/store";
+import type { SubtreeLink, SubtreeMap, Project, Artifact } from "@/types";
+import { artifactModule, subtreeModule, traceModule } from "@/store";
 import {
   artifactTreeCyPromise,
   createSubtreeMap,
@@ -42,10 +42,14 @@ export default class SubtreeModule extends VuexModule {
   @Action
   /**
    * Recalculates the subtree map of project artifacts and updates store.
+   *
+   * @param artifacts - The artifacts to create the subtree for.
    */
-  async updateSubtreeMap(): Promise<void> {
+  async updateSubtreeMap(
+    artifacts: Artifact[] = artifactModule.allArtifacts
+  ): Promise<void> {
     artifactTreeCyPromise.then(async (cy) => {
-      const subtreeMap = await createSubtreeMap(cy, artifactModule.artifacts);
+      const subtreeMap = await createSubtreeMap(cy, artifacts);
 
       this.SET_SUBTREE_MAP(subtreeMap);
     });
@@ -73,6 +77,23 @@ export default class SubtreeModule extends VuexModule {
 
   @Action
   /**
+   * Temporarily removes all hidden nodes, runs the callback, then restores the hidden nodes.
+   */
+  async restoreHiddenNodesAfter(cb: () => Promise<void>): Promise<void> {
+    const collapsedParents = this.collapsedParentNodes;
+
+    await this.resetHiddenNodes();
+    await cb();
+
+    for (const id of collapsedParents) {
+      if (this.hiddenSubtreeNodes.includes(id)) continue;
+
+      await this.hideSubtree(id);
+    }
+  }
+
+  @Action
+  /**
    * Updates the subtree map, and hides all subtrees greater than the set threshold.
    */
   async initializeProject(project: Project): Promise<void> {
@@ -84,7 +105,7 @@ export default class SubtreeModule extends VuexModule {
         {} as Record<string, number>
       );
 
-    await this.updateSubtreeMap();
+    await this.updateSubtreeMap(project.artifacts);
 
     for (const id of artifactIds) {
       if (this.hiddenSubtreeNodes.includes(id)) continue;

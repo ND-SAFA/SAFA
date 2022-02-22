@@ -92,7 +92,7 @@ export default class DocumentModule extends VuexModule {
     traceModule.initializeTraces({ currentArtifactIds });
     await resetGraphFocus();
 
-    setTimeout(appModule.onLoadEnd, 1000);
+    setTimeout(appModule.onLoadEnd, 200);
   }
 
   @Action

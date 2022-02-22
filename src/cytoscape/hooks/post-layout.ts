@@ -6,6 +6,7 @@ import {
   IGraphLayout,
 } from "@/types";
 import { artifactSelectionModule, viewportModule } from "@/store";
+import { cyCenterNodes, cyZoomReset } from "@/cytoscape";
 
 /**
  * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.
@@ -75,7 +76,8 @@ export const centerViewOnNode: LayoutHook = (): void => {
   const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
 
   if (!selectedArtifacts) {
-    viewportModule.centerOnRootNode();
+    cyZoomReset();
+    cyCenterNodes();
   } else {
     viewportModule.centerOnArtifacts([selectedArtifacts]);
   }

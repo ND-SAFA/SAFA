@@ -36,10 +36,11 @@ export default class CommitModule extends VuexModule {
    *
    * @return The undone commit.
    */
-  async undoCommit(): Promise<Commit | undefined> {
+  async undoCommit(): Promise<Commit> {
     if (!this.canUndo) {
-      logModule.onWarning("There are no commits to undo.");
-      return;
+      const errorMessage = "There are no commits to undo.";
+      logModule.onWarning(errorMessage);
+      throw Error(errorMessage);
     }
 
     const lastCommitIndex = this.commits.length - 1;
@@ -57,10 +58,11 @@ export default class CommitModule extends VuexModule {
    *
    * @return The redone commit.
    */
-  async redoCommit(): Promise<Commit | undefined> {
+  async redoCommit(): Promise<Commit> {
     if (!this.canRedo) {
-      logModule.onWarning("Cannot redo because no commits have been reverted.");
-      return;
+      const errorMessage = "Cannot redo because no commits have been reverted.";
+      logModule.onWarning(errorMessage);
+      throw Error(errorMessage);
     }
 
     const lastCommitIndex = this.revertedCommits.length - 1;

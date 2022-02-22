@@ -41,7 +41,7 @@ export class CommitBuilder {
     return this;
   }
 
-  save(): Promise<void> {
+  save(): Promise<Commit> {
     return saveCommit(this.commit);
   }
 

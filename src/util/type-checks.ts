@@ -1,24 +1,10 @@
 import { Artifact, EntityModification } from "@/types/domain";
-import { APIError, APIResponse } from "@/types/api/base-api";
 import {
   IGenericFilePanel,
   ProjectFile,
   TraceFile,
   TracePanel,
 } from "@/types/components";
-
-/**
- * Returns whether the given APIResponse is an API error.
- *
- * @param blob - The response to check.
- *
- * @return Whether this item is an error.
- */
-export function isAPIError<T>(
-  blob: APIResponse<T> | APIError
-): blob is APIError {
-  return blob.status > 0;
-}
 
 /**
  * Returns whether the given ArtifactDelta is an modified artifact.

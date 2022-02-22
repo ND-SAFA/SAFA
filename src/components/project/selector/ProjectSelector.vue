@@ -177,6 +177,7 @@ export default Vue.extend({
       deleteProject(project.projectId)
         .then(async () => {
           logModule.onSuccess(`${project.name} successfully deleted.`);
+          this.$emit("unselected");
 
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId

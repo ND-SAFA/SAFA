@@ -105,7 +105,7 @@ export function createCommit(version: ProjectVersion): Commit {
  * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
  */
 export function createDefaultTypeIcons(
-  artifactTypes: ArtifactType[]
+  artifactTypes: ArtifactType[] = []
 ): Record<string, string> {
   return artifactTypes
     .map((t) => ({ [t.name]: t.icon }))

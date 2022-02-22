@@ -20,6 +20,10 @@ export default class TypeOptionsModule extends VuexModule {
    */
   private artifactTypeDirections: ArtifactTypeDirections = {};
   /**
+   * A list of all artifact types.
+   */
+  private allArtifactTypes: ArtifactType[] = [];
+  /**
    * A mapping of the icons for each artifact type.
    */
   private artifactTypeIcons: ArtifactTypeIcons = createDefaultTypeIcons([]);
@@ -30,6 +34,7 @@ export default class TypeOptionsModule extends VuexModule {
    */
   initializeTypeIcons(artifactTypes: ArtifactType[]): void {
     this.SET_TYPE_ICONS(createDefaultTypeIcons(artifactTypes));
+    this.SET_TYPES(artifactTypes);
   }
 
   @Action
@@ -62,6 +67,16 @@ export default class TypeOptionsModule extends VuexModule {
    */
   SET_LINK_DIRECTIONS(artifactTypeDirections: ArtifactTypeDirections): void {
     this.artifactTypeDirections = artifactTypeDirections;
+  }
+
+  @Mutation
+  /**
+   * Sets the artifact types.
+   *
+   * @param artifactTypes - The artifact types.
+   */
+  SET_TYPES(artifactTypes: ArtifactType[]): void {
+    this.allArtifactTypes = artifactTypes;
   }
 
   @Mutation
@@ -104,9 +119,7 @@ export default class TypeOptionsModule extends VuexModule {
    * @returns All possible artifact type icons.
    */
   get allArtifactTypeIcons(): string[] {
-    return Object.values(
-      createDefaultTypeIcons(projectModule.getProject.artifactTypes)
-    );
+    return Object.values(createDefaultTypeIcons(this.allArtifactTypes));
   }
 
   /**

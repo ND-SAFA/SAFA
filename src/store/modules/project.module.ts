@@ -130,7 +130,10 @@ export default class ProjectModule extends VuexModule {
     const unaffectedTypes = this.project.artifactTypes.filter(
       (a) => a.typeId !== artifactType.typeId
     );
-    this.SET_ARTIFACT_TYPES([...unaffectedTypes, artifactType]);
+    const allArtifactTypes = [...unaffectedTypes, artifactType];
+
+    this.SET_ARTIFACT_TYPES(allArtifactTypes);
+    typeOptionsModule.SET_TYPES(allArtifactTypes);
   }
 
   @Mutation

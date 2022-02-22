@@ -43,8 +43,7 @@ import Vue from "vue";
 import { LabeledArtifactDirection } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { logModule, projectModule, typeOptionsModule } from "@/store";
-import { removeTraceType } from "@/api";
-import { createOrUpdateArtifactType } from "@/api/endpoints/artifact-type-api";
+import { artifactTypeChangeHandler, removeTraceType } from "@/api";
 
 export default Vue.extend({
   name: "trace-link-direction-tab",
@@ -86,15 +85,8 @@ export default Vue.extend({
       );
 
       if (artifactTypeQuery.length === 1) {
-        const artifactType = artifactTypeQuery[0];
-        artifactType.icon = icon;
-        const projectId = projectModule.getProject.projectId;
-        createOrUpdateArtifactType(projectId, artifactType).then(
-          (updatedArtifactType) => {
-            projectModule.addOrUpdateArtifactType(updatedArtifactType);
-            typeOptionsModule.updateArtifactIcon({ ...entry, icon });
-          }
-        );
+        typeOptionsModule.updateArtifactIcon({ ...entry, icon });
+        artifactTypeChangeHandler({ ...artifactTypeQuery[0], icon });
       } else {
         logModule.onWarning("Unable to find artifact type: " + entry.label);
       }

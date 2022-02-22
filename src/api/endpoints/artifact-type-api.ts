@@ -1,4 +1,4 @@
-import { ArtifactType, Project, ProjectDocument } from "@/types";
+import { ArtifactType } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**

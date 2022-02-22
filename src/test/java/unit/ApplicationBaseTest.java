@@ -76,19 +76,6 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         return sendPost(route, commitBuilder.asJson(), expectedStatus);
     }
 
-    /**
-     * Returns the route for committing changes to project versions.
-     *
-     * @param projectVersion The base version to commit to.
-     * @return The route to the endpoint.
-     */
-    protected String getCommitRoute(ProjectVersion projectVersion) {
-        return RouteBuilder
-            .withRoute(AppRoutes.Projects.commitChange)
-            .withVersion(projectVersion)
-            .get();
-    }
-
     protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName) throws Exception {
         return setupDualVersions(projectName, true);
     }

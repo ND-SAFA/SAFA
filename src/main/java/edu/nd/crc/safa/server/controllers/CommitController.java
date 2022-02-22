@@ -27,11 +27,9 @@ import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -67,7 +65,6 @@ public class CommitController extends BaseController {
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
     @PostMapping(AppRoutes.Projects.commitChange)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();

@@ -4,7 +4,7 @@
     item-key="versionId"
     no-data-text="Project contains no versions"
     :headers="headers"
-    :items="versions"
+    :items="displayedVersions"
     :is-open="isOpen"
     :is-loading="isLoading"
     :has-edit="false"
@@ -37,7 +37,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion, DataItem } from "@/types";
 import { deleteProjectVersion, getProjectVersions } from "@/api";
-import { logModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { versionSelectorHeader } from "./headers";
 import VersionCreator from "./VersionCreator.vue";
@@ -69,6 +69,10 @@ export default Vue.extend({
       type: Object as PropType<ProjectIdentifier>,
       required: false,
     },
+    hideCurrentVersion: {
+      type: Boolean,
+      required: false,
+    },
   },
   data() {
     return {
@@ -86,6 +90,18 @@ export default Vue.extend({
   watch: {
     project() {
       this.loadProjectVersions();
+    },
+  },
+  computed: {
+    loadedProjectVersionId(): string | undefined {
+      return projectModule.versionId;
+    },
+    displayedVersions(): ProjectVersion[] {
+      return this.hideCurrentVersion
+        ? this.versions.filter(
+            ({ versionId }) => versionId !== this.loadedProjectVersionId
+          )
+        : this.versions;
     },
   },
   methods: {

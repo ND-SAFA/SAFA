@@ -73,13 +73,13 @@ export default Vue.extend({
       return projectModule.getProject;
     },
     afterVersion(): string {
-      return versionToString(deltaModule.getAfterVersion);
+      return versionToString(deltaModule.deltaVersion);
     },
     beforeVersion(): string {
       return versionToString(projectModule.getProject.projectVersion);
     },
     isDeltaViewEnabled(): boolean {
-      return deltaModule.getIsDeltaViewEnabled;
+      return deltaModule.inDeltaView;
     },
   },
   watch: {

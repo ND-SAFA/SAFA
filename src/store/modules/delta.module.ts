@@ -144,14 +144,14 @@ export default class ErrorModule extends VuexModule {
   /**
    * @return The current version that deltas are made to.
    */
-  get getAfterVersion(): ProjectVersion | undefined {
+  get deltaVersion(): ProjectVersion | undefined {
     return this.afterVersion;
   }
 
   /**
    * @return Whether the delta view is currently enabled.
    */
-  get getIsDeltaViewEnabled(): boolean {
+  get inDeltaView(): boolean {
     return this.isDeltaViewEnabled;
   }
 
@@ -183,7 +183,7 @@ export default class ErrorModule extends VuexModule {
    */
   get getTraceDeltaType(): (id: string) => ArtifactDeltaState | undefined {
     return (id) => {
-      if (!this.getIsDeltaViewEnabled) {
+      if (!this.inDeltaView) {
         return undefined;
       } else if (id in this.projectDelta.traces.added) {
         return ArtifactDeltaState.ADDED;

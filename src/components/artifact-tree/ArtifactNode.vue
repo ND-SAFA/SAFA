@@ -66,7 +66,7 @@ export default Vue.extend({
       );
     },
     isDeltaViewEnabled(): boolean {
-      return deltaModule.getIsDeltaViewEnabled;
+      return deltaModule.inDeltaView;
     },
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;

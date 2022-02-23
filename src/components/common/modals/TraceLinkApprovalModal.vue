@@ -20,19 +20,19 @@
 </template>
 
 <script lang="ts">
-import { approveLinkAPIHandler, declineLinkAPIHandler } from "@/api";
+import Vue, { PropType } from "vue";
 import {
   TraceApproval,
   TraceLink,
   TraceLinkDisplayData,
   TraceType,
 } from "@/types";
-import Vue, { PropType } from "vue";
-import { GenericModal } from "@/components/common";
-import TraceLinkDisplay from "./TraceLinkDisplay.vue";
+import { approveLinkAPIHandler, declineLinkAPIHandler } from "@/api";
+import { GenericModal } from "@/components/common/generic";
+import { TraceLinkDisplay } from "@/components/common/display";
 
 /**
- * Displays trace links on a panel.
+ * A modal for approving trace links.
  *
  * @emits `close` - On close.
  */

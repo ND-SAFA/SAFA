@@ -62,7 +62,7 @@ import { GenericModal } from "@/components/common";
 /**
  * A modal for creating new versions.
  *
- * @emits-1 `create` (string) - On version creation.
+ * @emits-1 `create` (ProjectVersion) - On version creation.
  * @emits-2 `close` - On close.
  */
 export default Vue.extend({

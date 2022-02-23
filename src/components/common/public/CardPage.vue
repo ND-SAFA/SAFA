@@ -25,7 +25,7 @@ import { SafaIcon } from "@/components/navigation";
 
 /**
  * Presents the page within a card containing SAFA title, a slot for a form,
- * and a slot for its actions..
+ * and a slot for its actions.
  */
 export default Vue.extend({
   name: "card-page",

@@ -1,11 +1,19 @@
-# Installation
+# SAFA Front-End
 
-1. Install package libraries : `npm install`
-2. Choose a backend environment: local, development, production
-   1. Local
-      1. Make sure you have an instance of the backend running at http://localhost:8080
-      2. `npm run serve:local`
-   2. Development and Production
-      1. Download .env files from notion and place at the top of the project folder
-      2. `npm run serve:dev` to target deployed development branch
-      3. `npm run serve:prod` to target deployed production branch
+## Getting Started
+
+To see the basic requirements of developing on the front-end, see the [Front-End Basic Requirements](https://www.notion.so/nd-safa/Front-End-Basic-Requirements-3cbf39015ca54fc5a93c9ba252cf95e2).
+
+To get started with developing, see the [Front-End Setup Guide](https://www.notion.so/nd-safa/Front-End-Setup-Guide-fecdc878a7b3428d8075684e9ad14cce).
+
+## Style Conventions
+
+Front-end style conventions can be found in the [Front-End Style Guide](https://www.notion.so/nd-safa/Front-End-Style-Guide-69e1f91e112e49af950d476f301b9cb2).
+
+## Architecture
+
+To learn more about the code architecture of the front-end, and the way that information flows through the app, read about the [Front-End Architecture](https://www.notion.so/nd-safa/Front-End-Architecture-d972dfcd4b0645e69d7ea3490c95b8f4).
+
+## Pull Requests
+
+Ready to submit a pull request to the project? Read about [Front-End Pull Requests](https://www.notion.so/nd-safa/Front-End-Pull-Requests-bc116ce62dc74c61b793fa349a6763fe).

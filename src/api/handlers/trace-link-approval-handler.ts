@@ -40,7 +40,7 @@ export async function declineLinkAPIHandler(
       onSuccess();
     }
 
-    await projectModule.deleteTraceLink(link);
+    await projectModule.deleteTraceLinks([link]);
   });
 }
 

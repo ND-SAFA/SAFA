@@ -61,10 +61,11 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+  async deleteTraceLinks(traceLinks: TraceLink[]): Promise<void> {
+    const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
     const removeLink = (currentTraces: TraceLink[]) =>
       currentTraces.filter(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+        ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
       );
 
     this.SET_PROJECT_TRACES(removeLink(this.projectTraces));

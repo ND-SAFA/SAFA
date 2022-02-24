@@ -186,6 +186,8 @@ export default Vue.extend({
         members: [], // TODO: Add current user as owner?
         artifacts: this.artifacts,
         traces: this.traces,
+        artifactTypes: [],
+        documents: [],
       };
     },
   },

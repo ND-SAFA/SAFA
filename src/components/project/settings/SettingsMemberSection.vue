@@ -75,7 +75,7 @@ export default Vue.extend({
   },
   computed: {
     isAdmin(): boolean {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
+      const userEmail = sessionModule.userEmail;
       const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
       const userQuery = this.project.members.filter(
         (m) => m.email === userEmail

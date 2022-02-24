@@ -37,7 +37,7 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
     .withRemovedArtifact(artifact)
     .save()
     .then(({ artifacts }) => artifacts.removed[0])
-    .then(projectModule.deleteArtifactByName);
+    .then((artifact) => projectModule.deleteArtifacts([artifact]));
 }
 
 /**

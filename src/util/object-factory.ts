@@ -1,4 +1,5 @@
 import {
+  ArtifactType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
@@ -58,6 +59,8 @@ export function createProject(): Project {
     artifacts: [],
     traces: [],
     projectVersion: undefined,
+    artifactTypes: [],
+    documents: [],
   };
 }
 
@@ -101,14 +104,12 @@ export function createCommit(version: ProjectVersion): Commit {
 /**
  * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
  */
-export function createDefaultTypeIcons(): Record<string, string> {
-  return {
-    requirement: "mdi-clipboard-text",
-    design: "mdi-math-compass",
-    hazard: "mdi-hazard-lights",
-    environmentalassumption: "mdi-pine-tree-fire",
-    default: "mdi-help",
-  };
+export function createDefaultTypeIcons(
+  artifactTypes: ArtifactType[] = []
+): Record<string, string> {
+  return artifactTypes
+    .map((t) => ({ [t.name]: t.icon }))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), { default: "mdi-help" });
 }
 
 /**

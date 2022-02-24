@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactTree, VersionLabel, PrivatePage } from "@/components";
+import { ArtifactTree, PrivatePage } from "@/components";
 
 /**
  * Displays the artifact tree of the current project with a label
@@ -19,7 +19,6 @@ export default Vue.extend({
   components: {
     PrivatePage,
     ArtifactTree,
-    VersionLabel,
   },
 });
 </script>

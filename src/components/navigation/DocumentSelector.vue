@@ -1,5 +1,6 @@
 <template>
   <v-select
+    ref="documentSelector"
     v-model="select"
     :items="items"
     label="Document"
@@ -151,6 +152,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    handleCloseMenu() {
+      (this.$refs.documentSelector as HTMLElement).blur();
+    },
     resetModalData() {
       this.documentName = "";
       this.artifactIds = [];
@@ -158,6 +162,7 @@ export default Vue.extend({
       this.isCreateOpen = false;
       this.isEditOpen = false;
       this.confirmDelete = false;
+      this.handleCloseMenu();
     },
 
     handleCreateOpen() {

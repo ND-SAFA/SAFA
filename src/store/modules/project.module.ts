@@ -1,6 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
+  ArtifactType,
   Project,
   ProjectDocument,
   ProjectIdentifier,
@@ -13,6 +14,7 @@ import {
   logModule,
   subtreeModule,
   traceModule,
+  typeOptionsModule,
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
 import { reloadDocumentArtifacts } from "@/api";
@@ -34,6 +36,7 @@ export default class ProjectModule extends VuexModule {
   async initializeProject(project: Project): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
+    typeOptionsModule.initializeTypeIcons(project.artifactTypes);
 
     await setTimeout(async () => {
       // Not sure why this needs any wait, but it doesnt work without it.
@@ -73,11 +76,15 @@ export default class ProjectModule extends VuexModule {
   /**
    * Deletes the artifact with the given name.
    */
-  async deleteArtifactByName(artifact: Artifact): Promise<void> {
+  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+    if (artifacts.length === 0) return;
+
+    const deletedNames = artifacts.map(({ name }) => name);
+
     this.SET_ARTIFACTS(
-      this.project.artifacts.filter(({ name }) => name !== artifact.name)
+      this.project.artifacts.filter(({ name }) => !deletedNames.includes(name))
     );
-    await artifactModule.deleteArtifactByName(artifact);
+    await artifactModule.deleteArtifacts(artifacts);
     await subtreeModule.updateSubtreeMap();
   }
 
@@ -107,14 +114,34 @@ export default class ProjectModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+  async deleteTraceLinks(traceLinks: TraceLink[]): Promise<void> {
+    if (traceLinks.length === 0) return;
+
+    const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
+
     this.SET_TRACES(
       this.project.traces.filter(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+        ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
       )
     );
-    await traceModule.deleteTraceLink(traceLink);
+    await traceModule.deleteTraceLinks(traceLinks);
     await subtreeModule.updateSubtreeMap();
+  }
+
+  @Action
+  /**
+   * Adds a new artifact type.
+   *
+   * @param artifactType - The artifact type to add.
+   */
+  addOrUpdateArtifactType(artifactType: ArtifactType): void {
+    const unaffectedTypes = this.project.artifactTypes.filter(
+      (a) => a.typeId !== artifactType.typeId
+    );
+    const allArtifactTypes = [...unaffectedTypes, artifactType];
+
+    this.SET_ARTIFACT_TYPES(allArtifactTypes);
+    typeOptionsModule.SET_TYPES(allArtifactTypes);
   }
 
   @Mutation
@@ -171,6 +198,14 @@ export default class ProjectModule extends VuexModule {
    */
   SET_DOCUMENTS(documents: ProjectDocument[]): void {
     this.project.documents = documents;
+  }
+
+  @Mutation
+  /**
+   * Sets the current artifact type in the project.
+   */
+  SET_ARTIFACT_TYPES(artifactTypes: ArtifactType[]): void {
+    this.project.artifactTypes = artifactTypes;
   }
 
   /**

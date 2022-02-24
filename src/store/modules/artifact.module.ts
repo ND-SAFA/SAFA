@@ -66,9 +66,10 @@ export default class ArtifactModule extends VuexModule {
   /**
    * Deletes the artifact with the given name.
    */
-  async deleteArtifactByName(artifact: Artifact): Promise<void> {
+  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+    const deletedNames = artifacts.map(({ name }) => name);
     const removeArtifact = (currentArtifacts: Artifact[]) =>
-      currentArtifacts.filter(({ name }) => name !== artifact.name);
+      currentArtifacts.filter(({ name }) => !deletedNames.includes(name));
 
     this.SET_PROJECT_ARTIFACTS(removeArtifact(this.projectArtifacts));
     this.SET_CURRENT_ARTIFACTS(removeArtifact(this.currentArtifacts));

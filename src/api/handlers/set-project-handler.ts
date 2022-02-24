@@ -16,6 +16,7 @@ import {
   loadProjectDocuments,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
+import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -51,7 +52,6 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
-  await loadProjectDocuments(project);
   await projectModule.initializeProject(project);
   await resetGraphFocus(isDifferentProject);
   await reloadTraceMatrices();

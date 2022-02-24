@@ -59,6 +59,7 @@ export default Vue.extend({
       if (!this.isDeltaViewEnabled) {
         if (this.isProjectDefined()) {
           deltaModule.setIsDeltaViewEnabled(true);
+          this.isModalOpen = true;
         } else {
           this.errorMessage = "Please select a baseline project version";
         }
@@ -73,13 +74,13 @@ export default Vue.extend({
       return projectModule.getProject;
     },
     afterVersion(): string {
-      return versionToString(deltaModule.getAfterVersion);
+      return versionToString(deltaModule.deltaVersion);
     },
     beforeVersion(): string {
       return versionToString(projectModule.getProject.projectVersion);
     },
     isDeltaViewEnabled(): boolean {
-      return deltaModule.getIsDeltaViewEnabled;
+      return deltaModule.inDeltaView;
     },
   },
   watch: {

@@ -1,5 +1,5 @@
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
-import { artifactSelectionModule, viewportModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
 import { EventObject } from "cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { Artifact } from "@/types";

@@ -114,7 +114,7 @@ export default Vue.extend({
   },
   computed: {
     hasDeletePermission(): boolean {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
+      const userEmail = sessionModule.userEmail;
       const projectMembershipQuery = projectModule.getProject.members.filter(
         (m) => m.email === userEmail
       );
@@ -177,6 +177,7 @@ export default Vue.extend({
       deleteProject(project.projectId)
         .then(async () => {
           logModule.onSuccess(`${project.name} successfully deleted.`);
+          this.$emit("unselected");
 
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
@@ -196,9 +197,7 @@ export default Vue.extend({
         projectId: project.projectId,
         description: project.description,
         name: project.name,
-        members: [],
-        artifacts: [],
-        traces: [],
+        // The following fields included for typescript reasons.
       })
         .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(

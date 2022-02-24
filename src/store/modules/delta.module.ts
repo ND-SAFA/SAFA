@@ -5,12 +5,14 @@ import type {
   ProjectVersion,
   ProjectDelta,
   EntityModification,
+  TraceLink,
 } from "@/types";
 import { ArtifactDeltaState, PanelType } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
 import {
   appModule,
+  deltaModule,
   projectModule,
   subtreeModule,
   viewportModule,
@@ -55,14 +57,15 @@ export default class ErrorModule extends VuexModule {
    * @param payload - All artifact deltas.
    */
   async setDeltaPayload(payload: ProjectDelta): Promise<void> {
+    await this.removeDeltaAdditions();
     this.SET_DELTA_PAYLOAD(payload);
     await projectModule.addOrUpdateArtifacts([
       ...Object.values(payload.artifacts.added),
-      ...Object.values(payload.artifacts.removed),
+      ...Object.values(payload.artifacts.removed), // TODO: remove?
     ]);
     await projectModule.addOrUpdateTraceLinks([
       ...Object.values(payload.traces.added),
-      ...Object.values(payload.traces.removed),
+      ...Object.values(payload.traces.removed), // TODO: remove?
     ]);
     await subtreeModule.restoreHiddenNodesAfter(
       viewportModule.setArtifactTreeLayout
@@ -88,6 +91,15 @@ export default class ErrorModule extends VuexModule {
     this.SET_DELTA_IN_VIEW(false);
     this.setIsDeltaViewEnabled(false);
     appModule.closePanel(PanelType.right);
+  }
+
+  @Action
+  /**
+   * Removes delta artifacts and traces from the current project.
+   */
+  async removeDeltaAdditions(): Promise<void> {
+    await projectModule.deleteArtifacts(Object.values(this.addedArtifacts));
+    await projectModule.deleteTraceLinks(Object.values(this.addedTraces));
   }
 
   @Mutation
@@ -121,14 +133,14 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
-   * @return A mapping of artifact IDs and the artifact's added.
+   * @return A mapping of artifact IDs and the artifacts added.
    */
   get addedArtifacts(): Record<string, Artifact> {
     return this.projectDelta.artifacts.added;
   }
 
   /**
-   * @return A mapping of artifact IDs and the artifact's removed.
+   * @return A mapping of artifact IDs and the artifacts removed.
    */
   get removedArtifacts(): Record<string, Artifact> {
     return this.projectDelta.artifacts.removed;
@@ -142,16 +154,23 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
+   * @return A mapping of trace IDs and the traces added.
+   */
+  get addedTraces(): Record<string, TraceLink> {
+    return this.projectDelta.traces.added;
+  }
+
+  /**
    * @return The current version that deltas are made to.
    */
-  get getAfterVersion(): ProjectVersion | undefined {
+  get deltaVersion(): ProjectVersion | undefined {
     return this.afterVersion;
   }
 
   /**
    * @return Whether the delta view is currently enabled.
    */
-  get getIsDeltaViewEnabled(): boolean {
+  get inDeltaView(): boolean {
     return this.isDeltaViewEnabled;
   }
 
@@ -183,7 +202,7 @@ export default class ErrorModule extends VuexModule {
    */
   get getTraceDeltaType(): (id: string) => ArtifactDeltaState | undefined {
     return (id) => {
-      if (!this.getIsDeltaViewEnabled) {
+      if (!this.inDeltaView) {
         return undefined;
       } else if (id in this.projectDelta.traces.added) {
         return ArtifactDeltaState.ADDED;

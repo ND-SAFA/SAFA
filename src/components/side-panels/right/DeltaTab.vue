@@ -126,7 +126,7 @@ export default Vue.extend({
       );
     },
     isDeltaMode(): boolean {
-      return deltaModule.getIsDeltaViewEnabled;
+      return deltaModule.inDeltaView;
     },
   },
   watch: {

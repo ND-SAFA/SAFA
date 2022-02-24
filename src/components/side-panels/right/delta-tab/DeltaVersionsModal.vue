@@ -15,6 +15,7 @@
           </v-row>
           <v-row justify="center">
             <version-selector
+              hide-current-version
               :project="project"
               :is-open="isOpen"
               @selected="selectVersion"
@@ -25,13 +26,10 @@
       </v-row>
     </template>
     <template v-slot:actions>
-      <v-container class="ma-0 pa-0">
-        <v-row justify="center" class="ma-10">
-          <v-btn @click="onSubmit" color="primary ">
-            Save <v-icon id="upload-button">mdi-check</v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
+      <v-spacer />
+      <v-btn @click="onSubmit" color="primary ">
+        Save <v-icon id="upload-button">mdi-check</v-icon>
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -40,9 +38,9 @@
 import Vue, { PropType } from "vue";
 import { Project, ProjectDelta, ProjectVersion } from "@/types";
 import { getProjectDelta } from "@/api";
-import { logModule, deltaModule, viewportModule } from "@/store";
+import { logModule, deltaModule } from "@/store";
 import { GenericModal } from "@/components/common";
-import { VersionSelector } from "@/components/project/version-selector";
+import { VersionSelector } from "@/components/project";
 
 /**
  * A modal for displaying delta versions.
@@ -62,11 +60,18 @@ export default Vue.extend({
     return {
       selectedVersion: undefined as ProjectVersion | undefined,
       isLoading: false,
+      isInitialized: false,
     };
   },
   methods: {
     selectVersion(version: ProjectVersion) {
       this.selectedVersion = version;
+
+      if (this.isInitialized) {
+        this.onSubmit();
+      } else {
+        this.isInitialized = true;
+      }
     },
     unselectVersion() {
       this.selectedVersion = undefined;
@@ -93,8 +98,14 @@ export default Vue.extend({
       }
     },
   },
-  mounted() {
-    this.selectedVersion = undefined;
+  watch: {
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.selectedVersion = undefined;
+      this.isLoading = false;
+      this.isInitialized = false;
+    },
   },
 });
 </script>

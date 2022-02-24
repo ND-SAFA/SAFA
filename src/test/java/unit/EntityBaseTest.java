@@ -101,7 +101,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     TestUtil testUtil;
 
     public static JSONObject jsonCreator(String content) {
-        System.out.println("CONTENT:" + content);
         return content.length() == 0 ? new JSONObject() : new JSONObject(content);
     }
 

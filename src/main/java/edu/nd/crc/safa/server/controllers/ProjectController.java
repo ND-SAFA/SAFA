@@ -66,7 +66,7 @@ public class ProjectController extends BaseController {
             projectEntities = this.projectService.updateProjectAtVersion(
                 payloadProject, payloadProjectVersion, project);
         }
-        System.out.println("RESPONSE:" + projectEntities);
+
         return projectEntities;
     }
 

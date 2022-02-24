@@ -47,7 +47,7 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(() => projectModule.deleteArtifactByName(artifact))
+            .then(() => projectModule.deleteArtifacts([artifact]))
             .then(resolve)
             .catch(reject);
         }

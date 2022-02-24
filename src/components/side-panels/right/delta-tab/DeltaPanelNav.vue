@@ -59,6 +59,7 @@ export default Vue.extend({
       if (!this.isDeltaViewEnabled) {
         if (this.isProjectDefined()) {
           deltaModule.setIsDeltaViewEnabled(true);
+          this.isModalOpen = true;
         } else {
           this.errorMessage = "Please select a baseline project version";
         }

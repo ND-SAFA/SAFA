@@ -38,7 +38,7 @@
 import Vue, { PropType } from "vue";
 import { Project, ProjectDelta, ProjectVersion } from "@/types";
 import { getProjectDelta } from "@/api";
-import { logModule, deltaModule } from "@/store";
+import { logModule, deltaModule, projectModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project";
 
@@ -87,6 +87,10 @@ export default Vue.extend({
             sourceVersion.versionId,
             this.selectedVersion.versionId
           ).then(async (deltaPayload: ProjectDelta) => {
+            await projectModule.deleteArtifacts(
+              Object.values(deltaModule.addedArtifacts)
+            );
+
             await deltaModule.setDeltaPayload(deltaPayload);
             deltaModule.setAfterVersion(this.selectedVersion);
             this.$emit("close");

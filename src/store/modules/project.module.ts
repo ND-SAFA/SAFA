@@ -76,11 +76,15 @@ export default class ProjectModule extends VuexModule {
   /**
    * Deletes the artifact with the given name.
    */
-  async deleteArtifactByName(artifact: Artifact): Promise<void> {
+  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+    if (artifacts.length === 0) return;
+
+    const deletedNames = artifacts.map(({ name }) => name);
+
     this.SET_ARTIFACTS(
-      this.project.artifacts.filter(({ name }) => name !== artifact.name)
+      this.project.artifacts.filter(({ name }) => !deletedNames.includes(name))
     );
-    await artifactModule.deleteArtifactByName(artifact);
+    await artifactModule.deleteArtifacts(artifacts);
     await subtreeModule.updateSubtreeMap();
   }
 

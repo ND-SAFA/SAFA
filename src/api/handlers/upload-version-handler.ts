@@ -1,22 +1,17 @@
-import {
-  EmptyLambda,
-  ProjectIdentifier,
-  ProjectVersion,
-  ProjectCreationResponse,
-} from "@/types";
+import { EmptyLambda, ProjectCreationResponse } from "@/types";
 import { logModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import {
   connectAndSubscribeToVersion,
   updateProjectThroughFlatFiles,
 } from "@/api/endpoints";
-import { setAndSubscribeToProject, setCreatedProject } from "@/api";
+import { setCreatedProject } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
  *
- * @param selectedProject - The project that has been selected by the user
- * @param selectedVersion - The version associated with given project to update.
+ * @param projectId - The project that has been selected by the user
+ * @param versionId - The version associated with given project to update.
  * @param selectedFiles  - The flat files that will update given version
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful
  * @param onLoadStart - Callback to indicate that loading should be displayed
@@ -24,19 +19,15 @@ import { setAndSubscribeToProject, setCreatedProject } from "@/api";
  * @param onFinally - Callback to call if upload was successful.
  */
 export async function uploadNewProjectVersion(
-  selectedProject: ProjectIdentifier | undefined,
-  selectedVersion: ProjectVersion | undefined,
+  projectId: string,
+  versionId: string,
   selectedFiles: File[],
   setVersionIfSuccessful: boolean,
   onLoadStart: EmptyLambda,
   onLoadEnd: EmptyLambda,
   onFinally: EmptyLambda
 ): Promise<void> {
-  if (selectedProject === undefined) {
-    logModule.onWarning("Please select a project to update");
-  } else if (selectedVersion === undefined) {
-    logModule.onWarning("Please select a version to upload to");
-  } else if (selectedFiles.length === 0) {
+  if (selectedFiles.length === 0) {
     logModule.onWarning("Please at least one file to upload");
   } else {
     onLoadStart();
@@ -45,13 +36,12 @@ export async function uploadNewProjectVersion(
       formData.append("files", file);
     });
     if (setVersionIfSuccessful) {
-      connectAndSubscribeToVersion(
-        selectedProject.projectId,
-        selectedVersion.versionId
-      ).catch((e) => logModule.onError(e.message));
+      connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
+        logModule.onError(e.message)
+      );
     }
 
-    updateProjectThroughFlatFiles(selectedVersion.versionId, formData)
+    updateProjectThroughFlatFiles(versionId, formData)
       .then(async (res: ProjectCreationResponse) => {
         logModule.onSuccess(
           `Flat files were uploaded successfully and ${res.project.name} was updated.`

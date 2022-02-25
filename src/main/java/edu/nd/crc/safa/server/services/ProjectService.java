@@ -9,9 +9,11 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -97,12 +99,19 @@ public class ProjectService {
      *
      * @return List of projects where given user has access to.
      */
-    public List<Project> getCurrentUserProjects() {
+    public List<ProjectIdentifier> getCurrentUserProjects() {
         SafaUser user = this.safaUserService.getCurrentUser();
         return this.projectMembershipRepository
             .findByMember(user)
             .stream()
             .map(ProjectMembership::getProject)
+            .map(project -> {
+                List<ProjectMemberAppEntity> members = this.projectMembershipRepository.findByProject(project)
+                    .stream()
+                    .map(ProjectMemberAppEntity::new)
+                    .collect(Collectors.toList());
+                return new ProjectIdentifier(project, members);
+            })
             .collect(Collectors.toList());
     }
 

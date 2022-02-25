@@ -7,6 +7,7 @@
     no-data-text="No projects created."
     :is-loading="isLoading"
     :has-delete-for-indexes="hasDeleteForIndexes"
+    :has-delete="false"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -121,11 +122,7 @@ export default Vue.extend({
           const projectMembershipQuery = project.members.filter(
             (m) => m.email === userEmail && m.role === ProjectRole.OWNER
           );
-          if (projectMembershipQuery.length === 1) {
-            return projectIndex;
-          }
-
-          return -1;
+          return projectMembershipQuery.length === 1 ? projectIndex : -1;
         })
         .filter((idx) => idx !== -1);
     },

@@ -195,12 +195,10 @@ async function projectMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: ProjectMessage = JSON.parse(frame.body) as ProjectMessage;
-  if (sessionModule.userEmail !== message.user) {
-    switch (message.type) {
-      case "MEMBERS":
-        return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
-      case "DOCUMENTS":
-        return reloadDocumentArtifacts(projectId);
-    }
+  switch (message.type) {
+    case "MEMBERS":
+      return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
+    case "DOCUMENTS":
+      return reloadDocumentArtifacts(projectId);
   }
 }

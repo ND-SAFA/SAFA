@@ -82,13 +82,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
+import {
+  Artifact,
+  Project,
+  ProjectMembership,
+  ProjectRole,
+  StepState,
+  TraceFile,
+  TraceLink,
+} from "@/types";
 import { saveOrUpdateProject, setCreatedProject } from "@/api";
 import { appModule, sessionModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createTraceUploader, createArtifactUploader } from "./uploaders";
-import { TraceFileCreator, ArtifactTypeCreator } from "./panels";
+import { createArtifactUploader, createTraceUploader } from "./uploaders";
+import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
@@ -179,12 +187,17 @@ export default Vue.extend({
       return this.traceUploader.panels.map((p) => p.projectFile);
     },
     project(): Project {
+      const user: ProjectMembership = {
+        projectMembershipId: "",
+        email: sessionModule.userEmail,
+        role: ProjectRole.OWNER,
+      };
       return {
         projectId: "",
         name: this.name,
         description: this.description,
-        owner: sessionModule.userEmail,
-        members: [],
+        owner: user.email,
+        members: [user],
         artifacts: this.artifacts,
         traces: this.traces,
         artifactTypes: [],

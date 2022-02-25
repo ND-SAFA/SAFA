@@ -119,12 +119,9 @@ export default Vue.extend({
       return this.projects
         .map((project, projectIndex) => {
           const projectMembershipQuery = project.members.filter(
-            (m) => m.email === userEmail
+            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
           );
-          if (
-            projectMembershipQuery.length === 1 &&
-            projectMembershipQuery[0].role === ProjectRole.OWNER
-          ) {
+          if (projectMembershipQuery.length === 1) {
             return projectIndex;
           }
 

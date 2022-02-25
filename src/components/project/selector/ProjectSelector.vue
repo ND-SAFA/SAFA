@@ -6,7 +6,7 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    :has-delete="hasDeletePermission"
+    :has-delete-for-indexes="hasDeleteForIndexes"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -113,15 +113,24 @@ export default Vue.extend({
     },
   },
   computed: {
-    hasDeletePermission(): boolean {
-      const userEmail = sessionModule.userEmail;
-      const projectMembershipQuery = projectModule.getProject.members.filter(
-        (m) => m.email === userEmail
-      );
-      if (projectMembershipQuery.length === 1) {
-        return projectMembershipQuery[0].role === ProjectRole.OWNER;
-      }
-      return false;
+    hasDeleteForIndexes(): number[] {
+      const userEmail = sessionModule.authenticationToken?.sub || "";
+
+      return this.projects
+        .map((project, projectIndex) => {
+          const projectMembershipQuery = project.members.filter(
+            (m) => m.email === userEmail
+          );
+          if (
+            projectMembershipQuery.length === 1 &&
+            projectMembershipQuery[0].role === ProjectRole.OWNER
+          ) {
+            return projectIndex;
+          }
+
+          return -1;
+        })
+        .filter((idx) => idx !== -1);
     },
   },
   methods: {

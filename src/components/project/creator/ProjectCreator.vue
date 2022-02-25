@@ -84,7 +84,7 @@
 import Vue from "vue";
 import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
 import { saveOrUpdateProject, setCreatedProject } from "@/api";
-import { appModule } from "@/store";
+import { appModule, sessionModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { createTraceUploader, createArtifactUploader } from "./uploaders";
@@ -183,7 +183,8 @@ export default Vue.extend({
         projectId: "",
         name: this.name,
         description: this.description,
-        members: [], // TODO: Add current user as owner?
+        owner: sessionModule.userEmail,
+        members: [],
         artifacts: this.artifacts,
         traces: this.traces,
         artifactTypes: [],

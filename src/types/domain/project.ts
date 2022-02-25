@@ -42,7 +42,15 @@ export interface ProjectErrors {
   traces: ParserError[];
 }
 
-interface ProjectDescription {
+/**
+ * Defines a project.
+ */
+export interface ProjectIdentifier {
+  /**
+   * The ID of the project.
+   */
+  projectId: string;
+
   /**
    * The name of the project.
    */
@@ -51,23 +59,16 @@ interface ProjectDescription {
    * The description of the project.
    */
   description: string;
-}
-/**
- * Defines a project.
- */
-export interface ProjectIdentifier extends ProjectDescription {
-  /**
-   * The ID of the project.
-   */
-  projectId: string;
-}
 
-/**
- * Defines object used to hold information needed
- * for project selection.
- */
-export interface Meta extends ProjectDescription {
+  /**
+   * List of members and roles in project.
+   */
   members: ProjectMembership[];
+
+  /**
+   * The primary owner of this project.
+   */
+  owner: string;
 }
 
 /**
@@ -137,11 +138,7 @@ export interface ProjectDocument {
 /**
  * Defines a versioned and parsed project.
  */
-export interface Project {
-  /**
-   * Unique id for project.
-   */
-  projectId: string;
+export interface Project extends ProjectIdentifier {
   /**
    * The project's version.
    */
@@ -155,11 +152,6 @@ export interface Project {
    * The project's traces.
    */
   traces: TraceLink[];
-
-  /**
-   * Information for project selection.
-   */
-  meta: Meta;
 
   /**
    * The current document id.

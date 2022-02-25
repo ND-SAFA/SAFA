@@ -193,12 +193,7 @@ export default Vue.extend({
     saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<void> {
       this.isLoading = true;
 
-      return saveOrUpdateProject({
-        projectId: project.projectId,
-        description: project.description,
-        name: project.name,
-        // The following fields included for typescript reasons.
-      })
+      return saveOrUpdateProject(project)
         .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId

@@ -37,7 +37,7 @@ export default Vue.extend({
       return projectModule.getProject;
     },
     hasDescription(): boolean {
-      const description = this.project.meta.description;
+      const description = this.project.description;
       return description !== "";
     },
     headers() {

@@ -55,6 +55,7 @@ export function createProject(): Project {
     name: "Untitled",
     projectId: "",
     description: "",
+    owner: "",
     members: [],
     artifacts: [],
     traces: [],
@@ -119,7 +120,13 @@ export function createDefaultTypeIcons(
  * @return An empty document.
  */
 export function createDocument(
-  project: ProjectIdentifier = { projectId: "", name: "", description: "" },
+  project: ProjectIdentifier = {
+    projectId: "",
+    name: "",
+    description: "",
+    owner: "",
+    members: [],
+  },
   artifactIds: string[] = [],
   name = "Default"
 ): ProjectDocument {

@@ -13,10 +13,8 @@ import {
   connectAndSubscribeToVersion,
   reloadTraceMatrices,
   loadVersionIfExistsHandler,
-  loadProjectDocuments,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
-import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.

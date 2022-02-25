@@ -1,6 +1,5 @@
 import { ArtifactType, ProjectMembership, TraceLink } from "@/types";
 import { Artifact } from "./artifact";
-import ArtifactTypeNode from "@/components/project/creator/tim-tree-view/ArtifactTypeNode.vue";
 
 /**
  * Enumerates the states of parsing.
@@ -43,14 +42,7 @@ export interface ProjectErrors {
   traces: ParserError[];
 }
 
-/**
- * Defines a project.
- */
-export interface ProjectIdentifier {
-  /**
-   * The ID of the project.
-   */
-  projectId: string;
+interface ProjectDescription {
   /**
    * The name of the project.
    */
@@ -59,6 +51,23 @@ export interface ProjectIdentifier {
    * The description of the project.
    */
   description: string;
+}
+/**
+ * Defines a project.
+ */
+export interface ProjectIdentifier extends ProjectDescription {
+  /**
+   * The ID of the project.
+   */
+  projectId: string;
+}
+
+/**
+ * Defines object used to hold information needed
+ * for project selection.
+ */
+export interface Meta extends ProjectDescription {
+  members: ProjectMembership[];
 }
 
 /**
@@ -128,7 +137,11 @@ export interface ProjectDocument {
 /**
  * Defines a versioned and parsed project.
  */
-export interface Project extends ProjectIdentifier {
+export interface Project {
+  /**
+   * Unique id for project.
+   */
+  projectId: string;
   /**
    * The project's version.
    */
@@ -144,9 +157,9 @@ export interface Project extends ProjectIdentifier {
   traces: TraceLink[];
 
   /**
-   * Map of project members and their role.
+   * Information for project selection.
    */
-  members: ProjectMembership[];
+  meta: Meta;
 
   /**
    * The current document id.

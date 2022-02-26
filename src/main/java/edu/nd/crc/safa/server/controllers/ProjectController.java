@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -76,7 +77,7 @@ public class ProjectController extends BaseController {
      * @return List of project identifiers.
      */
     @GetMapping(AppRoutes.Projects.getUserProjects)
-    public List<Project> getUserProjects() {
+    public List<ProjectIdentifier> getUserProjects() {
         return projectService.getCurrentUserProjects();
     }
 

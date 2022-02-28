@@ -6,7 +6,8 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    :has-delete="hasDeletePermission"
+    :has-delete-for-indexes="hasDeleteForIndexes"
+    :has-delete="false"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -113,15 +114,17 @@ export default Vue.extend({
     },
   },
   computed: {
-    hasDeletePermission(): boolean {
-      const userEmail = sessionModule.userEmail;
-      const projectMembershipQuery = projectModule.getProject.members.filter(
-        (m) => m.email === userEmail
-      );
-      if (projectMembershipQuery.length === 1) {
-        return projectMembershipQuery[0].role === ProjectRole.OWNER;
-      }
-      return false;
+    hasDeleteForIndexes(): number[] {
+      const userEmail = sessionModule.authenticationToken?.sub || "";
+
+      return this.projects
+        .map((project, projectIndex) => {
+          const projectMembershipQuery = project.members.filter(
+            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
+          );
+          return projectMembershipQuery.length === 1 ? projectIndex : -1;
+        })
+        .filter((idx) => idx !== -1);
     },
   },
   methods: {
@@ -193,12 +196,7 @@ export default Vue.extend({
     saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<void> {
       this.isLoading = true;
 
-      return saveOrUpdateProject({
-        projectId: project.projectId,
-        description: project.description,
-        name: project.name,
-        // The following fields included for typescript reasons.
-      })
+      return saveOrUpdateProject(project)
         .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId

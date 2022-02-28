@@ -5,5 +5,10 @@ export const projectSelectorHeaders = [
     sortable: false,
     value: "description",
   },
+  {
+    text: "Owner",
+    sortable: false,
+    value: "owner",
+  },
   { text: "Actions", value: "actions", sortable: false },
 ];

@@ -67,6 +67,7 @@ export default Vue.extend({
         projectId: this.project.projectId,
         name: project.name,
         description: project.description,
+        owner: "",
       })
         .then(() => projectModule.SET_PROJECT_IDENTIFIER(project))
         .catch((e) => {

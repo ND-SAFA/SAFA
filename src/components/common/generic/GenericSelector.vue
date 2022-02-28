@@ -120,6 +120,10 @@ export default Vue.extend({
       required: false,
       default: true,
     },
+    hasDeleteForIndexes: {
+      type: Array,
+      required: false,
+    },
     canDeleteLastItem: {
       type: Boolean,
       required: false,
@@ -148,9 +152,13 @@ export default Vue.extend({
       this.search = "";
     },
     isDeleteEnabled(item: DataItemProps): boolean {
-      const isNotLastItem = this.items.indexOf(item) !== this.items.length - 1;
+      const index = this.items.indexOf(item);
+      const isNotLastItem = index !== this.items.length - 1;
 
-      return this.hasDelete && (this.canDeleteLastItem || isNotLastItem);
+      return (
+        (this.hasDelete || this.hasDeleteForIndexes?.includes(index)) &&
+        (this.canDeleteLastItem || isNotLastItem)
+      );
     },
   },
   mounted() {

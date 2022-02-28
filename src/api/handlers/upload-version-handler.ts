@@ -28,7 +28,7 @@ export async function uploadNewProjectVersion(
   onFinally: EmptyLambda
 ): Promise<void> {
   if (selectedFiles.length === 0) {
-    logModule.onWarning("Please at least one file to upload");
+    logModule.onWarning("Please add at least one file to upload");
   } else {
     onLoadStart();
     const formData = new FormData();

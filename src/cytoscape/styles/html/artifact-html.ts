@@ -17,8 +17,7 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
   halignBox: "center",
   valignBox: "center",
   tpl(data?: ArtifactData) {
-    // This handles an issue with ghost nodes that are not typesafe.
-    if (!data?.artifactType) return "";
+    if (!data?.artifactType || data.logicType) return "";
 
     return createNodeHtml(data);
   },

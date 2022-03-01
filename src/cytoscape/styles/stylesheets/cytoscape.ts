@@ -7,6 +7,8 @@ import {
   ARTIFACT_WIDTH,
   ARTIFACT_SELECTED_BORDER_WIDTH,
   ARTIFACT_COLOR,
+  POLYGON_AND,
+  POLYGON_OR,
 } from "@/cytoscape/styles/config/artifact-tree-config";
 import {
   TRACE_COLOR,
@@ -96,12 +98,29 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
+    selector: "node[logicType='AND']",
+    style: {
+      shape: "polygon",
+      "shape-polygon-points": POLYGON_AND,
+      "border-width": "1",
+    },
+  },
+  {
+    selector: "node[logicType='OR']",
+    style: {
+      shape: "polygon",
+      "shape-polygon-points": POLYGON_OR,
+      "border-width": "1",
+    },
+  },
+  {
     selector: "node[?isSelected]",
     style: {
       "border-color": ThemeColors.artifactBorder,
       "border-width": ARTIFACT_SELECTED_BORDER_WIDTH,
     },
   },
+
   {
     selector: ".hidden",
     css: {

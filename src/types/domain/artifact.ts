@@ -52,6 +52,10 @@ export interface ArtifactData extends CytoCoreElementData {
    */
   artifactType: string;
   /**
+   * For FTA nodes, the logic type of the artifact.
+   */
+  logicType?: string;
+  /**
    * The state of changes to the artifact.
    */
   artifactDeltaState: ArtifactDeltaState;

@@ -72,10 +72,17 @@ export function htmlBody(
  */
 export function htmlContainer(
   elements: string[],
-  width?: number,
-  height?: number,
-  opacity?: number,
-  color?: string
+  {
+    width,
+    height,
+    opacity,
+    color,
+  }: {
+    width?: number;
+    height?: number;
+    opacity?: number;
+    color?: string;
+  } = {}
 ): string {
   const backgroundColor = color ? `background-color: ${color};` : "";
   const visibility = opacity !== undefined ? `opacity: ${opacity};` : "";

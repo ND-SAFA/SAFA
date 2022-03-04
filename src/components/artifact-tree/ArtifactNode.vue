@@ -5,18 +5,19 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
+  artifactSelectionModule,
   deltaModule,
   errorModule,
-  artifactSelectionModule,
   subtreeModule,
 } from "@/store";
 import {
   Artifact,
-  ArtifactWarning,
-  ProjectWarnings,
-  ArtifactDeltaState,
   ArtifactCytoCoreElement,
+  ArtifactDeltaState,
+  ArtifactWarning,
+  DocumentType,
   EntityModification,
+  ProjectWarnings,
 } from "@/types";
 
 export default Vue.extend({
@@ -103,7 +104,8 @@ export default Vue.extend({
       }
     },
     definition(): ArtifactCytoCoreElement {
-      const { id, body, type, name } = this.artifactDefinition;
+      const { id, body, type, name, safetyCaseType, logicType } =
+        this.artifactDefinition;
       const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
       const hiddenChildWarnings =
         errorModule.getWarningsByArtifactNames(hiddenChildren);
@@ -124,10 +126,8 @@ export default Vue.extend({
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,
           childDeltaStates: hiddenChildDeltaStates,
-          // TODO: inject from data
-          // safetyCaseType: ["GOAL", "CONTEXT", "SOLUTION", "STRATEGY"][
-          //   Math.floor(Math.random() * 4)
-          // ],
+          safetyCaseType,
+          logicType,
         },
       };
     },

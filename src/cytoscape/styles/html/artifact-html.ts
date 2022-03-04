@@ -47,10 +47,12 @@ function htmlArtifact(data: ArtifactData): string {
       htmlFooter(data),
       htmlStoplight(data),
     ],
-    ARTIFACT_WIDTH * 1.95,
-    ARTIFACT_HEIGHT * 2.7,
-    data.opacity,
-    getBackgroundColor(data.artifactDeltaState)
+    {
+      width: ARTIFACT_WIDTH * 1.95,
+      height: ARTIFACT_HEIGHT * 2.7,
+      opacity: data.opacity,
+      color: getBackgroundColor(data.artifactDeltaState),
+    }
   );
 }
 
@@ -122,16 +124,19 @@ function htmlFooter(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function htmlStoplight(data: ArtifactData): string {
-  if (!data.childDeltaStates?.length) return "";
+  const { childDeltaStates = [] } = data;
 
-  const renderAdded = data.childDeltaStates.includes(ArtifactDeltaState.ADDED);
-  const renderRemoved = data.childDeltaStates.includes(
-    ArtifactDeltaState.REMOVED
-  );
-  const renderMod = data.childDeltaStates.includes(ArtifactDeltaState.MODIFIED);
+  if (!childDeltaStates.length) return "";
+
+  const renderAdded = childDeltaStates.includes(ArtifactDeltaState.ADDED);
+  const renderRemoved = childDeltaStates.includes(ArtifactDeltaState.REMOVED);
+  const renderMod = childDeltaStates.includes(ArtifactDeltaState.MODIFIED);
+  const classes = data.safetyCaseType
+    ? "d-flex artifact-sc-stoplight"
+    : "d-flex artifact-stoplight";
 
   return `
-    <div class="d-flex artifact-stoplight">
+    <div class="${classes}">
       ${renderAdded ? "<div class='artifact-added flex-grow-1'></div>" : ""}
       ${renderRemoved ? "<div class='artifact-removed flex-grow-1'></div>" : ""}
       ${renderMod ? "<div class='artifact-modified flex-grow-1'></div>" : ""}
@@ -149,20 +154,72 @@ function htmlStoplight(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function htmlSafetyCase(data: ArtifactData): string {
+  const attrs = { opacity: data.opacity };
   const header = [
     htmlHeader(data.safetyCaseType?.toLowerCase() || ""),
-    htmlSubheader(data.artifactName),
+    htmlStoplight(data),
+    htmlSafetyCaseDetails(data),
   ];
 
   switch (data.safetyCaseType) {
     case "GOAL":
     case "CONTEXT":
-      return htmlContainer([...header, htmlBody(data.body, 100, 200, 70)]);
+      return htmlContainer(
+        [...header, htmlBody(data.body, 100, 200, 70)],
+        attrs
+      );
     case "SOLUTION":
-      return htmlContainer([...header, htmlBody(data.body, 40, 140, 60)], 140);
+      return htmlContainer([...header, htmlBody(data.body, 40, 140, 60)], {
+        ...attrs,
+        width: 140,
+      });
     case "STRATEGY":
-      return htmlContainer([...header, htmlBody(data.body, 80, 170, 70)]);
+      return htmlContainer(
+        [...header, htmlBody(data.body, 80, 170, 70)],
+        attrs
+      );
     default:
       return "";
   }
+}
+
+/**
+ * Creates the HTML for representing an artifact node's warning and collapsed children.
+ *
+ * @param data - The artifact data to render.
+ *
+ * @return stringified HTML for the node.
+ */
+function htmlSafetyCaseDetails(data: ArtifactData): string {
+  const displayChildren = !!data.hiddenChildren;
+  let displayWarning = !!data.warnings?.length;
+
+  if (displayChildren) {
+    displayWarning ||= !!data.childWarnings?.length;
+  }
+
+  const warning = `
+    <div class="d-flex warning-text text-body-1">
+      <span class="material-icons md-18">warning</span>
+    </div>
+  `;
+
+  const hiddenChildren = `
+    <div class="d-flex text-body-1 pr-1">
+      <span class="material-icons md-18">expand_more</span>
+      <span>
+        ${data.hiddenChildren} ${displayWarning ? "" : "Hidden"}
+      </span>
+    </div>
+  `;
+
+  return `
+    <div class="artifact-sc-details">
+      <span class="text-body-1 flex-grow-1">
+        ${data.artifactName}
+      </span>
+      ${displayChildren ? hiddenChildren : ""}
+      ${displayWarning ? warning : ""}
+    </div>
+  `;
 }

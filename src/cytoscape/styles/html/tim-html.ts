@@ -20,8 +20,7 @@ export const timNodeHtml: HtmlDefinition<TimNodeData> = {
         `<span class="text-h6 artifact-header" style="white-space: normal">${data.id}</span>`,
         `<span class="text-center text-body-1" >${data.count}</span>`,
       ],
-      TIM_NODE_WIDTH,
-      TIM_NODE_HEIGHT
+      { width: TIM_NODE_WIDTH, height: TIM_NODE_HEIGHT }
     );
   },
 };

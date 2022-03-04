@@ -85,6 +85,25 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "border-width": 6,
     },
   },
+  // Nodes - Delta
+  {
+    selector: "node[artifactDeltaState='ADDED']",
+    style: {
+      "background-color": ThemeColors.artifactAdded,
+    },
+  },
+  {
+    selector: "node[artifactDeltaState='MODIFIED']",
+    style: {
+      "background-color": ThemeColors.artifactModified,
+    },
+  },
+  {
+    selector: "node[artifactDeltaState='REMOVED']",
+    style: {
+      "background-color": ThemeColors.artifactRemoved,
+    },
+  },
   // Nodes - Logic
   {
     selector: "node[logicType='AND']",

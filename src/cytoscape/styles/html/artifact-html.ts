@@ -1,13 +1,12 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
-import { capitalize, ThemeColors } from "@/util";
+import { ThemeColors } from "@/util";
 import {
-  getBackgroundColor,
   htmlBody,
   htmlContainer,
   htmlHeader,
   htmlSubheader,
-} from "@/cytoscape/styles/html/core-html";
+} from "./core-html";
 
 /**
  * Renders artifact html.
@@ -53,6 +52,23 @@ function htmlArtifact(data: ArtifactData): string {
     data.opacity,
     getBackgroundColor(data.artifactDeltaState)
   );
+}
+
+/**
+ * Returns the background color for the given delta state.
+ * @param deltaState
+ */
+export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
+  switch (deltaState) {
+    case ArtifactDeltaState.ADDED:
+      return ThemeColors.artifactAdded;
+    case ArtifactDeltaState.REMOVED:
+      return ThemeColors.artifactRemoved;
+    case ArtifactDeltaState.MODIFIED:
+      return ThemeColors.artifactModified;
+    default:
+      return ThemeColors.artifactDefault;
+  }
 }
 
 /**

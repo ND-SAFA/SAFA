@@ -1,5 +1,4 @@
-import { ArtifactData, ArtifactDeltaState } from "@/types";
-import { capitalize, ThemeColors } from "@/util";
+import { capitalize } from "@/util";
 
 /**
  * Creates the HTML for representing a node's header.
@@ -95,21 +94,4 @@ export function htmlContainer(
       ${elements.join("\n")}
     </div>
   `;
-}
-
-/**
- * Returns the background color for the given delta state.
- * @param deltaState
- */
-export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
-  switch (deltaState) {
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.artifactAdded;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.artifactRemoved;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.artifactModified;
-    default:
-      return ThemeColors.artifactDefault;
-  }
 }

@@ -20,6 +20,9 @@ $graph-border-radius: 8px;
   flex-direction: column;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.artifact-border {
   border-radius: $graph-border-radius;
   border: $graph-border-width solid $color-border;
 }

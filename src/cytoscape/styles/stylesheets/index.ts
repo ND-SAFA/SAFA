@@ -1,8 +1,8 @@
-import { CytoscapeStyle } from "@/cytoscape/styles/stylesheets/cytoscape";
-import { EdgeHandlesStyle } from "@/cytoscape/styles/stylesheets/edge-handles";
+import { CytoscapeStyle } from "./base";
+import { EdgeHandlesStyle } from "./edge-handles";
 
-export const GraphStyle = CytoscapeStyle.concat(EdgeHandlesStyle);
+export const GraphStyle = [...CytoscapeStyle, ...EdgeHandlesStyle];
 
-export * from "./cytoscape";
+export * from "./base";
 export * from "./edge-handles";
 export * from "./tim-styles";

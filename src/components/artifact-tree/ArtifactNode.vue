@@ -124,6 +124,10 @@ export default Vue.extend({
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,
           childDeltaStates: hiddenChildDeltaStates,
+          // TODO: inject from data
+          // safetyCaseType: ["GOAL", "CONTEXT", "SOLUTION", "STRATEGY"][
+          //   Math.floor(Math.random() * 4)
+          // ],
         },
       };
     },

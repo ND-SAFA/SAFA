@@ -9,7 +9,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.entities.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;

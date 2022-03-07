@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.TraceMatrixRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

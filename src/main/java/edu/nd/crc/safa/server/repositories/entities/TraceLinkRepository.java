@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.traces;
+package edu.nd.crc.safa.server.repositories.entities;
 
 import java.util.List;
 import java.util.Optional;

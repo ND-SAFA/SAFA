@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.impl;
+package edu.nd.crc.safa.server.repositories.entities.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public interface IVersionRepository<
      * @param projectVersion The project version whose existing entities are retrieved.
      * @return List of entities in project version.
      */
-    List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion);
+    List<VersionEntity> getVersionEntitiesByProjectVersion(ProjectVersion projectVersion);
 
     /**
      * Returns the version of the entity specified by entity id in given project version.
@@ -36,8 +36,8 @@ public interface IVersionRepository<
      * @param entityId       The id of the base entity whose version is being retrieved.
      * @return Optional of entity version at given project version.
      */
-    Optional<VersionEntity> getEntityVersionsInProjectVersionByVersionId(ProjectVersion projectVersion,
-                                                                         String entityId);
+    Optional<VersionEntity> getEntityVersionsByProjectVersionAndBaseEntityId(ProjectVersion projectVersion,
+                                                                             String entityId);
 
     /**
      * Saves the state of given app entity to given project version.

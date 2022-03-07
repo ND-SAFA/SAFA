@@ -27,7 +27,6 @@ public class FTAArtifact {
     @Type(type = "uuid-char")
     @Column(name = "fta_artifact_id")
     UUID ftaArtifactId;
-
     /**
      * The associated base artifact.
      */
@@ -37,12 +36,12 @@ public class FTAArtifact {
     Artifact artifact;
     /**
      * The artifact type of the parent node.
+     * TODO: Generate this type instead of storing it!
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(nullable = false)
     ArtifactType parentType;
-
     /**
      * For FTA nodes, the logic type of the artifact.
      */
@@ -56,5 +55,37 @@ public class FTAArtifact {
         this.artifact = artifact;
         this.parentType = parentType;
         this.logicType = ftaNodeType;
+    }
+
+    public UUID getFtaArtifactId() {
+        return ftaArtifactId;
+    }
+
+    public void setFtaArtifactId(UUID ftaArtifactId) {
+        this.ftaArtifactId = ftaArtifactId;
+    }
+
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    public void setArtifact(Artifact artifact) {
+        this.artifact = artifact;
+    }
+
+    public ArtifactType getParentType() {
+        return parentType;
+    }
+
+    public void setParentType(ArtifactType parentType) {
+        this.parentType = parentType;
+    }
+
+    public FTANodeType getLogicType() {
+        return logicType;
+    }
+
+    public void setLogicType(FTANodeType logicType) {
+        this.logicType = logicType;
     }
 }

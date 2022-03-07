@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.impl;
+package edu.nd.crc.safa.server.repositories.entities.impl;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -38,15 +38,38 @@ public abstract class GenericVersionRepository<
 
     /**
      * @param project The project whose entities are retrieved.
-     * @return Queries for all version entities in given project.
+     * @return Returns all versions of the base entities in a project.
      */
-    abstract List<VersionEntity> getEntitiesInProject(Project project);
+    abstract List<VersionEntity> getVersionEntitiesByProject(Project project);
 
     /**
      * @param entity The base entities whose versions are retrieved
      * @return List of versions associated with given base entities.
      */
-    abstract List<VersionEntity> findByEntity(BaseEntity entity);
+    abstract List<VersionEntity> getVersionEntitiesByBaseEntity(BaseEntity entity);
+
+    /**
+     * @param baseEntityId The name of the base entity.
+     * @return Returns the base entity in given project with given name.
+     */
+    abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
+
+    /**
+     * @param project The project whose entities are retrieved.
+     * @return Returns list of base entities existing in project.
+     */
+    abstract List<BaseEntity> getBaseEntitiesByProject(Project project);
+
+    /**
+     * Finds base entity associated with given app entity if an entity exists.
+     * Otherwise, creates the base entity along with any missing auxiliary objects.
+     *
+     * @param projectVersion    The project version associated with given app entity.
+     * @param artifactAppEntity The application entity whose sub entities are being created.
+     * @return Returns the base entity associated with given app entity.
+     */
+    abstract BaseEntity findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                              AppEntity artifactAppEntity) throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing
@@ -64,21 +87,14 @@ public abstract class GenericVersionRepository<
                                                                AppEntity appEntity);
 
     /**
-     * @param baseEntityId The name of the base entity.
-     * @return Returns the base entity in given project with given name.
-     */
-    abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
-
-    /**
-     * Finds base entity associated with given app entity if an entity exists.
-     * Otherwise, creates the base entity along with any missing auxiliary objects.
+     * Creates the VersionEntity representing a deletion in a project version.
      *
-     * @param projectVersion    The project version associated with given app entity.
-     * @param artifactAppEntity The application entity whose sub entities are being created.
-     * @return Returns the base entity associated with given app entity.
+     * @param projectVersion The project version associated with deletion.
+     * @param baseEntity     The base entity being deleted.
+     * @return The version entity representing the deletion.
      */
-    abstract BaseEntity findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
-                                                              AppEntity artifactAppEntity) throws SafaError;
+    abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
+                                                      BaseEntity baseEntity);
 
     /**
      * Saves given artifact version to project version, deleting any previous entry
@@ -91,27 +107,6 @@ public abstract class GenericVersionRepository<
     abstract void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
                                               VersionEntity artifactVersion) throws SafaError;
 
-    /**
-     * @param project The project whose entities are retrieved.
-     * @return Returns list of base entities existing in project.
-     */
-    abstract List<BaseEntity> getBaseEntitiesInProject(Project project);
-
-    /**
-     * Creates the VersionEntity representing a deletion in a project version.
-     *
-     * @param projectVersion The project version associated with deletion.
-     * @param baseEntity     The base entity being deleted.
-     * @return The version entity representing the deletion.
-     */
-    abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                      BaseEntity baseEntity);
-
-    /**
-     * @param baseEntity The base entity whose versions are returned.
-     * @return Returns list of versions associated with base entity.
-     */
-    abstract List<VersionEntity> findVersionEntitiesWithBaseEntity(BaseEntity baseEntity);
 
     /**
      * Calculates contents of each artifact at given version and returns bodies at version.
@@ -120,7 +115,7 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public List<VersionEntity> getEntityVersionsInProjectVersion(ProjectVersion projectVersion) {
+    public List<VersionEntity> getVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
         Hashtable<String, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
         return this.retrieveEntitiesAtProjectVersion(projectVersion, entityHashTable);
@@ -133,10 +128,10 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public Optional<VersionEntity> getEntityVersionsInProjectVersionByVersionId(
+    public Optional<VersionEntity> getEntityVersionsByProjectVersionAndBaseEntityId(
         ProjectVersion projectVersion,
         String entityId) {
-        List<VersionEntity> versionEntities = this.getEntitiesInProject(projectVersion.getProject())
+        List<VersionEntity> versionEntities = this.getVersionEntitiesByProject(projectVersion.getProject())
             .stream()
             .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
             .collect(Collectors.toList());
@@ -221,7 +216,7 @@ public abstract class GenericVersionRepository<
         Hashtable<String, ModifiedEntity<AppEntity>> modifiedEntities = new Hashtable<>();
         Hashtable<String, AppEntity> removedEntities = new Hashtable<>();
 
-        List<BaseEntity> projectArtifacts = this.getBaseEntitiesInProject(project);
+        List<BaseEntity> projectArtifacts = this.getBaseEntitiesByProject(project);
 
         for (BaseEntity baseEntity : projectArtifacts) {
             Triplet<VersionEntity, VersionEntity, ModificationType> delta = this
@@ -262,7 +257,7 @@ public abstract class GenericVersionRepository<
         BaseEntity baseEntity,
         ProjectVersion baseVersion,
         ProjectVersion targetVersion) {
-        List<VersionEntity> bodies = this.findVersionEntitiesWithBaseEntity(baseEntity);
+        List<VersionEntity> bodies = this.getVersionEntitiesByBaseEntity(baseEntity);
 
         VersionEntity beforeEntity = this.getEntityAtVersion(bodies,
             baseVersion);
@@ -387,7 +382,7 @@ public abstract class GenericVersionRepository<
 
     private Hashtable<String, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         Hashtable<String, List<VersionEntity>> entityHashtable = new Hashtable<>();
-        List<VersionEntity> versionEntities = this.getEntitiesInProject(projectVersion.getProject());
+        List<VersionEntity> versionEntities = this.getVersionEntitiesByProject(projectVersion.getProject());
         for (VersionEntity versionEntity : versionEntities) {
             String entityId = versionEntity.getBaseEntityId();
             if (entityHashtable.containsKey(entityId)) {
@@ -441,7 +436,7 @@ public abstract class GenericVersionRepository<
             response.add(commitResponse);
         }
 
-        List<Pair<VersionEntity, CommitError>> removedArtifactBodies = this.getBaseEntitiesInProject(
+        List<Pair<VersionEntity, CommitError>> removedArtifactBodies = this.getBaseEntitiesByProject(
                 projectVersion.getProject())
             .stream()
             .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
@@ -490,7 +485,7 @@ public abstract class GenericVersionRepository<
                                                                    BaseEntity baseEntity,
                                                                    AppEntity appEntity) {
         VersionEntity previousBody =
-            getEntityBeforeVersion(this.findByEntity(baseEntity), projectVersion);
+            getEntityBeforeVersion(this.getVersionEntitiesByBaseEntity(baseEntity), projectVersion);
         if (previousBody == null) {
             return appEntity == null ? null : ModificationType.ADDED;
         } else {

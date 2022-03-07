@@ -13,10 +13,10 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.entities.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.impl;
+package edu.nd.crc.safa.server.repositories.entities.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +13,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.entities.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.TraceMatrixRepository;
 import edu.nd.crc.safa.server.services.TraceMatrixService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +43,12 @@ public class TraceLinkVersionRepositoryImpl
     TraceMatrixService traceMatrixService;
 
     @Override
-    public List<TraceLinkVersion> getEntitiesInProject(Project project) {
+    public List<TraceLinkVersion> getVersionEntitiesByProject(Project project) {
         return traceLinkVersionRepository.findByProjectVersionProject(project);
     }
 
     @Override
-    public List<TraceLinkVersion> findByEntity(TraceLink traceLink) {
+    public List<TraceLinkVersion> getVersionEntitiesByBaseEntity(TraceLink traceLink) {
         return traceLinkVersionRepository.findByTraceLink(traceLink);
     }
 
@@ -113,13 +113,6 @@ public class TraceLinkVersionRepositoryImpl
         return traceLink;
     }
 
-    private Artifact assertAndFindArtifact(Project project, String artifactName) throws SafaError {
-        Optional<Artifact> sourceArtifactOptional = this.artifactRepository.findByProjectAndName(project, artifactName);
-        if (sourceArtifactOptional.isPresent()) {
-            return sourceArtifactOptional.get();
-        }
-        throw new SafaError("Could not find trace link artifact:" + artifactName);
-    }
 
     @Override
     public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
@@ -139,7 +132,7 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public List<TraceLink> getBaseEntitiesInProject(Project project) {
+    public List<TraceLink> getBaseEntitiesByProject(Project project) {
         return this.traceLinkRepository.getLinksInProject(project);
     }
 
@@ -147,11 +140,11 @@ public class TraceLinkVersionRepositoryImpl
     public TraceLinkVersion createRemovedVersionEntity(ProjectVersion projectVersion,
                                                        TraceLink traceLink) {
         //TODO: Need to remove assumption that removed links are manual
-        return TraceLinkVersion.createManualLinkWithVersionAndModification(
-            projectVersion,
-            ModificationType.REMOVED,
-            traceLink
-        );
+        return (new TraceLinkVersion())
+            .withProjectVersion(projectVersion)
+            .withTraceLink(traceLink)
+            .withModificationType(ModificationType.REMOVED)
+            .withManualTraceType();
     }
 
     @Override
@@ -160,12 +153,15 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public List<TraceLinkVersion> findVersionEntitiesWithBaseEntity(TraceLink baseEntity) {
-        return this.traceLinkVersionRepository.findByTraceLink(baseEntity);
-    }
-
-    @Override
     public TraceAppEntity createAppFromVersion(TraceLinkVersion versionEntity) {
         return new TraceAppEntity(versionEntity);
+    }
+
+    private Artifact assertAndFindArtifact(Project project, String artifactName) throws SafaError {
+        Optional<Artifact> sourceArtifactOptional = this.artifactRepository.findByProjectAndName(project, artifactName);
+        if (sourceArtifactOptional.isPresent()) {
+            return sourceArtifactOptional.get();
+        }
+        throw new SafaError("Could not find trace link artifact:" + artifactName);
     }
 }

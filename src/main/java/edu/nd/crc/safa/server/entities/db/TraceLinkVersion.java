@@ -109,24 +109,33 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return traceLinkVersion;
     }
 
-    public static TraceLinkVersion createManualLinkWithVersionAndModification(ProjectVersion projectVersion,
-                                                                              ModificationType modificationType,
-                                                                              TraceLink traceLink) {
-        TraceLinkVersion traceLinkVersion = new TraceLinkVersion();
-        traceLinkVersion.projectVersion = projectVersion;
-        traceLinkVersion.modificationType = modificationType;
-        traceLinkVersion.traceLink = traceLink;
-        traceLinkVersion.traceType = TraceType.MANUAL;
-        traceLinkVersion.approvalStatus = TraceApproval.APPROVED;
-        traceLinkVersion.score = 1;
-        return traceLinkVersion;
-    }
-
     private static TraceApproval getDefaultApprovalStatus(TraceType traceType) {
         if (traceType == TraceType.MANUAL) {
             return TraceApproval.APPROVED;
         }
         return TraceApproval.UNREVIEWED;
+    }
+
+    public TraceLinkVersion withProjectVersion(ProjectVersion projectVersion) {
+        setProjectVersion(projectVersion);
+        return this;
+    }
+
+    public TraceLinkVersion withModificationType(ModificationType modificationType) {
+        setModificationType(modificationType);
+        return this;
+    }
+
+    public TraceLinkVersion withTraceLink(TraceLink traceLink) {
+        setTraceLink(traceLink);
+        return this;
+    }
+
+    public TraceLinkVersion withManualTraceType() {
+        setTraceType(TraceType.MANUAL);
+        setApprovalStatus(TraceApproval.APPROVED);
+        setScore(1);
+        return this;
     }
 
     public UUID getTraceLinkVersionId() {

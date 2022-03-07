@@ -46,6 +46,10 @@ public class ArtifactAppEntity implements IAppEntity {
      * List of document Ids this artifact belongs to.
      */
     public List<String> documentIds;
+    /**
+     * The type of document this artifact is displayed in.
+     */
+    DocumentType documentType = DocumentType.ARTIFACT_TREE;
 
     public ArtifactAppEntity() {
         this.id = "";
@@ -74,6 +78,14 @@ public class ArtifactAppEntity implements IAppEntity {
             body.getName(),
             body.getSummary(),
             body.getContent());
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
     }
 
     public List<String> getDocumentIds() {

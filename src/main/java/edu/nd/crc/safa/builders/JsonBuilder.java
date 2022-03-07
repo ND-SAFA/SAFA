@@ -98,6 +98,7 @@ public class JsonBuilder extends BaseBuilder {
         artifact.put("body", body);
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
+        artifact.put("documentType", DocumentType.ARTIFACT_TREE.toString());
         project.getJSONArray("artifacts").put(artifact);
         return this;
     }

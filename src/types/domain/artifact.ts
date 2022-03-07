@@ -1,6 +1,6 @@
 import { ArtifactDeltaState } from "./delta";
 import { CytoCoreElementData } from "@/types/cytoscape";
-import { DocumentType } from "@/types/domain/project";
+import { DocumentType } from "@/types/domain/document";
 
 export enum FTANodeType {
   OR = "OR",
@@ -46,10 +46,6 @@ export interface Artifact {
    * The type of document this artifact is displayed in.
    */
   documentType?: DocumentType;
-  /**
-   * For FTA logic nodes, the type of the parent artifact.
-   */
-  parentType?: string;
   /**
    * For FTA logic nodes,  the logical operator of this node.
    */

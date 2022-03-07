@@ -15,7 +15,6 @@ import {
   ArtifactCytoCoreElement,
   ArtifactDeltaState,
   ArtifactWarning,
-  DocumentType,
   EntityModification,
   ProjectWarnings,
 } from "@/types";

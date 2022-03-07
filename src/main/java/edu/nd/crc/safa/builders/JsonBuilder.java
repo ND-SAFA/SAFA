@@ -136,4 +136,16 @@ public class JsonBuilder extends BaseBuilder {
         docJson.put("type", documentType);
         return docJson;
     }
+
+    public JSONObject getArtifact(String projectName, String artifactName) {
+        JSONArray artifacts = this.projects.get(projectName).getJSONArray("artifacts");
+        for (Object artifactObj : artifacts) {
+            JSONObject artifact = (JSONObject) artifactObj;
+            if (artifact.getString("name").equals(artifactName)) {
+                return artifact;
+            }
+        }
+        String error = String.format("Could not find artifact %s in project %s.", artifactName, projectName);
+        throw new RuntimeException("Could not find artifact with name:" + error);
+    }
 }

@@ -5,8 +5,8 @@ import edu.nd.crc.safa.server.entities.app.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

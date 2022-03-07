@@ -17,12 +17,12 @@ import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;

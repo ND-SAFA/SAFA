@@ -6,7 +6,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

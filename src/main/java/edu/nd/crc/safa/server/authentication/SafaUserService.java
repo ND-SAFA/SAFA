@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.authentication;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
+import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;

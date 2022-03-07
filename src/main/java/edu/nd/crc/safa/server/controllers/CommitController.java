@@ -18,10 +18,10 @@ import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.repositories.impl.IVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 

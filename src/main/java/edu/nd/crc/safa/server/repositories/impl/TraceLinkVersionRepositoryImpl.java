@@ -13,10 +13,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
 import edu.nd.crc.safa.server.services.TraceMatrixService;
 
 import org.springframework.beans.factory.annotation.Autowired;

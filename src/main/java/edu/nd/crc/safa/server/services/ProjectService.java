@@ -20,10 +20,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;

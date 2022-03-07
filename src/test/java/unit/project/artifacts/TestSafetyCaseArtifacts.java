@@ -8,7 +8,7 @@ import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
-import edu.nd.crc.safa.server.repositories.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

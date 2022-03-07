@@ -8,7 +8,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.entities.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceMatrixRepository;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

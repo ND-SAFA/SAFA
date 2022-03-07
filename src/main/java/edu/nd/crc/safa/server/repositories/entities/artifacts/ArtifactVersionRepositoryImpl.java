@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.impl;
+package edu.nd.crc.safa.server.repositories.entities.artifacts;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +17,9 @@ import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
-import edu.nd.crc.safa.server.repositories.entities.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.entities.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.entities.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.entities.FTAArtifactRepository;
-import edu.nd.crc.safa.server.repositories.entities.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.entities.GenericVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -112,7 +108,9 @@ public class ArtifactVersionRepositoryImpl
                     .artifactTypeRepository
                     .findByProjectAndNameIgnoreCase(project, parentTypeName)
                     .ifPresent(parentType -> {
-                        FTAArtifact ftaArtifact = new FTAArtifact(artifact, parentType, artifactAppEntity.getLogicType());
+                        FTAArtifact ftaArtifact = new FTAArtifact(artifact,
+                            parentType,
+                            artifactAppEntity.getLogicType());
                         this.ftaArtifactRepository.save(ftaArtifact);
                     });
                 break;

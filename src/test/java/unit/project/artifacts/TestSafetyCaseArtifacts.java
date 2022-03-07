@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
-import edu.nd.crc.safa.server.repositories.entities.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.json.JSONObject;

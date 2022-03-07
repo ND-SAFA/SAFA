@@ -9,7 +9,7 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.entities.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceMatrixRepository;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

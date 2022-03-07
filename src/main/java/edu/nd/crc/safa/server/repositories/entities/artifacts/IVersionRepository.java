@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.impl;
+package edu.nd.crc.safa.server.repositories.entities.artifacts;
 
 import java.util.List;
 import java.util.Optional;

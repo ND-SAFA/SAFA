@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /**
@@ -27,6 +29,7 @@ public class SafetyCaseArtifact {
     @Column(name = "safety_case_artifact_id")
     UUID safetyCaseArtifactId;
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
     @Column(name = "safety_case_type")

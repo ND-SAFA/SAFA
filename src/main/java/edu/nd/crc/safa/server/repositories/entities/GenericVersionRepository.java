@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.impl;
+package edu.nd.crc.safa.server.repositories.entities;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -19,6 +19,7 @@ import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.VersionAction;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.IVersionRepository;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import org.javatuples.Pair;
@@ -40,25 +41,25 @@ public abstract class GenericVersionRepository<
      * @param project The project whose entities are retrieved.
      * @return Returns all versions of the base entities in a project.
      */
-    abstract List<VersionEntity> getVersionEntitiesByProject(Project project);
+    protected abstract List<VersionEntity> getVersionEntitiesByProject(Project project);
 
     /**
      * @param entity The base entities whose versions are retrieved
      * @return List of versions associated with given base entities.
      */
-    abstract List<VersionEntity> getVersionEntitiesByBaseEntity(BaseEntity entity);
+    protected abstract List<VersionEntity> getVersionEntitiesByBaseEntity(BaseEntity entity);
 
     /**
      * @param baseEntityId The name of the base entity.
      * @return Returns the base entity in given project with given name.
      */
-    abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
+    protected abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
 
     /**
      * @param project The project whose entities are retrieved.
      * @return Returns list of base entities existing in project.
      */
-    abstract List<BaseEntity> getBaseEntitiesByProject(Project project);
+    protected abstract List<BaseEntity> getBaseEntitiesByProject(Project project);
 
     /**
      * Finds base entity associated with given app entity if an entity exists.
@@ -68,8 +69,8 @@ public abstract class GenericVersionRepository<
      * @param artifactAppEntity The application entity whose sub entities are being created.
      * @return Returns the base entity associated with given app entity.
      */
-    abstract BaseEntity findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
-                                                              AppEntity artifactAppEntity) throws SafaError;
+    protected abstract BaseEntity findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                                        AppEntity artifactAppEntity) throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing
@@ -81,10 +82,10 @@ public abstract class GenericVersionRepository<
      * @param appEntity        The app entity whose content is being compared to previous commits.
      * @return The version entity for saving the app entity content to project version.
      */
-    abstract VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
-                                                               ModificationType modificationType,
-                                                               BaseEntity baseEntity,
-                                                               AppEntity appEntity);
+    protected abstract VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
+                                                                         ModificationType modificationType,
+                                                                         BaseEntity baseEntity,
+                                                                         AppEntity appEntity);
 
     /**
      * Creates the VersionEntity representing a deletion in a project version.
@@ -93,8 +94,8 @@ public abstract class GenericVersionRepository<
      * @param baseEntity     The base entity being deleted.
      * @return The version entity representing the deletion.
      */
-    abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                      BaseEntity baseEntity);
+    protected abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
+                                                                BaseEntity baseEntity);
 
     /**
      * Saves given artifact version to project version, deleting any previous entry
@@ -104,8 +105,8 @@ public abstract class GenericVersionRepository<
      * @param artifactVersion The version entity being saved.
      * @throws SafaError Throws error if saving fails.
      */
-    abstract void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
-                                              VersionEntity artifactVersion) throws SafaError;
+    protected abstract void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+                                                        VersionEntity artifactVersion) throws SafaError;
 
 
     /**

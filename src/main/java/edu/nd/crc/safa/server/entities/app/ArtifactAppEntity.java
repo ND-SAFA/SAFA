@@ -6,6 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONObject;
 
@@ -50,6 +51,10 @@ public class ArtifactAppEntity implements IAppEntity {
      * The type of document this artifact is displayed in.
      */
     DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    /**
+     * For safety case nodes, the type of safety case node.
+     */
+    SafetyCaseType safetyCaseType;
 
     public ArtifactAppEntity() {
         this.id = "";
@@ -88,6 +93,14 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentType = documentType;
     }
 
+    public SafetyCaseType getSafetyCaseType() {
+        return safetyCaseType;
+    }
+
+    public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
+        this.safetyCaseType = safetyCaseType;
+    }
+    
     public List<String> getDocumentIds() {
         return documentIds;
     }

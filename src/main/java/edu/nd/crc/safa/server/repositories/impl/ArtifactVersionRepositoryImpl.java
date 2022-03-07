@@ -83,8 +83,9 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    public Artifact findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
-                                                        ArtifactAppEntity artifactAppEntity) throws SafaError {
+    @Override
+    public Artifact findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                          ArtifactAppEntity artifactAppEntity) throws SafaError {
         Project project = projectVersion.getProject();
         String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.type;

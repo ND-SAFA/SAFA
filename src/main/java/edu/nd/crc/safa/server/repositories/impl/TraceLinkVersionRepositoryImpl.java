@@ -79,8 +79,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLink findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
-                                                         TraceAppEntity trace) throws SafaError {
+    public TraceLink findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                           TraceAppEntity trace) throws SafaError {
         Project project = projectVersion.getProject();
 
         TraceLink traceLink;

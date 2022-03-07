@@ -77,8 +77,8 @@ public abstract class GenericVersionRepository<
      * @param artifactAppEntity The application entity whose sub entities are being created.
      * @return Returns the base entity associated with given app entity.
      */
-    abstract BaseEntity findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
-                                                            AppEntity artifactAppEntity) throws SafaError;
+    abstract BaseEntity findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                              AppEntity artifactAppEntity) throws SafaError;
 
     /**
      * Saves given artifact version to project version, deleting any previous entry
@@ -458,7 +458,7 @@ public abstract class GenericVersionRepository<
         ProjectVersion projectVersion,
         AppEntity appEntity) throws SafaError {
 
-        BaseEntity baseEntity = this.findOrCreateBaseEntityFromAppEntity(
+        BaseEntity baseEntity = this.findOrCreateBaseEntitiesFromAppEntity(
             projectVersion,
             appEntity);
 

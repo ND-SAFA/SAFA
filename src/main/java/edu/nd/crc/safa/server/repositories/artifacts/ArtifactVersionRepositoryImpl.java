@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.artifacts;
+package edu.nd.crc.safa.server.repositories.artifacts;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +17,9 @@ import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.entities.GenericVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

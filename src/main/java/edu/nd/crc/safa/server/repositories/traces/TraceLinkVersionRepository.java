@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.traces;
+package edu.nd.crc.safa.server.repositories.traces;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.IVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

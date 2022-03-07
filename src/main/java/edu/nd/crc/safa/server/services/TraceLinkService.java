@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

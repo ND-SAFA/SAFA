@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities.traces;
+package edu.nd.crc.safa.server.repositories.traces;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,8 +13,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
-import edu.nd.crc.safa.server.repositories.entities.GenericVersionRepository;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.services.TraceMatrixService;
 
 import org.springframework.beans.factory.annotation.Autowired;

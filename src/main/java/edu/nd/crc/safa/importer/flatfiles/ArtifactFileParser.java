@@ -15,9 +15,9 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactFileRepository;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactFileRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

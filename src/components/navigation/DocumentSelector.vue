@@ -108,7 +108,8 @@ import Vue from "vue";
 import { ProjectDocument } from "@/types";
 import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
 import { artifactModule, documentModule, logModule } from "@/store";
-import { ArtifactInput, GenericIconButton, GenericModal } from "@/components";
+import { ArtifactInput } from "@/components";
+import { GenericIconButton, GenericModal } from "@/components/common/generic";
 
 export default Vue.extend({
   name: "DocumentSelector",

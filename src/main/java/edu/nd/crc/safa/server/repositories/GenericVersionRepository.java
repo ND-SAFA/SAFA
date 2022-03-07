@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.entities;
+package edu.nd.crc.safa.server.repositories;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -19,7 +19,7 @@ import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.VersionAction;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.IVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import org.javatuples.Pair;

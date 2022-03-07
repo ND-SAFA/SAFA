@@ -8,17 +8,17 @@ import java.io.Serializable;
 public enum ModificationType implements Serializable {
     ADDED {
         public String toString() {
-            return "added";
+            return "ADDED";
         }
     },
     MODIFIED {
         public String toString() {
-            return "modified";
+            return "MODIFIED";
         }
     },
     REMOVED {
         public String toString() {
-            return "removed";
+            return "REMOVED";
         }
     }
 }

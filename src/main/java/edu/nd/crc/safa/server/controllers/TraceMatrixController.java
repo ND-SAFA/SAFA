@@ -13,8 +13,8 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.entities.traces.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 

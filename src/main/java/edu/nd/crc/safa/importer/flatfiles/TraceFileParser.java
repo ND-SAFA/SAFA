@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

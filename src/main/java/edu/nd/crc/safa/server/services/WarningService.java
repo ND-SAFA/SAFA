@@ -11,9 +11,9 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.Warning;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
 import edu.nd.crc.safa.warnings.Rule;
 import edu.nd.crc.safa.warnings.RuleName;
@@ -48,7 +48,7 @@ public class WarningService {
      * @return A mapping of  artifact name's to their resulting violations
      */
     public Map<String, List<RuleName>> findViolationsInArtifactTree(ProjectVersion projectVersion) {
-        List<ArtifactVersion> artifacts = artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
+        List<ArtifactVersion> artifacts = artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
         List<TraceLinkVersion> traceLinkVersions =
             this.traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         List<TraceLink> traceLinks =

@@ -18,11 +18,11 @@ import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;

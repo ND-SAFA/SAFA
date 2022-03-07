@@ -1,7 +1,7 @@
 package unit.project.matrices;
 
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;

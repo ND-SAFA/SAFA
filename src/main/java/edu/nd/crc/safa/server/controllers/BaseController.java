@@ -7,9 +7,9 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;

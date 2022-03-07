@@ -19,16 +19,16 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -265,11 +265,11 @@ public class DbEntityBuilder extends BaseBuilder {
         TraceLink traceLink = new TraceLink(source, target);
         this.traceLinkRepository.save(traceLink);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, projectVersionIndex);
-        TraceLinkVersion traceLinkVersion = TraceLinkVersion.createManualLinkWithVersionAndModification(
-            projectVersion,
-            ModificationType.ADDED,
-            traceLink
-        );
+        TraceLinkVersion traceLinkVersion = (new TraceLinkVersion())
+            .withProjectVersion(projectVersion)
+            .withTraceLink(traceLink)
+            .withModificationType(ModificationType.REMOVED)
+            .withManualTraceType();
         traceLinkVersion.setApprovalStatus(TraceApproval.APPROVED);
         this.traceLinkVersionRepository.save(traceLinkVersion);
         return this;

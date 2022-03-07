@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.impl;
+package edu.nd.crc.safa.server.repositories.entities.artifacts;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,14 +12,14 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
+import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.entities.GenericVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,13 +44,19 @@ public class ArtifactVersionRepositoryImpl
     @Autowired
     DocumentRepository documentRepository;
 
+    @Autowired
+    FTAArtifactRepository ftaArtifactRepository;
+
+    @Autowired
+    SafetyCaseArtifactRepository safetyCaseArtifactRepository;
+
     @Override
-    public List<ArtifactVersion> getEntitiesInProject(Project project) {
+    public List<ArtifactVersion> getVersionEntitiesByProject(Project project) {
         return artifactVersionRepository.findByProjectVersionProject(project);
     }
 
     @Override
-    public List<ArtifactVersion> findByEntity(Artifact artifact) {
+    public List<ArtifactVersion> getVersionEntitiesByBaseEntity(Artifact artifact) {
         return artifactVersionRepository.findByArtifact(artifact);
     }
 
@@ -83,8 +89,9 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    public Artifact findOrCreateBaseEntityFromAppEntity(ProjectVersion projectVersion,
-                                                        ArtifactAppEntity artifactAppEntity) throws SafaError {
+    @Override
+    public Artifact findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
+                                                          ArtifactAppEntity artifactAppEntity) throws SafaError {
         Project project = projectVersion.getProject();
         String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.type;
@@ -94,8 +101,72 @@ public class ArtifactVersionRepositoryImpl
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
 
+        switch (artifactAppEntity.getDocumentType()) {
+            case FTA:
+                String parentTypeName = artifactAppEntity.getParentType();
+                this
+                    .artifactTypeRepository
+                    .findByProjectAndNameIgnoreCase(project, parentTypeName)
+                    .ifPresent(parentType -> {
+                        FTAArtifact ftaArtifact = new FTAArtifact(artifact,
+                            parentType,
+                            artifactAppEntity.getLogicType());
+                        this.ftaArtifactRepository.save(ftaArtifact);
+                    });
+                break;
+            case SAFETY_CASE:
+                SafetyCaseArtifact safetyCaseArtifact = new SafetyCaseArtifact(artifact,
+                    artifactAppEntity.getSafetyCaseType());
+                this.safetyCaseArtifactRepository.save(safetyCaseArtifact);
+                break;
+            default:
+                break;
+        }
+
         artifactAppEntity.setId(artifactId);
         return artifact;
+    }
+
+    @Override
+    public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+                                            ArtifactVersion newArtifactVersion) throws SafaError {
+        try {
+            //Overriding any version equal to given
+            this.artifactVersionRepository
+                .findByProjectVersionAndArtifactName(projectVersion, newArtifactVersion.getName())
+                .ifPresent((existingVersionEntity) -> {
+                    artifactVersionRepository.delete(existingVersionEntity);
+                });
+            this.artifactVersionRepository.save(newArtifactVersion);
+        } catch (Exception e) {
+            String error = String.format("An error occurred while saving artifact: %s", newArtifactVersion.getName());
+            throw new SafaError(error, e);
+        }
+    }
+
+    @Override
+    public List<Artifact> getBaseEntitiesByProject(Project project) {
+        return this.artifactRepository.findByProject(project);
+    }
+
+    @Override
+    public ArtifactVersion createRemovedVersionEntity(ProjectVersion projectVersion,
+                                                      Artifact artifact) {
+        return new ArtifactVersion(
+            projectVersion,
+            ModificationType.REMOVED,
+            artifact,
+            "", "");
+    }
+
+    @Override
+    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
+        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
+    }
+
+    @Override
+    public ArtifactAppEntity createAppFromVersion(ArtifactVersion versionEntity) {
+        return new ArtifactAppEntity(versionEntity);
     }
 
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
@@ -105,7 +176,6 @@ public class ArtifactVersionRepositoryImpl
             .stream()
             .map(da -> da.getDocument().getDocumentId().toString())
             .collect(Collectors.toList());
-
 
         List<String> newDocumentIds = incomingDocumentIds
             .stream()
@@ -163,51 +233,5 @@ public class ArtifactVersionRepositoryImpl
             .orElseGet(() -> new ArtifactType(project, typeName));
         this.artifactTypeRepository.save(artifactType);
         return artifactType;
-    }
-
-    @Override
-    public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
-                                            ArtifactVersion newArtifactVersion) throws SafaError {
-        try {
-            this.artifactVersionRepository
-                .findByProjectVersionAndArtifactName(projectVersion, newArtifactVersion.getName())
-                .ifPresent((existingVersionEntity) -> {
-                    artifactVersionRepository.delete(existingVersionEntity);
-                });
-            this.artifactVersionRepository.save(newArtifactVersion);
-        } catch (Exception e) {
-            String error = String.format("An error occurred while saving artifact: %s", newArtifactVersion.getName());
-            throw new SafaError(error, e);
-        }
-    }
-
-    @Override
-    public List<Artifact> getBaseEntitiesInProject(Project project) {
-        return this.artifactRepository.findByProject(project);
-    }
-
-    @Override
-    public ArtifactVersion createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                      Artifact artifact) {
-        return new ArtifactVersion(
-            projectVersion,
-            ModificationType.REMOVED,
-            artifact,
-            "", "");
-    }
-
-    @Override
-    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
-        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
-    }
-
-    @Override
-    public List<ArtifactVersion> findVersionEntitiesWithBaseEntity(Artifact baseEntity) {
-        return this.artifactVersionRepository.findByArtifact(baseEntity);
-    }
-
-    @Override
-    public ArtifactAppEntity createAppFromVersion(ArtifactVersion versionEntity) {
-        return new ArtifactAppEntity(versionEntity);
     }
 }

@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -15,14 +16,19 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
+import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.FTAArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +48,8 @@ public class ProjectRetrievalService {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
+    private final SafetyCaseArtifactRepository safetyCaseArtifactRepository;
+    private final FTAArtifactRepository ftaArtifactRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
 
@@ -52,6 +60,8 @@ public class ProjectRetrievalService {
                                    ProjectMembershipRepository projectMembershipRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    ArtifactTypeRepository artifactTypeRepository,
+                                   SafetyCaseArtifactRepository safetyCaseArtifactRepository,
+                                   FTAArtifactRepository ftaArtifactRepository,
                                    CommitErrorRetrievalService commitErrorRetrievalService,
                                    WarningService warningService) {
         this.documentRepository = documentRepository;
@@ -60,6 +70,8 @@ public class ProjectRetrievalService {
         this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
+        this.safetyCaseArtifactRepository = safetyCaseArtifactRepository;
+        this.ftaArtifactRepository = ftaArtifactRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
     }
@@ -125,7 +137,7 @@ public class ProjectRetrievalService {
      */
     public List<ArtifactAppEntity> getArtifactInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
-            .getEntityVersionsInProjectVersion(projectVersion);
+            .getVersionEntitiesByProjectVersion(projectVersion);
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
@@ -138,6 +150,26 @@ public class ProjectRetrievalService {
                     .map(da -> da.getDocument().getDocumentId().toString())
                     .collect(Collectors.toList());
             artifactAppEntity.setDocumentIds(documentIds);
+
+            /** Add special node types attributes
+             * 1. Safety Cases
+             * 2. FTA
+             */
+            Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                this.safetyCaseArtifactRepository.findByArtifact(artifact);
+            if (safetyCaseArtifactOptional.isPresent()) {
+                SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+            } else {
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                if (ftaArtifactOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.FTA);
+                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                    artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
+                }
+            }
         }
         return artifacts;
     }
@@ -161,7 +193,7 @@ public class ProjectRetrievalService {
     public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion,
                                                           List<String> existingArtifactIds) {
         return this.traceLinkVersionRepository
-            .getEntityVersionsInProjectVersion(projectVersion)
+            .getVersionEntitiesByProjectVersion(projectVersion)
             .stream()
             .map(TraceAppEntity::new)
             .filter(t -> existingArtifactIds.contains(t.sourceId)

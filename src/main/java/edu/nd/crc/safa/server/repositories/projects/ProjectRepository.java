@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories;
+package edu.nd.crc.safa.server.repositories.projects;
 
 import java.util.UUID;
 

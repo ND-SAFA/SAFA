@@ -17,8 +17,8 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
@@ -67,7 +67,7 @@ public class TraceLinkGenerator {
     public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
                                                           Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<ArtifactVersion> artifactsInVersion =
-            this.artifactVersionRepository.getEntityVersionsInProjectVersion(projectVersion);
+            this.artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
         Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue0());
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,

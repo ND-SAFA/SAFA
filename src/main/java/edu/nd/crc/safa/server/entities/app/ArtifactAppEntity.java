@@ -6,6 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONObject;
 
@@ -13,24 +14,55 @@ import org.json.JSONObject;
  * Represents the JSON model that is used on the front-end application.
  */
 public class ArtifactAppEntity implements IAppEntity {
+    /**
+     * UUID uniquely identifying artifact.
+     */
     @NotNull
     public String id;
-
+    /**
+     * The user-defined identifier for the artifact.
+     */
     @NotNull
     @NotEmpty
     public String name;
-
+    /**
+     * Summary of the artifact body used for short displays of what the
+     * artifact contains.
+     */
     @NotNull
     public String summary;
-
+    /**
+     * The string representation of an artifact's content. Could be string, code, or other
+     * file type like JSON.
+     */
     @NotNull
     public String body;
-
+    /**
+     * The name of the ArtifactType this pertains to.
+     */
     @NotNull
     @NotEmpty
     public String type;
-
+    /**
+     * List of document Ids this artifact belongs to.
+     */
     public List<String> documentIds;
+    /**
+     * The type of document this artifact is displayed in.
+     */
+    DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    /**
+     * For safety case nodes, the type of safety case node.
+     */
+    SafetyCaseType safetyCaseType;
+    /**
+     * For FTA logic nodes, the type of the parent artifact.
+     */
+    String parentType;
+    /**
+     * For FTA logic nodes,  the logical operator of this node.
+     */
+    FTANodeType logicType;
 
     public ArtifactAppEntity() {
         this.id = "";
@@ -59,6 +91,38 @@ public class ArtifactAppEntity implements IAppEntity {
             body.getName(),
             body.getSummary(),
             body.getContent());
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
+    }
+
+    public SafetyCaseType getSafetyCaseType() {
+        return safetyCaseType;
+    }
+
+    public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
+        this.safetyCaseType = safetyCaseType;
+    }
+    
+    public String getParentType() {
+        return parentType;
+    }
+
+    public void setParentType(String parentType) {
+        this.parentType = parentType;
+    }
+
+    public FTANodeType getLogicType() {
+        return logicType;
+    }
+
+    public void setLogicType(FTANodeType logicType) {
+        this.logicType = logicType;
     }
 
     public List<String> getDocumentIds() {

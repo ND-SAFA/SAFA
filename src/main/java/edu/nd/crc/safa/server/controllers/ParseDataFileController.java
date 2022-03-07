@@ -23,10 +23,10 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 
 import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
@@ -110,7 +110,9 @@ public class ParseDataFileController extends BaseController {
         if (artifactQuery.isPresent()) {
             String artifactId = artifactQuery.get().getArtifactId().toString();
             Optional<ArtifactVersion> artifactVersionQuery =
-                this.artifactVersionRepository.getEntityVersionsInProjectVersionByVersionId(projectVersion, artifactId);
+                this.artifactVersionRepository.getEntityVersionsByProjectVersionAndBaseEntityId(
+                    projectVersion,
+                    artifactId);
             if (artifactVersionQuery.isPresent()) {
                 artifactExists = !artifactVersionQuery.get().getModificationType().equals(ModificationType.REMOVED);
             }

@@ -10,13 +10,14 @@ import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.server.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.entities.traces.TraceLinkVersionRepository;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 /**
  * Responsible for providing an interface to modify artifacts in a project by calculating

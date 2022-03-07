@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -55,6 +57,10 @@ public class Artifact implements Serializable, IBaseEntity {
 
     @Column(name = "name")
     String name;
+
+    @Column(name = "document_type")
+    @Enumerated(EnumType.STRING)
+    DocumentType documentType = DocumentType.ARTIFACT_TREE;
 
     public Artifact() {
     }

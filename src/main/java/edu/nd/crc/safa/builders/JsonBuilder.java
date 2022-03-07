@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONArray;
@@ -98,7 +99,23 @@ public class JsonBuilder extends BaseBuilder {
         artifact.put("body", body);
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
+        artifact.put("documentType", DocumentType.ARTIFACT_TREE.toString());
         project.getJSONArray("artifacts").put(artifact);
+        return this;
+    }
+
+    public JsonBuilder withSafetyCaseArtifact(String projectName,
+                                              String artifactId,
+                                              String artifactName,
+                                              String artifactType,
+                                              String body,
+                                              SafetyCaseType safetyCaseType
+    ) {
+
+        this.withArtifact(projectName, artifactId, artifactName, artifactType, body);
+        JSONObject artifact = this.getArtifact(projectName, artifactName);
+        artifact.put("safetyCaseType", safetyCaseType.toString());
+        artifact.put("documentType", DocumentType.SAFETY_CASE.toString());
         return this;
     }
 
@@ -134,5 +151,17 @@ public class JsonBuilder extends BaseBuilder {
         docJson.put("description", description);
         docJson.put("type", documentType);
         return docJson;
+    }
+
+    public JSONObject getArtifact(String projectName, String artifactName) {
+        JSONArray artifacts = this.projects.get(projectName).getJSONArray("artifacts");
+        for (Object artifactObj : artifacts) {
+            JSONObject artifact = (JSONObject) artifactObj;
+            if (artifact.getString("name").equals(artifactName)) {
+                return artifact;
+            }
+        }
+        String error = String.format("Could not find artifact %s in project %s.", artifactName, projectName);
+        throw new RuntimeException("Could not find artifact with name:" + error);
     }
 }

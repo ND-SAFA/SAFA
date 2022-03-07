@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.SafaUserRepository;
+import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;

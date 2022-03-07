@@ -71,7 +71,7 @@ public class CommitController extends BaseController {
 
         ProjectChange<ArtifactAppEntity> artifactChanges = commitArtifactChanges(projectVersion,
             projectCommit.getArtifacts());
-        ProjectChange<TraceAppEntity> traceChanges = commitTraceChanges(projectVersion, projectCommit.getTraces());
+        ProjectChange<TraceAppEntity> traceChanges = commitChanges(projectVersion, projectCommit.getTraces());
 
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges);
     }
@@ -79,7 +79,8 @@ public class CommitController extends BaseController {
     private ProjectChange<ArtifactAppEntity> commitArtifactChanges(
         ProjectVersion projectVersion,
         ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
-        return commitTraceChanges(
+
+        return commitChanges(
             projectVersion,
             artifacts,
             this.artifactVersionRepository,
@@ -87,9 +88,9 @@ public class CommitController extends BaseController {
             VersionEntityTypes.ARTIFACTS);
     }
 
-    private ProjectChange<TraceAppEntity> commitTraceChanges(ProjectVersion projectVersion,
-                                                             ProjectChange<TraceAppEntity> traces) throws SafaError {
-        return commitTraceChanges(
+    private ProjectChange<TraceAppEntity> commitChanges(ProjectVersion projectVersion,
+                                                        ProjectChange<TraceAppEntity> traces) throws SafaError {
+        return commitChanges(
             projectVersion,
             traces,
             this.traceLinkVersionRepository,
@@ -111,7 +112,7 @@ public class CommitController extends BaseController {
      * @throws SafaError Throws error if anything goes wrong during any commit.
      */
     private <AppEntity extends IAppEntity,
-        VersionEntity extends IVersionEntity<AppEntity>> ProjectChange<AppEntity> commitTraceChanges(
+        VersionEntity extends IVersionEntity<AppEntity>> ProjectChange<AppEntity> commitChanges(
         ProjectVersion projectVersion,
         ProjectChange<AppEntity> projectChange,
         IVersionRepository<VersionEntity, AppEntity> versionRepository,

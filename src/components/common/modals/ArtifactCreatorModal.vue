@@ -159,15 +159,13 @@ export default Vue.extend({
       return this.documentType === DocumentType.SAFETY_CASE;
     },
     isValid(): boolean {
-      const isValidArtifact = this.isNameValid && this.body;
-      const isValidFTA = this.isFTA
-        ? this.logicType && this.parentId
-        : this.artifactType;
-      const isValidSC = this.isSafetyCase
-        ? this.safetyCaseType
-        : this.artifactType;
-
-      return !!(isValidArtifact && isValidFTA && isValidSC);
+      if (this.isFTA) {
+        return !!(this.logicType && this.parentId);
+      } else if (this.isSafetyCase) {
+        return !!(this.isNameValid && this.body && this.safetyCaseType);
+      } else {
+        return !!(this.isNameValid && this.body && this.artifactType);
+      }
     },
 
     documentTypes(): SelectOption[] {

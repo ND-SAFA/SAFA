@@ -1,8 +1,8 @@
+import { ProjectIdentifier } from "@/types/domain/project";
+
 /**
  * Enumerates the type of documents supported by SAFA
  */
-import { ProjectIdentifier } from "@/types";
-
 export enum DocumentType {
   ARTIFACT_TREE = "ARTIFACT_TREE",
   FTA = "FTA",

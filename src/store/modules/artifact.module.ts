@@ -1,7 +1,10 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
-import type { Artifact, ArtifactQueryFunction } from "@/types";
-import { DocumentArtifacts } from "@/types";
+import type {
+  Artifact,
+  ArtifactQueryFunction,
+  DocumentArtifacts,
+} from "@/types";
 import { getSingleQueryResult } from "@/util";
 import { artifactSelectionModule, documentModule } from "@/store";
 

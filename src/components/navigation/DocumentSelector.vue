@@ -47,6 +47,14 @@
             v-model="documentName"
             :error-messages="nameErrors"
           />
+          <v-select
+            filled
+            label="Type"
+            v-model="documentType"
+            :items="types"
+            item-text="name"
+            item-value="id"
+          />
           <artifact-input v-model="artifactIds" />
         </template>
         <template v-slot:actions>
@@ -74,6 +82,14 @@
             class="mt-4"
             v-model="documentName"
             :error-messages="nameErrors"
+          />
+          <v-select
+            filled
+            label="Type"
+            v-model="documentType"
+            :items="types"
+            item-text="name"
+            item-value="id"
           />
           <artifact-input v-model="artifactIds" />
         </template>
@@ -105,10 +121,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentType, ProjectDocument } from "@/types";
+import { documentTypeOptions } from "@/util";
 import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
 import { artifactModule, documentModule, logModule } from "@/store";
-import { ArtifactInput } from "@/components";
+import { ArtifactInput } from "@/components/common/input";
 import { GenericIconButton, GenericModal } from "@/components/common/generic";
 
 export default Vue.extend({
@@ -118,6 +135,7 @@ export default Vue.extend({
     isCreateOpen: false,
     isEditOpen: false,
     documentName: "",
+    documentType: DocumentType.ARTIFACT_TREE,
     artifactIds: [] as string[],
     editingDocument: undefined as ProjectDocument | undefined,
     confirmDelete: false,
@@ -126,6 +144,7 @@ export default Vue.extend({
     items(): ProjectDocument[] {
       return documentModule.projectDocuments;
     },
+    types: documentTypeOptions,
     select: {
       get() {
         return documentModule.document;
@@ -158,6 +177,7 @@ export default Vue.extend({
     },
     resetModalData() {
       this.documentName = "";
+      this.documentType = DocumentType.ARTIFACT_TREE;
       this.artifactIds = [];
       this.editingDocument = undefined;
       this.isCreateOpen = false;
@@ -170,7 +190,7 @@ export default Vue.extend({
       this.isCreateOpen = true;
     },
     handleAddDocument() {
-      addNewDocument(this.documentName, this.artifactIds)
+      addNewDocument(this.documentName, this.documentType, this.artifactIds)
         .then(() => {
           logModule.onSuccess(`Document created: ${this.documentName}`);
           this.resetModalData();
@@ -182,6 +202,7 @@ export default Vue.extend({
 
     handleEditOpen(document: ProjectDocument) {
       this.documentName = document.name;
+      this.documentType = document.type;
       this.editingDocument = document;
       this.artifactIds = artifactModule.allArtifacts
         .filter(({ id }) => document.artifactIds?.includes(id))
@@ -191,7 +212,9 @@ export default Vue.extend({
     handleEditDocument() {
       if (this.editingDocument) {
         this.editingDocument.name = this.documentName;
+        this.editingDocument.type = this.documentType;
         this.editingDocument.artifactIds = this.artifactIds;
+
         editDocument(this.editingDocument)
           .then(() => {
             logModule.onSuccess(`Document edited: ${this.documentName}`);

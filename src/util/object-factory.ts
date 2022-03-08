@@ -114,9 +114,12 @@ export function createDefaultTypeIcons(
 }
 
 /**
+ * Creates a document.
+ *
  * @param project - The associated project.
  * @param artifactIds - The artifact ids visible in this document.
  * @param name - The document name.
+ * @param type - The document type.
  * @return An empty document.
  */
 export function createDocument(
@@ -128,13 +131,14 @@ export function createDocument(
     members: [],
   },
   artifactIds: string[] = [],
-  name = "Default"
+  name = "Default",
+  type = DocumentType.ARTIFACT_TREE
 ): ProjectDocument {
   return {
     documentId: "",
     project,
     name,
-    type: DocumentType.ARTIFACT_TREE,
+    type,
     artifactIds,
     description: "",
   };

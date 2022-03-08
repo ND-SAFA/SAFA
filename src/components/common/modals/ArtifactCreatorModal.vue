@@ -190,9 +190,14 @@ export default Vue.extend({
       return [FTANodeType.AND, FTANodeType.OR];
     },
 
+    parentArtifact(): Artifact | undefined {
+      return this.parentId
+        ? artifactModule.getArtifactById(this.parentId)
+        : undefined;
+    },
     computedArtifactType(): string {
       if (this.isFTA) {
-        return artifactModule.getArtifactById(this.parentId).type;
+        return this.parentArtifact?.type || this.artifactType;
       } else if (this.isSafetyCase) {
         return this.safetyCaseType;
       } else {
@@ -260,7 +265,12 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      createOrUpdateArtifactHandler(this.versionId, artifact, isUpdate)
+      createOrUpdateArtifactHandler(
+        this.versionId,
+        artifact,
+        isUpdate,
+        this.parentArtifact
+      )
         .then(async () => {
           this.$emit("close");
         })

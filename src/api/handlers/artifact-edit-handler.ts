@@ -1,10 +1,12 @@
-import { Artifact, ConfirmationType } from "@/types";
+import { Artifact, ConfirmationType, TraceApproval, TraceType } from "@/types";
 import { logModule, projectModule } from "@/store";
 import {
   createArtifact,
-  updateArtifact,
+  createLink,
   deleteArtifactBody,
+  updateArtifact,
 } from "@/api/commits";
+import { getTraceId } from "@/util";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -13,22 +15,32 @@ import {
  * @param artifact - The artifact to create.
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
- * @param parentId - The parent artifact to link to.
+ * @param parentArtifact - The parent artifact to link to.
  */
 export async function createOrUpdateArtifactHandler(
   versionId: string,
   artifact: Artifact,
   isUpdate: boolean,
-  parentId = ""
+  parentArtifact?: Artifact
 ): Promise<void> {
   if (isUpdate) {
     await updateArtifact(versionId, artifact);
   } else {
     const createdArtifacts = await createArtifact(versionId, artifact);
 
-    if (!parentId) return;
+    if (!parentArtifact) return;
 
     for (const createdArtifact of createdArtifacts) {
+      await createLink({
+        traceLinkId: getTraceId(createdArtifact.id, parentArtifact.id),
+        sourceName: createdArtifact.name,
+        sourceId: createdArtifact.id,
+        targetName: parentArtifact.name,
+        targetId: parentArtifact.id,
+        approvalStatus: TraceApproval.APPROVED,
+        score: 1,
+        traceType: TraceType.MANUAL,
+      });
     }
   }
 }

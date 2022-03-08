@@ -88,6 +88,7 @@ import {
   DocumentType,
   FTANodeType,
   SafetyCaseType,
+  SelectOption,
 } from "@/types";
 import { documentTypeOptions, safetyCaseOptions } from "@/util";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
@@ -144,20 +145,13 @@ export default Vue.extend({
     };
   },
   computed: {
-    documentTypes: documentTypeOptions,
-    safetyCaseTypes: safetyCaseOptions,
-    logicTypes(): FTANodeType[] {
-      return [FTANodeType.AND, FTANodeType.OR];
-    },
     projectId(): string {
       return projectModule.projectId;
     },
     versionId(): string {
       return projectModule.versionIdWithLog || "";
     },
-    artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
-    },
+
     isFTA(): boolean {
       return this.documentType === DocumentType.FTA;
     },
@@ -175,7 +169,28 @@ export default Vue.extend({
 
       return !!(isValidArtifact && isValidFTA && isValidSC);
     },
-    fullArtifactType(): string {
+
+    documentTypes(): SelectOption[] {
+      const documentType = documentModule.document.type;
+      const options = documentTypeOptions();
+
+      if (documentType === DocumentType.FTA) {
+        return options.filter(({ id }) => id !== DocumentType.SAFETY_CASE);
+      } else if (documentType === DocumentType.SAFETY_CASE) {
+        return options.filter(({ id }) => id !== DocumentType.FTA);
+      } else {
+        return options.filter(({ id }) => id == DocumentType.ARTIFACT_TREE);
+      }
+    },
+    safetyCaseTypes: safetyCaseOptions,
+    artifactTypes(): string[] {
+      return typeOptionsModule.artifactTypes;
+    },
+    logicTypes(): FTANodeType[] {
+      return [FTANodeType.AND, FTANodeType.OR];
+    },
+
+    computedArtifactType(): string {
       if (this.isFTA) {
         return artifactModule.getArtifactById(this.parentId).type;
       } else if (this.isSafetyCase) {
@@ -183,6 +198,9 @@ export default Vue.extend({
       } else {
         return this.artifactType;
       }
+    },
+    computedName(): string {
+      return this.isFTA ? `${this.parentId}-logic` : this.name;
     },
   },
   watch: {
@@ -230,8 +248,8 @@ export default Vue.extend({
       const isUpdate = this.artifact !== undefined;
       const artifact: Artifact = {
         id: this.artifact?.id || "",
-        name: this.name,
-        type: this.fullArtifactType,
+        name: this.computedName,
+        type: this.computedArtifactType,
         summary: this.summary,
         body: this.body,
         documentType: this.documentType,

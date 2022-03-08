@@ -13,16 +13,23 @@ import {
  * @param artifact - The artifact to create.
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
+ * @param parentId - The parent artifact to link to.
  */
 export async function createOrUpdateArtifactHandler(
   versionId: string,
   artifact: Artifact,
-  isUpdate: boolean
+  isUpdate: boolean,
+  parentId = ""
 ): Promise<void> {
   if (isUpdate) {
     await updateArtifact(versionId, artifact);
   } else {
-    await createArtifact(versionId, artifact);
+    const createdArtifacts = await createArtifact(versionId, artifact);
+
+    if (!parentId) return;
+
+    for (const createdArtifact of createdArtifacts) {
+    }
   }
 }
 

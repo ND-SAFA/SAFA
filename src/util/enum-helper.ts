@@ -1,9 +1,9 @@
-import { DocumentType, SafetyCaseType } from "@/types";
+import { DocumentType, SafetyCaseType, SelectOption } from "@/types";
 
 /**
  * Returns display names for each document type.
  */
-export function documentTypeOptions(): { id: string; name: string }[] {
+export function documentTypeOptions(): SelectOption[] {
   return [
     { id: DocumentType.ARTIFACT_TREE, name: "Default" },
     { id: DocumentType.FTA, name: "FTA" },
@@ -14,7 +14,7 @@ export function documentTypeOptions(): { id: string; name: string }[] {
 /**
  * Returns display names for each safety case type.
  */
-export function safetyCaseOptions(): { id: string; name: string }[] {
+export function safetyCaseOptions(): SelectOption[] {
   return [
     { id: SafetyCaseType.CONTEXT, name: "Context" },
     { id: SafetyCaseType.GOAL, name: "Goal" },

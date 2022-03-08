@@ -51,7 +51,7 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
 export async function createArtifact(
   versionId: string,
   artifact: Artifact
-): Promise<void> {
+): Promise<Artifact[]> {
   return CommitBuilder.withCurrentVersion()
     .withNewArtifact(artifact)
     .save()
@@ -59,6 +59,8 @@ export async function createArtifact(
     .then(async (artifactsAdded) => {
       await projectModule.addOrUpdateArtifacts(artifactsAdded);
       await artifactSelectionModule.selectArtifact(artifactsAdded[0].id);
+
+      return artifactsAdded;
     });
 }
 

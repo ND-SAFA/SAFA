@@ -109,6 +109,7 @@ import { setTimeout } from "timers";
  * @emits `close` - Emitted when modal is exited or artifact is created.
  */
 export default Vue.extend({
+  name: "artifact-creator",
   components: { GenericModal, ArtifactInput },
   props: {
     title: {

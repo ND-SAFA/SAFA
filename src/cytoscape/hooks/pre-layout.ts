@@ -1,11 +1,20 @@
-import { EdgeSingular } from "cytoscape";
+import { EdgeSingular, EventObject } from "cytoscape";
 
-import { CytoCore, LayoutHook } from "@/types";
+import { CytoCore, CytoEvent, LayoutHook } from "@/types";
 import {
   artifactHtml as nodeHTML,
   GENERATED_LINK_SELECTOR,
   GENERATED_TRACE_MAX_WIDTH,
 } from "@/cytoscape/styles";
+import {
+  artifactTreeContextMenuOptions,
+  artifactTreeCyPromise,
+  artifactTreeMenuItems,
+} from "@/cytoscape";
+import {
+  ContextMenuOptions,
+  MenuItem,
+} from "@/types/cytoscape/plugins/context-menus";
 
 /**
  * Applies HTML overlays to the graph nodes.

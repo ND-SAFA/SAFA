@@ -296,4 +296,12 @@ export default class SubtreeModule extends VuexModule {
       return childNodes.filter((id) => hiddenNodes.includes(id));
     };
   }
+
+  /**
+   * @return Ids of the parent whose children are collapsed.
+   * Used for toggling Show/Hide subtree menu items.
+   */
+  get getCollapsedParentNodes(): string[] {
+    return this.collapsedParentNodes;
+  }
 }

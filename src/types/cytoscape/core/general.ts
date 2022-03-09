@@ -9,6 +9,7 @@ import {
 } from "@/types/cytoscape";
 import { TimNodeData } from "@/types/components/tim-tree";
 import { ArtifactData } from "@/types";
+import { ContextMenuOptions } from "@/types/cytoscape/plugins/context-menus";
 
 /**
  * The HtmlDefinitions used with in the application.
@@ -25,7 +26,7 @@ type AppHtmlDefinitions = (
 export interface CytoCore extends Core {
   nodeHtmlLabel(defs: AppHtmlDefinitions): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
-  contextMenus(options: unknown): void; //todo: add types for options
+  contextMenus(options: ContextMenuOptions | "get"): any; //todo: add types for return
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }

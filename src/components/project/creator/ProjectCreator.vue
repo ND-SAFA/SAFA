@@ -6,6 +6,7 @@
     @submit="saveProject()"
   >
     <v-row>Create a new project</v-row>
+
     <template v-slot:items>
       <v-stepper-content step="1">
         <v-container>
@@ -64,9 +65,12 @@
 
       <v-stepper-content step="4">
         <v-container>
-          <v-row justify="center">
+          <v-row dense justify="space-between" class="full-width">
             <v-col>
-              <h1 class="text-h6">Project TIM</h1>
+              <h1 class="text-h6 text-no-wrap">Project TIM</h1>
+            </v-col>
+            <v-col class="flex-grow-0">
+              <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
             </v-col>
           </v-row>
           <tim-tree
@@ -100,6 +104,7 @@ import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
+import { cyResetTim } from "@/cytoscape";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -154,6 +159,10 @@ export default Vue.extend({
     },
     onConfirmClose(): void {
       this.isConfirmOpen = false;
+    },
+
+    async handleResetGraph(): Promise<void> {
+      cyResetTim();
     },
   },
   computed: {

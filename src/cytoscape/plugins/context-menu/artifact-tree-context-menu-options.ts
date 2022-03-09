@@ -75,7 +75,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         await deleteArtifactFromCurrentVersion(artifact);
       });
     },
-    isVisible: (artifactData: ArtifactData | undefined) => {
+    isVisible: (artifactData: ArtifactData | undefined): boolean => {
       return artifactData !== undefined;
     },
   },
@@ -112,7 +112,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
 
       await subtreeModule.showSubtree(artifactId);
     },
-    isVisible: (artifactData: ArtifactData | undefined) => {
+    isVisible: (artifactData: ArtifactData | undefined): boolean => {
       if (artifactData !== undefined) {
         return subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
       }

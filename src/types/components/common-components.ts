@@ -28,6 +28,7 @@ export interface BaseButtonDefinition {
   label: string;
   isDisabled?: boolean;
   buttonColor?: string;
+  isHidden?: boolean;
 }
 
 /**

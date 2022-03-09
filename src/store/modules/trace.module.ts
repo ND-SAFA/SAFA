@@ -122,7 +122,7 @@ export default class TraceModule extends VuexModule {
    */
   get getTraceLinkByArtifacts(): LinkFinder {
     return (sourceId, targetId) => {
-      const traceQuery = this.traces.filter(
+      const traceQuery = this.allTraces.filter(
         (trace) => trace.sourceId === sourceId && trace.targetId === targetId
       );
 

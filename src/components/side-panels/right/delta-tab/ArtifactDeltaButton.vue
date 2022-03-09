@@ -1,6 +1,8 @@
 <template>
   <v-btn outlined :color="titleColor" @click="$emit('click', name)">
-    {{ name }}
+    <span style="max-width: 100px; overflow: hidden; text-overflow: ellipsis">{{
+      name
+    }}</span>
   </v-btn>
 </template>
 

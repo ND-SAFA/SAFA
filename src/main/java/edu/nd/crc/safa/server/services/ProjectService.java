@@ -80,7 +80,7 @@ public class ProjectService {
 
         entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
         entityVersionService.commitVersionTraces(projectVersion, traces);
-        return projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
+        return projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
     /**

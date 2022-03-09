@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -82,8 +83,8 @@ public class ProjectRetrievalService {
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectEntities retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
-        ProjectAppEntity projectAppEntity = this.retrieveApplicationEntity(projectVersion);
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+        ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
             .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
@@ -97,7 +98,7 @@ public class ProjectRetrievalService {
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity retrieveApplicationEntity(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectAppEntityAtProjectVersion(ProjectVersion projectVersion) {
 
         Project project = projectVersion.getProject();
 
@@ -151,24 +152,28 @@ public class ProjectRetrievalService {
                     .collect(Collectors.toList());
             artifactAppEntity.setDocumentIds(documentIds);
 
-            /** Add special node types attributes
-             * 1. Safety Cases
-             * 2. FTA
-             */
-            Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                this.safetyCaseArtifactRepository.findByArtifact(artifact);
-            if (safetyCaseArtifactOptional.isPresent()) {
-                SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-            } else {
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                    artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
-                }
+            switch (artifact.getDocumentType()) {
+                case SAFETY_CASE:
+                    Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                        this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                    if (safetyCaseArtifactOptional.isPresent()) {
+                        SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                        artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                        artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                    }
+                    //TODO: Throw error if not found?
+                    break;
+                case FTA:
+                    Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                    if (ftaArtifactOptional.isPresent()) {
+                        FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                        artifactAppEntity.setDocumentType(DocumentType.FTA);
+                        artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                        artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
+                    }
+                    break;
+                default:
+                    break;
             }
         }
         return artifacts;

@@ -68,7 +68,6 @@ public class CommitController extends BaseController {
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-
         ProjectChange<ArtifactAppEntity> artifactChanges = commitArtifactChanges(projectVersion,
             projectCommit.getArtifacts());
         ProjectChange<TraceAppEntity> traceChanges = commitChanges(projectVersion, projectCommit.getTraces());

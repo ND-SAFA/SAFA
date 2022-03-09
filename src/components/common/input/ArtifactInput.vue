@@ -57,6 +57,10 @@ export default Vue.extend({
       type: String,
       default: "Visible Artifacts",
     },
+    onlyDocumentArtifacts: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -85,7 +89,9 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return artifactModule.allArtifacts;
+      return this.onlyDocumentArtifacts
+        ? artifactModule.artifacts
+        : artifactModule.allArtifacts;
     },
   },
   watch: {

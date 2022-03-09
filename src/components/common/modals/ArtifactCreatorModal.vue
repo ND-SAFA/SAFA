@@ -8,6 +8,7 @@
     <template v-slot:body>
       <v-container>
         <v-text-field
+          v-if="!isFTA"
           filled
           v-model="name"
           label="Artifact Name"
@@ -39,6 +40,7 @@
           :items="logicTypes"
         />
         <artifact-input
+          only-document-artifacts
           v-if="isFTA"
           v-model="parentId"
           :multiple="false"

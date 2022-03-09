@@ -188,7 +188,7 @@ public class DbEntityBuilder extends BaseBuilder {
     public DbEntityBuilder newArtifact(String projectName, String typeName, String artifactName) {
         Project project = getProject(projectName);
         ArtifactType artifactType = getType(projectName, typeName);
-        Artifact artifact = new Artifact(project, artifactType, artifactName);
+        Artifact artifact = new Artifact(project, artifactType, artifactName, DocumentType.ARTIFACT_TREE);
         this.artifactRepository.save(artifact);
         this.addEntry(this.artifacts, projectName, artifactName, artifact);
         return this;

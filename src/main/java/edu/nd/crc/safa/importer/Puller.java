@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import edu.nd.crc.safa.importer.JIRA.Issue;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.TraceLinkService;
@@ -76,7 +77,9 @@ public class Puller {
             String artifactName = issue.key;
             String typeName = issue.key;
 
-            artifacts.add(new ArtifactAppEntity(null, typeName, artifactName, "", issueContent));
+            ArtifactAppEntity newArtifact = new ArtifactAppEntity(
+                null, typeName, artifactName, "", issueContent, DocumentType.ARTIFACT_TREE);
+            artifacts.add(newArtifact);
 
             // Check that the link is only an inward link to this node
             if (issue.links.size() > 0) {

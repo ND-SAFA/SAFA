@@ -63,8 +63,8 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             .getProjectVersion(projectName, 0);
     }
 
-    public void commit(CommitBuilder commitBuilder) throws Exception {
-        commitWithStatus(commitBuilder, status().is2xxSuccessful());
+    public JSONObject commit(CommitBuilder commitBuilder) throws Exception {
+        return commitWithStatus(commitBuilder, status().is2xxSuccessful());
     }
 
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {

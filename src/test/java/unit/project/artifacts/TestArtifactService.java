@@ -10,6 +10,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -148,7 +149,8 @@ public class TestArtifactService extends ApplicationBaseTest {
             typeName,
             artifactName,
             artifactSummary,
-            newContent);
+            newContent,
+            DocumentType.ARTIFACT_TREE);
 
         // VP - Verify that artifact body is detected to be modified
         this.entityVersionService.commitVersionArtifacts(projectVersion,

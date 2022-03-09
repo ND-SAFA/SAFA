@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
@@ -82,8 +83,8 @@ public class ProjectRetrievalService {
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectEntities retrieveAndCreateProjectResponse(ProjectVersion projectVersion) {
-        ProjectAppEntity projectAppEntity = this.retrieveApplicationEntity(projectVersion);
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+        ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
             .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.warningService.findViolationsInArtifactTree(projectVersion);
@@ -97,7 +98,7 @@ public class ProjectRetrievalService {
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity retrieveApplicationEntity(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectAppEntityAtProjectVersion(ProjectVersion projectVersion) {
 
         Project project = projectVersion.getProject();
 
@@ -108,7 +109,7 @@ public class ProjectRetrievalService {
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
-        List<Document> documents = this.documentRepository.findByProject(project);
+        List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
 
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
@@ -151,24 +152,28 @@ public class ProjectRetrievalService {
                     .collect(Collectors.toList());
             artifactAppEntity.setDocumentIds(documentIds);
 
-            /** Add special node types attributes
-             * 1. Safety Cases
-             * 2. FTA
-             */
-            Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                this.safetyCaseArtifactRepository.findByArtifact(artifact);
-            if (safetyCaseArtifactOptional.isPresent()) {
-                SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-            } else {
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                    artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
-                }
+            switch (artifact.getDocumentType()) {
+                case SAFETY_CASE:
+                    Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                        this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                    if (safetyCaseArtifactOptional.isPresent()) {
+                        SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                        artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                        artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                    }
+                    //TODO: Throw error if not found?
+                    break;
+                case FTA:
+                    Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                    if (ftaArtifactOptional.isPresent()) {
+                        FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                        artifactAppEntity.setDocumentType(DocumentType.FTA);
+                        artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                        artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
+                    }
+                    break;
+                default:
+                    break;
             }
         }
         return artifacts;
@@ -199,5 +204,26 @@ public class ProjectRetrievalService {
             .filter(t -> existingArtifactIds.contains(t.sourceId)
                 && existingArtifactIds.contains(t.targetId))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns list of documents in given project
+     *
+     * @param project The projects whose documents are returned.
+     * @return List of documents in project.
+     */
+    public List<DocumentAppEntity> getDocumentsInProject(Project project) {
+        List<Document> projectDocuments = this.documentRepository.findByProject(project);
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+                .stream()
+                .map(da -> da.getArtifact().getArtifactId().toString())
+                .collect(Collectors.toList());
+            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
+            documentAppEntities.add(documentAppEntity);
+
+        }
+        return documentAppEntities;
     }
 }

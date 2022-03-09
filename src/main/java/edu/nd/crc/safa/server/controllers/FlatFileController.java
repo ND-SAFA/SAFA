@@ -125,6 +125,6 @@ public class FlatFileController extends BaseController {
 
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.flatFileService.parseProjectFilesFromTIM(projectVersion);
-        return this.projectRetrievalService.retrieveAndCreateProjectResponse(projectVersion);
+        return this.projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 }

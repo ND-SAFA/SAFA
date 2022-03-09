@@ -13,6 +13,7 @@ import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,15 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(scArtifactJson);
-        commit(commitBuilder);
+        JSONObject commitResponseJson = commit(commitBuilder);
+
+        // VP - Verify that returned information is valid
+        JSONArray addedArtifactsJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
+        assertThat(addedArtifactsJson.length()).isEqualTo(1);
+        JSONObject artifactAdded = addedArtifactsJson.getJSONObject(0);
+        assertThat(artifactAdded.getString("name")).isEqualTo(artifactName);
+        assertThat(artifactAdded.getString("id")).isNotEmpty();
+        assertThat(artifactAdded.getString("documentType")).isEqualTo(DocumentType.SAFETY_CASE.toString());
 
         // VP - Verify that safety case was created
         List<SafetyCaseArtifact> safetyCaseArtifacts =

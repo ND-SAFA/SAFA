@@ -5,8 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -36,8 +36,8 @@ public class ProjectAppEntity {
 
     public List<ProjectMemberAppEntity> members;
 
-    public List<Document> documents;
-    
+    public List<DocumentAppEntity> documents;
+
     public List<ArtifactType> artifactTypes;
 
     public ProjectAppEntity() {
@@ -52,7 +52,7 @@ public class ProjectAppEntity {
                             List<ArtifactAppEntity> artifacts,
                             List<TraceAppEntity> traces,
                             List<ProjectMemberAppEntity> members,
-                            List<Document> documents,
+                            List<DocumentAppEntity> documents,
                             List<ArtifactType> artifactTypes) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
@@ -74,11 +74,11 @@ public class ProjectAppEntity {
         this.artifactTypes = artifactTypes;
     }
 
-    public List<Document> getDocuments() {
+    public List<DocumentAppEntity> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(List<Document> documents) {
+    public void setDocuments(List<DocumentAppEntity> documents) {
         this.documents = documents;
     }
 

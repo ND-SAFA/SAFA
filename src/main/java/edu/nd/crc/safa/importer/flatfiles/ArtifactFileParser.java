@@ -11,6 +11,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -125,7 +126,8 @@ public class ArtifactFileParser {
                 artifactType,
                 artifactName,
                 artifactSummary,
-                artifactContent
+                artifactContent,
+                DocumentType.ARTIFACT_TREE
             );
             artifactAppEntities.add(artifactAppEntity);
         }

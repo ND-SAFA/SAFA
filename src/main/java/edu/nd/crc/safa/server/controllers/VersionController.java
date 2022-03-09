@@ -10,7 +10,6 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class VersionController extends BaseController {
 
     private final VersionService versionService;
-    private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
     public VersionController(ProjectRepository projectRepository,
                              ProjectVersionRepository projectVersionRepository,
                              ResourceBuilder resourceBuilder,
-                             VersionService versionService,
-                             ProjectRetrievalService projectRetrievalService) {
+                             VersionService versionService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.versionService = versionService;
-        this.projectRetrievalService = projectRetrievalService;
     }
 
     /**

@@ -109,7 +109,7 @@ public class ProjectRetrievalService {
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
-        List<Document> documents = this.documentRepository.findByProject(project);
+        List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
 
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
@@ -204,5 +204,26 @@ public class ProjectRetrievalService {
             .filter(t -> existingArtifactIds.contains(t.sourceId)
                 && existingArtifactIds.contains(t.targetId))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns list of documents in given project
+     *
+     * @param project The projects whose documents are returned.
+     * @return List of documents in project.
+     */
+    public List<DocumentAppEntity> getDocumentsInProject(Project project) {
+        List<Document> projectDocuments = this.documentRepository.findByProject(project);
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+                .stream()
+                .map(da -> da.getArtifact().getArtifactId().toString())
+                .collect(Collectors.toList());
+            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
+            documentAppEntities.add(documentAppEntity);
+
+        }
+        return documentAppEntities;
     }
 }

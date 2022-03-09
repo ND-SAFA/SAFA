@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +23,7 @@ import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,6 +46,7 @@ public class DocumentController extends BaseController {
     private final DocumentArtifactRepository documentArtifactRepository;
 
     private final NotificationService notificationService;
+    private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
     public DocumentController(ProjectRepository projectRepository,
@@ -54,12 +55,14 @@ public class DocumentController extends BaseController {
                               DocumentRepository documentRepository,
                               ArtifactRepository artifactRepository,
                               DocumentArtifactRepository documentArtifactRepository,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;
         this.notificationService = notificationService;
+        this.projectRetrievalService = projectRetrievalService;
     }
 
     /**
@@ -102,18 +105,7 @@ public class DocumentController extends BaseController {
     @GetMapping(AppRoutes.Projects.getProjectDocuments)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
-        List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
-        for (Document document : projectDocuments) {
-            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
-                .stream()
-                .map(da -> da.getArtifact().getArtifactId().toString())
-                .collect(Collectors.toList());
-            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
-            documentAppEntities.add(documentAppEntity);
-
-        }
-        return documentAppEntities;
+        return this.projectRetrievalService.getDocumentsInProject(project);
     }
 
     /**

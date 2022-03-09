@@ -18,6 +18,7 @@ import edu.nd.crc.safa.config.AppConstraints;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.json.JSONObject;
 
 /**
  * Responsible for storing the unique identifiers for artifacts
@@ -57,18 +58,28 @@ public class Artifact implements Serializable, IBaseEntity {
 
     @Column(name = "name")
     String name;
-
     @Column(name = "document_type")
     @Enumerated(EnumType.STRING)
-    DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    DocumentType documentType;
 
     public Artifact() {
+        this.documentType = DocumentType.ARTIFACT_TREE;
     }
 
-    public Artifact(Project project, ArtifactType type, String name) {
-        setProject(project);
-        setType(type);
-        setName(name);
+    public Artifact(Project project, ArtifactType type, String name, DocumentType documentType) {
+        this();
+        this.project = project;
+        this.type = type;
+        this.name = name;
+        this.documentType = documentType;
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
     }
 
     public Project getProject() {
@@ -104,6 +115,9 @@ public class Artifact implements Serializable, IBaseEntity {
     }
 
     public String toString() {
-        return String.format("{%s:%s}", this.name, this.type.getName());
+        JSONObject json = new JSONObject();
+        json.put("name", this.name);
+        json.put("docType", this.documentType);
+        return json.toString();
     }
 }

@@ -12,6 +12,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -96,9 +97,10 @@ public class ArtifactVersionRepositoryImpl
         String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.type;
         String artifactName = artifactAppEntity.name;
+        DocumentType documentType = artifactAppEntity.getDocumentType();
 
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
-        Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType);
+        Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType, documentType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
 
         switch (artifactAppEntity.getDocumentType()) {
@@ -207,24 +209,27 @@ public class ArtifactVersionRepositoryImpl
     private Artifact createOrUpdateArtifact(Project project,
                                             String artifactId,
                                             String artifactName,
-                                            ArtifactType artifactType) throws SafaError {
+                                            ArtifactType artifactType,
+                                            DocumentType documentType) throws SafaError {
         if (artifactId.equals("")) {
             Artifact newArtifact = this.artifactRepository
                 .findByProjectAndName(project, artifactName)
-                .orElseGet(() -> new Artifact(project, artifactType, artifactName));
+                .orElseGet(() -> new Artifact(project, artifactType, artifactName, documentType));
             this.artifactRepository.save(newArtifact);
             return newArtifact;
+        } else {
+            Optional<Artifact> artifactOptional = this.artifactRepository
+                .findById(UUID.fromString(artifactId));
+            if (artifactOptional.isEmpty()) {
+                throw new SafaError("Could not find artifact with id:" + artifactId);
+            }
+            Artifact artifact = artifactOptional.get();
+            artifact.setType(artifactType);
+            artifact.setName(artifactName);
+            artifact.setDocumentType(documentType);
+            this.artifactRepository.save(artifact);
+            return artifact;
         }
-        Optional<Artifact> artifactOptional = this.artifactRepository
-            .findById(UUID.fromString(artifactId));
-        if (artifactOptional.isEmpty()) {
-            throw new SafaError("Could not find artifact with id:" + artifactId);
-        }
-        Artifact artifact = artifactOptional.get();
-        artifact.setType(artifactType);
-        artifact.setName(artifactName);
-        this.artifactRepository.save(artifact);
-        return artifact;
     }
 
     private ArtifactType findOrCreateArtifactType(Project project, String typeName) {

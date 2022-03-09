@@ -76,13 +76,15 @@ public class ArtifactAppEntity implements IAppEntity {
                              String type,
                              String name,
                              String summary,
-                             String body) {
+                             String body,
+                             DocumentType documentType) {
         this();
         this.id = artifactId;
         this.type = type;
         this.name = name;
         this.summary = summary;
         this.body = body;
+        this.documentType = documentType;
     }
 
     public ArtifactAppEntity(ArtifactVersion body) {
@@ -90,7 +92,8 @@ public class ArtifactAppEntity implements IAppEntity {
             body.getTypeName(),
             body.getName(),
             body.getSummary(),
-            body.getContent());
+            body.getContent(),
+            body.getArtifact().getDocumentType());
     }
 
     public DocumentType getDocumentType() {
@@ -108,7 +111,7 @@ public class ArtifactAppEntity implements IAppEntity {
     public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
         this.safetyCaseType = safetyCaseType;
     }
-    
+
     public String getParentType() {
         return parentType;
     }
@@ -181,9 +184,7 @@ public class ArtifactAppEntity implements IAppEntity {
         JSONObject json = new JSONObject();
         json.put("artifactId", id);
         json.put("name", name);
-        json.put("summary", summary);
-        json.put("body", body);
-        json.put("type", type);
+        json.put("docType", documentType);
         return json.toString();
     }
 }

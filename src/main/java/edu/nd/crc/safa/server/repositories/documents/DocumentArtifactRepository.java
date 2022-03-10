@@ -24,4 +24,6 @@ public interface DocumentArtifactRepository extends CrudRepository<DocumentArtif
     List<DocumentArtifact> findByDocument(Document document);
 
     Optional<DocumentArtifact> findByDocumentDocumentIdAndArtifact(UUID documentId, Artifact artifact);
+
+    Optional<DocumentArtifact> findByDocumentAndArtifactArtifactId(Document document, UUID artifactId);
 }

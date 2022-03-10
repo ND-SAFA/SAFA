@@ -81,17 +81,14 @@ public class DocumentController extends BaseController {
         throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        documentAppEntity.setProject(projectVersion.getProject());
-
+        documentAppEntity.setProject(project); // FEND never receives this part.
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
-        documentAppEntity.setDocumentId(document.getDocumentId());
-        this.createDocumentArtifactEntities(projectVersion, documentAppEntity.getArtifactIds(), document);
-
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
-        if (documentAppEntity.getArtifactIds().size() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+        if (documentAppEntity.getDocumentId() != null) {
+            documentAppEntity.setDocumentId(document.getDocumentId());
         }
+        createOrUpdateArtifactIds(projectVersion, document, documentAppEntity.getArtifactIds());
+        notifyDocumentChanges(documentAppEntity, projectVersion, project);
         return documentAppEntity;
     }
 
@@ -124,20 +121,37 @@ public class DocumentController extends BaseController {
         this.documentRepository.delete(document);
     }
 
-    private void createDocumentArtifactEntities(ProjectVersion projectVersion,
-                                                List<String> artifactIds,
-                                                Document document) {
-        List<UUID> artifactUUIDs = artifactIds
+    private void createOrUpdateArtifactIds(ProjectVersion projectVersion,
+                                           Document document,
+                                           List<String> artifactIds) throws SafaError {
+        List<DocumentArtifact> documentArtifacts = this.documentArtifactRepository.findByDocument(document);
+        List<String> artifactIdsLinkedToDocument = documentArtifacts
             .stream()
-            .map(UUID::fromString)
+            .map(da -> da.getArtifact().getArtifactId().toString())
             .collect(Collectors.toList());
-        for (UUID artifactId : artifactUUIDs) {
-            Optional<Artifact> artifactOptional = this.artifactRepository.findById(artifactId);
-            if (artifactOptional.isPresent()) {
-                Artifact artifact = artifactOptional.get();
-                DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
-                this.documentArtifactRepository.save(documentArtifact);
+        for (String artifactId : artifactIds) {
+            if (!artifactIdsLinkedToDocument.contains(artifactId)) {
+                Optional<Artifact> artifactOptional = this.artifactRepository.findById(UUID.fromString(artifactId));
+                if (artifactOptional.isPresent()) {
+                    Artifact artifact = artifactOptional.get();
+                    DocumentArtifact documentArtifact = new DocumentArtifact(
+                        projectVersion,
+                        document,
+                        artifact
+                    );
+                    this.documentArtifactRepository.save(documentArtifact);
+                } else {
+                    throw new SafaError("Could not find artifact with id: " + artifactId);
+                }
+
             }
+        }
+    }
+
+    private void notifyDocumentChanges(DocumentAppEntity documentAppEntity, ProjectVersion projectVersion, Project project) {
+        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
+        if (documentAppEntity.getArtifactIds().size() > 0) {
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
     }
 }

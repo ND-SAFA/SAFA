@@ -9,7 +9,7 @@ public enum SafetyCaseType {
             return "SOLUTION";
         }
     },
-    CONTENT {
+    CONTEXT {
         public String toString() {
             return "CONTEXT";
         }

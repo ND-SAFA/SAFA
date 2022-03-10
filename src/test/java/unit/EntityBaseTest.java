@@ -11,10 +11,11 @@ import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.StringCreator;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
@@ -78,6 +79,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected DocumentRepository documentRepository;
+
+    @Autowired
+    protected DocumentArtifactRepository documentArtifactRepository;
 
     @Autowired
     protected ProjectService projectService;

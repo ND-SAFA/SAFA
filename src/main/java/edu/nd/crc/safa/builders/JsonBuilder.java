@@ -149,7 +149,7 @@ public class JsonBuilder extends BaseBuilder {
         JSONObject docJson = new JSONObject();
         docJson.put("name", docName);
         docJson.put("description", description);
-        docJson.put("type", documentType);
+        docJson.put("type", documentType.toString());
         return docJson;
     }
 

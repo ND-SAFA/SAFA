@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.controllers;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.entities.app.UserAppEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
@@ -38,9 +39,9 @@ public class SafaUserController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Accounts.createNewUser)
-    public SafaUser createNewUser(@RequestBody SafaUser newUser) {
+    public UserAppEntity createNewUser(@RequestBody SafaUser newUser) {
         newUser.setPassword(this.passwordEncoder.encode(newUser.getPassword()));
         this.safaUserRepository.save(newUser);
-        return newUser;
+        return new UserAppEntity(newUser);
     }
 }

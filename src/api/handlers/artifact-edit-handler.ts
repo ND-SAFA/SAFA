@@ -1,5 +1,10 @@
 import { Artifact, ConfirmationType, TraceApproval, TraceType } from "@/types";
-import { logModule, projectModule } from "@/store";
+import {
+  artifactSelectionModule,
+  logModule,
+  projectModule,
+  viewportModule,
+} from "@/store";
 import {
   createArtifact,
   createLink,
@@ -24,9 +29,15 @@ export async function createOrUpdateArtifactHandler(
   parentArtifact?: Artifact
 ): Promise<void> {
   if (isUpdate) {
-    await updateArtifact(versionId, artifact);
+    const updatedArtifacts = await updateArtifact(versionId, artifact);
+
+    await projectModule.addOrUpdateArtifacts(updatedArtifacts);
   } else {
     const createdArtifacts = await createArtifact(versionId, artifact);
+
+    await projectModule.addOrUpdateArtifacts(createdArtifacts);
+    await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+    await viewportModule.setArtifactTreeLayout();
 
     if (!parentArtifact) return;
 

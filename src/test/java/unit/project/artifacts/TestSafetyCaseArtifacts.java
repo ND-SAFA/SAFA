@@ -38,19 +38,19 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         String projectName = "test-project";
         String artifactName = "RE-10";
         SafetyCaseType safetyCaseType = SafetyCaseType.SOLUTION;
-        String artifactTypeName = safetyCaseType.toString();
+        String safetyCaseTypeName = safetyCaseType.toString();
         String artifactBody = "this is a body";
 
         // Step - Create project with artifact type
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
-            .newType(projectName, artifactTypeName)
+            .newType(projectName, safetyCaseTypeName)
             .newVersionWithReturn(projectName);
 
         // Step - Create payload for safety cases solution node
         JSONObject scArtifactJson = jsonBuilder
             .withProject(projectName, projectName, "")
-            .withSafetyCaseArtifact(projectName, "", artifactName, artifactTypeName, artifactBody, safetyCaseType)
+            .withSafetyCaseArtifact(projectName, "", artifactName, safetyCaseTypeName, artifactBody, safetyCaseType)
             .getArtifact(projectName, artifactName);
 
         // Step - Send artifact creation request
@@ -66,6 +66,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         assertThat(artifactAdded.getString("name")).isEqualTo(artifactName);
         assertThat(artifactAdded.getString("id")).isNotEmpty();
         assertThat(artifactAdded.getString("documentType")).isEqualTo(DocumentType.SAFETY_CASE.toString());
+        assertThat(artifactAdded.get("safetyCaseType")).isEqualTo(safetyCaseType.toString());
 
         // VP - Verify that safety case was created
         List<SafetyCaseArtifact> safetyCaseArtifacts =
@@ -78,7 +79,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
 
         // VP - Verify that retrieving project returns artifact
-        List<ArtifactAppEntity> artifacts = projectRetrievalService.getArtifactInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> artifacts = projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
         assertThat(artifacts.size()).isEqualTo(1);
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.SAFETY_CASE);

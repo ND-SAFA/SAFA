@@ -43,7 +43,7 @@ public class DocumentService {
      * @param artifactIds    The artifactIds that should represent the artifact ids in the document at the given project
      *                       version.
      * @return The number of artifact entities updated.
-     * @throws SafaError
+     * @throws SafaError Throws error if an artifactId does not exist in system.
      */
     public int createOrUpdateArtifactIds(ProjectVersion projectVersion,
                                          Document document,
@@ -53,6 +53,36 @@ public class DocumentService {
             .stream()
             .map(da -> da.getArtifact().getArtifactId().toString())
             .collect(Collectors.toList());
+        int nUpdated = 0;
+
+        nUpdated += createNewDocumentArtifactLinks(projectVersion, document, artifactIds, artifactIdsLinkedToDocument);
+        nUpdated += removeDeletedDocumentArtifactLinks(document, artifactIds, artifactIdsLinkedToDocument);
+        return nUpdated;
+    }
+
+    private int removeDeletedDocumentArtifactLinks(Document document,
+                                                   List<String> artifactIds,
+                                                   List<String> artifactIdsLinkedToDocument) {
+        int nUpdated = 0;
+        for (String linkedArtifactId : artifactIdsLinkedToDocument) {
+            if (!artifactIds.contains(linkedArtifactId)) {
+                Optional<DocumentArtifact> documentArtifactOptional =
+                    this.documentArtifactRepository.findByDocumentAndArtifactArtifactId(document,
+                        UUID.fromString(linkedArtifactId));
+                if (documentArtifactOptional.isPresent()) {
+                    DocumentArtifact documentArtifact = documentArtifactOptional.get();
+                    this.documentArtifactRepository.delete(documentArtifact);
+                    nUpdated++;
+                }
+            }
+        }
+        return nUpdated;
+    }
+
+    private int createNewDocumentArtifactLinks(ProjectVersion projectVersion,
+                                               Document document,
+                                               List<String> artifactIds,
+                                               List<String> artifactIdsLinkedToDocument) throws SafaError {
         int nUpdated = 0;
         for (String artifactId : artifactIds) {
             if (!artifactIdsLinkedToDocument.contains(artifactId)) {

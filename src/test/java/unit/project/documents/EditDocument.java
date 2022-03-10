@@ -1,5 +1,6 @@
 package unit.project.documents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.Artifact;
@@ -35,7 +36,7 @@ public class EditDocument extends DocumentBaseTest {
         docJson.put("documentId", document.getDocumentId().toString());
 
         // Step - Send Update request.
-        JSONObject docCreated = createDocument(projectVersion, docJson);
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Verify that response object contains name, description, and type
         assertObjectsMatch(docCreated, docJson);
@@ -70,10 +71,25 @@ public class EditDocument extends DocumentBaseTest {
         docJson.put("artifactIds", artifactIds);
 
         // Step - Send Update request.
-        JSONObject docCreated = createDocument(projectVersion, docJson);
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Verify that response object contains name, description, and type
         assertObjectsMatch(docCreated, docJson);
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
+
+        // Step - Delete artifact id
+        artifactIds = new ArrayList<>();
+        docJson.put("artifactIds", artifactIds);
+
+        // Step - Update document
+        JSONObject docUpdated = createOrUpdateDocumentJson(projectVersion, docJson);
+
+        // VP - Verify that response contains updates.
+        assertObjectsMatch(docJson, docUpdated);
+        assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
+
+        // VP - Verify that updates are persisted
+        System.out.println("NUMBER LINKED ARTIFACTS" + this.documentArtifactRepository.findByDocument(document).size());
+
     }
 }

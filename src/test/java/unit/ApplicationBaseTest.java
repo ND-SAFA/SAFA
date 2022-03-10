@@ -130,9 +130,11 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             String key = it.next();
             Object value = expected.get(key);
             if (value instanceof JSONArray) {
-                JSONArray array = (JSONArray) value;
-                for (int i = 0; i < array.length(); i++) {
-                    Object expectedSubValue = array.get(i);
+                JSONArray expectedArray = (JSONArray) value;
+                JSONArray actualArray = actual.getJSONArray(key);
+                assertThat(actualArray.length()).isEqualTo(expectedArray.length());
+                for (int i = 0; i < expectedArray.length(); i++) {
+                    Object expectedSubValue = expectedArray.get(i);
                     Object actualSubValue = actual.getJSONArray(key).get(i);
                     assertThat(expectedSubValue).isEqualTo(actualSubValue);
                 }

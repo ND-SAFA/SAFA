@@ -58,11 +58,12 @@ public class DocumentBaseTest extends ApplicationBaseTest {
             .stream()
             .map(da -> da.getArtifact().getArtifactId().toString())
             .collect(Collectors.toList());
+        assertThat(artifactIds.size()).isEqualTo(documentArtifactIds.size());
         assertTrue(artifactIds.containsAll(documentArtifactIds));
         assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
 
-    protected JSONObject createDocument(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
+    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
         // Step - Send creation request.
         String route =
             RouteBuilder

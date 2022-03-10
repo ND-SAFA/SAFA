@@ -25,7 +25,7 @@ public class CreateNewDocument extends DocumentBaseTest {
         JSONObject docJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
         // Step - Send creation request.
-        JSONObject docCreated = createDocument(projectVersion, docJson);
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Assert all properties were returned as inputted.
         assertObjectsMatch(docCreated, docJson);

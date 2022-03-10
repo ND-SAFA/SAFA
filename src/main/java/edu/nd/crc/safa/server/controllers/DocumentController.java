@@ -1,9 +1,7 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
@@ -11,17 +9,13 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
-import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
+import edu.nd.crc.safa.server.services.DocumentService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
@@ -42,9 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentController extends BaseController {
 
     private final DocumentRepository documentRepository;
-    private final ArtifactRepository artifactRepository;
-    private final DocumentArtifactRepository documentArtifactRepository;
 
+    private final DocumentService documentService;
     private final NotificationService notificationService;
     private final ProjectRetrievalService projectRetrievalService;
 
@@ -53,14 +46,12 @@ public class DocumentController extends BaseController {
                               ProjectVersionRepository projectVersionRepository,
                               ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
-                              ArtifactRepository artifactRepository,
-                              DocumentArtifactRepository documentArtifactRepository,
+                              DocumentService documentService,
                               NotificationService notificationService,
                               ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.documentRepository = documentRepository;
-        this.artifactRepository = artifactRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
+        this.documentService = documentService;
         this.notificationService = notificationService;
         this.projectRetrievalService = projectRetrievalService;
     }
@@ -81,14 +72,15 @@ public class DocumentController extends BaseController {
         throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        documentAppEntity.setProject(project); // FEND never receives this part.
+        documentAppEntity.setProject(project); // Manually set to verify authenticity
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
         if (documentAppEntity.getDocumentId() != null) {
             documentAppEntity.setDocumentId(document.getDocumentId());
         }
-        createOrUpdateArtifactIds(projectVersion, document, documentAppEntity.getArtifactIds());
-        notifyDocumentChanges(documentAppEntity, projectVersion, project);
+        int nArtifactUpdated = documentService.createOrUpdateArtifactIds(projectVersion, document,
+            documentAppEntity.getArtifactIds());
+        documentService.notifyDocumentChanges(projectVersion, nArtifactUpdated > 0);
         return documentAppEntity;
     }
 
@@ -119,39 +111,5 @@ public class DocumentController extends BaseController {
         resourceBuilder.setProject(project).withEditProject();
         this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
         this.documentRepository.delete(document);
-    }
-
-    private void createOrUpdateArtifactIds(ProjectVersion projectVersion,
-                                           Document document,
-                                           List<String> artifactIds) throws SafaError {
-        List<DocumentArtifact> documentArtifacts = this.documentArtifactRepository.findByDocument(document);
-        List<String> artifactIdsLinkedToDocument = documentArtifacts
-            .stream()
-            .map(da -> da.getArtifact().getArtifactId().toString())
-            .collect(Collectors.toList());
-        for (String artifactId : artifactIds) {
-            if (!artifactIdsLinkedToDocument.contains(artifactId)) {
-                Optional<Artifact> artifactOptional = this.artifactRepository.findById(UUID.fromString(artifactId));
-                if (artifactOptional.isPresent()) {
-                    Artifact artifact = artifactOptional.get();
-                    DocumentArtifact documentArtifact = new DocumentArtifact(
-                        projectVersion,
-                        document,
-                        artifact
-                    );
-                    this.documentArtifactRepository.save(documentArtifact);
-                } else {
-                    throw new SafaError("Could not find artifact with id: " + artifactId);
-                }
-
-            }
-        }
-    }
-
-    private void notifyDocumentChanges(DocumentAppEntity documentAppEntity, ProjectVersion projectVersion, Project project) {
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
-        if (documentAppEntity.getArtifactIds().size() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
-        }
     }
 }

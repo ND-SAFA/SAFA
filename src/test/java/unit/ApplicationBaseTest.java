@@ -1,8 +1,10 @@
 package unit;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,5 +123,22 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             .withProject(project)
             .get();
         return sendGetWithArrayResponse(url, status().is2xxSuccessful());
+    }
+
+    protected void assertObjectsMatch(JSONObject expected, JSONObject actual) {
+        for (Iterator<String> it = actual.keys(); it.hasNext(); ) {
+            String key = it.next();
+            Object value = expected.get(key);
+            if (value instanceof JSONArray) {
+                JSONArray array = (JSONArray) value;
+                for (int i = 0; i < array.length(); i++) {
+                    Object expectedSubValue = array.get(i);
+                    Object actualSubValue = actual.getJSONArray(key).get(i);
+                    assertThat(expectedSubValue).isEqualTo(actualSubValue);
+                }
+            } else {
+                assertThat(expected.get(key)).isEqualTo(actual.get(key));
+            }
+        }
     }
 }

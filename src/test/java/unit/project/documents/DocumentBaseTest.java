@@ -1,10 +1,12 @@
 package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -30,6 +32,18 @@ public class DocumentBaseTest extends ApplicationBaseTest {
                                                  String docName,
                                                  String docDescription,
                                                  DocumentType docType) {
+        assertDocumentInProjectExists(project,
+            docName,
+            docDescription,
+            docType,
+            new ArrayList<>());
+    }
+
+    protected void assertDocumentInProjectExists(Project project,
+                                                 String docName,
+                                                 String docDescription,
+                                                 DocumentType docType,
+                                                 List<String> artifactIds) {
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
         assertThat(projectDocuments.size()).isEqualTo(1);
 
@@ -38,6 +52,14 @@ public class DocumentBaseTest extends ApplicationBaseTest {
         assertThat(document.getName()).isEqualTo(docName);
         assertThat(document.getType()).isEqualTo(docType);
         assertThat(document.getDescription()).isEqualTo(docDescription);
+
+        // VP - Verify that only the artifactIds given exist
+        List<String> documentArtifactIds = this.documentArtifactRepository.findByDocument(document)
+            .stream()
+            .map(da -> da.getArtifact().getArtifactId().toString())
+            .collect(Collectors.toList());
+        assertTrue(artifactIds.containsAll(documentArtifactIds));
+        assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
 
     protected JSONObject createDocument(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
@@ -48,14 +70,5 @@ public class DocumentBaseTest extends ApplicationBaseTest {
                 .withVersion(projectVersion)
                 .get();
         return sendPost(route, docJson, status().isCreated());
-    }
-
-    protected void assertObjectsMatch(JSONObject docCreated, JSONObject docJson) {
-
-        // VP - Verify that response object contains name, description, and type
-        for (Iterator<String> it = docJson.keys(); it.hasNext(); ) {
-            String key = it.next();
-            assertThat(docCreated.get(key)).isEqualTo(docJson.get(key));
-        }
     }
 }

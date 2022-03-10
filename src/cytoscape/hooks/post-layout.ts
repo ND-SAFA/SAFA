@@ -89,9 +89,9 @@ export const centerViewOnNode: LayoutHook = (): void => {
 };
 
 /**
- * Dynamically shows context menu items that are visible at the time of
- * getting called.
- * @param cy
+ * Attaches hook to every right click on the cytoscape instance enabling
+ * the dynamic showing of context menu items through lambda `isVisible`.
+ * @param cy The cytoscape instance
  */
 export const dynamicVisibilityHookForContextMenuItems = (
   cy: CytoCore

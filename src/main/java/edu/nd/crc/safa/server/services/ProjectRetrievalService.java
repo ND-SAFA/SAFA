@@ -103,7 +103,7 @@ public class ProjectRetrievalService {
         Project project = projectVersion.getProject();
 
         // Versioned Entities
-        List<ArtifactAppEntity> artifacts = getArtifactInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> artifacts = getArtifactsInProjectVersion(projectVersion);
         List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
         List<TraceAppEntity> traces = getTracesInProjectVersion(projectVersion, artifactIds);
 
@@ -136,51 +136,57 @@ public class ProjectRetrievalService {
      * @param projectVersion The version whose artifacts are retrieved.
      * @return List of artifact app entities as saved in project version.
      */
-    public List<ArtifactAppEntity> getArtifactInProjectVersion(ProjectVersion projectVersion) {
+    public List<ArtifactAppEntity> getArtifactsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
             .getVersionEntitiesByProjectVersion(projectVersion);
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
-            ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
-            artifacts.add(artifactAppEntity);
-            Artifact artifact = artifactVersion.getArtifact();
-            List<String> documentIds =
-                this.documentArtifactRepository
-                    .findByProjectVersionAndArtifact(projectVersion, artifact)
-                    .stream()
-                    .map(da -> da.getDocument().getDocumentId().toString())
-                    .collect(Collectors.toList());
-            artifactAppEntity.setDocumentIds(documentIds);
-
-            switch (artifact.getDocumentType()) {
-                case SAFETY_CASE:
-                    Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                        this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                    if (safetyCaseArtifactOptional.isPresent()) {
-                        SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                        artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                        artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                    }
-                    //TODO: Throw error if not found?
-                    break;
-                case FTA:
-                    Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                    if (ftaArtifactOptional.isPresent()) {
-                        FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                        artifactAppEntity.setDocumentType(DocumentType.FTA);
-                        artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                        artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
-                    }
-                    break;
-                default:
-                    break;
-            }
+            artifacts.add(getArtifactInProjectVersion(projectVersion, artifactVersion));
         }
         return artifacts;
     }
 
+    public ArtifactAppEntity getArtifactInProjectVersion(ProjectVersion projectVersion,
+                                                         ArtifactVersion artifactVersion) {
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
+
+        Artifact artifact = artifactVersion.getArtifact();
+        List<String> documentIds =
+            this.documentArtifactRepository
+                .findByProjectVersionAndArtifact(projectVersion, artifact)
+                .stream()
+                .map(da -> da.getDocument().getDocumentId().toString())
+                .collect(Collectors.toList());
+        artifactAppEntity.setDocumentIds(documentIds);
+
+        switch (artifact.getDocumentType()) {
+            case SAFETY_CASE:
+                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                if (safetyCaseArtifactOptional.isPresent()) {
+                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                }
+                //TODO: Throw error if not found?
+                break;
+            case FTA:
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                if (ftaArtifactOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.FTA);
+                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                    artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
+                }
+                break;
+            default:
+                break;
+        }
+        return artifactAppEntity;
+    }
+
     public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion) {
-        List<ArtifactAppEntity> projectVersionArtifacts = getArtifactInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> projectVersionArtifacts = getArtifactsInProjectVersion(projectVersion);
         List<String> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
             .map(ArtifactAppEntity::getId)

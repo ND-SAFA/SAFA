@@ -78,12 +78,14 @@ export default Vue.extend({
     cytoCoreGraph(): CytoCoreGraph {
       return artifactTreeGraph;
     },
+
     artifactHashMap(): Record<string, Artifact> {
       return artifactModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
       return artifactModule.artifacts;
     },
+
     traceLinks(): TraceLink[] {
       return deltaModule.inDeltaView
         ? traceModule.traces
@@ -92,6 +94,7 @@ export default Vue.extend({
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
     },
+
     nodesInView(): string[] {
       return viewportModule.getNodesInView;
     },

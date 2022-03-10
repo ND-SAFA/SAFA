@@ -130,6 +130,7 @@ export default Vue.extend({
           menuHandlers: this.projectMenuItems.map((i) => i[1]),
         },
         {
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
@@ -145,6 +146,7 @@ export default Vue.extend({
           ],
         },
         {
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,

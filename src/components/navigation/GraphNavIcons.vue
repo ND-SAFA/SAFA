@@ -1,5 +1,5 @@
 <template>
-  <v-row class="ma-0 pa-0" justify="center">
+  <v-row class="ma-0 pa-0" justify="center" style="flex-wrap: nowrap">
     <v-col
       v-for="definition in definitions"
       :key="definition.label"

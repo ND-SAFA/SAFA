@@ -1,5 +1,5 @@
 import { CyPromise, IGraphLayout, LayoutPayload } from "@/types";
-import { artifactTreeCyPromise } from "@/cytoscape/cy";
+import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
@@ -213,5 +213,17 @@ export function cyDisplayAll(
   cyPromise.then((cy) => {
     cy.nodes().style({ display: "element" });
     cy.edges().style({ display: "element" });
+  });
+}
+
+/**
+ * Centers the viewport on all graph nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyResetTim(cyPromise: CyPromise = timTreeCyPromise): void {
+  cyPromise.then((cy) => {
+    cy.zoom(1);
+    cy.center(cy.nodes());
   });
 }

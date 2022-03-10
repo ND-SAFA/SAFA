@@ -7,15 +7,17 @@
     >
       <v-row :justify="justify">
         <icon-button
-          v-if="definition.type === iconType"
+          v-if="!definition.isHidden && definition.type === iconType"
           :definition="definition"
         />
         <checkmark-menu
-          v-else-if="definition.type === checkmarkMenuType"
+          v-else-if="
+            !definition.isHidden && definition.type === checkmarkMenuType
+          "
           :definition="definition"
         />
         <list-menu
-          v-else-if="definition.type === listMenuType"
+          v-else-if="!definition.isHidden && definition.type === listMenuType"
           :definition="definition"
         />
       </v-row>

@@ -20,6 +20,9 @@ $graph-border-radius: 8px;
   flex-direction: column;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.artifact-border {
   border-radius: $graph-border-radius;
   border: $graph-border-width solid $color-border;
 }
@@ -71,20 +74,43 @@ $graph-border-radius: 8px;
   }
 }
 
+.artifact-added {
+  background: $color-added;
+}
+
+.artifact-removed {
+  background: $color-removed;
+}
+
+.artifact-modified {
+  background: $color-modified;
+}
+
 .artifact-stoplight {
   height: 10px;
   border-top: 1px solid $color-border;
+}
 
-  .artifact-added {
-    background: $color-added;
+.artifact-sc-stoplight {
+  height: 4px;
+  margin: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.artifact-sc-details {
+  height: 25px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  & > * {
+    justify-content: center;
   }
 
-  .artifact-removed {
-    background: $color-removed;
-  }
-
-  .artifact-modified {
-    background: $color-modified;
+  .warning-text {
+    color: $color-warning;
   }
 }
 

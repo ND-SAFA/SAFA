@@ -34,7 +34,7 @@ export const timGraph: CytoCoreGraph = {
       afterInit: (cy: CytoCore) => cy.nodeHtmlLabel([timNodeHtml]),
     },
   ],
-  afterInit: async () => {
+  async afterInit() {
     await viewportModule.setTimTreeLayout();
   },
 };

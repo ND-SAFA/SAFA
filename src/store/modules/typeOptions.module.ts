@@ -4,10 +4,10 @@ import type {
   ArtifactType,
   ArtifactTypeDirections,
   LabeledArtifactDirection,
+  ArtifactDirection,
+  ArtifactTypeIcons,
 } from "@/types";
-import { ArtifactDirection, ArtifactTypeIcons } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
-import { projectModule } from "@/store";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**

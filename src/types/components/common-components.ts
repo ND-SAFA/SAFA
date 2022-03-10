@@ -28,6 +28,7 @@ export interface BaseButtonDefinition {
   label: string;
   isDisabled?: boolean;
   buttonColor?: string;
+  isHidden?: boolean;
 }
 
 /**
@@ -150,4 +151,18 @@ export interface DataItem<T> {
    * The item of data.
    */
   item: T;
+}
+
+/**
+ * Represents an option for a select menu.
+ */
+export interface SelectOption {
+  /**
+   * The iud of the option to use as a stored.
+   */
+  id: string;
+  /**
+   * The name of the option to display.
+   */
+  name: string;
 }

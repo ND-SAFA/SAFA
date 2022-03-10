@@ -15,6 +15,7 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -24,6 +25,7 @@ import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +42,22 @@ public class CommitController extends BaseController {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
+    private final ProjectRetrievalService projectRetrievalService;
     private final NotificationService notificationService;
 
     @Autowired
     public CommitController(ProjectRepository projectRepository,
                             ProjectVersionRepository projectVersionRepository,
+                            ResourceBuilder resourceBuilder,
                             ArtifactVersionRepository artifactVersionRepository,
                             TraceLinkVersionRepository traceLinkVersionRepository,
-                            ResourceBuilder resourceBuilder,
+                            ProjectRetrievalService projectRetrievalService,
                             NotificationService notificationService
     ) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
+        this.projectRetrievalService = projectRetrievalService;
         this.notificationService = notificationService;
     }
 
@@ -78,12 +83,13 @@ public class CommitController extends BaseController {
     private ProjectChange<ArtifactAppEntity> commitArtifactChanges(
         ProjectVersion projectVersion,
         ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
-
+        AppEntityCreator<ArtifactAppEntity, ArtifactVersion> appEntityCreator = (versionEntity)
+            -> projectRetrievalService.getArtifactInProjectVersion(projectVersion, versionEntity);
         return commitChanges(
             projectVersion,
             artifacts,
             this.artifactVersionRepository,
-            ArtifactAppEntity::new,
+            appEntityCreator,
             VersionEntityTypes.ARTIFACTS);
     }
 

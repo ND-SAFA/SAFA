@@ -1,7 +1,7 @@
 <template>
   <generic-modal
     :title="title"
-    :isOpen="isOpen"
+    :isOpen="!!isOpen"
     :isLoading="isLoading"
     @close="$emit('close')"
   >
@@ -119,7 +119,7 @@ export default Vue.extend({
       default: "Create New Artifact",
     },
     isOpen: {
-      type: Boolean,
+      type: [Boolean, String],
       required: true,
     },
     artifact: {
@@ -210,7 +210,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    isOpen(isOpen: boolean): void {
+    isOpen(isOpen: boolean | string): void {
       if (!isOpen) {
         this.name = this.artifact?.name || "";
         this.summary = this.artifact?.summary || "";
@@ -222,6 +222,14 @@ export default Vue.extend({
         this.safetyCaseType =
           this.artifact?.safetyCaseType || SafetyCaseType.GOAL;
         this.parentId = "";
+      } else if (typeof isOpen === "string") {
+        if (isOpen in FTANodeType) {
+          this.documentType = DocumentType.FTA;
+          this.logicType = isOpen as FTANodeType;
+        } else if (isOpen in SafetyCaseType) {
+          this.documentType = DocumentType.SAFETY_CASE;
+          this.safetyCaseType = isOpen as SafetyCaseType;
+        }
       }
     },
     name(newName: string): void {
@@ -259,10 +267,13 @@ export default Vue.extend({
         summary: this.summary,
         body: this.body,
         documentType: this.documentType,
+        // TODO: not always populated
         documentIds: documentId ? [documentId] : [],
         logicType: this.isFTA ? this.logicType : undefined,
         safetyCaseType: this.isSafetyCase ? this.safetyCaseType : undefined,
       };
+
+      console.log(documentModule.document);
 
       this.isLoading = true;
 

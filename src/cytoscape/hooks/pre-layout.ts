@@ -1,5 +1,4 @@
 import { EdgeSingular } from "cytoscape";
-
 import { CytoCore, LayoutHook } from "@/types";
 import {
   artifactHtml as nodeHTML,

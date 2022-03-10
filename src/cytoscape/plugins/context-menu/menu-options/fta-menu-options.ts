@@ -1,6 +1,6 @@
 import { EventObject } from "cytoscape";
-import { documentModule, logModule } from "@/store";
-import { ArtifactData, DocumentType } from "@/types";
+import { appModule, documentModule, logModule } from "@/store";
+import { ArtifactData, DocumentType, FTANodeType } from "@/types";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 
 /**
@@ -10,8 +10,8 @@ export const ftaMenuItem: MenuItem = {
   id: "add-fta-node",
   content: "Add FTA Node",
   tooltipText: "Create a logical node (e.g. AND / OR)",
-  onClickFunction: (event: EventObject): void => {
-    logModule.onWarning("Adding FTA Nodes is in development.");
+  onClickFunction(): void {
+    appModule.openArtifactCreatorTo(FTANodeType.AND);
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
@@ -24,16 +24,16 @@ export const ftaMenuItem: MenuItem = {
       id: "fta-and-node",
       content: "AND",
       tooltipText: "Asserts all conditions must be met.",
-      onClickFunction: (event: EventObject): void => {
-        logModule.onWarning("Adding AND artifacts is in development.");
+      onClickFunction(): void {
+        appModule.openArtifactCreatorTo(FTANodeType.AND);
       },
     },
     {
       id: "fta-or-node",
       content: "OR",
       tooltipText: "Asserts at least one condition must be met.",
-      onClickFunction: (event: EventObject): void => {
-        logModule.onWarning("Adding OR artifacts is in development.");
+      onClickFunction(): void {
+        appModule.openArtifactCreatorTo(FTANodeType.OR);
       },
     },
   ],

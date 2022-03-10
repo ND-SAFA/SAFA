@@ -1,12 +1,6 @@
 import { Artifact, ArtifactNameValidationResponse } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "./commit-builder";
-import {
-  artifactModule,
-  artifactSelectionModule,
-  projectModule,
-} from "@/store";
-import { artifacts } from "@/test-data/test-data";
 
 /**
  * Returns whether the given artifact name already exists.
@@ -32,12 +26,13 @@ export async function isArtifactNameTaken(
  * @param artifact - The artifact to delete.
  *
  */
-export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
+export async function deleteArtifactBody(
+  artifact: Artifact
+): Promise<Artifact> {
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
     .save()
-    .then(({ artifacts }) => artifacts.removed[0])
-    .then((artifact) => projectModule.deleteArtifacts([artifact]));
+    .then(({ artifacts }) => artifacts.removed[0]);
 }
 
 /**
@@ -51,15 +46,11 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
 export async function createArtifact(
   versionId: string,
   artifact: Artifact
-): Promise<void> {
+): Promise<Artifact[]> {
   return CommitBuilder.withCurrentVersion()
     .withNewArtifact(artifact)
     .save()
-    .then(({ artifacts }) => artifacts.added)
-    .then(async (artifactsAdded) => {
-      await projectModule.addOrUpdateArtifacts(artifactsAdded);
-      await artifactSelectionModule.selectArtifact(artifactsAdded[0].id);
-    });
+    .then(({ artifacts }) => artifacts.added);
 }
 
 /**
@@ -73,10 +64,9 @@ export async function createArtifact(
 export async function updateArtifact(
   versionId: string,
   artifact: Artifact
-): Promise<void> {
+): Promise<Artifact[]> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
     .save()
-    .then(({ artifacts }) => artifacts.modified)
-    .then(projectModule.addOrUpdateArtifacts);
+    .then(({ artifacts }) => artifacts.modified);
 }

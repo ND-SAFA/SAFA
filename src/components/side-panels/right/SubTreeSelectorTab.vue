@@ -79,7 +79,10 @@ export default Vue.extend({
       const artifacts = artifactModule.artifacts;
 
       if (this.searchText !== "") {
-        return artifacts.filter((a) => a.body.includes(this.searchText));
+        return artifacts.filter(
+          (a) =>
+            a.name.includes(this.searchText) || a.body.includes(this.searchText)
+        );
       } else {
         return artifacts;
       }

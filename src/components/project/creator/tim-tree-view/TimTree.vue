@@ -1,6 +1,9 @@
 <template>
   <v-container class="elevation-3" style="max-height: 50vh; overflow: hidden">
-    <generic-cytoscape-controller :cyto-core-graph="cytoCoreGraph">
+    <generic-cytoscape-controller
+      :cyto-core-graph="cytoCoreGraph"
+      style="max-height: 50vh !important"
+    >
       <template v-slot:elements>
         <artifact-type-node
           v-for="artifactPanel in artifactPanels"
@@ -29,6 +32,7 @@ import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
+import { cyResetTim } from "@/cytoscape";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -69,6 +73,7 @@ export default Vue.extend({
     async inView(inView: boolean): Promise<void> {
       if (inView) {
         await viewportModule.setTimTreeLayout();
+        setTimeout(cyResetTim, 200);
       }
     },
   },

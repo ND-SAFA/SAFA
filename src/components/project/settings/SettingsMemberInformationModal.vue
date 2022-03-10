@@ -47,7 +47,6 @@ import { GenericModal } from "@/components/common";
 import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
 import { addOrUpdateProjectMember } from "@/api";
 import { logModule } from "@/store";
-import { getEnumKeys } from "@/util/enum-helper";
 
 /**
  * The modal for sharing a project with a user.
@@ -100,7 +99,12 @@ export default Vue.extend({
       );
     },
     projectRoles(): string[] {
-      return getEnumKeys(ProjectRole);
+      return [
+        ProjectRole.OWNER,
+        ProjectRole.ADMIN,
+        ProjectRole.EDITOR,
+        ProjectRole.VIEWER,
+      ];
     },
     itemLambdas(): EmptyLambda[] {
       return this.projectRoles.map((role) => {

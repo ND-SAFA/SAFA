@@ -17,7 +17,9 @@ export async function loadLastProject(): Promise<void> {
       .versionId;
 
     await sessionModule.updateSession({ versionId });
-    await loadVersionIfExistsHandler(versionId);
+    await loadVersionIfExistsHandler(versionId).catch(() =>
+      navigateTo(Routes.PROJECT_CREATOR)
+    );
   } else {
     await navigateTo(Routes.PROJECT_CREATOR);
   }

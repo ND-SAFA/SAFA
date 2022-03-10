@@ -4,10 +4,10 @@
 import { Artifact, TraceLink } from "@/types";
 
 export enum ArtifactDeltaState {
-  NO_CHANGE = "no_change",
-  MODIFIED = "modified",
-  ADDED = "added",
-  REMOVED = "removed",
+  NO_CHANGE = "NO_CHANGE",
+  MODIFIED = "MODIFIED",
+  ADDED = "ADDED",
+  REMOVED = "REMOVED",
 }
 
 /**

@@ -103,6 +103,7 @@ export interface ProjectVersion {
 export enum DocumentType {
   ARTIFACT_TREE = "ARTIFACT_TREE",
   FTA = "FTA",
+  SAFETY_CASE = "SAFETY_CASE",
 }
 
 /**

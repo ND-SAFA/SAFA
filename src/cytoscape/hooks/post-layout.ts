@@ -8,9 +8,10 @@ import {
   ArtifactData,
 } from "@/types";
 import { artifactSelectionModule, viewportModule } from "@/store";
-import { artifactTreeMenuItems, cyCenterNodes, cyZoomReset } from "@/cytoscape";
+import { cyCenterNodes, cyZoomReset } from "@/cytoscape";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { isArtifactData } from "@/util";
+import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
 /**
  * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.

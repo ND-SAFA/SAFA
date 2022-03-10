@@ -67,7 +67,7 @@ export interface MenuItem {
    * Filters the elements to have this menu item on cxttap
    * If the selector is not truthy no elements will have this menu item on cxttap
    */
-  selector: string;
+  selector?: string;
   /**
    * Item Icon
    */

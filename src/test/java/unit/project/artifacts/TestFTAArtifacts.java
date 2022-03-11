@@ -79,6 +79,6 @@ public class TestFTAArtifacts extends ApplicationBaseTest {
         assertThat(artifacts.size()).isEqualTo(1);
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.FTA);
-        assertThat(artifact.getSafetyCaseType()).isEqualTo(ftaType);
+        assertThat(artifact.getLogicType()).isEqualTo(ftaType);
     }
 }

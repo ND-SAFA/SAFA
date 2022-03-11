@@ -56,10 +56,6 @@ public class ArtifactAppEntity implements IAppEntity {
      */
     SafetyCaseType safetyCaseType;
     /**
-     * For FTA logic nodes, the type of the parent artifact.
-     */
-    String parentType;
-    /**
      * For FTA logic nodes,  the logical operator of this node.
      */
     FTANodeType logicType;
@@ -110,14 +106,6 @@ public class ArtifactAppEntity implements IAppEntity {
 
     public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
         this.safetyCaseType = safetyCaseType;
-    }
-
-    public String getParentType() {
-        return parentType;
-    }
-
-    public void setParentType(String parentType) {
-        this.parentType = parentType;
     }
 
     public FTANodeType getLogicType() {

@@ -176,7 +176,6 @@ public class ProjectRetrievalService {
                     FTAArtifact ftaArtifact = ftaArtifactOptional.get();
                     artifactAppEntity.setDocumentType(DocumentType.FTA);
                     artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                    artifactAppEntity.setParentType(ftaArtifact.getParentType().toString());
                 }
                 break;
             default:

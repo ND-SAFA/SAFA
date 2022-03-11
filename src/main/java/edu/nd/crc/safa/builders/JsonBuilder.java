@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.entities.app.FTANodeType;
 import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
@@ -116,6 +117,21 @@ public class JsonBuilder extends BaseBuilder {
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("safetyCaseType", safetyCaseType.toString());
         artifact.put("documentType", DocumentType.SAFETY_CASE.toString());
+        return this;
+    }
+
+    public JsonBuilder withFTAArtifact(String projectName,
+                                       String artifactId,
+                                       String artifactName,
+                                       String artifactType,
+                                       String body,
+                                       FTANodeType ftaNodeType
+    ) {
+
+        this.withArtifact(projectName, artifactId, artifactName, artifactType, body);
+        JSONObject artifact = this.getArtifact(projectName, artifactName);
+        artifact.put("logicType", ftaNodeType.toString());
+        artifact.put("documentType", DocumentType.FTA.toString());
         return this;
     }
 

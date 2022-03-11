@@ -31,10 +31,10 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
     ProjectRetrievalService projectRetrievalService;
 
     /**
-     * Verifies that an artifact can be created and updated through ArtifactController.
+     * Verifies that an SOLUTION node can be created.
      */
     @Test
-    public void testCreateAndRetrieveSafetyCaseArtifact() throws Exception {
+    public void testCraeteSolutionNode() throws Exception {
         String projectName = "test-project";
         String artifactName = "RE-10";
         SafetyCaseType safetyCaseType = SafetyCaseType.SOLUTION;

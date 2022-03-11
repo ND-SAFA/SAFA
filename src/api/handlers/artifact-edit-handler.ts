@@ -43,7 +43,7 @@ export async function createOrUpdateArtifactHandler(
 
     for (const createdArtifact of createdArtifacts) {
       await createLink({
-        traceLinkId: getTraceId(createdArtifact.id, parentArtifact.id),
+        traceLinkId: "",
         sourceName: createdArtifact.name,
         sourceId: createdArtifact.id,
         targetName: parentArtifact.name,

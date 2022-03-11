@@ -34,7 +34,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
      * Verifies that an SOLUTION node can be created.
      */
     @Test
-    public void testCraeteSolutionNode() throws Exception {
+    public void testCRUDSafetyNode() throws Exception {
         String projectName = "test-project";
         String artifactName = "RE-10";
         SafetyCaseType safetyCaseType = SafetyCaseType.SOLUTION;
@@ -60,13 +60,13 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         JSONObject commitResponseJson = commit(commitBuilder);
 
         // VP - Verify that returned information is valid
-        JSONArray addedArtifactsJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
-        assertThat(addedArtifactsJson.length()).isEqualTo(1);
-        JSONObject artifactAdded = addedArtifactsJson.getJSONObject(0);
-        assertThat(artifactAdded.getString("name")).isEqualTo(artifactName);
-        assertThat(artifactAdded.getString("id")).isNotEmpty();
-        assertThat(artifactAdded.getString("documentType")).isEqualTo(DocumentType.SAFETY_CASE.toString());
-        assertThat(artifactAdded.get("safetyCaseType")).isEqualTo(safetyCaseType.toString());
+        JSONArray artifactsAddedJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
+        assertThat(artifactsAddedJson.length()).isEqualTo(1);
+        JSONObject artifactAddedJson = artifactsAddedJson.getJSONObject(0);
+        assertThat(artifactAddedJson.getString("name")).isEqualTo(artifactName);
+        assertThat(artifactAddedJson.getString("id")).isNotEmpty();
+        assertThat(artifactAddedJson.getString("documentType")).isEqualTo(DocumentType.SAFETY_CASE.toString());
+        assertThat(artifactAddedJson.get("safetyCaseType")).isEqualTo(safetyCaseType.toString());
 
         // VP - Verify that safety case was created
         List<SafetyCaseArtifact> safetyCaseArtifacts =
@@ -84,5 +84,24 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.SAFETY_CASE);
         assertThat(artifact.getSafetyCaseType()).isEqualTo(safetyCaseType);
+
+        // Step - Delete artifact
+        CommitBuilder deleteCommitBuilder =
+            CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactAddedJson);
+        commit(deleteCommitBuilder);
+
+        // Step - Recreate artifact
+        CommitBuilder createCommitBuilder =
+            CommitBuilder.withVersion(projectVersion).withAddedArtifact(artifactAddedJson);
+        commit(createCommitBuilder);
+
+        // VP - Verify that safety case was created
+        safetyCaseArtifacts = safetyCaseArtifactRepository.findByArtifactProject(projectVersion.getProject());
+        assertThat(safetyCaseArtifacts.size()).isEqualTo(1);
+
+        // VP - Verify that information is persisted
+        safetyCaseArtifact = safetyCaseArtifacts.get(0);
+        assertThat(safetyCaseArtifact.getSafetyCaseType()).isEqualTo(safetyCaseType);
+        assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
     }
 }

@@ -31,7 +31,7 @@ public class FTAArtifact {
      */
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "artifact_id", nullable = false)
+    @JoinColumn(name = "artifact_id", nullable = false, unique = true)
     Artifact artifact;
     /**
      * For FTA nodes, the logic type of the artifact (e.g. AND / OR)

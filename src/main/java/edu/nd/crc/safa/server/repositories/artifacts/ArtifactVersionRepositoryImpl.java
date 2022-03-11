@@ -105,22 +105,31 @@ public class ArtifactVersionRepositoryImpl
         artifactAppEntity.setId(artifactId);
 
         switch (artifactAppEntity.getDocumentType()) {
+            //TODO: Find a way to structurally ensure potentially new properties to safety case
+            //or fta artifact will get propagated here too.
             case FTA:
-                String artifactTypeName = artifactAppEntity.getType();
-                Optional<ArtifactType> artifactTypeOptional = this
-                    .artifactTypeRepository
-                    .findByProjectAndNameIgnoreCase(project, artifactTypeName);
-                if (artifactTypeOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = new FTAArtifact(artifact, artifactAppEntity.getLogicType());
-                    this.ftaArtifactRepository.save(ftaArtifact);
+                FTAArtifact ftaArtifact;
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
 
+                if (ftaArtifactOptional.isPresent()) {
+                    ftaArtifact = ftaArtifactOptional.get();
+                    ftaArtifact.setLogicType(artifactAppEntity.getLogicType());
                 } else {
-                    throw new SafaError("Could not find artifact type: " + artifactTypeName);
+                    ftaArtifact = new FTAArtifact(artifact, artifactAppEntity.getLogicType());
                 }
+
+                this.ftaArtifactRepository.save(ftaArtifact);
                 break;
             case SAFETY_CASE:
-                SafetyCaseArtifact safetyCaseArtifact = new SafetyCaseArtifact(artifact,
-                    artifactAppEntity.getSafetyCaseType());
+                SafetyCaseArtifact safetyCaseArtifact;
+                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                if (safetyCaseArtifactOptional.isPresent()) {
+                    safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                    safetyCaseArtifact.setSafetyCaseType(artifactAppEntity.getSafetyCaseType());
+                } else {
+                    safetyCaseArtifact = new SafetyCaseArtifact(artifact, artifactAppEntity.getSafetyCaseType());
+                }
                 this.safetyCaseArtifactRepository.save(safetyCaseArtifact);
                 break;
             default:

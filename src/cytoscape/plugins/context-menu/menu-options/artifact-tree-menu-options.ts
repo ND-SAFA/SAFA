@@ -3,18 +3,17 @@ import {
   appModule,
   artifactModule,
   artifactSelectionModule,
-  documentModule,
   logModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { Artifact, ArtifactData, DocumentType, PanelType } from "@/types";
+import { Artifact, ArtifactData, PanelType } from "@/types";
 import { enableDrawMode } from "@/cytoscape";
 import { EventObject } from "cytoscape";
 import { deleteArtifactFromCurrentVersion } from "@/api";
-import { ftaMenuItem } from "@/cytoscape/plugins/context-menu/menu-options/fta-menu-options";
-import { safetyCaseMenuOption } from "@/cytoscape/plugins/context-menu/menu-options/safety-case-menu-option";
+import { ftaMenuItem } from "./fta-menu-options";
+import { safetyCaseMenuOption } from "./safety-case-menu-option";
 
 /**
  * List of menu items
@@ -25,7 +24,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Artifact",
     tooltipText: "Create new artifact",
     coreAsWell: true,
-    onClickFunction: (): void => {
+    onClickFunction(): void {
       if (projectModule.isProjectDefined) {
         appModule.openPanel(PanelType.artifactCreator);
       } else {
@@ -39,7 +38,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Link",
     tooltipText: "Create new trace link",
     coreAsWell: true,
-    onClickFunction: (): void => {
+    onClickFunction(): void {
       if (projectModule.isProjectDefined) {
         enableDrawMode();
       } else {
@@ -51,13 +50,14 @@ export const artifactTreeMenuItems: MenuItem[] = [
     id: "view-artifact",
     content: "View Artifact",
     tooltipText: "View Artifact",
+    selector: "node",
     coreAsWell: false,
-    onClickFunction: (event: EventObject): void => {
+    onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: Artifact) => {
         artifactSelectionModule.selectArtifact(artifact.id);
       });
     },
-    isVisible: (artifactData: ArtifactData | undefined) => {
+    isVisible(artifactData: ArtifactData | undefined): boolean {
       return artifactData !== undefined;
     },
   },
@@ -65,13 +65,14 @@ export const artifactTreeMenuItems: MenuItem[] = [
     id: "delete-artifact",
     content: "Delete Artifact",
     tooltipText: "Delete Artifact",
+    selector: "node",
     coreAsWell: false,
-    onClickFunction: (event: EventObject): void => {
+    onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
         await deleteArtifactFromCurrentVersion(artifact);
       });
     },
-    isVisible: (artifactData: ArtifactData | undefined): boolean => {
+    isVisible(artifactData: ArtifactData | undefined): boolean {
       return artifactData !== undefined;
     },
   },
@@ -79,8 +80,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     id: "highlight-artifact-subtree",
     content: "Highlight Subtree",
     tooltipText: "Highlight Subtree",
+    selector: "node",
     coreAsWell: false,
-    onClickFunction: (event: EventObject): void => {
+    onClickFunction(event: EventObject): void {
       handleOnClick(event, viewportModule.viewArtifactSubtree);
     },
     isVisible: hasSubtree,
@@ -89,7 +91,8 @@ export const artifactTreeMenuItems: MenuItem[] = [
     id: "hide-artifact-subtree",
     content: "Hide Subtree",
     tooltipText: "Hide all children.",
-    onClickFunction: async (event: EventObject): Promise<void> => {
+    selector: "node",
+    async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
       await subtreeModule.hideSubtree(artifactId);
@@ -100,12 +103,13 @@ export const artifactTreeMenuItems: MenuItem[] = [
     id: "show-artifact-subtree",
     content: "Show Subtree",
     tooltipText: "Show all hidden children.",
-    onClickFunction: async (event: EventObject): Promise<void> => {
+    selector: "node",
+    async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
       await subtreeModule.showSubtree(artifactId);
     },
-    isVisible: (artifactData: ArtifactData | undefined): boolean => {
+    isVisible(artifactData: ArtifactData | undefined): boolean {
       if (artifactData !== undefined) {
         return subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
       }

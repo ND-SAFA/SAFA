@@ -1,5 +1,7 @@
 package unit.project.documents;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -29,6 +31,7 @@ public class CreateNewDocument extends DocumentBaseTest {
 
         // VP - Assert all properties were returned as inputted.
         assertObjectsMatch(docCreated, docJson);
+        assertThat(docCreated.getString("documentId")).isNotEmpty();
 
         // VP - Verify that contents was persisted.
         assertDocumentInProjectExists(projectVersion.getProject(), docName, docDescription, docType);

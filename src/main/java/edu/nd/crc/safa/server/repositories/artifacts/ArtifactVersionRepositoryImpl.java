@@ -102,19 +102,21 @@ public class ArtifactVersionRepositoryImpl
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType, documentType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
+        artifactAppEntity.setId(artifactId);
 
         switch (artifactAppEntity.getDocumentType()) {
             case FTA:
-                String parentTypeName = artifactAppEntity.getParentType();
-                this
+                String artifactTypeName = artifactAppEntity.getType();
+                Optional<ArtifactType> artifactTypeOptional = this
                     .artifactTypeRepository
-                    .findByProjectAndNameIgnoreCase(project, parentTypeName)
-                    .ifPresent(parentType -> {
-                        FTAArtifact ftaArtifact = new FTAArtifact(artifact,
-                            parentType,
-                            artifactAppEntity.getLogicType());
-                        this.ftaArtifactRepository.save(ftaArtifact);
-                    });
+                    .findByProjectAndNameIgnoreCase(project, artifactTypeName);
+                if (artifactTypeOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = new FTAArtifact(artifact, artifactAppEntity.getLogicType());
+                    this.ftaArtifactRepository.save(ftaArtifact);
+
+                } else {
+                    throw new SafaError("Could not find artifact type: " + artifactTypeName);
+                }
                 break;
             case SAFETY_CASE:
                 SafetyCaseArtifact safetyCaseArtifact = new SafetyCaseArtifact(artifact,
@@ -125,7 +127,6 @@ public class ArtifactVersionRepositoryImpl
                 break;
         }
 
-        artifactAppEntity.setId(artifactId);
         return artifact;
     }
 

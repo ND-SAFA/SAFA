@@ -75,7 +75,7 @@ public class DocumentController extends BaseController {
         documentAppEntity.setProject(project); // Manually set to verify authenticity
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
-        if (documentAppEntity.getDocumentId() != null) {
+        if (documentAppEntity.getDocumentId() == null) {
             documentAppEntity.setDocumentId(document.getDocumentId());
         }
         int nArtifactUpdated = documentService.createOrUpdateArtifactIds(projectVersion, document,

@@ -34,7 +34,7 @@ public class FTAArtifact {
     @JoinColumn(name = "artifact_id", nullable = false)
     Artifact artifact;
     /**
-     * For FTA nodes, the logic type of the artifact.
+     * For FTA nodes, the logic type of the artifact (e.g. AND / OR)
      */
     @Column(name = "logic_type")
     FTANodeType logicType;

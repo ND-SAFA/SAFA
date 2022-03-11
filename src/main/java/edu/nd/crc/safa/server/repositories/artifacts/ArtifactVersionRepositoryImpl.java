@@ -106,17 +106,16 @@ public class ArtifactVersionRepositoryImpl
 
         switch (artifactAppEntity.getDocumentType()) {
             case FTA:
-                String parentTypeName = artifactAppEntity.getType();
+                String artifactTypeName = artifactAppEntity.getType();
                 Optional<ArtifactType> artifactTypeOptional = this
                     .artifactTypeRepository
-                    .findByProjectAndNameIgnoreCase(project, parentTypeName);
+                    .findByProjectAndNameIgnoreCase(project, artifactTypeName);
                 if (artifactTypeOptional.isPresent()) {
                     FTAArtifact ftaArtifact = new FTAArtifact(artifact, artifactAppEntity.getLogicType());
                     this.ftaArtifactRepository.save(ftaArtifact);
 
                 } else {
-                    throw new SafaError("Could not find parent type: " + parentTypeName);
-
+                    throw new SafaError("Could not find artifact type: " + artifactTypeName);
                 }
                 break;
             case SAFETY_CASE:

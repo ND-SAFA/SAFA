@@ -30,7 +30,7 @@ public class SafetyCaseArtifact {
     UUID safetyCaseArtifactId;
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "artifact_id", nullable = false)
+    @JoinColumn(name = "artifact_id", nullable = false, unique = true)
     Artifact artifact;
     @Column(name = "safety_case_type")
     SafetyCaseType safetyCaseType;

@@ -56,23 +56,22 @@ public class TestFTAArtifacts extends ApplicationBaseTest {
         JSONObject commitResponseJson = commit(commitBuilder);
 
         // VP - Verify that returned information is valid
-        JSONArray addedArtifactsJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
-        assertThat(addedArtifactsJson.length()).isEqualTo(1);
-        JSONObject artifactAdded = addedArtifactsJson.getJSONObject(0);
+        JSONArray artifactsAddedJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
+        assertThat(artifactsAddedJson.length()).isEqualTo(1);
+        JSONObject artifactAdded = artifactsAddedJson.getJSONObject(0);
         assertThat(artifactAdded.getString("name")).isEqualTo(artifactName);
         assertThat(artifactAdded.getString("id")).isNotEmpty();
         assertThat(artifactAdded.getString("documentType")).isEqualTo(DocumentType.FTA.toString());
         assertThat(artifactAdded.get("logicType")).isEqualTo(ftaType.toString());
 
         // VP - Verify that safety case was created
-        List<FTAArtifact> safetyCaseArtifacts =
-            ftaArtifactRepository.findByArtifactProject(projectVersion.getProject());
-        assertThat(safetyCaseArtifacts.size()).isEqualTo(1);
+        List<FTAArtifact> ftaArtifacts = ftaArtifactRepository.findByArtifactProject(projectVersion.getProject());
+        assertThat(ftaArtifacts.size()).isEqualTo(1);
 
         // VP - Verify that information is persisted
-        FTAArtifact safetyCaseArtifact = safetyCaseArtifacts.get(0);
-        assertThat(safetyCaseArtifact.getLogicType()).isEqualTo(ftaType);
-        assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
+        FTAArtifact ftaArtifact = ftaArtifacts.get(0);
+        assertThat(ftaArtifact.getLogicType()).isEqualTo(ftaType);
+        assertThat(ftaArtifact.getArtifact().getName()).isEqualTo(artifactName);
 
         // VP - Verify that retrieving project returns artifact
         List<ArtifactAppEntity> artifacts = projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
@@ -80,5 +79,15 @@ public class TestFTAArtifacts extends ApplicationBaseTest {
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.FTA);
         assertThat(artifact.getLogicType()).isEqualTo(ftaType);
+
+        // Step - Delete artifact
+        CommitBuilder deleteCommitBuilder =
+            CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactAdded);
+        commit(deleteCommitBuilder);
+
+        // Step - Recreate artifact
+        CommitBuilder createCommitBuilder =
+            CommitBuilder.withVersion(projectVersion).withAddedArtifact(artifactAdded);
+        commit(createCommitBuilder);
     }
 }

@@ -40,6 +40,7 @@ export default class ArtifactModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.
@@ -67,13 +68,13 @@ export default class ArtifactModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Deletes the artifact with the given name.
    */
   async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
     const deletedNames = artifacts.map(({ name }) => name);
     const removeArtifact = (currentArtifacts: Artifact[]) =>
       currentArtifacts.filter(({ name }) => !deletedNames.includes(name));
-
     this.SET_PROJECT_ARTIFACTS(removeArtifact(this.projectArtifacts));
     this.SET_CURRENT_ARTIFACTS(removeArtifact(this.currentArtifacts));
   }

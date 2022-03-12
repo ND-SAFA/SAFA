@@ -7,7 +7,6 @@ import {
   TraceLink,
   TraceType,
 } from "@/types";
-import { getTraceId } from "@/util";
 import { createLink } from "@/api";
 import { disableDrawMode } from "./edgeHandlesCore";
 
@@ -30,7 +29,7 @@ export function onArtifactTreeEdgeComplete(
   const sourceData: ArtifactData = sourceNode.data();
   const targetData: ArtifactData = targetNode.data();
   const traceLink: TraceLink = {
-    traceLinkId: getTraceId(sourceData.id, targetData.id),
+    traceLinkId: "",
     sourceId: sourceData.id,
     sourceName: sourceData.artifactName,
     targetId: targetData.id,

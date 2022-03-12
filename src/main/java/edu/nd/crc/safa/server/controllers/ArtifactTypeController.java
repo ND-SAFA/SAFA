@@ -10,8 +10,6 @@ import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +30,10 @@ public class ArtifactTypeController extends BaseController {
     NotificationService notificationService;
 
     @Autowired
-    public ArtifactTypeController(ProjectRepository projectRepository,
-                                  ProjectVersionRepository projectVersionRepository,
-                                  ResourceBuilder resourceBuilder,
+    public ArtifactTypeController(ResourceBuilder resourceBuilder,
                                   ArtifactTypeRepository artifactTypeRepository,
                                   NotificationService notificationService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.artifactTypeRepository = artifactTypeRepository;
         this.notificationService = notificationService;
     }

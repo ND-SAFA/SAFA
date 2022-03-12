@@ -10,10 +10,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
-import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,17 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RetrievalController extends BaseController {
 
-    private final VersionService versionService;
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public RetrievalController(ProjectRepository projectRepository,
-                               ProjectVersionRepository projectVersionRepository,
-                               ResourceBuilder resourceBuilder,
-                               VersionService versionService,
+    public RetrievalController(ResourceBuilder resourceBuilder,
                                ProjectRetrievalService projectRetrievalService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
-        this.versionService = versionService;
+        super(resourceBuilder);
         this.projectRetrievalService = projectRetrievalService;
     }
 

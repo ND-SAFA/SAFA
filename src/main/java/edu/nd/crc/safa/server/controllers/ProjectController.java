@@ -13,7 +13,6 @@ import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController extends BaseController {
 
+    private final ProjectRepository projectRepository;
     private final ProjectService projectService;
 
     @Autowired
-    public ProjectController(ProjectRepository projectRepository,
-                             ProjectVersionRepository projectVersionRepository,
-                             ResourceBuilder resourceBuilder,
+    public ProjectController(ResourceBuilder resourceBuilder,
+                             ProjectRepository projectRepository,
                              ProjectService projectService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
+        this.projectRepository = projectRepository;
         this.projectService = projectService;
     }
 

@@ -35,7 +35,7 @@ public class GetTraceMatrices extends TraceMatrixBaseTest {
 
         // Step - Send request to delete matrix.
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.getTraceMatrices)
+            .withRoute(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
             .withProject(project)
             .get();
         JSONObject projectMatrices = sendGet(route, status().isOk());

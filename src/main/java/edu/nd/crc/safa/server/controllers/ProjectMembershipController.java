@@ -50,7 +50,7 @@ public class ProjectMembershipController extends BaseController {
      * @param projectId The UUID of the project which the member is being added to.
      * @param request   The request containing project, member to add, and their given role.
      */
-    @PostMapping(AppRoutes.Projects.addProjectMember)
+    @PostMapping(AppRoutes.Projects.Membership.addProjectMember)
     public void addOrUpdateProjectMembership(@PathVariable UUID projectId,
                                              @RequestBody ProjectMembershipRequest request)
         throws SafaError {
@@ -67,7 +67,7 @@ public class ProjectMembershipController extends BaseController {
      * @param projectId The project whose members are being retrieved.
      * @return ServerResponse containing list of project members ships
      */
-    @GetMapping(AppRoutes.Projects.getProjectMembers)
+    @GetMapping(AppRoutes.Projects.Membership.getProjectMembers)
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         return this.projectService.getProjectMembers(project)
@@ -82,7 +82,7 @@ public class ProjectMembershipController extends BaseController {
      *
      * @param projectMembershipId ID of the membership linking user and project.
      */
-    @DeleteMapping(AppRoutes.Projects.deleteProjectMembership)
+    @DeleteMapping(AppRoutes.Projects.Membership.deleteProjectMembership)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
         //TODO: Check for project permission before deleting.

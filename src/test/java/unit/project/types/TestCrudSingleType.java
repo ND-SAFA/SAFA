@@ -36,7 +36,7 @@ public class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Create artifact type
         String endpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.createOrUpdateArtifactType)
+            .withRoute(AppRoutes.Projects.ArtifactType.createOrUpdateArtifactType)
             .withProject(project)
             .get();
         ArtifactType initialArtifactType = new ArtifactType(project, typeName);
@@ -77,7 +77,7 @@ public class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Retrieve artifact type
         String getEndpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.getProjectArtifactTypes)
+            .withRoute(AppRoutes.Projects.ArtifactType.getProjectArtifactTypes)
             .withProject(project)
             .get();
         JSONArray projectTypes = sendGetWithArrayResponse(getEndpoint, status().is2xxSuccessful());
@@ -88,7 +88,7 @@ public class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Delete artifact type
         String deleteEndpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteArtifactType)
+            .withRoute(AppRoutes.Projects.ArtifactType.deleteArtifactType)
             .withType(createdArtifactType)
             .get();
         sendDelete(deleteEndpoint, status().is2xxSuccessful());

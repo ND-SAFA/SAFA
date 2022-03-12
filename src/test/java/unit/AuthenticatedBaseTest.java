@@ -158,7 +158,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
 
         }
         String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteProjectMembership)
+            .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
             .withProjectMembership(projectMembershipOptional.get())
             .get();
         sendDelete(url, status().isNoContent());

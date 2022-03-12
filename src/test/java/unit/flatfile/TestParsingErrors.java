@@ -22,7 +22,7 @@ public class TestParsingErrors extends ApplicationBaseTest {
     public void testArtifactTypeNotFound() throws Exception {
 
         // Step 1 - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.projectFlatFiles,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.FlatFiles.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_2);
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
@@ -35,7 +35,7 @@ public class TestParsingErrors extends ApplicationBaseTest {
     public void testDuplicateArtifactBody() throws Exception {
 
         // Step 1 - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.projectFlatFiles,
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.FlatFiles.projectFlatFiles,
             ProjectPaths.PATH_TO_TEST_3);
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
 

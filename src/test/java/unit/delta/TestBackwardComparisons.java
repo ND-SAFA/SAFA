@@ -29,7 +29,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
 
         // Step - Calculate Delta in Backwards direction
         String backwardRouteName = RouteBuilder
-            .withRoute(AppRoutes.Projects.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .get();
@@ -72,7 +72,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
 
         // Step - Send Delta Request
         String backwardRouteName = RouteBuilder
-            .withRoute(AppRoutes.Projects.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();

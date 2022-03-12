@@ -37,7 +37,7 @@ public class DeltaController extends BaseController {
      * @return ProjectDelta with artifacts that were added, removed, and modified between versions.
      * @throws SafaError Throws error if baseline or target version is not found.
      */
-    @GetMapping(AppRoutes.Projects.calculateProjectDelta)
+    @GetMapping(AppRoutes.Projects.Delta.calculateProjectDelta)
     public ProjectDelta calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                               @PathVariable UUID targetVersionId) throws SafaError {
         ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId).withViewVersion();

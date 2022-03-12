@@ -33,7 +33,7 @@ public class RetrieveDocuments extends ApplicationBaseTest {
 
         // Step - Retrieve project documents
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.getProjectDocuments)
+            .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
             .withProject(project)
             .get();
         JSONArray documents = sendGetWithArrayResponse(route, status().isOk());

@@ -33,7 +33,7 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
     public void testUseCase() throws Exception {
 
         // Step 1 - Upload flat files
-        String routeName = AppRoutes.Projects.projectFlatFiles;
+        String routeName = AppRoutes.Projects.FlatFiles.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
             ProjectPaths.PATH_TO_BEFORE_FILES);
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);

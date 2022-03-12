@@ -36,7 +36,7 @@ public class TraceBaseTest extends ApplicationBaseTest {
     protected String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
 
         return RouteBuilder
-            .withRoute(AppRoutes.Projects.getGeneratedLinksInProjectVersion)
+            .withRoute(AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
             .withVersion(projectVersion)
             .get();
     }

@@ -124,7 +124,7 @@ public class TestArtifactController extends ApplicationBaseTest {
 
         // VP - Verify that status is okay and artifact does not exist
         String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.checkIfArtifactExists)
+            .withRoute(AppRoutes.Projects.Entities.checkIfArtifactExists)
             .withVersion(projectVersion)
             .withArtifactName(artifactName)
             .get();

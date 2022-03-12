@@ -67,7 +67,7 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
 
         // Step - Request artifact is added to document
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.addArtifactsToDocument)
+            .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
             .withVersion(projectVersion)
             .withDocument(document)
             .get();

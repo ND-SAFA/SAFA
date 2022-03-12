@@ -25,7 +25,7 @@ public class TestSafaErrorMessage extends ApplicationBaseTest {
         Project project = new Project();
         project.setProjectId(UUID.randomUUID());
         String routeName = RouteBuilder
-            .withRoute(AppRoutes.Projects.getVersions)
+            .withRoute(AppRoutes.Projects.Versions.getVersions)
             .withProject(project)
             .get();
 

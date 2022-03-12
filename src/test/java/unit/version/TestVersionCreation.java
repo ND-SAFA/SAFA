@@ -22,7 +22,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
         Project project = dbEntityBuilder
             .newProjectWithReturn(projectName);
         String routeName =
-            RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
+            RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion).withProject(project).get();
         JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
         assertThat(response.getString("message")).contains("initial version");
     }
@@ -35,7 +35,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newVersion(projectName)
             .getProject(projectName);
         String routeName =
-            RouteBuilder.withRoute(AppRoutes.Projects.createNewRevisionVersion).withProject(project).get();
+            RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion).withProject(project).get();
         JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 
         // VP - Verify that the correct version numbers appear
@@ -54,7 +54,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMinorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewMinorVersion).withProject(project).get();
 
         JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 
@@ -73,7 +73,7 @@ public class TestVersionCreation extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.createNewMajorVersion).withProject(project).get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewMajorVersion).withProject(project).get();
 
         JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
 

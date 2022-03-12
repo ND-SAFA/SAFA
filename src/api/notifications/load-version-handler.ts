@@ -1,4 +1,4 @@
-import { appModule, projectModule, viewportModule } from "@/store";
+import { appModule, errorModule, projectModule, viewportModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import {
   getArtifactsInVersion,
@@ -6,6 +6,7 @@ import {
   getTracesInVersion,
 } from "@/api/endpoints";
 import { reloadTraceMatrices, setCreatedProject } from "@/api";
+import { getWarningsInProjectVersion } from "@/api/endpoints/warning-api";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -56,4 +57,13 @@ export async function reloadTracesHandler(versionId: string): Promise<void> {
   await projectModule.addOrUpdateTraceLinks(traces);
   await reloadTraceMatrices();
   viewportModule.applyAutomove();
+}
+
+/**
+ * Call this function whenever warnings need ot be re-downloaded.
+ * @param versionId The id of whose versioned entities' warnings are updated.
+ */
+export async function reloadWarningsHandler(versionId: string): Promise<void> {
+  const warnings = await getWarningsInProjectVersion(versionId);
+  errorModule.setArtifactWarnings(warnings);
 }

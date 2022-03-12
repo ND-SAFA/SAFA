@@ -24,17 +24,17 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides endpoints for retrieving, creating, and deleting project versions.
  */
 @RestController
-public class VersionedEntityRetrievalController extends BaseController {
+public class RetrievalController extends BaseController {
 
     private final VersionService versionService;
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public VersionedEntityRetrievalController(ProjectRepository projectRepository,
-                                              ProjectVersionRepository projectVersionRepository,
-                                              ResourceBuilder resourceBuilder,
-                                              VersionService versionService,
-                                              ProjectRetrievalService projectRetrievalService) {
+    public RetrievalController(ProjectRepository projectRepository,
+                               ProjectVersionRepository projectVersionRepository,
+                               ResourceBuilder resourceBuilder,
+                               VersionService versionService,
+                               ProjectRetrievalService projectRetrievalService) {
         super(projectRepository, projectVersionRepository, resourceBuilder);
         this.versionService = versionService;
         this.projectRetrievalService = projectRetrievalService;

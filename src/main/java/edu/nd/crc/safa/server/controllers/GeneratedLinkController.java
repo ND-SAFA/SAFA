@@ -13,9 +13,6 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +33,10 @@ public class GeneratedLinkController extends BaseController {
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public GeneratedLinkController(ProjectRepository projectRepository,
-                                   ProjectVersionRepository projectVersionRepository,
-                                   ResourceBuilder resourceBuilder,
-                                   TraceLinkVersionRepository traceLinkVersionRepository,
+    public GeneratedLinkController(ResourceBuilder resourceBuilder,
                                    ProjectRetrievalService projectRetrievalService,
                                    TraceLinkGenerator traceLinkGenerator) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.projectRetrievalService = projectRetrievalService;
         this.traceLinkGenerator = traceLinkGenerator;
     }

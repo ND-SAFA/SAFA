@@ -8,7 +8,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.VersionService;
 
@@ -27,14 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VersionController extends BaseController {
 
+    private final ProjectVersionRepository projectVersionRepository;
     private final VersionService versionService;
 
     @Autowired
-    public VersionController(ProjectRepository projectRepository,
+    public VersionController(ResourceBuilder resourceBuilder,
                              ProjectVersionRepository projectVersionRepository,
-                             ResourceBuilder resourceBuilder,
                              VersionService versionService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
+        this.projectVersionRepository = projectVersionRepository;
         this.versionService = versionService;
     }
 

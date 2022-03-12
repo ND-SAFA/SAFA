@@ -21,8 +21,6 @@ import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
@@ -46,15 +44,13 @@ public class CommitController extends BaseController {
     private final NotificationService notificationService;
 
     @Autowired
-    public CommitController(ProjectRepository projectRepository,
-                            ProjectVersionRepository projectVersionRepository,
-                            ResourceBuilder resourceBuilder,
+    public CommitController(ResourceBuilder resourceBuilder,
                             ArtifactVersionRepository artifactVersionRepository,
                             TraceLinkVersionRepository traceLinkVersionRepository,
                             ProjectRetrievalService projectRetrievalService,
                             NotificationService notificationService
     ) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
         this.projectRetrievalService = projectRetrievalService;
@@ -77,6 +73,18 @@ public class CommitController extends BaseController {
             projectCommit.getArtifacts());
         ProjectChange<TraceAppEntity> traceChanges = commitChanges(projectVersion, projectCommit.getTraces());
 
+        if (artifactChanges.getSize() > 0) {
+            System.out.println("MESSAGE:ARTIFACTS");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+        }
+        if (traceChanges.getSize() > 0) {
+            System.out.println("MESSAGE:TRACES");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
+        }
+        if (artifactChanges.getSize() + traceChanges.getSize() > 0) {
+            System.out.println("MESSAGE:WARNINGS");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
+        }
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges);
     }
 
@@ -155,11 +163,6 @@ public class CommitController extends BaseController {
             appEntityCreator
         );
         change.getRemoved().addAll(entitiesRemoved);
-
-        if (change.getSize() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, versionEntityTypes);
-        }
-
         return change;
     }
 

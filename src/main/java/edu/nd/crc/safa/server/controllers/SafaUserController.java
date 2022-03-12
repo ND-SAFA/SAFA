@@ -4,8 +4,6 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.UserAppEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +26,10 @@ public class SafaUserController extends BaseController {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SafaUserController(ProjectRepository projectRepository,
-                              ProjectVersionRepository projectVersionRepository,
-                              ResourceBuilder resourceBuilder,
+    public SafaUserController(ResourceBuilder resourceBuilder,
                               SafaUserRepository safaUserRepository,
                               PasswordEncoder passwordEncoder) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;
     }

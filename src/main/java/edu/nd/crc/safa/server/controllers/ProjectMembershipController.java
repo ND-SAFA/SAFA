@@ -12,8 +12,6 @@ import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
@@ -37,12 +35,10 @@ public class ProjectMembershipController extends BaseController {
     private final NotificationService notificationService;
 
     @Autowired
-    public ProjectMembershipController(ProjectRepository projectRepository,
-                                       ProjectVersionRepository projectVersionRepository,
-                                       ResourceBuilder resourceBuilder,
+    public ProjectMembershipController(ResourceBuilder resourceBuilder,
                                        ProjectService projectService,
                                        NotificationService notificationService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.projectService = projectService;
         this.notificationService = notificationService;
     }

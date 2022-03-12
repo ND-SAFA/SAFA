@@ -1,5 +1,5 @@
 import { Commit } from "@/types";
-import { artifactModule, commitModule } from "@/store";
+import { projectModule, commitModule } from "@/store";
 import { persistCommit } from "./commit-api";
 
 /**
@@ -35,6 +35,6 @@ async function applyArtifactChanges(commit: Commit): Promise<void> {
   const artifactsAddedOrModified = commit.artifacts.added.concat(
     commit.artifacts.modified
   );
-  await artifactModule.addOrUpdateArtifacts(artifactsAddedOrModified);
-  await artifactModule.deleteArtifacts(commit.artifacts.removed);
+  await projectModule.addOrUpdateArtifacts(artifactsAddedOrModified);
+  await projectModule.deleteArtifacts(commit.artifacts.removed);
 }

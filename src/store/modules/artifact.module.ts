@@ -40,21 +40,18 @@ export default class ArtifactModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.
    */
   async addOrUpdateArtifacts(updatedArtifacts: Artifact[]): Promise<void> {
-    const updatedArtifactIds = updatedArtifacts.map((a) => a.id);
-    const newArtifactSet = this.projectArtifacts
-      .filter((a) => !updatedArtifactIds.includes(a.id))
-      .concat(updatedArtifacts);
     const visibleIds = documentModule.document.artifactIds;
-    const visibleArtifacts = newArtifactSet.filter(({ id }) =>
+    const visibleArtifacts = updatedArtifacts.filter(({ id }) =>
       visibleIds.includes(id)
     );
 
-    this.SET_PROJECT_ARTIFACTS(newArtifactSet);
+    this.SET_PROJECT_ARTIFACTS(updatedArtifacts);
     this.SET_CURRENT_ARTIFACTS(visibleArtifacts);
 
     const selectedArtifact = artifactSelectionModule.getSelectedArtifact;
@@ -71,6 +68,7 @@ export default class ArtifactModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Deletes the artifact with the given name.
    */
   async deleteArtifacts(artifacts: Artifact[]): Promise<void> {

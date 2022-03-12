@@ -17,8 +17,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +40,12 @@ public class DocumentArtifactController extends BaseController {
     private final NotificationService notificationService;
 
     @Autowired
-    public DocumentArtifactController(ProjectRepository projectRepository,
-                                      ProjectVersionRepository projectVersionRepository,
-                                      DocumentRepository documentRepository,
+    public DocumentArtifactController(DocumentRepository documentRepository,
                                       ArtifactRepository artifactRepository,
                                       DocumentArtifactRepository documentArtifactRepository,
                                       NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.documentRepository = documentRepository;
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;

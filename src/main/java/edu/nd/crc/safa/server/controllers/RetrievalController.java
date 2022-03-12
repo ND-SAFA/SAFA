@@ -10,10 +10,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
-import edu.nd.crc.safa.server.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,19 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides endpoints for retrieving, creating, and deleting project versions.
  */
 @RestController
-public class VersionedEntityRetrievalController extends BaseController {
+public class RetrievalController extends BaseController {
 
-    private final VersionService versionService;
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public VersionedEntityRetrievalController(ProjectRepository projectRepository,
-                                              ProjectVersionRepository projectVersionRepository,
-                                              ResourceBuilder resourceBuilder,
-                                              VersionService versionService,
-                                              ProjectRetrievalService projectRetrievalService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
-        this.versionService = versionService;
+    public RetrievalController(ResourceBuilder resourceBuilder,
+                               ProjectRetrievalService projectRetrievalService) {
+        super(resourceBuilder);
         this.projectRetrievalService = projectRetrievalService;
     }
 

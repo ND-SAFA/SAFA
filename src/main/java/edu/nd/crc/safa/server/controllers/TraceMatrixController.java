@@ -14,8 +14,6 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +33,10 @@ public class TraceMatrixController extends BaseController {
     ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
-    public TraceMatrixController(ProjectRepository projectRepository,
-                                 ProjectVersionRepository projectVersionRepository,
-                                 ResourceBuilder resourceBuilder,
+    public TraceMatrixController(ResourceBuilder resourceBuilder,
                                  TraceMatrixRepository traceMatrixRepository,
                                  ArtifactTypeRepository artifactTypeRepository) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.traceMatrixRepository = traceMatrixRepository;
         this.artifactTypeRepository = artifactTypeRepository;
     }

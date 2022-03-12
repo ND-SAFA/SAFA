@@ -19,5 +19,10 @@ public enum VersionEntityTypes {
         public String toString() {
             return "TRACES";
         }
+    },
+    WARNINGS {
+        public String toString() {
+            return "WARNINGS";
+        }
     }
 }

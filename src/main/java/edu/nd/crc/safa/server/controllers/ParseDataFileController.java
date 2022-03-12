@@ -25,8 +25,6 @@ import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 
 import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
@@ -54,14 +52,12 @@ public class ParseDataFileController extends BaseController {
     private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
-    public ParseDataFileController(ProjectRepository projectRepository,
-                                   ProjectVersionRepository projectVersionRepository,
-                                   ResourceBuilder resourceBuilder,
+    public ParseDataFileController(ResourceBuilder resourceBuilder,
                                    ArtifactRepository artifactRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    ArtifactFileParser artifactFileParser,
                                    TraceFileParser traceFileParser) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.artifactFileParser = artifactFileParser;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;

@@ -12,7 +12,6 @@ import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
@@ -33,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FlatFileController extends BaseController {
 
+    private final ProjectRepository projectRepository;
+
     private final ProjectService projectService;
     private final FileUploadService fileUploadService;
     private final NotificationService notificationService;
@@ -40,15 +41,15 @@ public class FlatFileController extends BaseController {
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public FlatFileController(ProjectService projectService,
+    public FlatFileController(ResourceBuilder resourceBuilder,
                               ProjectRepository projectRepository,
-                              ProjectVersionRepository projectVersionRepository,
-                              ResourceBuilder resourceBuilder,
+                              ProjectService projectService,
                               FileUploadService fileUploadService,
                               NotificationService notificationService,
                               FlatFileService flatFileParser,
                               ProjectRetrievalService projectRetrievalService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
+        this.projectRepository = projectRepository;
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.fileUploadService = fileUploadService;

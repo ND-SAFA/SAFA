@@ -13,8 +13,6 @@ import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.DocumentService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectRetrievalService;
@@ -42,14 +40,12 @@ public class DocumentController extends BaseController {
     private final ProjectRetrievalService projectRetrievalService;
 
     @Autowired
-    public DocumentController(ProjectRepository projectRepository,
-                              ProjectVersionRepository projectVersionRepository,
-                              ResourceBuilder resourceBuilder,
+    public DocumentController(ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
                               DocumentService documentService,
                               NotificationService notificationService,
                               ProjectRetrievalService projectRetrievalService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.documentRepository = documentRepository;
         this.documentService = documentService;
         this.notificationService = notificationService;

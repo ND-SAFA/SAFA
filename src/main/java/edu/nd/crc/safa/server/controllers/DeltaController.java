@@ -7,8 +7,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.DeltaService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +23,9 @@ public class DeltaController extends BaseController {
     private final DeltaService deltaService;
 
     @Autowired
-    public DeltaController(ProjectRepository projectRepository,
-                           ProjectVersionRepository projectVersionRepository,
-                           ResourceBuilder resourceBuilder,
+    public DeltaController(ResourceBuilder resourceBuilder,
                            DeltaService deltaService) {
-        super(projectRepository, projectVersionRepository, resourceBuilder);
+        super(resourceBuilder);
         this.deltaService = deltaService;
     }
 

@@ -8,8 +8,6 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,16 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public abstract class BaseController {
 
-    protected final ProjectVersionRepository projectVersionRepository;
-    protected final ProjectRepository projectRepository;
     protected final ResourceBuilder resourceBuilder;
 
     @Autowired
-    public BaseController(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository,
-                          ResourceBuilder resourceBuilder) {
-        this.projectVersionRepository = projectVersionRepository;
-        this.projectRepository = projectRepository;
+    public BaseController(ResourceBuilder resourceBuilder) {
         this.resourceBuilder = resourceBuilder;
     }
 

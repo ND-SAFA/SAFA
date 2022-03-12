@@ -89,5 +89,9 @@ public class AppRoutes {
             public static final String createOrUpdateArtifactType = getProjectArtifactTypes;
             public static final String deleteArtifactType = projectPrefix + "/artifactTypes/{typeId}";
         }
+
+        public static class Warnings {
+            public static final String getWarningsInProjectVersion = projectPrefix + "/versions/{versionId}/warnings";
+        }
     }
 }

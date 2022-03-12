@@ -54,7 +54,7 @@ public class GeneratedLinkController extends BaseController {
      * @return List of trace app entities representing generated links in project version.
      * @throws SafaError If user does not have permissions to access this project.
      */
-    @GetMapping(value = AppRoutes.Projects.getGeneratedLinksInProjectVersion)
+    @GetMapping(value = AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<TraceAppEntity> generatedTracesInVersion =
@@ -71,7 +71,7 @@ public class GeneratedLinkController extends BaseController {
      * @param traceLinkGenerationRequest Request containing source and target artifacts.
      * @return Returns list of trace app entities
      */
-    @PostMapping(value = AppRoutes.Projects.generateLinks)
+    @PostMapping(value = AppRoutes.Projects.Links.generateLinks)
     public List<TraceAppEntity> generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();

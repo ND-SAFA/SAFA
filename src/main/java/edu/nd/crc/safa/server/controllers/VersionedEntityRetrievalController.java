@@ -47,7 +47,7 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @return ProjectCreationResponse containing artifacts, traces, and warnings of project at version specified.
      * @throws SafaError Throws error if no version is associated with given id.
      */
-    @GetMapping(AppRoutes.Projects.getProjectInVersion)
+    @GetMapping(AppRoutes.Projects.Entities.getProjectInVersion)
     public ProjectEntities getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
@@ -60,7 +60,7 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @return List of artifact app entities.
      * @throws SafaError Throws error is user does not have read permission on the project.
      */
-    @GetMapping(AppRoutes.Projects.getArtifactsInVersion)
+    @GetMapping(AppRoutes.Projects.Entities.getArtifactsInVersion)
     public List<ArtifactAppEntity> getArtifactsInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
@@ -73,7 +73,7 @@ public class VersionedEntityRetrievalController extends BaseController {
      * @return List of trace app entities existing in specified version.
      * @throws SafaError Throws error is authorized user does not have read permission on the project.
      */
-    @GetMapping(AppRoutes.Projects.getTracesInVersion)
+    @GetMapping(AppRoutes.Projects.Entities.getTracesInVersion)
     public List<TraceAppEntity> getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<TraceAppEntity> traces = this.projectRetrievalService.getTracesInProjectVersion(projectVersion);

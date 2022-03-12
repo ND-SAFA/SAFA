@@ -40,7 +40,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
                                          String pathToFileDir) throws Exception {
         assertTokenExists();
         String path = RouteBuilder
-            .withRoute(AppRoutes.Projects.updateProjectVersionFromFlatFiles)
+            .withRoute(AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
             .withVersion(projectVersion)
             .get();
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
@@ -72,7 +72,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.commitChange)
+            .withRoute(AppRoutes.Projects.Commits.commitChange)
             .withVersion(commitVersion)
             .get();
         return sendPost(route, commitBuilder.asJson(), expectedStatus);
@@ -113,13 +113,13 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
                                       ProjectRole role,
                                       ResultMatcher httpResult) throws Exception {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        String url = RouteBuilder.withRoute(AppRoutes.Projects.addProjectMember).withProject(project).get();
+        String url = RouteBuilder.withRoute(AppRoutes.Projects.Membership.addProjectMember).withProject(project).get();
         return sendPost(url, toJson(request), httpResult);
     }
 
     protected JSONArray getProjectMembers(Project project) throws Exception {
         String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.getProjectMembers)
+            .withRoute(AppRoutes.Projects.Membership.getProjectMembers)
             .withProject(project)
             .get();
         return sendGetWithArrayResponse(url, status().is2xxSuccessful());

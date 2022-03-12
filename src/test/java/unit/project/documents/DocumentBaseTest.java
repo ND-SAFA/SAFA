@@ -67,7 +67,7 @@ public class DocumentBaseTest extends ApplicationBaseTest {
         // Step - Send creation request.
         String route =
             RouteBuilder
-                .withRoute(AppRoutes.Projects.createOrUpdateDocument)
+                .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
                 .withVersion(projectVersion)
                 .get();
         return sendPost(route, docJson, status().isCreated());

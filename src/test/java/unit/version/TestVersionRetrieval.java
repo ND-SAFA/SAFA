@@ -35,6 +35,6 @@ public class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private String createRouteName(Project project) {
-        return RouteBuilder.withRoute(AppRoutes.Projects.getVersions).withProject(project).get();
+        return RouteBuilder.withRoute(AppRoutes.Projects.Versions.getVersions).withProject(project).get();
     }
 }

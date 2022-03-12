@@ -69,7 +69,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
             .subscribeToVersion(currentUsername, projectVersion);
 
         // Step - Request artifact is removed from document
-        String route = RouteBuilder.withRoute(AppRoutes.Projects.removeArtifactFromDocument)
+        String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.removeArtifactFromDocument)
             .withVersion(projectVersion)
             .withDocument(document)
             .withArtifactId(artifact)

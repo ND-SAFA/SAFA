@@ -33,7 +33,7 @@ public class CreateTraceMatrix extends TraceMatrixBaseTest {
 
         // Step - Send request
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.createTraceMatrix)
+            .withRoute(AppRoutes.Projects.TraceMatrix.createTraceMatrix)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)

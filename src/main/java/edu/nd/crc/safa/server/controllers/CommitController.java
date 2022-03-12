@@ -69,7 +69,7 @@ public class CommitController extends BaseController {
      * @return ProjectCommit The commit containing the entities with any processing additions.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
-    @PostMapping(AppRoutes.Projects.commitChange)
+    @PostMapping(AppRoutes.Projects.Commits.commitChange)
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();

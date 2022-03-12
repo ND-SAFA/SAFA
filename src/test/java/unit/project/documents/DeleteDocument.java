@@ -38,7 +38,7 @@ public class DeleteDocument extends ApplicationBaseTest {
 
         // Step - Create new document payload
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteDocument)
+            .withRoute(AppRoutes.Projects.Documents.deleteDocument)
             .withDocument(document)
             .get();
         sendDelete(route, status().isNoContent());

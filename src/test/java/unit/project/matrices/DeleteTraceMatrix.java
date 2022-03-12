@@ -33,7 +33,7 @@ public class DeleteTraceMatrix extends TraceMatrixBaseTest {
 
         // Step - Send request to delete matrix.
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.deleteTraceMatrix)
+            .withRoute(AppRoutes.Projects.TraceMatrix.deleteTraceMatrix)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)

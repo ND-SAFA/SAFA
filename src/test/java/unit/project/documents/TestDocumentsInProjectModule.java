@@ -34,7 +34,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
 
         // Step - Retrieve project
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.getProjectInVersion)
+            .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
             .withVersion(projectVersion)
             .get();
         JSONObject response = sendGet(route, status().isOk());

@@ -76,7 +76,7 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping(AppRoutes.Projects.getUserProjects)
+    @GetMapping(AppRoutes.Projects.Membership.getUserProjects)
     public List<ProjectIdentifier> getUserProjects() {
         return projectService.getCurrentUserProjects();
     }

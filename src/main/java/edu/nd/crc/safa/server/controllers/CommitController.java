@@ -73,6 +73,18 @@ public class CommitController extends BaseController {
             projectCommit.getArtifacts());
         ProjectChange<TraceAppEntity> traceChanges = commitChanges(projectVersion, projectCommit.getTraces());
 
+        if (artifactChanges.getSize() > 0) {
+            System.out.println("MESSAGE:ARTIFACTS");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+        }
+        if (traceChanges.getSize() > 0) {
+            System.out.println("MESSAGE:TRACES");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
+        }
+        if (artifactChanges.getSize() + traceChanges.getSize() > 0) {
+            System.out.println("MESSAGE:WARNINGS");
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
+        }
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges);
     }
 
@@ -151,11 +163,6 @@ public class CommitController extends BaseController {
             appEntityCreator
         );
         change.getRemoved().addAll(entitiesRemoved);
-
-        if (change.getSize() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, versionEntityTypes);
-        }
-
         return change;
     }
 

@@ -1,6 +1,5 @@
-import { CytoEvent } from "@/types";
-import { ContextMenuOptions } from "@/types/cytoscape/plugins/context-menus";
-import { artifactTreeMenuItems } from "@/cytoscape/plugins/context-menu/menu-options/artifact-tree-menu-options";
+import { CytoEvent, ContextMenuOptions } from "@/types";
+import { artifactTreeMenuItems } from "./menu-options";
 
 /**
  * Defines the options on the artifact tree context menu.

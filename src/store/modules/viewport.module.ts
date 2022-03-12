@@ -99,6 +99,7 @@ export default class ViewportModule extends VuexModule {
 
     this.SET_LAYOUT(layoutPayload.layout);
     cyCreateLayout(layoutPayload);
+    this.applyAutomove();
 
     setTimeout(appModule.onLoadEnd, 200);
   }

@@ -1,7 +1,5 @@
-import { EventObject } from "cytoscape";
-import { appModule, documentModule, logModule } from "@/store";
-import { ArtifactData, DocumentType, FTANodeType } from "@/types";
-import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
+import { appModule, documentModule } from "@/store";
+import { ArtifactData, DocumentType, FTANodeType, MenuItem } from "@/types";
 
 /**
  * The menu item for creating FTA related nodes.

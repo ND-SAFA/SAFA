@@ -15,6 +15,7 @@
         <v-col>
           <v-row justify="end" class="mr-1">
             <generic-icon-button
+              v-if="!selectedArtifact.logicType"
               tooltip="Edit"
               icon-id="mdi-pencil"
               @click="onArtifactEdit"

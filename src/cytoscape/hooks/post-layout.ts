@@ -89,8 +89,11 @@ export const centerViewOnNode: LayoutHook = (): void => {
 };
 
 /**
+ * TODO: currently this will create multiple listeners on reformats.
+ *
  * Attaches hook to every right click on the cytoscape instance enabling
  * the dynamic showing of context menu items through lambda `isVisible`.
+ *
  * @param cy The cytoscape instance
  */
 export const dynamicVisibilityHookForContextMenuItems = (
@@ -102,6 +105,7 @@ export const dynamicVisibilityHookForContextMenuItems = (
       ? data
       : undefined;
     const contextMenuInstance = cy.contextMenus("get");
+
     artifactTreeMenuItems.forEach((menuItem: MenuItem) => {
       if (
         menuItem.coreAsWell ||

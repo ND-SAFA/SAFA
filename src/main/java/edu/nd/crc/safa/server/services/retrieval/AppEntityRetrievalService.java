@@ -22,6 +22,7 @@ import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
@@ -234,6 +235,26 @@ public class AppEntityRetrievalService {
     }
 
     /**
+     * Returns list of traces current active in project version containing
+     * source or target as given artifact.
+     *
+     * @param projectVersion The project version used to retrieve active links.
+     * @param artifactName   The artifact to be used to query links.
+     * @return List of traces active in version and associated with artifact
+     */
+    public List<TraceAppEntity> getTracesInProjectVersionRelatedToArtifact(
+        ProjectVersion projectVersion,
+        String artifactName
+    ) {
+        return this.traceLinkVersionRepository
+            .getVersionEntitiesByProjectVersion(projectVersion)
+            .stream()
+            .map(TraceAppEntity::new)
+            .filter(t -> artifactName.equals(t.sourceName) || artifactName.equals(t.targetName))
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Returns list of documents in given project
      *
      * @param project The projects whose documents are returned.
@@ -262,10 +283,13 @@ public class AppEntityRetrievalService {
      */
     public Map<String, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifacts = artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
-        List<TraceLinkVersion> traceLinkVersions =
-            this.traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         List<TraceLink> traceLinks =
-            traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
+            this.traceLinkVersionRepository
+                .getVersionEntitiesByProjectVersion(projectVersion)
+                .stream()
+                .filter(t -> t.getApprovalStatus() == TraceApproval.APPROVED)
+                .map(TraceLinkVersion::getTraceLink)
+                .collect(Collectors.toList());
         return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);
     }
 }

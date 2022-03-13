@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -58,13 +57,6 @@ public class TraceLink implements Serializable, IBaseEntity {
     Artifact targetArtifact;
 
     public TraceLink() {
-    }
-
-    public TraceLink(TraceAppEntity traceLink) {
-        String traceLinkId = traceLink.getTraceLinkId();
-        if (traceLinkId != null && !traceLinkId.equals("")) {
-            this.traceLinkId = UUID.fromString(traceLink.getTraceLinkId());
-        }
     }
 
     public TraceLink(Artifact sourceArtifact,

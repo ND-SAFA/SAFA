@@ -83,7 +83,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withAddedArtifact(designJson)
             .withAddedTrace(traceJson);
-        commit(commitBuilder);
+        designJson = commit(commitBuilder);
 
         // VP - Receive expected messages
         Hashtable<VersionEntityTypes, VersionMessage> messages = new Hashtable<>();
@@ -95,12 +95,32 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(messages.containsKey(VersionEntityTypes.ARTIFACTS)).isTrue();
         assertThat(messages.containsKey(VersionEntityTypes.TRACES)).isTrue();
         assertThat(messages.containsKey(VersionEntityTypes.WARNINGS)).isTrue();
-        
+
         // Step - Retrieve project warnings
         JSONObject rulesWithDesign = getProjectRules(projectVersion);
 
         // VP - Verify that no rules are generated
         assertThat(rulesWithDesign.length()).isEqualTo(0);
+
+        // Step - Delete design artifact
+        JSONObject updatedDesign = designJson
+            .getJSONObject("artifacts")
+            .getJSONArray("added")
+            .getJSONObject(0);
+        JSONObject deletionCommit =
+            commit(CommitBuilder.withVersion(projectVersion).withRemovedArtifact(updatedDesign));
+
+        // VP - Verify that trace was deleted too
+        JSONArray deletedTraces = deletionCommit.getJSONObject("traces").getJSONArray("removed");
+        assertThat(deletedTraces.length()).isEqualTo(1);
+
+        // Step - Retrieve project warnings
+        JSONObject rulesAfterDelete = getProjectRules(projectVersion);
+
+        // VP - Verify that rule is generated against
+        assertThat(rulesAfterDelete.length()).isEqualTo(1);
+        JSONObject ruleViolatedAfterDelete = rulesViolated.getJSONObject(0);
+        assertThat(ruleViolatedAfterDelete.getString("ruleName")).isEqualTo("Missing child");
     }
 
     private JSONObject getProjectRules(ProjectVersion projectVersion) throws Exception {

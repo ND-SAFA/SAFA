@@ -69,20 +69,27 @@ public class CommitController extends BaseController {
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+
+        // Pre-processing: Add related trace links to be removed.
+        for (ArtifactAppEntity artifactAppEntity : projectCommit.getArtifacts().getRemoved()) {
+            List<TraceAppEntity> associatedLinks = this.appEntityRetrievalService
+                .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifactAppEntity.getName());
+            projectCommit.addTraceToDelete(associatedLinks);
+        }
+
+        // Commit artifact and trace changes.
         ProjectChange<ArtifactAppEntity> artifactChanges = commitArtifactChanges(projectVersion,
             projectCommit.getArtifacts());
+
         ProjectChange<TraceAppEntity> traceChanges = commitChanges(projectVersion, projectCommit.getTraces());
 
         if (artifactChanges.getSize() > 0) {
-            System.out.println("MESSAGE:ARTIFACTS");
             this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
         if (traceChanges.getSize() > 0) {
-            System.out.println("MESSAGE:TRACES");
             this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
         }
         if (artifactChanges.getSize() + traceChanges.getSize() > 0) {
-            System.out.println("MESSAGE:WARNINGS");
             this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
         }
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges);
@@ -135,7 +142,7 @@ public class CommitController extends BaseController {
         ProjectChange<AppEntity> change = new ProjectChange<>();
 
         // Define actions
-        CommitAction<AppEntity, VersionEntity> saveAction = (appEntity) ->
+        CommitAction<AppEntity, VersionEntity> saveOrModifyAction = (appEntity) ->
             versionRepository.commitSingleEntityToProjectVersion(projectVersion, appEntity);
         CommitAction<AppEntity, VersionEntity> removeAction = (appEntity) ->
             versionRepository.deleteVersionEntityByBaseEntityId(projectVersion, appEntity.getId());
@@ -143,7 +150,7 @@ public class CommitController extends BaseController {
         // Commit added entities
         List<AppEntity> entitiesAdded = commitActionOnAppEntities(
             projectChange.getAdded(),
-            saveAction,
+            saveOrModifyAction,
             appEntityCreator
         );
         change.getAdded().addAll(entitiesAdded);
@@ -151,7 +158,7 @@ public class CommitController extends BaseController {
         // Commit modified entities
         List<AppEntity> entitiesModified = commitActionOnAppEntities(
             projectChange.getModified(),
-            saveAction,
+            saveOrModifyAction,
             appEntityCreator
         );
         change.getModified().addAll(entitiesModified);

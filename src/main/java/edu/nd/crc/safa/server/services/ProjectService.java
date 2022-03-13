@@ -24,6 +24,7 @@ import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class ProjectService {
     private final SafaUserRepository safaUserRepository;
 
     private final SafaUserService safaUserService;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
     private final EntityVersionService entityVersionService;
 
     @Autowired
@@ -53,14 +54,14 @@ public class ProjectService {
                           SafaUserRepository safaUserRepository,
                           SafaUserService safaUserService,
                           EntityVersionService entityVersionService,
-                          ProjectRetrievalService projectRetrievalService) {
+                          AppEntityRetrievalService appEntityRetrievalService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
         this.entityVersionService = entityVersionService;
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     /**
@@ -80,7 +81,7 @@ public class ProjectService {
 
         entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
         entityVersionService.commitVersionTraces(projectVersion, traces);
-        return projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
     /**

@@ -14,8 +14,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.NotificationService;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class FlatFileController extends BaseController {
     private final FileUploadService fileUploadService;
     private final NotificationService notificationService;
     private final FlatFileService flatFileService;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
@@ -47,14 +47,14 @@ public class FlatFileController extends BaseController {
                               FileUploadService fileUploadService,
                               NotificationService notificationService,
                               FlatFileService flatFileParser,
-                              ProjectRetrievalService projectRetrievalService) {
+                              AppEntityRetrievalService appEntityRetrievalService) {
         super(resourceBuilder);
         this.projectRepository = projectRepository;
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.fileUploadService = fileUploadService;
         this.flatFileService = flatFileParser;
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     /**
@@ -126,6 +126,6 @@ public class FlatFileController extends BaseController {
 
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.flatFileService.parseProjectFilesFromTIM(projectVersion);
-        return this.projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 }

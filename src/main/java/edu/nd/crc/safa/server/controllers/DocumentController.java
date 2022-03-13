@@ -15,7 +15,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.services.DocumentService;
 import edu.nd.crc.safa.server.services.NotificationService;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,19 +37,19 @@ public class DocumentController extends BaseController {
 
     private final DocumentService documentService;
     private final NotificationService notificationService;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public DocumentController(ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
                               DocumentService documentService,
                               NotificationService notificationService,
-                              ProjectRetrievalService projectRetrievalService) {
+                              AppEntityRetrievalService appEntityRetrievalService) {
         super(resourceBuilder);
         this.documentRepository = documentRepository;
         this.documentService = documentService;
         this.notificationService = notificationService;
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     /**
@@ -90,7 +90,7 @@ public class DocumentController extends BaseController {
     @GetMapping(AppRoutes.Projects.Documents.getProjectDocuments)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.projectRetrievalService.getDocumentsInProject(project);
+        return this.appEntityRetrievalService.getDocumentsInProject(project);
     }
 
     /**

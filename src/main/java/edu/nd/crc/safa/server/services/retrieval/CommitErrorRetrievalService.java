@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.services;
+package edu.nd.crc.safa.server.services.retrieval;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -23,7 +23,7 @@ import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,20 +40,20 @@ public class CommitController extends BaseController {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
     private final NotificationService notificationService;
 
     @Autowired
     public CommitController(ResourceBuilder resourceBuilder,
                             ArtifactVersionRepository artifactVersionRepository,
                             TraceLinkVersionRepository traceLinkVersionRepository,
-                            ProjectRetrievalService projectRetrievalService,
+                            AppEntityRetrievalService appEntityRetrievalService,
                             NotificationService notificationService
     ) {
         super(resourceBuilder);
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
         this.notificationService = notificationService;
     }
 
@@ -92,7 +92,7 @@ public class CommitController extends BaseController {
         ProjectVersion projectVersion,
         ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
         AppEntityCreator<ArtifactAppEntity, ArtifactVersion> appEntityCreator = (versionEntity)
-            -> projectRetrievalService.getArtifactInProjectVersion(projectVersion, versionEntity);
+            -> appEntityRetrievalService.retrieveArtifactAppEntityInProjectVersion(projectVersion, versionEntity);
         return commitChanges(
             projectVersion,
             artifacts,

@@ -74,7 +74,7 @@ public class TestFTAArtifacts extends ApplicationBaseTest {
         assertThat(ftaArtifact.getArtifact().getName()).isEqualTo(artifactName);
 
         // VP - Verify that retrieving project returns artifact
-        List<ArtifactAppEntity> artifacts = projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> artifacts = appEntityRetrievalService.getArtifactsInProjectVersion(projectVersion);
         assertThat(artifacts.size()).isEqualTo(1);
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.FTA);

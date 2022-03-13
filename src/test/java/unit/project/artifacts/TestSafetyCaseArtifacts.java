@@ -11,7 +11,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +28,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
     SafetyCaseArtifactRepository safetyCaseArtifactRepository;
 
     @Autowired
-    ProjectRetrievalService projectRetrievalService;
+    AppEntityRetrievalService appEntityRetrievalService;
 
     /**
      * Verifies that an SOLUTION node can be created.
@@ -79,7 +79,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
 
         // VP - Verify that retrieving project returns artifact
-        List<ArtifactAppEntity> artifacts = projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> artifacts = appEntityRetrievalService.getArtifactsInProjectVersion(projectVersion);
         assertThat(artifacts.size()).isEqualTo(1);
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.SAFETY_CASE);

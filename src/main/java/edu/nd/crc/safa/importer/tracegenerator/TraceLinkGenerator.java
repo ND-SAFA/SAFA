@@ -19,7 +19,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +33,22 @@ public class TraceLinkGenerator {
 
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public TraceLinkGenerator(TraceLinkVersionRepository traceLinkVersionRepository,
                               ArtifactVersionRepository artifactVersionRepository,
-                              ProjectRetrievalService projectRetrievalService) {
+                              AppEntityRetrievalService appEntityRetrievalService) {
         this.artifactVersionRepository = artifactVersionRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     public List<TraceAppEntity> generateTraceLinksToFile(ProjectVersion projectVersion,
                                                          Pair<ArtifactType, ArtifactType> artifactTypes) {
         String DELIMITER = "*";
         List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
-        List<String> approvedLinks = projectRetrievalService
+        List<String> approvedLinks = appEntityRetrievalService
             .getTracesInProjectVersion(projectVersion)
             .stream()
             .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))

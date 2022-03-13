@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.services.WarningService;
@@ -41,11 +41,14 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
             .newArtifactBody(projectName, sourceName, "", "")
             .newTraceLink(projectName, sourceName, targetName, 0);
 
-        ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        Project project = dbEntityBuilder.getProject(projectName);
         List<ArtifactVersion> projectBodies = dbEntityBuilder.getArtifactBodies(projectName);
         List<TraceLinkVersion> traceLinkVersions = dbEntityBuilder.getTraceLinks(projectName);
-        List<TraceLink> traceLinks = traceLinkVersions.stream().map(TraceLinkVersion::getTraceLink).collect(Collectors.toList());
-        Map<String, List<RuleName>> violations = warningService.findViolationsInArtifactTree(projectVersion,
+        List<TraceLink> traceLinks = traceLinkVersions
+            .stream()
+            .map(TraceLinkVersion::getTraceLink)
+            .collect(Collectors.toList());
+        Map<String, List<RuleName>> violations = warningService.generateWarningsOnEntities(project,
             projectBodies,
             traceLinks);
 

@@ -60,6 +60,20 @@ public class DocumentService {
         return nUpdated;
     }
 
+    /**
+     * Sends notification to project subscribers that the documents have changed. If updateArtifacts is
+     * true then project version subscribers will be notified to update their artifacts.
+     *
+     * @param projectVersion  The project version whose artifacts are updated.
+     * @param updateArtifacts Whether to notify project version subsribers.
+     */
+    public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
+        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+        if (updateArtifacts) {
+            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+        }
+    }
+
     private int removeDeletedDocumentArtifactLinks(Document document,
                                                    List<String> artifactIds,
                                                    List<String> artifactIdsLinkedToDocument) {
@@ -103,19 +117,5 @@ public class DocumentService {
             }
         }
         return nUpdated;
-    }
-
-    /**
-     * Sends notification to project subscribers that the documents have changed. If updateArtifacts is
-     * true then project version subscribers will be notified to update their artifacts.
-     *
-     * @param projectVersion  The project version whose artifacts are updated.
-     * @param updateArtifacts Whether to notify project version subsribers.
-     */
-    public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
-        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
-        if (updateArtifacts) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
-        }
     }
 }

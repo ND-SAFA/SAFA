@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.server.entities.api;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -52,5 +55,14 @@ public class ProjectCommit {
 
     public void setTraces(ProjectChange<TraceAppEntity> traces) {
         this.traces = traces;
+    }
+
+    public void addTraceToDelete(List<TraceAppEntity> tracesToAdd) {
+        List<TraceAppEntity> tracesToDelete = this.getTraces().getRemoved();
+        List<TraceAppEntity> newTraces = tracesToAdd.stream()
+            .filter(t -> !tracesToDelete.contains(t))
+            .collect(Collectors.toList());
+        newTraces.addAll(tracesToDelete);
+        this.getTraces().setRemoved(newTraces);
     }
 }

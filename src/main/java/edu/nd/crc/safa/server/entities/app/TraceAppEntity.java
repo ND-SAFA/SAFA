@@ -152,4 +152,8 @@ public class TraceAppEntity implements IAppEntity {
     public void setId(String id) {
         this.traceLinkId = id;
     }
+
+    public boolean equals(TraceAppEntity other) {
+        return this.sourceName == other.sourceName && this.targetName == other.targetName;
+    }
 }

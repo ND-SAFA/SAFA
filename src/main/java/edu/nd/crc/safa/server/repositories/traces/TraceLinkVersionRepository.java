@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
@@ -32,21 +31,11 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
         return findByProjectVersionProject(project);
     }
 
-    default Optional<TraceLinkVersion> getApprovedLinkIfExist(Artifact sourceArtifact, Artifact targetArtifact) {
-        return findByTraceLinkSourceArtifactAndTraceLinkTargetArtifactAndApprovalStatus(sourceArtifact, targetArtifact,
-            TraceApproval.APPROVED);
-    }
-
     List<TraceLinkVersion> findByProjectVersionProject(Project project);
 
     List<TraceLinkVersion> findByTraceLink(TraceLink traceLink);
 
     List<TraceLinkVersion> findByTraceLinkTraceLinkId(UUID traceLinkId);
-
-    Optional<TraceLinkVersion> findByTraceLinkSourceArtifactAndTraceLinkTargetArtifactAndApprovalStatus(
-        Artifact sourceArtifact,
-        Artifact targetArtifact,
-        TraceApproval approvalStatus);
 
     List<TraceLinkVersion> findByProjectVersionProjectAndApprovalStatus(Project project,
                                                                         TraceApproval approvalStatus);
@@ -54,15 +43,18 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
     List<TraceLinkVersion> findByProjectVersionAndApprovalStatus(ProjectVersion projectVersion,
                                                                  TraceApproval approvalStatus);
 
-    Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
-
-    default Optional<TraceLinkVersion> findByProjectVersionAndSourceAndTarget(ProjectVersion projectVersion,
-                                                                              String source,
-                                                                              String target) {
-        return findByProjectVersionAndTraceLinkSourceArtifactNameAndTraceLinkTargetArtifactName(projectVersion, source,
-            target);
+    default List<TraceLinkVersion> getByProjectVersionAndSourceName(ProjectVersion projectVersion,
+                                                                    String name) {
+        return findByProjectVersionAndTraceLinkSourceArtifactName(projectVersion, name);
     }
 
-    Optional<TraceLinkVersion> findByProjectVersionAndTraceLinkSourceArtifactNameAndTraceLinkTargetArtifactName(ProjectVersion projectVersion, String source, String target);
+    default List<TraceLinkVersion> getByProjectVersionAndTargetName(ProjectVersion projectVersion,
+                                                                    String name) {
+        return findByProjectVersionAndTraceLinkSourceArtifactName(projectVersion, name);
+    }
 
+    Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
+    
+    List<TraceLinkVersion> findByProjectVersionAndTraceLinkSourceArtifactName(ProjectVersion projectVersion,
+                                                                              String name);
 }

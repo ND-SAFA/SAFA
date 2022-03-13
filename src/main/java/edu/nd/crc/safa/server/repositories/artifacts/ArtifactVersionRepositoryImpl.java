@@ -21,6 +21,7 @@ import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,6 +51,9 @@ public class ArtifactVersionRepositoryImpl
 
     @Autowired
     SafetyCaseArtifactRepository safetyCaseArtifactRepository;
+
+    @Autowired
+    TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
     public List<ArtifactVersion> getVersionEntitiesByProject(Project project) {

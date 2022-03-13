@@ -28,10 +28,22 @@ public class NotificationService {
         this.safaUserService = safaUserService;
     }
 
+    /**
+     * Returns the topic endpoint for notifications to project entities.
+     *
+     * @param project The project whose topic is returned.
+     * @return String representing path to project version endpoint.
+     */
     public static String getProjectTopic(Project project) {
         return String.format("/topic/projects/%s", project.getProjectId().toString());
     }
 
+    /**
+     * Returns the topic endpoint for notifications to project version entities.
+     *
+     * @param projectVersion The project version whose topic is returned.
+     * @return String representing path to project version endpoint.
+     */
     public static String getVersionTopic(ProjectVersion projectVersion) {
         return String.format("/topic/revisions/%s", projectVersion.getVersionId());
     }

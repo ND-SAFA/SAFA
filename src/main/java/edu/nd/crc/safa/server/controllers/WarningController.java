@@ -8,7 +8,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.WarningService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WarningController extends BaseController {
 
-    private final WarningService warningService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public WarningController(ResourceBuilder resourceBuilder,
-                             WarningService warningService) {
+                             AppEntityRetrievalService appEntityRetrievalService) {
         super(resourceBuilder);
-        this.warningService = warningService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     /**
@@ -42,6 +42,6 @@ public class WarningController extends BaseController {
     @GetMapping(AppRoutes.Projects.Warnings.getWarningsInProjectVersion)
     public Map<String, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.warningService.findViolationsInArtifactTree(projectVersion);
+        return this.appEntityRetrievalService.retrieveWarningsInProjectVersion(projectVersion);
     }
 }

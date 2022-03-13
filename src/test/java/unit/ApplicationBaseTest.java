@@ -18,7 +18,7 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
 import org.json.JSONArray;
@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
-    protected ProjectRetrievalService projectRetrievalService;
+    protected AppEntityRetrievalService appEntityRetrievalService;
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {

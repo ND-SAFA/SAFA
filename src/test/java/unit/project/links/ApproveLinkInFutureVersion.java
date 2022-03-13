@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ApproveLinkInFutureVersion extends TraceBaseTest {
 
     @Autowired
-    ProjectRetrievalService projectRetrievalService;
+    AppEntityRetrievalService appEntityRetrievalService;
 
     @Test
     public void ableToEditGeneratedLinksInFutureVersions() throws Exception {

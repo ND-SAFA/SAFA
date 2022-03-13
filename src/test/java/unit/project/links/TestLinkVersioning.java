@@ -46,7 +46,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
         uploadFlatFilesToVersion(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectEntities baseEntities = projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
+        ProjectEntities baseEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
         List<TraceAppEntity> baseTraces = baseEntities.getProject().getTraces();
         assertThat(baseTraces.size()).isEqualTo(1);
 
@@ -57,7 +57,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
         assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectEntities targetEntities = projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
+        ProjectEntities targetEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
         List<TraceAppEntity> targetTraces = targetEntities.getProject().getTraces();
         assertThat(targetTraces.size()).isEqualTo(1);
     }

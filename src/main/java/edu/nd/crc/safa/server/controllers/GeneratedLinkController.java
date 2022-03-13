@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class GeneratedLinkController extends BaseController {
 
     private final TraceLinkGenerator traceLinkGenerator;
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public GeneratedLinkController(ResourceBuilder resourceBuilder,
-                                   ProjectRetrievalService projectRetrievalService,
+                                   AppEntityRetrievalService appEntityRetrievalService,
                                    TraceLinkGenerator traceLinkGenerator) {
         super(resourceBuilder);
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
         this.traceLinkGenerator = traceLinkGenerator;
     }
 
@@ -52,7 +52,7 @@ public class GeneratedLinkController extends BaseController {
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         List<TraceAppEntity> generatedTracesInVersion =
-            this.projectRetrievalService.getTracesInProjectVersion(projectVersion)
+            this.appEntityRetrievalService.getTracesInProjectVersion(projectVersion)
                 .stream()
                 .filter(t -> t.traceType.equals(TraceType.GENERATED))
                 .collect(Collectors.toList());

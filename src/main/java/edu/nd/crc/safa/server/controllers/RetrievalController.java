@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.ProjectRetrievalService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RetrievalController extends BaseController {
 
-    private final ProjectRetrievalService projectRetrievalService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
 
     @Autowired
     public RetrievalController(ResourceBuilder resourceBuilder,
-                               ProjectRetrievalService projectRetrievalService) {
+                               AppEntityRetrievalService appEntityRetrievalService) {
         super(resourceBuilder);
-        this.projectRetrievalService = projectRetrievalService;
+        this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
     /**
@@ -42,7 +42,7 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.Entities.getProjectInVersion)
     public ProjectEntities getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
     /**
@@ -55,7 +55,7 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.Entities.getArtifactsInVersion)
     public List<ArtifactAppEntity> getArtifactsInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.projectRetrievalService.getArtifactsInProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.getArtifactsInProjectVersion(projectVersion);
     }
 
     /**
@@ -68,7 +68,7 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.Entities.getTracesInVersion)
     public List<TraceAppEntity> getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        List<TraceAppEntity> traces = this.projectRetrievalService.getTracesInProjectVersion(projectVersion);
+        List<TraceAppEntity> traces = this.appEntityRetrievalService.getTracesInProjectVersion(projectVersion);
         return traces;
     }
 }

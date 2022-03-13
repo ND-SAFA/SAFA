@@ -20,7 +20,6 @@ import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.EntityVersionService;
-import edu.nd.crc.safa.server.services.TraceLinkService;
 
 import com.jsoniter.output.JsonStream;
 import org.eclipse.jgit.api.Git;
@@ -40,7 +39,6 @@ public class Puller {
     private final Set<String> foundNodes = new HashSet<String>();
     private final JIRA mJira;
     private final EntityVersionService entityVersionService;
-    private final TraceLinkService traceLinkService;
 
     @Value("${git.username:}")
     String gitUsername;
@@ -55,11 +53,9 @@ public class Puller {
 
     @Autowired
     public Puller(JIRA jira,
-                  EntityVersionService entityVersionService,
-                  TraceLinkService traceLinkService) {
+                  EntityVersionService entityVersionService) {
         this.mJira = jira;
         this.entityVersionService = entityVersionService;
-        this.traceLinkService = traceLinkService;
     }
 
     public void parseJIRAIssues(ProjectVersion projectVersion) throws Exception {

@@ -43,18 +43,5 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
     List<TraceLinkVersion> findByProjectVersionAndApprovalStatus(ProjectVersion projectVersion,
                                                                  TraceApproval approvalStatus);
 
-    default List<TraceLinkVersion> getByProjectVersionAndSourceName(ProjectVersion projectVersion,
-                                                                    String name) {
-        return findByProjectVersionAndTraceLinkSourceArtifactName(projectVersion, name);
-    }
-
-    default List<TraceLinkVersion> getByProjectVersionAndTargetName(ProjectVersion projectVersion,
-                                                                    String name) {
-        return findByProjectVersionAndTraceLinkSourceArtifactName(projectVersion, name);
-    }
-
     Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
-    
-    List<TraceLinkVersion> findByProjectVersionAndTraceLinkSourceArtifactName(ProjectVersion projectVersion,
-                                                                              String name);
 }

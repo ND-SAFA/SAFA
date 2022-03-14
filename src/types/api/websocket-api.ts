@@ -34,4 +34,5 @@ export enum VersionMessageType {
   VERSION = "VERSION",
   ARTIFACTS = "ARTIFACTS",
   TRACES = "TRACES",
+  WARNINGS = "WARNINGS",
 }

@@ -1,12 +1,41 @@
 import { ProjectIdentifier } from "@/types/domain/project";
 
 /**
- * Enumerates the type of documents supported by SAFA
+ * Enumerates the type of documents supported by SAFA.
  */
 export enum DocumentType {
   ARTIFACT_TREE = "ARTIFACT_TREE",
   FTA = "FTA",
   SAFETY_CASE = "SAFETY_CASE",
+  FMEA = "FMEA",
+  FMECA = "FMECA",
+}
+
+/**
+ * Enumerates the types of columns in a table document.
+ */
+export enum ColumnDataType {
+  FREE_TEXT = "FREE_TEXT",
+  RELATION = "RELATION",
+  SELECT = "SELECT",
+}
+
+/**
+ * Represents a column definition in a table-like document.
+ */
+export interface DocumentColumn {
+  /**
+   * The ID of this column.
+   */
+  id: string;
+  /**
+   * The name of this column.
+   */
+  name: string;
+  /**
+   * The type of data this column represents.
+   */
+  dataType: ColumnDataType;
 }
 
 /**
@@ -37,4 +66,8 @@ export interface ProjectDocument {
    * The ids of artifacts displayed within this document.
    */
   artifactIds: string[];
+  /**
+   * Defines the columns of a table-like document.
+   */
+  columns?: DocumentColumn[];
 }

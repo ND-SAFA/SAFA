@@ -1,6 +1,6 @@
 buildNoTests() {
   (
-    ./gradlew build --stacktrace -x Test
+    ./gradlew build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
   )
 }
 

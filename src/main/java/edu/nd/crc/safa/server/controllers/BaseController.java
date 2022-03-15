@@ -9,6 +9,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestController
 public abstract class BaseController {
@@ -28,6 +30,31 @@ public abstract class BaseController {
     @Autowired
     public BaseController(ResourceBuilder resourceBuilder) {
         this.resourceBuilder = resourceBuilder;
+    }
+
+    protected Document getDocumentById(DocumentRepository documentRepository,
+                                       UUID documentId) throws SafaError {
+        Optional<Document> documentOptional = documentRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            return documentOptional.get();
+        } else {
+            throw new SafaError("Could not find document with given id:" + documentId);
+        }
+    }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public SafaError handleFileSizeLimitExceeded(FileSizeLimitExceededException exception) {
+        exception.printStackTrace();
+        String errorMessage = exception.getFileName() + " is too big. Please contact SAFA administrators.";
+        return new SafaError(errorMessage, exception);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public SafaError handleFileSizeLimitExceeded(MaxUploadSizeExceededException exception) {
+        exception.printStackTrace();
+        String errorMessage = "Upload exceeded max size of " + exception.getMaxUploadSize()
+            + ". Please contact SAFA administrators.";
+        return new SafaError(errorMessage, exception);
     }
 
     @ExceptionHandler(SafaError.class)
@@ -65,16 +92,6 @@ public abstract class BaseController {
     public SafaError handleGenericError(Exception ex) {
         ex.printStackTrace();
         return new SafaError("An unexpected server error occurred.", ex);
-    }
-
-    protected Document getDocumentById(DocumentRepository documentRepository,
-                                       UUID documentId) throws SafaError {
-        Optional<Document> documentOptional = documentRepository.findById(documentId);
-        if (documentOptional.isPresent()) {
-            return documentOptional.get();
-        } else {
-            throw new SafaError("Could not find document with given id:" + documentId);
-        }
     }
 
     private String createValidationMessage(ObjectError error) {

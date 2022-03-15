@@ -77,7 +77,7 @@ export default Vue.extend({
         .then(async () => {
           this.isLoading = false;
 
-          if (goToPage && goToPage !== Routes.ARTIFACT_TREE) {
+          if (goToPage && goToPage !== Routes.ARTIFACT) {
             await navigateTo(goToPage);
           } else {
             await loadLastProject();

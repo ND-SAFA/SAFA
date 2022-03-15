@@ -1,7 +1,8 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { Project, ProjectDocument } from "@/types";
-import { createDocument } from "@/util";
+import { DocumentType } from "@/types";
+import { createDocument, isTableDocument } from "@/util";
 import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
 
@@ -173,5 +174,13 @@ export default class DocumentModule extends VuexModule {
     return (newName) => {
       return !!this.projectDocuments.find(({ name }) => name === newName);
     };
+  }
+
+  /**
+   * Returns whether the current document type is for rendering a table.
+   * TODO: remove value override.
+   */
+  get isTableDocument(): boolean {
+    return isTableDocument(this.currentDocument.type) || true;
   }
 }

@@ -24,7 +24,7 @@ export default Vue.extend({
   },
   methods: {
     onAvatarClick() {
-      navigateTo(Routes.ARTIFACT_TREE);
+      navigateTo(Routes.ARTIFACT);
     },
   },
 });

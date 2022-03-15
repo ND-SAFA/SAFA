@@ -38,7 +38,7 @@ export const routerChecks: Record<string, RouterCheck> = {
     }
   },
   closePanelsIfNotInGraph(to: Route) {
-    if (to.path !== Routes.ARTIFACT_TREE) {
+    if (to.path !== Routes.ARTIFACT) {
       appModule.closePanel(PanelType.left);
       appModule.closePanel(PanelType.right);
     }

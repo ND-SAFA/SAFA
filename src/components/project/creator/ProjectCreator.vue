@@ -149,7 +149,7 @@ export default Vue.extend({
       appModule.SET_IS_LOADING(true);
       saveOrUpdateProject(this.project)
         .then(async (res) => {
-          await navigateTo(Routes.ARTIFACT_TREE);
+          await navigateTo(Routes.ARTIFACT);
           await setCreatedProject(res);
         })
         .then(() => this.clearData())

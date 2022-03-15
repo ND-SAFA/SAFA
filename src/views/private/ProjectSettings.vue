@@ -54,7 +54,7 @@ export default Vue.extend({
   },
   methods: {
     handleGoBack() {
-      navigateTo(Routes.ARTIFACT_TREE);
+      navigateTo(Routes.ARTIFACT);
     },
   },
 });

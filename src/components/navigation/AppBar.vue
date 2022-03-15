@@ -70,7 +70,7 @@ export default Vue.extend({
   },
   computed: {
     doShowGraphButtons(): boolean {
-      return router.currentRoute.path === Routes.ARTIFACT_TREE;
+      return router.currentRoute.path === Routes.ARTIFACT;
     },
     isLoading(): boolean {
       return appModule.getIsLoading;

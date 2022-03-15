@@ -8,6 +8,7 @@
             v-bind="attrs"
             color="secondary"
             icon
+            :disabled="isDisabled"
           >
             <v-icon>{{ definition.icon }}</v-icon>
           </v-btn>
@@ -43,14 +44,11 @@
 import { ButtonDefinition } from "@/types";
 import Vue, { PropType } from "vue";
 import { ThemeColors } from "@/util";
-import { GenericIconButton } from "@/components/common/generic";
 
 export default Vue.extend({
-  components: {
-    GenericIconButton,
-  },
   props: {
     definition: Object as PropType<ButtonDefinition>,
+    isDisabled: Boolean,
   },
   data() {
     return {

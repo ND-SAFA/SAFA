@@ -17,6 +17,7 @@
                 :icon-id="
                   isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
                 "
+                :is-disabled="doDisableButtons"
                 @click="onLeftPanelClick"
               />
             </v-col>
@@ -34,6 +35,7 @@
               color="secondary"
               :tooltip="rightPanelTooltip"
               :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+              :is-disabled="doDisableButtons"
               @click="onRightPanelClick"
             />
           </v-row>
@@ -48,7 +50,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appModule, documentModule } from "@/store";
 import { GenericIconButton } from "@/components/common";
 import { router, Routes } from "@/router";
 import AppBarHeader from "./AppBarHeader.vue";
@@ -71,6 +73,9 @@ export default Vue.extend({
   computed: {
     doShowGraphButtons(): boolean {
       return router.currentRoute.path === Routes.ARTIFACT;
+    },
+    doDisableButtons(): boolean {
+      return documentModule.isTableDocument;
     },
     isLoading(): boolean {
       return appModule.getIsLoading;

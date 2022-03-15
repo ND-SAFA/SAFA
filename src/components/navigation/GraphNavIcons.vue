@@ -12,9 +12,13 @@
           :tooltip="definition.label"
           :icon-id="definition.icon"
           @click="definition.handler"
-          :is-disabled="definition.isDisabled"
+          :is-disabled="definition.isDisabled || doDisableButtons"
         />
-        <checkmark-menu v-else :definition="definition" />
+        <checkmark-menu
+          v-else
+          :definition="definition"
+          :is-disabled="definition.isDisabled || doDisableButtons"
+        />
       </v-row>
     </v-col>
   </v-row>
@@ -28,6 +32,7 @@ import {
   artifactModule,
   artifactSelectionModule,
   commitModule,
+  documentModule,
   projectModule,
   viewportModule,
 } from "@/store";
@@ -137,6 +142,9 @@ export default Vue.extend({
           isDisabled: !commitModule.canRedo,
         },
       ];
+    },
+    doDisableButtons(): boolean {
+      return documentModule.isTableDocument;
     },
   },
 });

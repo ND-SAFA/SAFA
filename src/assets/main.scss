@@ -12,6 +12,11 @@
   width: 100%;
 }
 
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // Fixes code-diff's broken styling
 code.hljs {
   min-height: 26px;

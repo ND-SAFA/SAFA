@@ -128,7 +128,6 @@ import {
   artifactModule,
   artifactSelectionModule,
   errorModule,
-  projectModule,
   traceModule,
 } from "@/store";
 import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
@@ -193,7 +192,6 @@ export default Vue.extend({
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
-          artifactSelectionModule.UNSELECT_ARTIFACT();
           appModule.closePanel(PanelType.left);
         });
       }

@@ -7,6 +7,14 @@
   >
     <template v-slot:body>
       <v-container>
+        <v-select
+          filled
+          label="Document Type"
+          v-model="documentType"
+          :items="documentTypes"
+          item-text="name"
+          item-value="id"
+        />
         <v-text-field
           v-if="!isFTA"
           filled
@@ -23,14 +31,6 @@
           v-model="artifactType"
           :items="artifactTypes"
           label="Artifact Type"
-        />
-        <v-select
-          filled
-          label="Document Type"
-          v-model="documentType"
-          :items="documentTypes"
-          item-text="name"
-          item-value="id"
         />
         <v-select
           v-if="isFTA"
@@ -211,7 +211,7 @@ export default Vue.extend({
   },
   watch: {
     isOpen(isOpen: boolean | string): void {
-      if (!isOpen) {
+      if (isOpen === true) {
         this.name = this.artifact?.name || "";
         this.summary = this.artifact?.summary || "";
         this.body = this.artifact?.body || "";
@@ -240,11 +240,10 @@ export default Vue.extend({
 
         this.nameCheckIsLoading = true;
         this.nameCheckTimer = setTimeout(() => {
-          if (!this.versionId) return;
-
           isArtifactNameTaken(this.versionId, newName).then((res) => {
             this.nameCheckIsLoading = false;
-            this.isNameValid = !res.artifactExists;
+            this.isNameValid =
+              !res.artifactExists || newName === this.artifact.name;
 
             if (this.isNameValid) {
               this.nameError = "";

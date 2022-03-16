@@ -2,10 +2,7 @@
   <v-container>
     <v-data-table class="elevation-1" :headers="headers" :items="items">
       <template v-slot:top>
-        <v-container>
-          TODO: Add New Artifacts Button/Modal, Edit Document Columns
-          Button/Modal, Edit/Delete Modals
-        </v-container>
+        <v-container> TODO: Edit Document Columns Button/Modal </v-container>
       </template>
       <template
         v-for="textName in textColumnNames"
@@ -29,12 +26,30 @@
         <generic-icon-button
           icon-id="mdi-pencil"
           tooltip="Edit"
-          @click="editItem(item)"
+          @click="handleEdit(item)"
         />
         <generic-icon-button
           icon-id="mdi-delete "
           tooltip="Delete"
-          @click="deleteItem(item)"
+          @click="handleDelete(item)"
+        />
+      </template>
+      <template v-slot:footer>
+        <v-row justify="end" class="mr-2 mt-1">
+          <generic-icon-button
+            fab
+            color="primary"
+            icon-id="mdi-plus"
+            tooltip="Create"
+            @click="handleCreate"
+          />
+        </v-row>
+
+        <artifact-creator-modal
+          :title="artifactCreatorTitle"
+          :is-open="createDialogueOpen"
+          :artifact="selectedArtifact"
+          @close="handleCloseModal"
         />
       </template>
     </v-data-table>
@@ -43,16 +58,23 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, documentModule } from "@/store";
 import { Artifact, ColumnDataType } from "@/types";
-import { GenericIconButton } from "@/components/common";
+import { artifactModule, documentModule } from "@/store";
+import { deleteArtifactFromCurrentVersion } from "@/api";
+import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
 
 /**
  * Represents a table of artifacts.
  */
 export default Vue.extend({
   name: "ArtifactTable",
-  components: { GenericIconButton },
+  components: { GenericIconButton, ArtifactCreatorModal },
+  data() {
+    return {
+      selectedArtifact: undefined as Artifact | undefined,
+      createDialogueOpen: false,
+    };
+  },
   computed: {
     headers() {
       return [
@@ -89,13 +111,26 @@ export default Vue.extend({
     items() {
       return artifactModule.artifacts;
     },
+
+    artifactCreatorTitle(): string {
+      return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
+    },
   },
   methods: {
-    editItem(artifact: Artifact) {
-      console.log("TODO: edit");
+    handleEdit(artifact: Artifact) {
+      console.log(artifact);
+      this.selectedArtifact = artifact;
+      this.createDialogueOpen = true;
     },
-    deleteItem(artifact: Artifact) {
-      console.log("TODO: delete");
+    handleDelete(artifact: Artifact) {
+      deleteArtifactFromCurrentVersion(artifact);
+    },
+    handleCreate() {
+      this.createDialogueOpen = true;
+    },
+    handleCloseModal() {
+      this.createDialogueOpen = false;
+      this.selectedArtifact = undefined;
     },
   },
 });

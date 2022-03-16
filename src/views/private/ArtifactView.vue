@@ -10,8 +10,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { documentModule } from "@/store";
-import { ArtifactTree, PrivatePage } from "@/components";
-import ArtifactTable from "@/components/artifact/table/ArtifactTable.vue";
+import { ArtifactTree, ArtifactTable, PrivatePage } from "@/components";
 
 /**
  * Displays the artifact tree of the current project with a label

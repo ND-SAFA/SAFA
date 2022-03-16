@@ -237,9 +237,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.v-list-item--active {
-  color: white !important;
-}
-</style>

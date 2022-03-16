@@ -2,7 +2,9 @@
   <v-container>
     <v-data-table class="elevation-1" :headers="headers" :items="items">
       <template v-slot:top>
-        <v-container> </v-container>
+        <v-container class="flex">
+          <table-column-editor class="ml-auto"
+        /></v-container>
       </template>
       <template
         v-for="{ id, dataType } in columns"
@@ -66,14 +68,20 @@ import { Artifact, ColumnDataType } from "@/types";
 import { artifactModule, documentModule } from "@/store";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
-import ArtifactTableChip from "@/components/artifact/ArtifactTableChip.vue";
+import ArtifactTableChip from "@/components/artifact/table/ArtifactTableChip.vue";
+import TableColumnEditor from "@/components/artifact/table/TableColumnEditor.vue";
 
 /**
  * Represents a table of artifacts.
  */
 export default Vue.extend({
   name: "ArtifactTable",
-  components: { ArtifactTableChip, GenericIconButton, ArtifactCreatorModal },
+  components: {
+    TableColumnEditor,
+    ArtifactTableChip,
+    GenericIconButton,
+    ArtifactCreatorModal,
+  },
   data() {
     return {
       selectedArtifact: undefined as Artifact | undefined,

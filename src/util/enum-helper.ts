@@ -1,4 +1,9 @@
-import { DocumentType, SafetyCaseType, SelectOption } from "@/types";
+import {
+  ColumnDataType,
+  DocumentType,
+  SafetyCaseType,
+  SelectOption,
+} from "@/types";
 
 /**
  * Returns display names for each document type.
@@ -37,5 +42,18 @@ export function safetyCaseOptions(): SelectOption[] {
     { id: SafetyCaseType.GOAL, name: "Goal" },
     { id: SafetyCaseType.STRATEGY, name: "Strategy" },
     { id: SafetyCaseType.SOLUTION, name: "Solution" },
+  ];
+}
+
+/**
+ * Returns display names for each column type.
+ *
+ * @return The select option names and ids.
+ */
+export function columnTypeOptions(): SelectOption[] {
+  return [
+    { id: ColumnDataType.FREE_TEXT, name: "Text" },
+    { id: ColumnDataType.RELATION, name: "Relation" },
+    { id: ColumnDataType.SELECT, name: "Select" },
   ];
 }

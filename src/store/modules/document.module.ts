@@ -209,4 +209,13 @@ export default class DocumentModule extends VuexModule {
         ]
       : [];
   }
+
+  /**
+   * Returns whether the given column name already exists.
+   */
+  get doesColumnExist(): (name: string) => boolean {
+    return (newName) => {
+      return !!this.tableColumns.find(({ name }) => name === newName);
+    };
+  }
 }

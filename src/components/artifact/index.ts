@@ -1,2 +1,2 @@
-export { default as ArtifactTree } from "./ArtifactTree.vue";
-export { default as ArtifactTable } from "./ArtifactTable.vue";
+export { default as ArtifactTree } from "./tree/ArtifactTree.vue";
+export { default as ArtifactTable } from "./table/ArtifactTable.vue";

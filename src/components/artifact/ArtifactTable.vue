@@ -2,7 +2,7 @@
   <v-container>
     <v-data-table class="elevation-1" :headers="headers" :items="items">
       <template v-slot:top>
-        <v-container> TODO: Edit Document Columns Button/Modal </v-container>
+        <v-container> </v-container>
       </template>
       <template
         v-for="textName in textColumnNames"

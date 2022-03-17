@@ -49,7 +49,7 @@ import {
   ProjectMembership,
   ProjectRole,
 } from "@/types";
-import { GenericSelector } from "@/components";
+import { GenericSelector } from "@/components/common/generic";
 import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 import { logModule, sessionModule } from "@/store";
@@ -75,12 +75,12 @@ export default Vue.extend({
   },
   computed: {
     isAdmin(): boolean {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
+      const userEmail = sessionModule.userEmail;
       const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
       const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail
+        (m) => m.email === userEmail && allowedRoles.includes(m.role)
       );
-      return userQuery.length === 1 && allowedRoles.includes(userQuery[0].role);
+      return userQuery.length === 1;
     },
     members(): ProjectMembership[] {
       return this.project.members;

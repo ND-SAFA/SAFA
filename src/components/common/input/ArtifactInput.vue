@@ -2,9 +2,9 @@
   <v-autocomplete
     filled
     chips
-    multiple
+    :multiple="multiple"
     deletable-chips
-    label="Visible Artifacts"
+    :label="label"
     v-model="model"
     :items="artifacts"
     item-text="name"
@@ -13,7 +13,7 @@
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:item="{ item }">
-      <v-list-item-content style="max-width: 300px">
+      <v-list-item-content style="max-width: 500px">
         <v-list-item-title
           v-html="`${getTypePrintName(item.type)} - ${item.name}`"
         />
@@ -46,8 +46,20 @@ export default Vue.extend({
   name: "artifact-input",
   props: {
     value: {
-      type: Array,
+      type: [Array, String],
       required: true,
+    },
+    multiple: {
+      type: Boolean,
+      default: true,
+    },
+    label: {
+      type: String,
+      default: "Visible Artifacts",
+    },
+    onlyDocumentArtifacts: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -77,14 +89,16 @@ export default Vue.extend({
   },
   computed: {
     artifacts(): Artifact[] {
-      return artifactModule.allArtifacts;
+      return this.onlyDocumentArtifacts
+        ? artifactModule.artifacts
+        : artifactModule.allArtifacts;
     },
   },
   watch: {
-    value(currentValue: string[]) {
+    value(currentValue: string[] | string) {
       this.model = currentValue;
     },
-    model(currentValue: string[]) {
+    model(currentValue: string[] | string) {
       this.$emit("input", currentValue);
     },
   },

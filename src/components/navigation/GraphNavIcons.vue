@@ -1,5 +1,5 @@
 <template>
-  <v-row class="ma-0 pa-0" justify="center">
+  <v-row class="ma-0 pa-0" justify="center" style="flex-wrap: nowrap">
     <v-col
       v-for="definition in definitions"
       :key="definition.label"
@@ -112,6 +112,12 @@ export default Vue.extend({
           },
           label: "Center Graph",
           icon: "mdi-graphql",
+        },
+        {
+          type: ButtonType.ICON,
+          handler: viewportModule.setArtifactTreeLayout,
+          label: "Reformat Graph",
+          icon: "mdi-refresh",
         },
         {
           type: ButtonType.CHECKMARK_MENU,

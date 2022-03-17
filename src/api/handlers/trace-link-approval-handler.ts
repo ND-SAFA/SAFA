@@ -1,5 +1,5 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
-import { appModule, projectModule, traceModule } from "@/store";
+import { appModule, projectModule } from "@/store";
 import { approveLink, declineLink } from "@/api/commits";
 
 /**
@@ -40,7 +40,7 @@ export async function declineLinkAPIHandler(
       onSuccess();
     }
 
-    await traceModule.deleteTraceLink(link);
+    await projectModule.deleteTraceLinks([link]);
   });
 }
 

@@ -11,7 +11,7 @@
         :opacity="getArtifactOpacity(artifact.id)"
       />
       <generic-graph-link
-        v-for="traceLink in nonDeclinedTraces"
+        v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         @click:right="onLinkRightClick"
@@ -43,6 +43,7 @@ import {
   appModule,
   artifactModule,
   artifactSelectionModule,
+  deltaModule,
   subtreeModule,
   traceModule,
   viewportModule,
@@ -51,8 +52,8 @@ import { artifactTreeGraph } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
+  TraceLinkApprovalModal,
 } from "@/components/common";
-import { TraceLinkApprovalModal } from "@/components/approve-links-view";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
@@ -77,18 +78,23 @@ export default Vue.extend({
     cytoCoreGraph(): CytoCoreGraph {
       return artifactTreeGraph;
     },
+
     artifactHashMap(): Record<string, Artifact> {
       return artifactModule.getArtifactsById;
     },
     artifacts(): Artifact[] {
       return artifactModule.artifacts;
     },
-    nonDeclinedTraces(): TraceLink[] {
-      return traceModule.nonDeclinedTraces;
+
+    traceLinks(): TraceLink[] {
+      return deltaModule.inDeltaView
+        ? traceModule.traces
+        : traceModule.nonDeclinedTraces;
     },
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
     },
+
     nodesInView(): string[] {
       return viewportModule.getNodesInView;
     },

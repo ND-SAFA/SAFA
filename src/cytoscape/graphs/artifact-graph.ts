@@ -29,6 +29,7 @@ export const artifactTreeGraph: CytoCoreGraph = {
     motionBlur: USE_MOTION_BLUR,
     motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
+    boxSelectionEnabled: true,
   },
   saveCy: artifactTreeResolveCy,
   plugins: [
@@ -52,11 +53,12 @@ export const artifactTreeGraph: CytoCoreGraph = {
     },
     {
       initialize: edgehandles,
-      afterInit: async (cy: CytoCore) =>
+      afterInit: async (cy: CytoCore) => {
         await setEdgeHandlesCore(
           artifactTreeCyPromise,
           cy.edgehandles(artifactTreeEdgeHandleOptions)
-        ),
+        );
+      },
     },
   ],
   async afterInit() {

@@ -1,7 +1,12 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { ProjectMessage, VersionMessage } from "@/types";
-import { projectModule, logModule } from "@/store";
+import {
+  ProjectMessage,
+  ProjectMessageType,
+  VersionMessage,
+  VersionMessageType,
+} from "@/types";
+import { projectModule, logModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/util";
 import {
   getProjectMembers,
@@ -166,15 +171,16 @@ async function versionMessageHandler(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const message: VersionMessage = frame.body as VersionMessage;
-
-  switch (message) {
-    case "VERSION":
-      return getProjectVersion(versionId).then(setCreatedProject);
-    case "ARTIFACTS":
-      return reloadArtifactsHandler(versionId);
-    case "TRACES":
-      return reloadTracesHandler(versionId);
+  const message: VersionMessage = JSON.parse(frame.body) as VersionMessage;
+  if (sessionModule.userEmail !== message.user) {
+    switch (message.type) {
+      case "VERSION":
+        return getProjectVersion(versionId).then(setCreatedProject);
+      case "ARTIFACTS":
+        return reloadArtifactsHandler(versionId);
+      case "TRACES":
+        return reloadTracesHandler(versionId);
+    }
   }
 }
 
@@ -188,8 +194,8 @@ async function projectMessageHandler(
   projectId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ProjectMessage = frame.body as ProjectMessage;
-  switch (message) {
+  const message: ProjectMessage = JSON.parse(frame.body) as ProjectMessage;
+  switch (message.type) {
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
     case "DOCUMENTS":

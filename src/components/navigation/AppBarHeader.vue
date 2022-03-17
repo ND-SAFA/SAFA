@@ -28,6 +28,12 @@
       :project="project"
       @close="changeVersionOpen = false"
     />
+    <version-creator
+      :is-open="createVersionOpen"
+      :project="project"
+      @close="createVersionOpen = false"
+      @create="onVersionCreated"
+    />
   </v-flex>
 </template>
 
@@ -38,17 +44,20 @@ import {
   ButtonType,
   EmptyLambda,
   ProjectIdentifier,
+  ProjectVersion,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
+import { loadVersionIfExistsHandler } from "@/api";
 import {
   BaselineVersionModal,
   ButtonRow,
   UploadNewVersionModal,
 } from "@/components/common";
+import { VersionCreator } from "@/components/project";
 import SafaIcon from "./SafaIcon.vue";
 import AccountDropdown from "./AccountDropdown.vue";
-import VersionLabel from "@/components/artifact-tree-view/VersionLabel.vue";
+import VersionLabel from "./VersionLabel.vue";
 
 /**
  * Local representation of generated menu items.
@@ -63,12 +72,14 @@ export default Vue.extend({
     ButtonRow,
     UploadNewVersionModal,
     BaselineVersionModal,
+    VersionCreator,
   },
   data() {
     return {
       openProjectOpen: false,
       uploadVersionOpen: false,
       changeVersionOpen: false,
+      createVersionOpen: false,
     };
   },
   methods: {
@@ -84,6 +95,17 @@ export default Vue.extend({
       } else {
         logModule.onWarning("Please select a project.");
       }
+    },
+    onCreateVersion(): void {
+      console.log(projectModule.projectId);
+      if (projectModule.projectId) {
+        this.createVersionOpen = true;
+      } else {
+        logModule.onWarning("Please select a project.");
+      }
+    },
+    onVersionCreated(version: ProjectVersion) {
+      loadVersionIfExistsHandler(version.versionId);
     },
   },
   computed: {
@@ -108,13 +130,23 @@ export default Vue.extend({
           menuHandlers: this.projectMenuItems.map((i) => i[1]),
         },
         {
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
-          menuItems: ["Change Version", "Upload Flat Files"],
-          menuHandlers: [this.onChangeVersion, this.onUploadVersion],
+          menuItems: [
+            "Change Version",
+            "Upload Flat Files",
+            "Create New Version",
+          ],
+          menuHandlers: [
+            this.onChangeVersion,
+            this.onUploadVersion,
+            this.onCreateVersion,
+          ],
         },
         {
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,

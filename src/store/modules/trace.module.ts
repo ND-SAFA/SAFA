@@ -1,8 +1,13 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { LinkFinder, LinkValidator, TraceLink } from "@/types";
-import { DocumentTraces, TraceApproval } from "@/types";
-import { documentModule, subtreeModule } from "@/store";
+import type {
+  LinkFinder,
+  LinkValidator,
+  TraceLink,
+  DocumentTraces,
+} from "@/types";
+import { TraceApproval } from "@/types";
+import { documentModule } from "@/store";
 import { getTraceId } from "@/util";
 
 @Module({ namespaced: true, name: "trace" })
@@ -61,16 +66,15 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  async deleteTraceLink(traceLink: TraceLink): Promise<void> {
+  async deleteTraceLinks(traceLinks: TraceLink[]): Promise<void> {
+    const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
     const removeLink = (currentTraces: TraceLink[]) =>
       currentTraces.filter(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
+        ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
       );
 
     this.SET_PROJECT_TRACES(removeLink(this.projectTraces));
     this.SET_CURRENT_TRACES(removeLink(this.currentTraces));
-
-    await subtreeModule.updateSubtreeMap();
   }
 
   @Mutation
@@ -118,7 +122,7 @@ export default class TraceModule extends VuexModule {
    */
   get getTraceLinkByArtifacts(): LinkFinder {
     return (sourceId, targetId) => {
-      const traceQuery = this.traces.filter(
+      const traceQuery = this.allTraces.filter(
         (trace) => trace.sourceId === sourceId && trace.targetId === targetId
       );
 

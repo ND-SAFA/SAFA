@@ -13,7 +13,6 @@ import {
   connectAndSubscribeToVersion,
   reloadTraceMatrices,
   loadVersionIfExistsHandler,
-  loadProjectDocuments,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
 
@@ -51,7 +50,6 @@ export async function setAndSubscribeToProject(
   const versionId = project.projectVersion?.versionId || "";
 
   await connectAndSubscribeToVersion(projectId, versionId);
-  await loadProjectDocuments(project);
   await projectModule.initializeProject(project);
   await resetGraphFocus(isDifferentProject);
   await reloadTraceMatrices();

@@ -1,6 +1,7 @@
 import { TraceApproval, TraceLink, Artifact } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "./commit-builder";
+import { projectModule, traceModule } from "@/store";
 
 /**
  * Returns all generated links for this project.
@@ -47,7 +48,9 @@ export async function approveLink(traceLink: TraceLink): Promise<void> {
   traceLink.approvalStatus = TraceApproval.APPROVED;
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
-    .save();
+    .save()
+    .then(async ({ traces }) => traces.modified)
+    .then(projectModule.addOrUpdateTraceLinks);
 }
 
 /**
@@ -59,7 +62,9 @@ export async function declineLink(traceLink: TraceLink): Promise<void> {
   traceLink.approvalStatus = TraceApproval.DECLINED;
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
-    .save();
+    .save()
+    .then(async ({ traces }) => traces.modified)
+    .then(projectModule.addOrUpdateTraceLinks);
 }
 
 /**
@@ -71,5 +76,9 @@ export async function declineLink(traceLink: TraceLink): Promise<void> {
  */
 export async function createLink(traceLink: TraceLink): Promise<void> {
   traceLink.approvalStatus = TraceApproval.APPROVED;
-  return CommitBuilder.withCurrentVersion().withNewTraceLink(traceLink).save();
+  return CommitBuilder.withCurrentVersion()
+    .withNewTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.added)
+    .then(projectModule.addOrUpdateTraceLinks);
 }

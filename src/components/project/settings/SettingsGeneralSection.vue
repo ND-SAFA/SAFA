@@ -67,9 +67,7 @@ export default Vue.extend({
         projectId: this.project.projectId,
         name: project.name,
         description: project.description,
-        members: [], //This route currently ignores membership field.
-        artifacts: [],
-        traces: [],
+        owner: "",
       })
         .then(() => projectModule.SET_PROJECT_IDENTIFIER(project))
         .catch((e) => {

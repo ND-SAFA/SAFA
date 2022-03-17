@@ -1,11 +1,10 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
 import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
 import {
+  appModule,
   artifactModule,
   artifactSelectionModule,
-  projectModule,
   subtreeModule,
-  viewportModule,
 } from "@/store";
 import {
   artifactTreeCyPromise,
@@ -16,10 +15,9 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
   cyIfNotAnimated,
-  cyZoomReset,
-  cyCenterNodes,
   cyCreateLayout,
   cyCenterOnArtifacts,
+  cyApplyAutomove,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -52,7 +50,7 @@ export default class ViewportModule extends VuexModule {
       artifact.id,
     ];
 
-    await artifactSelectionModule.selectArtifact(artifact.id);
+    artifactSelectionModule.selectArtifact(artifact.id);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",
@@ -79,8 +77,6 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: artifactTreeCyPromise };
 
     await this.setGraphLayout(payload);
-
-    cyCenterNodes();
   }
 
   @Action({ rawError: true })
@@ -92,8 +88,6 @@ export default class ViewportModule extends VuexModule {
     const payload = { layout, cyPromise: timTreeCyPromise };
 
     await this.setGraphLayout(payload);
-
-    cyCenterNodes();
   }
 
   @Action
@@ -101,9 +95,12 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
-    this.SET_LAYOUT(layoutPayload.layout);
+    appModule.onLoadStart();
 
+    this.SET_LAYOUT(layoutPayload.layout);
     cyCreateLayout(layoutPayload);
+
+    setTimeout(appModule.onLoadEnd, 200);
   }
 
   @Action
@@ -149,6 +146,16 @@ export default class ViewportModule extends VuexModule {
    */
   deselectArtifacts(): void {
     this.SET_CURRENT_COLLECTION([]);
+  }
+
+  @Action
+  /**
+   * Resets all automove events.
+   */
+  applyAutomove(): void {
+    if (this.currentLayout) {
+      cyApplyAutomove(this.currentLayout);
+    }
   }
 
   @Mutation

@@ -21,6 +21,7 @@ import { logModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
 export default Vue.extend({
+  name: "app-confirm-modal",
   components: { GenericModal },
   props: {
     message: {

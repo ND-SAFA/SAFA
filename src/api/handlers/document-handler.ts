@@ -1,5 +1,5 @@
-import { artifactModule, documentModule, projectModule } from "@/store";
-import { Artifact, Project, ProjectDocument } from "@/types";
+import { documentModule, projectModule } from "@/store";
+import { Artifact, DocumentType, Project, ProjectDocument } from "@/types";
 import {
   createOrUpdateDocument,
   deleteDocument,
@@ -24,10 +24,12 @@ export async function loadProjectDocuments(
  * Creates a new document.
  *
  * @param documentName - The document name create.
+ * @param documentType - The document type create.
  * @param artifactIds - The artifacts shown in the document.
  */
 export async function addNewDocument(
   documentName: string,
+  documentType: DocumentType,
   artifactIds: string[]
 ): Promise<void> {
   const versionId = projectModule.versionIdWithLog;
@@ -36,7 +38,12 @@ export async function addNewDocument(
 
   const createdDocument = await createOrUpdateDocument(
     versionId,
-    createDocument(projectModule.getProject, artifactIds, documentName)
+    createDocument(
+      projectModule.getProject,
+      artifactIds,
+      documentName,
+      documentType
+    )
   );
 
   await documentModule.addDocument(createdDocument);

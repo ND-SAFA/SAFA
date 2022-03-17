@@ -1,4 +1,5 @@
 import {
+  ArtifactType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
@@ -54,10 +55,13 @@ export function createProject(): Project {
     name: "Untitled",
     projectId: "",
     description: "",
+    owner: "",
     members: [],
     artifacts: [],
     traces: [],
     projectVersion: undefined,
+    artifactTypes: [],
+    documents: [],
   };
 }
 
@@ -101,32 +105,40 @@ export function createCommit(version: ProjectVersion): Commit {
 /**
  * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
  */
-export function createDefaultTypeIcons(): Record<string, string> {
-  return {
-    requirement: "mdi-clipboard-text",
-    design: "mdi-math-compass",
-    hazard: "mdi-hazard-lights",
-    environmentalassumption: "mdi-pine-tree-fire",
-    default: "mdi-help",
-  };
+export function createDefaultTypeIcons(
+  artifactTypes: ArtifactType[] = []
+): Record<string, string> {
+  return artifactTypes
+    .map((t) => ({ [t.name]: t.icon }))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), { default: "mdi-help" });
 }
 
 /**
+ * Creates a document.
+ *
  * @param project - The associated project.
  * @param artifactIds - The artifact ids visible in this document.
  * @param name - The document name.
+ * @param type - The document type.
  * @return An empty document.
  */
 export function createDocument(
-  project: ProjectIdentifier = { projectId: "", name: "", description: "" },
+  project: ProjectIdentifier = {
+    projectId: "",
+    name: "",
+    description: "",
+    owner: "",
+    members: [],
+  },
   artifactIds: string[] = [],
-  name = "Default"
+  name = "Default",
+  type = DocumentType.ARTIFACT_TREE
 ): ProjectDocument {
   return {
     documentId: "",
     project,
     name,
-    type: DocumentType.ARTIFACT_TREE,
+    type,
     artifactIds,
     description: "",
   };

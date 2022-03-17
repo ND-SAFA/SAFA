@@ -1,10 +1,11 @@
-import { Artifact, Project, ProjectDocument } from "@/types";
+import { Artifact, ProjectDocument } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * Creates given document under project specified.
+ *
  * @param versionId - The version to mark the document as created.
- * @param document The document to be created.
+ * @param document - The document to be created.
  */
 export async function createOrUpdateDocument(
   versionId: string,
@@ -21,7 +22,8 @@ export async function createOrUpdateDocument(
 
 /**
  * Returns list of documents associated with given project.
- * @param projectId The UUID of the project whose documents are retrieved.
+ *
+ * @param projectId - The UUID of the project whose documents are retrieved.
  */
 export async function getProjectDocuments(
   projectId: string

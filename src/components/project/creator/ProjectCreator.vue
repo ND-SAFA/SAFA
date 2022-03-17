@@ -6,6 +6,7 @@
     @submit="saveProject()"
   >
     <v-row>Create a new project</v-row>
+
     <template v-slot:items>
       <v-stepper-content step="1">
         <v-container>
@@ -64,9 +65,12 @@
 
       <v-stepper-content step="4">
         <v-container>
-          <v-row justify="center">
+          <v-row dense justify="space-between" class="full-width">
             <v-col>
-              <h1 class="text-h6">Project TIM</h1>
+              <h1 class="text-h6 text-no-wrap">Project TIM</h1>
+            </v-col>
+            <v-col class="flex-grow-0">
+              <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
             </v-col>
           </v-row>
           <tim-tree
@@ -82,16 +86,25 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
+import {
+  Artifact,
+  Project,
+  ProjectMembership,
+  ProjectRole,
+  StepState,
+  TraceFile,
+  TraceLink,
+} from "@/types";
 import { saveOrUpdateProject, setCreatedProject } from "@/api";
-import { appModule } from "@/store";
+import { appModule, sessionModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createTraceUploader, createArtifactUploader } from "./uploaders";
-import { TraceFileCreator, ArtifactTypeCreator } from "./panels";
+import { createArtifactUploader, createTraceUploader } from "./uploaders";
+import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
+import { cyResetTim } from "@/cytoscape";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -147,6 +160,10 @@ export default Vue.extend({
     onConfirmClose(): void {
       this.isConfirmOpen = false;
     },
+
+    async handleResetGraph(): Promise<void> {
+      cyResetTim();
+    },
   },
   computed: {
     artifactMap(): Record<string, Artifact> {
@@ -179,13 +196,21 @@ export default Vue.extend({
       return this.traceUploader.panels.map((p) => p.projectFile);
     },
     project(): Project {
+      const user: ProjectMembership = {
+        projectMembershipId: "",
+        email: sessionModule.userEmail,
+        role: ProjectRole.OWNER,
+      };
       return {
         projectId: "",
         name: this.name,
         description: this.description,
-        members: [], // TODO: Add current user as owner?
+        owner: user.email,
+        members: [user],
         artifacts: this.artifacts,
         traces: this.traces,
+        artifactTypes: [],
+        documents: [],
       };
     },
   },

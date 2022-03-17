@@ -6,7 +6,8 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    :has-delete="hasDeletePermission"
+    :has-delete-for-indexes="hasDeleteForIndexes"
+    :has-delete="false"
     @item:edit="onEditProject"
     @item:select="onSelectProject"
     @item:delete="onDeleteProject"
@@ -45,7 +46,6 @@
 import Vue from "vue";
 import {
   DataItem,
-  Project,
   ProjectCreationResponse,
   ProjectIdentifier,
   ProjectRole,
@@ -108,35 +108,33 @@ export default Vue.extend({
       if (isOpen) {
         this.fetchProjects();
         if (this.projects.length === 1) {
-          this.$emit("selected", this.projects[0], true);
+          this.$emit("selected", this.projects[0], false);
         }
       }
     },
   },
   computed: {
-    hasDeletePermission(): boolean {
+    hasDeleteForIndexes(): number[] {
       const userEmail = sessionModule.authenticationToken?.sub || "";
-      const projectMembershipQuery = projectModule.getProject.members.filter(
-        (m) => m.email === userEmail
-      );
-      if (projectMembershipQuery.length === 1) {
-        return projectMembershipQuery[0].role === ProjectRole.OWNER;
-      }
-      return false;
+
+      return this.projects
+        .map((project, projectIndex) => {
+          const projectMembershipQuery = project.members.filter(
+            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
+          );
+          return projectMembershipQuery.length === 1 ? projectIndex : -1;
+        })
+        .filter((idx) => idx !== -1);
     },
   },
   methods: {
     onUpdateProject(project: ProjectIdentifier) {
-      this.isLoading = true;
       this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
-      this.selected = project;
     },
     onSaveNewProject(newProject: ProjectIdentifier) {
-      this.isLoading = true;
       this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
-      this.selected = newProject;
     },
     onCloseProjectEdit() {
       this.editProjectDialogue = false;
@@ -182,6 +180,7 @@ export default Vue.extend({
       deleteProject(project.projectId)
         .then(async () => {
           logModule.onSuccess(`${project.name} successfully deleted.`);
+          this.$emit("unselected");
 
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
@@ -194,25 +193,18 @@ export default Vue.extend({
         })
         .finally(() => (this.isLoading = false));
     },
-    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<Project> {
-      return saveOrUpdateProject({
-        projectId: project.projectId,
-        description: project.description,
-        name: project.name,
-        members: [],
-        artifacts: [],
-        traces: [],
-      })
-        .then((res: ProjectCreationResponse) => {
-          const project = res.project;
-          projectModule.SET_PROJECT_IDENTIFIER(project);
+    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<void> {
+      this.isLoading = true;
+
+      return saveOrUpdateProject(project)
+        .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId
           );
 
           this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          this.selected = project;
           this.$emit("selected", project, true);
-          return project;
         })
         .finally(() => {
           this.isLoading = false;

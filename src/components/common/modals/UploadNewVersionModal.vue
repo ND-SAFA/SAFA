@@ -42,7 +42,7 @@ import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { uploadNewProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common/generic";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
-import { projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 
 /**
  * Modal for uploading a new version.
@@ -102,9 +102,18 @@ export default Vue.extend({
       this.filesSelected = files;
     },
     onSubmit() {
+      if (this.selectedProject === undefined) {
+        return logModule.onWarning("No project is selected.");
+      }
+      if (this.selectedVersion === undefined) {
+        return logModule.onWarning("No project version is selected.");
+      }
+      const projectId = this.selectedProject.projectId;
+      const versionId = this.selectedVersion.versionId;
+
       uploadNewProjectVersion(
-        this.selectedProject,
-        this.selectedVersion,
+        projectId,
+        versionId,
         this.filesSelected,
         this.setAsNewVersion,
         () => (this.isLoading = true),

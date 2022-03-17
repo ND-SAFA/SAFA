@@ -1,9 +1,24 @@
+import { DocumentType, SafetyCaseType, SelectOption } from "@/types";
+
 /**
- * Returns the enum keys if they are strings.
- * @param myEnum
+ * Returns display names for each document type.
  */
-export function getEnumKeys(myEnum: any): string[] {
-  return Object.keys(myEnum)
-    .map((key) => myEnum[key])
-    .filter((value) => typeof value === "string") as string[];
+export function documentTypeOptions(): SelectOption[] {
+  return [
+    { id: DocumentType.ARTIFACT_TREE, name: "Default" },
+    { id: DocumentType.FTA, name: "FTA" },
+    { id: DocumentType.SAFETY_CASE, name: "Safety Case" },
+  ];
+}
+
+/**
+ * Returns display names for each safety case type.
+ */
+export function safetyCaseOptions(): SelectOption[] {
+  return [
+    { id: SafetyCaseType.CONTEXT, name: "Context" },
+    { id: SafetyCaseType.GOAL, name: "Goal" },
+    { id: SafetyCaseType.STRATEGY, name: "Strategy" },
+    { id: SafetyCaseType.SOLUTION, name: "Solution" },
+  ];
 }

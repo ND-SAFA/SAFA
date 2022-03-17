@@ -1,5 +1,4 @@
-import { Artifact, EntityModification } from "@/types/domain";
-import { APIError, APIResponse } from "@/types/api/base-api";
+import { Artifact, ArtifactData, EntityModification } from "@/types/domain";
 import {
   IGenericFilePanel,
   ProjectFile,
@@ -8,33 +7,40 @@ import {
 } from "@/types/components";
 
 /**
- * Returns whether the given APIResponse is an API error.
- *
- * @param blob - The response to check.
- *
- * @return Whether this item is an error.
- */
-export function isAPIError<T>(
-  blob: APIResponse<T> | APIError
-): blob is APIError {
-  return blob.status > 0;
-}
-
-/**
  * Returns whether the given ArtifactDelta is an modified artifact.
  *
- * @param artifact - The artifact to check.
+ * @param obj - The artifact to check.
  *
  * @return Whether this item is an modified artifact.
  */
 export function isModifiedArtifact(
-  artifact: any
-): artifact is EntityModification<Artifact> {
-  return "before" in artifact && "after" in artifact;
+  obj: any
+): obj is EntityModification<Artifact> {
+  const requiredFields = ["before", "after"];
+  return containsFields(obj, requiredFields);
 }
 
 export function isArtifact(obj: any): obj is Artifact {
-  return "id" in obj && "summary" in obj && "body" in obj && "type" in obj;
+  const requiredFields = ["id", "summary", "body", "type"];
+  return containsFields(obj, requiredFields);
+}
+
+export function isArtifactData(obj: any): obj is ArtifactData {
+  const requiredFields = [
+    "body",
+    "artifactName",
+    "artifactType",
+    "artifactDeltaState",
+    "isSelected",
+    "opacity",
+  ];
+  return containsFields(obj, requiredFields);
+}
+
+function containsFields(obj: any, fields: string[]): boolean {
+  return fields
+    .map((field) => field in obj)
+    .reduce((prev, curr) => prev && curr, true);
 }
 
 /**
@@ -45,12 +51,8 @@ export function isArtifact(obj: any): obj is Artifact {
  * @return Whether this file is a trace file.
  */
 export function isTraceFile(file: ProjectFile): file is TraceFile {
-  return (
-    "source" in file &&
-    "target" in file &&
-    "isGenerated" in file &&
-    "traces" in file
-  );
+  const requiredFields = ["sourceId", "targetId", "isGenerated", "traces"];
+  return containsFields(file, requiredFields);
 }
 
 /**

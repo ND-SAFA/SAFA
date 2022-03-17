@@ -1,11 +1,12 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
+import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
+import { ThemeColors } from "@/util";
 import {
-  ARTIFACT_HEIGHT,
-  ARTIFACT_REDUCED_TRUNCATE_LENGTH,
-  ARTIFACT_TRUNCATE_LENGTH,
-  ARTIFACT_WIDTH,
-} from "@/cytoscape/styles/config/artifact-tree-config";
-import { capitalize, ThemeColors } from "@/util";
+  htmlBody,
+  htmlContainer,
+  htmlHeader,
+  htmlSubheader,
+} from "./core-html";
 
 /**
  * Renders artifact html.
@@ -17,10 +18,13 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
   halignBox: "center",
   valignBox: "center",
   tpl(data?: ArtifactData) {
-    // This handles an issue with ghost nodes that are not typesafe.
-    if (!data?.artifactType) return "";
+    if (!data?.artifactType || data.logicType) return "";
 
-    return createNodeHtml(data);
+    if (data.safetyCaseType) {
+      return htmlSafetyCase(data);
+    } else {
+      return htmlArtifact(data);
+    }
   },
 };
 
@@ -28,83 +32,45 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
  * Creates the HTML for representing an artifact node in a graph.
  *
  * @param data - The artifact data to render.
- * @param widthFactor - The factor to apply to the artifact width.
- * @param heightFactor - The factor to apply to the artifact height.
  *
  * @return stringified HTML for the node.
  */
-function createNodeHtml(
-  data: ArtifactData,
-  widthFactor = 1.95,
-  heightFactor = 2.7
-): string {
-  const height = ARTIFACT_HEIGHT * heightFactor;
-  const width = ARTIFACT_WIDTH * widthFactor;
-  const bodyFactor = 0.4;
-
-  const elements = [
-    createNodeHeader(data, height * 0.2),
-    createNodeSubHeader(data, height * 0.15),
-    createNodeBody(data, height * bodyFactor),
-    createNodeFooter(data),
-    createNodeStoplight(data),
-  ];
-
-  return wrapInNodeContainer(data, elements, width, height);
-}
-
-/**
- * Creates the HTML for representing an artifact node's header.
- *
- * @param data - The artifact data to render.
- * @param height - The height in pixes of the header.
- *
- * @return stringified HTML for the node.
- */
-function createNodeHeader(data: ArtifactData, height: number): string {
-  return `
-    <strong class="artifact-header text-body-1" style="height:${height}px">
-      ${capitalize(data.artifactType)}
-    </strong>
-  `;
-}
-
-/**
- * Creates the HTML for representing an artifact node's subheader.
- *
- * @param data - The artifact data to render.
- * @param height - The height in pixes of the subheader.
- *
- * @return stringified HTML for the node.
- */
-function createNodeSubHeader(data: ArtifactData, height: number): string {
-  return `
-    <span class="artifact-sub-header text-body-1" style="height:${height}px">
-      ${data.artifactName}
-    </span>
-  `;
-}
-
-/**
- * Creates the HTML for representing an artifact node's body.
- *
- * @param data - The artifact data to render.
- * @param height - The height in pixes of the body.
- *
- * @return stringified HTML for the node.
- */
-function createNodeBody(data: ArtifactData, height: number): string {
+function htmlArtifact(data: ArtifactData): string {
   const hasFooter = !!(data.warnings?.length || data.hiddenChildren);
-  const truncateLength = hasFooter
-    ? ARTIFACT_REDUCED_TRUNCATE_LENGTH
-    : ARTIFACT_TRUNCATE_LENGTH;
+  const truncateLength = hasFooter ? 100 : 150;
 
-  const body =
-    data.body.length > truncateLength
-      ? data.body.slice(0, truncateLength) + "..."
-      : data.body;
+  return htmlContainer(
+    [
+      htmlHeader(data.artifactType),
+      htmlSubheader(data.artifactName),
+      htmlBody(data.body, truncateLength),
+      htmlFooter(data),
+      htmlStoplight(data),
+    ],
+    {
+      width: ARTIFACT_WIDTH * 1.95,
+      height: ARTIFACT_HEIGHT * 2.7,
+      opacity: data.opacity,
+      color: getBackgroundColor(data.artifactDeltaState),
+    }
+  );
+}
 
-  return `<span class="text-body-2 artifact-body" style="height:${height}px">${body}</span>`;
+/**
+ * Returns the background color for the given delta state.
+ * @param deltaState
+ */
+export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
+  switch (deltaState) {
+    case ArtifactDeltaState.ADDED:
+      return ThemeColors.artifactAdded;
+    case ArtifactDeltaState.REMOVED:
+      return ThemeColors.artifactRemoved;
+    case ArtifactDeltaState.MODIFIED:
+      return ThemeColors.artifactModified;
+    default:
+      return ThemeColors.artifactDefault;
+  }
 }
 
 /**
@@ -114,7 +80,7 @@ function createNodeBody(data: ArtifactData, height: number): string {
  *
  * @return stringified HTML for the node.
  */
-function createNodeFooter(data: ArtifactData): string {
+function htmlFooter(data: ArtifactData): string {
   const displayChildren = !!data.hiddenChildren;
   let displayWarning = !!data.warnings?.length;
   let message = data.warnings?.[0]?.ruleName || "Warning";
@@ -157,17 +123,20 @@ function createNodeFooter(data: ArtifactData): string {
  *
  * @return stringified HTML for the node.
  */
-function createNodeStoplight(data: ArtifactData): string {
-  if (!data.childDeltaStates?.length) return "";
+function htmlStoplight(data: ArtifactData): string {
+  const { childDeltaStates = [] } = data;
 
-  const renderAdded = data.childDeltaStates.includes(ArtifactDeltaState.ADDED);
-  const renderRemoved = data.childDeltaStates.includes(
-    ArtifactDeltaState.REMOVED
-  );
-  const renderMod = data.childDeltaStates.includes(ArtifactDeltaState.MODIFIED);
+  if (!childDeltaStates.length) return "";
+
+  const renderAdded = childDeltaStates.includes(ArtifactDeltaState.ADDED);
+  const renderRemoved = childDeltaStates.includes(ArtifactDeltaState.REMOVED);
+  const renderMod = childDeltaStates.includes(ArtifactDeltaState.MODIFIED);
+  const classes = data.safetyCaseType
+    ? "d-flex artifact-sc-stoplight"
+    : "d-flex artifact-stoplight";
 
   return `
-    <div class="d-flex artifact-stoplight">
+    <div class="${classes}">
       ${renderAdded ? "<div class='artifact-added flex-grow-1'></div>" : ""}
       ${renderRemoved ? "<div class='artifact-removed flex-grow-1'></div>" : ""}
       ${renderMod ? "<div class='artifact-modified flex-grow-1'></div>" : ""}
@@ -175,43 +144,82 @@ function createNodeStoplight(data: ArtifactData): string {
   `;
 }
 
+// Safety case
+
 /**
- * Creates the HTML for representing an artifact node's container.
+ * Creates the HTML for representing an artifact node in a graph.
  *
  * @param data - The artifact data to render.
- * @param elements - The elements to render within the container.
- * @param height - The height in pixes of the container.
- * @param width - The width in pixes of the container.
  *
  * @return stringified HTML for the node.
  */
-function wrapInNodeContainer(
-  data: ArtifactData,
-  elements: string[],
-  width: number,
-  height: number
-): string {
-  const backgroundColor = getBackgroundColor(data.artifactDeltaState);
-  const style = `width:${width}px;height:${height}px;opacity:${data.opacity};background-color: ${backgroundColor}`;
-  return `
-    <div 
-      class="artifact-container" 
-      style="${style}"
-    >
-      ${elements.join("\n")}
-    </div>
-  `;
+function htmlSafetyCase(data: ArtifactData): string {
+  const attrs = { opacity: data.opacity };
+  const header = [
+    htmlHeader(data.safetyCaseType?.toLowerCase() || ""),
+    htmlStoplight(data),
+    htmlSafetyCaseDetails(data),
+  ];
+
+  switch (data.safetyCaseType) {
+    case "GOAL":
+    case "CONTEXT":
+      return htmlContainer(
+        [...header, htmlBody(data.body, 100, 200, 70)],
+        attrs
+      );
+    case "SOLUTION":
+      return htmlContainer([...header, htmlBody(data.body, 40, 140, 60)], {
+        ...attrs,
+        width: 140,
+      });
+    case "STRATEGY":
+      return htmlContainer(
+        [...header, htmlBody(data.body, 80, 170, 70)],
+        attrs
+      );
+    default:
+      return "";
+  }
 }
 
-function getBackgroundColor(deltaState: ArtifactDeltaState): string {
-  switch (deltaState) {
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.artifactAdded;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.artifactRemoved;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.artifactModified;
-    default:
-      return ThemeColors.artifactDefault;
+/**
+ * Creates the HTML for representing an artifact node's warning and collapsed children.
+ *
+ * @param data - The artifact data to render.
+ *
+ * @return stringified HTML for the node.
+ */
+function htmlSafetyCaseDetails(data: ArtifactData): string {
+  const displayChildren = !!data.hiddenChildren;
+  let displayWarning = !!data.warnings?.length;
+
+  if (displayChildren) {
+    displayWarning ||= !!data.childWarnings?.length;
   }
+
+  const warning = `
+    <div class="d-flex warning-text text-body-1">
+      <span class="material-icons md-18">warning</span>
+    </div>
+  `;
+
+  const hiddenChildren = `
+    <div class="d-flex text-body-1 pr-1">
+      <span class="material-icons md-18">expand_more</span>
+      <span>
+        ${data.hiddenChildren} ${displayWarning ? "" : "Hidden"}
+      </span>
+    </div>
+  `;
+
+  return `
+    <div class="artifact-sc-details">
+      <span class="text-body-1 flex-grow-1">
+        ${data.artifactName}
+      </span>
+      ${displayChildren ? hiddenChildren : ""}
+      ${displayWarning ? warning : ""}
+    </div>
+  `;
 }

@@ -1,7 +1,10 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
-import type { Artifact, ArtifactQueryFunction } from "@/types";
-import { DocumentArtifacts } from "@/types";
+import type {
+  Artifact,
+  ArtifactQueryFunction,
+  DocumentArtifacts,
+} from "@/types";
 import { getSingleQueryResult } from "@/util";
 import { artifactSelectionModule, documentModule } from "@/store";
 
@@ -57,7 +60,7 @@ export default class ArtifactModule extends VuexModule {
         ({ name }) => name === selectedArtifact.name
       );
       if (query.length > 0) {
-        await artifactSelectionModule.selectArtifact(query[0].id);
+        artifactSelectionModule.selectArtifact(query[0].id);
       }
     }
   }
@@ -66,9 +69,10 @@ export default class ArtifactModule extends VuexModule {
   /**
    * Deletes the artifact with the given name.
    */
-  async deleteArtifactByName(artifact: Artifact): Promise<void> {
+  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+    const deletedNames = artifacts.map(({ name }) => name);
     const removeArtifact = (currentArtifacts: Artifact[]) =>
-      currentArtifacts.filter(({ name }) => name !== artifact.name);
+      currentArtifacts.filter(({ name }) => !deletedNames.includes(name));
 
     this.SET_PROJECT_ARTIFACTS(removeArtifact(this.projectArtifacts));
     this.SET_CURRENT_ARTIFACTS(removeArtifact(this.currentArtifacts));

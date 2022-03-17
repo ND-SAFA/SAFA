@@ -18,6 +18,11 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   private selectedSubtreeIds: string[] = [];
   /**
+   * The currently selected group of nodes.
+   */
+  private selectedGroupIds: string[] = [];
+
+  /**
    * The opacity of unselected artifact nodes.
    */
   private unselectedNodeOpacity = 0.1;
@@ -54,10 +59,20 @@ export default class ArtifactSelectionModule extends VuexModule {
    *
    * @param artifactId - The artifact to select.
    */
-  async selectArtifact(artifactId: string): Promise<void> {
+  selectArtifact(artifactId: string): void {
     this.SELECT_ARTIFACT(artifactId);
     appModule.openPanel(PanelType.left);
     viewportModule.centerOnArtifacts([artifactId]);
+  }
+
+  @Action
+  /**
+   * Adds the given artifact to the selected group.
+   *
+   * @param artifactId - The artifact to select.
+   */
+  addToSelectedGroup(artifactId: string): void {
+    this.SELECT_GROUP([...this.selectedGroupIds, artifactId]);
   }
 
   @Action
@@ -66,6 +81,7 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   clearSelections(): void {
     this.SET_SELECTED_SUBTREE([]);
+    this.SELECT_GROUP([]);
     this.UNSELECT_ARTIFACT();
     appModule.closePanel(PanelType.left);
   }
@@ -106,10 +122,20 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * Sets the given artifact as selected.
    *
-   * @param artifactId - The name of the artifact to select.
+   * @param artifactId - The ID of the artifact to select.
    */
   SELECT_ARTIFACT(artifactId: string): void {
     this.selectedArtifactId = artifactId;
+  }
+
+  @Mutation
+  /**
+   * Sets the given artifacts as a selected group.
+   *
+   * @param artifactIds - The IDs of the group of artifacts to select.
+   */
+  SELECT_GROUP(artifactIds: string[]): void {
+    this.selectedGroupIds = artifactIds;
   }
 
   @Mutation
@@ -125,6 +151,13 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   get getSelectedArtifactId(): string {
     return this.selectedArtifactId;
+  }
+
+  /**
+   * @return The currently selected artifact id.
+   */
+  get getSelectedGroupIds(): string[] {
+    return this.selectedGroupIds;
   }
 
   /**
@@ -166,5 +199,16 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   get getIgnoreTypes(): string[] {
     return this.ignoreTypes;
+  }
+
+  /**
+   * @return Whether the given artifact id is selected or in the selected group.
+   */
+  get isArtifactInSelectedGroup(): (id: string) => boolean {
+    return (id) => {
+      return (
+        id === this.selectedArtifactId || this.selectedGroupIds.includes(id)
+      );
+    };
   }
 }

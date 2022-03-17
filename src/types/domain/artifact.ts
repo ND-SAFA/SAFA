@@ -1,5 +1,18 @@
 import { ArtifactDeltaState } from "./delta";
 import { CytoCoreElementData } from "@/types/cytoscape";
+import { DocumentType } from "@/types/domain/document";
+
+export enum FTANodeType {
+  OR = "OR",
+  AND = "AND",
+}
+
+export enum SafetyCaseType {
+  GOAL = "GOAL",
+  SOLUTION = "SOLUTION",
+  CONTEXT = "CONTEXT",
+  STRATEGY = "STRATEGY",
+}
 
 /**
  * Defines an artifact file.
@@ -29,6 +42,18 @@ export interface Artifact {
    * The ids of documents that display this artifact.
    */
   documentIds: string[];
+  /**
+   * The type of document this artifact is displayed in.
+   */
+  documentType?: DocumentType;
+  /**
+   * For FTA logic nodes,  the logical operator of this node.
+   */
+  logicType?: FTANodeType;
+  /**
+   * For safety case nodes, the type of safety case node.
+   */
+  safetyCaseType?: SafetyCaseType;
 }
 
 /**
@@ -51,6 +76,14 @@ export interface ArtifactData extends CytoCoreElementData {
    * The type of the artifact.
    */
   artifactType: string;
+  /**
+   * For FTA nodes, the logic type of the artifact.
+   */
+  logicType?: string;
+  /**
+   * For safety case nodes, the type of the artifact.
+   */
+  safetyCaseType?: string;
   /**
    * The state of changes to the artifact.
    */

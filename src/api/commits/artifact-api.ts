@@ -26,10 +26,13 @@ export async function isArtifactNameTaken(
  * @param artifact - The artifact to delete.
  *
  */
-export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
+export async function deleteArtifactBody(
+  artifact: Artifact
+): Promise<Artifact> {
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
-    .save();
+    .save()
+    .then(({ artifacts }) => artifacts.removed[0]);
 }
 
 /**
@@ -43,8 +46,11 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
 export async function createArtifact(
   versionId: string,
   artifact: Artifact
-): Promise<void> {
-  return CommitBuilder.withCurrentVersion().withNewArtifact(artifact).save();
+): Promise<Artifact[]> {
+  return CommitBuilder.withCurrentVersion()
+    .withNewArtifact(artifact)
+    .save()
+    .then(({ artifacts }) => artifacts.added);
 }
 
 /**
@@ -58,8 +64,9 @@ export async function createArtifact(
 export async function updateArtifact(
   versionId: string,
   artifact: Artifact
-): Promise<void> {
+): Promise<Artifact[]> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
-    .save();
+    .save()
+    .then(({ artifacts }) => artifacts.modified);
 }

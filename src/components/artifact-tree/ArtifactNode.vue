@@ -3,24 +3,21 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import {
+  artifactSelectionModule,
   deltaModule,
   errorModule,
-  artifactSelectionModule,
   subtreeModule,
 } from "@/store";
 import {
   Artifact,
-  ArtifactWarning,
-  ProjectWarnings,
-  AddedArtifact,
-  ArtifactDeltaState,
-  ModifiedArtifact,
-  RemovedArtifact,
   ArtifactCytoCoreElement,
+  ArtifactDeltaState,
+  ArtifactWarning,
   EntityModification,
+  ProjectWarnings,
 } from "@/types";
-import Vue, { PropType } from "vue";
 
 export default Vue.extend({
   name: "artifact",
@@ -63,19 +60,13 @@ export default Vue.extend({
     },
   },
   computed: {
-    selectedArtifact(): Artifact | undefined {
-      return artifactSelectionModule.getSelectedArtifact;
-    },
     isSelected(): boolean {
-      const selectedArtifact = this.selectedArtifact;
-
-      return (
-        selectedArtifact !== undefined &&
-        selectedArtifact.id === this.artifactDefinition.id
+      return artifactSelectionModule.isArtifactInSelectedGroup(
+        this.artifactDefinition.id
       );
     },
     isDeltaViewEnabled(): boolean {
-      return deltaModule.getIsDeltaViewEnabled;
+      return deltaModule.inDeltaView;
     },
     localWarnings(): ArtifactWarning[] | undefined {
       const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
@@ -112,7 +103,8 @@ export default Vue.extend({
       }
     },
     definition(): ArtifactCytoCoreElement {
-      const { id, body, type, name } = this.artifactDefinition;
+      const { id, body, type, name, safetyCaseType, logicType } =
+        this.artifactDefinition;
       const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
       const hiddenChildWarnings =
         errorModule.getWarningsByArtifactNames(hiddenChildren);
@@ -133,6 +125,8 @@ export default Vue.extend({
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,
           childDeltaStates: hiddenChildDeltaStates,
+          safetyCaseType,
+          logicType,
         },
       };
     },

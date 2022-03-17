@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { PanelState } from "@/types";
-import { PanelType } from "@/types";
+import { FTANodeType, PanelType, SafetyCaseType } from "@/types";
 
 @Module({ namespaced: true, name: "app" })
 /**
@@ -25,8 +25,10 @@ export default class ProjectModule extends VuexModule {
   private isErrorDisplayOpen = false;
   /**
    * Whether the artifact creator is open.
+   * If the value is set to a safety case or FTA node type, then the
+   * artifact creator will open to that type set.
    */
-  private isArtifactCreatorOpen = false;
+  private isArtifactCreatorOpen: boolean | string = false;
 
   @Action
   /**
@@ -95,6 +97,16 @@ export default class ProjectModule extends VuexModule {
     });
   }
 
+  @Action
+  /**
+   * Opens the artifact creator to a specific node type.
+   *
+   * @param type - The type of panel.
+   */
+  openArtifactCreatorTo(type: SafetyCaseType | FTANodeType): void {
+    this.SET_ARTIFACT_CREATOR(type);
+  }
+
   @Mutation
   /**
    * Sets the current loading state.
@@ -103,6 +115,16 @@ export default class ProjectModule extends VuexModule {
    */
   SET_IS_LOADING(isLoading: boolean): void {
     this.isLoading = isLoading;
+  }
+
+  @Mutation
+  /**
+   * Sets the artifact creator state.
+   *
+   * @param isOpenOrType - The state of the artifact creator.
+   */
+  SET_ARTIFACT_CREATOR(isOpenOrType: boolean | string): void {
+    this.isArtifactCreatorOpen = isOpenOrType;
   }
 
   @Mutation
@@ -175,7 +197,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return Whether the artifact creator is open.
    */
-  get getIsArtifactCreatorOpen(): boolean {
+  get getIsArtifactCreatorOpen(): boolean | string {
     return this.isArtifactCreatorOpen;
   }
 

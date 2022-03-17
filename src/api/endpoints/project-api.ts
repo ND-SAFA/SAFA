@@ -59,7 +59,10 @@ export async function updateProjectThroughFlatFiles(
  * @return The saved project.
  */
 export async function saveOrUpdateProject(
-  project: Project
+  project: Omit<
+    Project,
+    "artifacts" | "documents" | "artifactTypes" | "members" | "traces"
+  >
 ): Promise<ProjectCreationResponse> {
   return authHttpClient<ProjectCreationResponse>(Endpoint.project, {
     method: "POST",

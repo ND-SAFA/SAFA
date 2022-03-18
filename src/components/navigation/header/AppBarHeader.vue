@@ -53,9 +53,9 @@ import {
   BaselineVersionModal,
   ButtonRow,
   UploadNewVersionModal,
+  SafaIcon,
 } from "@/components/common";
 import { VersionCreator } from "@/components/project";
-import SafaIcon from "./SafaIcon.vue";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
 

@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { DocumentColumn, Project, ProjectDocument } from "@/types";
-import { ColumnDataType, DocumentType } from "@/types";
+import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
@@ -36,10 +36,10 @@ export default class DocumentModule extends VuexModule {
       documents = [],
     } = project;
 
-    const defaultDocument = createDocument(
+    const defaultDocument = createDocument({
       project,
-      artifacts.map(({ id }) => id)
-    );
+      artifactIds: artifacts.map(({ id }) => id),
+    });
 
     const loadedDocument = documents.find(
       ({ documentId }) => documentId === currentDocumentId

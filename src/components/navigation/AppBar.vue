@@ -27,7 +27,7 @@
           </v-row>
         </v-col>
         <v-col cols="4">
-          <graph-nav-icons />
+          <graph-buttons />
         </v-col>
         <v-col cols="4">
           <v-row justify="end" class="ma-0 pa-0">
@@ -53,15 +53,15 @@ import Vue from "vue";
 import { appModule, documentModule } from "@/store";
 import { GenericIconButton } from "@/components/common";
 import { router, Routes } from "@/router";
-import AppBarHeader from "./AppBarHeader.vue";
-import GraphNavIcons from "./GraphNavIcons.vue";
+import AppBarHeader from "./header/AppBarHeader.vue";
+import GraphButtons from "./graph/GraphButtons.vue";
 import LoadingBar from "./LoadingBar.vue";
-import DocumentSelector from "@/components/navigation/DocumentSelector.vue";
+import DocumentSelector from "./document/DocumentSelector.vue";
 
 export default Vue.extend({
   components: {
     DocumentSelector,
-    GraphNavIcons,
+    GraphButtons,
     AppBarHeader,
     GenericIconButton,
     LoadingBar,

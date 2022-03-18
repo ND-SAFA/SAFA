@@ -23,13 +23,13 @@ export async function loadProjectDocuments(
 /**
  * Creates a new document.
  *
- * @param documentName - The document name create.
- * @param documentType - The document type create.
+ * @param name - The document name create.
+ * @param type - The document type create.
  * @param artifactIds - The artifacts shown in the document.
  */
 export async function addNewDocument(
-  documentName: string,
-  documentType: DocumentType,
+  name: string,
+  type: DocumentType,
   artifactIds: string[]
 ): Promise<void> {
   const versionId = projectModule.versionIdWithLog;
@@ -38,12 +38,12 @@ export async function addNewDocument(
 
   const createdDocument = await createOrUpdateDocument(
     versionId,
-    createDocument(
-      projectModule.getProject,
+    createDocument({
+      project: projectModule.getProject,
       artifactIds,
-      documentName,
-      documentType
-    )
+      name,
+      type,
+    })
   );
 
   await documentModule.addDocument(createdDocument);

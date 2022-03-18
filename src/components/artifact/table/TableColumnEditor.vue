@@ -31,15 +31,12 @@
         Add Column
       </v-btn>
 
-      <table-column-modal
-        :is-open="isCreateOpen"
-        @close="isCreateOpen = false"
-      />
+      <table-column-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
 
       <table-column-modal
         :is-open="isEditOpen"
         :column="editingColumn"
-        @close="isEditOpen = false"
+        @close="handleCloseMenu"
       />
     </template>
   </v-select>
@@ -60,7 +57,6 @@ export default Vue.extend({
     isCreateOpen: false,
     isEditOpen: false,
     editingColumn: undefined as DocumentColumn | undefined,
-    confirmDelete: false,
   }),
   computed: {
     items(): DocumentColumn[] {
@@ -85,6 +81,9 @@ export default Vue.extend({
   methods: {
     handleCloseMenu() {
       (this.$refs.tableColumnEditor as HTMLElement).blur();
+      this.isCreateOpen = false;
+      this.isEditOpen = false;
+      this.editingColumn = undefined;
     },
     handleCreateOpen() {
       this.isCreateOpen = true;

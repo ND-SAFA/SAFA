@@ -147,32 +147,23 @@ export function createDefaultTypeIcons(
 }
 
 /**
- * Creates a document.
- *
- * @param project - The associated project.
- * @param artifactIds - The artifact ids visible in this document.
- * @param name - The document name.
- * @param type - The document type.
- * @return An empty document.
+ * @return An document initialized to the given props.
  */
 export function createDocument(
-  project: ProjectIdentifier = {
-    projectId: "",
-    name: "",
-    description: "",
-    owner: "",
-    members: [],
-  },
-  artifactIds: string[] = [],
-  name = "Default",
-  type = DocumentType.ARTIFACT_TREE
+  document?: Partial<ProjectDocument>
 ): ProjectDocument {
   return {
-    documentId: "",
-    project,
-    name,
-    type,
-    artifactIds,
-    description: "",
+    documentId: document?.documentId || "",
+    project: document?.project || {
+      projectId: "",
+      name: "",
+      description: "",
+      owner: "",
+      members: [],
+    },
+    name: document?.name || "Default",
+    type: document?.type || DocumentType.ARTIFACT_TREE,
+    artifactIds: document?.artifactIds || [],
+    description: document?.description || "",
   };
 }

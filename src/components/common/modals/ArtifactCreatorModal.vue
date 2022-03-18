@@ -206,7 +206,11 @@ export default Vue.extend({
       }
     },
     computedName(): string {
-      return this.isFTA ? `${this.parentId}-logic` : this.editedArtifact.name;
+      const { name, logicType } = this.editedArtifact;
+
+      return this.isFTA
+        ? `${this.parentArtifact?.name || this.parentId}-${logicType}`
+        : name;
     },
   },
   watch: {

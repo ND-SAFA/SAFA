@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { DocumentColumn, Project, ProjectDocument } from "@/types";
-import { ColumnDataType } from "@/types";
+import { ColumnDataType, DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
@@ -158,6 +158,13 @@ export default class DocumentModule extends VuexModule {
    */
   get document(): ProjectDocument {
     return this.currentDocument;
+  }
+
+  /**
+   * @return The current document.
+   */
+  get type(): DocumentType {
+    return this.currentDocument.type;
   }
 
   /**

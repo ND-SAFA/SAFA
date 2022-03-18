@@ -1,0 +1,93 @@
+<template>
+  <div>
+    <div v-for="{ id, name, dataType } in columns" :key="id">
+      <v-text-field
+        filled
+        v-if="isFreeText(dataType)"
+        :label="name"
+        :value="getStringModel(id)"
+        @input="setStringModel(id, $event)"
+      />
+      <v-combobox
+        filled
+        multiple
+        chips
+        deletable-chips
+        v-if="isSelect(dataType)"
+        :label="name"
+        :value="getArrayModel(id)"
+        @input="setArrayModel(id, $event)"
+      />
+      <artifact-input
+        v-if="isRelation(dataType)"
+        :label="name"
+        :value="getArrayModel(id)"
+        @input="setArrayModel(id, $event)"
+      />
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import { Artifact, ColumnDataType, DocumentColumn } from "@/types";
+import { documentModule } from "@/store";
+import ArtifactInput from "@/components/common/input/ArtifactInput.vue";
+
+/**
+ * An input for any custom fields defined in the current document.
+ */
+export default Vue.extend({
+  name: "custom-field-input",
+  components: { ArtifactInput },
+  props: {
+    value: {
+      type: Object as PropType<Artifact>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      model: this.value,
+      showPassword: false,
+    };
+  },
+  computed: {
+    columns(): DocumentColumn[] {
+      return documentModule.tableColumns;
+    },
+  },
+  methods: {
+    getStringModel(columnId: string): string {
+      return this.model.customFields?.[columnId] || "";
+    },
+    setStringModel(columnId: string, value: string) {
+      if (!this.model.customFields) {
+        this.model.customFields = {};
+      }
+      this.model.customFields[columnId] = value;
+    },
+    getArrayModel(columnId: string): string[] {
+      const value = this.model.customFields?.[columnId];
+      return value ? value.split("||") : [];
+    },
+    setArrayModel(columnId: string, value: string[]) {
+      if (!this.model.customFields) {
+        this.model.customFields = {};
+      }
+      this.model.customFields[columnId] = value.join("||");
+      console.log(this.model.customFields);
+    },
+
+    isFreeText(dataType: ColumnDataType): boolean {
+      return dataType === ColumnDataType.FREE_TEXT;
+    },
+    isRelation(dataType: ColumnDataType): boolean {
+      return dataType === ColumnDataType.RELATION;
+    },
+    isSelect(dataType: ColumnDataType): boolean {
+      return dataType === ColumnDataType.SELECT;
+    },
+  },
+});
+</script>

@@ -1,15 +1,18 @@
 import {
+  Artifact,
   ArtifactType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
   DocumentType,
+  FTANodeType,
   MessageType,
   Project,
   ProjectDelta,
   ProjectDocument,
   ProjectIdentifier,
   ProjectVersion,
+  SafetyCaseType,
   SessionModel,
   SnackbarMessage,
 } from "@/types";
@@ -80,6 +83,20 @@ export function createProjectDelta(): ProjectDelta {
       modified: {},
       removed: {},
     },
+  };
+}
+
+export function createArtifact(artifact?: Partial<Artifact>): Artifact {
+  return {
+    id: artifact?.id || "",
+    name: artifact?.name || "",
+    summary: artifact?.summary || "",
+    body: artifact?.body || "",
+    type: artifact?.type || "",
+    documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
+    documentIds: artifact?.documentIds || [],
+    safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
+    logicType: artifact?.logicType || FTANodeType.AND,
   };
 }
 

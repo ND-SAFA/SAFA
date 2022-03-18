@@ -1,6 +1,7 @@
 import {
   ColumnDataType,
   DocumentType,
+  FTANodeType,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
@@ -16,7 +17,25 @@ export function documentTypeOptions(): SelectOption[] {
     { id: DocumentType.FTA, name: "FTA" },
     { id: DocumentType.SAFETY_CASE, name: "Safety Case" },
     { id: DocumentType.FMEA, name: "FMEA" },
+    { id: DocumentType.FMECA, name: "FMECA" },
   ];
+}
+
+/**
+ * Returns the document types of artifacts that can be created on a given document.
+ *
+ * @return The select option names and ids.
+ */
+export function documentTypeMap(): { [type in DocumentType]: SelectOption[] } {
+  const options = documentTypeOptions();
+
+  return {
+    [DocumentType.ARTIFACT_TREE]: [options[0]],
+    [DocumentType.FTA]: [options[0], options[1]],
+    [DocumentType.SAFETY_CASE]: [options[0], options[2]],
+    [DocumentType.FMEA]: [options[0], options[3]],
+    [DocumentType.FMECA]: [options[0], options[4]],
+  };
 }
 
 /**
@@ -42,6 +61,18 @@ export function safetyCaseOptions(): SelectOption[] {
     { id: SafetyCaseType.GOAL, name: "Goal" },
     { id: SafetyCaseType.STRATEGY, name: "Strategy" },
     { id: SafetyCaseType.SOLUTION, name: "Solution" },
+  ];
+}
+
+/**
+ * Returns display names for each logic type.
+ *
+ * @return The select option names and ids.
+ */
+export function logicTypeOptions(): SelectOption[] {
+  return [
+    { id: FTANodeType.AND, name: "And" },
+    { id: FTANodeType.OR, name: "Or" },
   ];
 }
 

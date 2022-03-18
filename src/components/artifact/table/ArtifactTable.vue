@@ -11,18 +11,18 @@
         v-slot:[`item.${id}`]="{ item }"
       >
         <span v-if="isFreeText(dataType)" class="text-body-1" :key="id">
-          {{ item[id] }}
+          {{ item[id] || "" }}
         </span>
         <div v-if="isRelation(dataType)" :key="id">
           <artifact-table-chip
-            v-for="artifactId in item[id].split('||')"
+            v-for="artifactId in getArrayValue(item[id])"
             :key="artifactId"
             :text="getArtifactName(artifactId)"
           />
         </div>
         <div v-if="isSelect(dataType)" :key="id">
           <artifact-table-chip
-            v-for="val in item[id].split('||')"
+            v-for="val in getArrayValue(item[id])"
             :key="val"
             :text="val"
           />
@@ -111,10 +111,7 @@ export default Vue.extend({
     items() {
       return artifactModule.artifacts.map((artifact) => ({
         ...artifact,
-        //TODO: remove test data
-        1: "A",
-        2: "3681f538-0f3f-4e6e-a73c-1ecbb5033a94||bce84af9-704b-4cef-8aea-7e479e27c51f",
-        3: "D||E",
+        ...artifact.customFields,
       }));
     },
     artifactCreatorTitle(): string {
@@ -123,7 +120,6 @@ export default Vue.extend({
   },
   methods: {
     handleEdit(artifact: Artifact) {
-      console.log(artifact);
       this.selectedArtifact = artifact;
       this.createDialogueOpen = true;
     },
@@ -149,6 +145,9 @@ export default Vue.extend({
     },
     getArtifactName(id: string): string {
       return artifactModule.getArtifactById(id).name;
+    },
+    getArrayValue(itemValue?: string): string[] {
+      return itemValue?.split("||") || [];
     },
   },
 });

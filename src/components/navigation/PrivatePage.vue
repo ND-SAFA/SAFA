@@ -10,7 +10,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appModule } from "@/store";
-import { LeftNavDrawer, RightNavDrawer } from "@/components/side-panels";
+import { LeftNavDrawer, RightNavDrawer } from "./side-panels";
 import AppBar from "./AppBar.vue";
 
 export default Vue.extend({

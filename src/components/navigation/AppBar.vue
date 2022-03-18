@@ -51,13 +51,16 @@
 <script lang="ts">
 import Vue from "vue";
 import { appModule, documentModule } from "@/store";
-import { GenericIconButton } from "@/components/common";
 import { router, Routes } from "@/router";
-import AppBarHeader from "./header/AppBarHeader.vue";
-import GraphButtons from "./graph/GraphButtons.vue";
+import { GenericIconButton } from "@/components/common";
+import { AppBarHeader } from "./header";
+import { GraphButtons } from "./graph";
+import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
-import DocumentSelector from "./document/DocumentSelector.vue";
 
+/**
+ * Displays the navigation top bar.
+ */
 export default Vue.extend({
   components: {
     DocumentSelector,

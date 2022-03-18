@@ -35,7 +35,7 @@
           @click="handleEdit(item)"
         />
         <generic-icon-button
-          icon-id="mdi-delete "
+          icon-id="mdi-delete"
           tooltip="Delete"
           @click="handleDelete(item)"
         />

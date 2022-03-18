@@ -1,9 +1,11 @@
 import {
   Artifact,
   ArtifactType,
+  ColumnDataType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
+  DocumentColumn,
   DocumentType,
   FTANodeType,
   MessageType,
@@ -86,6 +88,9 @@ export function createProjectDelta(): ProjectDelta {
   };
 }
 
+/**
+ * @return An artifact initialized to the given props.
+ */
 export function createArtifact(artifact?: Partial<Artifact>): Artifact {
   return {
     id: artifact?.id || "",
@@ -97,6 +102,17 @@ export function createArtifact(artifact?: Partial<Artifact>): Artifact {
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
+  };
+}
+
+/**
+ * @return An column initialized to the given props.
+ */
+export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {
+  return {
+    id: column?.id || "",
+    name: column?.name || "",
+    dataType: column?.dataType || ColumnDataType.FREE_TEXT,
   };
 }
 

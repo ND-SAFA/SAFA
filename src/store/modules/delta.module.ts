@@ -61,11 +61,11 @@ export default class ErrorModule extends VuexModule {
     this.SET_DELTA_PAYLOAD(payload);
     await projectModule.addOrUpdateArtifacts([
       ...Object.values(payload.artifacts.added),
-      ...Object.values(payload.artifacts.removed), // TODO: remove?
+      ...Object.values(payload.artifacts.removed),
     ]);
     await projectModule.addOrUpdateTraceLinks([
       ...Object.values(payload.traces.added),
-      ...Object.values(payload.traces.removed), // TODO: remove?
+      ...Object.values(payload.traces.removed),
     ]);
     await subtreeModule.restoreHiddenNodesAfter(
       viewportModule.setArtifactTreeLayout

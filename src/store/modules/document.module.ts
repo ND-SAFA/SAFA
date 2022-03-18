@@ -185,36 +185,16 @@ export default class DocumentModule extends VuexModule {
 
   /**
    * Returns whether the current document type is for rendering a table.
-   * TODO: remove value override.
    */
   get isTableDocument(): boolean {
-    return isTableDocument(this.currentDocument.type) || true;
+    return isTableDocument(this.currentDocument.type);
   }
 
   /**
    * Returns the column definitions for a table document.
-   * TODO: remove value override.
    */
   get tableColumns(): DocumentColumn[] {
-    return this.isTableDocument
-      ? this.currentDocument.columns || [
-          {
-            id: "1",
-            name: "Text",
-            dataType: ColumnDataType.FREE_TEXT,
-          },
-          {
-            id: "2",
-            name: "Relation",
-            dataType: ColumnDataType.RELATION,
-          },
-          {
-            id: "3",
-            name: "Select",
-            dataType: ColumnDataType.SELECT,
-          },
-        ]
-      : [];
+    return (this.isTableDocument && this.currentDocument.columns) || [];
   }
 
   /**

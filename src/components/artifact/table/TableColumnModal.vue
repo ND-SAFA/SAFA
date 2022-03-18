@@ -46,9 +46,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DocumentColumn, SelectOption } from "@/types";
-import { documentModule } from "@/store";
+import { documentModule, logModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 import { columnTypeOptions, createColumn } from "@/util";
+import { editDocument } from "@/api";
 
 /**
  * Represents a modal for editing a table column.
@@ -102,31 +103,43 @@ export default Vue.extend({
       this.$emit("close");
     },
     handleSubmit() {
-      // TODO: add or edit a new column in document.
-      // addNewDocument(this.documentName, this.documentType, this.artifactIds)
-      //   .then(() => {
-      //     logModule.onSuccess(`Document created: ${this.documentName}`);
-      //     this.resetModalData();
-      //   })
-      //   .catch(() => {
-      //     logModule.onError(`Unable to create document: ${this.documentName}`);
-      //   });
+      const document = documentModule.document;
+
+      if (!this.isEditMode) {
+        document.columns = [...(document.columns || []), this.editingColumn];
+      }
+
+      editDocument(document)
+        .then(() => {
+          logModule.onSuccess(`Column updated: ${this.editingColumn.name}`);
+          this.resetModalData();
+        })
+        .catch(() => {
+          logModule.onError(
+            `Unable to update column: ${this.editingColumn.name}`
+          );
+        });
     },
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        // TODO: delete the current column.
-        // deleteAndSwitchDocuments(this.editingDocument)
-        //   .then(() => {
-        //     logModule.onSuccess(`Document Deleted: ${this.documentName}`);
-        //     this.resetModalData();
-        //   })
-        //   .catch(() => {
-        //     logModule.onError(
-        //       `Unable to delete document: ${this.documentName}`
-        //     );
-        //   });
+        const document = documentModule.document;
+
+        document.columns = (document.columns || []).filter(
+          ({ id }) => id === this.editingColumn.id
+        );
+
+        editDocument(document)
+          .then(() => {
+            logModule.onSuccess(`Column deleted: ${this.editingColumn.name}`);
+            this.resetModalData();
+          })
+          .catch(() => {
+            logModule.onError(
+              `Unable to deleted column: ${this.editingColumn.name}`
+            );
+          });
       }
     },
   },

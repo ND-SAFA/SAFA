@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.app.FTANodeType;
 import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -167,6 +168,20 @@ public class JsonBuilder extends BaseBuilder {
         docJson.put("description", description);
         docJson.put("type", documentType.toString());
         return docJson;
+    }
+
+    public JSONObject createFMEADocument(String name, String description) {
+        JSONObject fmeaJson = this.createDocument(name, description, DocumentType.FMEA);
+        fmeaJson.put("columns", new ArrayList<>());
+        return fmeaJson;
+    }
+
+    public JSONObject createDocumentColumn(String id, String name, DocumentColumnDataType dataType) {
+        JSONObject columnJson = new JSONObject();
+        columnJson.put("id", id);
+        columnJson.put("name", name);
+        columnJson.put("dataType", dataType);
+        return columnJson;
     }
 
     public JSONObject getArtifact(String projectName, String artifactName) {

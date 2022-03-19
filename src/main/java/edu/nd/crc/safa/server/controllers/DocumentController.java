@@ -6,8 +6,8 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -69,16 +69,26 @@ public class DocumentController extends BaseController {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
         documentAppEntity.setProject(project); // Manually set to verify authenticity
+
+        // Create or update: document base entity
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
         if (documentAppEntity.getDocumentId() == null) {
             documentAppEntity.setDocumentId(document.getDocumentId());
         }
+
+        // Create or update: artifact links
         int nArtifactUpdated = documentService.createOrUpdateArtifactIds(projectVersion, document,
             documentAppEntity.getArtifactIds());
+
+        // Create or update: columns
+        documentService.updateFMEAColumns(documentAppEntity, document);
+
+        // Update version subscribers
         documentService.notifyDocumentChanges(projectVersion, nArtifactUpdated > 0);
         return documentAppEntity;
     }
+
 
     /**
      * Returns the Documents associated with given specified project.
@@ -94,7 +104,9 @@ public class DocumentController extends BaseController {
     }
 
     /**
-     * Deletes the document specified by the given id.
+     * Deletes the document specified by the given id all cascading entities including
+     * 1. Document-Artifact Links
+     * 2. DocumentColumns
      *
      * @param documentId The UUID of the document to delete.
      * @throws SafaError Throws error is authorized user does not have edit permission.

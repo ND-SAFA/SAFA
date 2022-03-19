@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
@@ -30,6 +31,7 @@ import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
@@ -60,6 +62,7 @@ public class AppEntityRetrievalService {
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafetyCaseArtifactRepository safetyCaseArtifactRepository;
     private final FTAArtifactRepository ftaArtifactRepository;
+    private final DocumentColumnRepository documentColumnRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
 
@@ -72,6 +75,7 @@ public class AppEntityRetrievalService {
                                      ArtifactTypeRepository artifactTypeRepository,
                                      SafetyCaseArtifactRepository safetyCaseArtifactRepository,
                                      FTAArtifactRepository ftaArtifactRepository,
+                                     DocumentColumnRepository documentColumnRepository,
                                      CommitErrorRetrievalService commitErrorRetrievalService,
                                      WarningService warningService) {
         this.documentRepository = documentRepository;
@@ -82,6 +86,7 @@ public class AppEntityRetrievalService {
         this.projectMembershipRepository = projectMembershipRepository;
         this.safetyCaseArtifactRepository = safetyCaseArtifactRepository;
         this.ftaArtifactRepository = ftaArtifactRepository;
+        this.documentColumnRepository = documentColumnRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
     }
@@ -264,13 +269,24 @@ public class AppEntityRetrievalService {
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
         List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
         for (Document document : projectDocuments) {
+            // Retrieve linked artifact Ids
             List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
                 .stream()
                 .map(da -> da.getArtifact().getArtifactId().toString())
                 .collect(Collectors.toList());
             DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
-            documentAppEntities.add(documentAppEntity);
 
+            // Retrieve FMEA columns
+            if (document.getType() == DocumentType.FMEA) {
+                List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
+                    .findByDocumentOrderByTableColumnIndexAsc(document)
+                    .stream()
+                    .map(DocumentColumnAppEntity::new)
+                    .collect(Collectors.toList());
+                documentAppEntity.setColumns(documentColumns);
+            }
+
+            documentAppEntities.add(documentAppEntity);
         }
         return documentAppEntities;
     }

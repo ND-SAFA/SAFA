@@ -98,14 +98,11 @@ public class CommitController extends BaseController {
     private ProjectChange<ArtifactAppEntity> commitArtifactChanges(
         ProjectVersion projectVersion,
         ProjectChange<ArtifactAppEntity> artifacts) throws SafaError {
-        AppEntityCreator<ArtifactAppEntity, ArtifactVersion> appEntityCreator = (versionEntity)
-            -> appEntityRetrievalService.retrieveArtifactAppEntityInProjectVersion(projectVersion, versionEntity);
         return commitChanges(
             projectVersion,
             artifacts,
             this.artifactVersionRepository,
-            appEntityCreator,
-            VersionEntityTypes.ARTIFACTS);
+            this.artifactVersionRepository::retrieveAppEntityFromVersionEntity);
     }
 
     private ProjectChange<TraceAppEntity> commitChanges(ProjectVersion projectVersion,
@@ -114,8 +111,7 @@ public class CommitController extends BaseController {
             projectVersion,
             traces,
             this.traceLinkVersionRepository,
-            TraceAppEntity::new,
-            VersionEntityTypes.TRACES);
+            this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity);
     }
 
     /**

@@ -12,6 +12,7 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -88,9 +89,11 @@ public class TestLinkApproval extends TraceBaseTest {
         generatedLink.setApprovalStatus(TraceApproval.APPROVED);
 
         // Step - Approve generated trace link
+        TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
+            .retrieveAppEntityFromVersionEntity(generatedLink);
         commit(CommitBuilder
             .withVersion(projectVersion)
-            .withModifiedTrace(generatedLink));
+            .withModifiedTrace(generatedLinkAppEntity));
 
         // VP - Verify that trace link is approved
         Optional<TraceLinkVersion> approvedLinkQuery =
@@ -104,9 +107,11 @@ public class TestLinkApproval extends TraceBaseTest {
         generatedLink.setApprovalStatus(TraceApproval.DECLINED);
 
         // Step - Commit changes
+        TraceAppEntity updatedGeneratedLink = this.traceLinkVersionRepository
+            .retrieveAppEntityFromVersionEntity(generatedLink);
         commit(CommitBuilder
             .withVersion(projectVersion)
-            .withModifiedTrace(generatedLink));
+            .withModifiedTrace(updatedGeneratedLink));
 
         // VP - Verify that link is saved.
         Optional<TraceLinkVersion> declinedLinkQuery = traceLinkVersionRepository.findByProjectVersionAndTraceLink(
@@ -152,8 +157,8 @@ public class TestLinkApproval extends TraceBaseTest {
             ArtifactVersion sourceBody = artifactVersionRepository.getBodiesWithName(project, source).get(0);
             ArtifactVersion targetBody = artifactVersionRepository.getBodiesWithName(project, target).get(0);
 
-            sourceArtifacts.add(new ArtifactAppEntity(sourceBody));
-            targetArtifacts.add(new ArtifactAppEntity(targetBody));
+            sourceArtifacts.add(artifactVersionRepository.retrieveAppEntityFromVersionEntity(sourceBody));
+            targetArtifacts.add(artifactVersionRepository.retrieveAppEntityFromVersionEntity(targetBody));
         }
 
         // Send to generate route

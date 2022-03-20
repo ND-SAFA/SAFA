@@ -146,8 +146,24 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceAppEntity createAppFromVersion(TraceLinkVersion versionEntity) {
-        return new TraceAppEntity(versionEntity);
+    public TraceAppEntity retrieveAppEntityFromVersionEntity(TraceLinkVersion trace) {
+        if (trace == null) {
+            return null;
+        }
+        UUID traceLinkId = trace.getTraceLink().getTraceLinkId();
+        Artifact sourceArtifact = trace.getTraceLink().getSourceArtifact();
+        Artifact targetArtifact = trace.getTraceLink().getTargetArtifact();
+
+        return new TraceAppEntity(
+            traceLinkId != null ? traceLinkId.toString() : "",
+            sourceArtifact.getName(),
+            sourceArtifact.getArtifactId().toString(),
+            targetArtifact.getName(),
+            targetArtifact.getArtifactId().toString(),
+            trace.getApprovalStatus(),
+            trace.getScore(),
+            trace.getTraceType()
+        );
     }
 
     private Artifact assertAndFindArtifact(Project project, String artifactName) throws SafaError {

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONObject;
@@ -81,15 +80,6 @@ public class ArtifactAppEntity implements IAppEntity {
         this.summary = summary;
         this.body = body;
         this.documentType = documentType;
-    }
-
-    public ArtifactAppEntity(ArtifactVersion body) {
-        this(body.getArtifact().getArtifactId().toString(),
-            body.getTypeName(),
-            body.getName(),
-            body.getSummary(),
-            body.getContent(),
-            body.getArtifact().getDocumentType());
     }
 
     public DocumentType getDocumentType() {

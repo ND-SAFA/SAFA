@@ -113,7 +113,8 @@ public class TestArtifactService extends ApplicationBaseTest {
 
         // Step - Create new version + update artifact with same artifact (no change)
         ArtifactVersion artifactVersion = dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
-        ArtifactAppEntity artifactApp = new ArtifactAppEntity(artifactVersion);
+        ArtifactAppEntity artifactApp = this.artifactVersionRepository
+            .retrieveAppEntityFromVersionEntity(artifactVersion);
 
         // VP - Verify that no new entry has been created
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);

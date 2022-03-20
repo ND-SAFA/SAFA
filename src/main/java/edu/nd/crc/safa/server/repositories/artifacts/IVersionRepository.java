@@ -41,6 +41,14 @@ public interface IVersionRepository<
                                                                              String entityId);
 
     /**
+     * Defines a method for constructing AppEntities for attaching sub-entities.
+     *
+     * @param versionEntity A versioned entity.
+     * @return The corresponding app entity to given version entity.
+     */
+    AppEntity retrieveAppEntityFromVersionEntity(VersionEntity versionEntity);
+
+    /**
      * Saves the state of given app entity to given project version.
      *
      * @param projectVersion The project version to save the changes to.
@@ -85,11 +93,4 @@ public interface IVersionRepository<
      */
     EntityDelta<AppEntity> calculateEntityDelta(ProjectVersion baselineVersion,
                                                 ProjectVersion targetVersion);
-
-
-    /**
-     * @param versionEntity A versioned entity.
-     * @return The corresponding app entity to given version entity.
-     */
-    AppEntity createAppFromVersion(VersionEntity versionEntity);
 }

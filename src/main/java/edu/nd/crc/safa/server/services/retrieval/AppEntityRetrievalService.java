@@ -253,7 +253,6 @@ public class AppEntityRetrievalService {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .map(TraceAppEntity::new)
             .filter(t -> artifactName.equals(t.sourceName) || artifactName.equals(t.targetName))
             .collect(Collectors.toList());
     }

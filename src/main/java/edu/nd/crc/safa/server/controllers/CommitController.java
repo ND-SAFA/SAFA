@@ -15,7 +15,6 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -117,13 +116,12 @@ public class CommitController extends BaseController {
     /**
      * Creates any added entities, saves any modified entities, and marks entities removed.
      *
-     * @param projectVersion     The project version that should notified of the changes.
-     * @param projectChange      The entities that are being touched.
-     * @param versionRepository  The IVersionRepository used for this entity.
-     * @param appEntityCreator   The constructor for creating app entities from version entities.
-     * @param versionEntityTypes The type of version entities that are being updated.
-     * @param <AppEntity>        The entity used on the application side.
-     * @param <VersionEntity>    The entity used for version control.
+     * @param projectVersion    The project version that should be notified of the changes.
+     * @param projectChange     The entities that are being touched.
+     * @param versionRepository The IVersionRepository used for this entity.
+     * @param appEntityCreator  The constructor for creating app entities from version entities.
+     * @param <AppEntity>       The entity used on the application side.
+     * @param <VersionEntity>   The entity used for version control.
      * @return ProjectChange containing processed entities.
      * @throws SafaError Throws error if anything goes wrong during any commit.
      */
@@ -139,9 +137,9 @@ public class CommitController extends BaseController {
 
         // Define actions
         CommitAction<AppEntity, VersionEntity> saveOrModifyAction = (appEntity) ->
-            versionRepository.commitSingleEntityToProjectVersion(projectVersion, appEntity);
+            versionRepository.commitAppEntityToProjectVersion(projectVersion, appEntity);
         CommitAction<AppEntity, VersionEntity> removeAction = (appEntity) ->
-            versionRepository.deleteVersionEntityByBaseEntityId(projectVersion, appEntity.getId());
+            versionRepository.deleteVersionEntityByBaseEntityId(projectVersion, appEntity.getBaseEntityId());
 
         // Commit added entities
         List<AppEntity> entitiesAdded = commitActionOnAppEntities(

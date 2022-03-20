@@ -73,8 +73,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLink findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
-                                                           TraceAppEntity trace) throws SafaError {
+    public TraceLink createOrUpdateAppEntity(ProjectVersion projectVersion,
+                                             TraceAppEntity trace) throws SafaError {
         Project project = projectVersion.getProject();
 
         TraceLink traceLink;
@@ -108,7 +108,7 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+    public void createOrUpdateVersionEntity(ProjectVersion projectVersion,
                                             TraceLinkVersion traceLinkVersion) throws SafaError {
         try {
             this.traceLinkVersionRepository
@@ -125,7 +125,7 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public List<TraceLink> getBaseEntitiesByProject(Project project) {
+    public List<TraceLink> retrieveBaseEntitiesByProject(Project project) {
         return this.traceLinkRepository.getLinksInProject(project);
     }
 

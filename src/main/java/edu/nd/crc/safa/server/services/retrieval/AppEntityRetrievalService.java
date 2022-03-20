@@ -117,9 +117,9 @@ public class AppEntityRetrievalService {
         Project project = projectVersion.getProject();
 
         // Versioned Entities
-        List<ArtifactAppEntity> artifacts = getArtifactsInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
-        List<TraceAppEntity> traces = getTracesInProjectVersion(projectVersion, artifactIds);
+        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion);
+        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getBaseEntityId).collect(Collectors.toList());
+        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
@@ -150,9 +150,9 @@ public class AppEntityRetrievalService {
      * @param projectVersion The version whose artifacts are retrieved.
      * @return List of artifact app entities as saved in project version.
      */
-    public List<ArtifactAppEntity> getArtifactsInProjectVersion(ProjectVersion projectVersion) {
+    public List<ArtifactAppEntity> retrieveArtifactsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion);
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
             artifacts.add(retrieveArtifactAppEntityInProjectVersion(projectVersion, artifactVersion));
@@ -296,7 +296,8 @@ public class AppEntityRetrievalService {
      * @return A mapping of  artifact name's to their resulting violations
      */
     public Map<String, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
-        List<ArtifactVersion> artifacts = artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
+        List<ArtifactVersion> artifacts = artifactVersionRepository
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<TraceLink> traceLinks =
             this.traceLinkVersionRepository
                 .retrieveVersionEntitiesByProjectVersion(projectVersion)

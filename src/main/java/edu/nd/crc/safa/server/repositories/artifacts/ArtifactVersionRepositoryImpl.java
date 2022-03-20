@@ -56,12 +56,12 @@ public class ArtifactVersionRepositoryImpl
     TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
-    public List<ArtifactVersion> getVersionEntitiesByProject(Project project) {
+    public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
         return artifactVersionRepository.findByProjectVersionProject(project);
     }
 
     @Override
-    public List<ArtifactVersion> getVersionEntitiesByBaseEntity(Artifact artifact) {
+    public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
         return artifactVersionRepository.findByArtifact(artifact);
     }
 
@@ -95,10 +95,10 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public Artifact findOrCreateBaseEntitiesFromAppEntity(ProjectVersion projectVersion,
-                                                          ArtifactAppEntity artifactAppEntity) throws SafaError {
+    public Artifact createOrUpdateAppEntity(ProjectVersion projectVersion,
+                                            ArtifactAppEntity artifactAppEntity) throws SafaError {
         Project project = projectVersion.getProject();
-        String artifactId = artifactAppEntity.getId();
+        String artifactId = artifactAppEntity.getBaseEntityId();
         String typeName = artifactAppEntity.type;
         String artifactName = artifactAppEntity.name;
         DocumentType documentType = artifactAppEntity.getDocumentType();
@@ -106,7 +106,7 @@ public class ArtifactVersionRepositoryImpl
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType, documentType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
-        artifactAppEntity.setId(artifactId);
+        artifactAppEntity.setBaseEntityId(artifactId);
 
         switch (artifactAppEntity.getDocumentType()) {
             //TODO: Find a way to structurally ensure potentially new properties to safety case
@@ -144,7 +144,7 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public void saveOrOverrideVersionEntity(ProjectVersion projectVersion,
+    public void createOrUpdateVersionEntity(ProjectVersion projectVersion,
                                             ArtifactVersion newArtifactVersion) throws SafaError {
         try {
             //Overriding any version equal to given
@@ -161,7 +161,7 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public List<Artifact> getBaseEntitiesByProject(Project project) {
+    public List<Artifact> retrieveBaseEntitiesByProject(Project project) {
         return this.artifactRepository.findByProject(project);
     }
 

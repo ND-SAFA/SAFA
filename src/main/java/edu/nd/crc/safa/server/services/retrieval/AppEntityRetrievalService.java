@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.services.retrieval;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -14,22 +13,17 @@ import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
@@ -60,8 +54,6 @@ public class AppEntityRetrievalService {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
-    private final SafetyCaseArtifactRepository safetyCaseArtifactRepository;
-    private final FTAArtifactRepository ftaArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
@@ -73,8 +65,6 @@ public class AppEntityRetrievalService {
                                      ProjectMembershipRepository projectMembershipRepository,
                                      ArtifactVersionRepository artifactVersionRepository,
                                      ArtifactTypeRepository artifactTypeRepository,
-                                     SafetyCaseArtifactRepository safetyCaseArtifactRepository,
-                                     FTAArtifactRepository ftaArtifactRepository,
                                      DocumentColumnRepository documentColumnRepository,
                                      CommitErrorRetrievalService commitErrorRetrievalService,
                                      WarningService warningService) {
@@ -84,8 +74,6 @@ public class AppEntityRetrievalService {
         this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
-        this.safetyCaseArtifactRepository = safetyCaseArtifactRepository;
-        this.ftaArtifactRepository = ftaArtifactRepository;
         this.documentColumnRepository = documentColumnRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
@@ -160,52 +148,6 @@ public class AppEntityRetrievalService {
             artifacts.add(artifactAppEntity);
         }
         return artifacts;
-    }
-
-    /**
-     * Returns ArtifactAppEntity associated with ArtifactVersion in given project version with
-     * any Safety Case or FTA information inserted into app entity.
-     *
-     * @param projectVersion  The project version associated with returned ArtifactAppEntity.
-     * @param artifactVersion The artifact version used to populate the artifact.
-     * @return The populated ArtifactAppEntity
-     */
-    public ArtifactAppEntity retrieveArtifactAppEntityInProjectVersion(ProjectVersion projectVersion,
-                                                                       ArtifactVersion artifactVersion) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
-
-        Artifact artifact = artifactVersion.getArtifact();
-        List<String> documentIds =
-            this.documentArtifactRepository
-                .findByProjectVersionAndArtifact(projectVersion, artifact)
-                .stream()
-                .map(da -> da.getDocument().getDocumentId().toString())
-                .collect(Collectors.toList());
-        artifactAppEntity.setDocumentIds(documentIds);
-
-        switch (artifact.getDocumentType()) {
-            case SAFETY_CASE:
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                }
-                //TODO: Throw error if not found?
-                break;
-            case FTA:
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                }
-                break;
-            default:
-                break;
-        }
-        return artifactAppEntity;
     }
 
     /**

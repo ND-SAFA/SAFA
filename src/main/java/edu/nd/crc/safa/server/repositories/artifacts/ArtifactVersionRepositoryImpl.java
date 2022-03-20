@@ -181,8 +181,51 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public ArtifactAppEntity createAppFromVersion(ArtifactVersion versionEntity) {
-        return new ArtifactAppEntity(versionEntity);
+    public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
+        // Step 1 - Create base entity information
+        ProjectVersion projectVersion = artifactVersion.getProjectVersion();
+        ArtifactAppEntity artifactAppEntity =
+            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
+                artifactVersion.getTypeName(),
+                artifactVersion.getName(),
+                artifactVersion.getSummary(),
+                artifactVersion.getContent(),
+                artifactVersion.getArtifact().getDocumentType());
+
+        // Step 2 - Attach document links
+        Artifact artifact = artifactVersion.getArtifact();
+        List<String> documentIds =
+            this.documentArtifactRepository
+                .findByProjectVersionAndArtifact(projectVersion, artifact)
+                .stream()
+                .map(da -> da.getDocument().getDocumentId().toString())
+                .collect(Collectors.toList());
+        artifactAppEntity.setDocumentIds(documentIds);
+
+        // Step 3 - Attach Safety Case or FTA information
+        switch (artifact.getDocumentType()) {
+            case SAFETY_CASE:
+                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                if (safetyCaseArtifactOptional.isPresent()) {
+                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                }
+                //TODO: Throw error if not found?
+                break;
+            case FTA:
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                if (ftaArtifactOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.FTA);
+                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                }
+                break;
+            default:
+                break;
+        }
+        return artifactAppEntity;
     }
 
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,

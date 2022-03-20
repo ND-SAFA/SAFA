@@ -130,7 +130,9 @@ public class TraceFileParser {
         for (CSVRecord record : records) {
             String sourceName = record.get(SOURCE_PARAM).trim();
             String targetName = record.get(TARGET_PARAM).trim();
-            traceLinks.add(new TraceAppEntity(sourceName, targetName));
+            traceLinks.add(new TraceAppEntity()
+                .asManualTrace()
+                .betweenArtifacts(sourceName, targetName));
         }
         return traceLinks;
     }

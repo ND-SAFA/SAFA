@@ -87,7 +87,9 @@ public class Puller {
                     .forEach((link) -> {
                         String source = issue.key;
                         String target = link.InwardKey;
-                        TraceAppEntity trace = new TraceAppEntity(source, target);
+                        TraceAppEntity trace = new TraceAppEntity()
+                            .asManualTrace()
+                            .betweenArtifacts(source, target);
                         traces.add(trace);
                     });
             }

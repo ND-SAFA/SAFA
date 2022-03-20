@@ -73,7 +73,7 @@ public class TraceLinkGenerator {
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue1());
         TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
-            new TraceAppEntity(s.getName(), t.getName(), score);
+            new TraceAppEntity().asGeneratedTrace(score).betweenArtifacts(s.getName(), t.getName());
 
         return generateLinksFromTokens(sTokens, tTokens, traceLinkConstructor);
     }
@@ -82,7 +82,10 @@ public class TraceLinkGenerator {
                                                                         List<ArtifactAppEntity> targetDocs) {
         Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(sourceDocs);
         Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(targetDocs);
-        return generateLinksFromTokens(sourceTokens, targetTokens, TraceAppEntity::new);
+        TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()
+            .asGeneratedTrace(score)
+            .betweenArtifacts(s, t);
+        return generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor);
     }
 
     private <Key, Link> List<Link> generateLinksFromTokens(Map<Key, Collection<String>> sTokens,

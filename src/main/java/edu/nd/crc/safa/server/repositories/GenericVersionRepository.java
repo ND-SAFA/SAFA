@@ -284,11 +284,6 @@ public abstract class GenericVersionRepository<
     }
 
     private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
-                                                                VersionAction versionAction) {
-        return commitErrorHandler(projectVersion, versionAction, "unknown");
-    }
-
-    private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
                                                                 VersionEntityAction<VersionEntity> versionEntityAction,
                                                                 String entityName) {
         String errorDescription = null;

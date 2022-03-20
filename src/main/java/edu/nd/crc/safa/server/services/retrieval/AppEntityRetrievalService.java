@@ -155,7 +155,9 @@ public class AppEntityRetrievalService {
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
-            artifacts.add(retrieveArtifactAppEntityInProjectVersion(projectVersion, artifactVersion));
+            ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository
+                .retrieveAppEntityFromVersionEntity(artifactVersion);
+            artifacts.add(artifactAppEntity);
         }
         return artifacts;
     }

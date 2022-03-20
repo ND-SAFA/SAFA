@@ -289,7 +289,7 @@ public abstract class GenericVersionRepository<
     }
 
     private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
-                                                                VersionAction<VersionEntity> versionAction,
+                                                                VersionEntityAction<VersionEntity> versionEntityAction,
                                                                 String entityName) {
         String errorDescription = null;
         VersionEntity versionEntity = null;

@@ -449,20 +449,6 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private Pair<BaseEntity, VersionEntity> createVersionEntityFromAppEntity(
-        ProjectVersion projectVersion,
-        AppEntity appEntity) throws SafaError {
-
-        BaseEntity baseEntity = this.findOrCreateBaseEntitiesFromAppEntity(
-            projectVersion,
-            appEntity);
-
-        VersionEntity versionEntity = this.calculateVersionEntityFromAppEntity(
-            projectVersion,
-            baseEntity,
-            appEntity);
-        return new Pair<>(baseEntity, versionEntity);
-    }
     private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
                                                                 BaseEntity baseEntity,
                                                                 AppEntity appEntity) {

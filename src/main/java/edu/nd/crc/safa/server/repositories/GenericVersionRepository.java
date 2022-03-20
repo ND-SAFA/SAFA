@@ -81,20 +81,10 @@ public abstract class GenericVersionRepository<
      * @param appEntity        The app entity whose content is being compared to previous commits.
      * @return The version entity for saving the app entity content to project version.
      */
-    protected abstract VersionEntity createEntityVersionWithModification(ProjectVersion projectVersion,
-                                                                         ModificationType modificationType,
-                                                                         BaseEntity baseEntity,
-                                                                         AppEntity appEntity);
-
-    /**
-     * Creates the VersionEntity representing a deletion in a project version.
-     *
-     * @param projectVersion The project version associated with deletion.
-     * @param baseEntity     The base entity being deleted.
-     * @return The version entity representing the deletion.
-     */
-    protected abstract VersionEntity createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                                BaseEntity baseEntity);
+    protected abstract VersionEntity instantiateVersionEntityWithModification(ProjectVersion projectVersion,
+                                                                              ModificationType modificationType,
+                                                                              BaseEntity baseEntity,
+                                                                              AppEntity appEntity);
 
     /**
      * Saves given artifact version to project version, deleting any previous entry
@@ -197,14 +187,17 @@ public abstract class GenericVersionRepository<
 
             if (baseEntityOptional.isPresent()) {
                 BaseEntity baseEntity = baseEntityOptional.get();
-                VersionEntity removedVersionEntity = this.createRemovedVersionEntity(projectVersion, baseEntity);
-                this.saveOrOverrideVersionEntity(projectVersion, removedVersionEntity);
-                return Optional.of(removedVersionEntity);
+                VersionEntity removedVersionEntity = this.instantiateVersionEntityFromAppEntity(
+                    projectVersion,
+                    baseEntity,
+                    null);
+                this.createOrUpdateVersionEntity(projectVersion, removedVersionEntity);
+                return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
             }
         };
-        return commitErrorHandler(projectVersion, versionAction);
+        return commitErrorHandler(projectVersion, versionEntityAction, "unknown");
     }
 
     @Override
@@ -281,7 +274,7 @@ public abstract class GenericVersionRepository<
         VersionEntity versionEntity = null;
         CommitError commitError = null;
         try {
-            Optional<VersionEntity> versionEntityOptional = versionAction.action();
+            Optional<VersionEntity> versionEntityOptional = versionEntityAction.action();
             if (versionEntityOptional.isPresent()) {
                 versionEntity = versionEntityOptional.get();
             } else {
@@ -470,18 +463,13 @@ public abstract class GenericVersionRepository<
             appEntity);
         return new Pair<>(baseEntity, versionEntity);
     }
-
-    private VersionEntity calculateVersionEntityFromAppEntity(ProjectVersion projectVersion,
-                                                              BaseEntity baseEntity,
-                                                              AppEntity appEntity) {
+    private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
+                                                                BaseEntity baseEntity,
+                                                                AppEntity appEntity) {
         ModificationType modificationType = this
             .calculateModificationTypeForAppEntity(projectVersion, baseEntity, appEntity);
 
-        if (modificationType == null) {
-            return null;
-        }
-
-        return this.createEntityVersionWithModification(
+        return this.instantiateVersionEntityWithModification(
             projectVersion,
             modificationType,
             baseEntity,

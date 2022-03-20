@@ -66,32 +66,22 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public ArtifactVersion createEntityVersionWithModification(ProjectVersion projectVersion,
-                                                               ModificationType modificationType,
-                                                               Artifact artifact,
-                                                               ArtifactAppEntity artifactAppEntity) {
-        switch (modificationType) {
-            case ADDED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.ADDED,
-                    artifact,
-                    artifactAppEntity.summary,
-                    artifactAppEntity.body);
-            case MODIFIED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.MODIFIED,
-                    artifact,
-                    artifactAppEntity.summary,
-                    artifactAppEntity.body);
-            case REMOVED:
-                return new ArtifactVersion(projectVersion,
-                    ModificationType.REMOVED,
-                    artifact,
-                    "",
-                    "");
-            default:
-                throw new RuntimeException("Missing case in delta service.");
+    public ArtifactVersion instantiateVersionEntityWithModification(ProjectVersion projectVersion,
+                                                                    ModificationType modificationType,
+                                                                    Artifact artifact,
+                                                                    ArtifactAppEntity artifactAppEntity) {
+        if (modificationType == ModificationType.REMOVED || artifactAppEntity == null) {
+            return new ArtifactVersion(projectVersion,
+                ModificationType.REMOVED,
+                artifact,
+                "",
+                "");
         }
+        return new ArtifactVersion(projectVersion,
+            modificationType,
+            artifact,
+            artifactAppEntity.summary,
+            artifactAppEntity.body);
     }
 
     @Override
@@ -163,16 +153,6 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public List<Artifact> retrieveBaseEntitiesByProject(Project project) {
         return this.artifactRepository.findByProject(project);
-    }
-
-    @Override
-    public ArtifactVersion createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                      Artifact artifact) {
-        return new ArtifactVersion(
-            projectVersion,
-            ModificationType.REMOVED,
-            artifact,
-            "", "");
     }
 
     @Override

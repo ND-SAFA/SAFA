@@ -47,29 +47,21 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLinkVersion createEntityVersionWithModification(ProjectVersion projectVersion,
-                                                                ModificationType modificationType,
-                                                                TraceLink traceLink,
-                                                                TraceAppEntity traceAppEntity) {
-        switch (modificationType) {
-            case ADDED:
-                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
-                    ModificationType.ADDED,
-                    traceLink,
-                    traceAppEntity);
-            case MODIFIED:
-                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
-                    ModificationType.MODIFIED,
-                    traceLink,
-                    traceAppEntity);
-            case REMOVED:
-                return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
-                    ModificationType.REMOVED,
-                    traceLink,
-                    traceAppEntity);
-            default:
-                throw new RuntimeException("Missing case in delta service.");
+    public TraceLinkVersion instantiateVersionEntityWithModification(ProjectVersion projectVersion,
+                                                                     ModificationType modificationType,
+                                                                     TraceLink traceLink,
+                                                                     TraceAppEntity traceAppEntity) {
+        if (modificationType == ModificationType.REMOVED || traceAppEntity == null) {
+            return (new TraceLinkVersion())
+                .withProjectVersion(projectVersion)
+                .withTraceLink(traceLink)
+                .withModificationType(ModificationType.REMOVED)
+                .withManualTraceType();
         }
+        return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
+            modificationType,
+            traceLink,
+            traceAppEntity);
     }
 
     @Override
@@ -127,17 +119,6 @@ public class TraceLinkVersionRepositoryImpl
     @Override
     public List<TraceLink> retrieveBaseEntitiesByProject(Project project) {
         return this.traceLinkRepository.getLinksInProject(project);
-    }
-
-    @Override
-    public TraceLinkVersion createRemovedVersionEntity(ProjectVersion projectVersion,
-                                                       TraceLink traceLink) {
-        //TODO: Need to remove assumption that removed links are manual
-        return (new TraceLinkVersion())
-            .withProjectVersion(projectVersion)
-            .withTraceLink(traceLink)
-            .withModificationType(ModificationType.REMOVED)
-            .withManualTraceType();
     }
 
     @Override

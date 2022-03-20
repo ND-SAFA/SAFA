@@ -27,7 +27,8 @@ public interface IVersionRepository<
      * @param projectVersion The project version whose existing entities are retrieved.
      * @return List of entities in project version.
      */
-    List<VersionEntity> getVersionEntitiesByProjectVersion(ProjectVersion projectVersion);
+    List<VersionEntity> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion);
+
 
     /**
      * Returns the version of the entity specified by entity id in given project version.
@@ -36,7 +37,7 @@ public interface IVersionRepository<
      * @param entityId       The id of the base entity whose version is being retrieved.
      * @return Optional of entity version at given project version.
      */
-    Optional<VersionEntity> getEntityVersionsByProjectVersionAndBaseEntityId(ProjectVersion projectVersion,
+    Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(ProjectVersion projectVersion,
                                                                              String entityId);
 
     /**
@@ -47,8 +48,8 @@ public interface IVersionRepository<
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
-    Pair<VersionEntity, CommitError> commitSingleEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                        AppEntity appEntity) throws SafaError;
+    Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
+                                                                     AppEntity appEntity) throws SafaError;
 
     /**
      * Saves given application entities to given version, saving removal entities for entities present in previous
@@ -59,7 +60,7 @@ public interface IVersionRepository<
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
-    List<Pair<VersionEntity, CommitError>> commitAllEntitiesInProjectVersion(
+    List<Pair<VersionEntity, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
         List<AppEntity> appEntities) throws SafaError;
 

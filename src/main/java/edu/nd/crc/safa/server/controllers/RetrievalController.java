@@ -52,10 +52,10 @@ public class RetrievalController extends BaseController {
      * @return List of artifact app entities.
      * @throws SafaError Throws error is user does not have read permission on the project.
      */
-    @GetMapping(AppRoutes.Projects.Entities.getArtifactsInVersion)
-    public List<ArtifactAppEntity> getArtifactsInVersion(@PathVariable UUID versionId) throws SafaError {
+    @GetMapping(AppRoutes.Projects.Entities.getArtifactsInProjectVersion)
+    public List<ArtifactAppEntity> getArtifactsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.appEntityRetrievalService.getArtifactsInProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.retrieveArtifactsInProjectVersion(projectVersion);
     }
 
     /**
@@ -68,7 +68,6 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.Entities.getTracesInVersion)
     public List<TraceAppEntity> getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        List<TraceAppEntity> traces = this.appEntityRetrievalService.getTracesInProjectVersion(projectVersion);
-        return traces;
+        return this.appEntityRetrievalService.retrieveTracesInProjectVersion(projectVersion);
     }
 }

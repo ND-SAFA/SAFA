@@ -128,11 +128,11 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds.add(documentId);
     }
 
-    public String getId() {
+    public String getBaseEntityId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setBaseEntityId(String id) {
         this.id = id;
     }
 

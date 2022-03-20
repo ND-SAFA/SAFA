@@ -49,7 +49,7 @@ public class TraceLinkGenerator {
         String DELIMITER = "*";
         List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
         List<String> approvedLinks = appEntityRetrievalService
-            .getTracesInProjectVersion(projectVersion)
+            .retrieveTracesInProjectVersion(projectVersion)
             .stream()
             .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
             .map(link -> link.sourceName + DELIMITER + link.targetName)
@@ -67,7 +67,7 @@ public class TraceLinkGenerator {
     public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
                                                           Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<ArtifactVersion> artifactsInVersion =
-            this.artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
+            this.artifactVersionRepository.retrieveVersionEntitiesByProjectVersion(projectVersion);
         Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue0());
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,

@@ -116,10 +116,10 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public List<VersionEntity> getVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
+    public List<VersionEntity> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
         Hashtable<String, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
-        return this.retrieveEntitiesAtProjectVersion(projectVersion, entityHashTable);
+        return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
 
     /**
@@ -129,16 +129,16 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public Optional<VersionEntity> getEntityVersionsByProjectVersionAndBaseEntityId(
+    public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
         ProjectVersion projectVersion,
         String entityId) {
-        List<VersionEntity> versionEntities = this.getVersionEntitiesByProject(projectVersion.getProject())
+        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject())
             .stream()
             .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
             .collect(Collectors.toList());
         Hashtable<String, List<VersionEntity>> entityHashTable = new Hashtable<>();
         entityHashTable.put(entityId, versionEntities);
-        List<VersionEntity> currentVersionQuery = this.retrieveEntitiesAtProjectVersion(projectVersion,
+        List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
             entityHashTable);
         return currentVersionQuery.size() == 0 ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
@@ -217,7 +217,7 @@ public abstract class GenericVersionRepository<
         Hashtable<String, ModifiedEntity<AppEntity>> modifiedEntities = new Hashtable<>();
         Hashtable<String, AppEntity> removedEntities = new Hashtable<>();
 
-        List<BaseEntity> projectArtifacts = this.getBaseEntitiesByProject(project);
+        List<BaseEntity> projectArtifacts = this.retrieveBaseEntitiesByProject(project);
 
         for (BaseEntity baseEntity : projectArtifacts) {
             Triplet<VersionEntity, VersionEntity, ModificationType> delta = this
@@ -233,17 +233,17 @@ public abstract class GenericVersionRepository<
 
             switch (modificationType) {
                 case ADDED:
-                    AppEntity appEntity = this.createAppFromVersion(delta.getValue1());
+                    AppEntity appEntity = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
                     addedEntities.put(baseEntityId, appEntity);
                     break;
                 case MODIFIED:
-                    AppEntity appBefore = this.createAppFromVersion(delta.getValue0());
-                    AppEntity appAfter = this.createAppFromVersion(delta.getValue1());
+                    AppEntity appBefore = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
+                    AppEntity appAfter = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
                     ModifiedEntity<AppEntity> modifiedEntity = new ModifiedEntity<>(appBefore, appAfter);
                     modifiedEntities.put(baseEntityId, modifiedEntity);
                     break;
                 case REMOVED:
-                    AppEntity appRemoved = this.createAppFromVersion(delta.getValue0());
+                    AppEntity appRemoved = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
                     removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
@@ -258,7 +258,7 @@ public abstract class GenericVersionRepository<
         BaseEntity baseEntity,
         ProjectVersion baseVersion,
         ProjectVersion targetVersion) {
-        List<VersionEntity> bodies = this.getVersionEntitiesByBaseEntity(baseEntity);
+        List<VersionEntity> bodies = this.retrieveVersionEntitiesByBaseEntity(baseEntity);
 
         VersionEntity beforeEntity = this.getEntityAtVersion(bodies,
             baseVersion);

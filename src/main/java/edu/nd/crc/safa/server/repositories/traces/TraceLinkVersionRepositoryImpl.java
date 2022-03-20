@@ -27,26 +27,22 @@ public class TraceLinkVersionRepositoryImpl
 
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
-
     @Autowired
     TraceLinkRepository traceLinkRepository;
-
     @Autowired
     ArtifactRepository artifactRepository;
-
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
-
     @Autowired
     TraceMatrixService traceMatrixService;
 
     @Override
-    public List<TraceLinkVersion> getVersionEntitiesByProject(Project project) {
+    public List<TraceLinkVersion> retrieveVersionEntitiesByProject(Project project) {
         return traceLinkVersionRepository.findByProjectVersionProject(project);
     }
 
     @Override
-    public List<TraceLinkVersion> getVersionEntitiesByBaseEntity(TraceLink traceLink) {
+    public List<TraceLinkVersion> retrieveVersionEntitiesByBaseEntity(TraceLink traceLink) {
         return traceLinkVersionRepository.findByTraceLink(traceLink);
     }
 

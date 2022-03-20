@@ -212,13 +212,13 @@ public class AppEntityRetrievalService {
      * @param projectVersion The version of the project whose links are returned.
      * @return List of TraceAppEntity
      */
-    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion) {
-        List<ArtifactAppEntity> projectVersionArtifacts = getArtifactsInProjectVersion(projectVersion);
+    public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion) {
+        List<ArtifactAppEntity> projectVersionArtifacts = retrieveArtifactsInProjectVersion(projectVersion);
         List<String> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
-            .map(ArtifactAppEntity::getId)
+            .map(ArtifactAppEntity::getBaseEntityId)
             .collect(Collectors.toList());
-        return getTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
+        return retrieveTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
     }
 
     /**
@@ -228,12 +228,11 @@ public class AppEntityRetrievalService {
      * @param existingArtifactIds List of artifact ids for those existing in given version.
      * @return List of trace links existing in given version at the time of calling this.
      */
-    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion,
-                                                          List<String> existingArtifactIds) {
+    public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion,
+                                                               List<String> existingArtifactIds) {
         return this.traceLinkVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion)
+            .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .map(TraceAppEntity::new)
             .filter(t -> existingArtifactIds.contains(t.sourceId)
                 && existingArtifactIds.contains(t.targetId))
             .collect(Collectors.toList());
@@ -252,7 +251,7 @@ public class AppEntityRetrievalService {
         String artifactName
     ) {
         return this.traceLinkVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion)
+            .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
             .map(TraceAppEntity::new)
             .filter(t -> artifactName.equals(t.sourceName) || artifactName.equals(t.targetName))
@@ -301,7 +300,7 @@ public class AppEntityRetrievalService {
         List<ArtifactVersion> artifacts = artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
         List<TraceLink> traceLinks =
             this.traceLinkVersionRepository
-                .getVersionEntitiesByProjectVersion(projectVersion)
+                .retrieveVersionEntitiesByProjectVersion(projectVersion)
                 .stream()
                 .filter(t -> t.getApprovalStatus() == TraceApproval.APPROVED)
                 .map(TraceLinkVersion::getTraceLink)

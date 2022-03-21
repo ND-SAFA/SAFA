@@ -23,9 +23,9 @@ public class TraceMatrixService {
         this.traceMatrixRepository = traceMatrixRepository;
     }
 
-    public void verifyOrCreateTraceMatrix(Project project,
-                                          ArtifactType sourceArtifactType,
-                                          ArtifactType targetArtifactType) throws SafaError {
+    public void findOrCreateTraceMatrix(Project project,
+                                        ArtifactType sourceArtifactType,
+                                        ArtifactType targetArtifactType) throws SafaError {
         List<TraceMatrix> projectMatrices = this.traceMatrixRepository.findByProject(project);
         for (TraceMatrix tm : projectMatrices) {
             if (tm.getSourceArtifactType().equals(sourceArtifactType)

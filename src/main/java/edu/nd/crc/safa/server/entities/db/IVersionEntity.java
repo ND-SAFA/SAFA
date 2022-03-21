@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.server.entities.app.IAppEntity;
 
 /**
@@ -12,6 +14,10 @@ public interface IVersionEntity<AppType extends IAppEntity> {
     ModificationType getModificationType();
 
     String getBaseEntityId();
+
+    UUID getVersionEntityId();
+
+    void setVersionEntityId(UUID versionEntityId);
 
     boolean hasSameContent(IVersionEntity e);
 

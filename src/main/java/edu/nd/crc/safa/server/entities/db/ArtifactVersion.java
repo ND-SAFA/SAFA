@@ -91,8 +91,12 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
-    public UUID getEntityVersionId() {
+    public UUID getVersionEntityId() {
         return this.entityVersionId;
+    }
+
+    public void setVersionEntityId(UUID versionEntityId) {
+        this.setEntityVersionId(versionEntityId);
     }
 
     public void setEntityVersionId(UUID artifactBodyId) {
@@ -150,10 +154,6 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
 
     public void setProjectVersion(ProjectVersion projectVersion) {
         this.projectVersion = projectVersion;
-    }
-
-    public boolean hasSameId(ArtifactVersion other) {
-        return this.entityVersionId.equals(other.entityVersionId);
     }
 
     public String toString() {

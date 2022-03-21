@@ -61,15 +61,14 @@ public abstract class GenericVersionRepository<
     protected abstract Optional<BaseEntity> findBaseEntityById(String baseEntityId);
 
     /**
-     * Finds base entity associated with given app entity if an entity exists.
-     * Otherwise, creates the base entity along with any missing auxiliary objects.
+     * Creates or updates any entities related to AppEntity and returns the corresponding base entity.
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
      * @return Returns the base entity associated with given app entity.
      */
-    protected abstract BaseEntity createOrUpdateAppEntity(ProjectVersion projectVersion,
-                                                          AppEntity artifactAppEntity) throws SafaError;
+    protected abstract BaseEntity createOrUpdateRelatedEntities(ProjectVersion projectVersion,
+                                                                AppEntity artifactAppEntity) throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing
@@ -87,15 +86,15 @@ public abstract class GenericVersionRepository<
                                                                               AppEntity appEntity);
 
     /**
-     * Saves given artifact version to project version, deleting any previous entry
-     * to the project version if it exists.
+     * Given a VersionEntity this methods returns an optional possibly containing the source entity this
+     * corresponds with.
      *
-     * @param projectVersion  The project version which the entity is being saved to.
-     * @param artifactVersion The version entity being saved.
-     * @throws SafaError Throws error if saving fails.
+     * @param versionEntity The version entity being saved.
+     * @return Optional possibly containing existing version entity.
      */
-    protected abstract void createOrUpdateVersionEntity(ProjectVersion projectVersion,
-                                                        VersionEntity artifactVersion) throws SafaError;
+    protected abstract Optional<VersionEntity> findExistingVersionEntity(VersionEntity versionEntity);
+
+    protected abstract VersionEntity save(VersionEntity versionEntity);
 
     @Override
     public List<AppEntity> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
@@ -154,7 +153,7 @@ public abstract class GenericVersionRepository<
     public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
                                                                             AppEntity appEntity) {
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
-            BaseEntity baseEntity = this.createOrUpdateAppEntity(
+            BaseEntity baseEntity = this.createOrUpdateRelatedEntities(
                 projectVersion,
                 appEntity);
 
@@ -163,7 +162,7 @@ public abstract class GenericVersionRepository<
                 baseEntity,
                 appEntity);
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
-                createOrUpdateVersionEntity(projectVersion, versionEntity);
+                createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setBaseEntityId(baseEntityId);
             }
@@ -186,7 +185,7 @@ public abstract class GenericVersionRepository<
                     projectVersion,
                     baseEntity,
                     null);
-                this.createOrUpdateVersionEntity(projectVersion, removedVersionEntity);
+                this.createOrUpdateVersionEntity(removedVersionEntity);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
@@ -275,6 +274,20 @@ public abstract class GenericVersionRepository<
         response.addAll(removedArtifactBodies);
 
         return response;
+    }
+
+    private void createOrUpdateVersionEntity(VersionEntity versionEntity) throws SafaError {
+        try {
+            this.findExistingVersionEntity(versionEntity)
+                .ifPresent((existingVersionEntity) -> {
+                    versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId());
+                });
+            this.save(versionEntity);
+        } catch (Exception e) {
+            String name = versionEntity.getBaseEntityId();
+            String error = String.format("An error occurred while saving version entity with base id: %s", name);
+            throw new SafaError(error, e);
+        }
     }
 
     private Triplet<VersionEntity, VersionEntity, ModificationType> calculateDeltaEntityBetweenProjectVersions(

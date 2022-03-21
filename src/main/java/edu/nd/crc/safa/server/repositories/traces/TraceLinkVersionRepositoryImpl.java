@@ -37,13 +37,8 @@ public class TraceLinkVersionRepositoryImpl
     TraceMatrixService traceMatrixService;
 
     @Override
-    public List<TraceLinkVersion> retrieveVersionEntitiesByProject(Project project) {
-        return traceLinkVersionRepository.findByProjectVersionProject(project);
-    }
-
-    @Override
-    public List<TraceLinkVersion> retrieveVersionEntitiesByBaseEntity(TraceLink traceLink) {
-        return traceLinkVersionRepository.findByTraceLink(traceLink);
+    public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {
+        return this.traceLinkVersionRepository.save(traceLinkVersion);
     }
 
     @Override
@@ -65,55 +60,31 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLink createOrUpdateAppEntity(ProjectVersion projectVersion,
-                                             TraceAppEntity trace) throws SafaError {
+    public TraceLink createOrUpdateRelatedEntities(ProjectVersion projectVersion,
+                                                   TraceAppEntity newTrace) throws SafaError {
         Project project = projectVersion.getProject();
 
-        TraceLink traceLink;
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
             .getByProjectAndSourceAndTarget(
                 project,
-                trace.sourceName,
-                trace.targetName);
-        if (traceLinkOptional.isEmpty()) {
-            Artifact sourceArtifact = assertAndFindArtifact(project, trace.sourceName);
-            Artifact targetArtifact = assertAndFindArtifact(project, trace.targetName);
-            traceLink = new TraceLink(sourceArtifact, targetArtifact);
-            traceMatrixService.verifyOrCreateTraceMatrix(project,
-                sourceArtifact.getType(),
-                targetArtifact.getType());
-            this.traceLinkRepository.save(traceLink);
-        } else {
-            traceLink = traceLinkOptional.get();
-        }
-        Optional<TraceLinkVersion> traceLinkVersionOptional =
-            this.traceLinkVersionRepository.findByProjectVersionAndTraceLink(projectVersion,
-                traceLink);
-        if (traceLinkVersionOptional.isPresent()) {
-            TraceLinkVersion tv = traceLinkVersionOptional.get();
-            if (tv.getTraceType() == TraceType.MANUAL && trace.traceType != TraceType.MANUAL) {
-                throw new SafaError("Generated link cannot override manual one.");
-            }
-        }
+                newTrace.sourceName,
+                newTrace.targetName);
+        TraceLink traceLink = traceLinkOptional.isEmpty() ? createNewTraceLink(newTrace, project) :
+            traceLinkOptional.get();
+        assertNotOverridingManualLink(projectVersion, newTrace, traceLink);
 
         return traceLink;
     }
 
     @Override
-    public void createOrUpdateVersionEntity(ProjectVersion projectVersion,
-                                            TraceLinkVersion traceLinkVersion) throws SafaError {
-        try {
-            this.traceLinkVersionRepository
-                .findByProjectVersionAndTraceLink(projectVersion, traceLinkVersion.getTraceLink())
-                .ifPresent((existingVersionEntity) -> {
-                    traceLinkVersionRepository.delete(existingVersionEntity);
-                });
-            this.traceLinkVersionRepository.save(traceLinkVersion);
-        } catch (Exception e) {
-            String name = traceLinkVersion.getTraceLink().getTraceName();
-            String error = String.format("An error occurred while saving trace links: %s", name);
-            throw new SafaError(error, e);
-        }
+    public Optional<TraceLink> findBaseEntityById(String baseEntityId) {
+        return this.traceLinkRepository.findById(UUID.fromString(baseEntityId));
+    }
+
+    @Override
+    public Optional<TraceLinkVersion> findExistingVersionEntity(TraceLinkVersion traceLinkVersion) {
+        return this.traceLinkVersionRepository
+            .findByProjectVersionAndTraceLink(traceLinkVersion.getProjectVersion(), traceLinkVersion.getTraceLink());
     }
 
     @Override
@@ -122,8 +93,13 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public Optional<TraceLink> findBaseEntityById(String baseEntityId) {
-        return this.traceLinkRepository.findById(UUID.fromString(baseEntityId));
+    public List<TraceLinkVersion> retrieveVersionEntitiesByProject(Project project) {
+        return traceLinkVersionRepository.findByProjectVersionProject(project);
+    }
+
+    @Override
+    public List<TraceLinkVersion> retrieveVersionEntitiesByBaseEntity(TraceLink traceLink) {
+        return traceLinkVersionRepository.findByTraceLink(traceLink);
     }
 
     @Override
@@ -145,6 +121,30 @@ public class TraceLinkVersionRepositoryImpl
             trace.getScore(),
             trace.getTraceType()
         );
+    }
+
+    private TraceLink createNewTraceLink(TraceAppEntity newTrace, Project project) throws SafaError {
+        TraceLink traceLink;
+        Artifact sourceArtifact = assertAndFindArtifact(project, newTrace.sourceName);
+        Artifact targetArtifact = assertAndFindArtifact(project, newTrace.targetName);
+        traceLink = new TraceLink(sourceArtifact, targetArtifact);
+        traceMatrixService.findOrCreateTraceMatrix(project,
+            sourceArtifact.getType(),
+            targetArtifact.getType());
+        this.traceLinkRepository.save(traceLink);
+        return traceLink;
+    }
+
+    private void assertNotOverridingManualLink(ProjectVersion projectVersion, TraceAppEntity newTrace, TraceLink traceLink) throws SafaError {
+        Optional<TraceLinkVersion> existingLinkOptional =
+            this.traceLinkVersionRepository.findByProjectVersionAndTraceLink(projectVersion,
+                traceLink);
+        if (existingLinkOptional.isPresent()) {
+            TraceLinkVersion previousTraceLinkVersion = existingLinkOptional.get();
+            if (previousTraceLinkVersion.getTraceType() == TraceType.MANUAL && newTrace.traceType != TraceType.MANUAL) {
+                throw new SafaError("Generated link cannot override manual one.");
+            }
+        }
     }
 
     private Artifact assertAndFindArtifact(Project project, String artifactName) throws SafaError {

@@ -56,13 +56,8 @@ public class ArtifactVersionRepositoryImpl
     TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
-    public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
-        return artifactVersionRepository.findByProjectVersionProject(project);
-    }
-
-    @Override
-    public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
-        return artifactVersionRepository.findByArtifact(artifact);
+    public ArtifactVersion save(ArtifactVersion artifactVersion) {
+        return this.artifactVersionRepository.save(artifactVersion);
     }
 
     @Override
@@ -85,22 +80,106 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public Artifact createOrUpdateAppEntity(ProjectVersion projectVersion,
-                                            ArtifactAppEntity artifactAppEntity) throws SafaError {
-        Project project = projectVersion.getProject();
-        String artifactId = artifactAppEntity.getBaseEntityId();
-        String typeName = artifactAppEntity.type;
-        String artifactName = artifactAppEntity.name;
-        DocumentType documentType = artifactAppEntity.getDocumentType();
+    public Artifact createOrUpdateRelatedEntities(ProjectVersion projectVersion,
+                                                  ArtifactAppEntity artifactAppEntity) throws SafaError {
+        Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity);
+        artifactAppEntity.setBaseEntityId(artifactAppEntity.getBaseEntityId());
 
-        ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
-        Artifact artifact = createOrUpdateArtifact(project, artifactId, artifactName, artifactType, documentType);
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
-        artifactAppEntity.setBaseEntityId(artifactId);
+        createOrUpdateDocumentNodeInformation(artifactAppEntity, artifact);
+        return artifact;
+    }
 
+    @Override
+    public Optional<ArtifactVersion> findExistingVersionEntity(ArtifactVersion artifactVersion) {
+        return this.artifactVersionRepository
+            .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+    }
+
+    @Override
+    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
+        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
+    }
+
+    @Override
+    public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
+        return artifactVersionRepository.findByProjectVersionProject(project);
+    }
+
+    @Override
+    public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
+        return artifactVersionRepository.findByArtifact(artifact);
+    }
+
+    @Override
+    public List<Artifact> retrieveBaseEntitiesByProject(Project project) {
+        return this.artifactRepository.findByProject(project);
+    }
+
+    @Override
+    public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
+        // Step 1 - Create base entity information
+        ProjectVersion projectVersion = artifactVersion.getProjectVersion();
+        ArtifactAppEntity artifactAppEntity =
+            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
+                artifactVersion.getTypeName(),
+                artifactVersion.getName(),
+                artifactVersion.getSummary(),
+                artifactVersion.getContent(),
+                artifactVersion.getArtifact().getDocumentType());
+
+        // Step 2 - Attach document links
+        attachDocumentLinks(projectVersion, artifactVersion, artifactAppEntity);
+
+        // Step 3 - Attach Safety Case or FTA information
+        attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
+        return artifactAppEntity;
+    }
+
+    /**
+     * Private helper methods
+     */
+
+    private void attachDocumentLinks(ProjectVersion projectVersion,
+                                     ArtifactVersion artifactVersion,
+                                     ArtifactAppEntity artifactAppEntity) {
+        Artifact artifact = artifactVersion.getArtifact();
+        List<String> documentIds =
+            this.documentArtifactRepository
+                .findByProjectVersionAndArtifact(projectVersion, artifact)
+                .stream()
+                .map(da -> da.getDocument().getDocumentId().toString())
+                .collect(Collectors.toList());
+        artifactAppEntity.setDocumentIds(documentIds);
+    }
+
+    private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
+        switch (artifact.getDocumentType()) {
+            case SAFETY_CASE:
+                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                if (safetyCaseArtifactOptional.isPresent()) {
+                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                }
+                //TODO: Throw error if not found?
+                break;
+            case FTA:
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                if (ftaArtifactOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.FTA);
+                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
         switch (artifactAppEntity.getDocumentType()) {
-            //TODO: Find a way to structurally ensure potentially new properties to safety case
-            //or fta artifact will get propagated here too.
             case FTA:
                 FTAArtifact ftaArtifact;
                 Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
@@ -129,83 +208,6 @@ public class ArtifactVersionRepositoryImpl
             default:
                 break;
         }
-
-        return artifact;
-    }
-
-    @Override
-    public void createOrUpdateVersionEntity(ProjectVersion projectVersion,
-                                            ArtifactVersion newArtifactVersion) throws SafaError {
-        try {
-            //Overriding any version equal to given
-            this.artifactVersionRepository
-                .findByProjectVersionAndArtifactName(projectVersion, newArtifactVersion.getName())
-                .ifPresent((existingVersionEntity) -> {
-                    artifactVersionRepository.delete(existingVersionEntity);
-                });
-            this.artifactVersionRepository.save(newArtifactVersion);
-        } catch (Exception e) {
-            String error = String.format("An error occurred while saving artifact: %s", newArtifactVersion.getName());
-            throw new SafaError(error, e);
-        }
-    }
-
-    @Override
-    public List<Artifact> retrieveBaseEntitiesByProject(Project project) {
-        return this.artifactRepository.findByProject(project);
-    }
-
-    @Override
-    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
-        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
-    }
-
-    @Override
-    public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
-        // Step 1 - Create base entity information
-        ProjectVersion projectVersion = artifactVersion.getProjectVersion();
-        ArtifactAppEntity artifactAppEntity =
-            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
-                artifactVersion.getTypeName(),
-                artifactVersion.getName(),
-                artifactVersion.getSummary(),
-                artifactVersion.getContent(),
-                artifactVersion.getArtifact().getDocumentType());
-
-        // Step 2 - Attach document links
-        Artifact artifact = artifactVersion.getArtifact();
-        List<String> documentIds =
-            this.documentArtifactRepository
-                .findByProjectVersionAndArtifact(projectVersion, artifact)
-                .stream()
-                .map(da -> da.getDocument().getDocumentId().toString())
-                .collect(Collectors.toList());
-        artifactAppEntity.setDocumentIds(documentIds);
-
-        // Step 3 - Attach Safety Case or FTA information
-        switch (artifact.getDocumentType()) {
-            case SAFETY_CASE:
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                }
-                //TODO: Throw error if not found?
-                break;
-            case FTA:
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                }
-                break;
-            default:
-                break;
-        }
-        return artifactAppEntity;
     }
 
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
@@ -243,11 +245,13 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    private Artifact createOrUpdateArtifact(Project project,
-                                            String artifactId,
-                                            String artifactName,
-                                            ArtifactType artifactType,
-                                            DocumentType documentType) throws SafaError {
+    private Artifact createOrUpdateArtifactFromAppEntity(Project project,
+                                                         ArtifactAppEntity artifactAppEntity) throws SafaError {
+        String artifactId = artifactAppEntity.getBaseEntityId();
+        String typeName = artifactAppEntity.type;
+        String artifactName = artifactAppEntity.name;
+        ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
+        DocumentType documentType = artifactAppEntity.getDocumentType();
         if (artifactId.equals("")) {
             Artifact newArtifact = this.artifactRepository
                 .findByProjectAndName(project, artifactName)

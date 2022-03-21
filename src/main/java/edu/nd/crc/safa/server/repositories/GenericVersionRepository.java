@@ -97,6 +97,15 @@ public abstract class GenericVersionRepository<
     protected abstract void createOrUpdateVersionEntity(ProjectVersion projectVersion,
                                                         VersionEntity artifactVersion) throws SafaError;
 
+    @Override
+    public List<AppEntity> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
+        List<VersionEntity> artifactBodies = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
+        List<AppEntity> artifacts = new ArrayList<>();
+        for (VersionEntity artifactVersion : artifactBodies) {
+            artifacts.add(this.retrieveAppEntityFromVersionEntity(artifactVersion));
+        }
+        return artifacts;
+    }
 
     /**
      * Calculates contents of each artifact at given version and returns bodies at version.

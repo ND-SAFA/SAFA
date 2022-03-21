@@ -440,17 +440,17 @@ public abstract class GenericVersionRepository<
         VersionEntity previousBody =
             getEntityBeforeVersion(this.retrieveVersionEntitiesByBaseEntity(baseEntity), projectVersion);
         if (previousBody == null) {
-            return appEntity == null ? null : ModificationType.ADDED;
+            return appEntity == null ? ModificationType.NO_MODIFICATION : ModificationType.ADDED;
         } else {
             if (appEntity == null) {
                 boolean previouslyRemoved = previousBody.getModificationType() == ModificationType.REMOVED;
-                return previouslyRemoved ? null : ModificationType.REMOVED;
+                return previouslyRemoved ? ModificationType.NO_MODIFICATION : ModificationType.REMOVED;
             } else { // app entity is not null
                 if (previousBody.getModificationType() == ModificationType.REMOVED) {
                     return ModificationType.ADDED;
                 }
                 boolean hasSameContent = previousBody.hasSameContent(appEntity);
-                return hasSameContent ? null : ModificationType.MODIFIED;
+                return hasSameContent ? ModificationType.NO_MODIFICATION : ModificationType.MODIFIED;
             }
         }
     }

@@ -130,8 +130,7 @@ public class CommitController extends BaseController {
         ProjectVersion projectVersion,
         ProjectChange<AppEntity> projectChange,
         IVersionRepository<VersionEntity, AppEntity> versionRepository,
-        AppEntityCreator<AppEntity, VersionEntity> appEntityCreator,
-        VersionEntityTypes versionEntityTypes
+        AppEntityCreator<AppEntity, VersionEntity> appEntityCreator
     ) throws SafaError {
         ProjectChange<AppEntity> change = new ProjectChange<>();
 
@@ -188,11 +187,11 @@ public class CommitController extends BaseController {
         for (AppEntity appEntity : appEntities) {
             Pair<VersionEntity, CommitError> commitResponse = commitAction.commitAction(appEntity);
 
+            VersionEntity versionEntity = commitResponse.getValue0();
             CommitError commitError = commitResponse.getValue1();
             if (commitError != null) {
                 throw new SafaError(commitError.getDescription());
-            } else {
-                VersionEntity versionEntity = commitResponse.getValue0();
+            } else if (versionEntity != null) {
                 AppEntity traceAppEntity = appEntityCreator.createAppEntity(versionEntity);
                 updatedEntities.add(traceAppEntity);
             }

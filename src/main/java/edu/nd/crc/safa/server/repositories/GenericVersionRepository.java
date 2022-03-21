@@ -133,8 +133,9 @@ public abstract class GenericVersionRepository<
     }
 
     /**
-     * Commits the current state of app entity to given project version. Note,
-     * if submitted to an non-current version changes are not propagated upstream.
+     * Commits the current state of app entity to given project version. AppEntity is modified
+     * to contain the base entity id if created successfully. Warning, if submitted to an
+     * non-current version changes are not propagated upstream.
      *
      * @param projectVersion The project version to save the changes to.
      * @param appEntity      The app entity whose state is saved.

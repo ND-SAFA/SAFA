@@ -72,3 +72,16 @@ export function getArtifactTypePrintName(type?: string): string {
     ? nameMap[type.toLowerCase()] || capitalizeSentence(type.toLowerCase())
     : "Unknown Type";
 }
+
+/**
+ * Converts an enum value in capital snake case into a title case string.
+ *
+ * @param value - The value to convert.
+ * @return The displayable value.
+ */
+export function enumToDisplay(value: string): string {
+  return value
+    .split("_")
+    .map((word) => capitalize(word.toLowerCase()))
+    .join(" ");
+}

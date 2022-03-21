@@ -5,6 +5,21 @@ import {
   SafetyCaseType,
   SelectOption,
 } from "@/types";
+import { enumToDisplay } from "@/util/string-helper";
+
+/**
+ * Converts an enum value into a selectable option with a title case name.
+ *
+ * @param enumValue - The enum value in upper snake case to convert.
+ * @param name - The name of the option, which will bne generated if not given.
+ * @return The selectable option.
+ */
+export function createEnumOption(
+  enumValue: string,
+  name?: string
+): SelectOption {
+  return { id: enumValue, name: name || enumToDisplay(enumValue) };
+}
 
 /**
  * Returns display names for each document type.
@@ -13,11 +28,11 @@ import {
  */
 export function documentTypeOptions(): SelectOption[] {
   return [
-    { id: DocumentType.ARTIFACT_TREE, name: "Default" },
-    { id: DocumentType.FTA, name: "FTA" },
-    { id: DocumentType.SAFETY_CASE, name: "Safety Case" },
-    { id: DocumentType.FMEA, name: "FMEA" },
-    { id: DocumentType.FMECA, name: "FMECA" },
+    createEnumOption(DocumentType.ARTIFACT_TREE, "Default"),
+    createEnumOption(DocumentType.FTA, "FTA"),
+    createEnumOption(DocumentType.SAFETY_CASE),
+    createEnumOption(DocumentType.FMEA, "FMEA"),
+    createEnumOption(DocumentType.FMECA, "FMECA"),
   ];
 }
 
@@ -57,10 +72,10 @@ export function isTableDocument(type: DocumentType): boolean {
  */
 export function safetyCaseOptions(): SelectOption[] {
   return [
-    { id: SafetyCaseType.CONTEXT, name: "Context" },
-    { id: SafetyCaseType.GOAL, name: "Goal" },
-    { id: SafetyCaseType.STRATEGY, name: "Strategy" },
-    { id: SafetyCaseType.SOLUTION, name: "Solution" },
+    createEnumOption(SafetyCaseType.CONTEXT),
+    createEnumOption(SafetyCaseType.GOAL),
+    createEnumOption(SafetyCaseType.STRATEGY),
+    createEnumOption(SafetyCaseType.SOLUTION),
   ];
 }
 
@@ -70,10 +85,7 @@ export function safetyCaseOptions(): SelectOption[] {
  * @return The select option names and ids.
  */
 export function logicTypeOptions(): SelectOption[] {
-  return [
-    { id: FTANodeType.AND, name: "And" },
-    { id: FTANodeType.OR, name: "Or" },
-  ];
+  return [createEnumOption(FTANodeType.AND), createEnumOption(FTANodeType.OR)];
 }
 
 /**
@@ -83,8 +95,8 @@ export function logicTypeOptions(): SelectOption[] {
  */
 export function columnTypeOptions(): SelectOption[] {
   return [
-    { id: ColumnDataType.FREE_TEXT, name: "Text" },
-    { id: ColumnDataType.RELATION, name: "Relation" },
-    { id: ColumnDataType.SELECT, name: "Select" },
+    createEnumOption(ColumnDataType.FREE_TEXT, "Text"),
+    createEnumOption(ColumnDataType.RELATION),
+    createEnumOption(ColumnDataType.SELECT),
   ];
 }

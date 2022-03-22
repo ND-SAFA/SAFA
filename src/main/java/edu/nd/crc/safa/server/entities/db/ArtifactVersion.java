@@ -66,29 +66,43 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         nullable = false,
         columnDefinition = "TEXT")
     String content;
+    @Column
+    String customFields;
 
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
+        this.customFields = "{}";
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            ModificationType modificationType,
                            Artifact artifact,
                            String summary,
-                           String content) {
+                           String content,
+                           String customFields) {
         this.artifact = artifact;
         this.modificationType = modificationType;
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
+        this.customFields = customFields;
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            Artifact artifact,
                            String summary,
-                           String content) {
-        this(projectVersion, ModificationType.ADDED, artifact, summary, content);
+                           String content,
+                           String customFields) {
+        this(projectVersion, ModificationType.ADDED, artifact, summary, content, customFields);
+    }
+
+    public String getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(String customFields) {
+        this.customFields = customFields;
     }
 
     public UUID getVersionEntityId() {
@@ -170,18 +184,20 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
-                artifactVersion.getContent());
+                artifactVersion.getContent(),
+                artifactVersion.getCustomFields());
         }
         return false;
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.name, a.summary, a.body);
+        return hasSameContent(a.name, a.summary, a.body, a.customFields.toString());
     }
 
-    private boolean hasSameContent(String name, String summary, String content) {
+    private boolean hasSameContent(String name, String summary, String content, String customFields) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
-            && this.content.equals(content);
+            && this.content.equals(content)
+            && this.customFields.equals(customFields);
     }
 }

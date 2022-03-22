@@ -161,6 +161,7 @@ public abstract class GenericVersionRepository<
                 projectVersion,
                 baseEntity,
                 appEntity);
+
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = baseEntity.getBaseEntityId();

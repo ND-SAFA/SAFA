@@ -127,7 +127,8 @@ public class ArtifactFileParser {
                 artifactName,
                 artifactSummary,
                 artifactContent,
-                DocumentType.ARTIFACT_TREE
+                DocumentType.ARTIFACT_TREE,
+                new Hashtable<>()
             );
             artifactAppEntities.add(artifactAppEntity);
         }

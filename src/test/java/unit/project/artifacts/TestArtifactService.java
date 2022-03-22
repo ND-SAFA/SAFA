@@ -3,6 +3,7 @@ package unit.project.artifacts;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
@@ -151,11 +152,11 @@ public class TestArtifactService extends ApplicationBaseTest {
             artifactName,
             artifactSummary,
             newContent,
-            DocumentType.ARTIFACT_TREE);
+            DocumentType.ARTIFACT_TREE,
+            new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        this.entityVersionService.commitVersionArtifacts(projectVersion,
-            Arrays.asList(appEntity));
+        this.entityVersionService.commitVersionArtifacts(projectVersion, List.of(appEntity));
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,
                 artifact);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.Document;
 
+
 public class DocumentAppEntity extends Document {
 
     List<String> artifactIds;
@@ -13,6 +14,7 @@ public class DocumentAppEntity extends Document {
     public DocumentAppEntity() {
         super();
         this.artifactIds = new ArrayList<>();
+        this.columns = new ArrayList<>();
     }
 
     public DocumentAppEntity(Document document,

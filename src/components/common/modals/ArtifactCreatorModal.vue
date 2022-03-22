@@ -7,10 +7,18 @@
   >
     <template v-slot:body>
       <v-container>
+        <v-select
+          filled
+          label="Document Type"
+          v-model="editedArtifact.documentType"
+          :items="documentTypes"
+          item-text="name"
+          item-value="id"
+        />
         <v-text-field
           v-if="!isFTA"
           filled
-          v-model="name"
+          v-model="editedArtifact.name"
           label="Artifact Name"
           color="primary"
           hint="Please select an identifier for the artifact"
@@ -19,24 +27,16 @@
         />
         <v-combobox
           filled
-          v-if="!isFTA && !isSafetyCase"
-          v-model="artifactType"
+          v-if="!isFTA && !isSafetyCase && !isFMEA"
+          v-model="editedArtifact.type"
           :items="artifactTypes"
           label="Artifact Type"
-        />
-        <v-select
-          filled
-          label="Document Type"
-          v-model="documentType"
-          :items="documentTypes"
-          item-text="name"
-          item-value="id"
         />
         <v-select
           v-if="isFTA"
           filled
           label="Logic Type"
-          v-model="logicType"
+          v-model="editedArtifact.logicType"
           :items="logicTypes"
         />
         <artifact-input
@@ -50,7 +50,7 @@
           v-if="isSafetyCase"
           filled
           label="Safety Case Type"
-          v-model="safetyCaseType"
+          v-model="editedArtifact.safetyCaseType"
           :items="safetyCaseTypes"
           item-text="name"
           item-value="id"
@@ -59,22 +59,22 @@
           v-if="!isFTA"
           filled
           label="Artifact Summary"
-          v-model="summary"
-          class="mt-3"
+          v-model="editedArtifact.summary"
           rows="3"
         />
         <v-textarea
           filled
           v-if="!isFTA"
           label="Artifact Body"
-          v-model="body"
+          v-model="editedArtifact.body"
           rows="3"
         />
+        <custom-field-input v-if="isFMEA" v-model="editedArtifact" />
       </v-container>
     </template>
     <template v-slot:actions>
       <v-row justify="end">
-        <v-btn color="primary" :disabled="!isValid" @click="onSubmit">
+        <v-btn color="primary" :disabled="!canSave" @click="onSubmit">
           <v-icon>mdi-content-save</v-icon>
           <span class="ml-1">Save</span>
         </v-btn>
@@ -86,13 +86,17 @@
 import Vue, { PropType } from "vue";
 import {
   Artifact,
-  ButtonDefinition,
   DocumentType,
   FTANodeType,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
-import { documentTypeOptions, safetyCaseOptions } from "@/util";
+import {
+  createArtifact,
+  documentTypeMap,
+  logicTypeOptions,
+  safetyCaseOptions,
+} from "@/util";
 import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
 import {
   artifactModule,
@@ -101,8 +105,11 @@ import {
   projectModule,
   typeOptionsModule,
 } from "@/store";
-import { ArtifactInput } from "@/components/common/index";
-import { GenericModal } from "@/components/common/generic";
+import {
+  ArtifactInput,
+  GenericModal,
+  CustomFieldInput,
+} from "@/components/common";
 import { setTimeout } from "timers";
 
 /**
@@ -112,7 +119,7 @@ import { setTimeout } from "timers";
  */
 export default Vue.extend({
   name: "artifact-creator",
-  components: { GenericModal, ArtifactInput },
+  components: { CustomFieldInput, GenericModal, ArtifactInput },
   props: {
     title: {
       type: String,
@@ -129,25 +136,22 @@ export default Vue.extend({
   },
   data() {
     return {
-      name: this.artifact?.name || "",
-      summary: this.artifact?.summary || "",
-      body: this.artifact?.body || "",
-      artifactType: this.artifact?.type || "",
-      documentType: this.artifact?.documentType || DocumentType.ARTIFACT_TREE,
-      safetyCaseType: this.artifact?.safetyCaseType || SafetyCaseType.GOAL,
-      logicType: this.artifact?.logicType || FTANodeType.AND,
-
+      editedArtifact: createArtifact(this.artifact),
       parentId: "",
 
       isLoading: false,
       isNameValid: !!this.artifact?.name,
       nameError: "",
-      buttonDefinitions: [] as ButtonDefinition[],
       nameCheckTimer: undefined as ReturnType<typeof setTimeout> | undefined,
       nameCheckIsLoading: false,
+      canSave: false,
     };
   },
   computed: {
+    name(): string {
+      return this.editedArtifact.name;
+    },
+
     projectId(): string {
       return projectModule.projectId;
     },
@@ -156,39 +160,35 @@ export default Vue.extend({
     },
 
     isFTA(): boolean {
-      return this.documentType === DocumentType.FTA;
+      return this.editedArtifact.documentType === DocumentType.FTA;
     },
     isSafetyCase(): boolean {
-      return this.documentType === DocumentType.SAFETY_CASE;
+      return this.editedArtifact.documentType === DocumentType.SAFETY_CASE;
+    },
+    isFMEA(): boolean {
+      return this.editedArtifact.documentType === DocumentType.FMEA;
     },
     isValid(): boolean {
+      const { logicType, safetyCaseType, type, body } = this.editedArtifact;
+
       if (this.isFTA) {
-        return !!(this.logicType && this.parentId);
+        return !!(logicType && this.parentId);
       } else if (this.isSafetyCase) {
-        return !!(this.isNameValid && this.body && this.safetyCaseType);
+        return !!(this.isNameValid && body && safetyCaseType);
+      } else if (this.isFMEA) {
+        return !!(this.isNameValid && body);
       } else {
-        return !!(this.isNameValid && this.body && this.artifactType);
+        return !!(this.isNameValid && body && type);
       }
     },
 
-    documentTypes(): SelectOption[] {
-      const documentType = documentModule.document.type;
-      const options = documentTypeOptions();
-
-      if (documentType === DocumentType.FTA) {
-        return options.filter(({ id }) => id !== DocumentType.SAFETY_CASE);
-      } else if (documentType === DocumentType.SAFETY_CASE) {
-        return options.filter(({ id }) => id !== DocumentType.FTA);
-      } else {
-        return options.filter(({ id }) => id == DocumentType.ARTIFACT_TREE);
-      }
-    },
     safetyCaseTypes: safetyCaseOptions,
+    logicTypes: logicTypeOptions,
+    documentTypes(): SelectOption[] {
+      return documentTypeMap()[documentModule.type];
+    },
     artifactTypes(): string[] {
       return typeOptionsModule.artifactTypes;
-    },
-    logicTypes(): FTANodeType[] {
-      return [FTANodeType.AND, FTANodeType.OR];
     },
 
     parentArtifact(): Artifact | undefined {
@@ -198,82 +198,82 @@ export default Vue.extend({
     },
     computedArtifactType(): string {
       if (this.isFTA) {
-        return this.parentArtifact?.type || this.artifactType;
+        return this.parentArtifact?.type || this.editedArtifact.type;
       } else if (this.isSafetyCase) {
-        return this.safetyCaseType;
+        return this.editedArtifact.safetyCaseType || "";
+      } else if (this.isFMEA) {
+        return "FMEA";
       } else {
-        return this.artifactType;
+        return this.editedArtifact.type;
       }
     },
     computedName(): string {
-      return this.isFTA ? `${this.parentId}-logic` : this.name;
+      const { name, logicType } = this.editedArtifact;
+
+      return this.isFTA
+        ? `${this.parentArtifact?.name || this.parentId}-${logicType}`
+        : name;
     },
   },
   watch: {
     isOpen(isOpen: boolean | string): void {
-      if (!isOpen) {
-        this.name = this.artifact?.name || "";
-        this.summary = this.artifact?.summary || "";
-        this.body = this.artifact?.body || "";
-        this.artifactType = this.artifact?.type || "";
-        this.documentType =
-          this.artifact?.documentType || DocumentType.ARTIFACT_TREE;
-        this.logicType = this.artifact?.logicType || FTANodeType.AND;
-        this.safetyCaseType =
-          this.artifact?.safetyCaseType || SafetyCaseType.GOAL;
+      if (isOpen === true) {
+        this.editedArtifact = createArtifact(this.artifact);
         this.parentId = "";
       } else if (typeof isOpen === "string") {
         if (isOpen in FTANodeType) {
-          this.documentType = DocumentType.FTA;
-          this.logicType = isOpen as FTANodeType;
+          this.editedArtifact = createArtifact({
+            documentType: DocumentType.FTA,
+            logicType: isOpen as FTANodeType,
+          });
         } else if (isOpen in SafetyCaseType) {
-          this.documentType = DocumentType.SAFETY_CASE;
-          this.safetyCaseType = isOpen as SafetyCaseType;
+          this.editedArtifact = createArtifact({
+            documentType: DocumentType.SAFETY_CASE,
+            safetyCaseType: isOpen as SafetyCaseType,
+          });
         }
       }
     },
     name(newName: string): void {
-      if (newName !== "") {
-        if (this.nameCheckTimer) {
-          clearTimeout(this.nameCheckTimer);
-        }
+      if (!newName) return;
 
-        this.nameCheckIsLoading = true;
-        this.nameCheckTimer = setTimeout(() => {
-          if (!this.versionId) return;
-
-          isArtifactNameTaken(this.versionId, newName).then((res) => {
-            this.nameCheckIsLoading = false;
-            this.isNameValid = !res.artifactExists;
-
-            if (this.isNameValid) {
-              this.nameError = "";
-            } else {
-              this.nameError = "Name is already used, please select another.";
-            }
-          });
-        }, 500);
+      if (this.nameCheckTimer) {
+        clearTimeout(this.nameCheckTimer);
       }
+
+      this.nameCheckIsLoading = true;
+      this.nameCheckTimer = setTimeout(() => {
+        isArtifactNameTaken(this.versionId, newName).then((res) => {
+          this.nameCheckIsLoading = false;
+          this.isNameValid =
+            !res.artifactExists || newName === this.artifact.name;
+          this.nameError = this.isNameValid
+            ? ""
+            : "Name is already used, please select another.";
+          this.canSave = this.isNameValid;
+        });
+      }, 500);
+    },
+    editedArtifact: {
+      handler(): void {
+        this.canSave = this.isValid;
+      },
+      deep: true,
     },
   },
   methods: {
     onSubmit(): void {
       const { documentId } = documentModule.document;
+      const { logicType, safetyCaseType } = this.editedArtifact;
       const isUpdate = this.artifact !== undefined;
-      const artifact: Artifact = {
-        id: this.artifact?.id || "",
+      const artifact = createArtifact({
+        ...this.editedArtifact,
         name: this.computedName,
         type: this.computedArtifactType,
-        summary: this.summary,
-        body: this.body,
-        documentType: this.documentType,
-        // TODO: not always populated
         documentIds: documentId ? [documentId] : [],
-        logicType: this.isFTA ? this.logicType : undefined,
-        safetyCaseType: this.isSafetyCase ? this.safetyCaseType : undefined,
-      };
-
-      console.log(documentModule.document);
+        logicType: this.isFTA ? logicType : undefined,
+        safetyCaseType: this.isSafetyCase ? safetyCaseType : undefined,
+      });
 
       this.isLoading = true;
 

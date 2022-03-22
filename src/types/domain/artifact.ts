@@ -54,6 +54,10 @@ export interface Artifact {
    * For safety case nodes, the type of safety case node.
    */
   safetyCaseType?: SafetyCaseType;
+  /**
+   * Represents a collection of custom attributes on an artifact.
+   */
+  customFields?: Record<string, string>;
 }
 
 /**

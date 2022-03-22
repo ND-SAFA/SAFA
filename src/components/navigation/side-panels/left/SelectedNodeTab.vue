@@ -36,8 +36,6 @@
         {{ selectedArtifact.body }}
       </p>
 
-      <v-divider />
-
       <v-row>
         <v-col>
           <v-subheader>Parents</v-subheader>
@@ -54,7 +52,9 @@
               :key="parentName"
               @click="onArtifactClick(parentName)"
             >
-              {{ parentName }}
+              <span class="mb-1 text-ellipsis" style="max-width: 60px">
+                {{ parentName }}
+              </span>
             </v-btn>
           </v-list>
         </v-col>
@@ -74,30 +74,52 @@
               :key="childName"
               @click="onArtifactClick(childName)"
             >
-              {{ childName }}
+              <span class="mb-1 text-ellipsis" style="max-width: 60px">
+                {{ childName }}
+              </span>
             </v-btn>
           </v-list>
         </v-col>
       </v-row>
 
-      <v-divider class="mb-2" />
+      <div v-if="documents.length > 0">
+        <v-subheader>Documents</v-subheader>
+        <v-divider />
+
+        <v-list>
+          <v-list-item
+            v-for="doc in documents"
+            :key="doc.documentId"
+            @click="onSwitchDocument(doc)"
+          >
+            <v-list-item-title>
+              {{ doc.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ documentTypeName(doc.type) }}
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+      </div>
 
       <div v-if="selectedArtifactWarnings.length > 0">
         <v-row align="center" class="debug">
           <v-col>
-            <h2 class="text-h5">Warnings</h2>
+            <v-subheader>Warnings</v-subheader>
           </v-col>
           <v-col class="flex-grow-0 mr-2">
             <v-icon color="secondary">mdi-hazard-lights</v-icon>
           </v-col>
         </v-row>
 
+        <v-divider />
+
         <v-expansion-panels>
           <v-expansion-panel
             v-for="warning in selectedArtifactWarnings"
             :key="warning"
           >
-            <v-expansion-panel-header class="text-body-1 font-weight-bold">
+            <v-expansion-panel-header class="text-body-1">
               {{ warning.ruleName }}
             </v-expansion-panel-header>
             <v-expansion-panel-content class="text-body-1">
@@ -121,17 +143,24 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ArtifactWarning, PanelType, ProjectWarnings } from "@/types";
+import {
+  Artifact,
+  ArtifactWarning,
+  PanelType,
+  ProjectDocument,
+  ProjectWarnings,
+} from "@/types";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import {
   appModule,
   artifactModule,
   artifactSelectionModule,
+  documentModule,
   errorModule,
-  projectModule,
   traceModule,
 } from "@/store";
 import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
+import { documentTypeOptions } from "@/util";
 
 export default Vue.extend({
   components: { GenericIconButton, ArtifactCreatorModal },
@@ -172,6 +201,13 @@ export default Vue.extend({
         return [];
       }
     },
+    documents(): ProjectDocument[] {
+      if (!this.selectedArtifact) return [];
+
+      return documentModule.projectDocuments.filter(({ documentId }) =>
+        this.selectedArtifact?.documentIds.includes(documentId)
+      );
+    },
     projectWarnings(): ProjectWarnings {
       return errorModule.getArtifactWarnings;
     },
@@ -193,10 +229,17 @@ export default Vue.extend({
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
-          artifactSelectionModule.UNSELECT_ARTIFACT();
           appModule.closePanel(PanelType.left);
         });
       }
+    },
+    onSwitchDocument(document: ProjectDocument): void {
+      documentModule.switchDocuments(document);
+    },
+    documentTypeName(typeId: string): string {
+      return (
+        documentTypeOptions().find(({ id }) => id === typeId)?.name || typeId
+      );
     },
   },
 });

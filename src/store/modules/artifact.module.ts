@@ -127,7 +127,7 @@ export default class ArtifactModule extends VuexModule {
    */
   get getArtifactById(): ArtifactQueryFunction {
     return (targetArtifactId) => {
-      const query = this.artifacts.filter((a) => a.id === targetArtifactId);
+      const query = this.allArtifacts.filter((a) => a.id === targetArtifactId);
 
       return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
     };

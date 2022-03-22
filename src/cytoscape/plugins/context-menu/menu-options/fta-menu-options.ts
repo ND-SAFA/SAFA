@@ -13,7 +13,7 @@ export const ftaMenuItem: MenuItem = {
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
-      return documentModule.document.type === DocumentType.FTA;
+      return documentModule.type === DocumentType.FTA;
     }
     return false;
   },

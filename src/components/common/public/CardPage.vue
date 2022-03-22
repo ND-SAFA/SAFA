@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SafaIcon } from "@/components/navigation";
+import { SafaIcon } from "@/components/common/display";
 
 /**
  * Presents the page within a card containing SAFA title, a slot for a form,

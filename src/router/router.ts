@@ -3,7 +3,7 @@ import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import { Routes } from "./routes";
 import {
   ApproveLinksView,
-  ArtifactTreeView,
+  ArtifactView,
   CreateAccountView,
   ErrorPageView,
   ForgotPasswordView,
@@ -47,9 +47,9 @@ const routes: Array<RouteConfig> = [
     component: ProjectCreatorView,
   },
   {
-    path: Routes.ARTIFACT_TREE,
-    name: "Artifact Tree",
-    component: ArtifactTreeView,
+    path: Routes.ARTIFACT,
+    name: "Project",
+    component: ArtifactView,
   },
   {
     path: Routes.TRACE_LINK,

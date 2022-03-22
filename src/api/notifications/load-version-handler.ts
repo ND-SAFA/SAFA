@@ -20,7 +20,7 @@ export async function loadVersionIfExistsHandler(
   if (lastVersionId) {
     appModule.onLoadStart();
 
-    return navigateTo(Routes.ARTIFACT_TREE)
+    return navigateTo(Routes.ARTIFACT)
       .then(() => getProjectVersion(lastVersionId))
       .then(setCreatedProject)
       .finally(appModule.onLoadEnd);

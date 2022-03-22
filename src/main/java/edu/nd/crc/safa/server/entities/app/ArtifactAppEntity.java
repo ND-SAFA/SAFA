@@ -64,6 +64,7 @@ public class ArtifactAppEntity implements IAppEntity {
      * For FTA logic nodes,  the logical operator of this node.
      */
     public FTANodeType logicType;
+
     public ArtifactAppEntity() {
         this.id = "";
         this.name = "";
@@ -72,6 +73,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds = new ArrayList<>();
         this.customFields = new Hashtable<>();
     }
+    
     public ArtifactAppEntity(String artifactId,
                              String type,
                              String name,

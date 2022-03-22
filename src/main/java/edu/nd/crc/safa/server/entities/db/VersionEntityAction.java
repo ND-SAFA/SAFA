@@ -7,9 +7,9 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 /**
  * Represents a lambda returning a VersionEntity optional.
  *
- * @param <VersionEntity>
+ * @param <T> The type returned by the action.
  */
-public interface VersionEntityAction<VersionEntity> {
+public interface VersionEntityAction<T> {
 
-    Optional<VersionEntity> action() throws SafaError;
+    Optional<T> action() throws SafaError;
 }

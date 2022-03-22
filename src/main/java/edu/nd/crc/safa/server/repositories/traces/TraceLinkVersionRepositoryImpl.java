@@ -135,7 +135,9 @@ public class TraceLinkVersionRepositoryImpl
         return traceLink;
     }
 
-    private void assertNotOverridingManualLink(ProjectVersion projectVersion, TraceAppEntity newTrace, TraceLink traceLink) throws SafaError {
+    private void assertNotOverridingManualLink(ProjectVersion projectVersion,
+                                               TraceAppEntity newTrace,
+                                               TraceLink traceLink) throws SafaError {
         Optional<TraceLinkVersion> existingLinkOptional =
             this.traceLinkVersionRepository.findByProjectVersionAndTraceLink(projectVersion,
                 traceLink);

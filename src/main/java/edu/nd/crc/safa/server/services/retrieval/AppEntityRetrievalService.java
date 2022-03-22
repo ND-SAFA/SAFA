@@ -106,7 +106,10 @@ public class AppEntityRetrievalService {
 
         // Versioned Entities
         List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getBaseEntityId).collect(Collectors.toList());
+        List<String> artifactIds = artifacts
+            .stream()
+            .map(ArtifactAppEntity::getBaseEntityId)
+            .collect(Collectors.toList());
         List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
 
         // Project Entities

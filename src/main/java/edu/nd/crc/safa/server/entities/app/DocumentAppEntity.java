@@ -20,6 +20,7 @@ public class DocumentAppEntity extends Document {
                              List<String> artifactIds) {
         super(document);
         this.artifactIds = artifactIds;
+        this.columns = new ArrayList<>();
     }
 
     public DocumentAppEntity(Document document,

@@ -55,16 +55,32 @@ public class DocumentColumn {
      */
     @Column(nullable = false)
     int tableColumnIndex;
+    /**
+     * Whether this column should be required on rows in table.
+     */
+    @Column(nullable = false)
+    boolean required;
 
     public DocumentColumn() {
+        this.required = false;
     }
 
     public DocumentColumn(DocumentColumnAppEntity documentColumnAppEntity, Document document, int tableColumnIndex) {
+        this();
         this.documentColumnId = documentColumnAppEntity.getId();
         this.name = documentColumnAppEntity.getName();
         this.dataType = documentColumnAppEntity.getDataType();
         this.document = document;
         this.tableColumnIndex = tableColumnIndex;
+        this.required = documentColumnAppEntity.isRequired();
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 
     public int getTableColumnIndex() {

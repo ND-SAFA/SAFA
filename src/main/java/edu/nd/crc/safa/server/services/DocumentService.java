@@ -76,6 +76,14 @@ public class DocumentService {
      * @param document          The document db entity associated with document app entity.
      */
     public void updateFMEAColumns(DocumentAppEntity documentAppEntity, Document document) {
+        // Step - Remove columns no longer present in payload
+        List<UUID> originalColumnIds = this.documentColumnRepository
+            .findByDocument(document)
+            .stream()
+            .map(DocumentColumn::getDocumentColumnId)
+            .collect(Collectors.toList());
+
+        // Step - Add or update column database entities
         if (document.getType() == DocumentType.FMEA) {
             List<DocumentColumnAppEntity> documentColumns = documentAppEntity.getColumns();
             for (int columnIndex = 0; columnIndex < documentColumns.size(); columnIndex++) {
@@ -86,7 +94,16 @@ public class DocumentService {
                     columnIndex);
                 this.documentColumnRepository.save(documentColumn);
                 documentAppEntity.getColumns().get(columnIndex).setId(documentColumn.getDocumentColumnId());
+
+                // Mark as processed
+                UUID currentColumnId = documentColumn.getDocumentColumnId();
+                originalColumnIds.remove(currentColumnId);
             }
+        }
+
+        // Step - Remove columns not included in payload
+        for (UUID removedColumnId : originalColumnIds) {
+            this.documentColumnRepository.deleteById(removedColumnId);
         }
     }
 

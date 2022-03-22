@@ -15,4 +15,6 @@ public interface DocumentColumnRepository extends CrudRepository<DocumentColumn,
     List<DocumentColumn> findByDocumentOrderByTableColumnIndexAsc(Document document);
 
     List<DocumentColumn> findByDocumentDocumentIdOrderByTableColumnIndexAsc(UUID documentId);
+
+    List<DocumentColumn> findByDocument(Document document);
 }

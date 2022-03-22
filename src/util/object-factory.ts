@@ -102,6 +102,7 @@ export function createArtifact(artifact?: Partial<Artifact>): Artifact {
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
+    customFields: artifact?.customFields || {},
   };
 }
 

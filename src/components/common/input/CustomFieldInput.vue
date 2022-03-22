@@ -62,24 +62,23 @@ export default Vue.extend({
   },
   methods: {
     getStringModel(columnId: string): string {
-      return this.model.customFields?.[columnId] || "";
+      return this.value.customFields?.[columnId] || "";
     },
     setStringModel(columnId: string, value: string) {
-      if (!this.model.customFields) {
-        this.model.customFields = {};
+      if (!this.value.customFields) {
+        this.value.customFields = {};
       }
-      this.model.customFields[columnId] = value;
+      this.value.customFields[columnId] = value;
     },
     getArrayModel(columnId: string): string[] {
-      const value = this.model.customFields?.[columnId];
+      const value = this.value.customFields?.[columnId];
       return value ? value.split("||") : [];
     },
     setArrayModel(columnId: string, value: string[]) {
-      if (!this.model.customFields) {
-        this.model.customFields = {};
+      if (!this.value.customFields) {
+        this.value.customFields = {};
       }
-      this.model.customFields[columnId] = value.join("||");
-      console.log(this.model.customFields);
+      this.value.customFields[columnId] = value.join("||");
     },
 
     isFreeText(dataType: ColumnDataType): boolean {

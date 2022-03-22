@@ -201,6 +201,8 @@ export default Vue.extend({
         return this.parentArtifact?.type || this.editedArtifact.type;
       } else if (this.isSafetyCase) {
         return this.editedArtifact.safetyCaseType || "";
+      } else if (this.isFMEA) {
+        return "FMEA";
       } else {
         return this.editedArtifact.type;
       }

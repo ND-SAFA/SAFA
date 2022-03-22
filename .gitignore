@@ -30,3 +30,8 @@ pnpm-debug.log*
 
 #Electron-builder output
 /dist_electron
+
+# From Nightwatch Testing
+node_modules
+tests_output
+*.log

@@ -16,17 +16,17 @@
         <v-col @click.stop="handleEditOpen(item)">
           {{ item.name }}
         </v-col>
-        <v-col @click.stop="">
+        <v-col @click.stop="" style="flex-grow: 0.5">
           <generic-icon-button
             :is-disabled="isFirstItem(item)"
             icon-id="mdi-arrow-up"
-            :tooltip="`Move ${item.name} Up`"
+            :tooltip="`Move '${item.name}' Up`"
             @click="handleMove(item, true)"
           />
           <generic-icon-button
             :is-disabled="isLastItem(item)"
             icon-id="mdi-arrow-down"
-            :tooltip="`Move ${item.name} Down`"
+            :tooltip="`Move '${item.name}' Down`"
             @click="handleMove(item, false)"
           />
         </v-col>

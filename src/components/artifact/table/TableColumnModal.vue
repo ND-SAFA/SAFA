@@ -111,6 +111,12 @@ export default Vue.extend({
 
       if (!this.isEditMode) {
         document.columns = [...(document.columns || []), this.editingColumn];
+      } else if (document.columns) {
+        const index = document.columns.findIndex(
+          ({ id }) => id === this.editingColumn.id
+        );
+
+        document.columns[index] = this.editingColumn;
       }
 
       editDocument(document)
@@ -131,7 +137,7 @@ export default Vue.extend({
         const document = documentModule.document;
 
         document.columns = (document.columns || []).filter(
-          ({ id }) => id === this.editingColumn.id
+          ({ id }) => id !== this.editingColumn.id
         );
 
         editDocument(document)
@@ -141,7 +147,7 @@ export default Vue.extend({
           })
           .catch(() => {
             logModule.onError(
-              `Unable to deleted column: ${this.editingColumn.name}`
+              `Unable to delete column: ${this.editingColumn.name}`
             );
           });
       }

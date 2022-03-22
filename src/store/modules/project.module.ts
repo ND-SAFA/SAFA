@@ -46,15 +46,6 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Updates the project documents.
-   */
-  async updateDocuments(documents: ProjectDocument[]): Promise<void> {
-    this.SET_DOCUMENTS(documents);
-    await documentModule.updateDocuments(documents);
-  }
-
-  @Action
-  /**
    * Updates the current artifacts in the project, preserving any that already existed.
    *
    * @param artifacts - The artifacts to set.

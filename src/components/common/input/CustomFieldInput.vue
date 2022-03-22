@@ -21,6 +21,7 @@
         @input="setArrayModel(id, $event)"
       />
       <artifact-input
+        only-document-artifacts
         v-if="isRelation(dataType)"
         :label="name"
         :hint="required ? 'Requires a non-empty value' : ''"

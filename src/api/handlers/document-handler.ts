@@ -61,7 +61,8 @@ export async function editDocument(document: ProjectDocument): Promise<void> {
 
   const updatedDocument = await createOrUpdateDocument(versionId, document);
   await documentModule.updateDocuments([updatedDocument]);
-  if (documentModule.document === updatedDocument) {
+
+  if (documentModule.document.documentId === updatedDocument.documentId) {
     await documentModule.switchDocuments(updatedDocument);
   }
 }

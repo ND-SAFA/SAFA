@@ -20,14 +20,29 @@ public class DocumentColumnAppEntity {
      * The type of data this column contains
      */
     DocumentColumnDataType dataType;
+    /**
+     * Whether this column is required to create artifacts.
+     */
+    boolean required;
 
     public DocumentColumnAppEntity() {
+        this.required = false;
     }
 
     public DocumentColumnAppEntity(DocumentColumn documentColumn) {
+        this();
         this.id = documentColumn.getDocumentColumnId();
         this.name = documentColumn.getName();
         this.dataType = documentColumn.getDataType();
+        this.required = documentColumn.isRequired();
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 
     public UUID getId() {

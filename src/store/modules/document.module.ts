@@ -63,20 +63,28 @@ export default class DocumentModule extends VuexModule {
 
   @Action
   /**
-   * Reloads the artifact ids for all existing documents.
+   * Updates documents in store matching the documentIds of those given.
    *
    * @param updatedDocuments - The updated documents.
    */
   async updateDocuments(updatedDocuments: ProjectDocument[]): Promise<void> {
-    this.allDocuments.forEach((storedDocument) => {
-      const updatedDocument = updatedDocuments.find(
-        ({ documentId }) => documentId === storedDocument.documentId
-      );
+    const updatedDocumentIds: string[] = updatedDocuments.map(
+      (d) => d.documentId
+    );
+    const newDocuments = [
+      ...this.allDocuments.filter(
+        ({ documentId }) => !updatedDocumentIds.includes(documentId)
+      ),
+      ...updatedDocuments,
+    ];
+    this.SET_ALL_DOCUMENTS(newDocuments);
 
-      if (!updatedDocument) return;
-
-      storedDocument.artifactIds = updatedDocument.artifactIds;
-    });
+    if (updatedDocumentIds.includes(this.currentDocument.documentId)) {
+      const updatedCurrentDocument: ProjectDocument = updatedDocuments.filter(
+        ({ documentId }) => documentId === this.currentDocument.documentId
+      )[0];
+      this.SET_CURRENT_DOCUMENT(updatedCurrentDocument);
+    }
   }
 
   @Action

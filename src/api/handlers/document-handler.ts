@@ -59,10 +59,10 @@ export async function editDocument(document: ProjectDocument): Promise<void> {
 
   if (!versionId) return;
 
-  await createOrUpdateDocument(versionId, document);
-
-  if (documentModule.document === document) {
-    await documentModule.switchDocuments(document);
+  const updatedDocument = await createOrUpdateDocument(versionId, document);
+  await documentModule.updateDocuments([updatedDocument]);
+  if (documentModule.document === updatedDocument) {
+    await documentModule.switchDocuments(updatedDocument);
   }
 }
 

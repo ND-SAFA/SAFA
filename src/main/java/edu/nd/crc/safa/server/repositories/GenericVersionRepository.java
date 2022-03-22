@@ -325,6 +325,7 @@ public abstract class GenericVersionRepository<
             errorDescription =
                 "Could not parse entity " + entityName + ": " + AppConstraints.getConstraintError(e);
         } catch (Exception e) {
+            e.printStackTrace();
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {

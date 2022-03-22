@@ -5,7 +5,7 @@ package edu.nd.crc.safa.server.entities.db;
  */
 public enum DocumentType {
     /**
-     * Nodes represented to exist throughout all documents in the project.
+     * Document containing only pure system artifacts.
      */
     ARTIFACT_TREE {
         public String toString() {
@@ -13,7 +13,8 @@ public enum DocumentType {
         }
     },
     /**
-     * Nodes used only in fault tree analysis documents.
+     * Document containing system artifacts and the nodes for
+     * conducting a fault tree analysis.
      */
     FTA {
         public String toString() {
@@ -21,11 +22,22 @@ public enum DocumentType {
         }
     },
     /**
-     * Nodes used only in safety case documents.
+     * Document containing system artifacts and nodes required
+     * for constructing a safety case
      */
     SAFETY_CASE {
         public String toString() {
             return "SAFETY_CASE";
         }
-    }
+    },
+
+    /**
+     * Document containing system artifacts containing custom fields
+     * in a table
+     */
+    FMEA {
+        public String toString() {
+            return "FMEA";
+        }
+    },
 }

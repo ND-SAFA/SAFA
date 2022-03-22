@@ -53,7 +53,7 @@ public class AppRoutes {
             public static final String checkIfArtifactExists = projectPrefix
                 + "/versions/{versionId}/artifacts/validate/{artifactName}";
             public static final String getProjectInVersion = projectPrefix + "/versions/{versionId}";
-            public static final String getArtifactsInVersion = getProjectInVersion + "/artifacts";
+            public static final String getArtifactsInProjectVersion = getProjectInVersion + "/artifacts";
             public static final String getTracesInVersion = getProjectInVersion + "/traces";
             public static final String deleteVersionById = getProjectInVersion;
         }

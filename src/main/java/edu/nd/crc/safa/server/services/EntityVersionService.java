@@ -52,7 +52,7 @@ public class EntityVersionService {
     public void commitVersionArtifacts(ProjectVersion projectVersion,
                                        List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         List<Pair<ArtifactVersion, CommitError>> commitResponse = this.artifactVersionRepository
-            .commitAllEntitiesInProjectVersion(projectVersion, projectArtifacts);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, projectArtifacts);
         for (Pair<ArtifactVersion, CommitError> commitPayload : commitResponse) {
             CommitError commitError = commitPayload.getValue1();
             if (commitError != null) {
@@ -73,7 +73,7 @@ public class EntityVersionService {
     public void commitVersionTraces(ProjectVersion projectVersion,
                                     List<TraceAppEntity> traces) throws SafaError {
         List<Pair<TraceLinkVersion, CommitError>> commitResponse = this.traceLinkVersionRepository
-            .commitAllEntitiesInProjectVersion(projectVersion, traces);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, traces);
 
         for (Pair<TraceLinkVersion, CommitError> payload : commitResponse) {
             CommitError commitError = payload.getValue1();

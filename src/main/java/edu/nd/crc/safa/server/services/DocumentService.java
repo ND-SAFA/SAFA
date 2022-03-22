@@ -6,14 +6,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.server.entities.db.DocumentColumn;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -23,15 +28,19 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DocumentService {
-    DocumentArtifactRepository documentArtifactRepository;
-    ArtifactRepository artifactRepository;
+
+    private final ArtifactRepository artifactRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
+    private final DocumentColumnRepository documentColumnRepository;
     NotificationService notificationService;
 
-    public DocumentService(DocumentArtifactRepository documentArtifactRepository,
-                           ArtifactRepository artifactRepository,
+    public DocumentService(ArtifactRepository artifactRepository,
+                           DocumentArtifactRepository documentArtifactRepository,
+                           DocumentColumnRepository documentColumnRepository,
                            NotificationService notificationService) {
-        this.documentArtifactRepository = documentArtifactRepository;
         this.artifactRepository = artifactRepository;
+        this.documentArtifactRepository = documentArtifactRepository;
+        this.documentColumnRepository = documentColumnRepository;
         this.notificationService = notificationService;
     }
 
@@ -58,6 +67,27 @@ public class DocumentService {
         nUpdated += createNewDocumentArtifactLinks(projectVersion, document, artifactIds, artifactIdsLinkedToDocument);
         nUpdated += removeDeletedDocumentArtifactLinks(document, artifactIds, artifactIdsLinkedToDocument);
         return nUpdated;
+    }
+
+    /**
+     * If type if FMEA, creates or updates columns
+     *
+     * @param documentAppEntity The app entity whose columns are persisted.
+     * @param document          The document db entity associated with document app entity.
+     */
+    public void updateFMEAColumns(DocumentAppEntity documentAppEntity, Document document) {
+        if (document.getType() == DocumentType.FMEA) {
+            List<DocumentColumnAppEntity> documentColumns = documentAppEntity.getColumns();
+            for (int columnIndex = 0; columnIndex < documentColumns.size(); columnIndex++) {
+                DocumentColumnAppEntity documentColumnAppEntity = documentColumns.get(columnIndex);
+                DocumentColumn documentColumn = new DocumentColumn(
+                    documentColumnAppEntity,
+                    document,
+                    columnIndex);
+                this.documentColumnRepository.save(documentColumn);
+                documentAppEntity.getColumns().get(columnIndex).setId(documentColumn.getDocumentColumnId());
+            }
+        }
     }
 
     /**

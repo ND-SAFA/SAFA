@@ -1,14 +1,10 @@
 package edu.nd.crc.safa.server.entities.app;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import org.json.JSONObject;
@@ -18,63 +14,73 @@ import org.json.JSONObject;
  */
 public class TraceAppEntity implements IAppEntity {
     @NotNull
-    public String traceLinkId;
-
+    public String traceLinkId; // TODO: Convert to UUID
     @NotEmpty
     public String sourceName;
-
     public String sourceId;
-
     @NotEmpty
     public String targetName;
-
     public String targetId;
-
     public TraceApproval approvalStatus;
-
     public double score;
-
     public TraceType traceType;
 
     public TraceAppEntity() {
         this.traceLinkId = "";
     }
 
-    public TraceAppEntity(String sourceName, String targetName) {
-        this();
+    public TraceAppEntity(String traceLinkId,
+                          String sourceName,
+                          String sourceId,
+                          String targetName,
+                          String targetId,
+                          TraceApproval traceApproval,
+                          double score,
+                          TraceType traceType) {
+        this.traceLinkId = traceLinkId;
         this.sourceName = sourceName;
+        this.sourceId = sourceId;
         this.targetName = targetName;
-        this.approvalStatus = TraceApproval.APPROVED;
-        this.score = 1;
-        this.traceType = TraceType.MANUAL;
-    }
-
-    public TraceAppEntity(String sourceName, String targetName, double score) {
-        this();
-        this.sourceName = sourceName;
-        this.targetName = targetName;
-        this.approvalStatus = TraceApproval.UNREVIEWED;
+        this.targetId = targetId;
+        this.approvalStatus = traceApproval;
         this.score = score;
-        this.traceType = TraceType.GENERATED;
+        this.traceType = traceType;
     }
 
-    public TraceAppEntity(TraceLinkVersion trace) {
-        UUID traceLinkId = trace.getTraceLink().getTraceLinkId();
-        Artifact sourceArtifact = trace.getTraceLink().getSourceArtifact();
-        Artifact targetArtifact = trace.getTraceLink().getTargetArtifact();
-
-        this.traceLinkId = traceLinkId != null ? traceLinkId.toString() : "";
-        this.sourceName = sourceArtifact.getName();
-        this.sourceId = sourceArtifact.getArtifactId().toString();
-        this.targetName = targetArtifact.getName();
-        this.targetId = targetArtifact.getArtifactId().toString();
-        this.approvalStatus = trace.getApprovalStatus();
-        this.score = trace.getScore();
-        this.traceType = trace.getTraceType();
+    public TraceAppEntity asManualTrace() {
+        this.setApprovalStatus(TraceApproval.APPROVED);
+        this.setScore(1);
+        this.setTraceType(TraceType.MANUAL);
+        return this;
     }
 
-    public static List<TraceAppEntity> createEntities(List<TraceLinkVersion> links) {
-        return links.stream().map(TraceAppEntity::new).collect(Collectors.toList());
+    public TraceAppEntity asGeneratedTrace(double score) {
+        this.setApprovalStatus(TraceApproval.UNREVIEWED);
+        this.setScore(score);
+        this.setTraceType(TraceType.GENERATED);
+        return this;
+    }
+
+    public TraceAppEntity betweenArtifacts(String sourceName, String targetName) {
+        this.setSourceName(sourceName);
+        this.setTargetName(targetName);
+        return this;
+    }
+
+    public TraceApproval getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(TraceApproval approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public TraceType getTraceType() {
+        return traceType;
+    }
+
+    public void setTraceType(TraceType traceType) {
+        this.traceType = traceType;
     }
 
     public String getSourceId() {
@@ -117,14 +123,6 @@ public class TraceAppEntity implements IAppEntity {
         this.traceLinkId = traceLinkId;
     }
 
-    public TraceApproval isApproved() {
-        return approvalStatus;
-    }
-
-    public void setApproved(TraceApproval approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
     public double getScore() {
         return score;
     }
@@ -135,6 +133,7 @@ public class TraceAppEntity implements IAppEntity {
 
     public String toString() {
         JSONObject json = new JSONObject();
+        json.put("traceLinkId", this.traceLinkId);
         json.put("source", sourceName);
         json.put("target", targetName);
         json.put("type", traceType);
@@ -144,16 +143,17 @@ public class TraceAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getId() {
+    public String getBaseEntityId() {
         return this.traceLinkId;
     }
 
     @Override
-    public void setId(String id) {
+    public void setBaseEntityId(String id) {
         this.traceLinkId = id;
     }
 
     public boolean equals(TraceAppEntity other) {
-        return this.sourceName == other.sourceName && this.targetName == other.targetName;
+        return Objects.equals(this.sourceName, other.sourceName)
+            && Objects.equals(this.targetName, other.targetName);
     }
 }

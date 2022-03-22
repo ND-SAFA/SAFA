@@ -51,12 +51,11 @@ public class GeneratedLinkController extends BaseController {
     @GetMapping(value = AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        List<TraceAppEntity> generatedTracesInVersion =
-            this.appEntityRetrievalService.getTracesInProjectVersion(projectVersion)
-                .stream()
-                .filter(t -> t.traceType.equals(TraceType.GENERATED))
-                .collect(Collectors.toList());
-        return generatedTracesInVersion;
+        return this.appEntityRetrievalService
+            .retrieveTracesInProjectVersion(projectVersion)
+            .stream()
+            .filter(t -> t.traceType.equals(TraceType.GENERATED))
+            .collect(Collectors.toList());
     }
 
     /**

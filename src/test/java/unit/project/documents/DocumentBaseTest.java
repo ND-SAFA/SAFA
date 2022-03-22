@@ -15,6 +15,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import unit.ApplicationBaseTest;
 
@@ -64,12 +65,19 @@ public class DocumentBaseTest extends ApplicationBaseTest {
     }
 
     protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
-        // Step - Send creation request.
         String route =
             RouteBuilder
                 .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
                 .withVersion(projectVersion)
                 .get();
         return sendPost(route, docJson, status().isCreated());
+    }
+
+    protected JSONArray getProjectDocuments(Project project) throws Exception {
+        String route = RouteBuilder
+            .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
+            .withProject(project)
+            .get();
+        return sendGetWithArrayResponse(route, status().isOk());
     }
 }

@@ -49,7 +49,7 @@ public class TraceLinkGenerator {
         String DELIMITER = "*";
         List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
         List<String> approvedLinks = appEntityRetrievalService
-            .getTracesInProjectVersion(projectVersion)
+            .retrieveTracesInProjectVersion(projectVersion)
             .stream()
             .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
             .map(link -> link.sourceName + DELIMITER + link.targetName)
@@ -67,13 +67,13 @@ public class TraceLinkGenerator {
     public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
                                                           Pair<ArtifactType, ArtifactType> artifactTypes) {
         List<ArtifactVersion> artifactsInVersion =
-            this.artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
+            this.artifactVersionRepository.retrieveVersionEntitiesByProjectVersion(projectVersion);
         Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue0());
         Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,
             artifactTypes.getValue1());
         TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
-            new TraceAppEntity(s.getName(), t.getName(), score);
+            new TraceAppEntity().asGeneratedTrace(score).betweenArtifacts(s.getName(), t.getName());
 
         return generateLinksFromTokens(sTokens, tTokens, traceLinkConstructor);
     }
@@ -82,7 +82,10 @@ public class TraceLinkGenerator {
                                                                         List<ArtifactAppEntity> targetDocs) {
         Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(sourceDocs);
         Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(targetDocs);
-        return generateLinksFromTokens(sourceTokens, targetTokens, TraceAppEntity::new);
+        TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()
+            .asGeneratedTrace(score)
+            .betweenArtifacts(s, t);
+        return generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor);
     }
 
     private <Key, Link> List<Link> generateLinksFromTokens(Map<Key, Collection<String>> sTokens,

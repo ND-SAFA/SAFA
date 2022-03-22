@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -74,7 +75,8 @@ public class Puller {
             String typeName = issue.key;
 
             ArtifactAppEntity newArtifact = new ArtifactAppEntity(
-                null, typeName, artifactName, "", issueContent, DocumentType.ARTIFACT_TREE);
+                null, typeName, artifactName, "", issueContent, DocumentType.ARTIFACT_TREE,
+                new Hashtable<>());
             artifacts.add(newArtifact);
 
             // Check that the link is only an inward link to this node
@@ -87,7 +89,9 @@ public class Puller {
                     .forEach((link) -> {
                         String source = issue.key;
                         String target = link.InwardKey;
-                        TraceAppEntity trace = new TraceAppEntity(source, target);
+                        TraceAppEntity trace = new TraceAppEntity()
+                            .asManualTrace()
+                            .betweenArtifacts(source, target);
                         traces.add(trace);
                     });
             }

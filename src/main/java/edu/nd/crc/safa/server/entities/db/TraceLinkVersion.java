@@ -212,6 +212,16 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     }
 
     @Override
+    public UUID getVersionEntityId() {
+        return this.traceLinkVersionId;
+    }
+
+    @Override
+    public void setVersionEntityId(UUID versionEntityId) {
+        this.traceLinkVersionId = versionEntityId;
+    }
+
+    @Override
     public boolean hasSameContent(IVersionEntity e) {
         if (e instanceof TraceLinkVersion) {
             TraceLinkVersion other = (TraceLinkVersion) e;

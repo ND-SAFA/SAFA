@@ -39,7 +39,7 @@ public class EditDocument extends DocumentBaseTest {
         JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Verify that response object contains name, description, and type
-        assertObjectsMatch(docCreated, docJson);
+        assertObjectsMatch(docJson, docCreated);
 
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType);
     }
@@ -64,32 +64,28 @@ public class EditDocument extends DocumentBaseTest {
         Document document = dbEntityBuilder.getDocument(projectName, docName);
 
         // Step - Create new document payload
-        JSONObject docJson = jsonBuilder.createDocument(docName, newDescription, docType);
-        docJson.put("documentId", document.getDocumentId().toString());
+        JSONObject docRequestJson = jsonBuilder.createDocument(docName, newDescription, docType);
+        docRequestJson.put("documentId", document.getDocumentId().toString());
         Artifact artifact = this.dbEntityBuilder.getArtifact(projectName, artifactName);
         List<String> artifactIds = List.of(artifact.getArtifactId().toString());
-        docJson.put("artifactIds", artifactIds);
+        docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Send Update request.
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response object contains name, description, and type
-        assertObjectsMatch(docCreated, docJson);
+        assertObjectsMatch(docRequestJson, docCreated, List.of("documentId"));
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
 
         // Step - Delete artifact id
         artifactIds = new ArrayList<>();
-        docJson.put("artifactIds", artifactIds);
+        docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Update document
-        JSONObject docUpdated = createOrUpdateDocumentJson(projectVersion, docJson);
+        JSONObject docUpdated = createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response contains updates.
-        assertObjectsMatch(docJson, docUpdated);
+        assertObjectsMatch(docRequestJson, docUpdated);
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
-
-        // VP - Verify that updates are persisted
-        System.out.println("NUMBER LINKED ARTIFACTS" + this.documentArtifactRepository.findByDocument(document).size());
-
     }
 }

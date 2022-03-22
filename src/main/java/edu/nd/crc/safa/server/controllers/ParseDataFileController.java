@@ -106,7 +106,7 @@ public class ParseDataFileController extends BaseController {
         if (artifactQuery.isPresent()) {
             String artifactId = artifactQuery.get().getArtifactId().toString();
             Optional<ArtifactVersion> artifactVersionQuery =
-                this.artifactVersionRepository.getEntityVersionsByProjectVersionAndBaseEntityId(
+                this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(
                     projectVersion,
                     artifactId);
             if (artifactVersionQuery.isPresent()) {

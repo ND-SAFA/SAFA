@@ -1,11 +1,12 @@
 package edu.nd.crc.safa.server.entities.app;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONObject;
@@ -48,17 +49,21 @@ public class ArtifactAppEntity implements IAppEntity {
      */
     public List<String> documentIds;
     /**
+     * Mapping of columns ids to column values for this artifact.
+     */
+    public Map<String, String> customFields;
+    /**
      * The type of document this artifact is displayed in.
      */
-    DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    public DocumentType documentType = DocumentType.ARTIFACT_TREE;
     /**
      * For safety case nodes, the type of safety case node.
      */
-    SafetyCaseType safetyCaseType;
+    public SafetyCaseType safetyCaseType;
     /**
      * For FTA logic nodes,  the logical operator of this node.
      */
-    FTANodeType logicType;
+    public FTANodeType logicType;
 
     public ArtifactAppEntity() {
         this.id = "";
@@ -66,14 +71,16 @@ public class ArtifactAppEntity implements IAppEntity {
         this.body = "";
         this.summary = "";
         this.documentIds = new ArrayList<>();
+        this.customFields = new Hashtable<>();
     }
-
+    
     public ArtifactAppEntity(String artifactId,
                              String type,
                              String name,
                              String summary,
                              String body,
-                             DocumentType documentType) {
+                             DocumentType documentType,
+                             Map<String, String> customFields) {
         this();
         this.id = artifactId;
         this.type = type;
@@ -81,15 +88,15 @@ public class ArtifactAppEntity implements IAppEntity {
         this.summary = summary;
         this.body = body;
         this.documentType = documentType;
+        this.customFields = customFields;
     }
 
-    public ArtifactAppEntity(ArtifactVersion body) {
-        this(body.getArtifact().getArtifactId().toString(),
-            body.getTypeName(),
-            body.getName(),
-            body.getSummary(),
-            body.getContent(),
-            body.getArtifact().getDocumentType());
+    public Map<String, String> getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(Map<String, String> customFields) {
+        this.customFields = customFields;
     }
 
     public DocumentType getDocumentType() {
@@ -128,11 +135,11 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds.add(documentId);
     }
 
-    public String getId() {
+    public String getBaseEntityId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setBaseEntityId(String id) {
         this.id = id;
     }
 
@@ -173,6 +180,7 @@ public class ArtifactAppEntity implements IAppEntity {
         json.put("artifactId", id);
         json.put("name", name);
         json.put("docType", documentType);
+        json.put("customField", customFields);
         return json.toString();
     }
 }

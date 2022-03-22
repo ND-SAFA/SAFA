@@ -143,7 +143,6 @@ public class DbEntityBuilder extends BaseBuilder {
                                                int versionIndex,
                                                String docName,
                                                String artifactName) {
-        Project project = this.getProject(projectName);
         ProjectVersion projectVersion = this.getProjectVersion(projectName, 0);
         Document document = this.getDocument(projectName, docName);
         Artifact artifact = this.getArtifact(projectName, artifactName);
@@ -250,7 +249,8 @@ public class DbEntityBuilder extends BaseBuilder {
             modificationType,
             artifact,
             summary,
-            content);
+            content,
+            "{}");
         this.artifactVersionRepository.save(artifactVersion);
         addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactVersion);
         return this;

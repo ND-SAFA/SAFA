@@ -79,7 +79,7 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
 
         // VP - Verify that retrieving project returns artifact
-        List<ArtifactAppEntity> artifacts = appEntityRetrievalService.getArtifactsInProjectVersion(projectVersion);
+        List<ArtifactAppEntity> artifacts = appEntityRetrievalService.retrieveArtifactsInProjectVersion(projectVersion);
         assertThat(artifacts.size()).isEqualTo(1);
         ArtifactAppEntity artifact = artifacts.get(0);
         assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.SAFETY_CASE);

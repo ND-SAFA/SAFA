@@ -3,33 +3,29 @@ package edu.nd.crc.safa.server.services.retrieval;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.api.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
+import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
@@ -58,8 +54,7 @@ public class AppEntityRetrievalService {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
-    private final SafetyCaseArtifactRepository safetyCaseArtifactRepository;
-    private final FTAArtifactRepository ftaArtifactRepository;
+    private final DocumentColumnRepository documentColumnRepository;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
 
@@ -70,8 +65,7 @@ public class AppEntityRetrievalService {
                                      ProjectMembershipRepository projectMembershipRepository,
                                      ArtifactVersionRepository artifactVersionRepository,
                                      ArtifactTypeRepository artifactTypeRepository,
-                                     SafetyCaseArtifactRepository safetyCaseArtifactRepository,
-                                     FTAArtifactRepository ftaArtifactRepository,
+                                     DocumentColumnRepository documentColumnRepository,
                                      CommitErrorRetrievalService commitErrorRetrievalService,
                                      WarningService warningService) {
         this.documentRepository = documentRepository;
@@ -80,8 +74,7 @@ public class AppEntityRetrievalService {
         this.artifactVersionRepository = artifactVersionRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
-        this.safetyCaseArtifactRepository = safetyCaseArtifactRepository;
-        this.ftaArtifactRepository = ftaArtifactRepository;
+        this.documentColumnRepository = documentColumnRepository;
         this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
     }
@@ -112,9 +105,12 @@ public class AppEntityRetrievalService {
         Project project = projectVersion.getProject();
 
         // Versioned Entities
-        List<ArtifactAppEntity> artifacts = getArtifactsInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts.stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
-        List<TraceAppEntity> traces = getTracesInProjectVersion(projectVersion, artifactIds);
+        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion);
+        List<String> artifactIds = artifacts
+            .stream()
+            .map(ArtifactAppEntity::getBaseEntityId)
+            .collect(Collectors.toList());
+        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
@@ -145,60 +141,16 @@ public class AppEntityRetrievalService {
      * @param projectVersion The version whose artifacts are retrieved.
      * @return List of artifact app entities as saved in project version.
      */
-    public List<ArtifactAppEntity> getArtifactsInProjectVersion(ProjectVersion projectVersion) {
+    public List<ArtifactAppEntity> retrieveArtifactsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifactBodies = artifactVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion);
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactBodies) {
-            artifacts.add(retrieveArtifactAppEntityInProjectVersion(projectVersion, artifactVersion));
+            ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository
+                .retrieveAppEntityFromVersionEntity(artifactVersion);
+            artifacts.add(artifactAppEntity);
         }
         return artifacts;
-    }
-
-    /**
-     * Returns ArtifactAppEntity associated with ArtifactVersion in given project version with
-     * any Safety Case or FTA information inserted into app entity.
-     *
-     * @param projectVersion  The project version associated with returned ArtifactAppEntity.
-     * @param artifactVersion The artifact version used to populate the artifact.
-     * @return The populated ArtifactAppEntity
-     */
-    public ArtifactAppEntity retrieveArtifactAppEntityInProjectVersion(ProjectVersion projectVersion,
-                                                                       ArtifactVersion artifactVersion) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(artifactVersion);
-
-        Artifact artifact = artifactVersion.getArtifact();
-        List<String> documentIds =
-            this.documentArtifactRepository
-                .findByProjectVersionAndArtifact(projectVersion, artifact)
-                .stream()
-                .map(da -> da.getDocument().getDocumentId().toString())
-                .collect(Collectors.toList());
-        artifactAppEntity.setDocumentIds(documentIds);
-
-        switch (artifact.getDocumentType()) {
-            case SAFETY_CASE:
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                }
-                //TODO: Throw error if not found?
-                break;
-            case FTA:
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                }
-                break;
-            default:
-                break;
-        }
-        return artifactAppEntity;
     }
 
     /**
@@ -207,13 +159,13 @@ public class AppEntityRetrievalService {
      * @param projectVersion The version of the project whose links are returned.
      * @return List of TraceAppEntity
      */
-    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion) {
-        List<ArtifactAppEntity> projectVersionArtifacts = getArtifactsInProjectVersion(projectVersion);
+    public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion) {
+        List<ArtifactAppEntity> projectVersionArtifacts = retrieveArtifactsInProjectVersion(projectVersion);
         List<String> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
-            .map(ArtifactAppEntity::getId)
+            .map(ArtifactAppEntity::getBaseEntityId)
             .collect(Collectors.toList());
-        return getTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
+        return retrieveTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
     }
 
     /**
@@ -223,12 +175,11 @@ public class AppEntityRetrievalService {
      * @param existingArtifactIds List of artifact ids for those existing in given version.
      * @return List of trace links existing in given version at the time of calling this.
      */
-    public List<TraceAppEntity> getTracesInProjectVersion(ProjectVersion projectVersion,
-                                                          List<String> existingArtifactIds) {
+    public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion,
+                                                               List<String> existingArtifactIds) {
         return this.traceLinkVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion)
+            .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .map(TraceAppEntity::new)
             .filter(t -> existingArtifactIds.contains(t.sourceId)
                 && existingArtifactIds.contains(t.targetId))
             .collect(Collectors.toList());
@@ -247,9 +198,8 @@ public class AppEntityRetrievalService {
         String artifactName
     ) {
         return this.traceLinkVersionRepository
-            .getVersionEntitiesByProjectVersion(projectVersion)
+            .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .map(TraceAppEntity::new)
             .filter(t -> artifactName.equals(t.sourceName) || artifactName.equals(t.targetName))
             .collect(Collectors.toList());
     }
@@ -264,13 +214,24 @@ public class AppEntityRetrievalService {
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
         List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
         for (Document document : projectDocuments) {
+            // Retrieve linked artifact Ids
             List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
                 .stream()
                 .map(da -> da.getArtifact().getArtifactId().toString())
                 .collect(Collectors.toList());
             DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
-            documentAppEntities.add(documentAppEntity);
 
+            // Retrieve FMEA columns
+            if (document.getType() == DocumentType.FMEA) {
+                List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
+                    .findByDocumentOrderByTableColumnIndexAsc(document)
+                    .stream()
+                    .map(DocumentColumnAppEntity::new)
+                    .collect(Collectors.toList());
+                documentAppEntity.setColumns(documentColumns);
+            }
+
+            documentAppEntities.add(documentAppEntity);
         }
         return documentAppEntities;
     }
@@ -282,10 +243,11 @@ public class AppEntityRetrievalService {
      * @return A mapping of  artifact name's to their resulting violations
      */
     public Map<String, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
-        List<ArtifactVersion> artifacts = artifactVersionRepository.getVersionEntitiesByProjectVersion(projectVersion);
+        List<ArtifactVersion> artifacts = artifactVersionRepository
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<TraceLink> traceLinks =
             this.traceLinkVersionRepository
-                .getVersionEntitiesByProjectVersion(projectVersion)
+                .retrieveVersionEntitiesByProjectVersion(projectVersion)
                 .stream()
                 .filter(t -> t.getApprovalStatus() == TraceApproval.APPROVED)
                 .map(TraceLinkVersion::getTraceLink)

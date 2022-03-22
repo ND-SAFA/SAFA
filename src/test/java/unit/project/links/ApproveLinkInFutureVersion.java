@@ -99,9 +99,11 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
         generatedLink.setApprovalStatus(TraceApproval.APPROVED);
 
         // Step - Approve generated trace link
+        TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
+            .retrieveAppEntityFromVersionEntity(generatedLink);
         commit(CommitBuilder
             .withVersion(projectVersion)
-            .withModifiedTrace(generatedLink));
+            .withModifiedTrace(generatedLinkAppEntity));
 
         // VP - Verify that trace link is approved
         Optional<TraceLinkVersion> approvedLinkQuery =
@@ -115,9 +117,11 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
         generatedLink.setApprovalStatus(TraceApproval.DECLINED);
 
         // Step - Commit changes
+        TraceAppEntity updatedGeneratedLinkAppEntity = this.traceLinkVersionRepository
+            .retrieveAppEntityFromVersionEntity(generatedLink);
         commit(CommitBuilder
             .withVersion(projectVersion)
-            .withModifiedTrace(generatedLink));
+            .withModifiedTrace(updatedGeneratedLinkAppEntity));
 
         // VP - Verify that link is saved.
         Optional<TraceLinkVersion> declinedLinkQuery = traceLinkVersionRepository.findByProjectVersionAndTraceLink(

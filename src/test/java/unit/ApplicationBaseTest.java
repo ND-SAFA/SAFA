@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -125,22 +126,46 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         return sendGetWithArrayResponse(url, status().is2xxSuccessful());
     }
 
+    protected void assertMatch(Object expected, Object actual) {
+        if (expected instanceof JSONObject) {
+            assertObjectsMatch((JSONObject) expected, (JSONObject) actual);
+        } else if (expected instanceof JSONArray) {
+            assertArraysMatch((JSONArray) expected, (JSONArray) actual);
+        } else {
+            assertThat(actual).isEqualTo(expected);
+        }
+    }
+
     protected void assertObjectsMatch(JSONObject expected, JSONObject actual) {
-        for (Iterator<String> it = actual.keys(); it.hasNext(); ) {
-            String key = it.next();
-            Object value = expected.get(key);
-            if (value instanceof JSONArray) {
-                JSONArray expectedArray = (JSONArray) value;
-                JSONArray actualArray = actual.getJSONArray(key);
-                assertThat(actualArray.length()).isEqualTo(expectedArray.length());
-                for (int i = 0; i < expectedArray.length(); i++) {
-                    Object expectedSubValue = expectedArray.get(i);
-                    Object actualSubValue = actual.getJSONArray(key).get(i);
-                    assertThat(expectedSubValue).isEqualTo(actualSubValue);
-                }
-            } else {
-                assertThat(expected.get(key)).isEqualTo(actual.get(key));
+        assertObjectsMatch(expected, actual, new ArrayList<>());
+    }
+
+    protected void assertObjectsMatch(JSONObject expected,
+                                      JSONObject actual,
+                                      List<String> ignoreProperties) {
+        for (Iterator<String> expectedIterator = expected.keys(); expectedIterator.hasNext(); ) {
+            String key = expectedIterator.next();
+            if (ignoreProperties.contains(key)) {
+                continue;
             }
+
+            if (!actual.has(key)) {
+                throw new RuntimeException(actual + " does not contain key:" + key);
+            }
+
+            Object expectedValue = expected.get(key);
+            Object actualValue = actual.get(key);
+
+            assertMatch(expectedValue, actualValue);
+        }
+    }
+
+    private void assertArraysMatch(JSONArray expected, JSONArray actual) {
+        assertThat(actual.length()).isEqualTo(expected.length());
+        for (int i = 0; i < expected.length(); i++) {
+            Object expectedValue = expected.get(i);
+            Object actualValue = actual.get(i);
+            assertMatch(expectedValue, actualValue);
         }
     }
 }

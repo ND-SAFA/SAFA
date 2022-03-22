@@ -1,19 +1,19 @@
-package edu.nd.crc.safa.server.entities.api;
+package edu.nd.crc.safa.server.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.Project;
 
 public class DocumentAppEntity extends Document {
 
     List<String> artifactIds;
+    List<DocumentColumnAppEntity> columns;
 
     public DocumentAppEntity() {
         super();
         this.artifactIds = new ArrayList<>();
+        this.columns = new ArrayList<>();
     }
 
     public DocumentAppEntity(Document document,
@@ -22,13 +22,20 @@ public class DocumentAppEntity extends Document {
         this.artifactIds = artifactIds;
     }
 
-    public DocumentAppEntity(Project project,
+    public DocumentAppEntity(Document document,
                              List<String> artifactIds,
-                             String name,
-                             String description,
-                             DocumentType type) {
-        super(project, name, description, type);
+                             List<DocumentColumnAppEntity> columns) {
+        super(document);
         this.artifactIds = artifactIds;
+        this.columns = columns;
+    }
+
+    public List<DocumentColumnAppEntity> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<DocumentColumnAppEntity> columns) {
+        this.columns = columns;
     }
 
     public Document toDocument() {

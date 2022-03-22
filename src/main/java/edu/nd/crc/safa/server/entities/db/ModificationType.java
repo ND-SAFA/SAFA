@@ -20,5 +20,10 @@ public enum ModificationType implements Serializable {
         public String toString() {
             return "REMOVED";
         }
+    },
+    NO_MODIFICATION {
+        public String toString() {
+            return "NO_MODIFICATION";
+        }
     }
 }

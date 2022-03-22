@@ -2,6 +2,8 @@ package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.List;
+
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -21,7 +23,9 @@ public class CreateNewDocument extends DocumentBaseTest {
         DocumentType docType = DocumentType.ARTIFACT_TREE;
 
         // Step - Create empty project
-        ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder
+            .newProject(projectName)
+            .newVersionWithReturn(projectName);
 
         // Step - Create new document payload
         JSONObject docJson = jsonBuilder.createDocument(docName, docDescription, docType);
@@ -30,7 +34,7 @@ public class CreateNewDocument extends DocumentBaseTest {
         JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Assert all properties were returned as inputted.
-        assertObjectsMatch(docCreated, docJson);
+        assertObjectsMatch(docJson, docCreated, List.of("documentId"));
         assertThat(docCreated.getString("documentId")).isNotEmpty();
 
         // VP - Verify that contents was persisted.

@@ -32,6 +32,6 @@ pnpm-debug.log*
 /dist_electron
 
 # From Nightwatch Testing
-node_modules
+dir_to_ignore/node_modules
 tests_output
 *.log

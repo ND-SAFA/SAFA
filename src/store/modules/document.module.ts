@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { DocumentColumn, Project, ProjectDocument } from "@/types";
-import { DocumentType } from "@/types";
+import { ColumnDataType, DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
@@ -187,14 +187,35 @@ export default class DocumentModule extends VuexModule {
    * Returns whether the current document type is for rendering a table.
    */
   get isTableDocument(): boolean {
-    return isTableDocument(this.currentDocument.type);
+    return isTableDocument(this.currentDocument.type) || true;
   }
 
   /**
    * Returns the column definitions for a table document.
    */
   get tableColumns(): DocumentColumn[] {
-    return (this.isTableDocument && this.currentDocument.columns) || [];
+    return (
+      (this.isTableDocument && this.currentDocument.columns) || [
+        {
+          id: "1",
+          name: "Text",
+          required: true,
+          dataType: ColumnDataType.FREE_TEXT,
+        },
+        {
+          id: "2",
+          name: "Relation",
+          required: false,
+          dataType: ColumnDataType.RELATION,
+        },
+        {
+          id: "3",
+          name: "Select",
+          required: false,
+          dataType: ColumnDataType.SELECT,
+        },
+      ]
+    );
   }
 
   /**

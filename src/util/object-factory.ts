@@ -113,6 +113,7 @@ export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {
     id: column?.id || "",
     name: column?.name || "",
     dataType: column?.dataType || ColumnDataType.FREE_TEXT,
+    required: column?.required || false,
   };
 }
 

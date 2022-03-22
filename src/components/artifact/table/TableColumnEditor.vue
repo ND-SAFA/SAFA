@@ -8,18 +8,26 @@
     dense
     hide-details
     style="width: 200px"
+    @focus="handleLoadItems"
   >
     <template v-slot:selection> {{ selectDisplay }} </template>
     <template v-slot:item="{ item }">
-      <v-row dense align="center" @click.stop="handleEditOpen(item)">
-        <v-col>
+      <v-row dense align="center">
+        <v-col @click.stop="handleEditOpen(item)">
           {{ item.name }}
         </v-col>
-        <v-col class="flex-grow-0">
+        <v-col @click.stop="">
           <generic-icon-button
-            v-if="item.name !== 'Default'"
-            icon-id="mdi-dots-horizontal"
-            :tooltip="`Edit ${item.name}`"
+            :is-disabled="isFirstItem(item)"
+            icon-id="mdi-arrow-up"
+            :tooltip="`Move ${item.name} Up`"
+            @click="handleMove(item, true)"
+          />
+          <generic-icon-button
+            :is-disabled="isLastItem(item)"
+            icon-id="mdi-arrow-down"
+            :tooltip="`Move ${item.name} Down`"
+            @click="handleMove(item, false)"
           />
         </v-col>
       </v-row>
@@ -45,10 +53,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { DocumentColumn, SelectOption } from "@/types";
-import { documentModule } from "@/store";
+import { documentModule, logModule } from "@/store";
 import { GenericIconButton } from "@/components/common/generic";
 import { columnTypeOptions } from "@/util";
 import TableColumnModal from "./TableColumnModal.vue";
+import { editDocument } from "@/api";
 
 export default Vue.extend({
   name: "TableColumnEditor",
@@ -57,11 +66,9 @@ export default Vue.extend({
     isCreateOpen: false,
     isEditOpen: false,
     editingColumn: undefined as DocumentColumn | undefined,
+    items: documentModule.tableColumns,
   }),
   computed: {
-    items(): DocumentColumn[] {
-      return documentModule.tableColumns;
-    },
     dataTypes(): SelectOption[] {
       return columnTypeOptions();
     },
@@ -91,6 +98,36 @@ export default Vue.extend({
     handleEditOpen(column: DocumentColumn) {
       this.editingColumn = column;
       this.isEditOpen = true;
+    },
+    isFirstItem(item: DocumentColumn) {
+      return this.items.indexOf(item) === 0;
+    },
+    isLastItem(item: DocumentColumn) {
+      return this.items.indexOf(item) === this.items.length - 1;
+    },
+    handleLoadItems() {
+      this.items = documentModule.tableColumns;
+    },
+    handleMove(item: DocumentColumn, moveUp: boolean) {
+      const currentIndex = this.items.indexOf(item);
+      const swapIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
+      const document = documentModule.document;
+      const columns = document.columns || [];
+
+      [columns[currentIndex], columns[swapIndex]] = [
+        columns[swapIndex],
+        columns[currentIndex],
+      ];
+
+      this.items = document.columns = [...columns];
+
+      editDocument(document)
+        .then(() => {
+          logModule.onSuccess(`Column order updated`);
+        })
+        .catch(() => {
+          logModule.onError(`Unable to update column order`);
+        });
     },
   },
 });

@@ -36,6 +36,10 @@ export interface DocumentColumn {
    * The type of data this column represents.
    */
   dataType: ColumnDataType;
+  /**
+   * Whether this column must have a non-empty value.
+   */
+  required: boolean;
 }
 
 /**

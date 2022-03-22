@@ -7,9 +7,14 @@
         /></v-container>
       </template>
       <template
-        v-for="{ id, dataType } in columns"
+        v-for="{ id, dataType, required } in columns"
         v-slot:[`item.${id}`]="{ item }"
       >
+        <v-divider
+          v-if="required && !item[id]"
+          :key="id"
+          :style="`border-color: ${errorColor}; width: 40px`"
+        />
         <span v-if="isFreeText(dataType)" class="text-body-1" :key="id">
           {{ item[id] || "" }}
         </span>
@@ -70,6 +75,7 @@ import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "@/components/artifact/table/ArtifactTableChip.vue";
 import TableColumnEditor from "@/components/artifact/table/TableColumnEditor.vue";
+import { ThemeColors } from "@/util";
 
 /**
  * Represents a table of artifacts.
@@ -116,6 +122,9 @@ export default Vue.extend({
     },
     artifactCreatorTitle(): string {
       return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
+    },
+    errorColor(): string {
+      return ThemeColors.error;
     },
   },
   methods: {

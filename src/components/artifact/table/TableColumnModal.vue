@@ -21,6 +21,10 @@
         item-text="name"
         item-value="id"
       />
+      <v-checkbox
+        label="Requires a non-empty value"
+        v-model="editingColumn.required"
+      />
     </template>
     <template v-slot:actions>
       <v-btn

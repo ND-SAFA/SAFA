@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div v-for="{ id, name, dataType } in columns" :key="id">
+    <div v-for="{ id, name, dataType, required } in columns" :key="id">
       <v-text-field
         filled
         v-if="isFreeText(dataType)"
         :label="name"
+        :hint="required ? 'Requires a non-empty value' : ''"
         :value="getStringModel(id)"
         @input="setStringModel(id, $event)"
       />
@@ -15,12 +16,14 @@
         deletable-chips
         v-if="isSelect(dataType)"
         :label="name"
+        :hint="required ? 'Requires a non-empty value' : ''"
         :value="getArrayModel(id)"
         @input="setArrayModel(id, $event)"
       />
       <artifact-input
         v-if="isRelation(dataType)"
         :label="name"
+        :hint="required ? 'Requires a non-empty value' : ''"
         :value="getArrayModel(id)"
         @input="setArrayModel(id, $event)"
       />

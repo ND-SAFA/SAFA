@@ -38,6 +38,8 @@
           label="Logic Type"
           v-model="editedArtifact.logicType"
           :items="logicTypes"
+          item-text="name"
+          item-value="id"
         />
         <artifact-input
           only-document-artifacts

@@ -237,7 +237,10 @@ export default Vue.extend({
       }
     },
     name(newName: string): void {
-      if (!newName) return;
+      if (!newName) {
+        this.isNameValid = this.canSave = false;
+        return;
+      }
 
       if (this.nameCheckTimer) {
         clearTimeout(this.nameCheckTimer);

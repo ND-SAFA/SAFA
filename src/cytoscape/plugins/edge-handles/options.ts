@@ -106,8 +106,7 @@ function artifactTypesAreValid(
       sourceData.artifactType,
       targetData.artifactType
     );
-  }
-  if (sourceData.safetyCaseType) {
+  } else if (sourceData.safetyCaseType) {
     switch (sourceData.safetyCaseType) {
       case SafetyCaseType.STRATEGY:
         return SafetyCaseType.STRATEGY !== targetData.safetyCaseType;
@@ -116,9 +115,7 @@ function artifactTypesAreValid(
       default:
         return isTargetDefaultArtifact;
     }
-  }
-
-  if (sourceData.logicType) {
+  } else if (sourceData.logicType) {
     return isTargetDefaultArtifact;
   }
 

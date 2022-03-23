@@ -1,5 +1,10 @@
 import { typeOptionsModule, traceModule } from "@/store";
-import { EdgeHandlersOptions } from "@/types";
+import {
+  ArtifactData,
+  EdgeHandlersOptions,
+  FTANodeType,
+  SafetyCaseType,
+} from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 
@@ -20,22 +25,33 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
       return false;
     }
 
+    const sourceData: ArtifactData = sourceNode.data();
+    const targetData: ArtifactData = targetNode.data();
+
     // If this link already exists, the link cannot be created.
     const linkDoesNotExist = !traceModule.doesLinkExist(
-      sourceNode.data().id,
-      targetNode.data().id
+      sourceData.id,
+      targetData.id
+    );
+
+    // If this link in opposite direct exists, the link cannot be created.
+    const oppositeLinkDoesNotExist = !traceModule.doesLinkExist(
+      targetData.id,
+      sourceData.id
     );
 
     // If this link is to itself, the link cannot be created.
     const isNotSameNode = !sourceNode.same(targetNode);
 
     // If the link is not between allowed artifact directions, thee link cannot be created.
-    const linkIsAllowedByType = typeOptionsModule.isLinkAllowedByType(
-      sourceNode.data().artifactType,
-      targetNode.data().artifactType
-    );
+    let linkIsAllowedByType = artifactTypesAreValid(sourceData, targetData);
 
-    return linkDoesNotExist && isNotSameNode && linkIsAllowedByType;
+    return (
+      linkDoesNotExist &&
+      isNotSameNode &&
+      oppositeLinkDoesNotExist &&
+      linkIsAllowedByType
+    );
   },
 
   /**
@@ -69,3 +85,39 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
   // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom.
   disableBrowserGestures: true,
 };
+
+/**
+ * Returns whether given artifact can traced regarding their artifact types
+ * rules.
+ * @param sourceData The artifact data of the source artifact.
+ * @param targetData The artifact data of the target artifact.
+ */
+function artifactTypesAreValid(
+  sourceData: ArtifactData,
+  targetData: ArtifactData
+): boolean {
+  const isSourceDefaultArtifact =
+    !sourceData.safetyCaseType && !sourceData.logicType;
+  const isTargetDefaultArtifact =
+    !targetData.safetyCaseType && !targetData.logicType;
+
+  if (isSourceDefaultArtifact) {
+    return typeOptionsModule.isLinkAllowedByType(
+      sourceData.artifactType,
+      targetData.artifactType
+    );
+  } else if (sourceData.safetyCaseType) {
+    switch (sourceData.safetyCaseType) {
+      case SafetyCaseType.STRATEGY:
+        return SafetyCaseType.STRATEGY !== targetData.safetyCaseType;
+      case SafetyCaseType.SOLUTION:
+        return SafetyCaseType.SOLUTION !== targetData.safetyCaseType;
+      default:
+        return isTargetDefaultArtifact;
+    }
+  } else if (sourceData.logicType) {
+    return isTargetDefaultArtifact;
+  }
+
+  throw Error("Undefined trace link logic for:" + sourceData.type);
+}

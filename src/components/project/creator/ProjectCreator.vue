@@ -104,7 +104,7 @@ import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
-import { cyCenterNodes, cyResetTim } from "@/cytoscape";
+import { cyResetTim } from "@/cytoscape";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -152,7 +152,6 @@ export default Vue.extend({
           this.clearData();
           await navigateTo(Routes.ARTIFACT);
           await setCreatedProject(res);
-          cyCenterNodes();
         })
         .finally(() => {
           appModule.onLoadEnd();

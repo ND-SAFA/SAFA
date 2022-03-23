@@ -26,6 +26,12 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
       targetNode.data().id
     );
 
+    // If this link in opposite direct exists, the link cannot be created.
+    const oppositeLinkDoesNotExist = !traceModule.doesLinkExist(
+      targetNode.data().id,
+      sourceNode.data().id
+    );
+
     // If this link is to itself, the link cannot be created.
     const isNotSameNode = !sourceNode.same(targetNode);
 
@@ -35,7 +41,7 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
       targetNode.data().artifactType
     );
 
-    return linkDoesNotExist && isNotSameNode && linkIsAllowedByType;
+    return linkDoesNotExist && isNotSameNode && oppositeLinkDoesNotExist;
   },
 
   /**

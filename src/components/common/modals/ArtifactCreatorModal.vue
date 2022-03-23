@@ -233,6 +233,10 @@ export default Vue.extend({
             documentType: DocumentType.SAFETY_CASE,
             safetyCaseType: isOpen as SafetyCaseType,
           });
+        } else if (isOpen === DocumentType.FMEA) {
+          this.editedArtifact = createArtifact({
+            documentType: DocumentType.FMEA,
+          });
         }
       }
     },

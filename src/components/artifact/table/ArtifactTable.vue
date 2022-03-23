@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ColumnDataType } from "@/types";
+import { Artifact, ColumnDataType, DocumentType } from "@/types";
 import { artifactModule, documentModule } from "@/store";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
@@ -91,7 +91,7 @@ export default Vue.extend({
   data() {
     return {
       selectedArtifact: undefined as Artifact | undefined,
-      createDialogueOpen: false,
+      createDialogueOpen: false as boolean | DocumentType.FMEA,
     };
   },
   computed: {
@@ -137,7 +137,7 @@ export default Vue.extend({
       deleteArtifactFromCurrentVersion(artifact);
     },
     handleCreate() {
-      this.createDialogueOpen = true;
+      this.createDialogueOpen = DocumentType.FMEA;
     },
     handleCloseModal() {
       this.createDialogueOpen = false;

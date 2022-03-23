@@ -124,14 +124,22 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     private TraceLink createNewTraceLink(TraceAppEntity newTrace, Project project) throws SafaError {
-        TraceLink traceLink;
+        Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
+            .findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(project,
+                newTrace.targetName,
+                newTrace.sourceName);
+        if (traceLinkOptional.isPresent()) {
+            throw new SafaError("Trace link is already present in the opposite direction.");
+        }
+
         Artifact sourceArtifact = assertAndFindArtifact(project, newTrace.sourceName);
         Artifact targetArtifact = assertAndFindArtifact(project, newTrace.targetName);
-        traceLink = new TraceLink(sourceArtifact, targetArtifact);
-        traceMatrixService.findOrCreateTraceMatrix(project,
+        TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
+        traceMatrixService.assertOrCreateTraceMatrix(project,
             sourceArtifact.getType(),
             targetArtifact.getType());
         this.traceLinkRepository.save(traceLink);
+
         return traceLink;
     }
 

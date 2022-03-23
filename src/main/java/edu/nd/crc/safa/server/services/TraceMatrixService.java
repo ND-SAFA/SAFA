@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Responsible for collecting all parsing errors in a project version.
+ * Responsible for finding, creating, and deleting trace matrices.
  */
 @Service
 public class TraceMatrixService {
@@ -23,17 +23,14 @@ public class TraceMatrixService {
         this.traceMatrixRepository = traceMatrixRepository;
     }
 
-    public void findOrCreateTraceMatrix(Project project,
-                                        ArtifactType sourceArtifactType,
-                                        ArtifactType targetArtifactType) throws SafaError {
+    public void assertOrCreateTraceMatrix(Project project,
+                                          ArtifactType sourceArtifactType,
+                                          ArtifactType targetArtifactType) throws SafaError {
         List<TraceMatrix> projectMatrices = this.traceMatrixRepository.findByProject(project);
         for (TraceMatrix tm : projectMatrices) {
             if (tm.getSourceArtifactType().equals(sourceArtifactType)
                 && tm.getTargetArtifactType().equals(targetArtifactType)) {
                 return;
-            } else if (tm.getSourceArtifactType().equals(targetArtifactType)
-                && tm.getTargetArtifactType().equals(sourceArtifactType)) {
-                throw new SafaError("Trace link goes against existing trace link directions.");
             }
         }
         // Case only exists if no trace matrix exists.

@@ -37,7 +37,7 @@ export async function verifyAuthentication(): Promise<void> {
 
     if (!isAuthorized) {
       await logout();
-    } else if (isAuthorized && location.includes(Routes.ARTIFACT_TREE)) {
+    } else if (isAuthorized && location.includes(Routes.ARTIFACT)) {
       await loadLastProject();
     }
   } catch (e) {

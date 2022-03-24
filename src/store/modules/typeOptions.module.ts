@@ -111,6 +111,7 @@ export default class TypeOptionsModule extends VuexModule {
     targetType: string
   ) => boolean {
     return (sourceType, targetType) => {
+      //TODO: Add custom logic for tracing safety cases or FTA nodes.
       return !this.artifactTypeDirections[targetType]?.includes(sourceType);
     };
   }

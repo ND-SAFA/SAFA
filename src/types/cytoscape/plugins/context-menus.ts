@@ -26,13 +26,13 @@ export interface ContextMenuOptions {
    * Indicates that the menu item has a submenu.
    * If not provided default one will be used
    */
-  submenuIndicator?: IconDefinition;
+  submenuIndicator?: ContextIconDefinition;
 }
 
 /**
  * Submenu Icon Definition
  */
-export interface IconDefinition {
+export interface ContextIconDefinition {
   /**
    * Relative path to icon to be used for submenu
    */
@@ -71,7 +71,7 @@ export interface MenuItem {
   /**
    * Item Icon
    */
-  image?: IconDefinition;
+  image?: ContextIconDefinition;
 
   /**
    * The function to be executed on click.

@@ -18,15 +18,31 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
   halignBox: "center",
   valignBox: "center",
   tpl(data?: ArtifactData) {
-    if (!data?.artifactType || data.logicType) return "";
+    if (!data?.artifactType) return "";
 
     if (data.safetyCaseType) {
       return htmlSafetyCase(data);
+    } else if (data.logicType) {
+      return htmlFTA(data);
     } else {
       return htmlArtifact(data);
     }
   },
 };
+
+/**
+ * Creates the HTML for representing an artifact node in a graph.
+ *
+ * @param data - The artifact data to render.
+ *
+ * @return stringified HTML for the node.
+ */
+function htmlFTA(data: ArtifactData): string {
+  return htmlContainer([htmlSubheader(data.logicType || "")], {
+    opacity: data.opacity,
+    color: getBackgroundColor(data.artifactDeltaState),
+  });
+}
 
 /**
  * Creates the HTML for representing an artifact node in a graph.

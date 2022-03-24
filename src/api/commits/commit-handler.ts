@@ -1,5 +1,5 @@
 import { Commit } from "@/types";
-import { commitModule } from "@/store";
+import { projectModule, commitModule } from "@/store";
 import { persistCommit } from "./commit-api";
 
 /**
@@ -8,22 +8,33 @@ import { persistCommit } from "./commit-api";
  * @param commit - The commit to save.
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
-  await commitModule.saveCommit(commit);
-  return await persistCommit(commit);
+  const commitResponse = await persistCommit(commit);
+  await commitModule.saveCommit(commitResponse);
+  return commitResponse;
 }
 
 /**
  * Undoes the last commit.
  */
-export async function undoCommit(): Promise<Commit> {
-  const commit = await commitModule.undoCommit();
-  return await persistCommit(commit);
+export async function undoCommit(): Promise<void> {
+  const commit = await commitModule.undoLastCommit();
+  const commitResponse = await persistCommit(commit);
+  await applyArtifactChanges(commitResponse);
 }
 
 /**
  * Reattempts the last undone commit.
  */
-export async function redoCommit(): Promise<Commit> {
-  const commit = await commitModule.redoCommit();
-  return await saveCommit(commit);
+export async function redoCommit(): Promise<void> {
+  const commit = await commitModule.redoLastUndoneCommit();
+  const commitResponse = await persistCommit(commit);
+  await applyArtifactChanges(commitResponse);
+}
+
+async function applyArtifactChanges(commit: Commit): Promise<void> {
+  const artifactsAddedOrModified = commit.artifacts.added.concat(
+    commit.artifacts.modified
+  );
+  await projectModule.addOrUpdateArtifacts(artifactsAddedOrModified);
+  await projectModule.deleteArtifacts(commit.artifacts.removed);
 }

@@ -116,6 +116,8 @@ export default Vue.extend({
         this.openPanelIndexes = this.openPanelIndexes.filter(
           (panelIndex) => panelIndex !== i
         );
+      } else {
+        this.openPanelIndexes.push(i);
       }
     },
     deleteFile(i: number): void {

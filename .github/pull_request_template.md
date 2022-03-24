@@ -13,4 +13,4 @@
 # Review
 **Test Case** <br>
 *Please describe how these changes were tested.*
-- [TEST STEP 1]
+1. [TEST STEP 1]

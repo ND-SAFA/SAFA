@@ -88,20 +88,28 @@ export const centerViewOnNode: LayoutHook = (): void => {
   }
 };
 
+let initDynamic = true;
+
 /**
  * Attaches hook to every right click on the cytoscape instance enabling
  * the dynamic showing of context menu items through lambda `isVisible`.
+ *
  * @param cy The cytoscape instance
  */
 export const dynamicVisibilityHookForContextMenuItems = (
   cy: CytoCore
 ): void => {
+  if (!initDynamic) return;
+
+  initDynamic = false;
+
   cy.on(CytoEvent.CXT_TAP, (event: EventObject) => {
     const data = event.target.data();
     const artifactData: ArtifactData | undefined = isArtifactData(data)
       ? data
       : undefined;
     const contextMenuInstance = cy.contextMenus("get");
+
     artifactTreeMenuItems.forEach((menuItem: MenuItem) => {
       if (
         menuItem.coreAsWell ||

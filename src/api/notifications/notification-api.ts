@@ -1,18 +1,14 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import {
-  ProjectMessage,
-  ProjectMessageType,
-  VersionMessage,
-  VersionMessageType,
-} from "@/types";
-import { projectModule, logModule, sessionModule } from "@/store";
+import { ProjectMessage, VersionMessage, VersionMessageType } from "@/types";
+import { logModule, projectModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/util";
 import {
   getProjectMembers,
-  setCreatedProject,
   getProjectVersion,
   reloadDocumentArtifacts,
+  reloadWarningsHandler,
+  setCreatedProject,
 } from "@/api";
 import {
   reloadArtifactsHandler,
@@ -172,6 +168,14 @@ async function versionMessageHandler(
   frame: Frame
 ): Promise<void> {
   const message: VersionMessage = JSON.parse(frame.body) as VersionMessage;
+
+  // Handlers for automatic entity updates.
+  switch (message.type) {
+    case "WARNINGS":
+      return reloadWarningsHandler(versionId);
+  }
+
+  // Handlers for manual entity updates.
   if (sessionModule.userEmail !== message.user) {
     switch (message.type) {
       case "VERSION":

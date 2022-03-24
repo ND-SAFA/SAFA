@@ -17,6 +17,7 @@
                 :icon-id="
                   isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
                 "
+                :is-disabled="doDisableButtons"
                 @click="onLeftPanelClick"
               />
             </v-col>
@@ -26,7 +27,7 @@
           </v-row>
         </v-col>
         <v-col cols="4">
-          <graph-nav-icons />
+          <graph-buttons />
         </v-col>
         <v-col cols="4">
           <v-row justify="end" class="ma-0 pa-0">
@@ -34,6 +35,7 @@
               color="secondary"
               :tooltip="rightPanelTooltip"
               :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
+              :is-disabled="doDisableButtons"
               @click="onRightPanelClick"
             />
           </v-row>
@@ -48,18 +50,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
-import { GenericIconButton } from "@/components/common";
+import { appModule, documentModule } from "@/store";
 import { router, Routes } from "@/router";
-import AppBarHeader from "./AppBarHeader.vue";
-import GraphNavIcons from "./GraphNavIcons.vue";
+import { GenericIconButton } from "@/components/common";
+import { AppBarHeader } from "./header";
+import { GraphButtons } from "./graph";
+import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
-import DocumentSelector from "@/components/navigation/DocumentSelector.vue";
 
+/**
+ * Displays the navigation top bar.
+ */
 export default Vue.extend({
   components: {
     DocumentSelector,
-    GraphNavIcons,
+    GraphButtons,
     AppBarHeader,
     GenericIconButton,
     LoadingBar,
@@ -70,7 +75,10 @@ export default Vue.extend({
   },
   computed: {
     doShowGraphButtons(): boolean {
-      return router.currentRoute.path === Routes.ARTIFACT_TREE;
+      return router.currentRoute.path === Routes.ARTIFACT;
+    },
+    doDisableButtons(): boolean {
+      return documentModule.isTableDocument;
     },
     isLoading(): boolean {
       return appModule.getIsLoading;

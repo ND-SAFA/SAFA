@@ -7,7 +7,7 @@ export enum Routes {
   FORGOT_PASSWORD = "/forgot",
   RESET_PASSWORD = "/reset",
   HOME = "/",
-  ARTIFACT_TREE = "/project",
+  ARTIFACT = "/project",
   TRACE_LINK = "/links",
   ERROR = "/error",
   PROJECT_CREATOR = "/create",

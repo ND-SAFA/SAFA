@@ -24,8 +24,7 @@ export default class CommitModule extends VuexModule {
    * @param commit - The commit to save.
    */
   async saveCommit(commit: Commit): Promise<void> {
-    const revert = this.createRevert(commit);
-
+    const revert = this.getRevert(commit);
     this.ADD_COMMIT({ commit, revert });
   }
 
@@ -36,7 +35,7 @@ export default class CommitModule extends VuexModule {
    *
    * @return The undone commit.
    */
-  async undoCommit(): Promise<Commit> {
+  undoLastCommit(): Commit {
     if (!this.canUndo) {
       const errorMessage = "There are no commits to undo.";
       logModule.onWarning(errorMessage);
@@ -48,17 +47,16 @@ export default class CommitModule extends VuexModule {
 
     this.SET_COMMITS(this.commits.filter((c, i) => i !== lastCommitIndex));
     this.ADD_REVERTED_COMMIT(lastCommitHistory);
-
     return lastCommitHistory.revert;
   }
 
   @Action
   /**
-   * Reattempts the last undone commit.
+   * Removes and returns the last reverted commit.
    *
    * @return The redone commit.
    */
-  async redoCommit(): Promise<Commit> {
+  redoLastUndoneCommit(): Commit {
     if (!this.canRedo) {
       const errorMessage = "Cannot redo because no commits have been reverted.";
       logModule.onWarning(errorMessage);
@@ -113,7 +111,7 @@ export default class CommitModule extends VuexModule {
    * re-added, and modified entities are reverted to their state before the last
    * client change.
    */
-  get createRevert(): (c: Commit) => Commit {
+  get getRevert(): (c: Commit) => Commit {
     return (commit: Commit) => {
       const originalArtifacts: Artifact[] = commit.artifacts.modified.map(
         (a: Artifact) => artifactModule.getArtifactById(a.id)

@@ -32,7 +32,6 @@ import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
-import { cyResetTim } from "@/cytoscape";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -73,7 +72,6 @@ export default Vue.extend({
     async inView(inView: boolean): Promise<void> {
       if (inView) {
         await viewportModule.setTimTreeLayout();
-        setTimeout(cyResetTim, 200);
       }
     },
   },

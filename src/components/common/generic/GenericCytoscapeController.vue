@@ -1,6 +1,6 @@
 <template>
   <cytoscape
-    id="cy-container"
+    class="cy-container"
     :config="cytoCoreGraph.config"
     :preConfig="preConfig"
     :afterCreated="afterCreated"

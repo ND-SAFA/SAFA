@@ -38,6 +38,8 @@
           label="Logic Type"
           v-model="editedArtifact.logicType"
           :items="logicTypes"
+          item-text="name"
+          item-value="id"
         />
         <artifact-input
           only-document-artifacts
@@ -231,11 +233,18 @@ export default Vue.extend({
             documentType: DocumentType.SAFETY_CASE,
             safetyCaseType: isOpen as SafetyCaseType,
           });
+        } else if (isOpen === DocumentType.FMEA) {
+          this.editedArtifact = createArtifact({
+            documentType: DocumentType.FMEA,
+          });
         }
       }
     },
     name(newName: string): void {
-      if (!newName) return;
+      if (!newName) {
+        this.isNameValid = this.canSave = false;
+        return;
+      }
 
       if (this.nameCheckTimer) {
         clearTimeout(this.nameCheckTimer);

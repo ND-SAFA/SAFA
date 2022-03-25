@@ -5,6 +5,7 @@ import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
+import { artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "document" })
 /**

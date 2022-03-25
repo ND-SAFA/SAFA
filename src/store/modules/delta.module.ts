@@ -216,10 +216,10 @@ export default class ErrorModule extends VuexModule {
   /**
    * @return The delta state of the given artifacts id.
    */
-  get getArtifactDeltaType(): (id: string) => ArtifactDeltaState | undefined {
+  get getArtifactDeltaType(): (id: string) => ArtifactDeltaState {
     return (id) => {
       if (!this.inDeltaView) {
-        return undefined;
+        return ArtifactDeltaState.NO_CHANGE;
       } else if (id in this.projectDelta.artifacts.added) {
         return ArtifactDeltaState.ADDED;
       } else if (id in this.projectDelta.artifacts.modified) {

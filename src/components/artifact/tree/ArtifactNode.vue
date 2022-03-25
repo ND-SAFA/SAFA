@@ -84,23 +84,10 @@ export default Vue.extend({
         return ArtifactDeltaState.NO_CHANGE;
       }
 
-      const artifactId: string = this.artifactDefinition.id;
-      const addedArtifacts = deltaModule.addedArtifacts;
-      const removedArtifacts = deltaModule.removedArtifacts;
-      const modifiedArtifacts = deltaModule.modifiedArtifacts;
-
-      if (artifactId in addedArtifacts) {
-        this.setAddedData(addedArtifacts[artifactId]);
-        return ArtifactDeltaState.ADDED;
-      } else if (artifactId in removedArtifacts) {
-        this.setRemovedData(removedArtifacts[artifactId]);
-        return ArtifactDeltaState.REMOVED;
-      } else if (artifactId in modifiedArtifacts) {
-        this.setModifiedData(modifiedArtifacts[artifactId]);
-        return ArtifactDeltaState.MODIFIED;
-      } else {
-        return ArtifactDeltaState.NO_CHANGE;
-      }
+      return (
+        deltaModule.getArtifactDeltaType(this.artifactDefinition.id) ||
+        ArtifactDeltaState.NO_CHANGE
+      );
     },
     definition(): ArtifactCytoCoreElement {
       const { id, body, type, name, safetyCaseType, logicType } =

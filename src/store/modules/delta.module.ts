@@ -2,9 +2,9 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
   Artifact,
-  ProjectVersion,
-  ProjectDelta,
   EntityModification,
+  ProjectDelta,
+  ProjectVersion,
   TraceLink,
 } from "@/types";
 import { ArtifactDeltaState, PanelType } from "@/types";
@@ -12,7 +12,6 @@ import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
 import {
   appModule,
-  deltaModule,
   projectModule,
   subtreeModule,
   viewportModule,
@@ -210,6 +209,25 @@ export default class ErrorModule extends VuexModule {
         return ArtifactDeltaState.MODIFIED;
       } else if (id in this.projectDelta.traces.removed) {
         return ArtifactDeltaState.REMOVED;
+      }
+    };
+  }
+
+  /**
+   * @return The delta state of the given artifacts id.
+   */
+  get getArtifactDeltaType(): (id: string) => ArtifactDeltaState | undefined {
+    return (id) => {
+      if (!this.inDeltaView) {
+        return undefined;
+      } else if (id in this.projectDelta.artifacts.added) {
+        return ArtifactDeltaState.ADDED;
+      } else if (id in this.projectDelta.artifacts.modified) {
+        return ArtifactDeltaState.MODIFIED;
+      } else if (id in this.projectDelta.artifacts.removed) {
+        return ArtifactDeltaState.REMOVED;
+      } else {
+        return ArtifactDeltaState.NO_CHANGE;
       }
     };
   }

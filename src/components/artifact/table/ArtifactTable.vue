@@ -1,6 +1,11 @@
 <template>
   <v-container>
-    <v-data-table class="elevation-1" :headers="headers" :items="items">
+    <v-data-table
+      class="elevation-1"
+      :headers="headers"
+      :items="items"
+      :item-class="getItemBackground"
+    >
       <template v-slot:top>
         <v-container class="flex">
           <table-column-editor class="ml-auto"
@@ -69,8 +74,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ColumnDataType, DocumentType } from "@/types";
-import { artifactModule, documentModule } from "@/store";
+import {
+  Artifact,
+  ArtifactDeltaState,
+  ColumnDataType,
+  DocumentType,
+} from "@/types";
+import { artifactModule, deltaModule, documentModule } from "@/store";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "@/components/artifact/table/ArtifactTableChip.vue";
@@ -158,6 +168,20 @@ export default Vue.extend({
     },
     getArrayValue(itemValue?: string): string[] {
       return itemValue?.split("||") || [];
+    },
+    getItemBackground(item: Artifact): string {
+      const deltaState = deltaModule.getArtifactDeltaType(item.id);
+
+      switch (deltaState) {
+        case ArtifactDeltaState.ADDED:
+          return "artifact-added";
+        case ArtifactDeltaState.MODIFIED:
+          return "artifact-modified";
+        case ArtifactDeltaState.REMOVED:
+          return "artifact-removed";
+        default:
+          return "";
+      }
     },
   },
 });

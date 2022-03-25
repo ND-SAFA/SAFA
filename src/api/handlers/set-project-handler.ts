@@ -4,6 +4,7 @@ import {
   appModule,
   artifactSelectionModule,
   deltaModule,
+  documentModule,
   errorModule,
   projectModule,
   subtreeModule,
@@ -79,5 +80,8 @@ export async function setCreatedProject(
  * Reloads the current project.
  */
 export async function reloadProject(): Promise<void> {
+  const document = documentModule.document;
+
   await loadVersionIfExistsHandler(projectModule.versionId);
+  await documentModule.switchDocuments(document);
 }

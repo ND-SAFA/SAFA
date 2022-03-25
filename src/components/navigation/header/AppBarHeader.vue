@@ -106,6 +106,8 @@ export default Vue.extend({
     },
     onVersionCreated(version: ProjectVersion) {
       loadVersionIfExistsHandler(version.versionId);
+
+      this.createVersionOpen = false;
     },
   },
   computed: {

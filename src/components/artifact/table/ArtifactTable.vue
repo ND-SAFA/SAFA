@@ -8,42 +8,10 @@
       :item-class="getItemBackground"
     >
       <template v-slot:top>
-        <v-container>
-          <v-row>
-            <v-col>
-              <v-text-field
-                dense
-                rounded
-                outlined
-                clearable
-                label="Search"
-                style="max-width: 600px"
-                v-model="searchText"
-              />
-            </v-col>
-            <v-col class="flex-grow-0">
-              <v-row dense class="flex-nowrap">
-                <v-col>
-                  <v-autocomplete
-                    outlined
-                    multiple
-                    dense
-                    v-if="inDeltaView"
-                    label="Delta Types"
-                    v-model="selectedDeltaTypes"
-                    :items="deltaTypes"
-                    item-text="name"
-                    item-value="id"
-                    style="width: 200px"
-                  />
-                </v-col>
-                <v-col>
-                  <table-column-editor />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-container>
+        <artifact-table-header
+          @search="searchText = $event"
+          @filter="selectedDeltaTypes = $event"
+        />
       </template>
       <template
         v-for="{ id, dataType, required } in columns"
@@ -114,12 +82,12 @@ import {
   ColumnDataType,
   DocumentType,
 } from "@/types";
-import { deltaTypeOptions, ThemeColors } from "@/util";
+import { ThemeColors } from "@/util";
 import { artifactModule, deltaModule, documentModule } from "@/store";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
-import TableColumnEditor from "./TableColumnEditor.vue";
+import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 
 type FlatArtifact = Artifact & Record<string, string>;
 
@@ -129,7 +97,7 @@ type FlatArtifact = Artifact & Record<string, string>;
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
-    TableColumnEditor,
+    ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
     ArtifactCreatorModal,
@@ -149,6 +117,7 @@ export default Vue.extend({
     isTableView(): boolean {
       return documentModule.isTableDocument;
     },
+
     headers() {
       return [
         {
@@ -187,9 +156,7 @@ export default Vue.extend({
             } as FlatArtifact)
         );
     },
-    deltaTypes() {
-      return deltaTypeOptions();
-    },
+
     artifactCreatorTitle(): string {
       return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
     },
@@ -247,5 +214,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>

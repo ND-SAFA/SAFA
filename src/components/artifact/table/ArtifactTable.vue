@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="isTableView">
     <v-data-table
       class="elevation-1"
       :headers="headers"
@@ -15,6 +15,7 @@
                 dense
                 rounded
                 outlined
+                clearable
                 label="Search"
                 style="max-width: 600px"
                 v-model="searchText"
@@ -142,6 +143,12 @@ export default Vue.extend({
     };
   },
   computed: {
+    inDeltaView(): boolean {
+      return deltaModule.inDeltaView;
+    },
+    isTableView(): boolean {
+      return documentModule.isTableDocument;
+    },
     headers() {
       return [
         {
@@ -182,9 +189,6 @@ export default Vue.extend({
     },
     deltaTypes() {
       return deltaTypeOptions();
-    },
-    inDeltaView(): boolean {
-      return deltaModule.inDeltaView;
     },
     artifactCreatorTitle(): string {
       return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";

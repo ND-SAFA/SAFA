@@ -1,15 +1,14 @@
 <template>
   <private-page full-window>
     <template v-slot:page>
-      <artifact-tree v-if="!isTableView" />
-      <artifact-table v-if="isTableView" />
+      <artifact-table />
+      <artifact-tree />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { documentModule } from "@/store";
 import { ArtifactTree, ArtifactTable, PrivatePage } from "@/components";
 
 /**
@@ -22,11 +21,6 @@ export default Vue.extend({
     ArtifactTable,
     PrivatePage,
     ArtifactTree,
-  },
-  computed: {
-    isTableView(): boolean {
-      return documentModule.isTableDocument;
-    },
   },
 });
 </script>

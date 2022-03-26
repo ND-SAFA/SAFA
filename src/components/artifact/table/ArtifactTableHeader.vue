@@ -45,7 +45,7 @@ import { deltaModule } from "@/store";
 import TableColumnEditor from "./TableColumnEditor.vue";
 
 /**
- * Represents a table of artifacts.
+ * Represents the header and inputs for a table of artifacts.
  *
  * @emits-1 `search` (String) - On text search.
  * @emits-1 `filter` (ArtifactDeltaState[]) - On filter search.

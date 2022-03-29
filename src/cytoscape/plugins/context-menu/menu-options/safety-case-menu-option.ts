@@ -37,14 +37,6 @@ export const safetyCaseMenuOption: MenuItem = {
       },
     },
     {
-      id: "sc-solution-node",
-      content: "Solution Node",
-      tooltipText: "Define how the system resolves a strategy.",
-      onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION);
-      },
-    },
-    {
       id: "sc-context-node",
       content: "Context Node",
       tooltipText: "Define the expected system environment assumptions.",
@@ -57,7 +49,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Evidence Node",
       tooltipText: "Define a container for ground-truth resources.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.STRATEGY);
+        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION);
       },
     },
   ],

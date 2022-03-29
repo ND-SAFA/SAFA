@@ -105,6 +105,7 @@ import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
 import { cyResetTim } from "@/cytoscape";
+import { createProject } from "@/util";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -128,7 +129,6 @@ export default Vue.extend({
       name: "",
       description: "",
       currentStep: 1,
-      isConfirmOpen: false,
       artifactUploader: createArtifactUploader(),
       traceUploader: createTraceUploader(),
     };
@@ -137,6 +137,7 @@ export default Vue.extend({
     setStepIsValid(stepIndex: number, isValid: boolean): void {
       Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
     },
+
     clearData() {
       this.name = "";
       this.description = "";
@@ -144,7 +145,6 @@ export default Vue.extend({
       this.artifactUploader = createArtifactUploader();
       this.traceUploader = createTraceUploader();
     },
-
     saveProject: function (): void {
       appModule.onLoadStart();
       saveOrUpdateProject(this.project)
@@ -156,9 +156,6 @@ export default Vue.extend({
         .finally(() => {
           appModule.onLoadEnd();
         });
-    },
-    onConfirmClose(): void {
-      this.isConfirmOpen = false;
     },
 
     async handleResetGraph(): Promise<void> {
@@ -172,46 +169,38 @@ export default Vue.extend({
         .reduce((acc, cur) => ({ ...acc, ...cur }), {});
     },
     artifacts(): Artifact[] {
-      let artifacts: Artifact[] = [];
-      this.artifactUploader.panels.forEach(({ projectFile }) => {
-        if (projectFile.artifacts !== undefined) {
-          artifacts = artifacts.concat(projectFile.artifacts);
-        }
-      });
-      return artifacts;
+      return this.artifactUploader.panels
+        .map(({ projectFile }) => projectFile.artifacts || [])
+        .reduce((acc, cur) => [...acc, ...cur], []);
     },
     artifactTypes(): string[] {
       return this.artifactUploader.panels.map((p) => p.projectFile.type);
     },
+
     traces(): TraceLink[] {
-      let traces: TraceLink[] = [];
-      this.traceUploader.panels.forEach(({ projectFile }) => {
-        if (projectFile.traces !== undefined) {
-          traces = traces.concat(projectFile.traces);
-        }
-      });
-      return traces;
+      return this.traceUploader.panels
+        .map(({ projectFile }) => projectFile.traces || [])
+        .reduce((acc, cur) => [...acc, ...cur], []);
     },
     traceFiles(): TraceFile[] {
       return this.traceUploader.panels.map((p) => p.projectFile);
     },
+
     project(): Project {
       const user: ProjectMembership = {
         projectMembershipId: "",
         email: sessionModule.userEmail,
         role: ProjectRole.OWNER,
       };
-      return {
-        projectId: "",
+
+      return createProject({
         name: this.name,
         description: this.description,
         owner: user.email,
         members: [user],
         artifacts: this.artifacts,
         traces: this.traces,
-        artifactTypes: [],
-        documents: [],
-      };
+      });
     },
   },
   watch: {

@@ -14,13 +14,10 @@
       />
     </template>
     <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn @click="onSave" color="primary">
-            <v-icon>mdi-check</v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
+      <v-btn @click="onSave" color="primary" class="ml-auto">
+        <v-icon>mdi-check</v-icon>
+        Save
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -28,8 +25,9 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier } from "@/types";
+import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for renaming a project.
@@ -65,39 +63,22 @@ export default Vue.extend({
     return {
       name: "",
       description: "",
+      identifier: createProjectIdentifier(this.project),
     };
-  },
-  mounted() {
-    this.clearData();
   },
   watch: {
     isOpen(isOpen: boolean) {
-      if (!isOpen) {
-        this.clearData();
-      }
-    },
-    project(project: ProjectIdentifier | undefined): void {
-      if (project !== undefined) {
-        this.name = project.name;
-        this.description = project.description;
+      if (isOpen) {
+        this.identifier = createProjectIdentifier(this.project);
       }
     },
   },
   methods: {
-    clearData() {
-      this.name = this.project?.name || "";
-      this.description = this.project?.description || "";
-    },
     onClose() {
       this.$emit("close");
     },
     onSave() {
-      const projectId = this.project?.projectId || "";
-      this.$emit("save", {
-        projectId: projectId,
-        name: this.name,
-        description: this.description,
-      } as ProjectIdentifier);
+      this.$emit("save", this.identifier);
     },
   },
 });

@@ -5,6 +5,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
+import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -17,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -31,7 +34,12 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
     AppEntityRetrievalService appEntityRetrievalService;
 
     /**
-     * Verifies that an SOLUTION node can be created.
+     * Verifies that an SOLUTION node can be:
+     * - created
+     * - modified
+     * - removed
+     * - recreated
+     * - delta calculation
      */
     @Test
     public void testCRUDSafetyNode() throws Exception {
@@ -93,7 +101,13 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         // Step - Recreate artifact
         CommitBuilder createCommitBuilder =
             CommitBuilder.withVersion(projectVersion).withAddedArtifact(artifactAddedJson);
-        commit(createCommitBuilder);
+        JSONObject recreatedCommit = commit(createCommitBuilder);
+        String artifactId =
+            recreatedCommit
+                .getJSONObject("artifacts")
+                .getJSONArray("added")
+                .getJSONObject(0)
+                .getString("id");
 
         // VP - Verify that safety case was created
         safetyCaseArtifacts = safetyCaseArtifactRepository.findByArtifactProject(projectVersion.getProject());
@@ -103,5 +117,29 @@ public class TestSafetyCaseArtifacts extends ApplicationBaseTest {
         safetyCaseArtifact = safetyCaseArtifacts.get(0);
         assertThat(safetyCaseArtifact.getSafetyCaseType()).isEqualTo(safetyCaseType);
         assertThat(safetyCaseArtifact.getArtifact().getName()).isEqualTo(artifactName);
+
+        // Step - Modify artifact
+        ProjectVersion newProjectVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
+        String newArtifactBody = "new artifact body.";
+        artifactAddedJson.put("body", newArtifactBody);
+
+        // Step - Commit modified artifact
+        commit(CommitBuilder
+            .withVersion(newProjectVersion)
+            .withModifiedArtifact(artifactAddedJson));
+
+        // Step - Get project delta
+        String deltaRouteName = RouteBuilder
+            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+            .withBaselineVersion(projectVersion)
+            .withTargetVersion(newProjectVersion)
+            .get();
+        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
+
+        // VP - Verify that change is detected
+        JSONObject modifiedArtifacts = projectDelta.getJSONObject("artifacts").getJSONObject("modified");
+        JSONObject modifiedArtifact = modifiedArtifacts.getJSONObject(artifactId);
+        assertThat(modifiedArtifact.getJSONObject("before").getString("body")).isEqualTo(artifactBody);
+        assertThat(modifiedArtifact.getJSONObject("after").getString("body")).isEqualTo(newArtifactBody);
     }
 }

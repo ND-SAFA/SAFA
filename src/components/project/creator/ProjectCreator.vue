@@ -9,58 +9,56 @@
 
     <template v-slot:items>
       <v-stepper-content step="1">
-        <v-container>
-          <project-identifier-input
-            v-bind:name.sync="name"
-            v-bind:description.sync="description"
-          />
-        </v-container>
+        <project-identifier-input
+          v-bind:name.sync="name"
+          v-bind:description.sync="description"
+        />
+        <project-files-input
+          v-bind:name.sync="name"
+          v-bind:description.sync="description"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <v-container>
-          <generic-uploader
-            item-name="artifact"
-            :uploader="artifactUploader"
-            :artifact-map="artifactMap"
-            @change="artifactUploader.panels = $event"
-            @upload:valid="setStepIsValid(1, true)"
-            @upload:invalid="setStepIsValid(1, false)"
-          >
-            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <artifact-type-creator
-                :is-open="isCreatorOpen"
-                :artifact-types="artifactTypes"
-                @submit="onAddFile"
-                @close="onClose"
-              />
-            </template>
-          </generic-uploader>
-        </v-container>
+        <generic-uploader
+          item-name="artifact"
+          :uploader="artifactUploader"
+          :artifact-map="artifactMap"
+          @change="artifactUploader.panels = $event"
+          @upload:valid="setStepIsValid(1, true)"
+          @upload:invalid="setStepIsValid(1, false)"
+        >
+          <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+            <artifact-type-creator
+              :is-open="isCreatorOpen"
+              :artifact-types="artifactTypes"
+              @submit="onAddFile"
+              @close="onClose"
+            />
+          </template>
+        </generic-uploader>
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <v-container>
-          <generic-uploader
-            item-name="trace link"
-            :uploader="traceUploader"
-            :artifact-map="artifactMap"
-            :default-valid-state="true"
-            @change="traceUploader.panels = $event"
-            @upload:valid="setStepIsValid(2, true)"
-            @upload:invalid="setStepIsValid(2, false)"
-          >
-            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <trace-file-creator
-                :is-open="isCreatorOpen"
-                :trace-files="traceFiles"
-                :artifact-types="artifactTypes"
-                @submit="onAddFile"
-                @close="onClose"
-              />
-            </template>
-          </generic-uploader>
-        </v-container>
+        <generic-uploader
+          item-name="trace link"
+          :uploader="traceUploader"
+          :artifact-map="artifactMap"
+          :default-valid-state="true"
+          @change="traceUploader.panels = $event"
+          @upload:valid="setStepIsValid(2, true)"
+          @upload:invalid="setStepIsValid(2, false)"
+        >
+          <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+            <trace-file-creator
+              :is-open="isCreatorOpen"
+              :trace-files="traceFiles"
+              :artifact-types="artifactTypes"
+              @submit="onAddFile"
+              @close="onClose"
+            />
+          </template>
+        </generic-uploader>
       </v-stepper-content>
 
       <v-stepper-content step="4">
@@ -95,22 +93,24 @@ import {
   TraceFile,
   TraceLink,
 } from "@/types";
+import { createProject } from "@/util";
 import { saveOrUpdateProject, setCreatedProject } from "@/api";
 import { appModule, sessionModule } from "@/store";
-import { GenericStepper } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createArtifactUploader, createTraceUploader } from "./uploaders";
-import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
-import { TimTree } from "./tim-tree-view";
-import { GenericUploader } from "./validation-panels";
 import { navigateTo, Routes } from "@/router";
 import { cyResetTim } from "@/cytoscape";
-import { createProject } from "@/util";
+import { GenericStepper } from "@/components/common";
+import { ProjectIdentifierInput } from "@/components/project/shared";
+import { ProjectFilesInput } from "@/components/project/shared";
+import { TimTree } from "./tim-tree-view";
+import { GenericUploader } from "./validation-panels";
+import { createArtifactUploader, createTraceUploader } from "./uploaders";
+import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
 export default Vue.extend({
   components: {
+    ProjectFilesInput,
     GenericStepper,
     ProjectIdentifierInput,
     GenericUploader,
@@ -213,9 +213,8 @@ export default Vue.extend({
         Vue.set(this.steps, 0, [this.name, true]);
       }
     },
-    name(): void {
-      const hasName = this.name !== "";
-      Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
+    name(newName: string): void {
+      Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""]);
     },
   },
 });

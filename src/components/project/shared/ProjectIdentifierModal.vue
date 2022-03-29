@@ -2,7 +2,7 @@
   <generic-modal
     :is-open="isOpen"
     :title="title"
-    size="s"
+    size="m"
     :actions-height="50"
     :is-loading="isLoading"
     @close="onClose"
@@ -12,9 +12,20 @@
         v-bind:name.sync="name"
         v-bind:description.sync="description"
       />
+      <project-files-input
+        v-if="doShowUpload"
+        v-bind:name.sync="name"
+        v-bind:description.sync="description"
+        @update:open="isUploadOpen = $event"
+      />
     </template>
     <template v-slot:actions>
-      <v-btn @click="onSave" color="primary" class="ml-auto">
+      <v-btn
+        @click="onSave"
+        color="primary"
+        class="ml-auto"
+        :disabled="isDisabled"
+      >
         <v-icon>mdi-check</v-icon>
         Save
       </v-btn>
@@ -28,6 +39,7 @@ import { ProjectIdentifier } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
+import ProjectFilesInput from "./ProjectFilesInput.vue";
 
 /**
  * A modal for renaming a project.
@@ -39,6 +51,7 @@ export default Vue.extend({
   components: {
     GenericModal,
     ProjectIdentifierInput,
+    ProjectFilesInput,
   },
   props: {
     isOpen: {
@@ -58,12 +71,14 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    doShowUpload: Boolean,
   },
   data() {
     return {
       name: "",
       description: "",
       identifier: createProjectIdentifier(this.project),
+      isUploadOpen: false,
     };
   },
   watch: {
@@ -79,6 +94,11 @@ export default Vue.extend({
     },
     onSave() {
       this.$emit("save", this.identifier);
+    },
+  },
+  computed: {
+    isDisabled(): boolean {
+      return this.name.length === 0 || (this.doShowUpload && this.isUploadOpen);
     },
   },
 });

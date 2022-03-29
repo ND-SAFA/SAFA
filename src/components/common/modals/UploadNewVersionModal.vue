@@ -4,7 +4,7 @@
     title="Upload Flat Files"
     :is-open="isOpen"
     :startStep="startStep"
-    :after-steps="[['Upload Files', filesSelected.length > 0]]"
+    :after-steps="[['Upload Files', selectedFiles.length > 0]]"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -66,7 +66,7 @@ export default Vue.extend({
       currentStep: 1,
       selectedProject: undefined as ProjectIdentifier | undefined,
       selectedVersion: undefined as ProjectVersion | undefined,
-      filesSelected: [] as File[],
+      selectedFiles: [] as File[],
       isLoading: false,
       setAsNewVersion: true,
     };
@@ -95,11 +95,11 @@ export default Vue.extend({
     onClose() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
-      this.filesSelected = [];
+      this.selectedFiles = [];
       this.$emit("close");
     },
     onChangeFiles(files: File[]) {
-      this.filesSelected = files;
+      this.selectedFiles = files;
     },
     onSubmit() {
       if (this.selectedProject === undefined) {
@@ -108,18 +108,17 @@ export default Vue.extend({
       if (this.selectedVersion === undefined) {
         return logModule.onWarning("No project version is selected.");
       }
-      const projectId = this.selectedProject.projectId;
-      const versionId = this.selectedVersion.versionId;
+
+      this.isLoading = true;
 
       uploadNewProjectVersion(
-        projectId,
-        versionId,
-        this.filesSelected,
-        this.setAsNewVersion,
-        () => (this.isLoading = true),
-        () => (this.isLoading = false),
-        this.onClose
-      );
+        this.selectedProject.projectId,
+        this.selectedVersion.versionId,
+        this.selectedFiles,
+        this.setAsNewVersion
+      )
+        .then(() => this.onClose())
+        .finally(() => (this.isLoading = false));
     },
   },
 });

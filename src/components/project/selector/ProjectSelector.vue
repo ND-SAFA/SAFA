@@ -25,6 +25,7 @@
     </template>
     <template v-slot:addItemDialogue>
       <project-identifier-modal
+        do-show-upload
         title="Create New Project"
         :is-open="addProjectDialogue"
         @save="onSaveNewProject"
@@ -202,7 +203,7 @@ export default Vue.extend({
             (p) => project.projectId !== p.projectId
           );
 
-          this.projects = [project as ProjectIdentifier].concat(projectRemoved);
+          this.projects = [project, ...projectRemoved];
           this.selected = project;
           this.$emit("selected", project, true);
         })

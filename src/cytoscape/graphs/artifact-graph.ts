@@ -53,8 +53,8 @@ export const artifactTreeGraph: CytoCoreGraph = {
     },
     {
       initialize: edgehandles,
-      afterInit: async (cy: CytoCore) => {
-        await setEdgeHandlesCore(
+      afterInit(cy: CytoCore): Promise<void> {
+        return setEdgeHandlesCore(
           artifactTreeCyPromise,
           cy.edgehandles(artifactTreeEdgeHandleOptions)
         );

@@ -35,7 +35,6 @@
               color="secondary"
               :tooltip="rightPanelTooltip"
               :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
-              :is-disabled="doDisableButtons"
               @click="onRightPanelClick"
             />
           </v-row>

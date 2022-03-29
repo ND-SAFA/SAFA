@@ -1,10 +1,17 @@
 <template>
-  <v-container>
-    <v-data-table class="elevation-1" :headers="headers" :items="items">
+  <v-container v-if="isTableView">
+    <v-data-table
+      class="elevation-1"
+      :headers="headers"
+      :items="items"
+      :search="searchText"
+      :item-class="getItemBackground"
+    >
       <template v-slot:top>
-        <v-container class="flex">
-          <table-column-editor class="ml-auto"
-        /></v-container>
+        <artifact-table-header
+          @search="searchText = $event"
+          @filter="selectedDeltaTypes = $event"
+        />
       </template>
       <template
         v-for="{ id, dataType, required } in columns"
@@ -69,13 +76,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ColumnDataType, DocumentType } from "@/types";
-import { artifactModule, documentModule } from "@/store";
+import {
+  Artifact,
+  ArtifactDeltaState,
+  ColumnDataType,
+  DocumentType,
+} from "@/types";
+import { ThemeColors } from "@/util";
+import { artifactModule, deltaModule, documentModule } from "@/store";
 import { deleteArtifactFromCurrentVersion } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
-import ArtifactTableChip from "@/components/artifact/table/ArtifactTableChip.vue";
-import TableColumnEditor from "@/components/artifact/table/TableColumnEditor.vue";
-import { ThemeColors } from "@/util";
+import ArtifactTableChip from "./ArtifactTableChip.vue";
+import ArtifactTableHeader from "./ArtifactTableHeader.vue";
+
+type FlatArtifact = Artifact & Record<string, string>;
 
 /**
  * Represents a table of artifacts.
@@ -83,7 +97,7 @@ import { ThemeColors } from "@/util";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
-    TableColumnEditor,
+    ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
     ArtifactCreatorModal,
@@ -92,9 +106,18 @@ export default Vue.extend({
     return {
       selectedArtifact: undefined as Artifact | undefined,
       createDialogueOpen: false as boolean | DocumentType.FMEA,
+      searchText: "",
+      selectedDeltaTypes: [] as ArtifactDeltaState[],
     };
   },
   computed: {
+    inDeltaView(): boolean {
+      return deltaModule.inDeltaView;
+    },
+    isTableView(): boolean {
+      return documentModule.isTableDocument;
+    },
+
     headers() {
       return [
         {
@@ -115,12 +138,25 @@ export default Vue.extend({
     columns() {
       return documentModule.tableColumns;
     },
-    items() {
-      return artifactModule.artifacts.map((artifact) => ({
-        ...artifact,
-        ...artifact.customFields,
-      }));
+    items(): FlatArtifact[] {
+      return artifactModule.artifacts
+        .filter(
+          (item) =>
+            !this.inDeltaView ||
+            this.selectedDeltaTypes.length === 0 ||
+            this.selectedDeltaTypes.includes(
+              deltaModule.getArtifactDeltaType(item.id)
+            )
+        )
+        .map(
+          (artifact) =>
+            ({
+              ...artifact,
+              ...artifact.customFields,
+            } as FlatArtifact)
+        );
     },
+
     artifactCreatorTitle(): string {
       return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
     },
@@ -153,14 +189,28 @@ export default Vue.extend({
     isSelect(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.SELECT;
     },
+
     getArtifactName(id: string): string {
       return artifactModule.getArtifactById(id).name;
     },
     getArrayValue(itemValue?: string): string[] {
       return itemValue?.split("||") || [];
     },
+
+    getItemBackground(item: Artifact): string {
+      const deltaState = deltaModule.getArtifactDeltaType(item.id);
+
+      switch (deltaState) {
+        case ArtifactDeltaState.ADDED:
+          return "artifact-added";
+        case ArtifactDeltaState.MODIFIED:
+          return "artifact-modified";
+        case ArtifactDeltaState.REMOVED:
+          return "artifact-removed";
+        default:
+          return "";
+      }
+    },
   },
 });
 </script>
-
-<style scoped></style>

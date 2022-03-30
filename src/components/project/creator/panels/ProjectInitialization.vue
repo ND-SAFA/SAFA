@@ -36,6 +36,7 @@ import {
   ProjectFilesInput,
   ProjectIdentifierInput,
 } from "@/components/project/shared";
+import { sessionModule } from "@/store";
 
 /**
  * Input fields for editing a project.
@@ -81,7 +82,33 @@ export default Vue.extend({
     },
   },
   methods: {
-    jiraLogin(): void {},
+    async jiraLogin(): Promise<void> {
+      const clientId = "oKrINIDiMwdJTjiBsDVPTq2yhXKE6JpH";
+      const redirect = "http://localhost:8080/create?mode=jira";
+
+      window.open(
+        `https://auth.atlassian.com/authorize?` +
+          `audience=api.atlassian.com&` +
+          `client_id=${clientId}&` +
+          `scope=read&` +
+          `redirect_uri=${redirect}&` +
+          `state=${sessionModule.getToken}&` +
+          `response_type=code&` +
+          `prompt=consent`
+      );
+      // const basicRes = await fetch(
+      //   `https://${clientId}.atlassian.net/rest/api/3/project/search`
+      // );
+      //
+      // console.log(await basicRes.json());
+      //
+      // const cloudId = "xyz";
+      // const authRes = await fetch(
+      //   `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search`
+      // );
+      //
+      // console.log(await authRes.json());
+    },
   },
 });
 </script>

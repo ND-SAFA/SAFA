@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import JiraApi from "jira-client";
 import {
   ProjectFilesInput,
   ProjectIdentifierInput,
@@ -61,7 +60,7 @@ export default Vue.extend({
     },
   },
   data() {
-    return { tab: 0, tabs: ["Basic", "Bulk Upload", "JIRA"] };
+    return { tab: 0, tabs: ["Standard Upload", "Bulk Upload", "JIRA Upload"] };
   },
   computed: {
     currentName: {
@@ -82,18 +81,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    jiraLogin(): void {
-      const jira = new JiraApi({
-        protocol: "https",
-        host: "safa-ai.atlassian.com",
-        username: "tjnewman111@gmail.com",
-        password: "Th1s1satlass1an",
-        apiVersion: "latest",
-        strictSSL: true,
-      });
-
-      jira.getProject("DRON").then((res: any) => console.log(res));
-    },
+    jiraLogin(): void {},
   },
 });
 </script>

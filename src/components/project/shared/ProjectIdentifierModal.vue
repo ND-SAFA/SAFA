@@ -12,11 +12,16 @@
         v-bind:name.sync="name"
         v-bind:description.sync="description"
       />
-      <project-files-input
+      <v-switch
+        style="margin-left: 80px"
         v-if="doShowUpload"
+        v-model="isUploadOpen"
+        label="Upload Flat Files"
+      />
+      <project-files-input
+        v-if="doShowUpload && isUploadOpen"
         v-bind:name.sync="name"
         v-bind:description.sync="description"
-        @update:open="isUploadOpen = $event"
       />
     </template>
     <template v-slot:actions>

@@ -1,16 +1,7 @@
 <template>
   <v-container style="max-width: 30em">
-    <v-switch
-      v-model="doUploadFlatFiles"
-      label="Upload Flat Files"
-      @change:files="onChangeFiles"
-    />
-    <generic-file-selector
-      v-if="doUploadFlatFiles"
-      @change:files="onChangeFiles"
-    />
+    <generic-file-selector @change:files="onChangeFiles" />
     <v-btn
-      v-if="doUploadFlatFiles"
       block
       color="primary"
       :disabled="isDisabled"
@@ -31,9 +22,8 @@ import { logModule } from "@/store";
 /**
  * Togglable input for project files.
  *
- * @emits-1 `update:open` (Boolean) - On toggle open.
- * @emits-2 `update:files` (File[]) - On flat files updated.
- * @emits-3 `close` - On close.
+ * @emits-1 `update:files` (File[]) - On flat files updated.
+ * @emits-2 `close` - On close.
  */
 export default Vue.extend({
   components: {
@@ -52,7 +42,6 @@ export default Vue.extend({
   data() {
     return {
       selectedFiles: [] as File[],
-      doUploadFlatFiles: false,
       isLoading: false,
     };
   },
@@ -92,13 +81,6 @@ export default Vue.extend({
     },
   },
   watch: {
-    doUploadFlatFiles(doUpload: boolean) {
-      if (!doUpload) {
-        this.selectedFiles = [];
-      }
-
-      this.$emit("update:open", doUpload);
-    },
     selectedFiles(files: File[]) {
       this.$emit("update:files", files);
     },

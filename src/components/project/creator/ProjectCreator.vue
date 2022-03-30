@@ -9,11 +9,7 @@
 
     <template v-slot:items>
       <v-stepper-content step="1">
-        <project-identifier-input
-          v-bind:name.sync="name"
-          v-bind:description.sync="description"
-        />
-        <project-files-input
+        <project-initialization
           v-bind:name.sync="name"
           v-bind:description.sync="description"
         />
@@ -62,21 +58,11 @@
       </v-stepper-content>
 
       <v-stepper-content step="4">
-        <v-container>
-          <v-row dense justify="space-between" class="full-width">
-            <v-col>
-              <h1 class="text-h6 text-no-wrap">Project TIM</h1>
-            </v-col>
-            <v-col class="flex-grow-0">
-              <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
-            </v-col>
-          </v-row>
-          <tim-tree
-            :artifact-panels="artifactUploader.panels"
-            :trace-panels="traceUploader.panels"
-            :in-view="currentStep === 4"
-          />
-        </v-container>
+        <tim-tree
+          :artifact-panels="artifactUploader.panels"
+          :trace-panels="traceUploader.panels"
+          :in-view="currentStep === 4"
+        />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -97,22 +83,22 @@ import { createProject } from "@/util";
 import { saveOrUpdateProject, setCreatedProject } from "@/api";
 import { appModule, sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { cyResetTim } from "@/cytoscape";
 import { GenericStepper } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
-import { ProjectFilesInput } from "@/components/project/shared";
 import { TimTree } from "./tim-tree-view";
 import { GenericUploader } from "./validation-panels";
 import { createArtifactUploader, createTraceUploader } from "./uploaders";
-import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
+import {
+  ArtifactTypeCreator,
+  TraceFileCreator,
+  ProjectInitialization,
+} from "./panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
 export default Vue.extend({
   components: {
-    ProjectFilesInput,
+    ProjectInitialization,
     GenericStepper,
-    ProjectIdentifierInput,
     GenericUploader,
     ArtifactTypeCreator,
     TraceFileCreator,
@@ -137,7 +123,6 @@ export default Vue.extend({
     setStepIsValid(stepIndex: number, isValid: boolean): void {
       Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
     },
-
     clearData() {
       this.name = "";
       this.description = "";
@@ -156,10 +141,6 @@ export default Vue.extend({
         .finally(() => {
           appModule.onLoadEnd();
         });
-    },
-
-    async handleResetGraph(): Promise<void> {
-      cyResetTim();
     },
   },
   computed: {

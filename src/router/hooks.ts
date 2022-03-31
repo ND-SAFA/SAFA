@@ -12,7 +12,7 @@ export async function navigateTo(
   route: Routes | string,
   query?: Record<string, string>
 ): Promise<void> {
-  if (router.currentRoute.path === route) {
+  if (router.currentRoute.path === route && !query) {
     return;
   } else {
     await router.push({ path: route, query });

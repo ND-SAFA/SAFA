@@ -1,4 +1,4 @@
-import { logModule, viewportModule } from "@/store";
+import { logModule } from "@/store";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   connectAndSubscribeToVersion,
@@ -44,7 +44,6 @@ export async function uploadNewProjectVersion(
     if (setVersionIfSuccessful) {
       await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });
       await setCreatedProject(res);
-      await viewportModule.setArtifactTreeLayout();
     }
   }
 }

@@ -28,8 +28,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      tab: 0,
-      tabs: ["Standard Upload", "Bulk Upload", "JIRA Upload"],
       name: "",
       description: "",
     };

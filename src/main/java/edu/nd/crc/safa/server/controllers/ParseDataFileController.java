@@ -23,8 +23,8 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 
 import org.apache.commons.csv.CSVParser;
 import org.javatuples.Pair;
@@ -48,12 +48,12 @@ public class ParseDataFileController extends BaseController {
     private final ArtifactFileParser artifactFileParser;
     private final TraceFileParser traceFileParser;
 
-    private final ArtifactRepository artifactRepository;
+    private final ProjectRetriever artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public ParseDataFileController(ResourceBuilder resourceBuilder,
-                                   ArtifactRepository artifactRepository,
+                                   ProjectRetriever artifactRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    ArtifactFileParser artifactFileParser,
                                    TraceFileParser traceFileParser) {

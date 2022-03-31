@@ -17,8 +17,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactFileRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -39,7 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ArtifactFileParser {
 
     private final ArtifactFileRepository artifactFileRepository;
-    private final ArtifactRepository artifactRepository;
+    private final ProjectRetriever artifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final CommitErrorRepository commitErrorRepository;
 
@@ -51,7 +51,7 @@ public class ArtifactFileParser {
 
     @Autowired
     public ArtifactFileParser(ArtifactFileRepository artifactFileRepository,
-                              ArtifactRepository artifactRepository,
+                              ProjectRetriever artifactRepository,
                               ArtifactTypeRepository artifactTypeRepository,
                               EntityVersionService entityVersionService,
                               CommitErrorRepository commitErrorRepository) {

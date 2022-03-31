@@ -1,4 +1,4 @@
-package unit.version;
+package unit.project.version;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

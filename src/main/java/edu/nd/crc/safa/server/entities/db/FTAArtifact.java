@@ -20,7 +20,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "fta_artifact")
-public class FTAArtifact {
+public class FTAArtifact implements IArtifact {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -69,5 +69,9 @@ public class FTAArtifact {
 
     public void setLogicType(FTANodeType logicType) {
         this.logicType = logicType;
+    }
+
+    public String getName() {
+        return this.artifact.getName();
     }
 }

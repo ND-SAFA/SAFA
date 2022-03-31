@@ -1,8 +1,6 @@
 package edu.nd.crc.safa.server.repositories.artifacts;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,8 +22,8 @@ import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.utilities.JSONHelper;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,7 +36,7 @@ public class ArtifactVersionRepositoryImpl
     ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
-    ArtifactRepository artifactRepository;
+    ProjectRetriever artifactRepository;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -57,6 +55,9 @@ public class ArtifactVersionRepositoryImpl
 
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
+
+    @Autowired
+    JSONHelper jsonHelper;
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
@@ -81,7 +82,7 @@ public class ArtifactVersionRepositoryImpl
             artifact,
             artifactAppEntity.summary,
             artifactAppEntity.body,
-            stringify(artifactAppEntity.customFields));
+            jsonHelper.stringify(artifactAppEntity.customFields));
     }
 
     @Override
@@ -132,7 +133,7 @@ public class ArtifactVersionRepositoryImpl
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
                 artifactVersion.getArtifact().getDocumentType(),
-                parse(artifactVersion.getCustomFields()));
+                jsonHelper.parse(artifactVersion.getCustomFields()));
 
         // Step 2 - Attach document links
         attachDocumentLinks(projectVersion, artifactVersion, artifactAppEntity);
@@ -285,30 +286,5 @@ public class ArtifactVersionRepositoryImpl
             .orElseGet(() -> new ArtifactType(project, typeName));
         this.artifactTypeRepository.save(artifactType);
         return artifactType;
-    }
-
-    private String stringify(Map<String, String> table) {
-        List<String> keys = table.keySet()
-            .stream()
-            .sorted()
-            .collect(Collectors.toList());
-        JSONObject json = new JSONObject();
-        for (String key : keys) {
-            json.put(key, table.get(key));
-        }
-        return json.toString();
-    }
-
-    private Hashtable<String, String> parse(String tableContent) {
-        Hashtable<String, String> hashtable = new Hashtable<>();
-        if (tableContent.equals("")) {
-            return hashtable;
-        }
-
-        JSONObject tableJson = new JSONObject(tableContent);
-        for (String key : tableJson.keySet()) {
-            hashtable.put(key, tableJson.getString(key));
-        }
-        return hashtable;
     }
 }

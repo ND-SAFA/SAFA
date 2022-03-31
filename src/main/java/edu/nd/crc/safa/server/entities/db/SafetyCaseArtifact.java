@@ -21,7 +21,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "safety_case_artifact")
-public class SafetyCaseArtifact {
+public class SafetyCaseArtifact implements IArtifact {
 
     @Id
     @GeneratedValue
@@ -57,5 +57,10 @@ public class SafetyCaseArtifact {
 
     public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
         this.safetyCaseType = safetyCaseType;
+    }
+
+    @Override
+    public String getName() {
+        return this.artifact.getName();
     }
 }

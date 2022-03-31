@@ -1,93 +1,61 @@
 package unit.project.artifacts;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import java.util.Hashtable;
+import java.util.Map;
 
-import java.util.List;
-
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.FTANodeType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.FTAArtifact;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.ApplicationBaseTest;
 
 /**
  * Tests that the client is allowed to CRUD Safety Case Artifacts
  */
-public class TestFTAArtifacts extends ApplicationBaseTest {
+public class TestFTAArtifacts extends ArtifactBaseTest<FTAArtifact> {
+
+    FTANodeType ftaNodeType = FTANodeType.AND;
+    String ftaType = ftaNodeType.toString();
 
     @Autowired
     FTAArtifactRepository ftaArtifactRepository;
 
-    /**
-     * Verifies that an artifact can be created and updated through ArtifactController.
-     */
-    @Test
-    public void testCreateAndRetrieveFTAArtifact() throws Exception {
-        String projectName = "test-project";
-        String artifactName = "RE-10";
-        FTANodeType ftaType = FTANodeType.AND;
-        String safetyCaseTypeName = ftaType.toString();
-        String artifactBody = "this is a body";
 
-        // Step - Create project with artifact type
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newType(projectName, safetyCaseTypeName)
-            .newVersionWithReturn(projectName);
-
-        // Step - Create payload for safety cases solution node
-        JSONObject scArtifactJson = jsonBuilder
+    @Override
+    public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {
+        return jsonBuilder
             .withProject(projectName, projectName, "")
-            .withFTAArtifact(projectName, "", artifactName, safetyCaseTypeName, artifactBody, ftaType)
+            .withFTAArtifact(projectName, artifactName, ftaType, artifactBody, ftaNodeType)
             .getArtifact(projectName, artifactName);
+    }
 
-        // Step - Send artifact creation request
-        CommitBuilder commitBuilder = CommitBuilder
-            .withVersion(projectVersion)
-            .withAddedArtifact(scArtifactJson);
-        JSONObject commitResponseJson = commit(commitBuilder);
+    @Override
+    public String getArtifactType() {
+        return ftaType;
+    }
 
-        // VP - Verify that returned information is valid
-        JSONArray artifactsAddedJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
-        assertThat(artifactsAddedJson.length()).isEqualTo(1);
-        JSONObject artifactAdded = artifactsAddedJson.getJSONObject(0);
-        assertThat(artifactAdded.getString("name")).isEqualTo(artifactName);
-        assertThat(artifactAdded.getString("id")).isNotEmpty();
-        assertThat(artifactAdded.getString("documentType")).isEqualTo(DocumentType.FTA.toString());
-        assertThat(artifactAdded.get("logicType")).isEqualTo(ftaType.toString());
+    @Override
+    public DocumentType getDocumentType() {
+        return DocumentType.FTA;
+    }
 
-        // VP - Verify that safety case was created
-        List<FTAArtifact> ftaArtifacts = ftaArtifactRepository.findByArtifactProject(projectVersion.getProject());
-        assertThat(ftaArtifacts.size()).isEqualTo(1);
+    @Override
+    public Map<String, Object> getJsonExpectedProperties() {
+        Hashtable<String, Object> expectedProperties = new Hashtable<>();
+        expectedProperties.put("logicType", ftaNodeType);
+        return expectedProperties;
+    }
 
-        // VP - Verify that information is persisted
-        FTAArtifact ftaArtifact = ftaArtifacts.get(0);
-        assertThat(ftaArtifact.getLogicType()).isEqualTo(ftaType);
-        assertThat(ftaArtifact.getArtifact().getName()).isEqualTo(artifactName);
+    @Override
+    public IProjectEntityRetriever<FTAArtifact> getArtifactRepository() {
+        return ftaArtifactRepository;
+    }
 
-        // VP - Verify that retrieving project returns artifact
-        List<ArtifactAppEntity> artifacts = appEntityRetrievalService.retrieveArtifactsInProjectVersion(projectVersion);
-        assertThat(artifacts.size()).isEqualTo(1);
-        ArtifactAppEntity artifact = artifacts.get(0);
-        assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.FTA);
-        assertThat(artifact.getLogicType()).isEqualTo(ftaType);
-
-        // Step - Delete artifact
-        CommitBuilder deleteCommitBuilder =
-            CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactAdded);
-        commit(deleteCommitBuilder);
-
-        // Step - Recreate artifact
-        CommitBuilder createCommitBuilder =
-            CommitBuilder.withVersion(projectVersion).withAddedArtifact(artifactAdded);
-        commit(createCommitBuilder);
+    @Override
+    public Class getArtifactClass() {
+        return FTAArtifact.class;
     }
 }

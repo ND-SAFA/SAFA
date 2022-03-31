@@ -3,6 +3,7 @@ package edu.nd.crc.safa.builders;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.app.FTANodeType;
@@ -90,6 +91,15 @@ public class JsonBuilder extends BaseBuilder {
                                     String name,
                                     String type,
                                     String body) {
+        return withArtifact(projectName, artifactId, name, type, body, new Hashtable<>());
+    }
+
+    public JsonBuilder withArtifact(String projectName,
+                                    String artifactId,
+                                    String name,
+                                    String type,
+                                    String body,
+                                    Map<String, String> customFields) {
         JSONObject project = this.projects.get(projectName);
         JSONObject artifact = new JSONObject();
         if (artifact != null) { // TODO: don't let this in production
@@ -102,19 +112,19 @@ public class JsonBuilder extends BaseBuilder {
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
         artifact.put("documentType", DocumentType.ARTIFACT_TREE.toString());
+        artifact.put("customFields", customFields);
         project.getJSONArray("artifacts").put(artifact);
         return this;
     }
 
     public JsonBuilder withSafetyCaseArtifact(String projectName,
-                                              String artifactId,
                                               String artifactName,
                                               String artifactType,
                                               String body,
                                               SafetyCaseType safetyCaseType
     ) {
 
-        this.withArtifact(projectName, artifactId, artifactName, artifactType, body);
+        this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("safetyCaseType", safetyCaseType.toString());
         artifact.put("documentType", DocumentType.SAFETY_CASE.toString());
@@ -122,17 +132,30 @@ public class JsonBuilder extends BaseBuilder {
     }
 
     public JsonBuilder withFTAArtifact(String projectName,
-                                       String artifactId,
                                        String artifactName,
                                        String artifactType,
                                        String body,
                                        FTANodeType ftaNodeType
     ) {
 
-        this.withArtifact(projectName, artifactId, artifactName, artifactType, body);
+        this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("logicType", ftaNodeType.toString());
         artifact.put("documentType", DocumentType.FTA.toString());
+        return this;
+    }
+
+    public JsonBuilder withFMEAArtifact(String projectName,
+                                        String artifactName,
+                                        String artifactType,
+                                        String body,
+                                        JSONObject customFields
+    ) {
+
+        this.withArtifact(projectName, "", artifactName, artifactType, body);
+        JSONObject artifact = this.getArtifact(projectName, artifactName);
+        artifact.put("customFields", customFields);
+        artifact.put("documentType", DocumentType.FMEA.toString());
         return this;
     }
 

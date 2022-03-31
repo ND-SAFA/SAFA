@@ -33,7 +33,7 @@ import org.json.JSONObject;
                 "name"
             }, name = AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT)
     })
-public class Artifact implements Serializable, IBaseEntity {
+public class Artifact implements Serializable, IBaseEntity, IArtifact {
 
     @Id
     @GeneratedValue

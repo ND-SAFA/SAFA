@@ -19,9 +19,9 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
@@ -47,7 +47,7 @@ public class DbEntityBuilder extends BaseBuilder {
     private final DocumentRepository documentRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
-    private final ArtifactRepository artifactRepository;
+    private final ProjectRetriever artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
@@ -71,7 +71,7 @@ public class DbEntityBuilder extends BaseBuilder {
                            DocumentRepository documentRepository,
                            DocumentArtifactRepository documentArtifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
-                           ArtifactRepository artifactRepository,
+                           ProjectRetriever artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkVersionRepository traceLinkVersionRepository) {
@@ -128,6 +128,12 @@ public class DbEntityBuilder extends BaseBuilder {
         return this;
     }
 
+    public boolean hasDocument(String projectName,
+                               String documentName) {
+        assertProjectExists(this.documents, projectName);
+        return this.documents.get(projectName).containsKey(documentName);
+    }
+
     public DbEntityBuilder newDocument(String projectName,
                                        String docName,
                                        String docDescription,
@@ -178,6 +184,11 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactTypeRepository.save(artifactType);
         addEntry(this.artifactTypes, projectName, typeName, artifactType);
         return this;
+    }
+
+    public boolean hasType(String projectName, String typeName) {
+        assertProjectExists(this.artifactTypes, projectName);
+        return this.artifactTypes.get(projectName).containsKey(typeName);
     }
 
     public Artifact newArtifactWithReturn(String projectName, String typeName, String artifactName) {

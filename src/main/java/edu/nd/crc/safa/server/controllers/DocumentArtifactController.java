@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
@@ -35,13 +35,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentArtifactController extends BaseController {
 
     private final DocumentRepository documentRepository;
-    private final ArtifactRepository artifactRepository;
+    private final ProjectRetriever artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
 
     @Autowired
     public DocumentArtifactController(DocumentRepository documentRepository,
-                                      ArtifactRepository artifactRepository,
+                                      ProjectRetriever artifactRepository,
                                       DocumentArtifactRepository documentArtifactRepository,
                                       NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {

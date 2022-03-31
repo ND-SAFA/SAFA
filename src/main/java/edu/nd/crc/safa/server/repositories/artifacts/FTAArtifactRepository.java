@@ -12,9 +12,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FTAArtifactRepository extends CrudRepository<FTAArtifact, UUID> {
+public interface FTAArtifactRepository extends CrudRepository<FTAArtifact, UUID>, IProjectEntityRetriever<FTAArtifact> {
 
     Optional<FTAArtifact> findByArtifact(Artifact artifact);
 
     List<FTAArtifact> findByArtifactProject(Project project);
+
+    default List<FTAArtifact> getByProject(Project project) {
+        return this.findByArtifactProject(project);
+    }
 }

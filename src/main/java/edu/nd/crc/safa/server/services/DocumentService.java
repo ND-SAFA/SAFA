@@ -16,7 +16,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.server.entities.db.DocumentColumn;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 
@@ -29,12 +29,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class DocumentService {
 
-    private final ArtifactRepository artifactRepository;
+    private final ProjectRetriever artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
     NotificationService notificationService;
 
-    public DocumentService(ArtifactRepository artifactRepository,
+    public DocumentService(ProjectRetriever artifactRepository,
                            DocumentArtifactRepository documentArtifactRepository,
                            DocumentColumnRepository documentColumnRepository,
                            NotificationService notificationService) {

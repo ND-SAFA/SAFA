@@ -160,6 +160,15 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         }
     }
 
+    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
+        String route =
+            RouteBuilder
+                .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
+                .withVersion(projectVersion)
+                .get();
+        return sendPost(route, docJson, status().isCreated());
+    }
+
     private void assertArraysMatch(JSONArray expected, JSONArray actual) {
         assertThat(actual.length()).isEqualTo(expected.length());
         for (int i = 0; i < expected.length(); i++) {

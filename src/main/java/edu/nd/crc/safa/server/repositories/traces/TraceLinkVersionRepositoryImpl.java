@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.services.TraceMatrixService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class TraceLinkVersionRepositoryImpl
     @Autowired
     TraceLinkRepository traceLinkRepository;
     @Autowired
-    ArtifactRepository artifactRepository;
+    ProjectRetriever artifactRepository;
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
     @Autowired

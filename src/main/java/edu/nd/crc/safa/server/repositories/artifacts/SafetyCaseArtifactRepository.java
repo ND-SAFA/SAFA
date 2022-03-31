@@ -12,9 +12,14 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SafetyCaseArtifactRepository extends CrudRepository<SafetyCaseArtifact, UUID> {
+public interface SafetyCaseArtifactRepository extends
+    CrudRepository<SafetyCaseArtifact, UUID>, IProjectEntityRetriever<SafetyCaseArtifact> {
 
     List<SafetyCaseArtifact> findByArtifactProject(Project project);
 
     Optional<SafetyCaseArtifact> findByArtifact(Artifact artifact);
+
+    default List<SafetyCaseArtifact> getByProject(Project project) {
+        return this.findByArtifactProject(project);
+    }
 }

@@ -12,7 +12,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArtifactRepository extends CrudRepository<Artifact, UUID> {
+public interface ProjectRetriever extends CrudRepository<Artifact, UUID>, IProjectEntityRetriever<Artifact> {
 
     Optional<Artifact> findByProjectAndName(Project project, String name);
 

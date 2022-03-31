@@ -3,7 +3,7 @@
     :is-open="isOpen"
     :title="title"
     size="m"
-    :actions-height="50"
+    :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
     @close="onClose"
   >
@@ -24,7 +24,7 @@
         v-bind:description.sync="description"
       />
     </template>
-    <template v-slot:actions>
+    <template v-slot:actions v-if="!isUploadOpen">
       <v-btn
         @click="onSave"
         color="primary"

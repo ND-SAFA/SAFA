@@ -220,7 +220,9 @@ public class ArtifactVersionRepositoryImpl
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
                                            Artifact artifact,
                                            List<String> incomingDocumentIds) {
-        List<String> persistedDocumentIds = documentArtifactRepository.findByProjectVersionAndArtifact(projectVersion, artifact)
+        List<String> persistedDocumentIds = documentArtifactRepository
+            //TODO: Implement document versioning
+            .findByProjectVersionProjectAndArtifact(projectVersion.getProject(), artifact)
             .stream()
             .map(da -> da.getDocument().getDocumentId().toString())
             .collect(Collectors.toList());

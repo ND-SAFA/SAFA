@@ -13,10 +13,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import unit.ApplicationBaseTest;
 
 /**
@@ -64,14 +62,6 @@ public class DocumentBaseTest extends ApplicationBaseTest {
         assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
 
-    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
-        String route =
-            RouteBuilder
-                .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
-                .withVersion(projectVersion)
-                .get();
-        return sendPost(route, docJson, status().isCreated());
-    }
 
     protected JSONArray getProjectDocuments(Project project) throws Exception {
         String route = RouteBuilder

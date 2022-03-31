@@ -35,6 +35,9 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
     String artifactName = "RE-10";
     String artifactBody = "this is a body";
     String newArtifactBody = "this is a new body";
+    String documentName = "document-name";
+    String documentDescription = "document-description";
+    String documentId;
 
     public abstract JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody);
 
@@ -82,15 +85,24 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
      * @throws Exception Throws exception is error occurs while committing artifact.
      */
     protected Pair<JSONObject, T> testCreation(ProjectVersion projectVersion) throws Exception {
-        // Step - Create project with artifact type
+        // Step - Create artifact type
         if (!this.dbEntityBuilder.hasType(projectName, this.getArtifactType())) {
             dbEntityBuilder.newType(projectName, this.getArtifactType());
         }
 
+        // Step - Create document if not exists
+        if (documentId == null) {
+            documentId = createDocument(projectVersion);
+        }
+
+        // Step - Create artifact json
+        JSONObject artifactJson = this.getArtifactJson(projectName, artifactName, artifactBody);
+        artifactJson.put("documentIds", List.of(documentId));
+
         // Step - Send artifact creation request
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersion)
-            .withAddedArtifact(this.getArtifactJson(projectName, artifactName, artifactBody));
+            .withAddedArtifact(artifactJson);
         JSONObject commitResponseJson = commit(commitBuilder);
 
         // VP - Verify single artifact returned in response
@@ -115,7 +127,6 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
         T projectArtifact = projectArtifacts.get(0);
         assertThat(projectArtifact.getName()).isEqualTo(artifactName);
         for (Map.Entry<String, Object> entry : this.getEntityExpectedProperties().entrySet()) {
-            System.out.println(entry.getKey());
             Object value = this.getField(projectArtifact, entry.getKey());
             assertThat(value).isEqualTo(entry.getValue());
         }
@@ -171,5 +182,24 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
         Field field = tmp.getDeclaredField(strKey);
         field.setAccessible(true);
         return field.get(o);
+    }
+
+    private String createDocument(ProjectVersion projectVersion) throws Exception {
+        // Step - Create new document payload
+        JSONObject requestedDocumentJson = this.createDocumentJson();
+
+        // Step - Send creation request.
+        JSONObject documentJson = createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
+        return documentJson.getString("documentId");
+    }
+
+    protected JSONObject createDocumentJson() {
+        DocumentType documentType = this.getDocumentType();
+        switch (documentType) {
+            case SAFETY_CASE:
+                return jsonBuilder.createFMEADocument(documentName, documentDescription);
+            default:
+                return jsonBuilder.createDocument(documentName, documentDescription, documentType);
+        }
     }
 }

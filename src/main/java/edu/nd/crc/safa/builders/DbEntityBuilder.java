@@ -128,6 +128,12 @@ public class DbEntityBuilder extends BaseBuilder {
         return this;
     }
 
+    public boolean hasDocument(String projectName,
+                               String documentName) {
+        assertProjectExists(this.documents, projectName);
+        return this.documents.get(projectName).containsKey(documentName);
+    }
+
     public DbEntityBuilder newDocument(String projectName,
                                        String docName,
                                        String docDescription,

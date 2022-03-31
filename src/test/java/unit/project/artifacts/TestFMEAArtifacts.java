@@ -1,8 +1,10 @@
 package unit.project.artifacts;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;
@@ -66,5 +68,14 @@ public class TestFMEAArtifacts extends ArtifactBaseTest<Artifact> {
     @Override
     public Class getArtifactClass() {
         return Artifact.class;
+    }
+
+    @Override
+    protected JSONObject createDocumentJson() {
+        JSONObject documentJson = super.createDocumentJson();
+        JSONObject columnsJson = this.jsonBuilder.createDocumentColumn("", documentName,
+            DocumentColumnDataType.SELECT);
+        documentJson.put("columns", List.of(columnsJson));
+        return documentJson;
     }
 }

@@ -14,6 +14,14 @@ export enum Routes {
   PROJECT_SETTINGS = "/project/settings",
 }
 
+/**
+ * Enumerates query parameters used in the app.
+ */
+export enum QueryParams {
+  TAB = "tab",
+  VERSION = "version",
+}
+
 export const routesWithRequiredProject: string[] = [
   Routes.TRACE_LINK,
   Routes.PROJECT_SETTINGS,

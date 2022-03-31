@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { navigateTo, router, Routes } from "@/router";
+import { getParam, QueryParams, router, updateParam } from "@/router";
 import { JiraUpload, ProjectBulkUpload } from "./panels";
 import ProjectCreatorStepper from "./ProjectCreatorStepper.vue";
 
@@ -41,19 +41,20 @@ export default Vue.extend({
     };
   },
   mounted() {
-    const { query } = router.currentRoute;
+    const tabId = getParam(QueryParams.TAB);
+    const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
 
-    if (query.tab) {
-      this.tab = this.tabs.findIndex(({ id }) => id === query.tab);
+    if (tabId && tabIndex !== -1) {
+      this.tab = tabIndex;
     }
   },
   watch: {
     tab(index: number) {
-      const tabId = this.tabs[index].id;
-      const { query } = router.currentRoute;
+      const currentTabId = this.tabs[index].id;
+      const routeTabId = getParam(QueryParams.TAB);
 
-      if (query.tab !== tabId) {
-        navigateTo(Routes.PROJECT_CREATOR, { tab: tabId });
+      if (currentTabId !== routeTabId) {
+        updateParam(QueryParams.TAB, currentTabId);
       }
     },
   },

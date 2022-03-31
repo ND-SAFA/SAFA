@@ -1,4 +1,4 @@
-import { Routes } from "@/router/routes";
+import { QueryParams, Routes } from "@/router/routes";
 import router from "@/router/router";
 
 /**
@@ -16,5 +16,26 @@ export async function navigateTo(
     return;
   } else {
     await router.push({ path: route, query });
+  }
+}
+
+/**
+ * Return the app's query parameters.
+ *
+ * @param key - The query param key.
+ */
+export function getParam(key: QueryParams): string | (string | null)[] {
+  return router.currentRoute.query[key];
+}
+
+/**
+ * Changes the app's query parameters.
+ *
+ * @param key - The query param key.
+ * @param value - The query param value.
+ */
+export async function updateParam(key: string, value: string): Promise<void> {
+  if (router.currentRoute.query[key] !== value) {
+    return navigateTo(router.currentRoute.path, { [key]: value });
   }
 }

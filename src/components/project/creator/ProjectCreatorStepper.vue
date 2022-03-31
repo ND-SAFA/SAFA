@@ -127,7 +127,7 @@ export default Vue.extend({
       this.artifactUploader = createArtifactUploader();
       this.traceUploader = createTraceUploader();
     },
-    saveProject: function (): void {
+    saveProject(): void {
       appModule.onLoadStart();
       saveOrUpdateProject(this.project)
         .then(async (res) => {

@@ -9,7 +9,7 @@ import {
   ForgotPasswordView,
   LoginView,
   ProjectCreatorView,
-  ProjectSettings,
+  ProjectSettingsView,
   ResetPasswordView,
 } from "@/views";
 import { routerChecks } from "@/router/checks";
@@ -64,7 +64,7 @@ const routes: Array<RouteConfig> = [
   {
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
-    component: ProjectSettings,
+    component: ProjectSettingsView,
   },
   {
     path: Routes.ERROR,

@@ -48,7 +48,7 @@ import {
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
-import { loadVersionIfExistsHandler } from "@/api";
+import { clearProject, loadVersionIfExistsHandler } from "@/api";
 import {
   BaselineVersionModal,
   ButtonRow,
@@ -86,6 +86,10 @@ export default Vue.extend({
     onOpenProject(): void {
       this.openProjectOpen = true;
     },
+    async onCreateProject(): Promise<void> {
+      await clearProject();
+      await navigateTo(Routes.PROJECT_CREATOR);
+    },
     onUploadVersion(): void {
       this.uploadVersionOpen = true;
     },
@@ -97,7 +101,6 @@ export default Vue.extend({
       }
     },
     onCreateVersion(): void {
-      console.log(projectModule.projectId);
       if (projectModule.projectId) {
         this.createVersionOpen = true;
       } else {
@@ -117,7 +120,7 @@ export default Vue.extend({
     projectMenuItems(): CondensedMenuItem[] {
       const options: CondensedMenuItem[] = [
         ["Open", this.onOpenProject],
-        ["Create", () => navigateTo(Routes.PROJECT_CREATOR)],
+        ["Create", this.onCreateProject],
         ["Settings", () => navigateTo(Routes.PROJECT_SETTINGS)],
       ];
       return projectModule.projectId ? options : options.slice(0, -1);

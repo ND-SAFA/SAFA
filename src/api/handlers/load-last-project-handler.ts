@@ -10,11 +10,14 @@ import {
  * Loads the last stored project.
  */
 export async function loadLastProject(): Promise<void> {
-  const projects = await getProjects();
   let versionId = String(getParam(QueryParams.VERSION));
 
-  if (!versionId && projects.length > 0) {
-    versionId = (await getCurrentVersion(projects[0].projectId)).versionId;
+  if (!versionId) {
+    const projects = await getProjects();
+
+    if (projects.length > 0) {
+      versionId = (await getCurrentVersion(projects[0].projectId)).versionId;
+    }
   }
 
   if (versionId) {

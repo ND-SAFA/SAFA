@@ -1,4 +1,4 @@
-import { logModule } from "@/store";
+import { appModule, logModule } from "@/store";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   connectAndSubscribeToVersion,
@@ -35,15 +35,27 @@ export async function uploadNewProjectVersion(
       );
     }
 
-    const res = await updateProjectThroughFlatFiles(versionId, formData);
+    const uploadFlatFiles = async () => {
+      const res = await updateProjectThroughFlatFiles(versionId, formData);
 
-    logModule.onSuccess(
-      `Flat files were uploaded successfully and ${res.project.name} was updated.`
-    );
+      logModule.onSuccess(
+        `Flat files were uploaded successfully and ${res.project.name} was updated.`
+      );
+
+      return res;
+    };
 
     if (setVersionIfSuccessful) {
-      await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });
+      appModule.onLoadStart();
+      connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
+        logModule.onError(e.message)
+      );
+      await navigateTo(Routes.ARTIFACT);
+      const res = await uploadFlatFiles();
       await setCreatedProject(res);
+      appModule.onLoadEnd();
+    } else {
+      await uploadFlatFiles();
     }
   }
 }

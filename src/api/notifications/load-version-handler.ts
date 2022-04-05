@@ -1,5 +1,5 @@
 import { appModule, errorModule, projectModule, viewportModule } from "@/store";
-import { navigateTo, QueryParams, Routes } from "@/router";
+import { navigateTo, Routes } from "@/router";
 import {
   getArtifactsInVersion,
   getProjectVersion,
@@ -20,7 +20,7 @@ export async function loadVersionIfExistsHandler(
   if (lastVersionId) {
     appModule.onLoadStart();
 
-    return navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: lastVersionId })
+    return navigateTo(Routes.ARTIFACT)
       .then(() => getProjectVersion(lastVersionId))
       .then(setCreatedProject)
       .finally(appModule.onLoadEnd);

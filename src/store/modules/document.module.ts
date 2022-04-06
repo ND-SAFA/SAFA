@@ -1,7 +1,8 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { Project, ProjectDocument } from "@/types";
-import { createDocument } from "@/util";
+import type { DocumentColumn, Project, ProjectDocument } from "@/types";
+import { ColumnDataType, DocumentType } from "@/types";
+import { createDocument, isTableDocument } from "@/util";
 import { appModule, artifactModule, traceModule } from "@/store";
 import { resetGraphFocus } from "@/api";
 
@@ -35,10 +36,10 @@ export default class DocumentModule extends VuexModule {
       documents = [],
     } = project;
 
-    const defaultDocument = createDocument(
+    const defaultDocument = createDocument({
       project,
-      artifacts.map(({ id }) => id)
-    );
+      artifactIds: artifacts.map(({ id }) => id),
+    });
 
     const loadedDocument = documents.find(
       ({ documentId }) => documentId === currentDocumentId
@@ -62,20 +63,28 @@ export default class DocumentModule extends VuexModule {
 
   @Action
   /**
-   * Reloads the artifact ids for all existing documents.
+   * Updates documents in store matching the documentIds of those given.
    *
    * @param updatedDocuments - The updated documents.
    */
   async updateDocuments(updatedDocuments: ProjectDocument[]): Promise<void> {
-    this.allDocuments.forEach((storedDocument) => {
-      const updatedDocument = updatedDocuments.find(
-        ({ documentId }) => documentId === storedDocument.documentId
-      );
+    const updatedDocumentIds: string[] = updatedDocuments.map(
+      (d) => d.documentId
+    );
+    const newDocuments = [
+      ...this.allDocuments.filter(
+        ({ documentId }) => !updatedDocumentIds.includes(documentId)
+      ),
+      ...updatedDocuments,
+    ];
+    this.SET_ALL_DOCUMENTS(newDocuments);
 
-      if (!updatedDocument) return;
-
-      storedDocument.artifactIds = updatedDocument.artifactIds;
-    });
+    if (updatedDocumentIds.includes(this.currentDocument.documentId)) {
+      const updatedCurrentDocument: ProjectDocument = updatedDocuments.filter(
+        ({ documentId }) => documentId === this.currentDocument.documentId
+      )[0];
+      this.SET_CURRENT_DOCUMENT(updatedCurrentDocument);
+    }
   }
 
   @Action
@@ -160,6 +169,13 @@ export default class DocumentModule extends VuexModule {
   }
 
   /**
+   * @return The current document.
+   */
+  get type(): DocumentType {
+    return this.currentDocument.type;
+  }
+
+  /**
    * @return The default document.
    */
   get defaultDocument(): ProjectDocument {
@@ -172,6 +188,29 @@ export default class DocumentModule extends VuexModule {
   get doesDocumentExist(): (name: string) => boolean {
     return (newName) => {
       return !!this.projectDocuments.find(({ name }) => name === newName);
+    };
+  }
+
+  /**
+   * Returns whether the current document type is for rendering a table.
+   */
+  get isTableDocument(): boolean {
+    return isTableDocument(this.currentDocument.type);
+  }
+
+  /**
+   * Returns the column definitions for a table document.
+   */
+  get tableColumns(): DocumentColumn[] {
+    return (this.isTableDocument && this.currentDocument.columns) || [];
+  }
+
+  /**
+   * Returns whether the given column name already exists.
+   */
+  get doesColumnExist(): (name: string) => boolean {
+    return (newName) => {
+      return !!this.tableColumns.find(({ name }) => name === newName);
     };
   }
 }

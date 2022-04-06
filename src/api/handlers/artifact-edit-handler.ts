@@ -11,7 +11,6 @@ import {
   deleteArtifactBody,
   updateArtifact,
 } from "@/api/commits";
-import { getTraceId } from "@/util";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -43,7 +42,7 @@ export async function createOrUpdateArtifactHandler(
 
     for (const createdArtifact of createdArtifacts) {
       await createLink({
-        traceLinkId: getTraceId(createdArtifact.id, parentArtifact.id),
+        traceLinkId: "",
         sourceName: createdArtifact.name,
         sourceId: createdArtifact.id,
         targetName: parentArtifact.name,
@@ -77,7 +76,10 @@ export function deleteArtifactFromCurrentVersion(
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
           deleteArtifactBody(artifact)
-            .then(() => projectModule.deleteArtifacts([artifact]))
+            .then(async () => {
+              await projectModule.deleteArtifacts([artifact]);
+              await artifactSelectionModule.UNSELECT_ARTIFACT();
+            })
             .then(resolve)
             .catch(reject);
         }

@@ -15,7 +15,7 @@ export const safetyCaseMenuOption: MenuItem = {
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
-      return documentModule.document.type === DocumentType.SAFETY_CASE;
+      return documentModule.type === DocumentType.SAFETY_CASE;
     }
     return false;
   },

@@ -47,7 +47,7 @@ export async function uploadNewProjectVersion(
           `Flat files were uploaded successfully and ${res.project.name} was updated.`
         );
         if (setVersionIfSuccessful) {
-          await navigateTo(Routes.ARTIFACT_TREE);
+          await navigateTo(Routes.ARTIFACT);
           await setCreatedProject(res);
           await viewportModule.setArtifactTreeLayout();
         }

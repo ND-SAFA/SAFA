@@ -1,15 +1,20 @@
 import {
+  Artifact,
   ArtifactType,
+  ColumnDataType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
+  DocumentColumn,
   DocumentType,
+  FTANodeType,
   MessageType,
   Project,
   ProjectDelta,
   ProjectDocument,
   ProjectIdentifier,
   ProjectVersion,
+  SafetyCaseType,
   SessionModel,
   SnackbarMessage,
 } from "@/types";
@@ -84,6 +89,36 @@ export function createProjectDelta(): ProjectDelta {
 }
 
 /**
+ * @return An artifact initialized to the given props.
+ */
+export function createArtifact(artifact?: Partial<Artifact>): Artifact {
+  return {
+    id: artifact?.id || "",
+    name: artifact?.name || "",
+    summary: artifact?.summary || "",
+    body: artifact?.body || "",
+    type: artifact?.type || "",
+    documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
+    documentIds: artifact?.documentIds || [],
+    safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
+    logicType: artifact?.logicType || FTANodeType.AND,
+    customFields: artifact?.customFields || {},
+  };
+}
+
+/**
+ * @return An column initialized to the given props.
+ */
+export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {
+  return {
+    id: column?.id || "",
+    name: column?.name || "",
+    dataType: column?.dataType || ColumnDataType.FREE_TEXT,
+    required: column?.required || false,
+  };
+}
+
+/**
  * @returns An empty commit.
  */
 export function createCommit(version: ProjectVersion): Commit {
@@ -114,32 +149,23 @@ export function createDefaultTypeIcons(
 }
 
 /**
- * Creates a document.
- *
- * @param project - The associated project.
- * @param artifactIds - The artifact ids visible in this document.
- * @param name - The document name.
- * @param type - The document type.
- * @return An empty document.
+ * @return An document initialized to the given props.
  */
 export function createDocument(
-  project: ProjectIdentifier = {
-    projectId: "",
-    name: "",
-    description: "",
-    owner: "",
-    members: [],
-  },
-  artifactIds: string[] = [],
-  name = "Default",
-  type = DocumentType.ARTIFACT_TREE
+  document?: Partial<ProjectDocument>
 ): ProjectDocument {
   return {
-    documentId: "",
-    project,
-    name,
-    type,
-    artifactIds,
-    description: "",
+    documentId: document?.documentId || "",
+    project: document?.project || {
+      projectId: "",
+      name: "",
+      description: "",
+      owner: "",
+      members: [],
+    },
+    name: document?.name || "Default",
+    type: document?.type || DocumentType.ARTIFACT_TREE,
+    artifactIds: document?.artifactIds || [],
+    description: document?.description || "",
   };
 }

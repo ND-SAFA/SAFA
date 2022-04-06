@@ -18,6 +18,8 @@ import {
   cyCreateLayout,
   cyCenterOnArtifacts,
   cyApplyAutomove,
+  cyCenterNodes,
+  cyResetTim,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -99,8 +101,13 @@ export default class ViewportModule extends VuexModule {
 
     this.SET_LAYOUT(layoutPayload.layout);
     cyCreateLayout(layoutPayload);
+    this.applyAutomove();
 
-    setTimeout(appModule.onLoadEnd, 200);
+    setTimeout(() => {
+      appModule.onLoadEnd();
+      cyCenterNodes();
+      cyResetTim();
+    }, 200);
   }
 
   @Action

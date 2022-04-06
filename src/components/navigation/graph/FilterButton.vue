@@ -14,9 +14,7 @@
 </template>
 
 <script lang="ts">
-import { projectModule, typeOptionsModule } from "@/store";
-import { Artifact } from "@/types";
-import { Project } from "@/types";
+import { typeOptionsModule } from "@/store";
 import Vue from "vue";
 
 export default Vue.extend({

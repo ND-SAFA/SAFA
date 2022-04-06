@@ -45,6 +45,7 @@ export default class TraceModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Updates the current trace links in the project, preserving any that already existed.
    *
    * @param traceLinks - The trace links to set.
@@ -62,6 +63,7 @@ export default class TraceModule extends VuexModule {
 
   @Action
   /**
+   * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Deletes the given trace link.
    *
    * @param traceLink - The trace link to remove.

@@ -53,9 +53,9 @@ import {
   BaselineVersionModal,
   ButtonRow,
   UploadNewVersionModal,
+  SafaIcon,
 } from "@/components/common";
 import { VersionCreator } from "@/components/project";
-import SafaIcon from "./SafaIcon.vue";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
 
@@ -130,7 +130,7 @@ export default Vue.extend({
           menuHandlers: this.projectMenuItems.map((i) => i[1]),
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
@@ -146,7 +146,7 @@ export default Vue.extend({
           ],
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT_TREE),
+          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,

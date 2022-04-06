@@ -146,15 +146,15 @@ export default Vue.extend({
     },
 
     saveProject: function (): void {
-      appModule.SET_IS_LOADING(true);
+      appModule.onLoadStart();
       saveOrUpdateProject(this.project)
         .then(async (res) => {
-          await navigateTo(Routes.ARTIFACT_TREE);
+          this.clearData();
+          await navigateTo(Routes.ARTIFACT);
           await setCreatedProject(res);
         })
-        .then(() => this.clearData())
         .finally(() => {
-          appModule.SET_IS_LOADING(false);
+          appModule.onLoadEnd();
         });
     },
     onConfirmClose(): void {

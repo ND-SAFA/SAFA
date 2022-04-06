@@ -24,8 +24,10 @@ const scopes = [
   .join("%20");
 
 /**
- * Runs a fetch call to the atlassian API.
+ * Runs a fetch call to the Atlassian API.
+ *
  * @param args - The fetch parameters to use.
+ * @return THe returned data.
  */
 async function fetchAtlassian<T>(
   ...args: Parameters<typeof fetch>

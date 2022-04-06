@@ -35,3 +35,4 @@ pnpm-debug.log*
 dir_to_ignore/node_modules
 tests_output
 *.log
+*.png

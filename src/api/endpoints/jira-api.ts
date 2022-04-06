@@ -7,7 +7,9 @@ import {
 import { sessionModule } from "@/store";
 
 const scopes = [
+  // Current Jira API version:
   "read:jira-work",
+  // Upcoming Jira API version:
   // "read:issue-type:jira",
   // "read:project:jira",
   // "read:project.property:jira",

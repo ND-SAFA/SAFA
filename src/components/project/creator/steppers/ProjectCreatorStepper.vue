@@ -85,10 +85,10 @@ import { appModule, sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { TimTree } from "./tim-tree-view";
-import { GenericUploader } from "./validation-panels";
-import { createArtifactUploader, createTraceUploader } from "./uploaders";
-import { ArtifactTypeCreator, TraceFileCreator } from "./panels";
+import { TimTree } from "../tim-tree-view";
+import { GenericUploader } from "../validation-panels";
+import { createArtifactUploader, createTraceUploader } from "../uploaders";
+import { ArtifactTypeCreator, TraceFileCreator } from "../panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -109,9 +109,11 @@ export default Vue.extend({
         ["Upload Trace Links", true],
         ["View TIM", true],
       ] as StepState[],
+      currentStep: 1,
+
       name: "",
       description: "",
-      currentStep: 1,
+
       artifactUploader: createArtifactUploader(),
       traceUploader: createTraceUploader(),
     };

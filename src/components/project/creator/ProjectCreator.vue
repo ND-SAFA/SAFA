@@ -13,7 +13,7 @@
         <project-bulk-upload />
       </v-tab-item>
       <v-tab-item key="3">
-        <jira-upload />
+        <jira-creator-stepper />
       </v-tab-item>
     </v-tabs-items>
   </v-container>
@@ -22,14 +22,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { getParam, QueryParams, updateParam } from "@/router";
-import { JiraUpload, ProjectBulkUpload } from "./panels";
-import ProjectCreatorStepper from "./ProjectCreatorStepper.vue";
+import { ProjectCreatorStepper, JiraCreatorStepper } from "./steppers";
+import { ProjectBulkUpload } from "./panels";
 
 /**
  * Allows for creating a project.
  */
 export default Vue.extend({
-  components: { ProjectCreatorStepper, ProjectBulkUpload, JiraUpload },
+  components: { ProjectCreatorStepper, ProjectBulkUpload, JiraCreatorStepper },
   data() {
     return {
       tab: 0,

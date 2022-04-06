@@ -81,7 +81,7 @@ export async function getJiraToken(accessCode: string): Promise<string> {
 }
 
 /**
- * Exchanges an atlassian access code for a API token.
+ * Exchanges an atlassian access code the list of cloud sites associated with the given user.
  *
  * @param accessToken - The access token received from authorizing jira.
  * @return The jira sites for this user.

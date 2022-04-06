@@ -1,26 +1,27 @@
+import {
+  JiraAccessToken,
+  JiraCloudSite,
+  JiraProject,
+  JiraProjectList,
+} from "@/types";
 import { sessionModule } from "@/store";
 
-/**
- * Represents the access code returned from authorizing jira.
- */
-interface JiraAccessToken {
-  access_token: string;
-}
-
-/**
- * Represents the cloud id returned from authorizing jira.
- */
-interface JiraCloudId {
-  id: string;
-}
-
-/**
- * Represents a jira project.
- */
-interface JiraProject {
-  id: string;
-  name: string;
-}
+const scopes = [
+  "read:jira-work",
+  // "read:issue-type:jira",
+  // "read:project:jira",
+  // "read:project.property:jira",
+  // "read:user:jira",
+  // "read:application-role:jira",
+  // "read:avatar:jira",
+  // "read:group:jira",
+  // "read:issue-type-hierarchy:jira",
+  // "read:project-category:jira",
+  // "read:project-version:jira",
+  // "read:project.component:jira",
+]
+  .map((scope) => scope.replace(/:/g, "%3A"))
+  .join("%20");
 
 /**
  * Runs a fetch call to the atlassian API.
@@ -41,9 +42,9 @@ export function authorizeJira(): void {
   window.open(
     `https://auth.atlassian.com/authorize?` +
       `audience=api.atlassian.com&` +
-      `client_id=${process.env.JIRA_CLIENT_ID}&` +
-      `scope=read%3Ajira-work&` +
-      `redirect_uri=${process.env.JIRA_REDIRECT_LINK}&` +
+      `client_id=${process.env.VUE_APP_JIRA_CLIENT_ID}&` +
+      `scope=${scopes}&` +
+      `redirect_uri=${process.env.VUE_APP_JIRA_REDIRECT_LINK}&` +
       `state=${sessionModule.getToken}&` +
       `response_type=code&` +
       `prompt=consent`
@@ -51,46 +52,73 @@ export function authorizeJira(): void {
 }
 
 /**
- * Exchanges an atlassian access code for a cloud id.
+ * Exchanges an atlassian access code for a API token.
  *
  * @param accessCode - The access code received from authorizing jira.
- * @return The jira cloud id of the authorized user.
+ * @return The jira access token.
  */
-export async function getJiraCloudId(accessCode: string): Promise<string> {
+export async function getJiraToken(accessCode: string): Promise<string> {
   const authorization = await fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         code: accessCode,
         grant_type: "authorization_code",
-        client_id: process.env.JIRA_CLIENT_ID,
-        client_secret: process.env.JIRA_CLIENT_SECRET,
-        redirect_uri: process.env.JIRA_REDIRECT_LINK,
+        client_id: process.env.VUE_APP_JIRA_CLIENT_ID,
+        client_secret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
+        redirect_uri: process.env.VUE_APP_JIRA_REDIRECT_LINK,
       }),
     }
   );
 
-  const cloudIds = await fetchAtlassian<JiraCloudId[]>(
+  return authorization.access_token;
+}
+
+/**
+ * Exchanges an atlassian access code for a API token.
+ *
+ * @param accessToken - The access token received from authorizing jira.
+ * @return The jira sites for this user.
+ */
+export async function getJiraCloudSites(
+  accessToken: string
+): Promise<JiraCloudSite[]> {
+  return fetchAtlassian<JiraCloudSite[]>(
     "https://api.atlassian.com/oauth/token/accessible-resources",
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${authorization.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     }
   );
-
-  return cloudIds[0]?.id || "";
 }
 
 /**
  * Returns all jira projects for the given user.
  *
+ * @param accessToken - The access token received from authorizing jira.
  * @param cloudId - The cloud id for the current user.
+ * @return The user's projects associated with this company.
  */
-export async function getJiraProjects(cloudId: string): Promise<JiraProject[]> {
-  return fetchAtlassian<JiraProject[]>(
-    `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search`
+export async function getJiraProjects(
+  accessToken: string,
+  cloudId: string
+): Promise<JiraProject[]> {
+  const projects = await fetchAtlassian<JiraProjectList>(
+    `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+    }
   );
+
+  return projects.values;
 }

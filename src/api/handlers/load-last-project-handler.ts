@@ -10,7 +10,7 @@ import {
  * Loads the last stored project.
  */
 export async function loadLastProject(): Promise<void> {
-  let versionId = String(getParam(QueryParams.VERSION));
+  let versionId = getParam(QueryParams.VERSION);
 
   if (!versionId) {
     const projects = await getProjects();
@@ -19,8 +19,7 @@ export async function loadLastProject(): Promise<void> {
       versionId = (await getCurrentVersion(projects[0].projectId)).versionId;
     }
   }
-
-  if (versionId) {
+  if (versionId && typeof versionId === "string") {
     await sessionModule.updateSession({ versionId });
     await loadVersionIfExistsHandler(versionId).catch(() =>
       navigateTo(Routes.PROJECT_CREATOR)

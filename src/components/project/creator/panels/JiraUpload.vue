@@ -11,7 +11,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { getParam, QueryParams } from "@/router";
-import { authorizeJira, getJiraCloudId, getJiraProjects } from "@/api";
+import {
+  authorizeJira,
+  getJiraToken,
+  getJiraProjects,
+  getJiraCloudSites,
+} from "@/api";
 
 /**
  * Allows for creating a project from JIRA.
@@ -22,8 +27,9 @@ export default Vue.extend({
 
     if (!accessCode) return;
 
-    const cloudId = await getJiraCloudId(String(accessCode));
-    const projects = await getJiraProjects(cloudId);
+    const token = await getJiraToken(String(accessCode));
+    const sites = await getJiraCloudSites(token);
+    const projects = await getJiraProjects(token, sites[0].id);
 
     console.log(projects);
   },

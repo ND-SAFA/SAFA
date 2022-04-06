@@ -24,7 +24,9 @@ export async function navigateTo(
  *
  * @param key - The query param key.
  */
-export function getParam(key: QueryParams): string | (string | null)[] {
+export function getParam(
+  key: QueryParams
+): string | (string | null)[] | undefined {
   return router.currentRoute.query[key];
 }
 

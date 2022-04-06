@@ -25,16 +25,13 @@
         <h1 class="text-h5">Jira Domains</h1>
         <v-divider />
         <v-list>
-          <v-list-item-group v-model="selectedSite">
+          <v-list-item-group>
             <template v-for="site in sites">
               <v-list-item :key="site.id" @click="handleSiteSelect(site)">
                 <v-list-item-content>
-                  <v-list-item-title v-text="site.name"></v-list-item-title>
+                  <v-list-item-title v-text="site.name" />
 
-                  <v-list-item-subtitle
-                    class="text--primary"
-                    v-text="site.url"
-                  />
+                  <v-list-item-subtitle v-text="site.url" />
                 </v-list-item-content>
               </v-list-item>
             </template>
@@ -46,14 +43,14 @@
         <h1 class="text-h5">Jira Projects</h1>
         <v-divider />
         <v-list>
-          <v-list-item-group v-model="selectedProject">
+          <v-list-item-group>
             <template v-for="project in projects">
               <v-list-item
                 :key="project.id"
                 @click="handleProjectSelect(project)"
               >
                 <v-list-item-content>
-                  <v-list-item-title v-text="project.name"></v-list-item-title>
+                  <v-list-item-title v-text="project.name" />
                 </v-list-item-content>
               </v-list-item>
             </template>
@@ -163,13 +160,23 @@ export default Vue.extend({
       authorizeJira();
     },
     handleSiteSelect(site: JiraCloudSite) {
-      this.selectedSite = site;
-      this.setStepIsValid(1, true);
-      this.currentStep = 3;
+      if (this.selectedSite?.id !== site.id) {
+        this.selectedSite = site;
+        this.setStepIsValid(1, true);
+        this.currentStep = 3;
+      } else {
+        this.selectedSite = undefined;
+        this.setStepIsValid(1, false);
+      }
     },
     handleProjectSelect(project: JiraProject) {
-      this.selectedProject = project;
-      this.setStepIsValid(2, true);
+      if (this.selectedProject?.id !== project.id) {
+        this.selectedProject = project;
+        this.setStepIsValid(2, true);
+      } else {
+        this.selectedProject = undefined;
+        this.setStepIsValid(2, false);
+      }
     },
     handleSaveProject(): void {
       // TODO: when endpoint exists:

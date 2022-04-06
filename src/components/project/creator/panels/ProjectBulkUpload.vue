@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined>
+  <v-card outlined elevation="1">
     <project-identifier-input
       v-bind:name.sync="name"
       v-bind:description.sync="description"

@@ -5,7 +5,7 @@ This may be outdated (Using a reference from nightwatch 1.0.0), but I will updat
     - preveious testing folder has been changed to allow nightwatch to run tests
 ***********************************************************************************************/
 module.exports = {
-  'src_folders': ['tests_dev'],
+  'src_folders': ['tests/e2e/nightwatch'],
   //'page_objects_path': ['page-objects'],
 
   'webdriver': {

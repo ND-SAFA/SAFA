@@ -1,0 +1,6 @@
+ID,Summary,Content
+F5,The UAV loads an up-to-date terrain map for its planned flight route prior to deployment.,The UAV loads an up-to-date terrain map for its planned flight route prior to deployment.
+F6,The UAV shall adjust its altitude to compensate for changes in terrain based.,The UAV shall adjust its altitude to compensate for changes in terrain based.
+F10,The system cedes control to the RPIC upon request,The system cedes control to the RPIC when requested using the radio controller.
+F11,The system shall track GPS coordinates within 1 meter of accuracy,The system shall track GPS coordinates within 1 meter of accuracy
+F21,Time to impact is computed based on velocity and direction of flight,Time to impact is computed based on velocity and direction of flight

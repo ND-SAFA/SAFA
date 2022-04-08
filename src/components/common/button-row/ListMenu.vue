@@ -15,17 +15,25 @@
     <v-list>
       <v-container
         v-for="(item, itemIndex) in definition.menuItems"
-        :key="item"
+        :key="item.name"
         class="mt-0 mb-0 pt-0 pb-0"
       >
-        <v-btn
-          text
-          block
-          class="text-none"
-          :color="itemColor"
-          @click="() => onItemClick(itemIndex, item)"
-          >{{ item }}</v-btn
-        >
+        <v-tooltip bottom open-delay="300" z-index="12">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              text
+              block
+              class="text-none"
+              :color="itemColor"
+              @click="() => onItemClick(itemIndex, item.name)"
+            >
+              {{ item.name }}
+            </v-btn>
+          </template>
+          <span>{{ item.tooltip }}</span>
+        </v-tooltip>
       </v-container>
     </v-list>
   </v-menu>
@@ -90,7 +98,7 @@ export default Vue.extend({
   },
   methods: {
     onItemClick(itemIndex: number, value: string): void {
-      this.$props.definition.menuHandlers[itemIndex]("payload");
+      this.definition.menuItems?.[itemIndex].onClick();
       this.definition.selectedItem = value;
     },
   },

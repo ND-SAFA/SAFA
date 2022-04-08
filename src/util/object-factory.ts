@@ -53,20 +53,31 @@ export function createSession(): SessionModel {
 }
 
 /**
- * @return An empty project delta.
+ * @return An empty project identifier.
  */
-export function createProject(): Project {
+export function createProjectIdentifier(
+  identifier?: Partial<ProjectIdentifier>
+): ProjectIdentifier {
   return {
-    name: "Untitled",
-    projectId: "",
-    description: "",
-    owner: "",
-    members: [],
-    artifacts: [],
-    traces: [],
-    projectVersion: undefined,
-    artifactTypes: [],
-    documents: [],
+    name: identifier?.name || "Untitled",
+    projectId: identifier?.projectId || "",
+    description: identifier?.description || "",
+    owner: identifier?.owner || "",
+    members: identifier?.members || [],
+  };
+}
+
+/**
+ * @return An empty project.
+ */
+export function createProject(project?: Partial<Project>): Project {
+  return {
+    ...createProjectIdentifier(project),
+    artifacts: project?.artifacts || [],
+    traces: project?.traces || [],
+    projectVersion: project?.projectVersion || undefined,
+    artifactTypes: project?.artifactTypes || [],
+    documents: project?.documents || [],
   };
 }
 

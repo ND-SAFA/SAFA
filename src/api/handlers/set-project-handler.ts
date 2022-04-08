@@ -16,6 +16,7 @@ import {
   loadVersionIfExistsHandler,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
+import { QueryParams, updateParam } from "@/router";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -46,14 +47,15 @@ export async function resetGraphFocus(
 export async function setAndSubscribeToProject(
   project: Project
 ): Promise<void> {
-  const isDifferentProject = projectModule.projectId !== project.projectId;
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
+  const isDifferentProject = projectModule.versionId !== versionId;
 
   await connectAndSubscribeToVersion(projectId, versionId);
   await projectModule.initializeProject(project);
   await resetGraphFocus(isDifferentProject);
   await reloadTraceMatrices();
+  await updateParam(QueryParams.VERSION, versionId);
 }
 
 /**

@@ -1,6 +1,6 @@
 <template>
   <v-avatar :size="size" @click.native="onAvatarClick">
-    <img :src="pathToLogo" alt="John" />
+    <img :src="pathToLogo" alt="SAFA" />
   </v-avatar>
 </template>
 

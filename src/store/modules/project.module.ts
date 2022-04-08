@@ -15,9 +15,11 @@ import {
   subtreeModule,
   traceModule,
   typeOptionsModule,
+  viewportModule,
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
 import { reloadDocumentArtifacts } from "@/api";
+import { cyApplyAutomove } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -97,6 +99,7 @@ export default class ProjectModule extends VuexModule {
     this.SET_TRACES(updatedTraces);
     await traceModule.addOrUpdateTraceLinks(updatedTraces);
     await subtreeModule.updateSubtreeMap();
+    viewportModule.applyAutomove();
   }
 
   @Action

@@ -63,11 +63,11 @@ export default Vue.extend({
     },
     onSave(project: ProjectIdentifier): void {
       this.isEditLoading = true;
+
       saveOrUpdateProject({
         projectId: this.project.projectId,
         name: project.name,
         description: project.description,
-        owner: "",
       })
         .then(() => projectModule.SET_PROJECT_IDENTIFIER(project))
         .catch((e) => {

@@ -6,3 +6,4 @@ export * from "./version-api";
 export * from "./matrix-api";
 export * from "./entity-retrieval-api";
 export * from "./document-api";
+export * from "./jira-api";

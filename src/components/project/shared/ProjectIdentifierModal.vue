@@ -2,8 +2,8 @@
   <generic-modal
     :is-open="isOpen"
     :title="title"
-    size="s"
-    :actions-height="50"
+    size="m"
+    :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
     @close="onClose"
   >
@@ -12,15 +12,28 @@
         v-bind:name.sync="name"
         v-bind:description.sync="description"
       />
+      <v-switch
+        style="margin-left: 80px"
+        v-if="doShowUpload"
+        v-model="isUploadOpen"
+        label="Upload Flat Files"
+      />
+      <project-files-input
+        v-if="doShowUpload && isUploadOpen"
+        v-bind:name.sync="name"
+        v-bind:description.sync="description"
+      />
     </template>
-    <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn @click="onSave" color="primary">
-            <v-icon>mdi-check</v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
+    <template v-slot:actions v-if="!isUploadOpen">
+      <v-btn
+        @click="onSave"
+        color="primary"
+        class="ml-auto"
+        :disabled="isDisabled"
+      >
+        <v-icon>mdi-check</v-icon>
+        Save
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -28,8 +41,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier } from "@/types";
+import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
+import ProjectFilesInput from "./ProjectFilesInput.vue";
 
 /**
  * A modal for renaming a project.
@@ -41,6 +56,7 @@ export default Vue.extend({
   components: {
     GenericModal,
     ProjectIdentifierInput,
+    ProjectFilesInput,
   },
   props: {
     isOpen: {
@@ -60,44 +76,34 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    doShowUpload: Boolean,
   },
   data() {
     return {
       name: "",
       description: "",
+      identifier: createProjectIdentifier(this.project),
+      isUploadOpen: false,
     };
-  },
-  mounted() {
-    this.clearData();
   },
   watch: {
     isOpen(isOpen: boolean) {
-      if (!isOpen) {
-        this.clearData();
-      }
-    },
-    project(project: ProjectIdentifier | undefined): void {
-      if (project !== undefined) {
-        this.name = project.name;
-        this.description = project.description;
+      if (isOpen) {
+        this.identifier = createProjectIdentifier(this.project);
       }
     },
   },
   methods: {
-    clearData() {
-      this.name = this.project?.name || "";
-      this.description = this.project?.description || "";
-    },
     onClose() {
       this.$emit("close");
     },
     onSave() {
-      const projectId = this.project?.projectId || "";
-      this.$emit("save", {
-        projectId: projectId,
-        name: this.name,
-        description: this.description,
-      } as ProjectIdentifier);
+      this.$emit("save", this.identifier);
+    },
+  },
+  computed: {
+    isDisabled(): boolean {
+      return this.name.length === 0 || (this.doShowUpload && this.isUploadOpen);
     },
   },
 });

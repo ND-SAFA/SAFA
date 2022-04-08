@@ -33,20 +33,19 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import {
   ButtonDefinition,
+  ButtonMenuItem,
   ButtonType,
-  EmptyLambda,
   ListMenuDefinition,
   ProjectIdentifier,
   ProjectMembership,
   ProjectRole,
 } from "@/types";
-import Vue, { PropType } from "vue";
-import { GenericModal } from "@/components/common";
-import ButtonRow from "@/components/common/button-row/ButtonRow.vue";
-import { addOrUpdateProjectMember } from "@/api";
 import { logModule } from "@/store";
+import { addOrUpdateProjectMember } from "@/api";
+import { GenericModal, ButtonRow } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
@@ -106,20 +105,20 @@ export default Vue.extend({
         ProjectRole.VIEWER,
       ];
     },
-    itemLambdas(): EmptyLambda[] {
-      return this.projectRoles.map((role) => {
-        return () => {
+    menuItems(): ButtonMenuItem[] {
+      return this.projectRoles.map((role) => ({
+        name: role,
+        onClick: () => {
           this.userRole = this.getProjectRole(role);
-        };
-      });
+        },
+      }));
     },
     buttonDefinition(): ButtonDefinition[] {
       return [
         {
           type: ButtonType.LIST_MENU,
           label: "Project Role",
-          menuItems: this.projectRoles,
-          menuHandlers: this.itemLambdas,
+          menuItems: this.menuItems,
           buttonColor: "primary",
           buttonIsText: false,
           showSelectedValue: true,

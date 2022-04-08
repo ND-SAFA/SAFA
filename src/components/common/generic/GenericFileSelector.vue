@@ -3,7 +3,7 @@
     clearable
     outlined
     small-chips
-    label="File"
+    label="Upload Files"
     :multiple="multiple"
     truncate-length="30"
     class="mt-3"

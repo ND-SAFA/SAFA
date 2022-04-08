@@ -128,10 +128,10 @@ export default Vue.extend({
           type: ButtonType.CHECKMARK_MENU,
           label: "Filter Artifacts",
           icon: "mdi-filter",
-          menuItems: this.menuItems.map((i) => capitalize(i[0])),
-          menuHandlers: this.menuItems.map(
-            (item, itemIndex) => () => this.filterTypeHandler(itemIndex)
-          ),
+          menuItems: this.menuItems.map(([name], itemIndex) => ({
+            name,
+            onClick: () => this.filterTypeHandler(itemIndex),
+          })),
           checkmarkValues: this.menuItems.map((i) => i[1]),
         },
         {

@@ -93,10 +93,10 @@ export default Vue.extend({
       return {
         type: ButtonType.LIST_MENU,
         label: this.source === "" ? "Select Source" : this.source,
-        menuItems: this.artifactTypes,
-        menuHandlers: this.artifactTypes.map(
-          (type) => () => (this.source = type)
-        ),
+        menuItems: this.artifactTypes.map((type) => ({
+          name: type,
+          onClick: () => (this.source = type),
+        })),
         buttonColor: "primary",
         buttonIsText: false,
         showSelectedValue: true,
@@ -106,10 +106,10 @@ export default Vue.extend({
       return {
         type: ButtonType.LIST_MENU,
         label: this.target === "" ? "Select Target" : this.target,
-        menuItems: this.targetTypes,
-        menuHandlers: this.targetTypes.map(
-          (type) => () => (this.target = type)
-        ),
+        menuItems: this.targetTypes.map((type) => ({
+          name: type,
+          onClick: () => (this.target = type),
+        })),
         buttonColor: "primary",
         buttonIsText: false,
         showSelectedValue: true,

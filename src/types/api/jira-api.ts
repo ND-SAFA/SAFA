@@ -24,6 +24,10 @@ export interface JiraCloudSite {
    * The Jira site's url.
    */
   url: string;
+  /**
+   * The Jira site's avatar url.
+   */
+  avatarUrl: string;
 }
 
 /**
@@ -31,13 +35,43 @@ export interface JiraCloudSite {
  */
 export interface JiraProject {
   /**
-   * The project id.
+   * The project's domain url.
+   */
+  self: string;
+  /**
+   * The project's unique id.
    */
   id: string;
   /**
-   * The project name.
+   * The project's unique key name.
+   */
+  key: string;
+  /**
+   * The project's name.
    */
   name: string;
+  /**
+   * The avatar urls for the project.
+   */
+  avatarUrls: {
+    "48x48": string;
+    "32x32": string;
+    "24x24": string;
+    "16x16": string;
+  };
+  /**
+   * Project insights.
+   */
+  insight: {
+    /**
+     * The total number of issues in this project.
+     */
+    totalIssueCount: number;
+    /**
+     * A timestamp for last time an issue was updated.
+     */
+    lastIssueUpdateTime: string;
+  };
 }
 
 /**

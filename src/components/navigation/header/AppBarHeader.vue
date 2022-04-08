@@ -41,6 +41,7 @@
 import Vue from "vue";
 import {
   ButtonDefinition,
+  ButtonMenuItem,
   ButtonType,
   EmptyLambda,
   ProjectIdentifier,
@@ -59,12 +60,8 @@ import { VersionCreator } from "@/components/project";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
 
-/**
- * Local representation of generated menu items.
- */
-type CondensedMenuItem = [string, EmptyLambda];
-
 export default Vue.extend({
+  name: "AppBarHeader",
   components: {
     VersionLabel,
     AccountDropdown,
@@ -117,12 +114,25 @@ export default Vue.extend({
     project(): ProjectIdentifier {
       return projectModule.getProject;
     },
-    projectMenuItems(): CondensedMenuItem[] {
-      const options: CondensedMenuItem[] = [
-        ["Open", this.onOpenProject],
-        ["Create", this.onCreateProject],
-        ["Settings", () => navigateTo(Routes.PROJECT_SETTINGS)],
+    projectMenuItems(): ButtonMenuItem[] {
+      const options: ButtonMenuItem[] = [
+        {
+          name: "Open Project",
+          tooltip: "Open another project",
+          onClick: this.onOpenProject,
+        },
+        {
+          name: "Create Project",
+          tooltip: "Create a new project",
+          onClick: this.onCreateProject,
+        },
+        {
+          name: "Project Settings",
+          tooltip: "Open this project's settings",
+          onClick: () => navigateTo(Routes.PROJECT_SETTINGS),
+        },
       ];
+
       return projectModule.projectId ? options : options.slice(0, -1);
     },
     definitions(): ButtonDefinition[] {
@@ -131,8 +141,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Project",
           buttonIsText: true,
-          menuItems: this.projectMenuItems.map((i) => i[0]),
-          menuHandlers: this.projectMenuItems.map((i) => i[1]),
+          menuItems: this.projectMenuItems,
         },
         {
           isHidden: !this.$route.path.includes(Routes.ARTIFACT),
@@ -140,14 +149,21 @@ export default Vue.extend({
           label: "Version",
           buttonIsText: true,
           menuItems: [
-            "Change Version",
-            "Upload Flat Files",
-            "Create New Version",
-          ],
-          menuHandlers: [
-            this.onChangeVersion,
-            this.onUploadVersion,
-            this.onCreateVersion,
+            {
+              name: "Change Version",
+              tooltip: "Change to a different version of this project",
+              onClick: this.onChangeVersion,
+            },
+            {
+              name: "Create Version",
+              tooltip: "Create a new version of this project",
+              onClick: this.onCreateVersion,
+            },
+            {
+              name: "Upload Flat Files",
+              tooltip: "Upload project files in bulk",
+              onClick: this.onUploadVersion,
+            },
           ],
         },
         {
@@ -155,8 +171,13 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,
-          menuItems: ["Approve Generated Trace Links"],
-          menuHandlers: [() => navigateTo(Routes.TRACE_LINK)],
+          menuItems: [
+            {
+              name: "Approve Generated Trace Links",
+              tooltip: "Review automatically created graph links",
+              onClick: () => navigateTo(Routes.TRACE_LINK),
+            },
+          ],
         },
       ];
     },

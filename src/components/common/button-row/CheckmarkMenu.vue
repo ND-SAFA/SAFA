@@ -20,19 +20,14 @@
       <v-hover
         v-slot:default="{ hover }"
         v-for="(item, itemIndex) in definition.menuItems"
-        :key="item"
+        :key="item.name"
       >
-        <v-list-item
-          :style="hover ? `background-color: ${hoverColor};` : ''"
-          @click="(newState) => definition.menuHandlers[itemIndex](newState)"
-        >
+        <v-list-item :style="hover ? `background-color: ${hoverColor};` : ''">
           <v-checkbox
             readonly
-            :label="item"
+            :label="item.name"
             :input-value="definition.checkmarkValues[itemIndex]"
-            @click.stop="
-              (newState) => definition.menuHandlers[itemIndex](newState)
-            "
+            @click.stop="item.onClick"
           />
         </v-list-item>
       </v-hover>

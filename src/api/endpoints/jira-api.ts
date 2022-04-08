@@ -114,7 +114,7 @@ export async function getJiraProjects(
   cloudId: string
 ): Promise<JiraProject[]> {
   const projects = await fetchAtlassian<JiraProjectList>(
-    `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search`,
+    `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search?expand=insight`,
     {
       method: "GET",
       headers: {

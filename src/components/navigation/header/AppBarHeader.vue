@@ -128,7 +128,7 @@ export default Vue.extend({
         },
         {
           name: "Project Settings",
-          tooltip: "Open this project's settings",
+          tooltip: "View this project's settings",
           onClick: () => navigateTo(Routes.PROJECT_SETTINGS),
         },
       ];

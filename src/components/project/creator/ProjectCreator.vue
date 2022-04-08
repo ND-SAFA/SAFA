@@ -22,8 +22,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { getParam, QueryParams, updateParam } from "@/router";
-import { ProjectCreatorStepper, JiraCreatorStepper } from "./steppers";
-import { ProjectBulkUpload } from "./panels";
+import {
+  ProjectCreatorStepper,
+  JiraCreatorStepper,
+  ProjectBulkUpload,
+} from "./workflows";
 
 /**
  * Allows for creating a project.

@@ -18,7 +18,7 @@
         :key="item.name"
         class="mt-0 mb-0 pt-0 pb-0"
       >
-        <v-tooltip bottom open-delay="300">
+        <v-tooltip bottom open-delay="300" z-index="12">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               v-on="on"

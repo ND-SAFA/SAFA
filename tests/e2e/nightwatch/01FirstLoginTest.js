@@ -57,7 +57,7 @@ module.exports = {
 
 function clickButton(lableName, browser) {
     browser.useXpath();
-    browser.assert.visible(`//*[contains(text(),'${lableName}')]`, results => {
+    browser.assert.visible(`//*[contains(text(),'${lableName}')]`, function(results){
         if (results.value) {
             //console.log("Button is visible");
             browser.click(`//*[contains(text(),'${lableName}')]`);
@@ -89,5 +89,5 @@ function fillInTextBox(textBoxName, textBoxValue, browser) {
 
 function takeScreenShot(screenShotName) {
     /* This function will take a screenshot and save it to the correct location */
-    browser.saveScreenshot(`tests/e2e/nightwatch/screenshots/${screenShotName}.png`);
+    browser.saveScreenshot(`tests/e2e/nightwatch/screenshots/firstProject/${screenShotName}.png`);
 }

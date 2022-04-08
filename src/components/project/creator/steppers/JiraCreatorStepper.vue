@@ -91,6 +91,7 @@ import {
   getJiraCloudSites,
 } from "@/api";
 import { GenericStepper } from "@/components/common";
+import { logModule } from "@/store";
 
 /**
  * Allows for creating a project from JIRA.
@@ -235,6 +236,7 @@ export default Vue.extend({
       }
     },
     handleSaveProject(): void {
+      logModule.onInfo("Jira projects can not yet be created");
       // TODO: when endpoint exists:
       // appModule.onLoadStart();
       // saveOrUpdateProject(this.project)

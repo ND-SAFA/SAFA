@@ -16,6 +16,11 @@ public class AppRoutes {
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjects = projectPrefix;
 
+        public static class Import {
+            public static final String importPrefix = projectPrefix + "/import";
+            public static final String pullJiraProject = importPrefix + "/jira";
+        }
+
         public static class Membership {
             public static final String addProjectMember = projectPrefix + "/{projectId}/members";
             public static final String getProjectMembers = projectPrefix + "/{projectId}/members";

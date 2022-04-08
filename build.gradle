@@ -43,7 +43,6 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'commons-io:commons-io:2.11.0' // TODO: Upgrade contains breaking changes
     implementation 'org.json:json:20210307'
-    implementation 'com.atlassian.jira:jira-api:1000.29.0'
 
     //database
     implementation 'mysql:mysql-connector-java:8.0.25'

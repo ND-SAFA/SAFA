@@ -156,14 +156,18 @@ public class ProjectService {
             && projectVersion.hasValidId()) {
             throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
         }
-        this.projectRepository.save(project);
-        this.setCurrentUserAsOwner(project);
+        this.saveProjectWithCurrentUserAsOwner(project);
         projectVersion = this.createBaseProjectVersion(project);
         projectEntities = this.saveProjectEntitiesToVersion(
             projectVersion,
             payload.getArtifacts(),
             payload.getTraces());
         return projectEntities;
+    }
+
+    public void saveProjectWithCurrentUserAsOwner(Project project) {
+        this.projectRepository.save(project);
+        this.setCurrentUserAsOwner(project);
     }
 
     public ProjectVersion createBaseProjectVersion(Project project) {

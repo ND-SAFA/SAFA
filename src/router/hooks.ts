@@ -10,7 +10,7 @@ import router from "@/router/router";
  */
 export async function navigateTo(
   route: Routes | string,
-  query?: Record<string, string>
+  query?: Record<string, string | (string | null)[]>
 ): Promise<void> {
   if (router.currentRoute.path === route && !query) {
     return;
@@ -21,8 +21,16 @@ export async function navigateTo(
 
 /**
  * Return the app's query parameters.
+ */
+export function getParams(): Record<string, string | (string | null)[]> {
+  return router.currentRoute.query;
+}
+
+/**
+ * Return one of the app's query parameters.
  *
  * @param key - The query param key.
+ * @return The query parameter value.
  */
 export function getParam(
   key: QueryParams

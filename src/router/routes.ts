@@ -18,6 +18,7 @@ export enum Routes {
  * Enumerates query parameters used in the app.
  */
 export enum QueryParams {
+  LOGIN_PATH = "to",
   TAB = "tab",
   VERSION = "version",
   JIRA_TOKEN = "code",

@@ -49,8 +49,7 @@
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { loadLastProject } from "@/api";
-import { login } from "@/api/handlers/session-handler";
+import { login } from "@/api";
 
 /**
  * Presents the login page.
@@ -66,25 +65,16 @@ export default Vue.extend({
   }),
   methods: {
     handleLogin() {
-      const goToPage = new URLSearchParams(window.location.search).get("to");
-
       this.isLoading = true;
 
       login({
         email: this.email,
         password: this.password,
       })
-        .then(async () => {
-          this.isLoading = false;
-
-          if (goToPage && goToPage !== Routes.ARTIFACT) {
-            await navigateTo(goToPage);
-          } else {
-            await loadLastProject();
-          }
-        })
         .catch(() => {
           this.isError = true;
+        })
+        .finally(() => {
           this.isLoading = false;
         });
     },

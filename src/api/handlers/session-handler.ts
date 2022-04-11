@@ -1,5 +1,5 @@
 import { createSession } from "@/util";
-import { navigateTo, Routes } from "@/router";
+import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import { deltaModule, sessionModule, subtreeModule } from "@/store";
 import { loginUser } from "@/api/endpoints";
 import { clearProject } from "./set-project-handler";
@@ -11,8 +11,20 @@ import { loadLastProject } from "@/api";
  */
 export async function login(user: UserModel): Promise<void> {
   const session = await loginUser(user);
+  const goToPath = getParam(QueryParams.LOGIN_PATH);
 
   sessionModule.SET_SESSION(session);
+
+  if (typeof goToPath === "string" && goToPath !== Routes.ARTIFACT) {
+    const query = { ...getParams() };
+
+    delete query[QueryParams.LOGIN_PATH];
+
+    await navigateTo(goToPath, query);
+  } else {
+    await navigateTo(Routes.ARTIFACT);
+    await loadLastProject();
+  }
 }
 
 /**

@@ -12,17 +12,16 @@ import { loadLastProject } from "@/api";
 export async function login(user: UserModel): Promise<void> {
   const session = await loginUser(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
+  const query = { ...getParams() };
+
+  delete query[QueryParams.LOGIN_PATH];
 
   sessionModule.SET_SESSION(session);
 
   if (typeof goToPath === "string" && goToPath !== Routes.ARTIFACT) {
-    const query = { ...getParams() };
-
-    delete query[QueryParams.LOGIN_PATH];
-
     await navigateTo(goToPath, query);
   } else {
-    await navigateTo(Routes.ARTIFACT);
+    await navigateTo(Routes.ARTIFACT, query);
     await loadLastProject();
   }
 }

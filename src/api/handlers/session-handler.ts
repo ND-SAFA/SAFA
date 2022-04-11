@@ -1,10 +1,8 @@
+import { UserModel } from "@/types";
 import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import { deltaModule, sessionModule, subtreeModule } from "@/store";
-import { loginUser } from "@/api/endpoints";
-import { clearProject } from "./set-project-handler";
-import { UserModel } from "@/types";
-import { loadLastProject } from "@/api";
+import { loadLastProject, clearProject, loginUser } from "@/api";
 
 /**
  * Attempts to log a user in.

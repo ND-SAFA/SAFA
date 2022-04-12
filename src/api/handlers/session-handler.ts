@@ -1,18 +1,27 @@
-import { createSession } from "@/util";
-import { navigateTo, Routes } from "@/router";
-import { deltaModule, sessionModule, subtreeModule } from "@/store";
-import { loginUser } from "@/api/endpoints";
-import { clearProject } from "./set-project-handler";
 import { UserModel } from "@/types";
-import { loadLastProject } from "@/api";
+import { createSession } from "@/util";
+import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
+import { deltaModule, sessionModule, subtreeModule } from "@/store";
+import { loadLastProject, clearProject, loginUser } from "@/api";
 
 /**
  * Attempts to log a user in.
  */
 export async function login(user: UserModel): Promise<void> {
   const session = await loginUser(user);
+  const goToPath = getParam(QueryParams.LOGIN_PATH);
+  const query = { ...getParams() };
+
+  delete query[QueryParams.LOGIN_PATH];
 
   sessionModule.SET_SESSION(session);
+
+  if (typeof goToPath === "string" && goToPath !== Routes.ARTIFACT) {
+    await navigateTo(goToPath, query);
+  } else {
+    await navigateTo(Routes.ARTIFACT, query);
+    await loadLastProject();
+  }
 }
 
 /**

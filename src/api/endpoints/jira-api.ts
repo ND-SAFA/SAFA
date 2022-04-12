@@ -4,7 +4,7 @@ import {
   JiraProject,
   JiraProjectList,
 } from "@/types";
-import { sessionModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 
 const scopes = [
   // Current Jira API version:
@@ -35,8 +35,14 @@ async function fetchAtlassian<T>(
   ...args: Parameters<typeof fetch>
 ): Promise<T> {
   const response = await fetch(...args);
+  const resJson = (await response.json()) as T;
 
-  return (await response.json()) as T;
+  if (!response.ok) {
+    logModule.onError("Unable to connect to Atlassian");
+    throw Error("Unable to connect to Atlassian");
+  } else {
+    return resJson;
+  }
 }
 
 /**

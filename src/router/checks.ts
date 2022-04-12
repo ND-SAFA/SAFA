@@ -1,6 +1,7 @@
 import { PanelType, RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
 import {
+  QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
@@ -23,7 +24,13 @@ export const routerChecks: Record<string, RouterCheck> = {
     next: NavigationGuardNext
   ) {
     if (!routesPublic.includes(to.path) && !sessionModule.getDoesSessionExist) {
-      next({ path: Routes.LOGIN_ACCOUNT, query: { to: to.path } });
+      next({
+        path: Routes.LOGIN_ACCOUNT,
+        query: {
+          ...to.query,
+          [QueryParams.LOGIN_PATH]: to.path,
+        },
+      });
       return;
     }
   },

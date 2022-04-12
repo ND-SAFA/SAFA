@@ -33,7 +33,7 @@ export default class DocumentModule extends VuexModule {
     const {
       artifacts,
       traces,
-      currentDocumentId = "",
+      currentDocumentId = this.currentDocument.documentId,
       documents = [],
     } = project;
 

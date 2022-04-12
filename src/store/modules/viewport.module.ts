@@ -107,7 +107,7 @@ export default class ViewportModule extends VuexModule {
       appModule.onLoadEnd();
       cyCenterNodes();
       cyResetTim();
-    }, 100);
+    }, 200);
   }
 
   @Action

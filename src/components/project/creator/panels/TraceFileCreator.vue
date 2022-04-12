@@ -8,9 +8,9 @@
       </div>
     </v-col>
     <v-col cols="3">
-      <v-btn @click="onSubmit" color="primary" class="ml-10"
-        >Create Trace Matrix</v-btn
-      >
+      <v-btn @click="onSubmit" color="primary" class="ml-10">
+        Create Trace Matrix
+      </v-btn>
     </v-col>
   </v-row>
 </template>

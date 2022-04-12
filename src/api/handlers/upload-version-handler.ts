@@ -51,10 +51,12 @@ export async function uploadNewProjectVersion(
         connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
           logModule.onError(e.message)
         );
-        const res = await uploadFlatFiles();
+        // Note that changing the order below will cause the project to not properly render initially.
         await navigateTo(Routes.ARTIFACT);
+        const res = await uploadFlatFiles();
         await setCreatedProject(res);
       } catch (e) {
+        await navigateTo(Routes.PROJECT_CREATOR);
         logModule.onError(e.message);
       } finally {
         appModule.onLoadEnd();

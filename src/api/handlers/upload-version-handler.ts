@@ -46,14 +46,19 @@ export async function uploadNewProjectVersion(
     };
 
     if (setVersionIfSuccessful) {
-      appModule.onLoadStart();
-      connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
-        logModule.onError(e.message)
-      );
-      await navigateTo(Routes.ARTIFACT);
-      const res = await uploadFlatFiles();
-      await setCreatedProject(res);
-      appModule.onLoadEnd();
+      try {
+        appModule.onLoadStart();
+        connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
+          logModule.onError(e.message)
+        );
+        await navigateTo(Routes.ARTIFACT);
+        const res = await uploadFlatFiles();
+        await setCreatedProject(res);
+      } catch (e) {
+        logModule.onError(e.message);
+      } finally {
+        appModule.onLoadEnd();
+      }
     } else {
       await uploadFlatFiles();
     }

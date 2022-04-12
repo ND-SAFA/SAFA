@@ -9,8 +9,8 @@
   >
     <template v-slot:body>
       <project-identifier-input
-        v-bind:name.sync="name"
-        v-bind:description.sync="description"
+        v-bind:name.sync="identifier.name"
+        v-bind:description.sync="identifier.description"
       />
       <v-switch
         style="margin-left: 80px"
@@ -20,8 +20,8 @@
       />
       <project-files-input
         v-if="doShowUpload && isUploadOpen"
-        v-bind:name.sync="name"
-        v-bind:description.sync="description"
+        v-bind:name.sync="identifier.name"
+        v-bind:description.sync="identifier.description"
       />
     </template>
     <template v-slot:actions v-if="!isUploadOpen">
@@ -80,17 +80,24 @@ export default Vue.extend({
   },
   data() {
     return {
-      name: "",
-      description: "",
       identifier: createProjectIdentifier(this.project),
       isUploadOpen: false,
+      isDisabled: true,
     };
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.identifier = createProjectIdentifier(this.project);
-      }
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.identifier = createProjectIdentifier(this.project);
+    },
+    identifier: {
+      deep: true,
+      handler() {
+        this.isDisabled =
+          this.identifier.name.length === 0 ||
+          (this.doShowUpload && this.isUploadOpen);
+      },
     },
   },
   methods: {
@@ -99,11 +106,6 @@ export default Vue.extend({
     },
     onSave() {
       this.$emit("save", this.identifier);
-    },
-  },
-  computed: {
-    isDisabled(): boolean {
-      return this.name.length === 0 || (this.doShowUpload && this.isUploadOpen);
     },
   },
 });

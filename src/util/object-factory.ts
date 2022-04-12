@@ -59,7 +59,7 @@ export function createProjectIdentifier(
   identifier?: Partial<ProjectIdentifier>
 ): ProjectIdentifier {
   return {
-    name: identifier?.name || "Untitled",
+    name: identifier?.name || "",
     projectId: identifier?.projectId || "",
     description: identifier?.description || "",
     owner: identifier?.owner || "",

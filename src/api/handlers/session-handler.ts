@@ -1,7 +1,7 @@
 import { UserModel } from "@/types";
 import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
-import { deltaModule, sessionModule, subtreeModule } from "@/store";
+import { sessionModule } from "@/store";
 import { loadLastProject, clearProject, loginUser } from "@/api";
 
 /**
@@ -30,8 +30,6 @@ export async function login(user: UserModel): Promise<void> {
 export async function logout(): Promise<void> {
   sessionModule.SET_SESSION(createSession());
   await navigateTo(Routes.LOGIN_ACCOUNT);
-  deltaModule.clearDelta();
-  await subtreeModule.clearSubtrees();
   await clearProject();
 }
 

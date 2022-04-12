@@ -27,6 +27,7 @@ import {
   JiraCreatorStepper,
   ProjectBulkUpload,
 } from "./workflows";
+import { clearProject } from "@/api";
 
 /**
  * Allows for creating a project.
@@ -50,6 +51,8 @@ export default Vue.extend({
     if (tabId && tabIndex !== -1) {
       this.tab = tabIndex;
     }
+
+    clearProject();
   },
   watch: {
     tab(index: number) {

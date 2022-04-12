@@ -30,6 +30,16 @@ export default class TypeOptionsModule extends VuexModule {
 
   @Action
   /**
+   * Clears all store data.
+   */
+  clearData(): void {
+    this.SET_LINK_DIRECTIONS({});
+    this.SET_TYPE_ICONS(createDefaultTypeIcons([]));
+    this.SET_TYPES([]);
+  }
+
+  @Action
+  /**
    * Changes what directions of trace links between artifacts are allowed.
    */
   initializeTypeIcons(artifactTypes: ArtifactType[]): void {

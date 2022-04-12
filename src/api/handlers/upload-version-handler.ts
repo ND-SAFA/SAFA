@@ -51,8 +51,8 @@ export async function uploadNewProjectVersion(
         connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
           logModule.onError(e.message)
         );
-        await navigateTo(Routes.ARTIFACT);
         const res = await uploadFlatFiles();
+        await navigateTo(Routes.ARTIFACT);
         await setCreatedProject(res);
       } catch (e) {
         logModule.onError(e.message);

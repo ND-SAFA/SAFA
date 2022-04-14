@@ -8,6 +8,7 @@ import {
   errorModule,
   projectModule,
   subtreeModule,
+  typeOptionsModule,
   viewportModule,
 } from "@/store";
 import {
@@ -65,6 +66,9 @@ export async function clearProject(): Promise<void> {
   const project = createProject();
 
   await projectModule.initializeProject(project);
+  await resetGraphFocus();
+  typeOptionsModule.clearData();
+  await subtreeModule.clearSubtrees();
 }
 
 /**

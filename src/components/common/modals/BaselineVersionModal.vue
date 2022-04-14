@@ -67,17 +67,11 @@ export default Vue.extend({
     },
   },
   watch: {
-    /**
-     * If project property changes to defined project then selected project
-     * is set and stepper is advanced to version selection step.
-     *
-     * @param newProject - The new project prop.
-     */
-    project(newProject: ProjectIdentifier | undefined): void {
-      if (newProject !== undefined) {
-        this.selectedProject = newProject;
-        this.currentStep = 2;
-      }
+    isOpen(open: boolean) {
+      if (!open || !this.project) return;
+
+      this.selectedProject = this.project;
+      this.currentStep = 2;
     },
   },
   methods: {

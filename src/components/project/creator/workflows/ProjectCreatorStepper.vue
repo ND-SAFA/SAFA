@@ -37,7 +37,7 @@
 
       <v-stepper-content step="3">
         <generic-uploader
-          item-name="trace link"
+          item-name="trace matrix"
           :uploader="traceUploader"
           :artifact-map="artifactMap"
           :default-valid-state="true"
@@ -188,8 +188,7 @@ export default Vue.extend({
       if (stepNumber === 1) {
         const hasName = this.name !== "";
         Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
-      }
-      if (stepNumber === 2) {
+      } else if (stepNumber === 2) {
         Vue.set(this.steps, 0, [this.name, true]);
       }
     },

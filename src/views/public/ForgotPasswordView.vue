@@ -28,6 +28,7 @@
         color="primary"
         @click="handleReset"
         :disabled="email.length === 0"
+        :loading="isLoading"
       >
         Reset Password
       </v-btn>
@@ -43,26 +44,37 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage } from "@/components";
 import { navigateTo, Routes } from "@/router";
 import { createPasswordReset } from "@/api";
+import { CardPage } from "@/components";
 
 /**
- * Presents the forgot password page.
+ * Displays the forgot password page.
  */
 export default Vue.extend({
-  name: "forgot-password-view",
+  name: "ForgotPasswordView",
   components: { CardPage },
-  data: () => ({
-    email: "",
-    isSubmitted: false,
-    isError: false,
-  }),
+  data() {
+    return {
+      email: "",
+      isSubmitted: false,
+      isError: false,
+      isLoading: false,
+    };
+  },
   methods: {
+    /**
+     * Navigates to the login page.
+     */
     handleLogin() {
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
+    /**
+     * Sends a password reset email.
+     */
     handleReset() {
+      this.isLoading = true;
+
       createPasswordReset({
         email: this.email,
       })
@@ -70,7 +82,8 @@ export default Vue.extend({
           this.isSubmitted = true;
           this.isError = false;
         })
-        .catch(() => (this.isError = true));
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

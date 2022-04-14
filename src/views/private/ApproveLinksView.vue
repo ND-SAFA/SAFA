@@ -10,9 +10,9 @@
         show-decline
         title="Un-Reviewed Trace Links"
         :links="links"
-        :artifacts="artifactHashmap"
-        @link:approve="onApproveLink"
-        @link:decline="onDeclineLink"
+        :artifacts="artifactsById"
+        @link:approve="handleApprove"
+        @link:decline="handleDecline"
       />
       <v-divider class="mt-5" />
       <approval-section
@@ -21,8 +21,8 @@
         :show-decline="false"
         :start-open="false"
         :links="declinedLinks"
-        :artifacts="artifactHashmap"
-        @link:approve="onApproveDeclinedLink"
+        :artifacts="artifactsById"
+        @link:approve="handleApproveDeclined"
       />
       <v-divider class="mt-5" />
       <approval-section
@@ -31,8 +31,8 @@
         :show-approve="false"
         :start-open="false"
         :links="approvedLinks"
-        :artifacts="artifactHashmap"
-        @link:decline="onDeclineApprovedLink"
+        :artifacts="artifactsById"
+        @link:decline="handleDeclineApproved"
       />
       <v-divider class="mt-5 mb-10" />
     </template>
@@ -41,20 +41,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
-import {
-  TraceApproval,
-  TraceLink,
-  Artifact,
-  ProjectVersion,
-} from "@/types/domain";
+import { TraceApproval, TraceLink, ProjectVersion, EmptyLambda } from "@/types";
+import { navigateBack } from "@/router";
 import { artifactModule, projectModule } from "@/store";
+import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
 import { ApprovalSection, PrivatePage } from "@/components";
-import { navigateTo, Routes } from "@/router";
-import { EmptyLambda } from "@/types";
 
 export default Vue.extend({
-  name: "approval-links-view",
+  name: "ApproveLinksView",
   components: { PrivatePage, ApprovalSection },
   data() {
     return {
@@ -64,87 +58,131 @@ export default Vue.extend({
     };
   },
   watch: {
-    projectVersion(newVersion: ProjectVersion) {
-      if (newVersion) {
-        this.loadGeneratedLinks();
-      }
+    /**
+     * Loads generated links when the version changes.
+     */
+    projectVersion(newVersion?: ProjectVersion) {
+      if (!newVersion) return;
+
+      this.loadGeneratedLinks();
     },
   },
   computed: {
-    projectId(): string {
-      return projectModule.projectId;
-    },
-    artifactHashmap(): Record<string, Artifact> {
+    /**
+     * @return A collection of all artifacts, keyed by their id.
+     */
+    artifactsById() {
       return artifactModule.getArtifactsById;
     },
-    projectVersion(): ProjectVersion | undefined {
+    /**
+     * @return The current project version.
+     */
+    projectVersion() {
       return projectModule.getProject.projectVersion;
     },
   },
   methods: {
+    /**
+     * Navigates back to the artifact page.
+     */
     handleGoBack() {
-      navigateTo(Routes.ARTIFACT);
+      navigateBack();
     },
-    loadGeneratedLinks() {
+
+    /**
+     * Loads the generated links for the current project.
+     */
+    async loadGeneratedLinks() {
       const versionId = projectModule.versionIdWithLog;
+      const links = await getGeneratedLinks(versionId);
 
-      if (!versionId) return;
+      this.links = [];
+      this.approvedLinks = [];
+      this.declinedLinks = [];
 
-      getGeneratedLinks(versionId).then((links) => {
-        this.links = [];
-        this.approvedLinks = [];
-        this.declinedLinks = [];
-        links.forEach((link) => {
-          switch (link.approvalStatus) {
-            case TraceApproval.UNREVIEWED:
-              this.links.push(link);
-              break;
-            case TraceApproval.APPROVED:
-              this.approvedLinks.push(link);
-              break;
-            case TraceApproval.DECLINED:
-              this.declinedLinks.push(link);
-              break;
-          }
-        });
+      links.forEach((link) => {
+        switch (link.approvalStatus) {
+          case TraceApproval.UNREVIEWED:
+            this.links.push(link);
+            break;
+          case TraceApproval.APPROVED:
+            this.approvedLinks.push(link);
+            break;
+          case TraceApproval.DECLINED:
+            this.declinedLinks.push(link);
+            break;
+        }
       });
     },
-    approveLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
+
+    /**
+     * Approves the given link.
+     *
+     * @param link - The link to approve.
+     * @param filterCallback - The callback to run afterward.
+     */
+    approveLink(link: TraceLink, filterCallback: EmptyLambda) {
       handleApproveLink(link, () => {
         filterCallback();
         this.approvedLinks = this.approvedLinks.concat([link]);
       });
     },
-    declineLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
+    /**
+     * Declines the given link.
+     *
+     * @param link - The link to decline.
+     * @param filterCallback - The callback to run afterward.
+     */
+    declineLink(link: TraceLink, filterCallback: EmptyLambda) {
       handleDeclineLink(link, () => {
         filterCallback();
         this.declinedLinks = this.declinedLinks.concat([link]);
       });
     },
-    // methods directly used in component
-    onApproveLink(link: TraceLink) {
-      this.approveLinkHandler(link, () => {
+
+    /**
+     * Approves the given link and updates the stored links.
+     *
+     * @param link - The link to approve.
+     */
+    handleApprove(link: TraceLink) {
+      this.approveLink(link, () => {
         this.links = this.links.filter(
           (t) => t.traceLinkId != link.traceLinkId
         );
       });
     },
-    onApproveDeclinedLink(link: TraceLink) {
-      this.approveLinkHandler(link, () => {
+    /**
+     * Approves the given declined link and updates the stored links.
+     *
+     * @param link - The link to approve.
+     */
+    handleApproveDeclined(link: TraceLink) {
+      this.approveLink(link, () => {
         this.declinedLinks = this.declinedLinks.filter(
           (t) => t.traceLinkId != link.traceLinkId
         );
       });
     },
-    onDeclineLink(link: TraceLink) {
-      this.declineLinkHandler(link, () => {
+    /**
+     * Declines the given link and updates the stored links.
+     *
+     * @param link - The link to decline.
+     */
+    handleDecline(link: TraceLink) {
+      this.declineLink(link, () => {
         this.links = this.links.filter(
           (t) => t.traceLinkId != link.traceLinkId
         );
       });
     },
-    onDeclineApprovedLink(link: TraceLink) {
-      this.declineLinkHandler(link, () => {
+    /**
+     * Declines the given approved link and updates the stored links.
+     *
+     * @param link - The link to decline.
+     */
+    handleDeclineApproved(link: TraceLink) {
+      this.declineLink(link, () => {
         this.approvedLinks = this.approvedLinks.filter(
           (t) => t.traceLinkId != link.traceLinkId
         );

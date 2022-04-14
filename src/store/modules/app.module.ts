@@ -73,6 +73,14 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * Closes the side panels.
+   */
+  closeCreator(): void {
+    this.closePanel(PanelType.artifactCreator);
+  }
+
+  @Action
+  /**
    * If a project is selected, opens the given panel.
    *
    * @param panel - The type of panel.

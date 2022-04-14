@@ -20,6 +20,13 @@ export async function navigateTo(
 }
 
 /**
+ * Navigates to the previous page.
+ */
+export function navigateBack(): void {
+  router.back();
+}
+
+/**
  * Return the app's query parameters.
  */
 export function getParams(): Record<string, string | (string | null)[]> {

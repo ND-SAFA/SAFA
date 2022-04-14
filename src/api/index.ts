@@ -1,7 +1,7 @@
 /**
- * # API Function Naming Conventions
+ * # API Function Code Conventions
  *
- * ## API Function Prefixes
+ * ## API Function Name Prefixes
  * - "get" for object retrieval.
  * - "create" for object creation.
  * - "update" for object editing.
@@ -9,7 +9,7 @@
  * - "delete" for object deletion.
  * - "parse" for form data parsing.
  *
- * ## API Handler Function Prefixes
+ * ## API Handler Function Name Prefixes
  * - "handle" for all API handler functions.
  */
 

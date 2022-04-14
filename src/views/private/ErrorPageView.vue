@@ -4,7 +4,7 @@
       <v-row justify="center">
         <v-col align-self="center">
           <safa-icon />
-          Sorry, an error has occurred please refresh your browser and try
+          Sorry, an error has occurred. Please refresh your browser and try
           again.
         </v-col>
       </v-row>
@@ -20,6 +20,7 @@ import { PrivatePage, SafaIcon } from "@/components";
  * The default page displayed if an unknown error is encountered.
  */
 export default Vue.extend({
+  name: "ErrorPageView",
   components: {
     SafaIcon,
     PrivatePage,

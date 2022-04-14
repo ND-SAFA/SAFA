@@ -53,7 +53,7 @@ import { DocumentColumn, SelectOption } from "@/types";
 import { documentModule, logModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 import { columnTypeOptions, createColumn } from "@/util";
-import { editDocument } from "@/api";
+import { handleUpdateDocument } from "@/api";
 
 /**
  * Represents a modal for editing a table column.
@@ -119,7 +119,7 @@ export default Vue.extend({
         document.columns[index] = this.editingColumn;
       }
 
-      editDocument(document)
+      handleUpdateDocument(document)
         .then(() => {
           logModule.onSuccess(`Column updated: ${this.editingColumn.name}`);
           this.resetModalData();
@@ -140,7 +140,7 @@ export default Vue.extend({
           ({ id }) => id !== this.editingColumn.id
         );
 
-        editDocument(document)
+        handleUpdateDocument(document)
           .then(() => {
             logModule.onSuccess(`Column deleted: ${this.editingColumn.name}`);
             this.resetModalData();

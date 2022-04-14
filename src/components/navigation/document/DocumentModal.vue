@@ -48,7 +48,11 @@
 import Vue, { PropType } from "vue";
 import { ProjectDocument } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
+import {
+  handleCreateDocument,
+  handleDeleteDocument,
+  handleUpdateDocument,
+} from "@/api";
 import { documentModule, logModule } from "@/store";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
@@ -104,7 +108,7 @@ export default Vue.extend({
     },
     handleSubmit() {
       if (this.isEditMode) {
-        editDocument(this.editingDocument)
+        handleUpdateDocument(this.editingDocument)
           .then(() => {
             logModule.onSuccess(
               `Document edited: ${this.editingDocument.name}`
@@ -119,7 +123,7 @@ export default Vue.extend({
       } else {
         const { name, type, artifactIds } = this.editingDocument;
 
-        addNewDocument(name, type, artifactIds)
+        handleCreateDocument(name, type, artifactIds)
           .then(() => {
             logModule.onSuccess(`Document created: ${name}`);
             this.resetModalData();
@@ -133,7 +137,7 @@ export default Vue.extend({
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else if (this.editingDocument) {
-        deleteAndSwitchDocuments(this.editingDocument)
+        handleDeleteDocument(this.editingDocument)
           .then(() => {
             logModule.onSuccess(
               `Document Deleted: ${this.editingDocument.name}`

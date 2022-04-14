@@ -1,10 +1,6 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
-import {
-  createLink,
-  updateApprovedLink,
-  updateDeclinedLink,
-} from "@/api/commits";
+import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
 
 /**
  * Creates a new trace link.
@@ -67,7 +63,7 @@ export async function handleDeclineLink(
  * @param linkAPI - The endpoint to call with the link.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export function linkAPIHandler(
+function linkAPIHandler(
   link: TraceLink,
   linkAPI: (traceLink: TraceLink) => Promise<TraceLink[]>,
   onSuccess: () => Promise<void>

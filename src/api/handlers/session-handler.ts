@@ -2,12 +2,18 @@ import { UserModel } from "@/types";
 import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import { sessionModule } from "@/store";
-import { loadLastProject, clearProject, createLoginSession } from "@/api";
+import {
+  handleLoadLastProject,
+  handleClearProject,
+  createLoginSession,
+} from "@/api";
 
 /**
  * Attempts to log a user in.
+ *
+ * @param user - The user to log in.
  */
-export async function login(user: UserModel): Promise<void> {
+export async function handleLogin(user: UserModel): Promise<void> {
   const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
@@ -20,34 +26,34 @@ export async function login(user: UserModel): Promise<void> {
     await navigateTo(goToPath, query);
   } else {
     await navigateTo(Routes.ARTIFACT, query);
-    await loadLastProject();
+    await handleLoadLastProject();
   }
 }
 
 /**
- * Attempts to log a user out.
+ * Logs a user out.
  */
-export async function logout(): Promise<void> {
+export async function handleLogout(): Promise<void> {
   sessionModule.SET_SESSION(createSession());
   await navigateTo(Routes.LOGIN_ACCOUNT);
-  await clearProject();
+  await handleClearProject();
 }
 
 /**
  * Verifies the stored authentication token, and loads the last project if routing to the artifact tree.
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
-export async function verifyAuthentication(): Promise<void> {
+export async function handleAuthentication(): Promise<void> {
   try {
     const isAuthorized = await sessionModule.hasAuthorization();
     const location = window.location.href;
 
     if (!isAuthorized) {
-      await logout();
+      await handleLogout();
     } else if (isAuthorized && location.includes(Routes.ARTIFACT)) {
-      await loadLastProject();
+      await handleLoadLastProject();
     }
   } catch (e) {
-    await logout();
+    await handleLogout();
   }
 }

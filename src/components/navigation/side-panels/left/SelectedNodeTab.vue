@@ -150,7 +150,7 @@ import {
   ProjectDocument,
   ProjectWarnings,
 } from "@/types";
-import { deleteArtifactFromCurrentVersion } from "@/api";
+import { handleDeleteArtifact } from "@/api";
 import {
   appModule,
   artifactModule,
@@ -228,7 +228,7 @@ export default Vue.extend({
     },
     onDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
-        deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
+        handleDeleteArtifact(this.selectedArtifact).then(() => {
           appModule.closePanel(PanelType.left);
         });
       }

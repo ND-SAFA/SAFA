@@ -1,19 +1,17 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { ProjectMessage, VersionMessage, VersionMessageType } from "@/types";
+import { ProjectMessage, VersionMessage } from "@/types";
 import { logModule, projectModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/util";
 import {
   getProjectMembers,
   getProjectVersion,
-  reloadDocumentArtifacts,
-  reloadWarningsHandler,
-  setCreatedProject,
+  handleDocumentReload,
+  handleReloadWarnings,
+  handleSetProject,
+  handleReloadArtifacts,
+  handleReloadTraceLinks,
 } from "@/api";
-import {
-  reloadArtifactsHandler,
-  reloadTracesHandler,
-} from "./load-version-handler";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
 let sock: WebSocket;
@@ -25,12 +23,11 @@ let recInterval: NodeJS.Timeout;
 let currentReconnectAttempts = 0;
 
 /**
- * Returns singleton Stomp client or create new one if undefined.
+ * Returns the current stomp client, creating one if none exists.
  *
  * @param reconnect - Whether to create a new connection regardless
  * of websocket state.
- * @throws Throws errors if can't connect to server and reconnect is
- * not enabled.
+ * @throws If unable to connect to the server.
  * @return The stomp client.
  */
 function getStompClient(reconnect = false): Client {
@@ -68,6 +65,7 @@ function connect(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const stomp = getStompClient(isReconnect);
+
     if (stomp.connected) {
       logModule.onDevMessage("Client is connected to WebSocket.");
       clearInterval(recInterval);
@@ -81,6 +79,7 @@ function connect(
     }
 
     currentReconnectAttempts++;
+
     stomp.connect(
       { host: WEBSOCKET_URL() },
       () => {
@@ -172,18 +171,18 @@ async function versionMessageHandler(
   // Handlers for automatic entity updates.
   switch (message.type) {
     case "WARNINGS":
-      return reloadWarningsHandler(versionId);
+      return handleReloadWarnings(versionId);
   }
 
   // Handlers for manual entity updates.
   if (sessionModule.userEmail !== message.user) {
     switch (message.type) {
       case "VERSION":
-        return getProjectVersion(versionId).then(setCreatedProject);
+        return getProjectVersion(versionId).then(handleSetProject);
       case "ARTIFACTS":
-        return reloadArtifactsHandler(versionId);
+        return handleReloadArtifacts(versionId);
       case "TRACES":
-        return reloadTracesHandler(versionId);
+        return handleReloadTraceLinks(versionId);
     }
   }
 }
@@ -203,6 +202,6 @@ async function projectMessageHandler(
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
     case "DOCUMENTS":
-      return reloadDocumentArtifacts(projectId);
+      return handleDocumentReload(projectId);
   }
 }

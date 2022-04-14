@@ -4,7 +4,7 @@ import type { DocumentColumn, Project, ProjectDocument } from "@/types";
 import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, traceModule } from "@/store";
-import { resetGraphFocus } from "@/api";
+import { handleResetGraph } from "@/api";
 import { artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "document" })
@@ -98,7 +98,7 @@ export default class DocumentModule extends VuexModule {
     this.SET_CURRENT_DOCUMENT(document);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
-    await resetGraphFocus();
+    await handleResetGraph();
   }
 
   @Action

@@ -1,6 +1,6 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { updateProjectThroughFlatFiles, setCreatedProject } from "@/api";
+import { updateProjectThroughFlatFiles, handleSetProject } from "@/api";
 import { connectAndSubscribeToVersion } from "@/api/notifications";
 
 /**
@@ -11,7 +11,7 @@ import { connectAndSubscribeToVersion } from "@/api/notifications";
  * @param selectedFiles  - The flat files that will update given version.
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful.
  */
-export async function uploadNewProjectVersion(
+export async function handleUploadProjectVersion(
   projectId: string,
   versionId: string,
   selectedFiles: File[],
@@ -51,7 +51,7 @@ export async function uploadNewProjectVersion(
         // Note that changing the order below will cause the project to not properly render initially.
         await navigateTo(Routes.ARTIFACT);
         const res = await uploadFlatFiles();
-        await setCreatedProject(res);
+        await handleSetProject(res);
       } catch (e) {
         await navigateTo(Routes.PROJECT_CREATOR);
         logModule.onError(e.message);

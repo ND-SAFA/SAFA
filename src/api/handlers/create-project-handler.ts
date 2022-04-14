@@ -1,7 +1,7 @@
-import { appModule, logModule } from "@/store";
-import { createJiraProject, saveProject, setCreatedProject } from "@/api";
 import { Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
+import { appModule, logModule } from "@/store";
+import { createJiraProject, saveProject, handleSetProject } from "@/api";
 
 /**
  * Creates a new project, and sets related app state.
@@ -16,7 +16,7 @@ export async function handleImportProject(project: Project): Promise<void> {
     const res = await saveProject(project);
 
     await navigateTo(Routes.ARTIFACT);
-    await setCreatedProject(res);
+    await handleSetProject(res);
   } catch (e) {
     logModule.onError("Unable to import project");
     throw e;

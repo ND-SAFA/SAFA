@@ -8,3 +8,4 @@ export * from "./trace-matrix-handler";
 export * from "./document-handler";
 export * from "./artifact-type-handler";
 export * from "./create-project-handler";
+export * from "./load-version-handler";

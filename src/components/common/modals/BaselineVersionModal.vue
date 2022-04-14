@@ -17,7 +17,7 @@ import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { logModule } from "@/store";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
-import { loadVersionIfExistsHandler } from "@/api";
+import { handleLoadVersion } from "@/api";
 
 /**
  * Stepper for setting the current project and version.
@@ -83,7 +83,7 @@ export default Vue.extend({
       } else {
         this.isLoading = true;
 
-        await loadVersionIfExistsHandler(this.selectedVersion.versionId);
+        await handleLoadVersion(this.selectedVersion.versionId);
         this.isLoading = false;
         this.$emit("close");
       }

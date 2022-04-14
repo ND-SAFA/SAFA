@@ -1,39 +1,21 @@
-import { documentModule, projectModule } from "@/store";
-import { Artifact, DocumentType, Project, ProjectDocument } from "@/types";
-import {
-  saveDocument,
-  deleteDocument,
-  getDocuments,
-} from "@/api/endpoints/document-api";
+import { Artifact, DocumentType, ProjectDocument } from "@/types";
 import { createDocument } from "@/util";
+import { documentModule, projectModule } from "@/store";
+import { saveDocument, deleteDocument, getDocuments } from "@/api";
 
 /**
- * Adds documents to the given project object.
- *
- * @param project - The project to load documents for.
- */
-export async function loadProjectDocuments(
-  project: Project = projectModule.getProject
-): Promise<void> {
-  project.documents = await getDocuments(project.projectId).catch(() => []);
-}
-
-/**
- * Creates a new document.
+ * Creates a new document and updates app state.
  *
  * @param name - The document name create.
  * @param type - The document type create.
  * @param artifactIds - The artifacts shown in the document.
  */
-export async function addNewDocument(
+export async function handleCreateDocument(
   name: string,
   type: DocumentType,
   artifactIds: string[]
 ): Promise<void> {
   const versionId = projectModule.versionIdWithLog;
-
-  if (!versionId) return;
-
   const createdDocument = await saveDocument(
     versionId,
     createDocument({
@@ -48,16 +30,16 @@ export async function addNewDocument(
 }
 
 /**
- * Edits an existing document.
+ * Updates an existing document and updates app state.
  *
  * @param document - The document to edit.
  */
-export async function editDocument(document: ProjectDocument): Promise<void> {
+export async function handleUpdateDocument(
+  document: ProjectDocument
+): Promise<void> {
   const versionId = projectModule.versionIdWithLog;
-
-  if (!versionId) return;
-
   const updatedDocument = await saveDocument(versionId, document);
+
   await documentModule.updateDocuments([updatedDocument]);
 
   if (documentModule.document.documentId === updatedDocument.documentId) {
@@ -66,11 +48,12 @@ export async function editDocument(document: ProjectDocument): Promise<void> {
 }
 
 /**
- * Deletes the document and switches document's if this one was visible.
+ * Deletes the document and updates app state.
+ * Switches documents if the current one has been deleted.
  *
  * @param document - The document to delete.
  */
-export async function deleteAndSwitchDocuments(
+export async function handleDeleteDocument(
   document: ProjectDocument
 ): Promise<void> {
   await deleteDocument(document);
@@ -78,12 +61,12 @@ export async function deleteAndSwitchDocuments(
 }
 
 /**
- * Updates the artifact IDs for the all documents.
+ * Updates the artifact for the all documents.
  *
  * @param projectId - The project to load documents for.
  * @param artifacts - The full list of artifacts.
  */
-export async function reloadDocumentArtifacts(
+export async function handleDocumentReload(
   projectId = projectModule.projectId,
   artifacts: Artifact[] = projectModule.getProject.artifacts
 ): Promise<void> {

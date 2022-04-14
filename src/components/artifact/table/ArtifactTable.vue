@@ -84,7 +84,7 @@ import {
 } from "@/types";
 import { ThemeColors } from "@/util";
 import { artifactModule, deltaModule, documentModule } from "@/store";
-import { deleteArtifactFromCurrentVersion } from "@/api";
+import { handleDeleteArtifact } from "@/api";
 import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
@@ -170,7 +170,7 @@ export default Vue.extend({
       this.createDialogueOpen = true;
     },
     handleDelete(artifact: Artifact) {
-      deleteArtifactFromCurrentVersion(artifact);
+      handleDeleteArtifact(artifact);
     },
     handleCreate() {
       this.createDialogueOpen = DocumentType.FMEA;

@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { GenericFileSelector } from "@/components/common";
-import { saveProject, uploadNewProjectVersion } from "@/api";
+import { saveProject, handleUploadProjectVersion } from "@/api";
 import { logModule } from "@/store";
 
 /**
@@ -64,7 +64,7 @@ export default Vue.extend({
           description: this.description,
         });
 
-        await uploadNewProjectVersion(
+        await handleUploadProjectVersion(
           project.project.projectId,
           project.projectVersion.versionId,
           this.selectedFiles,

@@ -4,41 +4,38 @@ import {
   getArtifactsInVersion,
   getProjectVersion,
   getTracesInVersion,
-} from "@/api/endpoints";
-import { reloadTraceMatrices, setCreatedProject } from "@/api";
-import { getWarningsInProjectVersion } from "@/api/endpoints/warning-api";
+  handleLoadTraceMatrices,
+  handleSetProject,
+  getWarningsInProjectVersion,
+} from "@/api";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
  * tree page in order to show the new project.
  *
- * @param lastVersionId The id of the version to retrieve and load.
+ * @param versionId - The id of the version to retrieve and load.
  */
-export async function loadVersionIfExistsHandler(
-  lastVersionId: string | undefined
-): Promise<void> {
-  if (lastVersionId) {
-    appModule.onLoadStart();
+export async function handleLoadVersion(versionId: string): Promise<void> {
+  appModule.onLoadStart();
 
-    return navigateTo(Routes.ARTIFACT)
-      .then(() => getProjectVersion(lastVersionId))
-      .then(setCreatedProject)
-      .finally(appModule.onLoadEnd);
-  }
+  return navigateTo(Routes.ARTIFACT)
+    .then(() => getProjectVersion(versionId))
+    .then(handleSetProject)
+    .finally(appModule.onLoadEnd);
 }
 
 /**
  * Call this function whenever artifacts need to be re-downloaded.
  * Reloads project artifacts for the given version.
  *
- * @param versionId - The project version ID of the revision.
+ * @param versionId - The project version to load from.
  */
-export async function reloadArtifactsHandler(versionId: string): Promise<void> {
+export async function handleReloadArtifacts(versionId: string): Promise<void> {
   const artifacts = await getArtifactsInVersion(versionId);
   const currentArtifactCount = projectModule.getProject.artifacts.length;
 
   await projectModule.addOrUpdateArtifacts(artifacts);
-  await reloadTraceMatrices();
+  await handleLoadTraceMatrices();
 
   if (artifacts.length > currentArtifactCount) {
     await viewportModule.setArtifactTreeLayout();
@@ -49,21 +46,23 @@ export async function reloadArtifactsHandler(versionId: string): Promise<void> {
  * Call this function whenever trace links need to be re-downloaded.
  * Reloads project traces for the given version.
  *
- * @param versionId - The project version ID of the revision.
+ * @param versionId - The project version to load from.
  */
-export async function reloadTracesHandler(versionId: string): Promise<void> {
+export async function handleReloadTraceLinks(versionId: string): Promise<void> {
   const traces = await getTracesInVersion(versionId);
 
   await projectModule.addOrUpdateTraceLinks(traces);
-  await reloadTraceMatrices();
+  await handleLoadTraceMatrices();
   viewportModule.applyAutomove();
 }
 
 /**
- * Call this function whenever warnings need ot be re-downloaded.
- * @param versionId The id of whose versioned entities' warnings are updated.
+ * Call this function whenever warnings need to be re-downloaded.
+ *
+ * @param versionId - The project version to load from.
  */
-export async function reloadWarningsHandler(versionId: string): Promise<void> {
+export async function handleReloadWarnings(versionId: string): Promise<void> {
   const warnings = await getWarningsInProjectVersion(versionId);
+
   errorModule.setArtifactWarnings(warnings);
 }

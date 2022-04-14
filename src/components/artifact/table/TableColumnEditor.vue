@@ -57,7 +57,7 @@ import { documentModule, logModule } from "@/store";
 import { GenericIconButton } from "@/components/common/generic";
 import { columnTypeOptions } from "@/util";
 import TableColumnModal from "./TableColumnModal.vue";
-import { editDocument } from "@/api";
+import { handleUpdateDocument } from "@/api";
 
 export default Vue.extend({
   name: "TableColumnEditor",
@@ -121,7 +121,7 @@ export default Vue.extend({
 
       this.items = document.columns = [...columns];
 
-      editDocument(document)
+      handleUpdateDocument(document)
         .then(() => {
           logModule.onSuccess(`Column order updated`);
         })

@@ -13,20 +13,20 @@ import {
 } from "@/api";
 
 /**
- * Creates or updates artifact in BEND then updates app state.
+ * Creates or updates and artifact, and updates app state.
  *
- * @param versionId - The version that the artifact is stored within.
  * @param artifact - The artifact to create.
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
  * @param parentArtifact - The parent artifact to link to.
  */
-export async function createOrUpdateArtifactHandler(
-  versionId: string,
+export async function handleSaveArtifact(
   artifact: Artifact,
   isUpdate: boolean,
   parentArtifact?: Artifact
 ): Promise<void> {
+  const versionId = projectModule.versionIdWithLog;
+
   if (isUpdate) {
     const updatedArtifacts = await updateArtifact(versionId, artifact);
 
@@ -56,19 +56,12 @@ export async function createOrUpdateArtifactHandler(
 }
 
 /**
- * Requests the deletion of artifact body in currently selected project version.
- * The artifact is removed from the store if the request is successful.
+ * Deletes an artifact, and updates the app state.
  *
  * @param artifact  - The artifact to delete.
  */
-export function deleteArtifactFromCurrentVersion(
-  artifact: Artifact
-): Promise<void> {
+export function handleDeleteArtifact(artifact: Artifact): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (!projectModule.versionIdWithLog) {
-      return resolve();
-    }
-
     logModule.SET_CONFIRMATION_MESSAGE({
       type: ConfirmationType.INFO,
       title: `Delete ${artifact.name}?`,

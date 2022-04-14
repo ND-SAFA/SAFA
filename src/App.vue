@@ -19,10 +19,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { verifyAuthentication } from "@/api";
-import { AppConfirmModal, ArtifactCreatorModal, Snackbar } from "@/components";
-import { appModule, logModule } from "@/store";
 import { PanelType } from "@/types";
+import { appModule, logModule } from "@/store";
+import { handleAuthentication } from "@/api";
+import { AppConfirmModal, ArtifactCreatorModal, Snackbar } from "@/components";
 
 export default Vue.extend({
   name: "app",
@@ -32,7 +32,7 @@ export default Vue.extend({
     AppConfirmModal,
   },
   async mounted() {
-    await verifyAuthentication();
+    await handleAuthentication();
   },
   computed: {
     isArtifactCreatorOpen: () => appModule.getIsArtifactCreatorOpen,

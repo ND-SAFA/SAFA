@@ -49,7 +49,7 @@
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { login } from "@/api";
+import { handleLogin } from "@/api";
 
 /**
  * Presents the login page.
@@ -67,7 +67,7 @@ export default Vue.extend({
     handleLogin() {
       this.isLoading = true;
 
-      login({
+      handleLogin({
         email: this.email,
         password: this.password,
       })

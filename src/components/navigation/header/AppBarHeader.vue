@@ -49,7 +49,7 @@ import {
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
-import { clearProject, loadVersionIfExistsHandler } from "@/api";
+import { handleClearProject, handleLoadVersion } from "@/api";
 import {
   BaselineVersionModal,
   ButtonRow,
@@ -84,7 +84,7 @@ export default Vue.extend({
       this.openProjectOpen = true;
     },
     async onCreateProject(): Promise<void> {
-      await clearProject();
+      await handleClearProject();
       await navigateTo(Routes.PROJECT_CREATOR);
     },
     onUploadVersion(): void {
@@ -105,7 +105,7 @@ export default Vue.extend({
       }
     },
     onVersionCreated(version: ProjectVersion) {
-      loadVersionIfExistsHandler(version.versionId);
+      handleLoadVersion(version.versionId);
 
       this.createVersionOpen = false;
     },

@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logout } from "@/api";
+import { handleLogout } from "@/api";
 import { logModule, sessionModule } from "@/store";
 
 export default Vue.extend({
@@ -52,7 +52,7 @@ export default Vue.extend({
   },
   methods: {
     handleLogout(): void {
-      logout();
+      handleLogout();
     },
     handleEditAccount(): void {
       logModule.onInfo("Account editing is not yet available");

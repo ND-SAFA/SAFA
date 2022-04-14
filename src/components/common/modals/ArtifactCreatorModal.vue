@@ -99,7 +99,7 @@ import {
   logicTypeOptions,
   safetyCaseOptions,
 } from "@/util";
-import { createOrUpdateArtifactHandler, getDoesArtifactExist } from "@/api";
+import { handleSaveArtifact, getDoesArtifactExist } from "@/api";
 import {
   artifactModule,
   documentModule,
@@ -158,7 +158,7 @@ export default Vue.extend({
       return projectModule.projectId;
     },
     versionId(): string {
-      return projectModule.versionIdWithLog || "";
+      return projectModule.versionIdWithLog;
     },
 
     isFTA(): boolean {
@@ -288,12 +288,7 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      createOrUpdateArtifactHandler(
-        this.versionId,
-        artifact,
-        isUpdate,
-        this.parentArtifact
-      )
+      handleSaveArtifact(artifact, isUpdate, this.parentArtifact)
         .then(async () => {
           this.$emit("close");
         })

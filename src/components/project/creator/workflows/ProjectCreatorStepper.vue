@@ -80,7 +80,7 @@ import {
   TraceLink,
 } from "@/types";
 import { createProject } from "@/util";
-import { handleImportProject, saveProject, setCreatedProject } from "@/api";
+import { handleImportProject, saveProject, handleSetProject } from "@/api";
 import { appModule, sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components/common";

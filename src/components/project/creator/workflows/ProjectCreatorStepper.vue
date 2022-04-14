@@ -80,7 +80,11 @@ import {
   TraceLink,
 } from "@/types";
 import { createProject } from "@/util";
-import { saveOrUpdateProject, setCreatedProject } from "@/api";
+import {
+  handleImportProject,
+  saveOrUpdateProject,
+  setCreatedProject,
+} from "@/api";
 import { appModule, sessionModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { GenericStepper } from "@/components/common";
@@ -130,16 +134,7 @@ export default Vue.extend({
       this.traceUploader = createTraceUploader();
     },
     saveProject(): void {
-      appModule.onLoadStart();
-      saveOrUpdateProject(this.project)
-        .then(async (res) => {
-          this.clearData();
-          await navigateTo(Routes.ARTIFACT);
-          await setCreatedProject(res);
-        })
-        .finally(() => {
-          appModule.onLoadEnd();
-        });
+      handleImportProject(this.project).then(() => this.clearData());
     },
   },
   computed: {

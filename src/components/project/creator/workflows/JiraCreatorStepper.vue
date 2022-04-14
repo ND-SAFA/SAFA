@@ -33,8 +33,12 @@
 import Vue from "vue";
 import { JiraCloudSite, JiraProject, StepState } from "@/types";
 import { getParam, QueryParams } from "@/router";
-import { logModule } from "@/store";
-import { getJiraToken, getJiraProjects, getJiraCloudSites } from "@/api";
+import {
+  getJiraToken,
+  getJiraProjects,
+  getJiraCloudSites,
+  handleImportJiraProject,
+} from "@/api";
 import { GenericStepper } from "@/components/common";
 import {
   JiraAuthentication,
@@ -134,18 +138,13 @@ export default Vue.extend({
       }
     },
     handleSaveProject(): void {
-      logModule.onInfo("Jira projects can not yet be created");
-      // TODO: when endpoint exists:
-      // appModule.onLoadStart();
-      // saveOrUpdateProject(this.project)
-      //   .then(async (res) => {
-      //     this.clearData();
-      //     await navigateTo(Routes.ARTIFACT);
-      //     await setCreatedProject(res);
-      //   })
-      //   .finally(() => {
-      //     appModule.onLoadEnd();
-      //   });
+      if (!this.token || !this.selectedSite || !this.selectedProject) return;
+
+      handleImportJiraProject(
+        this.token,
+        this.selectedSite.id,
+        this.selectedProject.id
+      ).then(() => this.clearData());
     },
   },
 });

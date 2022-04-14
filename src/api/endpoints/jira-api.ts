@@ -3,8 +3,10 @@ import {
   JiraCloudSite,
   JiraProject,
   JiraProjectList,
+  ProjectCreationResponse,
 } from "@/types";
 import { logModule, sessionModule } from "@/store";
+import { authHttpClient, Endpoint } from "@/api";
 
 const scopes = [
   // Current Jira API version:
@@ -46,7 +48,7 @@ async function fetchAtlassian<T>(
 }
 
 /**
- * Opens an external link to authorize jira.
+ * Opens an external link to authorize Jira.
  */
 export function authorizeJira(): void {
   window.open(
@@ -64,8 +66,8 @@ export function authorizeJira(): void {
 /**
  * Exchanges an atlassian access code for a API token.
  *
- * @param accessCode - The access code received from authorizing jira.
- * @return The jira access token.
+ * @param accessCode - The access code received from authorizing Jira.
+ * @return The Jira access token.
  */
 export async function getJiraToken(accessCode: string): Promise<string> {
   const authorization = await fetchAtlassian<JiraAccessToken>(
@@ -92,7 +94,7 @@ export async function getJiraToken(accessCode: string): Promise<string> {
  * Exchanges an atlassian access code for the list of cloud sites associated with the given user.
  *
  * @param accessToken - The access token received from authorizing jira.
- * @return The jira sites for this user.
+ * @return The Jira sites for this user.
  */
 export async function getJiraCloudSites(
   accessToken: string
@@ -109,10 +111,10 @@ export async function getJiraCloudSites(
 }
 
 /**
- * Returns all jira projects for the given user.
+ * Returns all Jira projects for the given user's company.
  *
- * @param accessToken - The access token received from authorizing jira.
- * @param cloudId - The cloud id for the current user.
+ * @param accessToken - The access token received from authorizing Jira.
+ * @param cloudId - The Jira cloud id for the current company.
  * @return The user's projects associated with this company.
  */
 export async function getJiraProjects(
@@ -131,4 +133,26 @@ export async function getJiraProjects(
   );
 
   return projects.values;
+}
+
+/**
+ * Creates a new project based on a Jira project.
+ *
+ * @param accessToken - The access token received from authorizing Jira.
+ * @param cloudId - The Jira cloud id for the current company.
+ * @param projectId - The Jira project id to import.
+ */
+export async function postJiraProject(
+  accessToken: string,
+  cloudId: string,
+  projectId: string
+): Promise<void> {
+  return authHttpClient<void>(Endpoint.jiraProject, {
+    method: "POST",
+    body: JSON.stringify({
+      cloudId,
+      projectId,
+      bearerAccessToken: accessToken,
+    }),
+  });
 }

@@ -39,10 +39,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
+import { logModule, projectModule } from "@/store";
 import { uploadNewProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common/generic";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
-import { logModule, projectModule } from "@/store";
 
 /**
  * Modal for uploading a new version.

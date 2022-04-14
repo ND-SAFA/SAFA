@@ -2,13 +2,13 @@ import { UserModel } from "@/types";
 import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import { sessionModule } from "@/store";
-import { loadLastProject, clearProject, loginUser } from "@/api";
+import { loadLastProject, clearProject, createLoginSession } from "@/api";
 
 /**
  * Attempts to log a user in.
  */
 export async function login(user: UserModel): Promise<void> {
-  const session = await loginUser(user);
+  const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
 

@@ -7,9 +7,8 @@ import {
   TraceLink,
   TraceType,
 } from "@/types";
-import { createLink } from "@/api";
+import { handleCreateLink } from "@/api";
 import { disableDrawMode } from "./edgeHandlesCore";
-import { logModule } from "@/store";
 
 /**
  * Creates the finalized trace link when an edge creation draw is completed.
@@ -44,8 +43,5 @@ export function onArtifactTreeEdgeComplete(
 
   addedEdge.remove();
 
-  createLink(traceLink).catch((e) => {
-    logModule.onError("Unable to create a trace link");
-    logModule.onDevError(e.toString());
-  });
+  handleCreateLink(traceLink);
 }

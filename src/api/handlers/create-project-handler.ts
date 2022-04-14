@@ -1,5 +1,5 @@
 import { appModule, logModule } from "@/store";
-import { postJiraProject, saveOrUpdateProject, setCreatedProject } from "@/api";
+import { createJiraProject, saveProject, setCreatedProject } from "@/api";
 import { Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 
@@ -13,7 +13,7 @@ export async function handleImportProject(project: Project): Promise<void> {
   appModule.onLoadStart();
 
   try {
-    const res = await saveOrUpdateProject(project);
+    const res = await saveProject(project);
 
     await navigateTo(Routes.ARTIFACT);
     await setCreatedProject(res);
@@ -41,7 +41,7 @@ export async function handleImportJiraProject(
   appModule.onLoadStart();
 
   try {
-    await postJiraProject(accessToken, cloudId, projectId);
+    await createJiraProject(accessToken, cloudId, projectId);
   } catch (e) {
     logModule.onError("Unable to import jira project");
     throw e;

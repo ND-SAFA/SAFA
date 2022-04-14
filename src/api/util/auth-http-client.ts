@@ -1,6 +1,6 @@
 import { APIOptions } from "@/types";
 import { logModule, sessionModule } from "@/store";
-import { baseURL } from "./endpoints";
+import { baseURL } from "@/api";
 import { logout } from "@/api/handlers";
 
 /**

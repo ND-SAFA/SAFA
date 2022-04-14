@@ -52,9 +52,9 @@ import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import {
-  createNewMajorVersion,
-  createNewMinorVersion,
-  createNewRevisionVersion,
+  createMajorVersion,
+  createMinorVersion,
+  createRevisionVersion,
   getCurrentVersion,
 } from "@/api";
 import { GenericModal } from "@/components/common";
@@ -125,13 +125,13 @@ export default Vue.extend({
 
       switch (versionType) {
         case "major":
-          createVersionFrom(createNewMajorVersion);
+          createVersionFrom(createMajorVersion);
           break;
         case "minor":
-          createVersionFrom(createNewMinorVersion);
+          createVersionFrom(createMinorVersion);
           break;
         case "revision":
-          createVersionFrom(createNewRevisionVersion);
+          createVersionFrom(createRevisionVersion);
           break;
         default:
           throw Error("Unknown type" + versionType);
@@ -144,7 +144,7 @@ export default Vue.extend({
 
   watch: {
     isOpen(isOpen: boolean) {
-      if (isOpen) {
+      if (isOpen && this.project) {
         getCurrentVersion(this.project.projectId).then(
           (version) => (this.currentVersion = version)
         );

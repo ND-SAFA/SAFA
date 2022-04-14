@@ -1,9 +1,9 @@
 import { documentModule, projectModule } from "@/store";
 import { Artifact, DocumentType, Project, ProjectDocument } from "@/types";
 import {
-  createOrUpdateDocument,
+  saveDocument,
   deleteDocument,
-  getProjectDocuments,
+  getDocuments,
 } from "@/api/endpoints/document-api";
 import { createDocument } from "@/util";
 
@@ -15,9 +15,7 @@ import { createDocument } from "@/util";
 export async function loadProjectDocuments(
   project: Project = projectModule.getProject
 ): Promise<void> {
-  project.documents = await getProjectDocuments(project.projectId).catch(
-    () => []
-  );
+  project.documents = await getDocuments(project.projectId).catch(() => []);
 }
 
 /**
@@ -36,7 +34,7 @@ export async function addNewDocument(
 
   if (!versionId) return;
 
-  const createdDocument = await createOrUpdateDocument(
+  const createdDocument = await saveDocument(
     versionId,
     createDocument({
       project: projectModule.getProject,
@@ -59,7 +57,7 @@ export async function editDocument(document: ProjectDocument): Promise<void> {
 
   if (!versionId) return;
 
-  const updatedDocument = await createOrUpdateDocument(versionId, document);
+  const updatedDocument = await saveDocument(versionId, document);
   await documentModule.updateDocuments([updatedDocument]);
 
   if (documentModule.document.documentId === updatedDocument.documentId) {
@@ -89,7 +87,7 @@ export async function reloadDocumentArtifacts(
   projectId = projectModule.projectId,
   artifacts: Artifact[] = projectModule.getProject.artifacts
 ): Promise<void> {
-  const documents = await getProjectDocuments(projectId);
+  const documents = await getDocuments(projectId);
 
   await documentModule.updateDocuments(documents);
 

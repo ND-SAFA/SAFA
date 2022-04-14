@@ -51,12 +51,7 @@ import {
   ProjectIdentifier,
   ProjectRole,
 } from "@/types";
-import {
-  clearProject,
-  deleteProject,
-  getProjects,
-  saveOrUpdateProject,
-} from "@/api";
+import { clearProject, deleteProject, getProjects, saveProject } from "@/api";
 import { logModule, projectModule, sessionModule } from "@/store";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -197,7 +192,7 @@ export default Vue.extend({
     saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<void> {
       this.isLoading = true;
 
-      return saveOrUpdateProject(project)
+      return saveProject(project)
         .then(({ project }: ProjectCreationResponse) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId

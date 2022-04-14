@@ -44,7 +44,7 @@ import {
   ProjectRole,
 } from "@/types";
 import { logModule } from "@/store";
-import { addOrUpdateProjectMember } from "@/api";
+import { saveProjectMember } from "@/api";
 import { GenericModal, ButtonRow } from "@/components/common";
 
 /**
@@ -144,7 +144,7 @@ export default Vue.extend({
         projectId !== undefined &&
         projectRole !== undefined
       ) {
-        addOrUpdateProjectMember(projectId, this.userEmail, projectRole)
+        saveProjectMember(projectId, this.userEmail, projectRole)
           .then(() => this.$emit("confirm", project))
           .catch();
       } else {

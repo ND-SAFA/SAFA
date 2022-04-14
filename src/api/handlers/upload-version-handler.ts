@@ -1,10 +1,7 @@
 import { appModule, logModule } from "@/store";
-import { navigateTo, QueryParams, Routes } from "@/router";
-import {
-  connectAndSubscribeToVersion,
-  updateProjectThroughFlatFiles,
-} from "@/api/endpoints";
-import { setCreatedProject } from "@/api";
+import { navigateTo, Routes } from "@/router";
+import { updateProjectThroughFlatFiles, setCreatedProject } from "@/api";
+import { connectAndSubscribeToVersion } from "@/api/notifications";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.

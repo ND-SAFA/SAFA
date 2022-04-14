@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { GenericFileSelector } from "@/components/common";
-import { saveOrUpdateProject, uploadNewProjectVersion } from "@/api";
+import { saveProject, uploadNewProjectVersion } from "@/api";
 import { logModule } from "@/store";
 
 /**
@@ -58,7 +58,7 @@ export default Vue.extend({
       try {
         this.isLoading = true;
 
-        const project = await saveOrUpdateProject({
+        const project = await saveProject({
           projectId: "",
           name: this.name,
           description: this.description,

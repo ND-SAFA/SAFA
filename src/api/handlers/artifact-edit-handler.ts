@@ -7,10 +7,10 @@ import {
 } from "@/store";
 import {
   createArtifact,
-  createLink,
-  deleteArtifactBody,
+  deleteArtifact,
   updateArtifact,
-} from "@/api/commits";
+  handleCreateLink,
+} from "@/api";
 
 /**
  * Creates or updates artifact in BEND then updates app state.
@@ -41,7 +41,7 @@ export async function createOrUpdateArtifactHandler(
     if (!parentArtifact) return;
 
     for (const createdArtifact of createdArtifacts) {
-      await createLink({
+      await handleCreateLink({
         traceLinkId: "",
         sourceName: createdArtifact.name,
         sourceId: createdArtifact.id,
@@ -75,7 +75,7 @@ export function deleteArtifactFromCurrentVersion(
       body: `Deleting this artifact cannot be undone in this version of SAFA.`,
       statusCallback: (isConfirmed: boolean) => {
         if (isConfirmed) {
-          deleteArtifactBody(artifact)
+          deleteArtifact(artifact)
             .then(async () => {
               await projectModule.deleteArtifacts([artifact]);
               await artifactSelectionModule.UNSELECT_ARTIFACT();

@@ -99,7 +99,7 @@ import {
   logicTypeOptions,
   safetyCaseOptions,
 } from "@/util";
-import { createOrUpdateArtifactHandler, isArtifactNameTaken } from "@/api";
+import { createOrUpdateArtifactHandler, getDoesArtifactExist } from "@/api";
 import {
   artifactModule,
   documentModule,
@@ -252,15 +252,17 @@ export default Vue.extend({
 
       this.nameCheckIsLoading = true;
       this.nameCheckTimer = setTimeout(() => {
-        isArtifactNameTaken(this.versionId, newName).then((res) => {
-          this.nameCheckIsLoading = false;
-          this.isNameValid =
-            !res.artifactExists || newName === this.artifact.name;
-          this.nameError = this.isNameValid
-            ? ""
-            : "Name is already used, please select another.";
-          this.canSave = this.isNameValid;
-        });
+        getDoesArtifactExist(this.versionId, newName).then(
+          ({ artifactExists }) => {
+            this.nameCheckIsLoading = false;
+            this.isNameValid =
+              !artifactExists || newName === this.artifact.name;
+            this.nameError = this.isNameValid
+              ? ""
+              : "Name is already used, please select another.";
+            this.canSave = this.isNameValid;
+          }
+        );
       }, 500);
     },
     editedArtifact: {

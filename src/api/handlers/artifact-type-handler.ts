@@ -1,5 +1,5 @@
 import { ArtifactType } from "@/types";
-import { createOrUpdateArtifactType } from "@/api/endpoints/artifact-type-api";
+import { saveArtifactType } from "@/api/endpoints/artifact-type-api";
 import { projectModule } from "@/store";
 
 /**
@@ -10,7 +10,7 @@ import { projectModule } from "@/store";
 export async function artifactTypeChangeHandler(
   artifactType: ArtifactType
 ): Promise<void> {
-  const updatedArtifactType = await createOrUpdateArtifactType(
+  const updatedArtifactType = await saveArtifactType(
     projectModule.projectId,
     artifactType
   );

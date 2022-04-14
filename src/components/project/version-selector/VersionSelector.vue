@@ -143,13 +143,11 @@ export default Vue.extend({
         .finally(() => (this.isLoading = false));
     },
     loadProjectVersions() {
-      this.isLoading = true;
-      const project: ProjectIdentifier | undefined = this.project;
-      if (this.project === undefined) {
-        return;
-      }
+      if (!this.project) return;
 
-      getProjectVersions(project.projectId)
+      this.isLoading = true;
+
+      getProjectVersions(this.project.projectId)
         .then((versions: ProjectVersion[]) => {
           this.versions = versions;
         })

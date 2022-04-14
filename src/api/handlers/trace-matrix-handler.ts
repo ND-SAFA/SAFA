@@ -1,4 +1,4 @@
-import { deleteTraceMatrix, retrieveTraceMatrices } from "@/api";
+import { deleteTraceMatrix, getTraceMatrices } from "@/api";
 import { projectModule, typeOptionsModule } from "@/store";
 
 /**
@@ -7,7 +7,7 @@ import { projectModule, typeOptionsModule } from "@/store";
  * @return The current trace matrices.
  */
 export async function reloadTraceMatrices(): Promise<void> {
-  const matrix = await retrieveTraceMatrices(projectModule.getProject);
+  const matrix = await getTraceMatrices(projectModule.projectId);
 
   typeOptionsModule.SET_LINK_DIRECTIONS(matrix);
 }
@@ -23,7 +23,7 @@ export async function removeTraceType(
   targetArtifactTypeName: string
 ): Promise<void> {
   await deleteTraceMatrix(
-    projectModule.getProject,
+    projectModule.projectId,
     sourceArtifactTypeName,
     targetArtifactTypeName
   );

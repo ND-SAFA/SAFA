@@ -24,53 +24,53 @@ export enum Endpoint {
   deleteProjectMember = "projects/members/:projectMemberId",
   jiraProject = "projects/import/jira",
 
-  //Commits
+  // Commits
   commit = "projects/versions/:versionId/commit",
   isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/:artifactName",
 
-  //Types
+  // Types
   getProjectArtifactTypes = "projects/:projectId/artifactTypes",
   createOrUpdateArtifactType = "projects/:projectId/artifactTypes",
   deleteArtifactType = "projects/:projectId/artifactTypes/:typeId",
 
-  //Links
+  // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
 
-  //Entity Retrieval
+  // Entity Retrieval
   projectVersion = "projects/versions/:versionId",
   getArtifactsInVersion = "projects/versions/:versionId/artifacts",
   getTracesInVersion = "projects/versions/:versionId/traces",
 
-  //Versions
+  // Versions
   getProjectVersions = "projects/:projectId/versions",
   getCurrentVersion = "projects/:projectId/versions/current",
   createNewMajorVersion = "projects/:projectId/versions/major",
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
 
-  //Documents
+  // Documents
   createOrUpdateDocument = "projects/versions/:versionId/documents",
   getProjectDocuments = "projects/:projectId/documents",
   deleteDocument = "projects/documents/:documentId",
 
-  //Document Artifacts
+  // Document Artifacts
   addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
   removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
 
-  //Delta
+  // Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
 
-  //Parse Entities
+  // Parse Entities
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
 
-  //Trace Matrices
+  // Trace Matrices
   createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
   deleteTraceMatrix = "projects/matrices/:traceMatrixId",
   retrieveTraceMatrices = "projects/:projectId/matrices",
 
-  //Warnings
+  // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
 }
 

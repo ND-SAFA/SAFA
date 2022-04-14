@@ -37,7 +37,7 @@
 import Vue from "vue";
 import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { resetPassword } from "@/api";
+import { updatePassword } from "@/api";
 
 /**
  * Presents the reset password page.
@@ -56,7 +56,7 @@ export default Vue.extend({
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
     handleReset() {
-      resetPassword({
+      updatePassword({
         password: this.password,
         token: this.token,
       })

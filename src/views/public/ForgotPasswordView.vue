@@ -45,7 +45,7 @@
 import Vue from "vue";
 import { CardPage } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { forgotPassword } from "@/api";
+import { createPasswordReset } from "@/api";
 
 /**
  * Presents the forgot password page.
@@ -63,7 +63,7 @@ export default Vue.extend({
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
     handleReset() {
-      forgotPassword({
+      createPasswordReset({
         email: this.email,
       })
         .then(() => {

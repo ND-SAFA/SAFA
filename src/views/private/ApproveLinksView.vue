@@ -41,11 +41,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  approveLinkAPIHandler,
-  declineLinkAPIHandler,
-  getGeneratedLinks,
-} from "@/api";
+import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
 import {
   TraceApproval,
   TraceLink,
@@ -114,13 +110,13 @@ export default Vue.extend({
       });
     },
     approveLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
-      approveLinkAPIHandler(link, () => {
+      handleApproveLink(link, () => {
         filterCallback();
         this.approvedLinks = this.approvedLinks.concat([link]);
       });
     },
     declineLinkHandler(link: TraceLink, filterCallback: EmptyLambda) {
-      declineLinkAPIHandler(link, () => {
+      handleDeclineLink(link, () => {
         filterCallback();
         this.declinedLinks = this.declinedLinks.concat([link]);
       });

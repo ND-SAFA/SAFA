@@ -34,7 +34,7 @@ import Vue, { PropType } from "vue";
 import { Project, ProjectIdentifier } from "@/types";
 import { GenericIconButton } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
-import { saveOrUpdateProject } from "@/api";
+import { saveProject } from "@/api";
 import { projectModule } from "@/store";
 
 /**
@@ -64,7 +64,7 @@ export default Vue.extend({
     onSave(project: ProjectIdentifier): void {
       this.isEditLoading = true;
 
-      saveOrUpdateProject({
+      saveProject({
         projectId: this.project.projectId,
         name: project.name,
         description: project.description,

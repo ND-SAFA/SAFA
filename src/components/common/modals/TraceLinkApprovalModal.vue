@@ -27,7 +27,7 @@ import {
   TraceLinkDisplayData,
   TraceType,
 } from "@/types";
-import { approveLinkAPIHandler, declineLinkAPIHandler } from "@/api";
+import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common/generic";
 import { TraceLinkDisplay } from "@/components/common/display";
 
@@ -71,11 +71,11 @@ export default Vue.extend({
   },
   methods: {
     async onApproveLink(traceLink: TraceLink): Promise<void> {
-      await approveLinkAPIHandler(traceLink, undefined);
+      await handleApproveLink(traceLink, undefined);
       this.$emit("close");
     },
     onDeclineLink(traceLink: TraceLink): void {
-      declineLinkAPIHandler(traceLink, undefined);
+      handleDeclineLink(traceLink, undefined);
       this.$emit("close");
     },
   },

@@ -1,4 +1,4 @@
-import { parseTraceFile, generateLinks } from "@/api";
+import { parseTraceFile, createGeneratedLinks } from "@/api";
 import {
   ArtifactMap,
   IGenericUploader,
@@ -58,10 +58,12 @@ function generateTraceLinks(
     (a) => a.type === targetType
   );
 
-  return generateLinks(sourceArtifacts, targetArtifacts).then((traceLinks) => {
-    tracePanel.projectFile.traces = traceLinks;
-    tracePanel.entityNames = traceLinks.map(getTraceId);
-  });
+  return createGeneratedLinks(sourceArtifacts, targetArtifacts).then(
+    (traceLinks) => {
+      tracePanel.projectFile.traces = traceLinks;
+      tracePanel.entityNames = traceLinks.map(getTraceId);
+    }
+  );
 }
 
 function createTraceFile(traceLink: Link): TraceFile {

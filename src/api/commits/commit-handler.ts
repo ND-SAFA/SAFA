@@ -42,10 +42,14 @@ export async function redoCommit(): Promise<void> {
  * @param commit - The commit to apply.
  */
 async function applyArtifactChanges(commit: Commit): Promise<void> {
-  const artifactsAddedOrModified = commit.artifacts.added.concat(
-    commit.artifacts.modified
-  );
-
-  await projectModule.addOrUpdateArtifacts(artifactsAddedOrModified);
+  await projectModule.addOrUpdateArtifacts([
+    ...commit.artifacts.added,
+    ...commit.artifacts.modified,
+  ]);
   await projectModule.deleteArtifacts(commit.artifacts.removed);
+  await projectModule.addOrUpdateTraceLinks([
+    ...commit.traces.added,
+    ...commit.traces.modified,
+  ]);
+  await projectModule.deleteTraceLinks(commit.traces.removed);
 }

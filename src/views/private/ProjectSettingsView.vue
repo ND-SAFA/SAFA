@@ -33,7 +33,19 @@ export default Vue.extend({
     SettingsGeneralSection,
     SettingsMemberSection,
   },
-
+  data() {
+    return {
+      headers: [
+        { text: "Email", value: "email", sortable: false, isSelectable: false },
+        {
+          text: "Role",
+          value: "role",
+          sortable: true,
+          isSelectable: false,
+        },
+      ],
+    };
+  },
   computed: {
     /**
      * @return The current project.
@@ -46,20 +58,6 @@ export default Vue.extend({
      */
     hasDescription(): boolean {
       return this.project.description !== "";
-    },
-    /**
-     * @return The headers for the project members table.
-     */
-    headers() {
-      return [
-        { text: "Email", value: "email", sortable: false, isSelectable: false },
-        {
-          text: "Role",
-          value: "role",
-          sortable: true,
-          isSelectable: false,
-        },
-      ];
     },
   },
   methods: {

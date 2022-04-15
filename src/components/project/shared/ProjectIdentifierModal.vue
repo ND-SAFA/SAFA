@@ -31,7 +31,6 @@
         class="ml-auto"
         :disabled="isDisabled"
       >
-        <v-icon>mdi-check</v-icon>
         Save
       </v-btn>
     </template>

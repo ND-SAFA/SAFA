@@ -6,7 +6,7 @@
     light
     right
     stateless
-    v-model="isRightOpen"
+    :value="isRightOpen"
     width="325"
     height="100%"
   >

@@ -27,9 +27,7 @@
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn @click="handleSubmit" color="primary ">
-        Save <v-icon id="upload-button">mdi-check</v-icon>
-      </v-btn>
+      <v-btn @click="handleSubmit" color="primary "> Save </v-btn>
     </template>
   </generic-modal>
 </template>

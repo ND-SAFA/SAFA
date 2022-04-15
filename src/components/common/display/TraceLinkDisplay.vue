@@ -26,7 +26,6 @@
         class="ma-1"
         @click="$emit('link:approve', link)"
       >
-        <v-icon>mdi-check</v-icon>
         Approve
       </v-btn>
     </v-row>

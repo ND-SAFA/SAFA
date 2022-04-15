@@ -1,6 +1,11 @@
-import { Artifact, DocumentType, ProjectDocument } from "@/types";
+import {
+  Artifact,
+  DocumentColumn,
+  DocumentType,
+  ProjectDocument,
+} from "@/types";
 import { createDocument } from "@/util";
-import { documentModule, projectModule } from "@/store";
+import { documentModule, logModule, projectModule } from "@/store";
 import { saveDocument, deleteDocument, getDocuments } from "@/api";
 
 /**
@@ -75,4 +80,92 @@ export async function handleDocumentReload(
   await documentModule.updateDocuments(documents);
 
   documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
+}
+
+/**
+ * Changes the order of two columns.
+ *
+ * @param column - The column to move.
+ * @param moveUp - Whether to move the column up or down.
+ * @param onSuccess - Called if the operation is successful.
+ */
+export function handleColumnMove(
+  column: DocumentColumn,
+  moveUp: boolean,
+  onSuccess: (cols: DocumentColumn[]) => void
+): void {
+  const document = documentModule.document;
+  const currentIndex = (document.columns || []).indexOf(column);
+  const swapIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
+  const columns = document.columns || [];
+
+  [columns[currentIndex], columns[swapIndex]] = [
+    columns[swapIndex],
+    columns[currentIndex],
+  ];
+
+  document.columns = [...columns];
+
+  handleUpdateDocument(document)
+    .then(() => {
+      logModule.onSuccess(`Column order updated`);
+      onSuccess(document.columns || []);
+    })
+    .catch(() => logModule.onError(`Unable to update column order`));
+}
+
+/**
+ * Creates or updates a column.
+ *
+ * @param column - The column to save.
+ * @param isEditMode - If false, this column will be added to the current document.
+ * @param onSuccess - Called if the operation is successful.
+ */
+export function handleColumnSave(
+  column: DocumentColumn,
+  isEditMode: boolean,
+  onSuccess: () => void
+): void {
+  const document = documentModule.document;
+  const { id: columnId, name } = column;
+
+  if (!isEditMode) {
+    document.columns = [...(document.columns || []), column];
+  } else if (document.columns) {
+    const index = document.columns.findIndex(({ id }) => id === columnId);
+
+    document.columns[index] = column;
+  }
+
+  handleUpdateDocument(document)
+    .then(() => {
+      logModule.onSuccess(`Column updated: ${name}`);
+      onSuccess();
+    })
+    .catch(() => logModule.onError(`Unable to update column: ${name}`));
+}
+
+/**
+ * Deletes a column.
+ *
+ * @param column - The column to delete.
+ * @param onSuccess - Called if the operation is successful.
+ */
+export function handleColumnDelete(
+  column: DocumentColumn,
+  onSuccess: () => void
+): void {
+  const document = documentModule.document;
+  const { id: columnId, name } = column;
+
+  document.columns = (document.columns || []).filter(
+    ({ id }) => id !== columnId
+  );
+
+  handleUpdateDocument(document)
+    .then(() => {
+      logModule.onSuccess(`Column deleted: ${name}`);
+      onSuccess();
+    })
+    .catch(() => logModule.onError(`Unable to delete column: ${name}`));
 }

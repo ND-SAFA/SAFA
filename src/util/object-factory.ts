@@ -118,6 +118,44 @@ export function createArtifact(artifact?: Partial<Artifact>): Artifact {
 }
 
 /**
+ * Creates an artifact that may be initialized to a specific document type.
+ *
+ * @param artifact - The base artifact to create from.
+ * @param type - If true or matching no values, a normal artifact will be created.
+ *               If equal to an `FTANodeType`, an FTA node will be created.
+ *               If equal to a `SafetyCaseType`, a safety case node will be created.
+ *               If equal to a `DocumentType.FMEA`, an FMEA node will be created.
+ * @return An artifact initialized to the given props.
+ */
+export function createArtifactOfType(
+  artifact: Partial<Artifact> | undefined,
+  type: true | string
+): Artifact {
+  if (typeof type === "string") {
+    if (type in FTANodeType) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.FTA,
+        logicType: type as FTANodeType,
+      });
+    } else if (type in SafetyCaseType) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.SAFETY_CASE,
+        safetyCaseType: type as SafetyCaseType,
+      });
+    } else if (type === DocumentType.FMEA) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.FMEA,
+      });
+    }
+  }
+
+  return createArtifact(artifact);
+}
+
+/**
  * @return An column initialized to the given props.
  */
 export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {

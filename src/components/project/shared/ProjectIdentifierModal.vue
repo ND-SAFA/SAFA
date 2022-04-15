@@ -5,7 +5,7 @@
     size="m"
     :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
-    @close="onClose"
+    @close="handleClose"
   >
     <template v-slot:body>
       <project-identifier-input
@@ -101,7 +101,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    onClose() {
+    handleClose() {
       this.$emit("close");
     },
     onSave() {

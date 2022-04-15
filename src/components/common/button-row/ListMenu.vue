@@ -49,12 +49,11 @@ import Vue, { PropType } from "vue";
 import { ListMenuDefinition } from "@/types";
 import { ThemeColors } from "@/util";
 
-const DEFAULT_BUTTON_COLOR = "secondary";
-const DEFAULT_ITEM_COLOR = "primary";
-const DEFAULT_BUTTON_IS_TEXT = true;
-const DEFAULT_SHOW_SELECTED_VALUE = false;
-
+/**
+ * Renders a list menu.
+ */
 export default Vue.extend({
+  name: "ListMenu",
   props: {
     definition: {
       type: Object as PropType<ListMenuDefinition>,
@@ -68,32 +67,49 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The currently selected value.
+     */
     selectedValue(): string {
       return this.definition.selectedItem || "";
     },
+    /**
+     * @return Whether the menu is disabled.
+     */
     disabled(): boolean {
       return this.definition.isDisabled !== undefined
         ? this.definition.isDisabled
         : false;
     },
+    /**
+     * @return The button color.
+     */
     buttonColor(): string {
-      const { buttonColor } = this.definition;
-      return buttonColor === undefined ? DEFAULT_BUTTON_COLOR : buttonColor;
+      return this.definition.buttonColor || "secondary";
     },
+    /**
+     * @return The item color.
+     */
     itemColor(): string {
-      const { itemColor } = this.definition;
-      return itemColor === undefined ? DEFAULT_ITEM_COLOR : itemColor;
+      return this.definition.itemColor || "primary";
     },
+    /**
+     * @return Whether this is a text button.
+     */
     buttonIsText(): boolean {
       const { buttonIsText } = this.definition;
-      return buttonIsText === undefined ? DEFAULT_BUTTON_IS_TEXT : buttonIsText;
+      return buttonIsText === undefined ? true : buttonIsText;
     },
+    /**
+     * @return Whether to show the selected value.
+     */
     showSelectedValue(): boolean {
       const { showSelectedValue } = this.definition;
-      return showSelectedValue === undefined
-        ? DEFAULT_SHOW_SELECTED_VALUE
-        : showSelectedValue;
+      return showSelectedValue === undefined ? false : showSelectedValue;
     },
+    /**
+     * @return The button label.
+     */
     buttonLabel(): string {
       if (this.showSelectedValue && this.selectedValue !== "") {
         return this.selectedValue;
@@ -102,6 +118,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * When an item is clicked, the value will be selected, and the on click callback will be run.
+     */
     onItemClick(itemIndex: number, value: string): void {
       this.definition.menuItems?.[itemIndex].onClick();
       this.definition.selectedItem = value;

@@ -23,7 +23,7 @@
     <template v-slot:actions>
       <v-container>
         <v-row justify="center">
-          <v-btn :disabled="!validated" color="error" @click="onConfirm">
+          <v-btn :disabled="!validated" color="error" @click="handleConfirm">
             Add to Project
           </v-btn>
         </v-row>
@@ -135,7 +135,7 @@ export default Vue.extend({
       this.userEmail = "";
       this.userRole = undefined;
     },
-    async onConfirm() {
+    async handleConfirm() {
       const project = this.$props.project;
       const projectId = this.project?.projectId;
       const projectRole = this.userRole;

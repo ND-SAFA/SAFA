@@ -48,6 +48,14 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
+   * Closes the side panels.
+   */
+  openErrorDisplay(): void {
+    this.openPanel(PanelType.errorDisplay);
+  }
+
+  @Action
+  /**
    * Toggles whether the right panel is open.
    */
   toggleRightPanel(): void {
@@ -77,6 +85,14 @@ export default class ProjectModule extends VuexModule {
    */
   closeCreator(): void {
     this.closePanel(PanelType.artifactCreator);
+  }
+
+  @Action
+  /**
+   * Closes the side panels.
+   */
+  closeErrorDisplay(): void {
+    this.closePanel(PanelType.errorDisplay);
   }
 
   @Action

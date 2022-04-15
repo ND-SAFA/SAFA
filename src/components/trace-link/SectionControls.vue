@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
+import { GenericIconButton } from "@/components/common";
 
 /**
  * Displays section controls.
@@ -26,7 +26,7 @@ import GenericIconButton from "@/components/common/generic/GenericIconButton.vue
  * @emits-2 `close:all` - On right button click.
  */
 export default Vue.extend({
-  name: "section-controls",
+  name: "SectionControls",
   components: { GenericIconButton },
 });
 </script>

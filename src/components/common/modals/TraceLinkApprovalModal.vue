@@ -12,8 +12,8 @@
         :target-body="link.targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
-        @link:approve="onApproveLink"
-        @link:decline="onDeclineLink"
+        @link:approve="handleApprove"
+        @link:decline="handleDecline"
       />
     </template>
   </generic-modal>
@@ -37,7 +37,7 @@ import { TraceLinkDisplay } from "@/components/common/display";
  * @emits `close` - On close.
  */
 export default Vue.extend({
-  name: "trace-link-approval-modal",
+  name: "TraceLinkApprovalModal",
   components: { GenericModal, TraceLinkDisplay },
   props: {
     isOpen: {
@@ -50,32 +50,46 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return Whether this link can be modified.
+     */
     canBeModified(): boolean {
-      const traceLink: TraceLink = this.$props.link;
-      return traceLink.traceType === TraceType.GENERATED;
+      return this.link.traceType === TraceType.GENERATED;
     },
+    /**
+     * @return Whether this link can be approved.
+     */
     canBeApproved(): boolean {
-      const traceLink: TraceLink = this.$props.link;
       return (
         this.canBeModified &&
-        traceLink.approvalStatus !== TraceApproval.APPROVED
+        this.link.approvalStatus !== TraceApproval.APPROVED
       );
     },
+    /**
+     * @return Whether this link can be declined.
+     */
     canBeDeclined(): boolean {
-      const traceLink: TraceLink = this.$props.link;
       return (
         this.canBeModified &&
-        traceLink.approvalStatus !== TraceApproval.DECLINED
+        this.link.approvalStatus !== TraceApproval.DECLINED
       );
     },
   },
   methods: {
+    /**
+     * Approves the given link and closes the modal.
+     * @param traceLink - The link to approve.
+     */
     async handleApprove(traceLink: TraceLink): Promise<void> {
-      await handleApproveLink(traceLink, undefined);
+      await handleApproveLink(traceLink);
       this.$emit("close");
     },
+    /**
+     * Declines the given link and closes the modal.
+     * @param traceLink - The link to decline.
+     */
     handleDecline(traceLink: TraceLink): void {
-      handleDeclineLink(traceLink, undefined);
+      handleDeclineLink(traceLink);
       this.$emit("close");
     },
   },

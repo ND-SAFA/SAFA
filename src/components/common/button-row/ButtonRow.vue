@@ -32,7 +32,11 @@ import IconButton from "./IconButton.vue";
 import CheckmarkMenu from "./CheckmarkMenu.vue";
 import ListMenu from "./ListMenu.vue";
 
+/**
+ * Renders a generic row of buttons.
+ */
 export default Vue.extend({
+  name: "ButtonRow",
   components: { IconButton, CheckmarkMenu, ListMenu },
   props: {
     definitions: Array as PropType<ButtonDefinition[]>,

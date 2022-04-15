@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      {{ link.sourceName + "-" + link.targetName }}
+      {{ headerName }}
     </v-expansion-panel-header>
     <v-expansion-panel-content>
       <trace-link-display
@@ -29,7 +29,7 @@ import { TraceLinkDisplay } from "@/components/common";
  * @emits-2 `link:decline` - On Link Decline.
  */
 export default Vue.extend({
-  name: "trace-link-expansion-panel",
+  name: "TraceLinkExpansionPanel",
   components: { TraceLinkDisplay },
   props: {
     link: {
@@ -51,6 +51,14 @@ export default Vue.extend({
     showApprove: {
       type: Boolean,
       default: true,
+    },
+  },
+  computed: {
+    /**
+     * @return The trace link name.
+     */
+    headerName(): string {
+      return `${this.link.sourceName} - ${this.link.targetName}`;
     },
   },
 });

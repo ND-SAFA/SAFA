@@ -9,13 +9,13 @@
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
     @submit="onSubmit"
-    @close="onClose"
+    @close="handleClose"
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
         <generic-file-selector
           v-if="selectedVersion !== undefined"
-          @change:files="onChangeFiles"
+          @change:files="handleChangeFiles"
         />
       </v-stepper-content>
     </template>
@@ -50,7 +50,7 @@ import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
  * @emits `close` - On close.
  */
 export default Vue.extend({
-  name: "upload-new-version-modal",
+  name: "UploadNewVersionModal",
   components: {
     GenericFileSelector,
     ProjectVersionStepperModal,
@@ -72,35 +72,51 @@ export default Vue.extend({
     };
   },
   watch: {
+    /**
+     * Sets the current project and version when opened.
+     */
     isOpen(open: boolean) {
       const currentProject = projectModule.getProject;
       const currentVersion = currentProject.projectVersion;
 
-      if (open && currentProject.projectId) {
-        this.selectedProject = currentProject;
-        this.currentStep = 2;
+      if (!open || !currentProject.projectId) return;
 
-        if (currentVersion?.versionId) {
-          this.selectedVersion = currentVersion;
-        }
-      }
+      this.selectedProject = currentProject;
+      this.currentStep = 2;
+
+      if (!currentVersion?.versionId) return;
+
+      this.selectedVersion = currentVersion;
     },
   },
   computed: {
+    /**
+     * @return The start step, which skips the first step if a project is already selected.
+     */
     startStep(): number {
       return this.selectedProject === undefined ? 1 : 2;
     },
   },
   methods: {
-    onClose() {
+    /**
+     * Closes the modal and clears data.
+     */
+    handleClose() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
       this.selectedFiles = [];
       this.$emit("close");
     },
-    onChangeFiles(files: File[]) {
+    /**
+     * Updates the selected files.
+     * @param files - The files to select.
+     */
+    handleChangeFiles(files: File[]) {
       this.selectedFiles = files;
     },
+    /**
+     * Attempts to upload a new project version.
+     */
     onSubmit() {
       if (this.selectedProject === undefined) {
         return logModule.onWarning("No project is selected.");
@@ -117,7 +133,7 @@ export default Vue.extend({
         this.selectedFiles,
         this.setAsNewVersion
       )
-        .then(() => this.onClose())
+        .then(() => this.handleClose())
         .finally(() => (this.isLoading = false));
     },
   },

@@ -49,11 +49,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DocumentColumn, SelectOption } from "@/types";
-import { documentModule, logModule } from "@/store";
+import { DocumentColumn } from "@/types";
+import { documentModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 import { columnTypeOptions, createColumn } from "@/util";
-import { handleUpdateDocument } from "@/api";
+import { handleColumnDelete, handleColumnSave } from "@/api";
 
 /**
  * Represents a modal for editing a table column.
@@ -74,86 +74,77 @@ export default Vue.extend({
     return {
       editingColumn: createColumn(this.column),
       confirmDelete: false,
+      dataTypes: columnTypeOptions(),
     };
   },
   computed: {
+    /**
+     * @return Whether the modal is in edit mode.
+     */
     isEditMode(): boolean {
       return !!this.column;
     },
+    /**
+     * @return The modal title.
+     */
     title(): string {
       return this.isEditMode ? "Edit Column" : "Add Column";
     },
-    dataTypes(): SelectOption[] {
-      return columnTypeOptions();
-    },
 
+    /**
+     * @return Whether the current name is valid.
+     */
     isNameValid(): boolean {
       return (
         !documentModule.doesColumnExist(this.editingColumn.name) ||
         this.column?.name === this.editingColumn.name
       );
     },
+    /**
+     * @return Whether the current column is valid.
+     */
     isColumnValid(): boolean {
       return !!this.editingColumn.name && this.isNameValid;
     },
+    /**
+     * @return Any errors to report on the name.
+     */
     nameErrors(): string[] {
       return this.isNameValid ? [] : ["This name already exists"];
     },
   },
   methods: {
+    /**
+     * Resets modal data and closes the modal.
+     */
     resetModalData() {
       this.editingColumn = createColumn(this.column);
       this.confirmDelete = false;
       this.$emit("close");
     },
+    /**
+     * Attempts to save a column.
+     */
     handleSubmit() {
-      const document = documentModule.document;
-
-      if (!this.isEditMode) {
-        document.columns = [...(document.columns || []), this.editingColumn];
-      } else if (document.columns) {
-        const index = document.columns.findIndex(
-          ({ id }) => id === this.editingColumn.id
-        );
-
-        document.columns[index] = this.editingColumn;
-      }
-
-      handleUpdateDocument(document)
-        .then(() => {
-          logModule.onSuccess(`Column updated: ${this.editingColumn.name}`);
-          this.resetModalData();
-        })
-        .catch(() => {
-          logModule.onError(
-            `Unable to update column: ${this.editingColumn.name}`
-          );
-        });
+      handleColumnSave(this.editingColumn, this.isEditMode, () =>
+        this.resetModalData()
+      );
     },
+    /**
+     * Attempts to delete an existing column.
+     */
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        const document = documentModule.document;
-
-        document.columns = (document.columns || []).filter(
-          ({ id }) => id !== this.editingColumn.id
-        );
-
-        handleUpdateDocument(document)
-          .then(() => {
-            logModule.onSuccess(`Column deleted: ${this.editingColumn.name}`);
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(
-              `Unable to delete column: ${this.editingColumn.name}`
-            );
-          });
+        handleColumnDelete(this.editingColumn, () => this.resetModalData());
       }
     },
   },
   watch: {
+    /**
+     * When opened, the modal will reset the column being edited.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 

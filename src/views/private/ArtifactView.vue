@@ -36,7 +36,7 @@ export default Vue.extend({
     /**
      * Returns whether the artifact creator is open.
      */
-    isArtifactCreatorOpen(): boolean | string {
+    isArtifactCreatorOpen() {
       return appModule.getIsArtifactCreatorOpen;
     },
   },

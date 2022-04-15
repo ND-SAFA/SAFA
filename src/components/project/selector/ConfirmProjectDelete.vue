@@ -1,5 +1,10 @@
 <template>
-  <generic-modal size="md" :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal
+    size="md"
+    :is-open="isOpen"
+    :title="title"
+    @close="handleCancel"
+  >
     <template v-slot:body>
       <v-text-field
         v-model="confirmText"
@@ -12,7 +17,7 @@
       <v-btn
         :disabled="!validated"
         color="error"
-        @click="onConfirm"
+        @click="handleConfirm"
         class="ml-auto"
       >
         Delete
@@ -57,13 +62,13 @@ export default Vue.extend({
       this.confirmText = "";
       this.validated = false;
     },
-    onConfirm() {
+    handleConfirm() {
       const project = this.$props.project;
       if (this.validated) {
         this.$emit("confirm", project);
       }
     },
-    onCancel() {
+    handleCancel() {
       this.$emit("cancel");
     },
   },

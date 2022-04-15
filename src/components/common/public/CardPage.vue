@@ -28,7 +28,7 @@ import { SafaIcon } from "@/components/common/display";
  * and a slot for its actions.
  */
 export default Vue.extend({
-  name: "card-page",
+  name: "CardPage",
   components: { SafaIcon },
 });
 </script>

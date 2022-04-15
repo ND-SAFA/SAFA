@@ -39,12 +39,12 @@
         Add Column
       </v-btn>
 
-      <table-column-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
+      <table-column-modal :is-open="isCreateOpen" @close="handleCloseModal" />
 
       <table-column-modal
         :is-open="isEditOpen"
         :column="editingColumn"
-        @close="handleCloseMenu"
+        @close="handleCloseModal"
       />
     </template>
   </v-select>
@@ -52,29 +52,35 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentColumn, SelectOption } from "@/types";
-import { documentModule, logModule } from "@/store";
-import { GenericIconButton } from "@/components/common/generic";
+import { DocumentColumn } from "@/types";
 import { columnTypeOptions } from "@/util";
+import { documentModule } from "@/store";
+import { handleColumnMove } from "@/api";
+import { GenericIconButton } from "@/components/common";
 import TableColumnModal from "./TableColumnModal.vue";
-import { handleUpdateDocument } from "@/api";
 
 export default Vue.extend({
   name: "TableColumnEditor",
   components: { TableColumnModal, GenericIconButton },
-  data: () => ({
-    isCreateOpen: false,
-    isEditOpen: false,
-    editingColumn: undefined as DocumentColumn | undefined,
-    items: documentModule.tableColumns,
-  }),
+  data() {
+    return {
+      isCreateOpen: false,
+      isEditOpen: false,
+      editingColumn: undefined as DocumentColumn | undefined,
+      items: documentModule.tableColumns,
+      dataTypes: columnTypeOptions(),
+    };
+  },
   computed: {
-    dataTypes(): SelectOption[] {
-      return columnTypeOptions();
-    },
+    /**
+     * @return The select display name.
+     */
     selectDisplay(): string {
       return `${documentModule.tableColumns.length} Columns`;
     },
+    /**
+     * Emulates a select value to open the column editor on click.
+     */
     select: {
       get() {
         return undefined;
@@ -86,48 +92,60 @@ export default Vue.extend({
     },
   },
   methods: {
-    handleCloseMenu() {
+    /**
+     * Resets modal data and closes all modals.
+     */
+    handleCloseModal() {
       (this.$refs.tableColumnEditor as HTMLElement).blur();
       this.isCreateOpen = false;
       this.isEditOpen = false;
       this.editingColumn = undefined;
     },
+    /**
+     * Opens the create modal.
+     */
     handleCreateOpen() {
       this.isCreateOpen = true;
     },
+    /**
+     * Opens the edit modal.
+     * @param column - The column to edit.
+     */
     handleEditOpen(column: DocumentColumn) {
       this.editingColumn = column;
       this.isEditOpen = true;
     },
+
+    /**
+     * Returns whether the given column is the first.
+     * @param item - The column to check.
+     * @return Whether it is first.
+     */
     isFirstItem(item: DocumentColumn) {
       return this.items.indexOf(item) === 0;
     },
+    /**
+     * Returns whether the given column is the last.
+     * @param item - The column to check.
+     * @return Whether it is last.
+     */
     isLastItem(item: DocumentColumn) {
       return this.items.indexOf(item) === this.items.length - 1;
     },
+
+    /**
+     * Loads the current table columns.
+     */
     handleLoadItems() {
       this.items = documentModule.tableColumns;
     },
+    /**
+     * Changes the order of two columns.
+     * @param item - The column to move.
+     * @param moveUp - Whether to move the column up or down.
+     */
     handleMove(item: DocumentColumn, moveUp: boolean) {
-      const currentIndex = this.items.indexOf(item);
-      const swapIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
-      const document = documentModule.document;
-      const columns = document.columns || [];
-
-      [columns[currentIndex], columns[swapIndex]] = [
-        columns[swapIndex],
-        columns[currentIndex],
-      ];
-
-      this.items = document.columns = [...columns];
-
-      handleUpdateDocument(document)
-        .then(() => {
-          logModule.onSuccess(`Column order updated`);
-        })
-        .catch(() => {
-          logModule.onError(`Unable to update column order`);
-        });
+      handleColumnMove(item, moveUp, (columns) => (this.items = columns));
     },
   },
 });

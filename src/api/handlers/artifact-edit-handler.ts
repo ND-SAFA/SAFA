@@ -1,4 +1,10 @@
-import { Artifact, ConfirmationType, TraceApproval, TraceType } from "@/types";
+import {
+  Artifact,
+  ConfirmationType,
+  EmptyLambda,
+  TraceApproval,
+  TraceType,
+} from "@/types";
 import {
   artifactSelectionModule,
   logModule,
@@ -19,39 +25,48 @@ import {
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
  * @param parentArtifact - The parent artifact to link to.
+ * @param onSuccess - Called if the save is successful.
  */
 export async function handleSaveArtifact(
   artifact: Artifact,
   isUpdate: boolean,
-  parentArtifact?: Artifact
+  parentArtifact?: Artifact,
+  onSuccess?: EmptyLambda
 ): Promise<void> {
-  const versionId = projectModule.versionIdWithLog;
+  try {
+    const versionId = projectModule.versionIdWithLog;
 
-  if (isUpdate) {
-    const updatedArtifacts = await updateArtifact(versionId, artifact);
+    if (isUpdate) {
+      const updatedArtifacts = await updateArtifact(versionId, artifact);
 
-    await projectModule.addOrUpdateArtifacts(updatedArtifacts);
-  } else {
-    const createdArtifacts = await createArtifact(versionId, artifact);
+      await projectModule.addOrUpdateArtifacts(updatedArtifacts);
+    } else {
+      const createdArtifacts = await createArtifact(versionId, artifact);
 
-    await projectModule.addOrUpdateArtifacts(createdArtifacts);
-    await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
-    await viewportModule.setArtifactTreeLayout();
+      await projectModule.addOrUpdateArtifacts(createdArtifacts);
+      await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      await viewportModule.setArtifactTreeLayout();
 
-    if (!parentArtifact) return;
+      if (!parentArtifact) return;
 
-    for (const createdArtifact of createdArtifacts) {
-      await handleCreateLink({
-        traceLinkId: "",
-        sourceName: createdArtifact.name,
-        sourceId: createdArtifact.id,
-        targetName: parentArtifact.name,
-        targetId: parentArtifact.id,
-        approvalStatus: TraceApproval.APPROVED,
-        score: 1,
-        traceType: TraceType.MANUAL,
-      });
+      for (const createdArtifact of createdArtifacts) {
+        await handleCreateLink({
+          traceLinkId: "",
+          sourceName: createdArtifact.name,
+          sourceId: createdArtifact.id,
+          targetName: parentArtifact.name,
+          targetId: parentArtifact.id,
+          approvalStatus: TraceApproval.APPROVED,
+          score: 1,
+          traceType: TraceType.MANUAL,
+        });
+      }
     }
+
+    onSuccess?.();
+  } catch (e) {
+    logModule.onDevError(e);
+    logModule.onWarning("Unable to create artifact.");
   }
 }
 

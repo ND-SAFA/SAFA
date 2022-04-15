@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 30em">
-    <generic-file-selector @change:files="onChangeFiles" />
+    <generic-file-selector @change:files="handleChangeFiles" />
     <v-btn
       block
       color="primary"
@@ -51,7 +51,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChangeFiles(files: File[]) {
+    handleChangeFiles(files: File[]) {
       this.selectedFiles = files;
     },
     async onCreate() {

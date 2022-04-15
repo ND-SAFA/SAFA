@@ -8,8 +8,11 @@
 import Vue from "vue";
 import { navigateTo, Routes } from "@/router";
 
+/**
+ * Displays the SAFA icon.
+ */
 export default Vue.extend({
-  name: "safa-icon",
+  name: "SafaIcon",
   props: {
     size: {
       type: Number,
@@ -23,8 +26,11 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Navigates to the project creator when the logo is clicked.
+     */
     onAvatarClick() {
-      navigateTo(Routes.ARTIFACT);
+      navigateTo(Routes.PROJECT_CREATOR);
     },
   },
 });

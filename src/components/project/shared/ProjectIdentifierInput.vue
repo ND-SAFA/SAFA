@@ -49,7 +49,7 @@ export default Vue.extend({
       this.currentName = "";
       this.currentDescription = "";
     },
-    onClose() {
+    handleClose() {
       this.$emit("close");
       this.clearData();
     },

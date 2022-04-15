@@ -16,8 +16,8 @@
           item-value="id"
         />
         <v-text-field
-          v-if="!isFTA"
           filled
+          v-if="!isFTA"
           v-model="editedArtifact.name"
           label="Artifact Name"
           color="primary"
@@ -33,8 +33,8 @@
           label="Artifact Type"
         />
         <v-select
-          v-if="isFTA"
           filled
+          v-if="isFTA"
           label="Logic Type"
           v-model="editedArtifact.logicType"
           :items="logicTypes"
@@ -49,8 +49,8 @@
           label="Parent Artifact"
         />
         <v-select
-          v-if="isSafetyCase"
           filled
+          v-if="isSafetyCase"
           label="Safety Case Type"
           v-model="editedArtifact.safetyCaseType"
           :items="safetyCaseTypes"
@@ -58,8 +58,8 @@
           item-value="id"
         />
         <v-textarea
-          v-if="!isFTA"
           filled
+          v-if="!isFTA"
           label="Artifact Summary"
           v-model="editedArtifact.summary"
           rows="3"
@@ -77,42 +77,36 @@
     <template v-slot:actions>
       <v-row justify="end">
         <v-btn color="primary" :disabled="!canSave" @click="onSubmit">
-          <v-icon>mdi-content-save</v-icon>
-          <span class="ml-1">Save</span>
+          Save
         </v-btn>
       </v-row>
     </template>
   </generic-modal>
 </template>
+
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  Artifact,
-  DocumentType,
-  FTANodeType,
-  SafetyCaseType,
-  SelectOption,
-} from "@/types";
+import { setTimeout } from "timers";
+import { Artifact, DocumentType, SelectOption } from "@/types";
 import {
   createArtifact,
+  createArtifactOfType,
   documentTypeMap,
   logicTypeOptions,
   safetyCaseOptions,
 } from "@/util";
-import { handleSaveArtifact, getDoesArtifactExist } from "@/api";
 import {
   artifactModule,
   documentModule,
-  logModule,
   projectModule,
   typeOptionsModule,
 } from "@/store";
+import { handleSaveArtifact, getDoesArtifactExist } from "@/api";
 import {
   ArtifactInput,
   GenericModal,
   CustomFieldInput,
 } from "@/components/common";
-import { setTimeout } from "timers";
 
 /**
  * Modal for artifact creation.
@@ -120,7 +114,7 @@ import { setTimeout } from "timers";
  * @emits `close` - Emitted when modal is exited or artifact is created.
  */
 export default Vue.extend({
-  name: "artifact-creator",
+  name: "ArtifactCreator",
   components: { CustomFieldInput, GenericModal, ArtifactInput },
   props: {
     title: {
@@ -140,36 +134,44 @@ export default Vue.extend({
     return {
       editedArtifact: createArtifact(this.artifact),
       parentId: "",
-
       isLoading: false,
       isNameValid: !!this.artifact?.name,
       nameError: "",
       nameCheckTimer: undefined as ReturnType<typeof setTimeout> | undefined,
       nameCheckIsLoading: false,
       canSave: false,
+      safetyCaseTypes: safetyCaseOptions(),
+      logicTypes: logicTypeOptions(),
     };
   },
   computed: {
+    /**
+     * @return The artifact name.
+     */
     name(): string {
       return this.editedArtifact.name;
     },
-
-    projectId(): string {
-      return projectModule.projectId;
-    },
-    versionId(): string {
-      return projectModule.versionIdWithLog;
-    },
-
+    /**
+     * @return Whether the artifact type is for an FTA node.
+     */
     isFTA(): boolean {
       return this.editedArtifact.documentType === DocumentType.FTA;
     },
+    /**
+     * @return Whether the artifact type is for a safety case node.
+     */
     isSafetyCase(): boolean {
       return this.editedArtifact.documentType === DocumentType.SAFETY_CASE;
     },
+    /**
+     * @return Whether the artifact type is for an FMEA node.
+     */
     isFMEA(): boolean {
       return this.editedArtifact.documentType === DocumentType.FMEA;
     },
+    /**
+     * @return Whether the artifact data is valid.
+     */
     isValid(): boolean {
       const { logicType, safetyCaseType, type, body } = this.editedArtifact;
 
@@ -183,21 +185,29 @@ export default Vue.extend({
         return !!(this.isNameValid && body && type);
       }
     },
-
-    safetyCaseTypes: safetyCaseOptions,
-    logicTypes: logicTypeOptions,
+    /**
+     * @return The document types allowed on the current document.
+     */
     documentTypes(): SelectOption[] {
       return documentTypeMap()[documentModule.type];
     },
+    /**
+     * @return The types of artifacts that exist so far.
+     */
     artifactTypes(): string[] {
       return typeOptionsModule.artifactTypes;
     },
-
+    /**
+     * @return The parent artifact of a logic node.
+     */
     parentArtifact(): Artifact | undefined {
-      return this.parentId
+      return this.isFTA && this.parentId
         ? artifactModule.getArtifactById(this.parentId)
         : undefined;
     },
+    /**
+     * @return The computed type based on the artifact's document type.
+     */
     computedArtifactType(): string {
       if (this.isFTA) {
         return this.parentArtifact?.type || this.editedArtifact.type;
@@ -209,6 +219,9 @@ export default Vue.extend({
         return this.editedArtifact.type;
       }
     },
+    /**
+     * @return The computed name based on the artifact's document type.
+     */
     computedName(): string {
       const { name, logicType } = this.editedArtifact;
 
@@ -218,53 +231,47 @@ export default Vue.extend({
     },
   },
   watch: {
-    isOpen(isOpen: boolean | string): void {
-      if (isOpen === true) {
-        this.editedArtifact = createArtifact(this.artifact);
-        this.parentId = "";
-      } else if (typeof isOpen === "string") {
-        if (isOpen in FTANodeType) {
-          this.editedArtifact = createArtifact({
-            documentType: DocumentType.FTA,
-            logicType: isOpen as FTANodeType,
-          });
-        } else if (isOpen in SafetyCaseType) {
-          this.editedArtifact = createArtifact({
-            documentType: DocumentType.SAFETY_CASE,
-            safetyCaseType: isOpen as SafetyCaseType,
-          });
-        } else if (isOpen === DocumentType.FMEA) {
-          this.editedArtifact = createArtifact({
-            documentType: DocumentType.FMEA,
-          });
-        }
-      }
-    },
-    name(newName: string): void {
-      if (!newName) {
-        this.isNameValid = this.canSave = false;
-        return;
-      }
+    /**
+     * Resets artifact data when opened.
+     * If opened with a string, attempts to switch the artifact type to match the type given.
+     */
+    isOpen(openOrType: boolean | string): void {
+      if (!openOrType) return;
 
+      this.editedArtifact = createArtifactOfType(this.artifact, openOrType);
+    },
+    /**
+     * Checks for name conflicts when the name changes.
+     */
+    name(newName: string): void {
       if (this.nameCheckTimer) {
         clearTimeout(this.nameCheckTimer);
       }
 
       this.nameCheckIsLoading = true;
       this.nameCheckTimer = setTimeout(() => {
-        getDoesArtifactExist(this.versionId, newName).then(
-          ({ artifactExists }) => {
-            this.nameCheckIsLoading = false;
-            this.isNameValid =
-              !artifactExists || newName === this.artifact.name;
-            this.nameError = this.isNameValid
-              ? ""
-              : "Name is already used, please select another.";
-            this.canSave = this.isNameValid;
-          }
-        );
+        if (!newName) {
+          this.isNameValid = this.canSave = false;
+          this.nameCheckIsLoading = false;
+        } else if (newName === this.artifact?.name) {
+          this.isNameValid = this.canSave = true;
+          this.nameCheckIsLoading = false;
+        } else {
+          getDoesArtifactExist(projectModule.versionId, newName).then(
+            (nameExists) => {
+              this.nameCheckIsLoading = false;
+              this.canSave = this.isNameValid = !nameExists;
+              this.nameError = this.isNameValid
+                ? ""
+                : "Name is already used, please select another.";
+            }
+          );
+        }
       }, 500);
     },
+    /**
+     * Checks whether the artifact is valid when it changes.
+     */
     editedArtifact: {
       handler(): void {
         this.canSave = this.isValid;
@@ -273,6 +280,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Attempts to save the artifact.
+     */
     onSubmit(): void {
       const { documentId } = documentModule.document;
       const { logicType, safetyCaseType } = this.editedArtifact;
@@ -288,17 +298,9 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      handleSaveArtifact(artifact, isUpdate, this.parentArtifact)
-        .then(async () => {
-          this.$emit("close");
-        })
-        .catch((e) => {
-          logModule.onDevError(e);
-          logModule.onWarning("Unable to create artifact.");
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      handleSaveArtifact(artifact, isUpdate, this.parentArtifact, () =>
+        this.$emit("close")
+      ).then(() => (this.isLoading = false));
     },
   },
 });

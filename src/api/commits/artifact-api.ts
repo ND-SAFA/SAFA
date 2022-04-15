@@ -11,11 +11,13 @@ import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
-): Promise<ArtifactNameValidationResponse> {
-  return authHttpClient<ArtifactNameValidationResponse>(
+): Promise<boolean> {
+  const res = await authHttpClient<ArtifactNameValidationResponse>(
     fillEndpoint(Endpoint.isArtifactNameTaken, { versionId, artifactName }),
     { method: "GET" }
   );
+
+  return res.artifactExists;
 }
 
 /**

@@ -1,11 +1,11 @@
 <template>
   <generic-modal
-    :title="`Current Version: ${versionToString(currentVersion)}`"
+    :title="`Current Version: ${version}`"
     size="xs"
     :is-open="isOpen"
     :actions-height="0"
     v-bind:isLoading.sync="isLoading"
-    @close="onClose"
+    @close="handleClose"
   >
     <template v-slot:body>
       <v-container class="mt-2">
@@ -85,10 +85,12 @@ export default Vue.extend({
       currentVersion: undefined as ProjectVersion | undefined,
     };
   },
-  methods: {
-    versionToString(): string {
+  computed: {
+    version(): string {
       return versionToString(this.currentVersion);
     },
+  },
+  methods: {
     nextVersion(type: VersionType): string {
       if (this.currentVersion === undefined) {
         return "X.X.X";
@@ -137,11 +139,10 @@ export default Vue.extend({
           throw Error("Unknown type" + versionType);
       }
     },
-    onClose() {
+    handleClose() {
       this.$emit("close");
     },
   },
-
   watch: {
     isOpen(isOpen: boolean) {
       if (isOpen && this.project) {

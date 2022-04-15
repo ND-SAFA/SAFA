@@ -7,7 +7,9 @@
     :actions-height="0"
   >
     <template v-slot:body>
-      <v-btn color="error" @click="onConfirm" block class="mt-3">Delete</v-btn>
+      <v-btn color="error" @click="handleConfirm" block class="mt-3">
+        Delete
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -42,7 +44,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    onConfirm() {
+    handleConfirm() {
       this.$emit("confirm", this.$props.version);
     },
     onCancel() {

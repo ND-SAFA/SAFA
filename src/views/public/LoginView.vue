@@ -67,6 +67,18 @@ export default Vue.extend({
   },
   methods: {
     /**
+     * Navigate to the sign up page.
+     */
+    handleSignUp() {
+      navigateTo(Routes.CREATE_ACCOUNT);
+    },
+    /**
+     * Navigate to the forgot password page.
+     */
+    handleForgotPassword() {
+      navigateTo(Routes.FORGOT_PASSWORD);
+    },
+    /**
      * Attempts to log the user in.
      */
     handleLogin() {
@@ -79,18 +91,6 @@ export default Vue.extend({
         .then(() => (this.isError = false))
         .catch(() => (this.isError = true))
         .finally(() => (this.isLoading = false));
-    },
-    /**
-     * Navigate to the sign up page.
-     */
-    handleSignUp() {
-      navigateTo(Routes.CREATE_ACCOUNT);
-    },
-    /**
-     * Navigate to the forgot password page.
-     */
-    handleForgotPassword() {
-      navigateTo(Routes.FORGOT_PASSWORD);
     },
   },
 });

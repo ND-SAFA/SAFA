@@ -25,7 +25,7 @@ import { handleLoadVersion } from "@/api";
  * @emits `close` - Emitted when modal is exited or project + version set.
  */
 export default Vue.extend({
-  name: "baseline-version-modal",
+  name: "BaselineVersionModal",
   components: {
     ProjectVersionStepperModal,
   },
@@ -62,11 +62,17 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The start step, which skips the project selection if one is already given.
+     */
     startStep(): number {
       return this.project === undefined ? 1 : 2;
     },
   },
   watch: {
+    /**
+     * Sets the selected project and moves to the next step when opened with an existing project.
+     */
     isOpen(open: boolean) {
       if (!open || !this.project) return;
 
@@ -75,6 +81,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Loads the selected project version.
+     */
     async onSubmit() {
       if (this.selectedProject === undefined) {
         logModule.onWarning("Please select a project to update.");
@@ -84,6 +93,7 @@ export default Vue.extend({
         this.isLoading = true;
 
         await handleLoadVersion(this.selectedVersion.versionId);
+
         this.isLoading = false;
         this.$emit("close");
       }

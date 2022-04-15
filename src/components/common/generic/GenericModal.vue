@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :value="isOpen"
-    :width="`${getWidth()}px`"
+    :width="`${width}px`"
     @click:outside="$emit('close')"
     :retain-focus="false"
     persistent
@@ -74,24 +74,11 @@ export default Vue.extend({
       default: "m",
     },
   },
-  methods: {
-    getHeight(): number {
-      switch (this.size) {
-        case "xxs":
-          return 150;
-        case "xs":
-          return 200;
-        case "s":
-          return 300;
-        case "m":
-          return 500;
-        case "l":
-          return 700;
-        default:
-          return 400;
-      }
-    },
-    getWidth(): number {
+  computed: {
+    /**
+     * @return The modal width.
+     */
+    width(): number {
       switch (this.size) {
         case "xxs":
           return 250;

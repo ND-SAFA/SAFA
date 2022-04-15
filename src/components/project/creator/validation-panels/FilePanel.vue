@@ -3,7 +3,7 @@
     <v-expansion-panel-header>
       <v-row dense align="center" justify="start">
         <v-col class="flex-grow-0">
-          <v-icon :color="getIconColor(iconName)">{{ iconName }}</v-icon>
+          <v-icon :color="iconColor">{{ iconName }}</v-icon>
         </v-col>
         <v-col>
           <slot name="title" />
@@ -114,7 +114,7 @@ const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
  * @emits-4 `change` (file?: File) - On change.
  */
 export default Vue.extend({
-  name: "file-panel",
+  name: "FilePanel",
   components: {
     GenericSwitch,
     GenericFileSelector,
@@ -152,6 +152,9 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * Emits updates to ignore errors.
+     */
     ignoreErrors: {
       get(): boolean {
         return this.ignoreErrorsFlag;
@@ -160,6 +163,9 @@ export default Vue.extend({
         this.$emit("update:ignore-errors-flag", ignoreErrors);
       },
     },
+    /**
+     * Whether this file panel is valid.
+     */
     isValid(): boolean {
       return (
         this.ignoreErrors ||
@@ -167,32 +173,38 @@ export default Vue.extend({
         !this.showFileUploader
       );
     },
+    /**
+     * The panel's icon.
+     */
     iconName(): string {
       return this.isValid ? "mdi-check" : "mdi-close";
     },
-    errorIconName(): string {
-      return this.errors.length > 0 ? "mdi-close" : "mdi-check";
+    /**
+     * The panel's color.
+     */
+    iconColor(): string {
+      return this.isValid ? "success" : "error";
     },
   },
   watch: {
+    /**
+     * Emit changes to the validation status.
+     */
     isValid(): void {
       this.$emit("validate", this.isValid);
     },
   },
   methods: {
-    getIconColor(iconName: string): string {
-      switch (iconName) {
-        case "mdi-close":
-          return "error";
-        case "mdi-check":
-          return "success";
-        default:
-          return "primary";
-      }
-    },
+    /**
+     * Emits a change when the panel is cleared.
+     */
     handleClear(): void {
       this.$emit("change", undefined);
     },
+    /**
+     * Emits changed files.
+     * @param file - The uploaded file.
+     */
     emitChangeFiles(file: File | null): void {
       const fileIsEmpty = file === null;
 

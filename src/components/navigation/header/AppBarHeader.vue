@@ -47,7 +47,7 @@ import {
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
-import { handleClearProject, handleLoadVersion } from "@/api";
+import { handleLoadVersion } from "@/api";
 import {
   BaselineVersionModal,
   ButtonRow,
@@ -169,7 +169,6 @@ export default Vue.extend({
      * Navigates to the create project page.
      */
     async handleCreateProject(): Promise<void> {
-      await handleClearProject();
       await navigateTo(Routes.PROJECT_CREATOR);
     },
     /**

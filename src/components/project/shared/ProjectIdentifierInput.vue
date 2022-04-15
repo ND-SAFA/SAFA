@@ -16,6 +16,7 @@ import Vue from "vue";
  * @emits-3 `close` - On close.
  */
 export default Vue.extend({
+  name: "ProjectIdentifierInput",
   props: {
     name: {
       type: String,
@@ -27,6 +28,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * Emits changes to the name.
+     */
     currentName: {
       get(): string {
         return this.name;
@@ -35,6 +39,9 @@ export default Vue.extend({
         this.$emit("update:name", newName);
       },
     },
+    /**
+     * Emits changes to the description.
+     */
     currentDescription: {
       get(): string {
         return this.description;
@@ -42,16 +49,6 @@ export default Vue.extend({
       set(newDescription: string): void {
         this.$emit("update:description", newDescription);
       },
-    },
-  },
-  methods: {
-    clearData() {
-      this.currentName = "";
-      this.currentDescription = "";
-    },
-    handleClose() {
-      this.$emit("close");
-      this.clearData();
     },
   },
 });

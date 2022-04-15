@@ -128,7 +128,7 @@ export async function getProjectMembers(
 }
 
 /**
- * Shares project with given user containing email at set role.
+ * Shares a project with a user.
  *
  * @param projectId - The project to add this user to.
  * @param memberEmail - The email of the given user.

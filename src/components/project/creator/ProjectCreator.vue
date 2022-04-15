@@ -27,12 +27,12 @@ import {
   JiraCreatorStepper,
   ProjectBulkUpload,
 } from "./workflows";
-import { handleClearProject } from "@/api";
 
 /**
  * Allows for creating a project.
  */
 export default Vue.extend({
+  name: "ProjectCreator",
   components: { ProjectCreatorStepper, ProjectBulkUpload, JiraCreatorStepper },
   data() {
     return {
@@ -44,17 +44,21 @@ export default Vue.extend({
       ],
     };
   },
+  /**
+   * When the page loads, switch to any set tab in the query.
+   */
   mounted() {
     const tabId = getParam(QueryParams.TAB);
     const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
 
-    if (tabId && tabIndex !== -1) {
-      this.tab = tabIndex;
-    }
+    if (!tabId || tabIndex === -1) return;
 
-    handleClearProject();
+    this.tab = tabIndex;
   },
   watch: {
+    /**
+     * When the tab changes, update the query tab id.
+     */
     tab(index: number) {
       const currentTabId = this.tabs[index].id;
       const routeTabId = getParam(QueryParams.TAB);

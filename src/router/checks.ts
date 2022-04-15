@@ -7,6 +7,7 @@ import {
   routesWithRequiredProject,
 } from "@/router/routes";
 import { appModule, logModule, projectModule, sessionModule } from "@/store";
+import { handleClearProject } from "@/api";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -23,31 +24,37 @@ export const routerChecks: Record<string, RouterCheck> = {
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (!routesPublic.includes(to.path) && !sessionModule.getDoesSessionExist) {
-      next({
-        path: Routes.LOGIN_ACCOUNT,
-        query: {
-          ...to.query,
-          [QueryParams.LOGIN_PATH]: to.path,
-        },
-      });
+    if (sessionModule.getDoesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
+
+    next({
+      path: Routes.LOGIN_ACCOUNT,
+      query: {
+        ...to.query,
+        [QueryParams.LOGIN_PATH]: to.path,
+      },
+    });
   },
   requireProjectForRoutes(to: Route, from: Route, next: NavigationGuardNext) {
-    const isProjectDefined = projectModule.projectId !== "";
+    if (
+      projectModule.isProjectDefined ||
+      !routesWithRequiredProject.includes(to.path)
+    )
+      return;
 
-    if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
-      logModule.onWarning(
-        "Project must be selected before approving trace links."
-      );
-      next(Routes.HOME);
-    }
+    logModule.onWarning("Please select a project.");
+    next(Routes.HOME);
   },
   closePanelsIfNotInGraph(to: Route) {
-    if (to.path !== Routes.ARTIFACT) {
-      appModule.closePanel(PanelType.left);
-      appModule.closePanel(PanelType.right);
-    }
+    if (to.path === Routes.ARTIFACT) return;
+
+    appModule.closePanel(PanelType.left);
+    appModule.closePanel(PanelType.right);
+  },
+  clearProjectIfOpenCreate(to: Route) {
+    if (to.path !== Routes.PROJECT_CREATOR) return;
+
+    handleClearProject();
   },
 };

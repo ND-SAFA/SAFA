@@ -19,7 +19,6 @@ import {
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
 import { handleDocumentReload } from "@/api";
-import { cyApplyAutomove } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -140,7 +139,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
-   * Sets a new project.
+   * Updates the project identifier.
    *
    * @param project - The new project to track.
    */

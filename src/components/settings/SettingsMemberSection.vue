@@ -43,21 +43,17 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ConfirmationType,
-  Project,
-  ProjectMembership,
-  ProjectRole,
-} from "@/types";
+import { Project, ProjectMembership, ProjectRole } from "@/types";
+import { sessionModule } from "@/store";
+import { getProjectMembers, handleDeleteMember } from "@/api";
 import { GenericSelector } from "@/components/common/generic";
-import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
-import { logModule, sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
  */
 export default Vue.extend({
+  name: "SettingsMemberSection",
   components: { GenericSelector, SettingsMemberInformationModal },
   props: {
     project: {
@@ -71,26 +67,7 @@ export default Vue.extend({
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
-    };
-  },
-  computed: {
-    isAdmin(): boolean {
-      const userEmail = sessionModule.userEmail;
-      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-      const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail && allowedRoles.includes(m.role)
-      );
-      return userQuery.length === 1;
-    },
-    members(): ProjectMembership[] {
-      return this.project.members;
-    },
-    hasDescription(): boolean {
-      const description = this.project.description;
-      return description !== "";
-    },
-    headers() {
-      return [
+      headers: [
         { text: "Email", value: "email", sortable: false, isSelectable: false },
         {
           text: "Role",
@@ -99,10 +76,38 @@ export default Vue.extend({
           isSelectable: true,
         },
         { text: "Actions", value: "actions", sortable: false },
-      ];
+      ],
+    };
+  },
+  computed: {
+    /**
+     * @return Whether the current user is an admin.
+     */
+    isAdmin(): boolean {
+      const userEmail = sessionModule.userEmail;
+      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
+      const userQuery = this.project.members.filter(
+        (m) => m.email === userEmail && allowedRoles.includes(m.role)
+      );
+      return userQuery.length === 1;
+    },
+    /**
+     * @return All project members.
+     */
+    members() {
+      return this.project.members;
+    },
+    /**
+     * @return Whether the project has a description.
+     */
+    hasDescription(): boolean {
+      return this.project.description !== "";
     },
   },
   methods: {
+    /**
+     * Loads the project's members.
+     */
     async handleRetrieveMembers(): Promise<void> {
       if (this.project.projectId !== "") {
         this.isLoading = true;
@@ -110,28 +115,36 @@ export default Vue.extend({
         this.isLoading = false;
       }
     },
+    /**
+     * Opens the add member modal.
+     */
     handleAddMember(): void {
       this.isNewOpen = true;
     },
+    /**
+     * Opens the edit member modal.
+     * @param member - The member to edit.
+     */
     handleEditMember(member: ProjectMembership): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
+    /**
+     * Opens the delete member modal.
+     * @param member - The member to delete.
+     */
     handleDeleteMember(member: ProjectMembership): void {
-      logModule.SET_CONFIRMATION_MESSAGE({
-        type: ConfirmationType.INFO,
-        title: "Remove User from Project",
-        body: `Are you sure you want to remove ${member.email} from project?`,
-        statusCallback: async (isConfirmed: boolean) => {
-          if (isConfirmed) {
-            await deleteProjectMember(member);
-          }
-        },
-      });
+      handleDeleteMember(member);
     },
+    /**
+     * Closes the add member modal.
+     */
     async handleConfirmAdd(): Promise<void> {
       this.isNewOpen = false;
     },
+    /**
+     * Closes the edit member modal.
+     */
     async handleConfirmEdit(): Promise<void> {
       this.isEditOpen = false;
     },

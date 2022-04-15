@@ -48,3 +48,19 @@ export interface APIErrorBody {
    */
   errors: string[];
 }
+
+/**
+ * Defines the callbacks for an io handler function.
+ */
+export interface IOHandlerCallback<Res = void> {
+  /**
+   * Called on success with the response data.
+   * @param res - The successful response data.
+   */
+  onSuccess?: (res: Res) => void;
+  /**
+   * Called on error with the error details.
+   * @param err - The returned error.
+   */
+  onError?: (err: Error) => void;
+}

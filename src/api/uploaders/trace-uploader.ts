@@ -1,4 +1,3 @@
-import { parseTraceFile, createGeneratedLinks } from "@/api";
 import {
   ArtifactMap,
   IGenericUploader,
@@ -9,9 +8,14 @@ import {
   TraceLink,
   TracePanel,
 } from "@/types";
+import { parseTraceFile, createGeneratedLinks } from "@/api";
+import { extractTraceId } from "@/util";
 
 const DEFAULT_IS_GENERATED = false;
 
+/**
+ * Creates a trace file uploader.
+ */
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
   Link,
@@ -23,10 +27,15 @@ export function createTraceUploader(): IGenericUploader<
   };
 }
 
+/**
+ * Creates a new uploader panel.
+ *
+ * @param traceLink - The like to create the panel for.
+ */
 function createNewPanel(traceLink: Link): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
-    title: getTraceId(traceLink),
+    title: extractTraceId(traceLink),
     entityNames: [],
     projectFile: emptyArtifactFile,
     getIsValid(): boolean {
@@ -44,12 +53,18 @@ function createNewPanel(traceLink: Link): TracePanel {
   };
 }
 
+/**
+ * Generates all trace links between artifacts.
+ *
+ * @param artifactMap - A collection of all artifacts.
+ * @param panel - The trace panel to generate for.
+ */
 function generateTraceLinks(
   artifactMap: ArtifactMap,
-  tracePanel: TracePanel
+  panel: TracePanel
 ): Promise<void> {
-  const sourceType = tracePanel.projectFile.sourceId;
-  const targetType = tracePanel.projectFile.targetId;
+  const sourceType = panel.projectFile.sourceId;
+  const targetType = panel.projectFile.targetId;
   const artifacts: Artifact[] = Object.values(artifactMap);
   const sourceArtifacts: Artifact[] = artifacts.filter(
     (a) => a.type === sourceType
@@ -60,12 +75,17 @@ function generateTraceLinks(
 
   return createGeneratedLinks(sourceArtifacts, targetArtifacts).then(
     (traceLinks) => {
-      tracePanel.projectFile.traces = traceLinks;
-      tracePanel.entityNames = traceLinks.map(getTraceId);
+      panel.projectFile.traces = traceLinks;
+      panel.entityNames = traceLinks.map(extractTraceId);
     }
   );
 }
 
+/**
+ * Creates a new trace file.
+ *
+ * @param traceLink - The trace link in this file.
+ */
 function createTraceFile(traceLink: Link): TraceFile {
   return {
     sourceId: traceLink.sourceId,
@@ -77,6 +97,12 @@ function createTraceFile(traceLink: Link): TraceFile {
   };
 }
 
+/**
+ * Returns whether the panel is valid.
+ *
+ * @param panel - The panel to check.
+ * @return Whether it is valid.
+ */
 function isArtifactPanelValid(panel: TracePanel): boolean {
   return (
     panel.projectFile.file !== undefined &&
@@ -84,6 +110,11 @@ function isArtifactPanelValid(panel: TracePanel): boolean {
   );
 }
 
+/**
+ * Clears the panel.
+ *
+ * @param panel - The panel to clear.
+ */
 function clearPanel(panel: TracePanel): void {
   panel.projectFile = {
     ...panel.projectFile,
@@ -94,6 +125,13 @@ function clearPanel(panel: TracePanel): void {
   panel.entityNames = [];
 }
 
+/**
+ * Parses the uploaded trace links.
+ *
+ * @param artifactMap - A collection of all artifacts.
+ * @param panel - The trace panel.
+ * @param file - The file to parse.
+ */
 function createParsedArtifactFile(
   artifactMap: ArtifactMap,
   panel: TracePanel,
@@ -115,14 +153,18 @@ function createParsedArtifactFile(
     panel.projectFile.traces = validTraces;
     panel.projectFile.errors = errors;
     panel.projectFile.file = file;
-    panel.entityNames = traces.map(getTraceId);
+    panel.entityNames = traces.map(extractTraceId);
   });
 }
 
-function getTraceId(traceLink: Link): string {
-  return `${traceLink.sourceName}-${traceLink.targetName}`;
-}
-
+/**
+ * Returns any errors for the given trace link.
+ *
+ * @param traceFile - The trace file.
+ * @param artifactMap - A collection of all artifacts.
+ * @param traceLink - The trace to check.
+ * @return The error message, if there is one.
+ */
 function getTraceError(
   traceFile: TraceFile,
   artifactMap: Record<string, Artifact>,

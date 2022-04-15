@@ -36,6 +36,7 @@ import FilePanel from "./FilePanel.vue";
  * @emits-2 `validate` (isValid: boolean) - On validate.
  */
 export default Vue.extend({
+  name: "FilePanelController",
   components: {
     GenericSwitch,
     FilePanel,
@@ -57,23 +58,42 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return Whether this is a trace panel.
+     */
     isTracePanel(): boolean {
       return isTracePanel(this.panel);
     },
+    /**
+     * @return Whether this panel is valid.
+     */
     isValid(): boolean {
       return this.panel.getIsValid();
     },
+    /**
+     * @return Any errors in this panel.
+     */
     errors(): string[] {
       return this.panel.projectFile.errors;
     },
+    /**
+     * @return The title of the panel.
+     */
     title(): string {
       return this.panel.title;
     },
+    /**
+     * @return The names of the entities in the panel.
+     */
     entityNames(): string[] {
       return this.panel.entityNames;
     },
   },
   methods: {
+    /**
+     * Parses added files.
+     * @param file - The file to parse.
+     */
     async handleChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
         this.panel.clearPanel();
@@ -81,20 +101,28 @@ export default Vue.extend({
         await this.panel.parseFile(this.artifactMap, file);
       }
     },
+    /**
+     * Sets whether the panel is valid, and emits that change.
+     * @param isValid - Whether the panel is valid.
+     */
     setValidationState(isValid: boolean): void {
       this.panel.projectFile.isValid = isValid;
       this.$emit("validate", isValid);
     },
   },
   watch: {
+    /**
+     * Generates trace files when generate is toggled on.
+     */
     async isGeneratedToggle(isGenerated: boolean) {
-      if (isTracePanel(this.panel)) {
-        this.panel.projectFile.isGenerated = isGenerated;
-        if (isGenerated) {
-          await this.panel.generateTraceLinks(this.artifactMap);
-        } else {
-          this.panel.clearPanel();
-        }
+      if (!isTracePanel(this.panel)) return;
+
+      this.panel.projectFile.isGenerated = isGenerated;
+
+      if (isGenerated) {
+        await this.panel.generateTraceLinks(this.artifactMap);
+      } else {
+        this.panel.clearPanel();
       }
     },
   },

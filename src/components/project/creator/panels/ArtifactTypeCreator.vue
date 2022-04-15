@@ -23,6 +23,7 @@ import Vue, { PropType } from "vue";
  * @emits-2 `submit` (artifactName: string) - On submit.
  */
 export default Vue.extend({
+  name: "ArtifactTypeCreator",
   props: {
     isOpen: {
       type: Boolean,
@@ -40,6 +41,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Attempts to create a new artifact type panel.
+     */
     handleSubmit() {
       if (this.artifactName === "")
         this.errors = ["Artifact type cannot be empty."];
@@ -51,16 +55,22 @@ export default Vue.extend({
         this.$emit("close");
       }
     },
+    /**
+     * Attempts to create a new artifact type panel when enter is pressed.
+     */
     handleEnterPress(event: Event): void {
       event.preventDefault();
       this.handleSubmit();
     },
   },
   watch: {
-    isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.artifactName = "";
-      }
+    /**
+     * Empties the artifact name when opened.
+     */
+    isOpen(open: boolean): void {
+      if (!open) return;
+
+      this.artifactName = "";
     },
   },
 });

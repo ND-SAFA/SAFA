@@ -27,6 +27,7 @@ import { GenericModal } from "@/components/common";
  * @emits-2 `cancel` - On delete cancel.
  */
 export default Vue.extend({
+  name: "ConfirmVersionDelete",
   components: { GenericModal },
   props: {
     deleteDialogue: {
@@ -44,14 +45,23 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Emits a request to confirm the deletion.
+     */
     handleConfirm() {
-      this.$emit("confirm", this.$props.version);
+      this.$emit("confirm", this.version);
     },
+    /**
+     * Emits a request to cancel the deletion.
+     */
     handleCancel() {
       this.$emit("cancel");
     },
   },
   watch: {
+    /**
+     * Updates the title when the version changes.
+     */
     version(version: ProjectVersion) {
       this.title = `Delete version: ${versionToString(version)}`;
     },

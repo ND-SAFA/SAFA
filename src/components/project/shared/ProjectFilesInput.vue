@@ -15,9 +15,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { handleBulkImportProject } from "@/api";
 import { GenericFileSelector } from "@/components/common";
-import { saveProject, handleUploadProjectVersion } from "@/api";
-import { logModule } from "@/store";
 
 /**
  * Togglable input for project files.
@@ -26,6 +25,7 @@ import { logModule } from "@/store";
  * @emits-2 `close` - On close.
  */
 export default Vue.extend({
+  name: "ProjectFilesInput",
   components: {
     GenericFileSelector,
   },
@@ -46,41 +46,50 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * Whether the submit button is disabled.
+     */
     isDisabled(): boolean {
       return this.name.length === 0 || this.selectedFiles.length === 0;
     },
   },
   methods: {
+    /**
+     * Saves changed files.
+     * @param files - The changed files.
+     */
     handleChangeFiles(files: File[]) {
       this.selectedFiles = files;
     },
+    /**
+     * Attempts to save the project.
+     */
     async handleCreate() {
-      try {
-        this.isLoading = true;
+      this.isLoading = true;
 
-        const project = await saveProject({
+      handleBulkImportProject(
+        {
           projectId: "",
           name: this.name,
           description: this.description,
-        });
-
-        await handleUploadProjectVersion(
-          project.project.projectId,
-          project.projectVersion.versionId,
-          this.selectedFiles,
-          true
-        );
-
-        this.selectedFiles = [];
-      } catch (e) {
-        logModule.onDevWarning(e);
-        logModule.onError("Unable to create a project from these files");
-      } finally {
-        this.isLoading = false;
-      }
+        },
+        this.selectedFiles,
+        {
+          onSuccess: () => {
+            this.selectedFiles = [];
+            this.isLoading = false;
+          },
+          onError: () => {
+            this.isLoading = false;
+          },
+        }
+      );
     },
   },
   watch: {
+    /**
+     * Emits changes to selected files.
+     */
     selectedFiles(files: File[]) {
       this.$emit("update:files", files);
     },

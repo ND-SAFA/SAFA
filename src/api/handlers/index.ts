@@ -9,3 +9,5 @@ export * from "./document-handler";
 export * from "./artifact-type-handler";
 export * from "./create-project-handler";
 export * from "./load-version-handler";
+export * from "./edit-project-handler";
+export * from "./member-handler";

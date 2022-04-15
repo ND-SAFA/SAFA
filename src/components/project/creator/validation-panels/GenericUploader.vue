@@ -55,6 +55,7 @@ import ValidatedPanels from "./ValidatedPanels.vue";
  * @emits-3 `change` - On change.
  */
 export default Vue.extend({
+  name: "GenericUploader",
   components: {
     ValidatedPanels,
     FilePanelController,
@@ -84,32 +85,49 @@ export default Vue.extend({
     openPanelIndexes: [] as number[],
   }),
   computed: {
+    /**
+     * @return Whether all panels are valid.
+     */
     isValidStates(): boolean[] {
       return this.panels.map((p) => p.projectFile.isValid);
     },
-    panels(): IGenericFilePanel<ArtifactMap, ValidFileTypes>[] {
+    /**
+     * @return All panels.
+     */
+    panels() {
       return this.uploader.panels;
     },
+    /**
+     * @return All project files.
+     */
     projectFiles(): ProjectFile[] {
       return this.uploader.panels.map((p) => p.projectFile);
     },
   },
   methods: {
+    /**
+     * Closes the creator.
+     */
     handleCloseCreator(): void {
       this.isCreatorOpen = false;
     },
+    /**
+     * Emits changed panels.
+     */
     handleChange(
       i: number,
       panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
     ): void {
       this.$emit(
         "change",
-        this.panels.map((a, currentIndex) => {
-          if (currentIndex === i) return panel;
-          return a;
-        })
+        this.panels.map((a, currentIndex) => (currentIndex === i ? panel : a))
       );
     },
+    /**'
+     * Closes the panel if its valid, otherwise opens the panel.
+     * @param i - The panel index.
+     * @param isValid - Whether the panel is valid.
+     */
     handleValidateChange(i: number, isValid: boolean): void {
       if (isValid) {
         this.openPanelIndexes = this.openPanelIndexes.filter(
@@ -119,6 +137,10 @@ export default Vue.extend({
         this.openPanelIndexes.push(i);
       }
     },
+    /**
+     * Emits changes when a panel is deleted.
+     * @param i - The index of the deleted panel.
+     */
     handleDeleteFile(i: number): void {
       this.$emit(
         "change",
@@ -128,6 +150,10 @@ export default Vue.extend({
         this.$emit("upload:invalid");
       }
     },
+    /**
+     * Emits changes when a panel is added.
+     * @param payload - The added panel artifact name or trace link.
+     */
     handleAddFile(payload: string | Link): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));

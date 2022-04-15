@@ -38,6 +38,7 @@ import { GenericModal } from "@/components/common";
  * @emits-2 `cancel` - On delete cancel.
  */
 export default Vue.extend({
+  name: "ConfirmProjectDelete",
   components: { GenericModal },
   props: {
     isOpen: {
@@ -58,41 +59,51 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Clears modal data.
+     */
     clearData(): void {
       this.confirmText = "";
       this.validated = false;
     },
+    /**
+     * Emits a request to confirm deleting this project.
+     */
     handleConfirm() {
-      const project = this.$props.project;
       if (this.validated) {
-        this.$emit("confirm", project);
+        this.$emit("confirm", this.project);
       }
     },
+    /**
+     * Emits a request to cancel deleting this project.
+     */
     handleCancel() {
       this.$emit("cancel");
     },
   },
   watch: {
-    project(project: ProjectIdentifier) {
-      if (project !== undefined) {
-        this.textboxLabel = `Type "${project.name}"`;
-        this.title = `Deleting: ${project.name}`;
-      }
+    /**
+     * Updates the modal text when the project changes.
+     */
+    project(project: ProjectIdentifier | undefined) {
+      if (!project) return;
+
+      this.textboxLabel = `Type "${project.name}"`;
+      this.title = `Deleting: ${project.name}`;
     },
+    /**
+     * Updates the validated status when the text changes.
+     */
     confirmText() {
-      const project = this.$props.project;
-      if (project !== undefined) {
-        if (this.confirmText === project.name) {
-          this.validated = true;
-          return;
-        }
-      }
-      this.validated = false;
+      this.validated = this.project && this.confirmText === this.project.name;
     },
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
+    /**
+     * Clears the modal data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
     },
   },
 });

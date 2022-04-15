@@ -66,6 +66,7 @@ import { GenericModal } from "@/components/common";
  * @emits-2 `close` - On close.
  */
 export default Vue.extend({
+  name: "VersionCreator",
   components: {
     GenericModal,
   },
@@ -86,11 +87,18 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The version name.
+     */
     version(): string {
       return versionToString(this.currentVersion);
     },
   },
   methods: {
+    /**
+     * Returns the next version name.
+     * @param type - The type of new version.
+     */
     nextVersion(type: VersionType): string {
       if (this.currentVersion === undefined) {
         return "X.X.X";
@@ -107,19 +115,19 @@ export default Vue.extend({
           return "X.X.X";
       }
     },
+    /**
+     * Attempts to create a new version.
+     * @param versionType - The version type to create.
+     */
     handleClick(versionType: VersionType) {
-      const projectId = this.project?.projectId;
-
-      if (projectId === undefined) {
-        throw Error("project expected to be defined");
-      }
+      if (!this.project) return;
 
       const createVersionFrom = async (
         createVersion: (projectId: string) => Promise<ProjectVersion>
       ) => {
         this.isLoading = true;
 
-        const version = await createVersion(projectId);
+        const version = await createVersion(this.project.projectId);
 
         this.$emit("create", version);
         this.isLoading = false;
@@ -135,21 +143,25 @@ export default Vue.extend({
         case "revision":
           createVersionFrom(createRevisionVersion);
           break;
-        default:
-          throw Error("Unknown type" + versionType);
       }
     },
+    /**
+     * Emits a request to close the modal.
+     */
     handleClose() {
       this.$emit("close");
     },
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen && this.project) {
-        getCurrentVersion(this.project.projectId).then(
-          (version) => (this.currentVersion = version)
-        );
-      }
+    /**
+     * Gets the current version when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open || !this.project) return;
+
+      getCurrentVersion(this.project.projectId).then(
+        (version) => (this.currentVersion = version)
+      );
     },
   },
 });

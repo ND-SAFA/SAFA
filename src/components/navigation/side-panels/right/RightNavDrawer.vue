@@ -7,27 +7,31 @@
     right
     stateless
     v-model="isRightOpen"
-    :width="width"
+    width="325"
     height="100%"
   >
-    <side-panel />
+    <project-details-panel />
   </v-navigation-drawer>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import SidePanel from "./SidePanel.vue";
+import { appModule } from "@/store";
+import ProjectDetailsPanel from "./ProjectDetailsPanel.vue";
 
+/**
+ * Displays the right nav drawer.
+ */
 export default Vue.extend({
+  name: "RightNavDrawer",
   components: {
-    SidePanel,
+    ProjectDetailsPanel,
   },
-  props: {
-    isRightOpen: Boolean,
-    width: {
-      type: Number,
-      required: true,
-    },
+  computed: {
+    /**
+     * @return Whether the right panel is open.
+     */
+    isRightOpen: () => appModule.getIsRightOpen,
   },
 });
 </script>

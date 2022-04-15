@@ -37,23 +37,35 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { handleLogout } from "@/api";
 import { logModule, sessionModule } from "@/store";
+import { handleLogout } from "@/api";
 
 export default Vue.extend({
-  name: "account-dropdown",
+  name: "AccountDropdown",
   computed: {
+    /**
+     * @return The current user's email.
+     */
     userEmail() {
       return sessionModule.userEmail;
     },
+    /**
+     * @return The current user's name.
+     */
     userName() {
       return "Demo User";
     },
   },
   methods: {
+    /**
+     * Logs the user out.
+     */
     handleLogout(): void {
       handleLogout();
     },
+    /**
+     * Navigates to the account editing page.
+     */
     handleEditAccount(): void {
       logModule.onInfo("Account editing is not yet available");
     },

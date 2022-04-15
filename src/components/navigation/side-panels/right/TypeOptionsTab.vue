@@ -11,7 +11,7 @@
           v-for="type in entry.allowedTypes"
           :key="type"
           close
-          @click:close="onDeleteDirection(entry, type)"
+          @click:close="handleDeleteDirection(entry, type)"
         >
           {{ getTypeLabel(type) }}
         </v-chip>
@@ -27,7 +27,7 @@
         <v-btn
           v-for="option in icons"
           :key="option"
-          @change="onIconChange(entry, option)"
+          @change="handleIconChange(entry, option)"
         >
           <v-icon>{{ option }}</v-icon>
         </v-btn>
@@ -49,37 +49,39 @@ export default Vue.extend({
   name: "trace-link-direction-tab",
   data() {
     return {
-      artifactTypes: [] as string[],
       artifactDirections: [] as LabeledArtifactDirection[],
+      icons: typeOptionsModule.allArtifactTypeIcons,
     };
   },
+  /**
+   * Update artifact type directions on mount.
+   */
   mounted() {
-    this.artifactTypes = typeOptionsModule.artifactTypes;
-
-    this.artifactDirections = Object.entries(
-      typeOptionsModule.linkDirections
-    ).map(([type, allowedTypes]) => {
-      const icon = typeOptionsModule.getArtifactTypeIcon(type);
-
-      return {
-        type,
-        allowedTypes,
-        label: this.getTypeLabel(type),
-        icon,
-        iconIndex: this.icons.indexOf(icon),
-      };
-    });
+    this.generateTypeDirections();
   },
   computed: {
-    icons(): string[] {
-      return typeOptionsModule.allArtifactTypeIcons;
+    /**
+     * @return The current project's artifact types.
+     */
+    artifactTypes(): string[] {
+      return typeOptionsModule.artifactTypes;
     },
   },
   methods: {
+    /**
+     * Converts an artifact type to a title case name.
+     * @param type - The type to convert.
+     * @return The type display name.
+     */
     getTypeLabel(type: string) {
       return getArtifactTypePrintName(type);
     },
-    onIconChange(entry: LabeledArtifactDirection, icon: string) {
+    /**
+     * Updates the icon for an artifact type.
+     * @param entry - The type to update.
+     * @param icon - The icon to set.
+     */
+    handleIconChange(entry: LabeledArtifactDirection, icon: string) {
       const artifactTypeQuery = projectModule.getProject.artifactTypes.filter(
         (a) => a.name === entry.type
       );
@@ -91,13 +93,47 @@ export default Vue.extend({
         logModule.onWarning("Unable to find artifact type: " + entry.label);
       }
     },
-    onDeleteDirection(entry: LabeledArtifactDirection, removedType: string) {
+    /**
+     * Removes an artifact type direction.
+     * @param entry - The type to update.
+     * @param removedType - The type to remove.
+     */
+    handleDeleteDirection(
+      entry: LabeledArtifactDirection,
+      removedType: string
+    ) {
       entry.allowedTypes = entry.allowedTypes.filter(
         (allowedType) => allowedType !== removedType
       );
 
       typeOptionsModule.updateLinkDirections(entry);
       handleRemoveTraceType(entry.type, removedType);
+    },
+    /**
+     * Generates artifact type directions for the current artifact types.
+     */
+    generateTypeDirections() {
+      this.artifactDirections = Object.entries(
+        typeOptionsModule.linkDirections
+      ).map(([type, allowedTypes]) => {
+        const icon = typeOptionsModule.getArtifactTypeIcon(type);
+
+        return {
+          type,
+          allowedTypes,
+          label: this.getTypeLabel(type),
+          icon,
+          iconIndex: this.icons.indexOf(icon),
+        };
+      });
+    },
+  },
+  watch: {
+    /**
+     * Update artifact type directions when the types change.
+     */
+    artifactTypes() {
+      this.generateTypeDirections();
     },
   },
 });

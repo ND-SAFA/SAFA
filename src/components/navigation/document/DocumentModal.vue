@@ -31,7 +31,7 @@
         :outlined="confirmDelete"
         @click="handleDelete"
       >
-        {{ confirmDelete ? "Delete" : "Delete Document" }}
+        {{ deleteButtonText }}
       </v-btn>
       <v-btn outlined v-if="confirmDelete" @click="confirmDelete = false">
         Cancel
@@ -48,12 +48,8 @@
 import Vue, { PropType } from "vue";
 import { ProjectDocument } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import {
-  handleCreateDocument,
-  handleDeleteDocument,
-  handleUpdateDocument,
-} from "@/api";
-import { documentModule, logModule } from "@/store";
+import { documentModule } from "@/store";
+import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
 /**
@@ -76,89 +72,91 @@ export default Vue.extend({
       editingDocument: createDocument(this.document),
       confirmDelete: false,
       isValid: false,
+      types: documentTypeOptions(),
     };
   },
   computed: {
+    /**
+     * @return Whether the document is in edit mode.
+     */
     isEditMode(): boolean {
       return !!this.document;
     },
+    /**
+     * @return The modal title.
+     */
     title(): string {
       return this.isEditMode ? "Edit Document" : "Add Document";
     },
-    types: documentTypeOptions,
-
+    /**
+     * @return Whether the current document name is valid.
+     */
     isNameValid(): boolean {
       return (
         !documentModule.doesDocumentExist(this.document?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },
+    /**
+     * @return Whether the current document is valid.
+     */
     isDocumentValid(): boolean {
       return !!this.editingDocument.name && this.isNameValid;
     },
+    /**
+     * @return Document name errors to display.
+     */
     nameErrors(): string[] {
       return this.isNameValid ? [] : ["This name already exists"];
     },
+    /**
+     * @return The text to display on the delete button.
+     */
+    deleteButtonText(): string {
+      return this.confirmDelete ? "Delete" : "Delete Document";
+    },
   },
   methods: {
+    /**
+     * Resets all modal data.
+     */
     resetModalData() {
       this.editingDocument = createDocument(this.document);
       this.confirmDelete = false;
       this.$emit("close");
     },
+    /**
+     * Attempts to save the document.
+     */
     handleSubmit() {
-      if (this.isEditMode) {
-        handleUpdateDocument(this.editingDocument)
-          .then(() => {
-            logModule.onSuccess(
-              `Document edited: ${this.editingDocument.name}`
-            );
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(
-              `Unable to edit document: ${this.editingDocument.name}`
-            );
-          });
-      } else {
-        const { name, type, artifactIds } = this.editingDocument;
-
-        handleCreateDocument(name, type, artifactIds)
-          .then(() => {
-            logModule.onSuccess(`Document created: ${name}`);
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(`Unable to create document: ${name}`);
-          });
-      }
+      handleSaveDocument(this.editingDocument, this.isEditMode, () =>
+        this.resetModalData()
+      );
     },
+    /**
+     * Attempts to delete the document, after confirming.
+     */
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else if (this.editingDocument) {
-        handleDeleteDocument(this.editingDocument)
-          .then(() => {
-            logModule.onSuccess(
-              `Document Deleted: ${this.editingDocument.name}`
-            );
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(
-              `Unable to delete document: ${this.editingDocument.name}`
-            );
-          });
+        handleDeleteDocument(this.editingDocument, () => this.resetModalData());
       }
     },
   },
   watch: {
+    /**
+     * Whenever any document field changes, check whether the document is valid.
+     */
     editingDocument: {
       handler() {
         this.isValid = this.isDocumentValid;
       },
       deep: true,
     },
+    /**
+     * Reset the document when the modal is opened.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 

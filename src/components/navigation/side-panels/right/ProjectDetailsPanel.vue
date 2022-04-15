@@ -24,8 +24,11 @@ import TraceLinkDirectionTab from "./TypeOptionsTab.vue";
 
 const DELTA_TREE_INDEX = 1;
 
+/**
+ * Displays the project details panel.
+ */
 export default Vue.extend({
-  name: "hazard-hierarchy-panel",
+  name: "ProjectDetailsPanel",
   components: {
     TraceLinkDirectionTab,
     DeltaTab,
@@ -37,6 +40,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Opens the delta panel.
+     */
     openDeltaPanel(): void {
       this.selectedTab = DELTA_TREE_INDEX;
     },

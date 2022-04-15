@@ -122,7 +122,7 @@ export default Vue.extend({
       this.versionToDelete = version;
       this.deleteVersionDialogue = true;
     },
-    onVersionCreated(version: ProjectVersion) {
+    handleVersionCreated(version: ProjectVersion) {
       this.versions = [version].concat(this.versions);
       this.addVersionDialogue = false;
       this.$emit("selected", version);

@@ -12,12 +12,12 @@
           :tooltip="definition.label"
           :icon-id="definition.icon"
           @click="definition.handler"
-          :is-disabled="definition.isDisabled || doDisableButtons"
+          :is-disabled="isButtonDisabled(definition)"
         />
         <checkmark-menu
           v-else
           :definition="definition"
-          :is-disabled="definition.isDisabled || doDisableButtons"
+          :is-disabled="isButtonDisabled(definition)"
         />
       </v-row>
     </v-col>
@@ -26,21 +26,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ButtonDefinition, ButtonType, Artifact } from "@/types";
-import { capitalize } from "@/util";
+import { ButtonDefinition, ButtonType } from "@/types";
 import {
   artifactModule,
   artifactSelectionModule,
   commitModule,
   documentModule,
-  projectModule,
   viewportModule,
 } from "@/store";
-import { GenericIconButton, CheckmarkMenu } from "@/components/common";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
+import { GenericIconButton, CheckmarkMenu } from "@/components/common";
 
 export default Vue.extend({
+  name: "GraphButtons",
   components: {
     GenericIconButton,
     CheckmarkMenu,
@@ -50,41 +49,23 @@ export default Vue.extend({
       menuItems: [] as [string, boolean][], // label , persistent value
     };
   },
-  methods: {
-    async filterTypeHandler(index: number): Promise<void> {
-      const [type, oldState] = this.menuItems[index];
-      const newState = !oldState;
-      // Changes to arrays not detected: https://vuejs.org/v2/guide/reactivity.html#Change-Detection-Caveats
-      Vue.set(this.menuItems, index, [type, newState]);
-      artifactSelectionModule
-        .filterGraph({
-          type: "ignore",
-          ignoreType: type,
-          action: newState ? "remove" : "add",
-        })
-        .then();
-    },
-    createMenuPersistentData(): [string, boolean][] {
-      return Array.from(new Set(this.artifacts.map((a) => a.type))).map((i) => [
-        i,
-        true,
-      ]);
-    },
-  },
+  /**
+   * Updates the graph button state on mount.
+   */
   mounted() {
     this.menuItems = this.createMenuPersistentData();
   },
-  watch: {
-    artifacts(): void {
-      this.menuItems = this.createMenuPersistentData();
-    },
-  },
   computed: {
-    artifacts(): Artifact[] {
+    /**
+     * @return The visible project artifacts.
+     */
+    artifacts() {
       return artifactModule.artifacts;
     },
+    /**
+     * @return The graph button definitions to display.
+     */
     definitions(): ButtonDefinition[] {
-      // is computed because needs to react to changes to menuItems
       return [
         {
           type: ButtonType.ICON,
@@ -143,8 +124,45 @@ export default Vue.extend({
         },
       ];
     },
-    doDisableButtons(): boolean {
-      return documentModule.isTableDocument;
+  },
+  methods: {
+    /**
+     * @return Whether to disable a graph button.
+     */
+    isButtonDisabled(button: ButtonDefinition): boolean {
+      return button.isDisabled || documentModule.isTableDocument;
+    },
+    /**
+     * Filters the visible artifacts on the graph.
+     */
+    filterTypeHandler(index: number) {
+      const [type, oldState] = this.menuItems[index];
+      const newState = !oldState;
+
+      Vue.set(this.menuItems, index, [type, newState]);
+
+      artifactSelectionModule.filterGraph({
+        type: "ignore",
+        ignoreType: type,
+        action: newState ? "remove" : "add",
+      });
+    },
+    /**
+     * Creates saved state for the graph menu items.
+     */
+    createMenuPersistentData(): [string, boolean][] {
+      return Array.from(new Set(this.artifacts.map((a) => a.type))).map((i) => [
+        i,
+        true,
+      ]);
+    },
+  },
+  watch: {
+    /**
+     * Updates the graph button state when artifacts change
+     */
+    artifacts(): void {
+      this.menuItems = this.createMenuPersistentData();
     },
   },
 });

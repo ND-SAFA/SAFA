@@ -2,6 +2,7 @@ import {
   Artifact,
   DocumentColumn,
   DocumentType,
+  EmptyLambda,
   ProjectDocument,
 } from "@/types";
 import { createDocument } from "@/util";
@@ -57,12 +58,21 @@ export async function handleUpdateDocument(
  * Switches documents if the current one has been deleted.
  *
  * @param document - The document to delete.
+ * @param onSuccess - Called if the operation is successful.
  */
-export async function handleDeleteDocument(
-  document: ProjectDocument
-): Promise<void> {
-  await deleteDocument(document);
-  await documentModule.removeDocument(document);
+export function handleDeleteDocument(
+  document: ProjectDocument,
+  onSuccess: EmptyLambda
+): void {
+  const { name } = document;
+
+  deleteDocument(document)
+    .then(async () => {
+      await documentModule.removeDocument(document);
+      logModule.onSuccess(`Document Deleted: ${name}`);
+      onSuccess();
+    })
+    .catch(() => logModule.onError(`Unable to delete document: ${name}`));
 }
 
 /**
@@ -80,6 +90,37 @@ export async function handleDocumentReload(
   await documentModule.updateDocuments(documents);
 
   documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
+}
+
+/**
+ * Creates or updates a document, updates app state, and logs the result.
+ *
+ * @param document - The document to save.
+ * @param isUpdate - Set to true if the document already exists.
+ * @param onSuccess - Called if the operation is successful.
+ */
+export function handleSaveDocument(
+  document: ProjectDocument,
+  isUpdate: boolean,
+  onSuccess: EmptyLambda
+): void {
+  const { name, type, artifactIds } = document;
+
+  if (isUpdate) {
+    handleUpdateDocument(document)
+      .then(() => {
+        logModule.onSuccess(`Document edited: ${name}`);
+        onSuccess();
+      })
+      .catch(() => logModule.onError(`Unable to edit document: ${name}`));
+  } else {
+    handleCreateDocument(name, type, artifactIds)
+      .then(() => {
+        logModule.onSuccess(`Document created: ${name}`);
+        onSuccess();
+      })
+      .catch(() => logModule.onError(`Unable to create document: ${name}`));
+  }
 }
 
 /**
@@ -124,7 +165,7 @@ export function handleColumnMove(
 export function handleColumnSave(
   column: DocumentColumn,
   isEditMode: boolean,
-  onSuccess: () => void
+  onSuccess: EmptyLambda
 ): void {
   const document = documentModule.document;
   const { id: columnId, name } = column;
@@ -153,7 +194,7 @@ export function handleColumnSave(
  */
 export function handleColumnDelete(
   column: DocumentColumn,
-  onSuccess: () => void
+  onSuccess: EmptyLambda
 ): void {
   const document = documentModule.document;
   const { id: columnId, name } = column;

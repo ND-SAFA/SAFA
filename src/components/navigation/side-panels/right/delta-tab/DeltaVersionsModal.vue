@@ -18,8 +18,8 @@
               hide-current-version
               :project="project"
               :is-open="isOpen"
-              @selected="selectVersion"
-              @unselected="unselectVersion"
+              @selected="handleSelectVersion"
+              @unselected="handleDeselectVersion"
             />
           </v-row>
         </v-container>
@@ -27,7 +27,7 @@
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn @click="onSubmit" color="primary ">
+      <v-btn @click="handleSubmit" color="primary ">
         Save <v-icon id="upload-button">mdi-check</v-icon>
       </v-btn>
     </template>
@@ -36,11 +36,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectDelta, ProjectVersion } from "@/types";
-import { getProjectDelta } from "@/api";
-import { logModule, deltaModule } from "@/store";
+import { Project, ProjectVersion } from "@/types";
+import { logModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project";
+import { handleSetProjectDelta } from "@/api/handlers/delta-handler";
 
 /**
  * A modal for displaying delta versions.
@@ -48,6 +48,7 @@ import { VersionSelector } from "@/components/project";
  * @emits `close` - On close.
  */
 export default Vue.extend({
+  name: "DeltaVersionsModal",
   components: { VersionSelector, GenericModal },
   props: {
     isOpen: Boolean,
@@ -64,41 +65,46 @@ export default Vue.extend({
     };
   },
   methods: {
-    selectVersion(version: ProjectVersion) {
+    /**
+     * Selects a delta version.
+     * @param version - The version to select.
+     */
+    handleSelectVersion(version: ProjectVersion) {
       this.selectedVersion = version;
 
       if (this.isInitialized) {
-        this.onSubmit();
+        this.handleSubmit();
       } else {
         this.isInitialized = true;
       }
     },
-    unselectVersion() {
+    /**
+     * Deselects a delta version.
+     */
+    handleDeselectVersion() {
       this.selectedVersion = undefined;
     },
-    onSubmit() {
-      if (this.selectedVersion === undefined) {
+    /**
+     * Attempts to load a project delta.
+     */
+    handleSubmit() {
+      if (!this.selectedVersion) {
         logModule.onWarning("Please select a version to upload to");
+      } else if (!this.project.projectVersion) {
+        logModule.onWarning("Project source version is not selected.");
       } else {
-        const sourceVersion = this.project.projectVersion;
-
-        if (sourceVersion !== undefined) {
-          getProjectDelta(
-            sourceVersion.versionId,
-            this.selectedVersion.versionId
-          ).then(async (deltaPayload: ProjectDelta) => {
-            await deltaModule.setDeltaPayload(deltaPayload);
-            deltaModule.setAfterVersion(this.selectedVersion);
-            this.$emit("close");
-            logModule.onSuccess("Delta state was updated successfully.");
-          });
-        } else {
-          logModule.onWarning("Project source version is not selected.");
-        }
+        handleSetProjectDelta(
+          this.project.projectVersion,
+          this.selectedVersion,
+          () => this.$emit("close")
+        );
       }
     },
   },
   watch: {
+    /**
+     * Resets modal state when opened.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 

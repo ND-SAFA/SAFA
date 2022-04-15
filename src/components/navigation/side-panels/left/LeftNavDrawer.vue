@@ -7,7 +7,7 @@
     left
     stateless
     v-model="isLeftOpen"
-    :width="width"
+    width="250"
     height="100%"
   >
     <selected-node-tab />
@@ -15,18 +15,22 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+import { appModule } from "@/store";
 import SelectedNodeTab from "./SelectedNodeTab.vue";
 
+/**
+ * Displays the left nav drawer.
+ */
 export default Vue.extend({
+  name: "LeftNavDrawer",
   components: {
     SelectedNodeTab,
   },
-  props: {
-    isLeftOpen: Boolean,
-    width: {
-      type: Number,
-      required: true,
-    },
+  computed: {
+    /**
+     * @return Whether the left panel is open.
+     */
+    isLeftOpen: () => appModule.getIsLeftOpen,
   },
 });
 </script>

@@ -18,13 +18,13 @@
               v-if="!selectedArtifact.logicType"
               tooltip="Edit"
               icon-id="mdi-pencil"
-              @click="onArtifactEdit"
+              @click="handleArtifactEdit"
             />
             <generic-icon-button
               color="error"
               tooltip="Delete"
               icon-id="mdi-delete"
-              @click="onDeleteArtifact"
+              @click="handleDeleteArtifact"
             />
           </v-row>
         </v-col>
@@ -50,7 +50,7 @@
               class="mb-1"
               v-for="parentName in parents"
               :key="parentName"
-              @click="onArtifactClick(parentName)"
+              @click="handleArtifactClick(parentName)"
             >
               <span class="mb-1 text-ellipsis" style="max-width: 60px">
                 {{ parentName }}
@@ -72,7 +72,7 @@
               class="mb-1"
               v-for="childName in children"
               :key="childName"
-              @click="onArtifactClick(childName)"
+              @click="handleArtifactClick(childName)"
             >
               <span class="mb-1 text-ellipsis" style="max-width: 60px">
                 {{ childName }}
@@ -90,7 +90,7 @@
           <v-list-item
             v-for="doc in documents"
             :key="doc.documentId"
-            @click="onSwitchDocument(doc)"
+            @click="handleSwitchDocument(doc)"
           >
             <v-list-item-title>
               {{ doc.name }}
@@ -143,14 +143,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  ArtifactWarning,
-  PanelType,
-  ProjectDocument,
-  ProjectWarnings,
-} from "@/types";
-import { handleDeleteArtifact } from "@/api";
+import { Artifact, ArtifactWarning, PanelType, ProjectDocument } from "@/types";
+import { documentTypeOptions } from "@/util";
 import {
   appModule,
   artifactModule,
@@ -159,10 +153,14 @@ import {
   errorModule,
   traceModule,
 } from "@/store";
+import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
-import { documentTypeOptions } from "@/util";
 
+/**
+ * Displays the selected node tab.
+ */
 export default Vue.extend({
+  name: "SelectedNodeTab",
   components: { GenericIconButton, ArtifactCreatorModal },
   data() {
     return {
@@ -171,36 +169,41 @@ export default Vue.extend({
     };
   },
   computed: {
-    selectedArtifact(): Artifact | undefined {
+    /**
+     * @return The selected artifact.
+     */
+    selectedArtifact() {
       return artifactSelectionModule.getSelectedArtifact;
     },
-    selectedArtifactName(): string | undefined {
-      return this.selectedArtifact === undefined
-        ? undefined
-        : this.selectedArtifact.name;
+    /**
+     * @return The selected artifact's name.
+     */
+    selectedArtifactName(): string {
+      return this.selectedArtifact?.name || "";
     },
+    /**
+     * @return The selected artifact's parents.
+     */
     parents(): string[] {
-      const selectedArtifact = this.selectedArtifact;
-      if (selectedArtifact !== undefined) {
-        const query = traceModule.traces.filter(
-          ({ sourceName }) => sourceName === selectedArtifact.name
-        );
-        return query.map((l) => l.targetName);
-      } else {
-        return [];
-      }
+      if (!this.selectedArtifact) return [];
+
+      return traceModule.traces
+        .filter(({ sourceName }) => sourceName === this.selectedArtifactName)
+        .map(({ targetName }) => targetName);
     },
+    /**
+     * @return The selected artifact's children.
+     */
     children(): string[] {
-      const selectedArtifactName = this.selectedArtifactName;
-      if (selectedArtifactName !== undefined) {
-        const query = traceModule.traces.filter(
-          ({ targetName }) => targetName === selectedArtifactName
-        );
-        return query.map((l) => l.sourceName);
-      } else {
-        return [];
-      }
+      if (!this.selectedArtifact) return [];
+
+      return traceModule.traces
+        .filter(({ targetName }) => targetName === this.selectedArtifactName)
+        .map(({ sourceName }) => sourceName);
     },
+    /**
+     * @return The selected artifact's documents.
+     */
     documents(): ProjectDocument[] {
       if (!this.selectedArtifact) return [];
 
@@ -208,34 +211,53 @@ export default Vue.extend({
         this.selectedArtifact?.documentIds.includes(documentId)
       );
     },
-    projectWarnings(): ProjectWarnings {
-      return errorModule.getArtifactWarnings;
-    },
+    /**
+     * @return The selected artifact's warnings.
+     */
     selectedArtifactWarnings(): ArtifactWarning[] {
       const id = this.selectedArtifact?.id || "";
 
-      return this.projectWarnings[id] || [];
+      return errorModule.getArtifactWarnings[id] || [];
     },
   },
   methods: {
-    onArtifactEdit(): void {
+    /**
+     * Opens the artifact edit modal.
+     */
+    handleArtifactEdit(): void {
       this.isArtifactCreatorOpen = true;
     },
-    onArtifactClick(artifactName: string): void {
+    /**
+     * Selects an artifact.
+     * @param artifactName - The artifact to select.
+     */
+    handleArtifactClick(artifactName: string): void {
       const artifact = artifactModule.getArtifactByName(artifactName);
 
       artifactSelectionModule.selectArtifact(artifact.id);
     },
-    onDeleteArtifact(): void {
+    /**
+     * Attempts to delete the selected artifact.
+     */
+    handleDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         handleDeleteArtifact(this.selectedArtifact).then(() => {
           appModule.closePanel(PanelType.left);
         });
       }
     },
-    onSwitchDocument(document: ProjectDocument): void {
+    /**
+     * Switches to another document.
+     * @param document - The document to switch to.
+     */
+    handleSwitchDocument(document: ProjectDocument): void {
       documentModule.switchDocuments(document);
     },
+    /**
+     * Converts the document type into a display name.
+     * @param typeId - The document type id.
+     * @return The document type name.
+     */
     documentTypeName(typeId: string): string {
       return (
         documentTypeOptions().find(({ id }) => id === typeId)?.name || typeId
@@ -249,6 +271,7 @@ export default Vue.extend({
 .v-expansion-panel::before {
   box-shadow: none;
 }
+
 .artifact-title {
   overflow: hidden;
   text-overflow: ellipsis;

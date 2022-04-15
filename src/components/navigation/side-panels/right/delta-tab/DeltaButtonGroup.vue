@@ -24,11 +24,12 @@ import { capitalize } from "@/util";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
 /**
- * Displays delta buttons.
+ * Displays a group of delta buttons.
  *
  * @emits `click` - On delta button click.
  */
 export default Vue.extend({
+  name: "DeltaButtonGroup",
   components: { ArtifactDeltaButton },
   props: {
     deltaType: {
@@ -51,16 +52,19 @@ export default Vue.extend({
     };
   },
   methods: {
-    closeDeltaModal(): void {
-      this.selectedName = undefined;
-      this.isDeltaOpen = false;
-    },
+    /**
+     * Selects the given artifact.
+     * @param artifactName - The artifact to select.
+     */
     selectArtifact(artifactName: string): void {
       this.selectedName = artifactName;
       this.isDeltaOpen = true;
     },
   },
   computed: {
+    /**
+     * @return The button group title.
+     */
     title(): string {
       return capitalize(this.deltaType);
     },

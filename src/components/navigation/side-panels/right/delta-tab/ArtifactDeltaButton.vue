@@ -1,8 +1,8 @@
 <template>
   <v-btn outlined :color="titleColor" @click="$emit('click', name)">
-    <span style="max-width: 100px; overflow: hidden; text-overflow: ellipsis">{{
-      name
-    }}</span>
+    <span style="max-width: 100px; overflow: hidden; text-overflow: ellipsis">
+      {{ name }}
+    </span>
   </v-btn>
 </template>
 
@@ -11,11 +11,12 @@ import { DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
 
 /**
- * Displays delta information.
+ * Displays an artifact delta button.
  *
  * @emits `click` (name: string) - On click.
  */
 export default Vue.extend({
+  name: "ArtifactDeltaButton",
   props: {
     name: {
       type: String,
@@ -27,6 +28,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * The color to display for the button.
+     */
     titleColor(): string {
       switch (this.deltaType) {
         case "added":

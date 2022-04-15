@@ -26,7 +26,7 @@
     </template>
     <template v-slot:actions v-if="!isUploadOpen">
       <v-btn
-        @click="onSave"
+        @click="handleSave"
         color="primary"
         class="ml-auto"
         :disabled="isDisabled"
@@ -104,7 +104,7 @@ export default Vue.extend({
     handleClose() {
       this.$emit("close");
     },
-    onSave() {
+    handleSave() {
       this.$emit("save", this.identifier);
     },
   },

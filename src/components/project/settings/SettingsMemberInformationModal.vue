@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
     <template v-slot:body>
       <v-row dense class="mt-4">
         <v-col>
@@ -12,7 +12,7 @@
             style="min-width: 300px"
             :readonly="member !== undefined"
             :rules="emailRules"
-            @update:error="onErrorUpdate"
+            @update:error="handleErrorUpdate"
           />
         </v-col>
         <v-col>
@@ -128,7 +128,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    onErrorUpdate(hasErrors: boolean): void {
+    handleErrorUpdate(hasErrors: boolean): void {
       this.hasErrors = hasErrors;
     },
     clearData(): void {
@@ -151,7 +151,7 @@ export default Vue.extend({
         logModule.onWarning("Please define project role.");
       }
     },
-    onCancel() {
+    handleCancel() {
       this.$emit("cancel");
     },
     getProjectRole(role: string): ProjectRole {

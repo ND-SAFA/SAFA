@@ -12,10 +12,10 @@
         :has-select="false"
         :is-loading="isLoading"
         item-key="email"
-        @item:add="onAddMember"
-        @item:edit="onEditMember"
-        @item:delete="onDeleteMember"
-        @refresh="retrieveMembers"
+        @item:add="handleAddMember"
+        @item:edit="handleEditMember"
+        @item:delete="handleDeleteMember"
+        @refresh="handleRetrieveMembers"
         class="mt-5"
       >
         <template v-slot:addItemDialogue>
@@ -23,7 +23,7 @@
             :is-open="isNewOpen"
             :project="project"
             @cancel="isNewOpen = false"
-            @confirm="onConfirmAdd"
+            @confirm="handleConfirmAdd"
           />
         </template>
         <template v-slot:editItemDialogue>
@@ -33,7 +33,7 @@
             :project="project"
             :member="memberToEdit"
             @cancel="isEditOpen = false"
-            @confirm="onConfirmEdit"
+            @confirm="handleConfirmEdit"
           />
         </template>
       </generic-selector>
@@ -103,21 +103,21 @@ export default Vue.extend({
     },
   },
   methods: {
-    async retrieveMembers(): Promise<void> {
+    async handleRetrieveMembers(): Promise<void> {
       if (this.project.projectId !== "") {
         this.isLoading = true;
         this.members = await getProjectMembers(this.project.projectId);
         this.isLoading = false;
       }
     },
-    onAddMember(): void {
+    handleAddMember(): void {
       this.isNewOpen = true;
     },
-    onEditMember(member: ProjectMembership): void {
+    handleEditMember(member: ProjectMembership): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
-    onDeleteMember(member: ProjectMembership): void {
+    handleDeleteMember(member: ProjectMembership): void {
       logModule.SET_CONFIRMATION_MESSAGE({
         type: ConfirmationType.INFO,
         title: "Remove User from Project",
@@ -129,10 +129,10 @@ export default Vue.extend({
         },
       });
     },
-    async onConfirmAdd(): Promise<void> {
+    async handleConfirmAdd(): Promise<void> {
       this.isNewOpen = false;
     },
-    async onConfirmEdit(): Promise<void> {
+    async handleConfirmEdit(): Promise<void> {
       this.isEditOpen = false;
     },
   },

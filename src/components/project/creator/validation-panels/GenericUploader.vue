@@ -17,16 +17,16 @@
             :key="panel.title"
             :panel="panel"
             :artifactMap="artifactMap"
-            @change="onChange(i, $event)"
-            @delete="deleteFile(i)"
-            @validate="onValidateChange(i, $event)"
+            @change="handleChange(i, $event)"
+            @delete="handleDeleteFile(i)"
+            @validate="handleValidateChange(i, $event)"
           />
         </v-expansion-panels>
         <slot
           name="creator"
           v-bind:isCreatorOpen="isCreatorOpen"
-          v-bind:onAddFile="addFile"
-          v-bind:onClose="onCloseCreator"
+          v-bind:onAddFile="handleAddFile"
+          v-bind:onClose="handleCloseCreator"
         />
       </template>
     </validated-panels>
@@ -41,7 +41,6 @@ import {
   IGenericUploader,
   ValidFileTypes,
   ProjectFile,
-  TraceLink,
   ValidPayloads,
   Link,
 } from "@/types";
@@ -96,10 +95,10 @@ export default Vue.extend({
     },
   },
   methods: {
-    onCloseCreator(): void {
+    handleCloseCreator(): void {
       this.isCreatorOpen = false;
     },
-    onChange(
+    handleChange(
       i: number,
       panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
     ): void {
@@ -111,7 +110,7 @@ export default Vue.extend({
         })
       );
     },
-    onValidateChange(i: number, isValid: boolean): void {
+    handleValidateChange(i: number, isValid: boolean): void {
       if (isValid) {
         this.openPanelIndexes = this.openPanelIndexes.filter(
           (panelIndex) => panelIndex !== i
@@ -120,7 +119,7 @@ export default Vue.extend({
         this.openPanelIndexes.push(i);
       }
     },
-    deleteFile(i: number): void {
+    handleDeleteFile(i: number): void {
       this.$emit(
         "change",
         this.panels.filter((f, index) => index !== i)
@@ -129,7 +128,7 @@ export default Vue.extend({
         this.$emit("upload:invalid");
       }
     },
-    addFile(payload: string | Link): void {
+    handleAddFile(payload: string | Link): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);

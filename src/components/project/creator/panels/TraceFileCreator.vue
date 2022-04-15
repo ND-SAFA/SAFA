@@ -8,7 +8,7 @@
       </div>
     </v-col>
     <v-col cols="3">
-      <v-btn @click="onSubmit" color="primary" class="ml-10">
+      <v-btn @click="handleSubmit" color="primary" class="ml-10">
         Create Trace Matrix
       </v-btn>
     </v-col>
@@ -52,7 +52,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    onSubmit(): void {
+    handleSubmit(): void {
       if (this.source !== "" && this.target !== "") {
         const traceLink: Link = {
           sourceName: this.source,

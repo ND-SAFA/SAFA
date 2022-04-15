@@ -15,7 +15,7 @@
             text
             block
             color="primary"
-            @click="() => onClick('major')"
+            @click="() => handleClick('major')"
           >
             New Major Version: {{ nextVersion("major") }}
           </v-btn>
@@ -26,7 +26,7 @@
             text
             block
             color="primary"
-            @click="() => onClick('minor')"
+            @click="() => handleClick('minor')"
           >
             New Minor Version: {{ nextVersion("minor") }}
           </v-btn>
@@ -37,7 +37,7 @@
             text
             block
             color="primary"
-            @click="() => onClick('revision')"
+            @click="() => handleClick('revision')"
           >
             New Revision: {{ nextVersion("revision") }}</v-btn
           >
@@ -107,7 +107,7 @@ export default Vue.extend({
           return "X.X.X";
       }
     },
-    onClick(versionType: VersionType) {
+    handleClick(versionType: VersionType) {
       const projectId = this.project?.projectId;
 
       if (projectId === undefined) {

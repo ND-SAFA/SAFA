@@ -5,9 +5,9 @@
       label="Artifact Name"
       required
       :error-messages="errors"
-      @keydown.enter="onEnterPress"
+      @keydown.enter="handleEnterPress"
     />
-    <v-btn @click="onSubmit" color="primary" class="ml-1">
+    <v-btn @click="handleSubmit" color="primary" class="ml-1">
       Create Artifact
     </v-btn>
   </v-row>
@@ -40,7 +40,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    onSubmit() {
+    handleSubmit() {
       if (this.artifactName === "")
         this.errors = ["Artifact type cannot be empty."];
       else if (this.artifactTypes.includes(this.artifactName))
@@ -51,9 +51,9 @@ export default Vue.extend({
         this.$emit("close");
       }
     },
-    onEnterPress(event: Event): void {
+    handleEnterPress(event: Event): void {
       event.preventDefault();
-      this.onSubmit();
+      this.handleSubmit();
     },
   },
   watch: {

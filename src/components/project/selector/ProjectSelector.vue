@@ -8,10 +8,10 @@
     :is-loading="isLoading"
     :has-delete-for-indexes="hasDeleteForIndexes"
     :has-delete="false"
-    @item:edit="onEditProject"
-    @item:select="onSelectProject"
-    @item:delete="onDeleteProject"
-    @item:add="onAddItem"
+    @item:edit="handleEditProject"
+    @item:select="handleSelectProject"
+    @item:delete="handleDeleteProject"
+    @item:add="handleAddItem"
     @refresh="fetchProjects"
   >
     <template v-slot:editItemDialogue>
@@ -19,8 +19,8 @@
         title="Edit Project"
         :is-open="editProjectDialogue"
         :project="projectToEdit"
-        @save="onUpdateProject"
-        @close="onCloseProjectEdit"
+        @save="handleUpdateProject"
+        @close="handleCloseProjectEdit"
       />
     </template>
     <template v-slot:addItemDialogue>
@@ -28,16 +28,16 @@
         do-show-upload
         title="Create New Project"
         :is-open="addProjectDialogue"
-        @save="onSaveNewProject"
-        @close="onCloseAddProject"
+        @save="handleSaveNewProject"
+        @close="handleCloseAddProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
         :is-open="deleteProjectDialogue"
         :project="projectToDelete"
-        @confirm="onConfirmDeleteProject"
-        @cancel="onCancelDeleteProject"
+        @confirm="handleConfirmDeleteProject"
+        @cancel="handleCancelDeleteProject"
       />
     </template>
   </generic-selector>
@@ -129,42 +129,45 @@ export default Vue.extend({
     },
   },
   methods: {
-    onUpdateProject(project: ProjectIdentifier) {
+    handleUpdateProject(project: ProjectIdentifier) {
       this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
     },
-    onSaveNewProject(newProject: ProjectIdentifier) {
+    handleSaveNewProject(newProject: ProjectIdentifier) {
       this.saveOrUpdateProjectHandler(newProject);
       this.addProjectDialogue = false;
     },
-    onCloseProjectEdit() {
+    handleCloseProjectEdit() {
       this.editProjectDialogue = false;
     },
-    onSelectProject(item: DataItem<ProjectIdentifier>, goToNextStep = false) {
+    handleSelectProject(
+      item: DataItem<ProjectIdentifier>,
+      goToNextStep = false
+    ) {
       if (item.value) {
         this.$emit("selected", item.item, goToNextStep);
       } else {
         this.$emit("unselected");
       }
     },
-    onAddItem() {
+    handleAddItem() {
       this.addProjectDialogue = true;
     },
-    onCloseAddProject() {
+    handleCloseAddProject() {
       this.addProjectDialogue = false;
     },
-    onEditProject(item: ProjectIdentifier) {
+    handleEditProject(item: ProjectIdentifier) {
       this.projectToEdit = item;
       this.editProjectDialogue = true;
     },
-    onDeleteProject(item: ProjectIdentifier) {
+    handleDeleteProject(item: ProjectIdentifier) {
       this.deleteProjectDialogue = true;
       this.projectToDelete = item;
     },
-    onCancelDeleteProject() {
+    handleCancelDeleteProject() {
       this.deleteProjectDialogue = false;
     },
-    onConfirmDeleteProject(project: ProjectIdentifier) {
+    handleConfirmDeleteProject(project: ProjectIdentifier) {
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },

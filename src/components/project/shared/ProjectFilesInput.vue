@@ -5,7 +5,7 @@
       block
       color="primary"
       :disabled="isDisabled"
-      @click="onCreate"
+      @click="handleCreate"
       :loading="isLoading"
     >
       Create Project From Files
@@ -54,7 +54,7 @@ export default Vue.extend({
     handleChangeFiles(files: File[]) {
       this.selectedFiles = files;
     },
-    async onCreate() {
+    async handleCreate() {
       try {
         this.isLoading = true;
 

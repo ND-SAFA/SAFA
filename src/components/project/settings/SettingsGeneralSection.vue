@@ -9,7 +9,7 @@
           <generic-icon-button
             tooltip="Edit title"
             icon-id="mdi-pencil"
-            @click="onEdit"
+            @click="handleEdit"
           />
         </v-col>
       </v-row>
@@ -24,7 +24,7 @@
       v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
       @close="isEditOpen = false"
-      @save="onSave"
+      @save="handleSave"
     />
   </v-row>
 </template>
@@ -57,11 +57,11 @@ export default Vue.extend({
     };
   },
   methods: {
-    onEdit(): void {
+    handleEdit(): void {
       this.projectToEdit = this.project;
       this.isEditOpen = true;
     },
-    onSave(project: ProjectIdentifier): void {
+    handleSave(project: ProjectIdentifier): void {
       this.isEditLoading = true;
 
       saveProject({

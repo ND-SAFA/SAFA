@@ -9,25 +9,25 @@
     :is-loading="isLoading"
     :has-edit="false"
     :can-delete-last-item="false"
-    @item:select="onSelectVersion"
-    @item:delete="onDeleteVersion"
-    @item:add="onAddItem"
-    @refresh="loadProjectVersions"
+    @item:select="handleSelectVersion"
+    @item:delete="handleDeleteVersion"
+    @item:add="handleAddItem"
+    @refresh="handleLoadProjectVersions"
   >
     <template v-slot:addItemDialogue>
       <version-creator
         :is-open="addVersionDialogue"
         :project="project"
-        @close="onCreatorClose"
-        @create="onVersionCreated"
+        @close="handleCreatorClose"
+        @create="handleVersionCreated"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-version-delete
         :version="versionToDelete"
         :delete-dialogue="deleteVersionDialogue"
-        @cancel="onCancelDeleteVersion"
-        @confirm="onConfirmDeleteVersion"
+        @cancel="handleCancelDeleteVersion"
+        @confirm="handleConfirmDeleteVersion"
       />
     </template>
   </generic-selector>
@@ -85,11 +85,11 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.loadProjectVersions();
+    this.handleLoadProjectVersions();
   },
   watch: {
     project() {
-      this.loadProjectVersions();
+      this.handleLoadProjectVersions();
     },
   },
   computed: {
@@ -105,20 +105,20 @@ export default Vue.extend({
     },
   },
   methods: {
-    onCreatorClose() {
+    handleCreatorClose() {
       this.addVersionDialogue = false;
     },
-    onSelectVersion(item: DataItem<ProjectVersion>) {
+    handleSelectVersion(item: DataItem<ProjectVersion>) {
       if (item.value) {
         this.$emit("selected", item.item);
       } else {
         this.$emit("unselected");
       }
     },
-    onAddItem() {
+    handleAddItem() {
       this.addVersionDialogue = true;
     },
-    onDeleteVersion(version: ProjectVersion) {
+    handleDeleteVersion(version: ProjectVersion) {
       this.versionToDelete = version;
       this.deleteVersionDialogue = true;
     },
@@ -127,10 +127,10 @@ export default Vue.extend({
       this.addVersionDialogue = false;
       this.$emit("selected", version);
     },
-    onCancelDeleteVersion() {
+    handleCancelDeleteVersion() {
       this.deleteVersionDialogue = false;
     },
-    onConfirmDeleteVersion(version: ProjectVersion) {
+    handleConfirmDeleteVersion(version: ProjectVersion) {
       this.deleteVersionDialogue = false;
       this.isLoading = true;
       deleteProjectVersion(version.versionId)
@@ -142,7 +142,7 @@ export default Vue.extend({
         })
         .finally(() => (this.isLoading = false));
     },
-    loadProjectVersions() {
+    handleLoadProjectVersions() {
       if (!this.project) return;
 
       this.isLoading = true;

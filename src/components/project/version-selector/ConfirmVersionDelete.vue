@@ -3,7 +3,7 @@
     size="xxs"
     :is-open="deleteDialogue"
     :title="title"
-    @close="onCancel"
+    @close="handleCancel"
     :actions-height="0"
   >
     <template v-slot:body>
@@ -47,7 +47,7 @@ export default Vue.extend({
     handleConfirm() {
       this.$emit("confirm", this.$props.version);
     },
-    onCancel() {
+    handleCancel() {
       this.$emit("cancel");
     },
   },

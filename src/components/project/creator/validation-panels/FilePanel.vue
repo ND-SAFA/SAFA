@@ -190,7 +190,7 @@ export default Vue.extend({
           return "primary";
       }
     },
-    onClear(): void {
+    handleClear(): void {
       this.$emit("change", undefined);
     },
     emitChangeFiles(file: File | null): void {
@@ -201,7 +201,7 @@ export default Vue.extend({
       }
 
       if (fileIsEmpty) {
-        this.onClear();
+        this.handleClear();
       } else {
         this.$emit("change", file);
       }

@@ -80,9 +80,8 @@ import {
   TraceLink,
 } from "@/types";
 import { createProject } from "@/util";
-import { handleImportProject, saveProject, handleSetProject } from "@/api";
-import { appModule, sessionModule } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import { handleImportProject } from "@/api";
+import { sessionModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { TimTree } from "../tim-tree-view";

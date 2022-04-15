@@ -1,7 +1,7 @@
 <template>
   <file-panel
     :show-file-uploader="!isGeneratedToggle"
-    @change="onChange"
+    @change="handleChange"
     @delete="$emit('delete')"
     @validate="setValidationState"
     :errors="errors"
@@ -74,7 +74,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    async onChange(file: File | undefined): Promise<void> {
+    async handleChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
         this.panel.clearPanel();
       } else {

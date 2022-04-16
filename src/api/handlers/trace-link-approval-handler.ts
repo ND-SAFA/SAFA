@@ -1,6 +1,7 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
 import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
+import { extractTraceId } from "@/util";
 
 /**
  * Creates a new trace link.
@@ -13,8 +14,8 @@ export async function handleCreateLink(link: TraceLink): Promise<void> {
 
     await projectModule.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
-    logModule.onError("Unable to create trace link");
-    logModule.onDevError(e.toString());
+    logModule.onError(`Unable to create trace link: ${extractTraceId(link)}`);
+    logModule.onDevError(e);
   }
 }
 

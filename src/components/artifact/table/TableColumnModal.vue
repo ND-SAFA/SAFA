@@ -126,9 +126,9 @@ export default Vue.extend({
      * Attempts to save a column.
      */
     handleSubmit() {
-      handleColumnSave(this.editingColumn, this.isEditMode, () =>
-        this.resetModalData()
-      );
+      handleColumnSave(this.editingColumn, this.isEditMode, {
+        onSuccess: () => this.resetModalData(),
+      });
     },
     /**
      * Attempts to delete an existing column.
@@ -137,7 +137,9 @@ export default Vue.extend({
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        handleColumnDelete(this.editingColumn, () => this.resetModalData());
+        handleColumnDelete(this.editingColumn, {
+          onSuccess: () => this.resetModalData(),
+        });
       }
     },
   },

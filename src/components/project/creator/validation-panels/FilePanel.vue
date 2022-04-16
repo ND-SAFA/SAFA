@@ -219,7 +219,7 @@ export default Vue.extend({
       }
     },
     underDevelopmentError(): void {
-      logModule.onWarning("Viewing parsed entities is under development.");
+      logModule.onInfo("Viewing parsed entities is under development.");
     },
   },
 });

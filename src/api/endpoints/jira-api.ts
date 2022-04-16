@@ -42,8 +42,8 @@ async function fetchAtlassian<T>(
   const resJson = (await response.json()) as T;
 
   if (!response.ok) {
-    logModule.onError("Unable to connect to Atlassian");
-    throw Error("Unable to connect to Atlassian");
+    logModule.onError("Unable to connect to Atlassian.");
+    throw Error("Unable to connect to Atlassian.");
   } else {
     return resJson;
   }

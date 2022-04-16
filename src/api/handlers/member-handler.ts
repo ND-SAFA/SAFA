@@ -24,11 +24,11 @@ export function handleInviteMember(
 ): void {
   saveProjectMember(projectId, memberEmail, projectRole)
     .then(() => {
-      logModule.onSuccess(`${memberEmail} has been added to the project.`);
+      logModule.onSuccess(`Member added to the project: ${memberEmail}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to add member ${memberEmail}.`);
+      logModule.onSuccess(`Unable to add member: ${memberEmail}`);
       logModule.onDevError(e.message);
       onError?.(e);
     });

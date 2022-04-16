@@ -145,7 +145,9 @@ export default Vue.extend({
      * @param moveUp - Whether to move the column up or down.
      */
     handleMove(item: DocumentColumn, moveUp: boolean) {
-      handleColumnMove(item, moveUp, (columns) => (this.items = columns));
+      handleColumnMove(item, moveUp, {
+        onSuccess: (columns) => (this.items = columns),
+      });
     },
   },
 });

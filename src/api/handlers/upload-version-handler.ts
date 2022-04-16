@@ -18,7 +18,7 @@ export async function handleUploadProjectVersion(
   setVersionIfSuccessful: boolean
 ): Promise<void> {
   if (selectedFiles.length === 0) {
-    logModule.onWarning("Please add at least one file to upload");
+    logModule.onWarning("Please add at least one file to upload.");
   } else {
     const formData = new FormData();
 
@@ -35,9 +35,7 @@ export async function handleUploadProjectVersion(
     const uploadFlatFiles = async () => {
       const res = await updateProjectThroughFlatFiles(versionId, formData);
 
-      logModule.onSuccess(
-        `Flat files were uploaded successfully and ${res.project.name} was updated.`
-      );
+      logModule.onSuccess(`Flat files have been uploaded: ${res.project.name}`);
 
       return res;
     };

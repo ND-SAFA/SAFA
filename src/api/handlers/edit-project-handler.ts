@@ -25,7 +25,7 @@ export function handleSaveProject(
 ): void {
   saveProject(project)
     .then(({ project }: ProjectCreationResponse) => {
-      logModule.onSuccess(`${project.name} project has been saved.`);
+      logModule.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })
     .catch((e) => {
@@ -48,7 +48,7 @@ export function handleDeleteProject(
 ): void {
   deleteProject(project.projectId)
     .then(async () => {
-      logModule.onSuccess(`${project.name} has been deleted.`);
+      logModule.onSuccess(`Project has been deleted: ${project.name}`);
       onSuccess?.(project);
 
       if (project.name !== projectModule.getProject.name) return;
@@ -57,7 +57,7 @@ export function handleDeleteProject(
       await handleClearProject();
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to delete project ${project.name}.`);
+      logModule.onSuccess(`Unable to delete project: ${project.name}.`);
       logModule.onDevError(e.message);
       onError?.(e);
     });

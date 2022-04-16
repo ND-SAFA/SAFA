@@ -129,9 +129,9 @@ export default Vue.extend({
      * Attempts to save the document.
      */
     handleSubmit() {
-      handleSaveDocument(this.editingDocument, this.isEditMode, () =>
-        this.resetModalData()
-      );
+      handleSaveDocument(this.editingDocument, this.isEditMode, {
+        onSuccess: () => this.resetModalData(),
+      });
     },
     /**
      * Attempts to delete the document, after confirming.
@@ -140,7 +140,9 @@ export default Vue.extend({
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else if (this.editingDocument) {
-        handleDeleteDocument(this.editingDocument, () => this.resetModalData());
+        handleDeleteDocument(this.editingDocument, {
+          onSuccess: () => this.resetModalData(),
+        });
       }
     },
   },

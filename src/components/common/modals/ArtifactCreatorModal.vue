@@ -298,9 +298,13 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      handleSaveArtifact(artifact, isUpdate, this.parentArtifact, () =>
-        this.$emit("close")
-      ).then(() => (this.isLoading = false));
+      handleSaveArtifact(artifact, isUpdate, this.parentArtifact, {
+        onSuccess: () => {
+          this.$emit("close");
+          this.isLoading = false;
+        },
+        onError: () => (this.isLoading = false),
+      });
     },
   },
 });

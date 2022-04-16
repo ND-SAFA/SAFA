@@ -67,7 +67,7 @@ export default Vue.extend({
      * Navigates to the account editing page.
      */
     handleEditAccount(): void {
-      logModule.onInfo("Account editing is not yet available");
+      logModule.onInfo("Account editing is not yet available.");
     },
   },
 });

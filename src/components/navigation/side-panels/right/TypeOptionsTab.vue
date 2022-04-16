@@ -42,7 +42,7 @@
 import Vue from "vue";
 import { LabeledArtifactDirection } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
-import { logModule, projectModule, typeOptionsModule } from "@/store";
+import { projectModule, typeOptionsModule } from "@/store";
 import { handleSaveArtifactType, handleRemoveTraceType } from "@/api";
 
 export default Vue.extend({
@@ -82,16 +82,14 @@ export default Vue.extend({
      * @param icon - The icon to set.
      */
     handleIconChange(entry: LabeledArtifactDirection, icon: string) {
-      const artifactTypeQuery = projectModule.getProject.artifactTypes.filter(
-        (a) => a.name === entry.type
+      const type = projectModule.getProject.artifactTypes.find(
+        ({ name }) => name === entry.type
       );
 
-      if (artifactTypeQuery.length === 1) {
-        typeOptionsModule.updateArtifactIcon({ ...entry, icon });
-        handleSaveArtifactType({ ...artifactTypeQuery[0], icon });
-      } else {
-        logModule.onWarning("Unable to find artifact type: " + entry.label);
-      }
+      if (!type) return;
+
+      typeOptionsModule.updateArtifactIcon({ ...entry, icon });
+      handleSaveArtifactType({ ...type, icon });
     },
     /**
      * Removes an artifact type direction.

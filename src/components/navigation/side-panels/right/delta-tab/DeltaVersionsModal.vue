@@ -87,7 +87,7 @@ export default Vue.extend({
      */
     handleSubmit() {
       if (!this.selectedVersion) {
-        logModule.onWarning("Please select a version to upload to");
+        logModule.onWarning("Please select a version to upload to.");
       } else if (!this.project.projectVersion) {
         logModule.onWarning("Project source version is not selected.");
       } else {

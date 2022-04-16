@@ -1,7 +1,7 @@
 import {
   Artifact,
   ConfirmationType,
-  EmptyLambda,
+  IOHandlerCallback,
   TraceApproval,
   TraceType,
 } from "@/types";
@@ -19,19 +19,20 @@ import {
 } from "@/api";
 
 /**
- * Creates or updates and artifact, and updates app state.
+ * Creates or updates an artifact, and updates app state.
  *
  * @param artifact - The artifact to create.
  * @param isUpdate - Whether this operation should label this commit as
  * updating a previously existing artifact.
  * @param parentArtifact - The parent artifact to link to.
  * @param onSuccess - Called if the save is successful.
+ * @param onError - Called if the save fails.
  */
 export async function handleSaveArtifact(
   artifact: Artifact,
   isUpdate: boolean,
-  parentArtifact?: Artifact,
-  onSuccess?: EmptyLambda
+  parentArtifact: Artifact | undefined,
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   try {
     const versionId = projectModule.versionIdWithLog;
@@ -66,7 +67,8 @@ export async function handleSaveArtifact(
     onSuccess?.();
   } catch (e) {
     logModule.onDevError(e);
-    logModule.onWarning("Unable to create artifact.");
+    logModule.onError(`Unable to create artifact: ${artifact.name}`);
+    onError?.(e);
   }
 }
 

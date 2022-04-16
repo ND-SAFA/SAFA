@@ -23,13 +23,13 @@ export function handleImportProject(
 
   saveProject(project)
     .then(async (res) => {
-      logModule.onSuccess("Successfully created project.");
+      logModule.onSuccess(`Project has been created: ${project.name}`);
       await navigateTo(Routes.ARTIFACT);
       await handleSetProject(res);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError("Unable to import project");
+      logModule.onError(`Unable to import project: ${project.name}`);
       logModule.onDevError(e);
       onError?.(e);
     })
@@ -61,11 +61,11 @@ export function handleBulkImportProject(
       )
     )
     .then(async () => {
-      logModule.onSuccess("Successfully created project.");
+      logModule.onSuccess(`Project has been created: ${project.name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError("Unable to create a project from these files");
+      logModule.onError(`Unable to create project: ${project.name}`);
       logModule.onDevError(e);
       onError?.(e);
     })
@@ -91,11 +91,11 @@ export function handleImportJiraProject(
 
   createJiraProject(accessToken, cloudId, projectId)
     .then(() => {
-      logModule.onSuccess("Jira project has been imported.");
+      logModule.onSuccess(`Jira project has been created: ${projectId}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError("Unable to import jira project");
+      logModule.onError(`Unable to import jira project: ${projectId}`);
       logModule.onDevError(e.message);
       onError?.(e);
     })

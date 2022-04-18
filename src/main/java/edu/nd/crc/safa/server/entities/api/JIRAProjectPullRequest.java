@@ -8,6 +8,7 @@ public class JIRAProjectPullRequest {
     String cloudId; // The domain resource id
     String projectId; // The project id within domain
     String bearerAccessToken; // The user authentication id
+    String clientSecret; // used for refreshing the token later
 
     public JIRAProjectPullRequest() {
     }
@@ -36,4 +37,11 @@ public class JIRAProjectPullRequest {
         this.bearerAccessToken = bearerAccessToken;
     }
 
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+=    }
 }

@@ -9,6 +9,7 @@ public class AppRoutes {
         public static final String loginLink = "/login";
         private static final String accountPrefix = "/accounts";
         public static final String createNewUser = accountPrefix + "/create";
+        public static final String jiraCredentials = accountPrefix + "/credentials"
     }
 
     public static class Projects {

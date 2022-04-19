@@ -51,8 +51,8 @@ export async function handleUploadProjectVersion(
         const res = await uploadFlatFiles();
         await handleSetProject(res);
       } catch (e) {
-        await navigateTo(Routes.PROJECT_CREATOR);
         logModule.onError(e.message);
+        await navigateTo(Routes.PROJECT_CREATOR);
       } finally {
         appModule.onLoadEnd();
       }

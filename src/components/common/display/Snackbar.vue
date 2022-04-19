@@ -66,7 +66,7 @@ export default Vue.extend({
     showMessage(snackbarMessage: SnackbarMessage) {
       this.showSnackbar = true;
       this.snackbarMessage = snackbarMessage.message;
-      this.errors = snackbarMessage.errors;
+      this.errors = snackbarMessage.errors || [];
       this.messageType = snackbarMessage.type;
     },
     /**

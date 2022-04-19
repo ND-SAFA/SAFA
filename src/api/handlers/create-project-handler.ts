@@ -60,15 +60,8 @@ export function handleBulkImportProject(
         true
       )
     )
-    .then(async () => {
-      logModule.onSuccess(`Project has been created: ${project.name}`);
-      onSuccess?.();
-    })
-    .catch((e) => {
-      logModule.onError(`Unable to create project: ${project.name}`);
-      logModule.onDevError(e);
-      onError?.(e);
-    })
+    .then(onSuccess)
+    .catch(onError)
     .finally(() => appModule.onLoadEnd());
 }
 

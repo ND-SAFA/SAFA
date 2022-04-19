@@ -100,8 +100,8 @@ function createParsedArtifactFile(
   panel: ArtifactPanel,
   file: File
 ): Promise<void> {
-  return parseArtifactFile(panel.projectFile.type, file).then(
-    (res: ParseArtifactFileResponse) => {
+  return parseArtifactFile(panel.projectFile.type, file)
+    .then((res: ParseArtifactFileResponse) => {
       const { artifacts, errors } = res;
       const validArtifacts: Artifact[] = [];
 
@@ -122,8 +122,11 @@ function createParsedArtifactFile(
         file,
       };
       panel.entityNames = artifacts.map((a) => a.name);
-    }
-  );
+    })
+    .catch(() => {
+      panel.projectFile.isValid = false;
+      panel.projectFile.errors = ["Unable to parse file"];
+    });
 }
 
 /**

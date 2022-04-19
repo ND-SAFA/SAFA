@@ -34,10 +34,11 @@ export default class SubtreeModule extends VuexModule {
   private collapsedParentNodes: string[] = [];
 
   /**
+   * TODO: set this value more reasonably when we reduce inefficiencies.
    * The amount of child nodes that a node must have greater than or equal to
    * for the node to have its children automatically hidden.
    */
-  private autoCollapseSubtreeSize = 5;
+  private autoCollapseSubtreeSize = 100;
 
   @Action
   /**
@@ -243,6 +244,7 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
+   * TODO: this is very inefficient.
    * @returns a constructor for creating phantom links from artifacts.
    */
   get createSubtreeLinks(): (
@@ -251,10 +253,12 @@ export default class SubtreeModule extends VuexModule {
     c: string
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootId: string, childId: string) => {
+      const traces = traceModule.traces;
+
       const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
-        return traceModule.traces
+        return traces
           .filter((link) => {
             const value = isIncoming ? link.targetId : link.sourceId;
             const oppoValue = isIncoming ? link.sourceId : link.targetId;
@@ -263,7 +267,7 @@ export default class SubtreeModule extends VuexModule {
           .map((link) => {
             const base: SubtreeLink = {
               ...link,
-              traceLinkId: link.traceLinkId + "-phantom",
+              traceLinkId: `${link.traceLinkId}-phantom`,
               type: "SUBTREE",
               rootNode: rootId,
             };

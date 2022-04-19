@@ -2,7 +2,6 @@ import {
   Artifact,
   DocumentColumn,
   DocumentType,
-  EmptyLambda,
   IOHandlerCallback,
   ProjectDocument,
 } from "@/types";

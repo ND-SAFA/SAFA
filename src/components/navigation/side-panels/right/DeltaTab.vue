@@ -5,44 +5,20 @@
       v-if="isDeltaMode"
       deltaType="added"
       class="mt-10"
-      :names="addedArtifactNames"
-      :ids="addedArtifactIds"
-      @click="
-        (id) =>
-          handleArtifactSelect(
-            addedArtifacts[id].name,
-            addedArtifacts[id],
-            'added'
-          )
-      "
+      :artifacts="addedArtifacts"
+      @click="handleAddedSelect"
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="removed"
-      :names="removedArtifactNames"
-      :ids="removedArtifactIds"
-      @click="
-        (id) =>
-          handleArtifactSelect(
-            removedArtifacts[id].name,
-            removedArtifacts[id],
-            'removed'
-          )
-      "
+      :artifacts="removedArtifacts"
+      @click="handleRemovedSelect"
     />
     <delta-button-group
       v-if="isDeltaMode"
       deltaType="modified"
-      :names="modifiedArtifactNames"
-      :ids="modifiedArtifactIds"
-      @click="
-        (id) =>
-          handleArtifactSelect(
-            modifiedArtifacts[id].after.name,
-            modifiedArtifacts[id],
-            'modified'
-          )
-      "
+      :artifacts="modifiedArtifacts"
+      @click="handleModifiedSelect"
     />
     <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
@@ -58,7 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
-import { artifactModule, deltaModule } from "@/store";
+import { deltaModule } from "@/store";
 import {
   DeltaPanelNav,
   DeltaButtonGroup,
@@ -76,33 +52,15 @@ export default Vue.extend({
   data() {
     return {
       selectedDeltaArtifact: undefined as ChangedArtifact | undefined,
-      openPanels: [] as number[],
+      openPanels: [0, 1, 2],
     };
   },
   computed: {
-    /**
-     * @return All visible artifacts.
-     */
-    artifacts() {
-      return artifactModule.artifacts;
-    },
     /**
      * @return All added artifacts.
      */
     addedArtifacts() {
       return deltaModule.addedArtifacts;
-    },
-    /**
-     * @return All added artifact names.
-     */
-    addedArtifactNames(): string[] {
-      return Object.values(this.addedArtifacts).map((a) => a.name);
-    },
-    /**
-     * @return All added artifact ids.
-     */
-    addedArtifactIds(): string[] {
-      return Object.values(this.addedArtifacts).map((a) => a.id);
     },
     /**
      * @return All removed artifacts.
@@ -111,44 +69,10 @@ export default Vue.extend({
       return deltaModule.removedArtifacts;
     },
     /**
-     * @return All removed artifact names.
-     */
-    removedArtifactNames(): string[] {
-      return Object.values(this.removedArtifacts).map((a) => a.name);
-    },
-    /**
-     * @return All removed artifact ids.
-     */
-    removedArtifactIds(): string[] {
-      return Object.values(this.removedArtifacts).map((a) => a.id);
-    },
-    /**
      * @return All modified artifacts.
      */
     modifiedArtifacts() {
       return deltaModule.modifiedArtifacts;
-    },
-    /**
-     * @return All modified artifact names.
-     */
-    modifiedArtifactNames(): string[] {
-      return Object.values(this.modifiedArtifacts).map((a) => a.after.name);
-    },
-    /**
-     * @return All modified artifact ids.
-     */
-    modifiedArtifactIds(): string[] {
-      return Object.values(this.modifiedArtifacts).map((a) => a.after.id);
-    },
-    /**
-     * @return All changed artifact names.
-     */
-    deltaArtifacts(): string[] {
-      return [
-        ...this.addedArtifactNames,
-        ...this.removedArtifactNames,
-        ...this.modifiedArtifactNames,
-      ];
     },
     /**
      * @return Whether the app is in delta view.
@@ -159,7 +83,7 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Selects an artifact delta.
+     * Selects an artifact..
      */
     handleArtifactSelect(
       name: string,
@@ -167,6 +91,39 @@ export default Vue.extend({
       deltaType: DeltaType
     ): void {
       this.selectedDeltaArtifact = { name, artifact, deltaType };
+    },
+    /**
+     * Selects an added artifact.
+     * @param id - The artifact to select.
+     */
+    handleAddedSelect(id: string): void {
+      this.handleArtifactSelect(
+        this.addedArtifacts[id].name,
+        this.addedArtifacts[id],
+        "added"
+      );
+    },
+    /**
+     * Selects a modified artifact.
+     * @param id - The artifact to select.
+     */
+    handleModifiedSelect(id: string): void {
+      this.handleArtifactSelect(
+        this.modifiedArtifacts[id].after.name,
+        this.modifiedArtifacts[id],
+        "modified"
+      );
+    },
+    /**
+     * Selects a removed artifact.
+     * @param id - The artifact to select.
+     */
+    handleRemovedSelect(id: string): void {
+      this.handleArtifactSelect(
+        this.removedArtifacts[id].name,
+        this.removedArtifacts[id],
+        "removed"
+      );
     },
     /**
      * Closes the delta modal.

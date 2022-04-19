@@ -41,7 +41,7 @@ import Vue from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { logModule, projectModule } from "@/store";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericFileSelector } from "@/components/common/generic";
+import { GenericFileSelector } from "@/components/common";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**

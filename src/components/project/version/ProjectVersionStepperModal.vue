@@ -44,9 +44,9 @@ import {
   ProjectVersion,
 } from "@/types";
 import { versionToString } from "@/util";
-import { GenericStepperModal } from "@/components/common/generic";
+import { GenericStepperModal } from "@/components/common";
 import { ProjectSelector } from "@/components/project/selector";
-import { VersionSelector } from "@/components/project/version-selector";
+import VersionSelector from "./VersionSelector.vue";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
@@ -208,26 +208,24 @@ export default Vue.extend({
       },
     },
     /**
-     * @return The selected project, which emits updates on change.
+     * @return The project step number.
      */
-    selectedProject: {
-      get(): OptionalProjectIdentifier {
-        return this.project;
-      },
-      set(newProject: OptionalProjectIdentifier): void {
-        this.$emit("update:project", newProject);
-      },
+    projectStep(): number {
+      return this.beforeSteps.length + 1;
     },
     /**
-     * @return The selected version, which emits updates on change.
+     * @return The version step number.
      */
-    selectedVersion: {
-      get(): OptionalProjectVersion {
-        return this.version;
-      },
-      set(newVersion: OptionalProjectVersion): void {
-        this.$emit("update:version", newVersion);
-      },
+    versionStep(): number {
+      return this.projectStep + 1;
+    },
+    /**
+     * @return The total steps.
+     */
+    totalSteps(): number {
+      return (
+        (this.beforeSteps?.length || 0) + 2 + (this.afterSteps?.length || 0)
+      );
     },
     /**
      * @return Whether the current step is done.
@@ -249,24 +247,26 @@ export default Vue.extend({
       }
     },
     /**
-     * @return The project step number.
+     * @return The selected project, which emits updates on change.
      */
-    projectStep(): number {
-      return this.beforeSteps.length + 1;
+    selectedProject: {
+      get(): OptionalProjectIdentifier {
+        return this.project;
+      },
+      set(newProject: OptionalProjectIdentifier): void {
+        this.$emit("update:project", newProject);
+      },
     },
     /**
-     * @return The version step number.
+     * @return The selected version, which emits updates on change.
      */
-    versionStep(): number {
-      return this.projectStep + 1;
-    },
-    /**
-     * @return The total steps.
-     */
-    totalSteps(): number {
-      return (
-        (this.beforeSteps?.length || 0) + 2 + (this.afterSteps?.length || 0)
-      );
+    selectedVersion: {
+      get(): OptionalProjectVersion {
+        return this.version;
+      },
+      set(newVersion: OptionalProjectVersion): void {
+        this.$emit("update:version", newVersion);
+      },
     },
     /**
      * @return Whether the selector is open to the project page.

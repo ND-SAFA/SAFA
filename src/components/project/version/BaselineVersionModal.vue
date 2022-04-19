@@ -16,8 +16,8 @@
 import Vue, { PropType } from "vue";
 import { ProjectIdentifier, ProjectVersion } from "@/types";
 import { logModule } from "@/store";
-import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 import { handleLoadVersion } from "@/api";
+import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**
  * Stepper for setting the current project and version.

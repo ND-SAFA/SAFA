@@ -48,13 +48,12 @@ import {
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import { handleLoadVersion } from "@/api";
+import { ButtonRow, SafaIcon } from "@/components/common";
 import {
+  VersionCreator,
   BaselineVersionModal,
-  ButtonRow,
   UploadNewVersionModal,
-  SafaIcon,
-} from "@/components/common";
-import { VersionCreator } from "@/components/project";
+} from "@/components/project";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
 

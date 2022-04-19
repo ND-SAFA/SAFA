@@ -16,7 +16,7 @@
         <v-col @click.stop="handleEditOpen(item)">
           {{ item.name }}
         </v-col>
-        <v-col @click.stop="" style="flex-grow: 0.5">
+        <v-col @click.stop="">
           <generic-icon-button
             :is-disabled="isFirstItem(item)"
             icon-id="mdi-arrow-up"

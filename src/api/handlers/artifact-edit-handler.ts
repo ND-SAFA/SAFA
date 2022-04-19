@@ -48,7 +48,10 @@ export async function handleSaveArtifact(
       await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
       await viewportModule.setArtifactTreeLayout();
 
-      if (!parentArtifact) return;
+      if (!parentArtifact) {
+        onSuccess?.();
+        return;
+      }
 
       for (const createdArtifact of createdArtifacts) {
         await handleCreateLink({

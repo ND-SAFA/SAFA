@@ -6,73 +6,12 @@
     @close="$emit('close')"
   >
     <template v-slot:body>
-      <v-container>
-        <v-select
-          filled
-          label="Document Type"
-          v-model="editedArtifact.documentType"
-          :items="documentTypes"
-          item-text="name"
-          item-value="id"
-        />
-        <v-text-field
-          filled
-          v-if="!isFTA"
-          v-model="editedArtifact.name"
-          label="Artifact Name"
-          color="primary"
-          hint="Please select an identifier for the artifact"
-          :error-messages="nameError"
-          :loading="nameCheckIsLoading"
-        />
-        <v-combobox
-          filled
-          v-if="!isFTA && !isSafetyCase && !isFMEA"
-          v-model="editedArtifact.type"
-          :items="artifactTypes"
-          label="Artifact Type"
-        />
-        <v-select
-          filled
-          v-if="isFTA"
-          label="Logic Type"
-          v-model="editedArtifact.logicType"
-          :items="logicTypes"
-          item-text="name"
-          item-value="id"
-        />
-        <artifact-input
-          only-document-artifacts
-          v-if="isFTA"
-          v-model="parentId"
-          :multiple="false"
-          label="Parent Artifact"
-        />
-        <v-select
-          filled
-          v-if="isSafetyCase"
-          label="Safety Case Type"
-          v-model="editedArtifact.safetyCaseType"
-          :items="safetyCaseTypes"
-          item-text="name"
-          item-value="id"
-        />
-        <v-textarea
-          filled
-          v-if="!isFTA"
-          label="Artifact Summary"
-          v-model="editedArtifact.summary"
-          rows="3"
-        />
-        <v-textarea
-          filled
-          v-if="!isFTA"
-          label="Artifact Body"
-          v-model="editedArtifact.body"
-          rows="3"
-        />
-        <custom-field-input v-if="isFMEA" v-model="editedArtifact" />
-      </v-container>
+      <artifact-creator-inputs
+        :artifact="editedArtifact"
+        :current-artifact-name="currentArtifactName"
+        @change:parent="parentId = $event"
+        @change:valid="isNameValid = $event"
+      />
     </template>
     <template v-slot:actions>
       <v-row justify="end">
@@ -86,27 +25,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { setTimeout } from "timers";
-import { Artifact, DocumentType, SelectOption } from "@/types";
-import {
-  createArtifact,
-  createArtifactOfType,
-  documentTypeMap,
-  logicTypeOptions,
-  safetyCaseOptions,
-} from "@/util";
-import {
-  artifactModule,
-  documentModule,
-  projectModule,
-  typeOptionsModule,
-} from "@/store";
-import { handleSaveArtifact, getDoesArtifactExist } from "@/api";
-import {
-  ArtifactInput,
-  GenericModal,
-  CustomFieldInput,
-} from "@/components/common";
+import { Artifact, DocumentType } from "@/types";
+import { createArtifact, createArtifactOfType } from "@/util";
+import { artifactModule, documentModule } from "@/store";
+import { handleSaveArtifact } from "@/api";
+import { GenericModal } from "@/components/common";
+import ArtifactCreatorInputs from "./ArtifactCreatorInputs.vue";
 
 /**
  * Modal for artifact creation.
@@ -115,7 +39,10 @@ import {
  */
 export default Vue.extend({
   name: "ArtifactCreator",
-  components: { CustomFieldInput, GenericModal, ArtifactInput },
+  components: {
+    GenericModal,
+    ArtifactCreatorInputs,
+  },
   props: {
     title: {
       type: String,
@@ -134,22 +61,14 @@ export default Vue.extend({
     return {
       editedArtifact: createArtifact(this.artifact),
       parentId: "",
-      isLoading: false,
       isNameValid: !!this.artifact?.name,
-      nameError: "",
-      nameCheckTimer: undefined as ReturnType<typeof setTimeout> | undefined,
-      nameCheckIsLoading: false,
+      isLoading: false,
       canSave: false,
-      safetyCaseTypes: safetyCaseOptions(),
-      logicTypes: logicTypeOptions(),
     };
   },
   computed: {
-    /**
-     * @return The artifact name.
-     */
-    name(): string {
-      return this.editedArtifact.name;
+    currentArtifactName(): string {
+      return this.artifact?.name || "";
     },
     /**
      * @return Whether the artifact type is for an FTA node.
@@ -184,18 +103,6 @@ export default Vue.extend({
       } else {
         return !!(this.isNameValid && body && type);
       }
-    },
-    /**
-     * @return The document types allowed on the current document.
-     */
-    documentTypes(): SelectOption[] {
-      return documentTypeMap()[documentModule.type];
-    },
-    /**
-     * @return The types of artifacts that exist so far.
-     */
-    artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
     },
     /**
      * @return The parent artifact of a logic node.
@@ -241,35 +148,6 @@ export default Vue.extend({
       this.editedArtifact = createArtifactOfType(this.artifact, openOrType);
     },
     /**
-     * Checks for name conflicts when the name changes.
-     */
-    name(newName: string): void {
-      if (this.nameCheckTimer) {
-        clearTimeout(this.nameCheckTimer);
-      }
-
-      this.nameCheckIsLoading = true;
-      this.nameCheckTimer = setTimeout(() => {
-        if (!newName) {
-          this.isNameValid = this.canSave = false;
-          this.nameCheckIsLoading = false;
-        } else if (newName === this.artifact?.name) {
-          this.isNameValid = this.canSave = true;
-          this.nameCheckIsLoading = false;
-        } else {
-          getDoesArtifactExist(projectModule.versionId, newName).then(
-            (nameExists) => {
-              this.nameCheckIsLoading = false;
-              this.canSave = this.isNameValid = !nameExists;
-              this.nameError = this.isNameValid
-                ? ""
-                : "Name is already used, please select another.";
-            }
-          );
-        }
-      }, 500);
-    },
-    /**
      * Checks whether the artifact is valid when it changes.
      */
     editedArtifact: {
@@ -277,6 +155,18 @@ export default Vue.extend({
         this.canSave = this.isValid;
       },
       deep: true,
+    },
+    /**
+     * Checks whether the artifact is valid when it changes.
+     */
+    parentId() {
+      this.canSave = this.isValid;
+    },
+    /**
+     * Checks whether the artifact is valid when it changes.
+     */
+    isNameValid() {
+      this.canSave = this.isValid;
     },
   },
   methods: {

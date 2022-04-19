@@ -86,9 +86,10 @@ import {
 import { ThemeColors } from "@/util";
 import { artifactModule, deltaModule, documentModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
+import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
+import ArtifactCreatorModal from "../ArtifactCreatorModal.vue";
 
 /**
  * Represents a table of artifacts.

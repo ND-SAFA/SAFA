@@ -29,7 +29,7 @@ import {
 } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common/generic";
-import { TraceLinkDisplay } from "@/components/common/display";
+import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 
 /**
  * A modal for approving trace links.

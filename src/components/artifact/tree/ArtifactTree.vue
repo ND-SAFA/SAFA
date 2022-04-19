@@ -53,8 +53,8 @@ import { artifactTreeGraph } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
-  TraceLinkApprovalModal,
 } from "@/components/common";
+import { TraceLinkApprovalModal } from "@/components/trace-link";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({

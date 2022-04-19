@@ -20,7 +20,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
-import { TraceLinkDisplay } from "@/components/common";
+import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 
 /**
  * Displays trace links on a panel.

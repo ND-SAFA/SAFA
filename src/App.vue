@@ -9,38 +9,34 @@
     </v-main>
 
     <snackbar :timeout="5000" />
-    <artifact-creator-modal
-      :is-open="isArtifactCreatorOpen"
-      @close="closeArtifactCreator"
-    />
     <app-confirm-modal :message="confirmationMessage" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { verifyAuthentication } from "@/api";
-import { AppConfirmModal, ArtifactCreatorModal, Snackbar } from "@/components";
-import { appModule, logModule } from "@/store";
-import { PanelType } from "@/types";
+import { logModule } from "@/store";
+import { handleAuthentication } from "@/api";
+import { AppConfirmModal, Snackbar } from "@/components";
 
+/**
+ * Renders the SAFA app.
+ */
 export default Vue.extend({
-  name: "app",
+  name: "App",
   components: {
     Snackbar,
-    ArtifactCreatorModal,
     AppConfirmModal,
   },
   async mounted() {
-    await verifyAuthentication();
+    await handleAuthentication();
   },
   computed: {
-    isArtifactCreatorOpen: () => appModule.getIsArtifactCreatorOpen,
-    confirmationMessage: () => logModule.getConfirmationMessage,
-  },
-  methods: {
-    closeArtifactCreator(): void {
-      appModule.closePanel(PanelType.artifactCreator);
+    /**
+     * @return The current confirmation message, if one exists.
+     */
+    confirmationMessage() {
+      return logModule.getConfirmationMessage;
     },
   },
 });

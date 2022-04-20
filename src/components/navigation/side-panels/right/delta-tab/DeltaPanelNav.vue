@@ -4,7 +4,7 @@
     <v-row justify="center">
       <v-switch
         color="primary"
-        @click="onChange"
+        @click="handleChange"
         :value="isDeltaViewEnabled"
         :error-messages="errorMessage"
         readonly
@@ -14,7 +14,7 @@
     </v-row>
     <v-row justify="center" v-if="isDeltaViewEnabled">
       <v-btn
-        v-if="isProjectDefined()"
+        v-if="isProjectDefined"
         color="primary"
         @click="isModalOpen = true"
         class="pt-6 pb-6"
@@ -26,7 +26,7 @@
       <p v-else>No project has been selected.</p>
     </v-row>
     <delta-versions-modal
-      v-if="isProjectDefined()"
+      v-if="isProjectDefined"
       :is-open="isModalOpen"
       :project="project"
       @close="isModalOpen = false"
@@ -40,10 +40,13 @@ import { Project } from "@/types";
 import { versionToString } from "@/util";
 import { deltaModule, projectModule } from "@/store";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
-import { reloadProject } from "@/api";
+import { handleReloadProject } from "@/api";
 
+/**
+ * Displays the delta panel navigation.
+ */
 export default Vue.extend({
-  name: "left-panel-nav",
+  name: "DeltaPanelNav",
   components: {
     DeltaVersionsModal,
   },
@@ -51,13 +54,45 @@ export default Vue.extend({
     isModalOpen: false,
     errorMessage: undefined as string | undefined,
   }),
-  methods: {
+  computed: {
+    /**
+     * @return The current project.
+     */
+    project(): Project {
+      return projectModule.getProject;
+    },
+    /**
+     * @return Whether the current project is defined
+     */
     isProjectDefined(): boolean {
       return this.project.projectId !== "";
     },
-    onChange(): void {
+    /**
+     * @return The delta after version.
+     */
+    afterVersion(): string {
+      return versionToString(deltaModule.deltaVersion);
+    },
+    /**
+     * @return The delta before version.
+     */
+    beforeVersion(): string {
+      return versionToString(projectModule.getProject.projectVersion);
+    },
+    /**
+     * @return Whether delta view is enabled.
+     */
+    isDeltaViewEnabled(): boolean {
+      return deltaModule.inDeltaView;
+    },
+  },
+  methods: {
+    /**
+     * Changes whether delta view is enabled.
+     */
+    handleChange(): void {
       if (!this.isDeltaViewEnabled) {
-        if (this.isProjectDefined()) {
+        if (this.isProjectDefined) {
           deltaModule.setIsDeltaViewEnabled(true);
           this.isModalOpen = true;
         } else {
@@ -65,29 +100,18 @@ export default Vue.extend({
         }
       } else {
         deltaModule.setIsDeltaViewEnabled(false);
-        reloadProject();
+        handleReloadProject();
       }
-    },
-  },
-  computed: {
-    project(): Project {
-      return projectModule.getProject;
-    },
-    afterVersion(): string {
-      return versionToString(deltaModule.deltaVersion);
-    },
-    beforeVersion(): string {
-      return versionToString(projectModule.getProject.projectVersion);
-    },
-    isDeltaViewEnabled(): boolean {
-      return deltaModule.inDeltaView;
     },
   },
   watch: {
+    /**
+     * Resets errors when the project changes.
+     */
     project(): void {
-      if (this.isProjectDefined()) {
-        this.errorMessage = undefined;
-      }
+      if (!this.isProjectDefined) return;
+
+      this.errorMessage = undefined;
     },
   },
 });

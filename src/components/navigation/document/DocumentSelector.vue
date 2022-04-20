@@ -60,9 +60,15 @@ export default Vue.extend({
     editingDocument: undefined as ProjectDocument | undefined,
   }),
   computed: {
-    items(): ProjectDocument[] {
+    /**
+     * @return The current documents.
+     */
+    items() {
       return documentModule.projectDocuments;
     },
+    /**
+     * Switches documents when a document is selected.
+     */
     select: {
       get() {
         return documentModule.document;
@@ -77,15 +83,24 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Closes the selector menu and resets all data.
+     */
     handleCloseMenu() {
       (this.$refs.documentSelector as HTMLElement).blur();
       this.isEditOpen = false;
       this.isCreateOpen = false;
       this.editingDocument = undefined;
     },
+    /**
+     * Opens the create document modal.
+     */
     handleCreateOpen() {
       this.isCreateOpen = true;
     },
+    /**
+     * Opens the edit document modal.
+     */
     handleEditOpen(document: ProjectDocument) {
       this.editingDocument = document;
       this.isEditOpen = true;

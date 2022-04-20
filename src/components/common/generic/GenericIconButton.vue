@@ -26,7 +26,7 @@ import Vue from "vue";
  * @emits `click` - On button click.
  */
 export default Vue.extend({
-  name: "generic-icon-button",
+  name: "GenericIconButton",
   props: {
     tooltip: {
       type: String,
@@ -41,6 +41,9 @@ export default Vue.extend({
     isDisabled: Boolean,
   },
   computed: {
+    /**
+     * @return Whether the button is disabled.
+     */
     disabled(): boolean {
       return this.isDisabled === undefined ? false : this.isDisabled;
     },

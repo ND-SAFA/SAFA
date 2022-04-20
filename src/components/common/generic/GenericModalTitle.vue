@@ -19,7 +19,7 @@ import GenericIconButton from "./GenericIconButton.vue";
  * @emits `close` - On close.
  */
 export default Vue.extend({
-  name: "generic-modal-title",
+  name: "GenericModalTitle",
   components: {
     GenericIconButton,
   },

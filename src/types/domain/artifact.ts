@@ -61,6 +61,11 @@ export interface Artifact {
 }
 
 /**
+ * Defines an artifact with its custom fields flattened into the artifact data.
+ */
+export type FlatArtifact = Artifact & Record<string, string>;
+
+/**
  * Defines an artifact's data.
  */
 export interface ArtifactData extends CytoCoreElementData {

@@ -33,22 +33,22 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TracePanel, CytoCoreGraph } from "@/types";
-import { ArtifactPanel } from "@/components";
-import { timGraph } from "@/cytoscape/graphs";
+import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
+import { getTraceId } from "@/util";
 import { viewportModule } from "@/store";
-import ArtifactTypeNode from "./ArtifactTypeNode.vue";
+import { timGraph, cyResetTim } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
-import { cyResetTim } from "@/cytoscape";
+import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
  * and links between them as edges.
  */
 export default Vue.extend({
+  name: "TimTree",
   components: {
     ArtifactTypeNode,
     GenericCytoscapeController,
@@ -69,24 +69,37 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Returns the trace id for a panel.
+     * @param tracePanel - The panel to return the id for.
+     */
     getTraceId(tracePanel: TracePanel): string {
       const traceFile = tracePanel.projectFile;
-      return `${traceFile.sourceId}-${traceFile.targetId}`;
+      return getTraceId(traceFile.sourceId, traceFile.targetId);
     },
+    /**
+     * Resets the cytoscape viewport and centers artifacts.
+     */
     async handleResetGraph(): Promise<void> {
       cyResetTim();
     },
   },
   computed: {
+    /**
+     * @return The tim graph.
+     */
     cytoCoreGraph(): CytoCoreGraph {
       return timGraph;
     },
   },
   watch: {
+    /**
+     * When in view, reset the tim graph.
+     */
     async inView(inView: boolean): Promise<void> {
-      if (inView) {
-        await viewportModule.setTimTreeLayout();
-      }
+      if (!inView) return;
+
+      await viewportModule.setTimTreeLayout();
     },
   },
 });

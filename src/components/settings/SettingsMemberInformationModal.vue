@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
     <template v-slot:body>
       <v-row dense class="mt-4">
         <v-col>
@@ -12,7 +12,7 @@
             style="min-width: 300px"
             :readonly="member !== undefined"
             :rules="emailRules"
-            @update:error="onErrorUpdate"
+            @update:error="handleErrorUpdate"
           />
         </v-col>
         <v-col>
@@ -23,7 +23,7 @@
     <template v-slot:actions>
       <v-container>
         <v-row justify="center">
-          <v-btn :disabled="!validated" color="error" @click="onConfirm">
+          <v-btn :disabled="!validated" color="error" @click="handleConfirm">
             Add to Project
           </v-btn>
         </v-row>
@@ -44,13 +44,14 @@ import {
   ProjectRole,
 } from "@/types";
 import { logModule } from "@/store";
-import { addOrUpdateProjectMember } from "@/api";
+import { handleInviteMember } from "@/api";
 import { GenericModal, ButtonRow } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
  */
 export default Vue.extend({
+  name: "SettingsMemberInformation",
   components: { ButtonRow, GenericModal },
   props: {
     isOpen: {
@@ -87,9 +88,18 @@ export default Vue.extend({
           /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "E-mail must be valid",
       ],
+      projectRoles: [
+        ProjectRole.OWNER,
+        ProjectRole.ADMIN,
+        ProjectRole.EDITOR,
+        ProjectRole.VIEWER,
+      ],
     };
   },
   computed: {
+    /**
+     * @return Whether the user is validated.
+     */
     validated(): boolean {
       return (
         !this.hasErrors &&
@@ -97,14 +107,9 @@ export default Vue.extend({
         this.userRole !== undefined
       );
     },
-    projectRoles(): string[] {
-      return [
-        ProjectRole.OWNER,
-        ProjectRole.ADMIN,
-        ProjectRole.EDITOR,
-        ProjectRole.VIEWER,
-      ];
-    },
+    /**
+     * @return All project role menu items.
+     */
     menuItems(): ButtonMenuItem[] {
       return this.projectRoles.map((role) => ({
         name: role,
@@ -113,6 +118,9 @@ export default Vue.extend({
         },
       }));
     },
+    /**
+     * @return The project menu button.
+     */
     buttonDefinition(): ButtonDefinition[] {
       return [
         {
@@ -128,14 +136,24 @@ export default Vue.extend({
     },
   },
   methods: {
-    onErrorUpdate(hasErrors: boolean): void {
+    /**
+     * Handles any errors.
+     * @param hasErrors - Whether there are errors.
+     */
+    handleErrorUpdate(hasErrors: boolean): void {
       this.hasErrors = hasErrors;
     },
+    /**
+     * Clears modal data.
+     */
     clearData(): void {
       this.userEmail = "";
       this.userRole = undefined;
     },
-    async onConfirm() {
+    /**
+     * Attempts to save a change to a project member.
+     */
+    async handleConfirm() {
       const project = this.$props.project;
       const projectId = this.project?.projectId;
       const projectRole = this.userRole;
@@ -144,31 +162,45 @@ export default Vue.extend({
         projectId !== undefined &&
         projectRole !== undefined
       ) {
-        addOrUpdateProjectMember(projectId, this.userEmail, projectRole)
-          .then(() => this.$emit("confirm", project))
-          .catch();
+        handleInviteMember(projectId, this.userEmail, projectRole, {
+          onSuccess: () => this.$emit("confirm", project),
+        });
       } else {
         logModule.onWarning("Please define project role.");
       }
     },
-    onCancel() {
+    /**
+     * Closes the modal.
+     */
+    handleCancel() {
       this.$emit("cancel");
     },
+    /**
+     * Returns the correct role id for a role.
+     * @param role - The role to find.
+     */
     getProjectRole(role: string): ProjectRole {
       return ProjectRole[role.toUpperCase() as keyof typeof ProjectRole];
     },
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen && this.clearOnClose) {
-        this.clearData();
-      }
+    /**
+     * Clears the modal data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open || !this.clearOnClose) return;
+
+      this.clearData();
     },
+    /**
+     * Updates member fields when the member changes.
+     * @param newMember - The new member.
+     */
     member(newMember: ProjectMembership | undefined): void {
-      if (newMember !== undefined) {
-        this.userRole = newMember.role;
-        this.userEmail = newMember.email;
-      }
+      if (!newMember) return;
+
+      this.userRole = newMember.role;
+      this.userEmail = newMember.email;
     },
   },
 });

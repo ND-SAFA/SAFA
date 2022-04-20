@@ -1,12 +1,13 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { SubtreeLink, SubtreeMap, Project, Artifact } from "@/types";
-import { artifactModule, subtreeModule, traceModule } from "@/store";
+import { artifactModule, traceModule } from "@/store";
 import {
   artifactTreeCyPromise,
   createSubtreeMap,
   cyDisplayAll,
   cySetDisplay,
 } from "@/cytoscape";
+import { InternalTraceType } from "@/types";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -32,12 +33,6 @@ export default class SubtreeModule extends VuexModule {
    * List of nodes whose children are currently hidden.
    */
   private collapsedParentNodes: string[] = [];
-
-  /**
-   * The amount of child nodes that a node must have greater than or equal to
-   * for the node to have its children automatically hidden.
-   */
-  private autoCollapseSubtreeSize = 5;
 
   @Action
   /**
@@ -97,25 +92,7 @@ export default class SubtreeModule extends VuexModule {
    * Updates the subtree map, and hides all subtrees greater than the set threshold.
    */
   async initializeProject(project: Project): Promise<void> {
-    const artifactIds = project.artifacts.map(({ id }) => id).reverse();
-    const childrenPerArtifact = project.traces
-      .map(({ targetId }) => targetId)
-      .reduce(
-        (acc, id) => ({ ...acc, [id]: (acc[id] || 0) + 1 }),
-        {} as Record<string, number>
-      );
-
     await this.updateSubtreeMap(project.artifacts);
-
-    for (const id of artifactIds) {
-      if (this.hiddenSubtreeNodes.includes(id)) continue;
-
-      const childCount = childrenPerArtifact[id] || 0;
-
-      if (childCount >= this.autoCollapseSubtreeSize) {
-        await this.hideSubtree(id);
-      }
-    }
   }
 
   @Action
@@ -159,11 +136,18 @@ export default class SubtreeModule extends VuexModule {
    * @param rootId Id of artifact whose subtree showed by un-hidden.
    */
   async showSubtree(rootId: string): Promise<void> {
-    this.SET_SUBTREE_LINKS(
-      this.subtreeLinks.filter((link) => link.rootNode !== rootId)
-    );
-
     const subtreeNodes = this.getSubtreeByArtifactId(rootId);
+
+    this.SET_SUBTREE_LINKS(
+      this.subtreeLinks.filter(
+        (link) =>
+          link.rootNode !== rootId &&
+          !(
+            subtreeNodes.includes(link.sourceId) &&
+            subtreeNodes.includes(link.targetId)
+          )
+      )
+    );
 
     this.SET_HIDDEN_SUBTREE_NODES(
       this.hiddenSubtreeNodes.filter((n) => !subtreeNodes.includes(n))
@@ -243,6 +227,7 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
+   * TODO: this is very inefficient.
    * @returns a constructor for creating phantom links from artifacts.
    */
   get createSubtreeLinks(): (
@@ -251,20 +236,32 @@ export default class SubtreeModule extends VuexModule {
     c: string
   ) => SubtreeLink[] {
     return (nodesInSubtree: string[], rootId: string, childId: string) => {
+      const traces = traceModule.traces;
+      const subtreeLinkIds = this.subtreeLinks.map(
+        ({ traceLinkId }) => traceLinkId
+      );
+
       const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLink[] = (
         isIncoming: boolean
       ) => {
-        return traceModule.traces
+        return traces
           .filter((link) => {
             const value = isIncoming ? link.targetId : link.sourceId;
             const oppoValue = isIncoming ? link.sourceId : link.targetId;
-            return value === childId && !nodesInSubtree.includes(oppoValue);
+            const doesNotExist = !subtreeLinkIds.includes(
+              `${link.traceLinkId}-phantom`
+            );
+            return (
+              doesNotExist &&
+              value === childId &&
+              !nodesInSubtree.includes(oppoValue)
+            );
           })
           .map((link) => {
             const base: SubtreeLink = {
               ...link,
-              traceLinkId: link.traceLinkId + "-phantom",
-              type: "SUBTREE",
+              traceLinkId: `${link.traceLinkId}-phantom`,
+              type: InternalTraceType.SUBTREE,
               rootNode: rootId,
             };
 

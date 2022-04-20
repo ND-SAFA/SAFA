@@ -1,6 +1,6 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
-import { getBackgroundColor, ThemeColors } from "@/util";
+import { getBackgroundColor } from "@/util";
 import {
   htmlBody,
   htmlContainer,

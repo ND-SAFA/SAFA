@@ -12,10 +12,10 @@
         :has-select="false"
         :is-loading="isLoading"
         item-key="email"
-        @item:add="onAddMember"
-        @item:edit="onEditMember"
-        @item:delete="onDeleteMember"
-        @refresh="retrieveMembers"
+        @item:add="handleAddMember"
+        @item:edit="handleEditMember"
+        @item:delete="handleDeleteMember"
+        @refresh="handleRetrieveMembers"
         class="mt-5"
       >
         <template v-slot:addItemDialogue>
@@ -23,7 +23,7 @@
             :is-open="isNewOpen"
             :project="project"
             @cancel="isNewOpen = false"
-            @confirm="onConfirmAdd"
+            @confirm="handleConfirmAdd"
           />
         </template>
         <template v-slot:editItemDialogue>
@@ -33,7 +33,7 @@
             :project="project"
             :member="memberToEdit"
             @cancel="isEditOpen = false"
-            @confirm="onConfirmEdit"
+            @confirm="handleConfirmEdit"
           />
         </template>
       </generic-selector>
@@ -43,21 +43,17 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ConfirmationType,
-  Project,
-  ProjectMembership,
-  ProjectRole,
-} from "@/types";
+import { Project, ProjectMembership, ProjectRole } from "@/types";
+import { sessionModule } from "@/store";
+import { getProjectMembers, handleDeleteMember } from "@/api";
 import { GenericSelector } from "@/components/common/generic";
-import { deleteProjectMember, getProjectMembers } from "@/api";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
-import { logModule, sessionModule } from "@/store";
 
 /**
  * List the members of given project within the settings.
  */
 export default Vue.extend({
+  name: "SettingsMemberSection",
   components: { GenericSelector, SettingsMemberInformationModal },
   props: {
     project: {
@@ -71,26 +67,7 @@ export default Vue.extend({
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
-    };
-  },
-  computed: {
-    isAdmin(): boolean {
-      const userEmail = sessionModule.userEmail;
-      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-      const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail && allowedRoles.includes(m.role)
-      );
-      return userQuery.length === 1;
-    },
-    members(): ProjectMembership[] {
-      return this.project.members;
-    },
-    hasDescription(): boolean {
-      const description = this.project.description;
-      return description !== "";
-    },
-    headers() {
-      return [
+      headers: [
         { text: "Email", value: "email", sortable: false, isSelectable: false },
         {
           text: "Role",
@@ -99,40 +76,76 @@ export default Vue.extend({
           isSelectable: true,
         },
         { text: "Actions", value: "actions", sortable: false },
-      ];
+      ],
+    };
+  },
+  computed: {
+    /**
+     * @return Whether the current user is an admin.
+     */
+    isAdmin(): boolean {
+      const userEmail = sessionModule.userEmail;
+      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
+      const userQuery = this.project.members.filter(
+        (m) => m.email === userEmail && allowedRoles.includes(m.role)
+      );
+      return userQuery.length === 1;
+    },
+    /**
+     * @return All project members.
+     */
+    members() {
+      return this.project.members;
+    },
+    /**
+     * @return Whether the project has a description.
+     */
+    hasDescription(): boolean {
+      return this.project.description !== "";
     },
   },
   methods: {
-    async retrieveMembers(): Promise<void> {
+    /**
+     * Loads the project's members.
+     */
+    async handleRetrieveMembers(): Promise<void> {
       if (this.project.projectId !== "") {
         this.isLoading = true;
         this.members = await getProjectMembers(this.project.projectId);
         this.isLoading = false;
       }
     },
-    onAddMember(): void {
+    /**
+     * Opens the add member modal.
+     */
+    handleAddMember(): void {
       this.isNewOpen = true;
     },
-    onEditMember(member: ProjectMembership): void {
+    /**
+     * Opens the edit member modal.
+     * @param member - The member to edit.
+     */
+    handleEditMember(member: ProjectMembership): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
-    onDeleteMember(member: ProjectMembership): void {
-      logModule.SET_CONFIRMATION_MESSAGE({
-        type: ConfirmationType.INFO,
-        title: "Remove User from Project",
-        body: `Are you sure you want to remove ${member.email} from project?`,
-        statusCallback: async (isConfirmed: boolean) => {
-          if (isConfirmed) {
-            await deleteProjectMember(member);
-          }
-        },
-      });
+    /**
+     * Opens the delete member modal.
+     * @param member - The member to delete.
+     */
+    handleDeleteMember(member: ProjectMembership): void {
+      handleDeleteMember(member);
     },
-    async onConfirmAdd(): Promise<void> {
+    /**
+     * Closes the add member modal.
+     */
+    async handleConfirmAdd(): Promise<void> {
       this.isNewOpen = false;
     },
-    async onConfirmEdit(): Promise<void> {
+    /**
+     * Closes the edit member modal.
+     */
+    async handleConfirmEdit(): Promise<void> {
       this.isEditOpen = false;
     },
   },

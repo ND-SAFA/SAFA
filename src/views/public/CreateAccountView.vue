@@ -47,36 +47,48 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
 import { createUser } from "@/api";
+import { CardPage, PasswordField } from "@/components";
 
 /**
- * Presents the create account page.
+ * Displays the create account page.
  */
 export default Vue.extend({
-  name: "create-account-view",
+  name: "CreateAccountView",
   components: { CardPage, PasswordField },
-  data: () => ({
-    email: "",
-    password: "",
-    isError: false,
-    isCreated: false,
-  }),
+  data() {
+    return {
+      email: "",
+      password: "",
+      isError: false,
+      isLoading: false,
+      isCreated: false,
+    };
+  },
   methods: {
+    /**
+     * Navigates to the login page.
+     */
     handleLogin() {
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
+    /**
+     * Attempts to create a new account.
+     */
     handleCreateAccount() {
+      this.isLoading = true;
+
       createUser({
         email: this.email,
         password: this.password,
       })
         .then(() => {
-          this.isCreated = true;
           this.isError = false;
+          this.isCreated = true;
         })
-        .catch(() => (this.isError = true));
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

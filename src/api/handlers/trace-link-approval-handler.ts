@@ -1,6 +1,23 @@
 import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
-import { appModule, projectModule } from "@/store";
-import { approveLink, declineLink } from "@/api/commits";
+import { appModule, logModule, projectModule } from "@/store";
+import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
+import { extractTraceId } from "@/util";
+
+/**
+ * Creates a new trace link.
+ *
+ * @param link - The trace link to process.
+ */
+export async function handleCreateLink(link: TraceLink): Promise<void> {
+  try {
+    const createdLinks = await createLink(link);
+
+    await projectModule.addOrUpdateTraceLinks(createdLinks);
+  } catch (e) {
+    logModule.onError(`Unable to create trace link: ${extractTraceId(link)}`);
+    logModule.onDevError(e);
+  }
+}
 
 /**
  * Processes link approvals, setting the app state to loading in between, and updating trace links afterwards.
@@ -8,16 +25,14 @@ import { approveLink, declineLink } from "@/api/commits";
  * @param link - The trace link to process.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export async function approveLinkAPIHandler(
+export async function handleApproveLink(
   link: TraceLink,
   onSuccess?: EmptyLambda
 ): Promise<void> {
   link.approvalStatus = TraceApproval.APPROVED;
 
-  linkAPIHandler(link, approveLink, async () => {
-    if (onSuccess !== undefined) {
-      onSuccess();
-    }
+  linkAPIHandler(link, updateApprovedLink, async () => {
+    onSuccess?.();
 
     await projectModule.addOrUpdateTraceLinks([link]);
   });
@@ -29,16 +44,14 @@ export async function approveLinkAPIHandler(
  * @param link - The trace link to process.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export async function declineLinkAPIHandler(
+export async function handleDeclineLink(
   link: TraceLink,
   onSuccess?: EmptyLambda
 ): Promise<void> {
   link.approvalStatus = TraceApproval.DECLINED;
 
-  linkAPIHandler(link, declineLink, async () => {
-    if (onSuccess !== undefined) {
-      onSuccess();
-    }
+  linkAPIHandler(link, updateDeclinedLink, async () => {
+    onSuccess?.();
 
     await projectModule.deleteTraceLinks([link]);
   });
@@ -51,9 +64,9 @@ export async function declineLinkAPIHandler(
  * @param linkAPI - The endpoint to call with the link.
  * @param onSuccess - Run when the API call successfully resolves.
  */
-export function linkAPIHandler(
+function linkAPIHandler(
   link: TraceLink,
-  linkAPI: (traceLink: TraceLink) => Promise<void>,
+  linkAPI: (traceLink: TraceLink) => Promise<TraceLink[]>,
   onSuccess: () => Promise<void>
 ): void {
   appModule.onLoadStart();

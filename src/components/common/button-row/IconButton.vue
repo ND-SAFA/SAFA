@@ -6,7 +6,7 @@
     color="secondary"
     @click="definition.handler"
     class="mr-2"
-    :disabled="true"
+    :disabled="isDisabled"
   >
     <v-icon v-if="definition.type === 'icon'">
       {{ definition.icon }}
@@ -19,7 +19,11 @@
 import { IconDefinition } from "@/types";
 import Vue, { PropType } from "vue";
 
+/**
+ * Renders an icon button.
+ */
 export default Vue.extend({
+  name: "IconButton",
   props: {
     definition: {
       type: Object as PropType<IconDefinition>,
@@ -27,6 +31,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return Whether the button should be disabled.
+     */
     isDisabled() {
       const def: IconDefinition = this.definition;
       return def.isDisabled === undefined ? false : def.isDisabled;

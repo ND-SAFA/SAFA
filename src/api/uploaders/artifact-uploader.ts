@@ -1,15 +1,16 @@
-import { parseArtifactFile } from "@/api";
 import {
   ArtifactMap,
-  IGenericFilePanel,
   IGenericUploader,
   Artifact,
   ParseArtifactFileResponse,
   ArtifactFile,
+  ArtifactPanel,
 } from "@/types";
+import { parseArtifactFile } from "@/api";
 
-export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
-
+/**
+ * Creates an artifact uploader.
+ */
 export function createArtifactUploader(): IGenericUploader<
   ArtifactMap,
   string,
@@ -21,6 +22,11 @@ export function createArtifactUploader(): IGenericUploader<
   };
 }
 
+/**
+ * Creates a new uploader panel.
+ *
+ * @param artifactName - The title of the panel.
+ */
 function createNewPanel(artifactName: string): ArtifactPanel {
   const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
   return {
@@ -39,6 +45,11 @@ function createNewPanel(artifactName: string): ArtifactPanel {
   };
 }
 
+/**
+ * Creates a new artifact file.
+ *
+ * @param artifactType - The artifact type in this file.
+ */
 function createArtifactFile(artifactType: string): ArtifactFile {
   return {
     type: artifactType,
@@ -49,6 +60,12 @@ function createArtifactFile(artifactType: string): ArtifactFile {
   };
 }
 
+/**
+ * Returns whether the panel is valid.
+ *
+ * @param panel - The panel to check.
+ * @return Whether it is valid.
+ */
 function isArtifactPanelValid(panel: ArtifactPanel): boolean {
   return (
     panel.projectFile.file !== undefined &&
@@ -56,6 +73,11 @@ function isArtifactPanelValid(panel: ArtifactPanel): boolean {
   );
 }
 
+/**
+ * Clears the panel.
+ *
+ * @param panel - The panel to clear.
+ */
 function clearPanel(panel: ArtifactPanel): void {
   panel.projectFile = {
     ...panel.projectFile,
@@ -66,21 +88,28 @@ function clearPanel(panel: ArtifactPanel): void {
   panel.entityNames = [];
 }
 
+/**
+ * Parses the uploaded artifacts.
+ *
+ * @param artifactMap - A collection of all artifacts.
+ * @param panel - The artifact panel.
+ * @param file - The file to parse.
+ */
 function createParsedArtifactFile(
-  validArtifactMap: ArtifactMap,
+  artifactMap: ArtifactMap,
   panel: ArtifactPanel,
   file: File
 ): Promise<void> {
-  return parseArtifactFile(panel.projectFile.type, file).then(
-    (res: ParseArtifactFileResponse) => {
+  return parseArtifactFile(panel.projectFile.type, file)
+    .then((res: ParseArtifactFileResponse) => {
       const { artifacts, errors } = res;
       const validArtifacts: Artifact[] = [];
 
       artifacts.forEach((artifact) => {
-        const error = getArtifactError(validArtifactMap, artifact);
+        const error = getArtifactError(artifactMap, artifact);
         if (error === undefined) {
           validArtifacts.push(artifact);
-          validArtifactMap[artifact.name] = artifact;
+          artifactMap[artifact.name] = artifact;
         } else {
           errors.push(error);
         }
@@ -93,10 +122,20 @@ function createParsedArtifactFile(
         file,
       };
       panel.entityNames = artifacts.map((a) => a.name);
-    }
-  );
+    })
+    .catch(() => {
+      panel.projectFile.isValid = false;
+      panel.projectFile.errors = ["Unable to parse file"];
+    });
 }
 
+/**
+ * Returns any errors for the given artifact.
+ *
+ * @param artifactMap - A collection of all artifacts.
+ * @param artifact - The artifact to check.
+ * @return The error message, if there is one.
+ */
 function getArtifactError(
   artifactMap: ArtifactMap,
   artifact: Artifact

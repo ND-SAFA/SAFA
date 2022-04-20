@@ -15,33 +15,27 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { navigateBack } from "@/router";
+import { projectModule } from "@/store";
 import {
   PrivatePage,
   SettingsGeneralSection,
   SettingsMemberSection,
 } from "@/components";
-import { Project } from "@/types";
-import { navigateTo, Routes } from "@/router";
-import { projectModule } from "@/store";
 
+/**
+ * Displays project settings.
+ */
 export default Vue.extend({
-  name: "approval-links-view",
+  name: "ProjectSettingsView",
   components: {
     PrivatePage,
     SettingsGeneralSection,
     SettingsMemberSection,
   },
-
-  computed: {
-    project(): Project {
-      return projectModule.getProject;
-    },
-    hasDescription(): boolean {
-      const description = this.project.description;
-      return description !== "";
-    },
-    headers() {
-      return [
+  data() {
+    return {
+      headers: [
         { text: "Email", value: "email", sortable: false, isSelectable: false },
         {
           text: "Role",
@@ -49,12 +43,29 @@ export default Vue.extend({
           sortable: true,
           isSelectable: false,
         },
-      ];
+      ],
+    };
+  },
+  computed: {
+    /**
+     * @return The current project.
+     */
+    project() {
+      return projectModule.getProject;
+    },
+    /**
+     * @return Whether the current project has a description.
+     */
+    hasDescription(): boolean {
+      return this.project.description !== "";
     },
   },
   methods: {
+    /**
+     * Goes back to the artifact page.
+     */
     handleGoBack() {
-      navigateTo(Routes.ARTIFACT);
+      navigateBack();
     },
   },
 });

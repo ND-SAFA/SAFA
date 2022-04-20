@@ -6,7 +6,7 @@
     :title="title"
     :is-loading="isLoading"
     size="l"
-    @close="onClose"
+    @close="handleClose"
     @reset="clearData"
     @submit="$emit('submit')"
   >
@@ -44,9 +44,9 @@ import {
   ProjectVersion,
 } from "@/types";
 import { versionToString } from "@/util";
-import { GenericStepperModal } from "@/components/common/generic";
+import { GenericStepperModal } from "@/components/common";
 import { ProjectSelector } from "@/components/project/selector";
-import { VersionSelector } from "@/components/project/version-selector";
+import VersionSelector from "./VersionSelector.vue";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
@@ -62,7 +62,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
  * @emits-6 `update:version` (string) - On version update.
  */
 export default Vue.extend({
-  name: "project-version-stepper-modal",
+  name: "ProjectVersionStepperModal",
   components: {
     GenericStepperModal,
     ProjectSelector,
@@ -70,47 +70,36 @@ export default Vue.extend({
   },
   props: {
     /**
-     * The current step of the stepper, used as the v-model value.
-     * @model
+     * The current step of the stepper.
      */
     value: {
       type: Number,
       default: 1,
     },
-    /**
-     * The title of the modal
-     */
     title: {
       type: String,
       required: true,
     },
-    /**
-     *  Whether this current modal is open and in view.
-     */
     isOpen: {
       type: Boolean,
       required: true,
     },
-    /**
-     * Whether the current modal is loading.
-     */
     isLoading: {
       type: Boolean,
       required: false,
       default: false,
     },
-    /**
-     * The project used to bind and synchronize with parent.
-     */
     project: {
       type: Object as PropType<OptionalProjectIdentifier>,
       required: false,
     },
-    /**
-     * The version used to bind and synchronize with parent.
-     */
     version: {
       type: Object as PropType<OptionalProjectVersion>,
+      required: false,
+    },
+    startStep: {
+      type: Number,
+      default: 1,
       required: false,
     },
     /**
@@ -129,15 +118,6 @@ export default Vue.extend({
       required: false,
       default: () => [] as StepState[],
     },
-    /**
-     * Defines the starting step in the stepper. Useful if project or versions is
-     * already selected.
-     */
-    startStep: {
-      type: Number,
-      default: 1,
-      required: false,
-    },
   },
   data() {
     return {
@@ -149,6 +129,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Clears all modal data.
+     */
     clearData() {
       this.selectedProject = this.project;
       this.selectedVersion = undefined;
@@ -161,37 +144,61 @@ export default Vue.extend({
       }
       this.$emit("update:loading", false);
     },
-    onClose() {
+    /**
+     * Closes the modal.
+     */
+    handleClose() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
       this.$emit("close");
     },
+    /**
+     * Selects a project.
+     * @param project - The project to select
+     * @param goToNextStep - If true, the step will be incremented.
+     */
     selectProject(project: ProjectIdentifier, goToNextStep = false) {
-      if (this.currentStep === 1) {
-        this.selectedProject = project;
+      if (this.currentStep !== 1) return;
 
-        Vue.set(this.localSteps, 0, [project.name, true]);
+      this.selectedProject = project;
 
-        if (goToNextStep) this.currentStep++;
-      }
+      Vue.set(this.localSteps, 0, [project.name, true]);
+
+      if (goToNextStep) this.currentStep++;
     },
+    /**
+     * Deselects a project.
+     */
     unselectProject() {
       this.selectedProject = undefined;
       Vue.set(this.localSteps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
     },
+    /**
+     * Selects a version.
+     * @param version - The version to select.
+     */
     selectVersion(version: ProjectVersion) {
       this.selectedVersion = version;
       Vue.set(this.localSteps, 1, [versionToString(version), true]);
     },
+    /**
+     * Deselects a version.
+     */
     unselectVersion() {
       this.selectedVersion = undefined;
       Vue.set(this.localSteps, 1, [SELECT_VERSION_DEFAULT_NAME, false]);
     },
   },
   computed: {
+    /**
+     * @return All steps.
+     */
     steps(): StepState[] {
-      return this.beforeSteps.concat(this.localSteps.concat(this.afterSteps));
+      return [...this.beforeSteps, ...this.localSteps, ...this.afterSteps];
     },
+    /**
+     * @return The current step, which emits updates on change.
+     */
     currentStep: {
       get(): number {
         return this.value;
@@ -200,22 +207,29 @@ export default Vue.extend({
         this.$emit("input", newStep);
       },
     },
-    selectedProject: {
-      get(): OptionalProjectIdentifier {
-        return this.project;
-      },
-      set(newProject: OptionalProjectIdentifier): void {
-        this.$emit("update:project", newProject);
-      },
+    /**
+     * @return The project step number.
+     */
+    projectStep(): number {
+      return this.beforeSteps.length + 1;
     },
-    selectedVersion: {
-      get(): OptionalProjectVersion {
-        return this.version;
-      },
-      set(newVersion: OptionalProjectVersion): void {
-        this.$emit("update:version", newVersion);
-      },
+    /**
+     * @return The version step number.
+     */
+    versionStep(): number {
+      return this.projectStep + 1;
     },
+    /**
+     * @return The total steps.
+     */
+    totalSteps(): number {
+      return (
+        (this.beforeSteps?.length || 0) + 2 + (this.afterSteps?.length || 0)
+      );
+    },
+    /**
+     * @return Whether the current step is done.
+     */
     isStepDone(): boolean {
       switch (this.currentStep) {
         case this.projectStep:
@@ -232,18 +246,37 @@ export default Vue.extend({
           }
       }
     },
-    projectStep(): number {
-      return this.beforeSteps.length + 1;
+    /**
+     * @return The selected project, which emits updates on change.
+     */
+    selectedProject: {
+      get(): OptionalProjectIdentifier {
+        return this.project;
+      },
+      set(newProject: OptionalProjectIdentifier): void {
+        this.$emit("update:project", newProject);
+      },
     },
-    versionStep(): number {
-      return this.projectStep + 1;
+    /**
+     * @return The selected version, which emits updates on change.
+     */
+    selectedVersion: {
+      get(): OptionalProjectVersion {
+        return this.version;
+      },
+      set(newVersion: OptionalProjectVersion): void {
+        this.$emit("update:version", newVersion);
+      },
     },
-    totalSteps(): number {
-      return this.beforeSteps.length + 2 + this.afterSteps.length;
-    },
+    /**
+     * @return Whether the selector is open to the project page.
+     */
     projectSelectorIsOpen(): boolean {
       return this.isOpen && this.currentStep === this.projectStep;
     },
+    /**
+     * @return Whether the selector is open to the version page.
+     */
     versionSelectorIsOpen(): boolean {
       return (
         this.isOpen &&
@@ -253,10 +286,13 @@ export default Vue.extend({
     },
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
+    /**
+     * Clears modal data on open.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
     },
   },
 });

@@ -1,4 +1,4 @@
-import { Artifact, Link, TraceLink } from "@/types/domain";
+import { Artifact, Link } from "@/types/domain";
 import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 export interface IGenericFilePanel<Environment, F extends ProjectFile> {
@@ -24,3 +24,5 @@ export type ArtifactMap = Record<string, Artifact>;
 export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
   generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
 }
+
+export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;

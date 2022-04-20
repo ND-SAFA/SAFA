@@ -35,7 +35,7 @@ import SectionControls from "./SectionControls.vue";
  * @emits-2 `link:decline` - On Link Decline.
  */
 export default Vue.extend({
-  name: "approval-section",
+  name: "ApprovalSection",
   components: { TraceLinkExpansionPanel, SectionControls },
   props: {
     title: String,
@@ -61,19 +61,28 @@ export default Vue.extend({
     };
   },
   watch: {
+    /**
+     * When trace links change, sets all panels to open.
+     */
     links(newLinks: TraceLink[]) {
-      if (this.isOpen) {
-        this.$nextTick(
-          () => (this.openLinks = newLinks.map((_, index) => index))
-        );
-      }
+      if (!this.isOpen) return;
+
+      this.$nextTick(
+        () => (this.openLinks = newLinks.map((_, index) => index))
+      );
     },
   },
   methods: {
+    /**
+     * Opens all trace link panels.
+     */
     openAll() {
       this.openLinks = this.links.map((_, index) => index);
       this.isOpen = true;
     },
+    /**
+     * Closes all trace link panels.
+     */
     closeAll() {
       this.openLinks = [];
       this.isOpen = false;

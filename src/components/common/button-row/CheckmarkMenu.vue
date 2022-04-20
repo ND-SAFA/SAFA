@@ -36,11 +36,15 @@
 </template>
 
 <script lang="ts">
-import { ButtonDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { ButtonDefinition } from "@/types";
 import { ThemeColors } from "@/util";
 
+/**
+ * Renders a checkbox dropdown menu.
+ */
 export default Vue.extend({
+  name: "CheckmarkMenu",
   props: {
     definition: Object as PropType<ButtonDefinition>,
     isDisabled: Boolean,

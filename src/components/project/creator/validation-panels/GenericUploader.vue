@@ -17,16 +17,16 @@
             :key="panel.title"
             :panel="panel"
             :artifactMap="artifactMap"
-            @change="onChange(i, $event)"
-            @delete="deleteFile(i)"
-            @validate="onValidateChange(i, $event)"
+            @change="handleChange(i, $event)"
+            @delete="handleDeleteFile(i)"
+            @validate="handleValidateChange(i, $event)"
           />
         </v-expansion-panels>
         <slot
           name="creator"
           v-bind:isCreatorOpen="isCreatorOpen"
-          v-bind:onAddFile="addFile"
-          v-bind:onClose="onCloseCreator"
+          v-bind:onAddFile="handleAddFile"
+          v-bind:onClose="handleCloseCreator"
         />
       </template>
     </validated-panels>
@@ -41,7 +41,6 @@ import {
   IGenericUploader,
   ValidFileTypes,
   ProjectFile,
-  TraceLink,
   ValidPayloads,
   Link,
 } from "@/types";
@@ -56,6 +55,7 @@ import ValidatedPanels from "./ValidatedPanels.vue";
  * @emits-3 `change` - On change.
  */
 export default Vue.extend({
+  name: "GenericUploader",
   components: {
     ValidatedPanels,
     FilePanelController,
@@ -85,33 +85,50 @@ export default Vue.extend({
     openPanelIndexes: [] as number[],
   }),
   computed: {
+    /**
+     * @return Whether all panels are valid.
+     */
     isValidStates(): boolean[] {
       return this.panels.map((p) => p.projectFile.isValid);
     },
-    panels(): IGenericFilePanel<ArtifactMap, ValidFileTypes>[] {
+    /**
+     * @return All panels.
+     */
+    panels() {
       return this.uploader.panels;
     },
+    /**
+     * @return All project files.
+     */
     projectFiles(): ProjectFile[] {
       return this.uploader.panels.map((p) => p.projectFile);
     },
   },
   methods: {
-    onCloseCreator(): void {
+    /**
+     * Closes the creator.
+     */
+    handleCloseCreator(): void {
       this.isCreatorOpen = false;
     },
-    onChange(
+    /**
+     * Emits changed panels.
+     */
+    handleChange(
       i: number,
       panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
     ): void {
       this.$emit(
         "change",
-        this.panels.map((a, currentIndex) => {
-          if (currentIndex === i) return panel;
-          return a;
-        })
+        this.panels.map((a, currentIndex) => (currentIndex === i ? panel : a))
       );
     },
-    onValidateChange(i: number, isValid: boolean): void {
+    /**'
+     * Closes the panel if its valid, otherwise opens the panel.
+     * @param i - The panel index.
+     * @param isValid - Whether the panel is valid.
+     */
+    handleValidateChange(i: number, isValid: boolean): void {
       if (isValid) {
         this.openPanelIndexes = this.openPanelIndexes.filter(
           (panelIndex) => panelIndex !== i
@@ -120,7 +137,11 @@ export default Vue.extend({
         this.openPanelIndexes.push(i);
       }
     },
-    deleteFile(i: number): void {
+    /**
+     * Emits changes when a panel is deleted.
+     * @param i - The index of the deleted panel.
+     */
+    handleDeleteFile(i: number): void {
       this.$emit(
         "change",
         this.panels.filter((f, index) => index !== i)
@@ -129,7 +150,11 @@ export default Vue.extend({
         this.$emit("upload:invalid");
       }
     },
-    addFile(payload: string | Link): void {
+    /**
+     * Emits changes when a panel is added.
+     * @param payload - The added panel artifact name or trace link.
+     */
+    handleAddFile(payload: string | Link): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);

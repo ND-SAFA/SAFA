@@ -5,82 +5,50 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
+  Artifact,
+  ArtifactCytoCoreElement,
+  ArtifactDeltaState,
+  ArtifactWarning,
+} from "@/types";
+import {
   artifactSelectionModule,
   deltaModule,
   errorModule,
   subtreeModule,
 } from "@/store";
-import {
-  Artifact,
-  ArtifactCytoCoreElement,
-  ArtifactDeltaState,
-  ArtifactWarning,
-  EntityModification,
-  ProjectWarnings,
-} from "@/types";
 
 export default Vue.extend({
-  name: "artifact",
+  name: "ArtifactNode",
   props: {
-    artifactDefinition: Object as PropType<Artifact>,
+    artifactDefinition: {
+      type: Object as PropType<Artifact>,
+      required: true,
+    },
     opacity: {
       type: Number,
       required: true,
     },
   },
-  data: function () {
-    return {
-      addedData: undefined as Artifact | undefined,
-      removedData: undefined as Artifact | undefined,
-      modifiedData: undefined as EntityModification<Artifact> | undefined,
-    };
-  },
-  methods: {
-    setAddedData(data: Artifact) {
-      this.clearData();
-      this.addedData = data;
-    },
-    setRemovedData(data: Artifact) {
-      this.clearData();
-      this.removedData = data;
-    },
-    setModifiedData(data: EntityModification<Artifact>) {
-      this.clearData();
-      this.modifiedData = data;
-    },
-    clearData() {
-      this.addedData = undefined;
-      this.removedData = undefined;
-      this.modifiedData = undefined;
-    },
-  },
-  watch: {
-    artifactWarnings(): ProjectWarnings {
-      return errorModule.getArtifactWarnings;
-    },
-  },
   computed: {
+    /**
+     * @return Whether the current artifact is selected.
+     */
     isSelected(): boolean {
       return artifactSelectionModule.isArtifactInSelectedGroup(
         this.artifactDefinition.id
       );
     },
-    isDeltaViewEnabled(): boolean {
-      return deltaModule.inDeltaView;
-    },
+    /**
+     * @return Any artifact warnings.
+     */
     localWarnings(): ArtifactWarning[] | undefined {
-      const artifactWarnings: ProjectWarnings = errorModule.getArtifactWarnings;
-      const artifactId = this.artifactDefinition.id;
-
-      if (artifactId in artifactWarnings) {
-        return artifactWarnings[artifactId];
-      }
-
-      return undefined;
+      return errorModule.getArtifactWarnings[this.artifactDefinition.id];
     },
+    /**
+     * @return The delta state of this artifact.
+     */
     artifactDeltaState(): ArtifactDeltaState {
-      if (!this.isDeltaViewEnabled) {
-        this.clearData();
+      if (!deltaModule.inDeltaView) {
         return ArtifactDeltaState.NO_CHANGE;
       }
 
@@ -89,6 +57,9 @@ export default Vue.extend({
         ArtifactDeltaState.NO_CHANGE
       );
     },
+    /**
+     * @return The cytoscape definition of this artifact.
+     */
     definition(): ArtifactCytoCoreElement {
       const { id, body, type, name, safetyCaseType, logicType } =
         this.artifactDefinition;

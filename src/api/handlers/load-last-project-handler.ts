@@ -1,15 +1,11 @@
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { sessionModule } from "@/store";
-import {
-  getCurrentVersion,
-  getProjects,
-  loadVersionIfExistsHandler,
-} from "@/api";
+import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
 
 /**
  * Loads the last stored project.
  */
-export async function loadLastProject(): Promise<void> {
+export async function handleLoadLastProject(): Promise<void> {
   let versionId = getParam(QueryParams.VERSION);
 
   if (!versionId) {
@@ -21,7 +17,7 @@ export async function loadLastProject(): Promise<void> {
   }
   if (versionId && typeof versionId === "string") {
     await sessionModule.updateSession({ versionId });
-    await loadVersionIfExistsHandler(versionId).catch(() =>
+    await handleLoadVersion(versionId).catch(() =>
       navigateTo(Routes.PROJECT_CREATOR)
     );
   } else {

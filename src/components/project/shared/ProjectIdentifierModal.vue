@@ -5,7 +5,7 @@
     size="m"
     :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
-    @close="onClose"
+    @close="handleClose"
   >
     <template v-slot:body>
       <project-identifier-input
@@ -26,12 +26,11 @@
     </template>
     <template v-slot:actions v-if="!isUploadOpen">
       <v-btn
-        @click="onSave"
+        @click="handleSave"
         color="primary"
         class="ml-auto"
         :disabled="isDisabled"
       >
-        <v-icon>mdi-check</v-icon>
         Save
       </v-btn>
     </template>
@@ -53,6 +52,7 @@ import ProjectFilesInput from "./ProjectFilesInput.vue";
  * @emits-2 `save` (ProjectIdentifier) - On project save.
  */
 export default Vue.extend({
+  name: "ProjectIdentifierModal",
   components: {
     GenericModal,
     ProjectIdentifierInput,
@@ -86,11 +86,17 @@ export default Vue.extend({
     };
   },
   watch: {
+    /**
+     * Resets identifier data when opened.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 
       this.identifier = createProjectIdentifier(this.project);
     },
+    /**
+     * Verified fields when the identifier changes.
+     */
     identifier: {
       deep: true,
       handler() {
@@ -101,10 +107,16 @@ export default Vue.extend({
     },
   },
   methods: {
-    onClose() {
+    /**
+     * Emits a request to close.
+     */
+    handleClose() {
       this.$emit("close");
     },
-    onSave() {
+    /**
+     * Emits a request to save a project.
+     */
+    handleSave() {
       this.$emit("save", this.identifier);
     },
   },

@@ -20,6 +20,7 @@
         color="primary"
         @click="handleReset"
         :disabled="password.length === 0"
+        :loading="isLoading"
       >
         Update Password
       </v-btn>
@@ -35,28 +36,39 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { resetPassword } from "@/api";
+import { updatePassword } from "@/api";
+import { CardPage, PasswordField } from "@/components";
 
 /**
- * Presents the reset password page.
+ * Displays the reset password page.
  */
 export default Vue.extend({
-  name: "reset-password-view",
+  name: "ResetPasswordView",
   components: { PasswordField, CardPage },
-  data: () => ({
-    password: "",
-    token: "",
-    isSubmitted: false,
-    isError: false,
-  }),
+  data() {
+    return {
+      password: "",
+      token: "",
+      isSubmitted: false,
+      isError: false,
+      isLoading: false,
+    };
+  },
   methods: {
+    /**
+     * Navigates to the login page.
+     */
     handleLogin() {
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
+    /**
+     * Attempts to reset a user's password.
+     */
     handleReset() {
-      resetPassword({
+      this.isLoading = true;
+
+      updatePassword({
         password: this.password,
         token: this.token,
       })
@@ -64,7 +76,8 @@ export default Vue.extend({
           this.isSubmitted = true;
           this.isError = false;
         })
-        .catch(() => (this.isError = true));
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

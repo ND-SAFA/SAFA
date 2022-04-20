@@ -48,7 +48,7 @@ import TableColumnEditor from "./TableColumnEditor.vue";
  * Represents the header and inputs for a table of artifacts.
  *
  * @emits-1 `search` (String) - On text search.
- * @emits-1 `filter` (ArtifactDeltaState[]) - On filter search.
+ * @emits-2 `filter` (ArtifactDeltaState[]) - On filter search.
  */
 export default Vue.extend({
   name: "ArtifactTableHeader",
@@ -59,20 +59,27 @@ export default Vue.extend({
     return {
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
+      deltaTypes: deltaTypeOptions(),
     };
   },
   computed: {
+    /**
+     * @return Whether the app is in delta view.
+     */
     inDeltaView(): boolean {
       return deltaModule.inDeltaView;
     },
-    deltaTypes() {
-      return deltaTypeOptions();
-    },
   },
   watch: {
+    /**
+     * Emits the current search text on change.
+     */
     searchText(search: string) {
       this.$emit("search", search);
     },
+    /**
+     * Emits the selected delta types on change.
+     */
     selectedDeltaTypes(items: ArtifactDeltaState[]) {
       this.$emit("filter", items);
     },

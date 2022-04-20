@@ -22,6 +22,7 @@ import {
  * Allows for creating a project with a bulk upload.
  */
 export default Vue.extend({
+  name: "ProjectBulkUpload",
   components: {
     ProjectFilesInput,
     ProjectIdentifierInput,

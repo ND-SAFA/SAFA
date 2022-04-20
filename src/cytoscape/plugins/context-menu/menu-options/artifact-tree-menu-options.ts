@@ -11,7 +11,7 @@ import {
 import { Artifact, ArtifactData, PanelType } from "@/types";
 import { enableDrawMode } from "@/cytoscape";
 import { EventObject } from "cytoscape";
-import { deleteArtifactFromCurrentVersion } from "@/api";
+import { handleDeleteArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 
@@ -69,7 +69,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
-        await deleteArtifactFromCurrentVersion(artifact);
+        await handleDeleteArtifact(artifact);
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

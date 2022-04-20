@@ -81,3 +81,26 @@ export interface ProjectDelta {
    */
   traces: EntityDelta<TraceLink>;
 }
+
+/**
+ * Represents an artifact delta.
+ */
+export type DeltaArtifact = Artifact | EntityModification<Artifact>;
+
+/**
+ * Represents a changed artifact.
+ */
+export interface ChangedArtifact {
+  /**
+   * The artifact name.
+   */
+  name: string;
+  /**
+   * The artifact delta type.
+   */
+  deltaType: string;
+  /**
+   * The changed artifact.
+   */
+  artifact: DeltaArtifact;
+}

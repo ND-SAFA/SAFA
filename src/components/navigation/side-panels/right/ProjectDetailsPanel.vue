@@ -10,7 +10,7 @@
 
     <v-expansion-panels multiple>
       <sub-tree-selector-tab v-if="selectedTab === 0" />
-      <delta-tab v-if="selectedTab === 1" @open="openDeltaPanel" />
+      <delta-tab v-if="selectedTab === 1" />
       <trace-link-direction-tab v-if="selectedTab === 2" />
     </v-expansion-panels>
   </v-container>
@@ -22,10 +22,11 @@ import SubTreeSelectorTab from "./SubTreeSelectorTab.vue";
 import DeltaTab from "./DeltaTab.vue";
 import TraceLinkDirectionTab from "./TypeOptionsTab.vue";
 
-const DELTA_TREE_INDEX = 1;
-
+/**
+ * Displays the project details panel.
+ */
 export default Vue.extend({
-  name: "hazard-hierarchy-panel",
+  name: "ProjectDetailsPanel",
   components: {
     TraceLinkDirectionTab,
     DeltaTab,
@@ -35,11 +36,6 @@ export default Vue.extend({
     return {
       selectedTab: -1,
     };
-  },
-  methods: {
-    openDeltaPanel(): void {
-      this.selectedTab = DELTA_TREE_INDEX;
-    },
   },
 });
 </script>

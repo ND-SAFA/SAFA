@@ -5,7 +5,11 @@ import {
   JiraProjectList,
 } from "@/types";
 import { logModule, sessionModule } from "@/store";
+import { authHttpClient, Endpoint } from "@/api";
 
+/**
+ * The formatted scopes of jira permissions being requested.
+ */
 const scopes = [
   // Current Jira API version:
   "read:jira-work",
@@ -29,7 +33,7 @@ const scopes = [
  * Runs a fetch call to the Atlassian API.
  *
  * @param args - The fetch parameters to use.
- * @return THe returned data.
+ * @return The returned data.
  */
 async function fetchAtlassian<T>(
   ...args: Parameters<typeof fetch>
@@ -38,15 +42,15 @@ async function fetchAtlassian<T>(
   const resJson = (await response.json()) as T;
 
   if (!response.ok) {
-    logModule.onError("Unable to connect to Atlassian");
-    throw Error("Unable to connect to Atlassian");
+    logModule.onError("Unable to connect to Atlassian.");
+    throw Error("Unable to connect to Atlassian.");
   } else {
     return resJson;
   }
 }
 
 /**
- * Opens an external link to authorize jira.
+ * Opens an external link to authorize Jira.
  */
 export function authorizeJira(): void {
   window.open(
@@ -62,10 +66,10 @@ export function authorizeJira(): void {
 }
 
 /**
- * Exchanges an atlassian access code for a API token.
+ * Exchanges an Atlassian access code for a API token.
  *
- * @param accessCode - The access code received from authorizing jira.
- * @return The jira access token.
+ * @param accessCode - The access code received from authorizing Jira.
+ * @return The Jira access token.
  */
 export async function getJiraToken(accessCode: string): Promise<string> {
   const authorization = await fetchAtlassian<JiraAccessToken>(
@@ -89,10 +93,10 @@ export async function getJiraToken(accessCode: string): Promise<string> {
 }
 
 /**
- * Exchanges an atlassian access code for the list of cloud sites associated with the given user.
+ * Exchanges an Atlassian access code for the list of cloud sites associated with the given user.
  *
  * @param accessToken - The access token received from authorizing jira.
- * @return The jira sites for this user.
+ * @return The Jira sites for this user.
  */
 export async function getJiraCloudSites(
   accessToken: string
@@ -109,11 +113,11 @@ export async function getJiraCloudSites(
 }
 
 /**
- * Returns all jira projects for the given user.
+ * Returns all Jira projects for the given user and cloud site.
  *
- * @param accessToken - The access token received from authorizing jira.
- * @param cloudId - The cloud id for the current user.
- * @return The user's projects associated with this company.
+ * @param accessToken - The access token received from authorizing Jira.
+ * @param cloudId - The Jira cloud id to return projects for.
+ * @return The user's projects associated with this cloud.
  */
 export async function getJiraProjects(
   accessToken: string,
@@ -131,4 +135,26 @@ export async function getJiraProjects(
   );
 
   return projects.values;
+}
+
+/**
+ * Creates a new project based on a Jira project.
+ *
+ * @param accessToken - The access token received from authorizing Jira.
+ * @param cloudId - The Jira cloud id for the current site.
+ * @param projectId - The Jira project id to import.
+ */
+export async function createJiraProject(
+  accessToken: string,
+  cloudId: string,
+  projectId: string
+): Promise<void> {
+  return authHttpClient<void>(Endpoint.jiraProject, {
+    method: "POST",
+    body: JSON.stringify({
+      cloudId,
+      projectId,
+      bearerAccessToken: accessToken,
+    }),
+  });
 }

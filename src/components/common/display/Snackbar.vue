@@ -16,7 +16,7 @@
           <v-btn
             v-if="hasErrors"
             :color="messageColor"
-            @click="onSeeErrorClick"
+            @click="handleSeeError"
             class="ma-0"
           >
             See Errors
@@ -35,45 +35,69 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { MessageType, PanelType, SnackbarMessage } from "@/types";
+import { MessageType, SnackbarMessage } from "@/types";
 import { appModule, logModule } from "@/store";
 import { ServerErrorModal } from "@/components/common/modals";
 
+/**
+ * Displays snackbar messages.
+ */
 export default Vue.extend({
-  name: "snackbar",
+  name: "Snackbar",
   components: {
     ServerErrorModal,
   },
   props: {
     timeout: Number,
   },
-  data: () => ({
-    showSnackbar: false,
-    snackbarMessage: "",
-    messageType: MessageType.CLEAR,
-    errors: [] as string[],
-  }),
+  data() {
+    return {
+      showSnackbar: false,
+      snackbarMessage: "",
+      messageType: MessageType.CLEAR as MessageType,
+      errors: [] as string[],
+    };
+  },
   methods: {
+    /**
+     * Displays a snackbar message.
+     * @param snackbarMessage - The message to display.
+     */
     showMessage(snackbarMessage: SnackbarMessage) {
       this.showSnackbar = true;
       this.snackbarMessage = snackbarMessage.message;
-      this.errors = snackbarMessage.errors;
+      this.errors = snackbarMessage.errors || [];
       this.messageType = snackbarMessage.type;
     },
-    onSeeErrorClick(): void {
-      appModule.openPanel(PanelType.errorDisplay);
+    /**
+     * Opens the error display panel.
+     */
+    handleSeeError(): void {
+      appModule.openErrorDisplay();
     },
   },
   computed: {
+    /**
+     * @return Whether there arte any errors.
+     */
     hasErrors(): boolean {
       return this.errors.length > 0;
     },
+    /**
+     * @return The current message.
+     */
     message() {
       return logModule.getMessage;
     },
+    /**
+     * @return Whether the error display is open.
+     */
     isErrorDisplayOpen(): boolean {
       return appModule.getIsErrorDisplayOpen;
     },
+    /**
+     * @return The message color for the current message.
+     */
     messageColor(): string {
       switch (this.messageType) {
         case MessageType.INFO:
@@ -88,6 +112,9 @@ export default Vue.extend({
           return "info";
       }
     },
+    /**
+     * @return The message icon for the current message.
+     */
     messageIcon(): string {
       switch (this.messageType) {
         case MessageType.INFO:
@@ -104,11 +131,14 @@ export default Vue.extend({
     },
   },
   watch: {
+    /**
+     * When a new message is added, it will be displayed.
+     */
     message(newMessage: SnackbarMessage) {
-      if (newMessage.type !== MessageType.CLEAR) {
-        this.showMessage(newMessage);
-        logModule.CLEAR_MESSAGE();
-      }
+      if (newMessage.type === MessageType.CLEAR) return;
+
+      this.showMessage(newMessage);
+      logModule.CLEAR_MESSAGE();
     },
   },
 });

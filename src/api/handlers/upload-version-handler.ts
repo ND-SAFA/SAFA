@@ -1,10 +1,7 @@
 import { appModule, logModule } from "@/store";
-import { navigateTo, QueryParams, Routes } from "@/router";
-import {
-  connectAndSubscribeToVersion,
-  updateProjectThroughFlatFiles,
-} from "@/api/endpoints";
-import { setCreatedProject } from "@/api";
+import { navigateTo, Routes } from "@/router";
+import { updateProjectThroughFlatFiles, handleSetProject } from "@/api";
+import { connectAndSubscribeToVersion } from "@/api/notifications";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -14,14 +11,14 @@ import { setCreatedProject } from "@/api";
  * @param selectedFiles  - The flat files that will update given version.
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful.
  */
-export async function uploadNewProjectVersion(
+export async function handleUploadProjectVersion(
   projectId: string,
   versionId: string,
   selectedFiles: File[],
   setVersionIfSuccessful: boolean
 ): Promise<void> {
   if (selectedFiles.length === 0) {
-    logModule.onWarning("Please add at least one file to upload");
+    logModule.onWarning("Please add at least one file to upload.");
   } else {
     const formData = new FormData();
 
@@ -38,9 +35,7 @@ export async function uploadNewProjectVersion(
     const uploadFlatFiles = async () => {
       const res = await updateProjectThroughFlatFiles(versionId, formData);
 
-      logModule.onSuccess(
-        `Flat files were uploaded successfully and ${res.project.name} was updated.`
-      );
+      logModule.onSuccess(`Flat files have been uploaded: ${res.project.name}`);
 
       return res;
     };
@@ -54,10 +49,10 @@ export async function uploadNewProjectVersion(
         // Note that changing the order below will cause the project to not properly render initially.
         await navigateTo(Routes.ARTIFACT);
         const res = await uploadFlatFiles();
-        await setCreatedProject(res);
+        await handleSetProject(res);
       } catch (e) {
-        await navigateTo(Routes.PROJECT_CREATOR);
         logModule.onError(e.message);
+        await navigateTo(Routes.PROJECT_CREATOR);
       } finally {
         appModule.onLoadEnd();
       }

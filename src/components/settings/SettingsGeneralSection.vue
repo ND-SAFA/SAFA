@@ -9,7 +9,7 @@
           <generic-icon-button
             tooltip="Edit title"
             icon-id="mdi-pencil"
-            @click="onEdit"
+            @click="handleEdit"
           />
         </v-col>
       </v-row>
@@ -24,7 +24,7 @@
       v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
       @close="isEditOpen = false"
-      @save="onSave"
+      @save="handleSave"
     />
   </v-row>
 </template>
@@ -34,7 +34,7 @@ import Vue, { PropType } from "vue";
 import { Project, ProjectIdentifier } from "@/types";
 import { GenericIconButton } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
-import { saveOrUpdateProject } from "@/api";
+import { handleSaveProject } from "@/api";
 import { projectModule } from "@/store";
 
 /**
@@ -42,6 +42,7 @@ import { projectModule } from "@/store";
  * within the settings.
  */
 export default Vue.extend({
+  name: "SettingsGeneralSection",
   components: { GenericIconButton, ProjectIdentifierModal },
   props: {
     project: {
@@ -57,26 +58,37 @@ export default Vue.extend({
     };
   },
   methods: {
-    onEdit(): void {
+    /**
+     * Opens the edit modal.
+     */
+    handleEdit(): void {
       this.projectToEdit = this.project;
       this.isEditOpen = true;
     },
-    onSave(project: ProjectIdentifier): void {
+    /**
+     * Attempts to save the project.
+     */
+    handleSave(project: ProjectIdentifier): void {
       this.isEditLoading = true;
 
-      saveOrUpdateProject({
-        projectId: this.project.projectId,
-        name: project.name,
-        description: project.description,
-      })
-        .then(() => projectModule.SET_PROJECT_IDENTIFIER(project))
-        .catch((e) => {
-          console.error(e);
-        })
-        .finally(() => {
-          this.isEditLoading = false;
-          this.isEditOpen = false;
-        });
+      handleSaveProject(
+        {
+          projectId: this.project.projectId,
+          name: project.name,
+          description: project.description,
+        },
+        {
+          onSuccess: () => {
+            projectModule.SET_PROJECT_IDENTIFIER(project);
+            this.isEditLoading = false;
+            this.isEditOpen = false;
+          },
+          onError: () => {
+            this.isEditLoading = false;
+            this.isEditOpen = false;
+          },
+        }
+      );
     },
   },
 });

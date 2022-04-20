@@ -35,7 +35,7 @@
             <v-list-item
               v-for="artifact in artifactTypeHashTable[type]"
               :key="artifact.name"
-              @click="onArtifactClick(artifact)"
+              @click="handleArtifactClick(artifact)"
             >
               <v-list-item-content>
                 <v-list-item-title>{{ artifact.name }}</v-list-item-title>
@@ -58,37 +58,36 @@ import { Artifact } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
 
+/**
+ * Displays all project artifacts.
+ */
 export default Vue.extend({
-  name: "artifact-tab",
+  name: "SubTreeSelectorTab",
   data() {
     return {
       searchText: "",
     };
   },
-  methods: {
-    getTypePrintName: getArtifactTypePrintName,
-    getIconName(type: string): string {
-      return typeOptionsModule.getArtifactTypeIcon(type);
-    },
-    async onArtifactClick(artifact: Artifact): Promise<void> {
-      await viewportModule.viewArtifactSubtree(artifact);
-    },
-  },
   computed: {
+    /**
+     * @return Artifacts that match the search text.
+     */
     artifacts(): Artifact[] {
       const artifacts = artifactModule.artifacts;
 
-      if (this.searchText !== "") {
-        return artifacts.filter(
-          (a) =>
-            a.name.includes(this.searchText) || a.body.includes(this.searchText)
-        );
-      } else {
-        return artifacts;
-      }
+      return this.searchText
+        ? artifacts.filter(
+            ({ name, body }) =>
+              name.includes(this.searchText) || body.includes(this.searchText)
+          )
+        : artifacts;
     },
+    /**
+     * @return All artifacts grouped by their type.
+     */
     artifactTypeHashTable(): Record<string, Artifact[]> {
       const hashTable: Record<string, Artifact[]> = {};
+
       this.artifacts.forEach((a) => {
         if (a.type in hashTable) {
           hashTable[a.type].push(a);
@@ -96,10 +95,37 @@ export default Vue.extend({
           hashTable[a.type] = [a];
         }
       });
+
       return hashTable;
     },
+    /**
+     * @return All artifact types.
+     */
     artifactTypes(): string[] {
       return Object.keys(this.artifactTypeHashTable);
+    },
+  },
+  methods: {
+    /**
+     * Converts an artifact type into a title case name.
+     * @param type - The artifact type.
+     * @return The type display name.
+     */
+    getTypePrintName: getArtifactTypePrintName,
+    /**
+     * Returns the icon for this artifact type.
+     * @param type - The artifact type.
+     * @return The type icon.
+     */
+    getIconName(type: string): string {
+      return typeOptionsModule.getArtifactTypeIcon(type);
+    },
+    /**
+     * Focuses the graph on the given artifact's subtree.
+     * @param artifact - The artifact focus on.
+     */
+    async handleArtifactClick(artifact: Artifact): Promise<void> {
+      await viewportModule.viewArtifactSubtree(artifact);
     },
   },
 });

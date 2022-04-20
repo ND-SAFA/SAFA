@@ -3,24 +3,50 @@
     <template v-slot:page>
       <artifact-table />
       <artifact-tree />
+      <artifact-creator-modal
+        :is-open="isArtifactCreatorOpen"
+        @close="closeArtifactCreator"
+      />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactTree, ArtifactTable, PrivatePage } from "@/components";
+import { appModule } from "@/store";
+import {
+  ArtifactTree,
+  ArtifactTable,
+  PrivatePage,
+  ArtifactCreatorModal,
+} from "@/components";
 
 /**
- * Displays the artifact tree of the current project with a label
- * above it containing the current project and version.
+ * Displays the artifact tree and table.
  */
 export default Vue.extend({
-  name: "artifact-view",
+  name: "ArtifactView",
   components: {
     ArtifactTable,
     PrivatePage,
     ArtifactTree,
+    ArtifactCreatorModal,
+  },
+  computed: {
+    /**
+     * Returns whether the artifact creator is open.
+     */
+    isArtifactCreatorOpen() {
+      return appModule.getIsArtifactCreatorOpen;
+    },
+  },
+  methods: {
+    /**
+     * Closes the artifact creator.
+     */
+    closeArtifactCreator(): void {
+      appModule.closeCreator();
+    },
   },
 });
 </script>

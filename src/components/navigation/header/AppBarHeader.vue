@@ -32,7 +32,7 @@
       :is-open="createVersionOpen"
       :project="project"
       @close="createVersionOpen = false"
-      @create="onVersionCreated"
+      @create="handleVersionCreated"
     />
   </v-flex>
 </template>
@@ -43,20 +43,17 @@ import {
   ButtonDefinition,
   ButtonMenuItem,
   ButtonType,
-  EmptyLambda,
-  ProjectIdentifier,
   ProjectVersion,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
-import { clearProject, loadVersionIfExistsHandler } from "@/api";
+import { handleLoadVersion } from "@/api";
+import { ButtonRow, SafaIcon } from "@/components/common";
 import {
+  VersionCreator,
   BaselineVersionModal,
-  ButtonRow,
   UploadNewVersionModal,
-  SafaIcon,
-} from "@/components/common";
-import { VersionCreator } from "@/components/project";
+} from "@/components/project";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
 
@@ -79,52 +76,27 @@ export default Vue.extend({
       createVersionOpen: false,
     };
   },
-  methods: {
-    onOpenProject(): void {
-      this.openProjectOpen = true;
-    },
-    async onCreateProject(): Promise<void> {
-      await clearProject();
-      await navigateTo(Routes.PROJECT_CREATOR);
-    },
-    onUploadVersion(): void {
-      this.uploadVersionOpen = true;
-    },
-    onChangeVersion(): void {
-      if (projectModule.versionId) {
-        this.changeVersionOpen = true;
-      } else {
-        logModule.onWarning("Please select a project.");
-      }
-    },
-    onCreateVersion(): void {
-      if (projectModule.projectId) {
-        this.createVersionOpen = true;
-      } else {
-        logModule.onWarning("Please select a project.");
-      }
-    },
-    onVersionCreated(version: ProjectVersion) {
-      loadVersionIfExistsHandler(version.versionId);
-
-      this.createVersionOpen = false;
-    },
-  },
   computed: {
-    project(): ProjectIdentifier {
+    /**
+     * @return The current project.
+     */
+    project() {
       return projectModule.getProject;
     },
+    /**
+     * @return The menu items for projects.
+     */
     projectMenuItems(): ButtonMenuItem[] {
       const options: ButtonMenuItem[] = [
         {
           name: "Open Project",
           tooltip: "Open another project",
-          onClick: this.onOpenProject,
+          onClick: this.handleOpenProject,
         },
         {
           name: "Create Project",
           tooltip: "Create a new project",
-          onClick: this.onCreateProject,
+          onClick: this.handleCreateProject,
         },
         {
           name: "Project Settings",
@@ -135,6 +107,9 @@ export default Vue.extend({
 
       return projectModule.projectId ? options : options.slice(0, -1);
     },
+    /**
+     * @return The dropdown menus displayed on the nav bar.
+     */
     definitions(): ButtonDefinition[] {
       return [
         {
@@ -152,17 +127,17 @@ export default Vue.extend({
             {
               name: "Change Version",
               tooltip: "Change to a different version of this project",
-              onClick: this.onChangeVersion,
+              onClick: this.handleChangeVersion,
             },
             {
               name: "Create Version",
               tooltip: "Create a new version of this project",
-              onClick: this.onCreateVersion,
+              onClick: this.handleCreateVersion,
             },
             {
               name: "Upload Flat Files",
               tooltip: "Upload project files in bulk",
-              onClick: this.onUploadVersion,
+              onClick: this.handleUploadVersion,
             },
           ],
         },
@@ -180,6 +155,54 @@ export default Vue.extend({
           ],
         },
       ];
+    },
+  },
+  methods: {
+    /**
+     * Opens the project selector.
+     */
+    handleOpenProject(): void {
+      this.openProjectOpen = true;
+    },
+    /**
+     * Navigates to the create project page.
+     */
+    async handleCreateProject(): Promise<void> {
+      await navigateTo(Routes.PROJECT_CREATOR);
+    },
+    /**
+     * Opens the project version uploader.
+     */
+    handleUploadVersion(): void {
+      this.uploadVersionOpen = true;
+    },
+    /**
+     * Opens the project version selector.
+     */
+    handleChangeVersion(): void {
+      if (projectModule.versionId) {
+        this.changeVersionOpen = true;
+      } else {
+        logModule.onWarning("Please select a project.");
+      }
+    },
+    /**
+     * Opens the project version creator.
+     */
+    handleCreateVersion(): void {
+      if (projectModule.projectId) {
+        this.createVersionOpen = true;
+      } else {
+        logModule.onWarning("Please select a project.");
+      }
+    },
+    /**
+     * Closes the version creator and loads the created version.
+     */
+    handleVersionCreated(version: ProjectVersion) {
+      handleLoadVersion(version.versionId);
+
+      this.createVersionOpen = false;
     },
   },
 });

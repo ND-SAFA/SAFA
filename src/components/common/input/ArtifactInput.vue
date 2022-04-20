@@ -43,7 +43,7 @@ import { getArtifactTypePrintName } from "@/util";
  * @emits `enter` - On submit.
  */
 export default Vue.extend({
-  name: "artifact-input",
+  name: "ArtifactInput",
   props: {
     value: {
       type: [Array, String],
@@ -70,24 +70,48 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Converts the type name to title case.
+     * @param type - The type to convert.
+     * @return The title case type name.
+     */
     getTypePrintName: getArtifactTypePrintName,
-    filter(item: Artifact, queryText: string): boolean {
+    /**
+     * Decides whether to filter an artifact out of view.
+     * @param artifact - The artifact to check.
+     * @param queryText - The current query text.
+     * @return If true, the artifact should be kept.
+     */
+    filter(artifact: Artifact, queryText: string): boolean {
       const lowercaseQuery = queryText.toLowerCase();
+      const { name, type } = artifact;
 
       return (
-        item.name.toLowerCase().includes(lowercaseQuery) ||
-        item.type.toLowerCase().includes(lowercaseQuery) ||
-        this.getTypePrintName(item.type).toLowerCase().includes(lowercaseQuery)
+        name.toLowerCase().includes(lowercaseQuery) ||
+        type.toLowerCase().includes(lowercaseQuery) ||
+        this.getTypePrintName(type).toLowerCase().includes(lowercaseQuery)
       );
     },
-    handleSeeMore(item: Artifact) {
-      this.expandedId = item.id === this.expandedId ? "" : item.id;
+    /**
+     * Opens up the expanded display for an artifact.
+     * @param artifact - The artifact to view.
+     */
+    handleSeeMore(artifact: Artifact) {
+      this.expandedId = artifact.id === this.expandedId ? "" : artifact.id;
     },
-    isExpanded(item: Artifact): boolean {
-      return item.id === this.expandedId;
+    /**
+     * Returns whether the artifact has its display expanded.
+     * @param artifact - The artifact to check.
+     * @return Whether its display is expanded.
+     */
+    isExpanded(artifact: Artifact): boolean {
+      return artifact.id === this.expandedId;
     },
   },
   computed: {
+    /**
+     * @return The artifacts to select from.
+     */
     artifacts(): Artifact[] {
       return this.onlyDocumentArtifacts
         ? artifactModule.artifacts
@@ -95,9 +119,15 @@ export default Vue.extend({
     },
   },
   watch: {
+    /**
+     * Updates the model if the value changes.
+     */
     value(currentValue: string[] | string) {
       this.model = currentValue;
     },
+    /**
+     * Emits changes to the model.
+     */
     model(currentValue: string[] | string) {
       this.$emit("input", currentValue);
     },

@@ -1,4 +1,9 @@
-import { CyPromise, IGraphLayout, LayoutPayload } from "@/types";
+import {
+  CyPromise,
+  IGraphLayout,
+  InternalTraceType,
+  LayoutPayload,
+} from "@/types";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
@@ -6,7 +11,7 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { appModule, logModule, viewportModule } from "@/store";
+import { logModule } from "@/store";
 import { areArraysEqual } from "@/util";
 import { applyAutoMoveEvents } from "@/cytoscape";
 
@@ -195,7 +200,8 @@ export function cySetDisplay(
     cy.edges()
       .filter(
         (e) =>
-          artifactIds.includes(e.target().data().id) ||
+          e.data().type !== InternalTraceType.SUBTREE &&
+          artifactIds.includes(e.target().data().id) &&
           artifactIds.includes(e.source().data().id)
       )
       .style({ display });

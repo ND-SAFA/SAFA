@@ -56,13 +56,12 @@ public class TestSafaUserController extends ApplicationBaseTest {
         String password = "r{QjR3<Ec2eZV@?";
         createUser(email, password);
         loginUser(email, password, status().isOk());
-        sendGetWithArrayResponse(AppRoutes.Projects.createOrUpdateProjects,
-            status().is2xxSuccessful());
+        sendGetWithArrayResponse(AppRoutes.Projects.getProjects, status().is2xxSuccessful());
     }
 
     @Test
     public void invalidResourceRequest() throws Exception {
-        sendRequest(get(AppRoutes.Projects.createOrUpdateProjects), status().is4xxClientError());
+        sendRequest(get(AppRoutes.Projects.getProjects), status().is4xxClientError());
     }
 
     @Test

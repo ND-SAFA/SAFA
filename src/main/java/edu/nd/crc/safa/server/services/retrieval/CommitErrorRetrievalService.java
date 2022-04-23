@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 
@@ -33,17 +33,17 @@ public class CommitErrorRetrievalService {
     public ProjectParsingErrors collectionProjectErrors(ProjectVersion projectVersion) {
 
         List<ErrorApplicationEntity> timErrors = this.commitErrorRepository
-            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_TIM)
+            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectEntity.TIM)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
         List<ErrorApplicationEntity> artifactErrors = this.commitErrorRepository
-            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_ARTIFACTS)
+            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectEntity.ARTIFACTS)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
         List<ErrorApplicationEntity> traceErrors = this.commitErrorRepository
-            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectParsingActivities.PARSING_TRACES)
+            .findByProjectVersionAndApplicationActivity(projectVersion, ProjectEntity.TRACES)
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());

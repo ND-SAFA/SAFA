@@ -37,7 +37,7 @@ public class CommitError implements Serializable {
 
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
-    ProjectParsingActivities applicationActivity;
+    ProjectEntity applicationActivity;
 
     @Column(name = "file_name")
     String fileName;
@@ -49,20 +49,14 @@ public class CommitError implements Serializable {
     String description;
 
     public CommitError() {
-        this.applicationActivity = ProjectParsingActivities.UNKNOWN;
-    }
-
-    public CommitError(ProjectVersion projectVersion,
-                       String description) {
-        this();
-        this.projectVersion = projectVersion;
-        this.description = description;
     }
 
     public CommitError(ProjectVersion projectVersion,
                        String description,
-                       ProjectParsingActivities projectParsingActivity) {
-        this(projectVersion, description);
+                       ProjectEntity projectParsingActivity) {
+        this();
+        this.projectVersion = projectVersion;
+        this.description = description;
         this.applicationActivity = projectParsingActivity;
     }
 
@@ -78,11 +72,11 @@ public class CommitError implements Serializable {
         return this.id.toString();
     }
 
-    public ProjectParsingActivities getApplicationActivity() {
+    public ProjectEntity getApplicationActivity() {
         return this.applicationActivity;
     }
 
-    public void setApplicationActivity(ProjectParsingActivities applicationActivity) {
+    public void setApplicationActivity(ProjectEntity applicationActivity) {
         this.applicationActivity = applicationActivity;
     }
 

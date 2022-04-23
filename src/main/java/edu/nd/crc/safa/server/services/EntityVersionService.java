@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
@@ -56,7 +56,7 @@ public class EntityVersionService {
         for (Pair<ArtifactVersion, CommitError> commitPayload : commitResponse) {
             CommitError commitError = commitPayload.getValue1();
             if (commitError != null) {
-                commitError.setApplicationActivity(ProjectParsingActivities.PARSING_ARTIFACTS);
+                commitError.setApplicationActivity(ProjectEntity.ARTIFACTS);
                 this.commitErrorRepository.save(commitError);
             }
         }
@@ -78,7 +78,7 @@ public class EntityVersionService {
         for (Pair<TraceLinkVersion, CommitError> payload : commitResponse) {
             CommitError commitError = payload.getValue1();
             if (commitError != null) {
-                commitError.setApplicationActivity(ProjectParsingActivities.PARSING_TRACES);
+                commitError.setApplicationActivity(ProjectEntity.TRACES);
                 this.commitErrorRepository.save(commitError);
             }
         }

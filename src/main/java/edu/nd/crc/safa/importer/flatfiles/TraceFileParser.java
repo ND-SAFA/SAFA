@@ -8,8 +8,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -43,56 +43,36 @@ public class TraceFileParser {
     private final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
 
     private final ArtifactTypeRepository artifactTypeRepository;
-    private final TraceLinkGenerator traceLinkGenerator;
 
     @Autowired
-    public TraceFileParser(ArtifactTypeRepository artifactTypeRepository,
-                           TraceLinkGenerator traceLinkGenerator) {
+    public TraceFileParser(ArtifactTypeRepository artifactTypeRepository) {
         this.artifactTypeRepository = artifactTypeRepository;
-        this.traceLinkGenerator = traceLinkGenerator;
     }
 
-    public List<TraceAppEntity> parseTraceFiles(ProjectVersion projectVersion,
-                                                JSONObject timFileJson) throws SafaError {
+    public Pair<List<TraceAppEntity>, List<TraceGenerationRequest>> parseTraceFiles(ProjectVersion projectVersion,
+                                                                                    JSONObject timFileJson) throws SafaError {
         List<TraceAppEntity> traces = new ArrayList<>();
+        List<TraceGenerationRequest> traceGenerationRequests = new ArrayList<>();
+
         for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next();
             if (traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
                 continue;
             }
-            traces.addAll(this.parseTraceMatrixDefinition(projectVersion,
-                timFileJson.getJSONObject(traceMatrixKey)));
+            JSONObject traceMatrix = timFileJson.getJSONObject(traceMatrixKey);
+            String fileName = traceMatrix.getString("file"); // TODO: Make constants and perform validation
+            traces.addAll(readAndParseTraceFile(projectVersion, fileName));
+
+            boolean isGenerated = traceMatrix.has("generatelinks")
+                && traceMatrix.getBoolean("generatelinks");
+            if (isGenerated) {
+                String source = traceMatrix.getString(SOURCE_PARAM);
+                String target = traceMatrix.getString(TARGET_PARAM);
+                TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest(source, target);
+                traceGenerationRequests.add(traceGenerationRequest);
+            }
         }
-        return traces;
-    }
-
-    /**
-     * Responsible for parsing a Json objects specifying a trace matrix
-     * within of the project's tim.json file. Note, this function performs no validation
-     * is purely a translation from file to json.
-     *
-     * @param projectVersion        the project associated with trace matrix file
-     * @param traceMatrixDefinition the JSON object containing the specification
-     * @throws SafaError thrown on any parsing error of tim.json or its subsequent files
-     */
-    private List<TraceAppEntity> parseTraceMatrixDefinition(ProjectVersion projectVersion,
-                                                            JSONObject traceMatrixDefinition) throws SafaError {
-        Project project = projectVersion.getProject();
-        String fileName = traceMatrixDefinition.getString("file"); // TODO: Make constants and perform validation
-        boolean isGenerated = traceMatrixDefinition.has("generatelinks")
-            && traceMatrixDefinition.getBoolean("generatelinks");
-
-        Pair<ArtifactType, ArtifactType> matrixArtifactTypes = findMatrixArtifactTypes(project, traceMatrixDefinition);
-
-        List<TraceAppEntity> projectLinks = new ArrayList<>();
-
-        if (isGenerated) {
-            List<TraceAppEntity> generatedLinks = traceLinkGenerator
-                .generateTraceLinksToFile(projectVersion, matrixArtifactTypes);
-            projectLinks.addAll(generatedLinks);
-        }
-        projectLinks.addAll(readAndParseTraceFile(projectVersion, fileName));
-        return projectLinks;
+        return new Pair<>(traces, traceGenerationRequests);
     }
 
     /**
@@ -168,7 +148,7 @@ public class TraceFileParser {
         }
     }
 
-    private ArtifactType findArtifactTypeFromTraceMatrixDefinition(Project project, String typeName)
+    public ArtifactType findArtifactTypeFromTraceMatrixDefinition(Project project, String typeName)
         throws SafaError {
         Optional<ArtifactType> sourceTypeQuery = this.artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, typeName);

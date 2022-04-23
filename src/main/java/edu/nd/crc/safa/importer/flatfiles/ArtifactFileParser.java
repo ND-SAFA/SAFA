@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactFileRepository;
@@ -157,7 +157,7 @@ public class ArtifactFileParser {
 
         List<CommitError> commitErrors = errors
             .stream()
-            .map(e -> new CommitError(projectVersion, e, ProjectParsingActivities.PARSING_ARTIFACTS))
+            .map(e -> new CommitError(projectVersion, e, ProjectEntity.ARTIFACTS))
             .collect(Collectors.toList());
         return new Pair<>(validArtifacts, commitErrors);
     }

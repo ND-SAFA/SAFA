@@ -60,8 +60,12 @@ public class ProjectController extends BaseController {
 
         ProjectEntities projectEntities;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            projectEntities = this.projectService.createNewProjectWithVersion(
-                payloadProject, payloadProjectVersion, project);
+            if (payloadProjectVersion != null
+                && payloadProjectVersion.hasValidVersion()
+                && payloadProjectVersion.hasValidId()) {
+                throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
+            }
+            projectEntities = this.projectService.createNewProjectWithVersion(payloadProject, project);
         } else {
             this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
             projectEntities = this.projectService.updateProjectAtVersion(

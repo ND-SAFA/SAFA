@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.VersionEntityAction;
 import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
@@ -84,6 +85,13 @@ public abstract class GenericVersionRepository<
                                                                               ModificationType modificationType,
                                                                               BaseEntity baseEntity,
                                                                               AppEntity appEntity);
+
+    /**
+     * Returns the type of project entity this version repository corresponds to.
+     *
+     * @return ProjectEntity associated with this repository.
+     */
+    protected abstract ProjectEntity getProjectActivity();
 
     /**
      * Given a VersionEntity this methods returns an optional possibly containing the source entity this
@@ -170,13 +178,15 @@ public abstract class GenericVersionRepository<
 
             return Optional.of(versionEntity);
         };
-        return commitErrorHandler(projectVersion, versionEntityAction, appEntity.getBaseEntityId());
+        String baseEntityId = appEntity.getBaseEntityId();
+        return commitErrorHandler(projectVersion, versionEntityAction, baseEntityId, this.getProjectActivity());
     }
 
     @Override
     public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityId) {
+        String baseEntityId,
+        ProjectEntity projectEntity) {
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
@@ -192,7 +202,7 @@ public abstract class GenericVersionRepository<
                 return Optional.empty();
             }
         };
-        return commitErrorHandler(projectVersion, versionEntityAction, "unknown");
+        return commitErrorHandler(projectVersion, versionEntityAction, projectEntity.name(), this.getProjectActivity());
     }
 
     @Override
@@ -269,7 +279,10 @@ public abstract class GenericVersionRepository<
                 projectVersion.getProject())
             .stream()
             .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
-            .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(projectVersion, baseEntity.getBaseEntityId()))
+            .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
+                projectVersion,
+                baseEntity.getBaseEntityId(),
+                ProjectEntity.ARTIFACTS))
             .collect(Collectors.toList());
 
         response.addAll(removedArtifactBodies);
@@ -309,7 +322,8 @@ public abstract class GenericVersionRepository<
 
     private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
                                                                 VersionEntityAction<VersionEntity> versionEntityAction,
-                                                                String entityName) {
+                                                                String entityName,
+                                                                ProjectEntity projectEntity) {
         String errorDescription = null;
         VersionEntity versionEntity = null;
         CommitError commitError = null;
@@ -329,7 +343,7 @@ public abstract class GenericVersionRepository<
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {
-            commitError = new CommitError(projectVersion, errorDescription);
+            commitError = new CommitError(projectVersion, errorDescription, projectEntity);
         }
         return new Pair<>(versionEntity, commitError);
     }

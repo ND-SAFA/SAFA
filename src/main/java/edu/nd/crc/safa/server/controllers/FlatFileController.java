@@ -1,17 +1,20 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -32,8 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FlatFileController extends BaseController {
 
-    private final ProjectRepository projectRepository;
-
     private final ProjectService projectService;
     private final FileUploadService fileUploadService;
     private final NotificationService notificationService;
@@ -42,14 +43,12 @@ public class FlatFileController extends BaseController {
 
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
-                              ProjectRepository projectRepository,
                               ProjectService projectService,
                               FileUploadService fileUploadService,
                               NotificationService notificationService,
                               FlatFileService flatFileParser,
                               AppEntityRetrievalService appEntityRetrievalService) {
         super(resourceBuilder);
-        this.projectRepository = projectRepository;
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.fileUploadService = fileUploadService;
@@ -122,9 +121,12 @@ public class FlatFileController extends BaseController {
                                                                 ProjectVersion projectVersion,
                                                                 MultipartFile[] files)
         throws SafaError {
-
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        this.flatFileService.parseProjectFilesFromTIM(projectVersion);
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        if (!Files.exists(Paths.get(pathToFile))) {
+            throw new SafaError("TIM.json file was not uploaded for this project");
+        }
+        this.flatFileService.constructProjectFromFlatFiles(projectVersion, pathToFile);
         return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 }

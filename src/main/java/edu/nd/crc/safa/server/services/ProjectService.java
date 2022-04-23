@@ -146,22 +146,23 @@ public class ProjectService {
         return response;
     }
 
-    public ProjectEntities createNewProjectWithVersion(
-        Project project,
-        ProjectVersion projectVersion,
-        ProjectAppEntity payload) throws SafaError {
+    /**
+     * Creates a base version, saves entities to version, and returns result.
+     *
+     * @param project  The project identifier to relate to version and entities.
+     * @param entities The entities to save to project version.
+     * @return ProjectEntities containing all saved entities.
+     * @throws SafaError Throws error is something occurs while creating artifacts or traces.
+     */
+    public ProjectEntities createNewProjectWithVersion(Project project, ProjectAppEntity entities) throws SafaError {
         ProjectEntities projectEntities;
-        if (projectVersion != null
-            && projectVersion.hasValidVersion()
-            && projectVersion.hasValidId()) {
-            throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
-        }
+
         this.saveProjectWithCurrentUserAsOwner(project);
-        projectVersion = this.createBaseProjectVersion(project);
+        ProjectVersion projectVersion = this.createBaseProjectVersion(project);
         projectEntities = this.saveProjectEntitiesToVersion(
             projectVersion,
-            payload.getArtifacts(),
-            payload.getTraces());
+            entities.getArtifacts(),
+            entities.getTraces());
         return projectEntities;
     }
 

@@ -9,6 +9,7 @@ import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
@@ -57,6 +58,11 @@ public class TraceLinkVersionRepositoryImpl
             modificationType,
             traceLink,
             traceAppEntity);
+    }
+
+    @Override
+    protected ProjectEntity getProjectActivity() {
+        return ProjectEntity.TRACES;
     }
 
     @Override

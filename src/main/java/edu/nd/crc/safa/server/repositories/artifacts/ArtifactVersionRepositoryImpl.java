@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
@@ -83,6 +84,11 @@ public class ArtifactVersionRepositoryImpl
             artifactAppEntity.summary,
             artifactAppEntity.body,
             jsonHelper.stringify(artifactAppEntity.customFields));
+    }
+
+    @Override
+    protected ProjectEntity getProjectActivity() {
+        return ProjectEntity.ARTIFACTS;
     }
 
     @Override

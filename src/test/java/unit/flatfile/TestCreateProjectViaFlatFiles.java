@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
@@ -148,7 +148,7 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
         List<CommitError> commitErrors = commitErrorRepository.findByProjectVersion(projectVersion);
         assertThat(commitErrors.size()).as("requirement parsing errors").isEqualTo(1);
         CommitError error = commitErrors.get(0);
-        assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
+        assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntity.TRACES);
 
         List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);

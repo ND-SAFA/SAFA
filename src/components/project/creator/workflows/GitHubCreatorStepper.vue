@@ -7,15 +7,21 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <p class="text-caption">This page is a work in progress.</p>
+        <p class="mx-auto text-caption" style="width: fit-content">
+          This page is a work in progress.
+        </p>
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <p class="text-caption">[Select an organization]</p>
+        <p class="mx-auto text-caption" style="width: fit-content">
+          [Select an Organization.]
+        </p>
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <p class="text-caption">[Select an project]</p>
+        <p class="mx-auto text-caption" style="width: fit-content">
+          [Select a Project.]
+        </p>
       </v-stepper-content>
     </template>
   </generic-stepper>

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "npm run serve:dev",
+    "start": "npm run serve:local",
     "serve:local": "vue-cli-service serve --mode=local",
     "serve:dev": "vue-cli-service serve --mode=development",
     "serve:prod": "vue-cli-service serve --mode=production",

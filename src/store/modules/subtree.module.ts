@@ -142,6 +142,7 @@ export default class SubtreeModule extends VuexModule {
       this.subtreeLinks.filter(
         (link) =>
           link.rootNode !== rootId &&
+          // Make sure that phantom links created by other parent nodes are removed.
           !(
             subtreeNodes.includes(link.sourceId) &&
             subtreeNodes.includes(link.targetId)

@@ -11,6 +11,7 @@ import {
   ProjectCreatorView,
   ProjectSettingsView,
   ResetPasswordView,
+  UploadStatusView,
 } from "@/views";
 import { routerChecks } from "@/router/checks";
 import { NextPayload } from "@/types";
@@ -70,6 +71,11 @@ const routes: Array<RouteConfig> = [
     path: Routes.ERROR,
     name: "Error Page",
     component: ErrorPageView,
+  },
+  {
+    path: Routes.UPLOAD_STATUS,
+    name: "Upload Status",
+    component: UploadStatusView,
   },
 ];
 

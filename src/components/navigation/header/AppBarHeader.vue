@@ -99,6 +99,11 @@ export default Vue.extend({
           onClick: this.handleCreateProject,
         },
         {
+          name: "Project Uploads",
+          tooltip: "View recent and in-progress uploads",
+          onClick: () => navigateTo(Routes.UPLOAD_STATUS),
+        },
+        {
           name: "Project Settings",
           tooltip: "View this project's settings",
           onClick: () => navigateTo(Routes.PROJECT_SETTINGS),

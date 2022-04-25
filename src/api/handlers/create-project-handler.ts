@@ -94,3 +94,21 @@ export function handleImportJiraProject(
     })
     .finally(() => appModule.onLoadEnd());
 }
+
+/**
+ * Imports a GitHub project, sets related app state, and logs the status.
+ *
+ * @param accessToken - The access token received from authorizing GitHub.
+ * @param orgId - The GitHub organization id for the current company.
+ * @param projectId - The GitHub project id to import.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export function handleImportGitHubProject(
+  accessToken: string,
+  orgId: string,
+  projectId: string,
+  { onSuccess, onError }: IOHandlerCallback
+): void {
+  console.log("Importing from GitHub is not yet enabled.");
+}

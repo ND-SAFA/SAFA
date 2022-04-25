@@ -2,13 +2,14 @@ package unit.project.artifacts;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -121,7 +122,9 @@ public class TestArtifactService extends ApplicationBaseTest {
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        entityVersionService.commitVersionArtifacts(newVersion, Arrays.asList(artifactApp));
+        entityVersionService.setProjectEntitiesAtVersion(newVersion,
+            Arrays.asList(artifactApp),
+            new ArrayList<>());
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -156,7 +159,7 @@ public class TestArtifactService extends ApplicationBaseTest {
             new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        this.entityVersionService.commitVersionArtifacts(projectVersion, List.of(appEntity));
+        this.entityVersionService.setProjectEntitiesAtVersion(projectVersion, List.of(appEntity), new ArrayList<>());
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,
                 artifact);

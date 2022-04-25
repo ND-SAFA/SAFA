@@ -3,11 +3,11 @@ package unit.flatfile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
-
+import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
+import edu.nd.crc.safa.importer.flatfiles.ProjectTIMParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
@@ -34,15 +34,15 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
 
         // Step - parse Design artifact definition specification
-        JSONObject jsonSpec = new JSONObject("{\n"
-            + "    \"Design\": {\n"
-            + "      \"file\": \"Design.csv\"\n"
-            + "    }\n"
-            + "  }");
-        List<ArtifactAppEntity> artifacts = artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
+        JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
+        ProjectTIMParser ProjectTIMParser = new ProjectTIMParser(jsonSpec);
+        ProjectTIMParser.parse();
+        EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
+            artifactFileParser.parseArtifactFiles(projectVersion,
+                ProjectTIMParser);
 
         // VP - Verify that all design artifacts are created
-        assertThat(artifacts.size())
+        assertThat(artifactCreationResponse.getEntities().size())
             .as("artifacts created")
             .isEqualTo(SampleProjectConstants.N_DESIGNS);
     }
@@ -51,12 +51,11 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
     public void missingFileKey() throws Exception {
         ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
 
-        JSONObject jsonSpec = new JSONObject("{\n"
-            + "    \"Design\": {}\n"
-            + "  }");
-        Exception exception = assertThrows(SafaError.class, () -> {
-            artifactFileParser.parseArtifactFiles(projectVersion, jsonSpec);
-        });
+        JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
+
+        ProjectTIMParser ProjectTIMParser = new ProjectTIMParser(jsonSpec);
+
+        Exception exception = assertThrows(SafaError.class, ProjectTIMParser::parse);
         assertThat(exception.getMessage()).contains("file");
         projectService.deleteProject(projectVersion.getProject());
     }

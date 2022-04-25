@@ -5,9 +5,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
-import edu.nd.crc.safa.server.entities.app.FTANodeType;
-import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
+import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import org.json.JSONArray;

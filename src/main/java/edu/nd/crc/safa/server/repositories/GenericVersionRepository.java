@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.EntityDelta;
-import edu.nd.crc.safa.server.entities.app.IAppEntity;
-import edu.nd.crc.safa.server.entities.app.ModifiedEntity;
+import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
+import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;
+import edu.nd.crc.safa.server.entities.app.project.IAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IBaseEntity;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
@@ -185,8 +185,7 @@ public abstract class GenericVersionRepository<
     @Override
     public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityId,
-        ProjectEntity projectEntity) {
+        String baseEntityId) {
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
@@ -202,7 +201,7 @@ public abstract class GenericVersionRepository<
                 return Optional.empty();
             }
         };
-        return commitErrorHandler(projectVersion, versionEntityAction, projectEntity.name(), this.getProjectActivity());
+        return commitErrorHandler(projectVersion, versionEntityAction, baseEntityId, this.getProjectActivity());
     }
 
     @Override
@@ -281,8 +280,7 @@ public abstract class GenericVersionRepository<
             .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
             .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
                 projectVersion,
-                baseEntity.getBaseEntityId(),
-                ProjectEntity.ARTIFACTS))
+                baseEntity.getBaseEntityId()))
             .collect(Collectors.toList());
 
         response.addAll(removedArtifactBodies);
@@ -339,7 +337,7 @@ public abstract class GenericVersionRepository<
             errorDescription =
                 "Could not parse entity " + entityName + ": " + AppConstraints.getConstraintError(e);
         } catch (Exception e) {
-            e.printStackTrace();
+            //TODO e.printStackTrace();
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {

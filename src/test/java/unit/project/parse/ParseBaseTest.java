@@ -54,11 +54,10 @@ public class ParseBaseTest extends ApplicationBaseTest {
 
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName,
-            ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName);
-        JSONObject responseContent = sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
+        String pathToFile = ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName;
+        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToFile);
 
         // Step - Extract artifact and errors from body
-        return responseContent;
+        return sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
     }
 }

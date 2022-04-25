@@ -2,7 +2,7 @@ package edu.nd.crc.safa.server.entities.db;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.app.IAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.IAppEntity;
 
 /**
  * Interface that generalizing similarities between all versioned entities.

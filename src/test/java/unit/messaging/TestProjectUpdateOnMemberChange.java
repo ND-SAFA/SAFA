@@ -3,8 +3,8 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 

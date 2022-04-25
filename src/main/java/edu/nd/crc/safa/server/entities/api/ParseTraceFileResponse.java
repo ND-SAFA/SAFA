@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 /**
  * The response object for parsing traces containing the traces themselves

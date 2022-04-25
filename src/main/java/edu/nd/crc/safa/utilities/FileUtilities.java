@@ -77,6 +77,15 @@ public class FileUtilities {
         }
     }
 
+    public static void assertHasKeys(JSONObject obj, String[] keys) throws SafaError {
+        for (String key : keys) {
+            if (!obj.has(key)) {
+                String error = String.format("Expected %s to have key: %s", obj, key);
+                throw new SafaError(error);
+            }
+        }
+    }
+
     public static String toString(Object[] a) {
         if (a == null) {
             return "null";

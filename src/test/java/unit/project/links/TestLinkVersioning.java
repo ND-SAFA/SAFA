@@ -5,8 +5,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -46,7 +46,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
         uploadFlatFilesToVersion(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectEntities baseEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
+        ProjectVersionErrors baseEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
         List<TraceAppEntity> baseTraces = baseEntities.getProject().getTraces();
         assertThat(baseTraces.size()).isEqualTo(1);
 
@@ -57,7 +57,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
         assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectEntities targetEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
+        ProjectVersionErrors targetEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(v1);
         List<TraceAppEntity> targetTraces = targetEntities.getProject().getTraces();
         assertThat(targetTraces.size()).isEqualTo(1);
     }

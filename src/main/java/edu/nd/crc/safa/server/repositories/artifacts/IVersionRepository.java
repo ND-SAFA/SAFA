@@ -4,11 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.EntityDelta;
-import edu.nd.crc.safa.server.entities.app.IAppEntity;
+import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
+import edu.nd.crc.safa.server.entities.app.project.IAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.IVersionEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
@@ -89,8 +88,7 @@ public interface IVersionRepository<
      */
     Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityName,
-        ProjectEntity projectEntity);
+        String baseEntityName);
 
     /**
      * Calculates and returns the delta between the versions

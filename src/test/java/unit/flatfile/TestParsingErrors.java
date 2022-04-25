@@ -27,15 +27,16 @@ public class TestParsingErrors extends ApplicationBaseTest {
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isBadRequest(), this.token);
 
         // VP - Verify that message contains constraint
-        String message = responseBody.getString("message");
-        assertThat(message).matches(".*unknown type.*Requirements.*[\\s\\S]");
+        String message = responseBody.getString("message").toLowerCase();
+        assertThat(message).matches("unknown artifact type: requirements");
     }
 
     @Test
     public void testDuplicateArtifactBody() throws Exception {
 
         // Step 1 - Upload flat files
-        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(AppRoutes.Projects.FlatFiles.projectFlatFiles,
+        String route = AppRoutes.Projects.FlatFiles.projectFlatFiles;
+        MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(route,
             ProjectPaths.PATH_TO_TEST_3);
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().is2xxSuccessful(), this.token);
 
@@ -45,7 +46,7 @@ public class TestParsingErrors extends ApplicationBaseTest {
         assertThat(artifactErrors.length()).isEqualTo(1);
 
         // VP - Verify that artifact error specifies which artifact it occurred on.
-        String artifactError = artifactErrors.getJSONObject(0).getString("message");
-        assertThat(artifactError).matches(".*duplicate.*artifact.*SAF4.*");
+        String artifactError = artifactErrors.getJSONObject(0).getString("message").toLowerCase();
+        assertThat(artifactError).matches(".*duplicate.*artifact.*saf4.*");
     }
 }

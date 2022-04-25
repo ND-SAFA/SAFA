@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.server.services;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
-import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;

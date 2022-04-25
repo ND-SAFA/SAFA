@@ -47,6 +47,7 @@ public class CommitErrorRetrievalService {
             .stream()
             .map(ErrorApplicationEntity::new)
             .collect(Collectors.toList());
+
         return new ProjectParsingErrors(timErrors, artifactErrors, traceErrors);
     }
 }

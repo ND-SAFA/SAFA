@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 

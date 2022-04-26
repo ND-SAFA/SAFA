@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.db.DocumentColumn;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;

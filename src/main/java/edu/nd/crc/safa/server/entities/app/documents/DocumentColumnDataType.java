@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.documents;
 
 /**
  * Represents the types of data that a column can have.

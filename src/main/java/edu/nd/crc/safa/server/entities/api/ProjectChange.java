@@ -20,14 +20,6 @@ public class ProjectChange<T> {
         this.modified = new ArrayList<>();
     }
 
-    public ProjectChange(List<T> added,
-                         List<T> removed,
-                         List<T> modified) {
-        this.added = added;
-        this.removed = removed;
-        this.modified = modified;
-    }
-
     public List<T> getAdded() {
         return added;
     }

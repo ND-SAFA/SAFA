@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.delta;
 
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 

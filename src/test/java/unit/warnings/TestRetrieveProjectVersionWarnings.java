@@ -8,8 +8,8 @@ import java.util.Hashtable;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONArray;

@@ -16,7 +16,7 @@ import unit.ApplicationBaseTest;
 public class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     public void retrieveNoProjects() throws Exception {
-        JSONArray response = sendGetWithArrayResponse(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
+        JSONArray response = sendGetWithArrayResponse(AppRoutes.Projects.getProjects, status().isOk());
         assertThat(response.length()).isEqualTo(0);
     }
 
@@ -36,7 +36,7 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("firstProject")
             .newProject("secondProject")
             .newProject("other project", otherUser);
-        JSONArray response = sendGetWithArrayResponse(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
+        JSONArray response = sendGetWithArrayResponse(AppRoutes.Projects.getProjects, status().isOk());
         assertThat(response.length()).isEqualTo(2);
     }
 

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;
 
@@ -14,20 +14,20 @@ import edu.nd.crc.safa.warnings.RuleName;
  * 3. Any errors occurring in the project.
  * 4. Any warnings about the current project version.
  */
-public class ProjectEntities {
+public class ProjectVersionErrors {
 
     ProjectAppEntity project;
     ProjectVersion projectVersion;
     ProjectParsingErrors errors;
     Map<String, List<RuleName>> warnings;
 
-    public ProjectEntities() {
+    public ProjectVersionErrors() {
     }
 
-    public ProjectEntities(ProjectAppEntity project,
-                           ProjectVersion projectVersion,
-                           ProjectParsingErrors errors,
-                           Map<String, List<RuleName>> warnings) {
+    public ProjectVersionErrors(ProjectAppEntity project,
+                                ProjectVersion projectVersion,
+                                ProjectParsingErrors errors,
+                                Map<String, List<RuleName>> warnings) {
         this.project = project;
         this.projectVersion = projectVersion;
         this.errors = errors;

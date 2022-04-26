@@ -9,16 +9,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.importer.flatfiles.ArtifactFile;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
+import edu.nd.crc.safa.importer.flatfiles.ArtifactTypeService;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
@@ -46,7 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ParseDataFileController extends BaseController {
 
     private final ArtifactFileParser artifactFileParser;
-    private final TraceFileParser traceFileParser;
+    private final ArtifactTypeService artifactTypeService;
 
     private final ProjectRetriever artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
@@ -56,12 +59,12 @@ public class ParseDataFileController extends BaseController {
                                    ProjectRetriever artifactRepository,
                                    ArtifactVersionRepository artifactVersionRepository,
                                    ArtifactFileParser artifactFileParser,
-                                   TraceFileParser traceFileParser) {
+                                   ArtifactTypeService artifactTypeService) {
         super(resourceBuilder);
         this.artifactFileParser = artifactFileParser;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.traceFileParser = traceFileParser;
+        this.artifactTypeService = artifactTypeService;
     }
 
     /**
@@ -78,13 +81,14 @@ public class ParseDataFileController extends BaseController {
                                                        @RequestParam MultipartFile file) {
         ParseArtifactFileResponse response = new ParseArtifactFileResponse();
         tryParseFile(response, () -> {
-            CSVParser fileCSV = artifactFileParser.readArtifactFile(file);
-            List<ArtifactAppEntity> artifacts =
-                artifactFileParser.parseArtifactFileIntoApplicationEntities(
+            CSVParser fileCSV = ArtifactFile.readArtifactFile(file);
+            EntityCreation<ArtifactAppEntity, String> entityCreationResponse =
+                ArtifactFile.parseArtifactFileIntoApplicationEntities(
                     file.getOriginalFilename(),
                     artifactType,
                     fileCSV);
-            response.setArtifacts(artifacts);
+            response.setArtifacts(entityCreationResponse.getEntities());
+            response.setErrors(entityCreationResponse.getErrors());
         });
         return response;
     }
@@ -129,12 +133,11 @@ public class ParseDataFileController extends BaseController {
     public ParseTraceFileResponse parseTraceFile(@RequestParam MultipartFile file) {
         ParseTraceFileResponse response = new ParseTraceFileResponse();
         tryParseFile(response, () -> {
-            CSVParser fileCSV = traceFileParser.readTraceFile(file);
-            Pair<List<TraceAppEntity>, List<Pair<String, Long>>> parseResponse =
-                traceFileParser.readTraceFile(fileCSV);
-            List<String> errors = parseResponse.getValue1().stream().map(Pair::getValue0).collect(Collectors.toList());
+            EntityCreation<TraceAppEntity, Pair<String, Long>> parseResponse =
+                TraceFileParser.readTraceFile(file);
+            List<String> errors = parseResponse.getErrors().stream().map(Pair::getValue0).collect(Collectors.toList());
 
-            response.setTraces(parseResponse.getValue0());
+            response.setTraces(parseResponse.getEntities());
             response.setErrors(errors);
         });
         return response;

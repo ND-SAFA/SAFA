@@ -3,8 +3,8 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
+import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;

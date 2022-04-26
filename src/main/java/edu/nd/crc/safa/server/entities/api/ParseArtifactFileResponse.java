@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
 public class ParseArtifactFileResponse implements ParseFileResponse {
 

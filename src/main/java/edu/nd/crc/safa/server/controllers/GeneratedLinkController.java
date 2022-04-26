@@ -9,8 +9,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceLinkGenerationRequest;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -51,6 +51,8 @@ public class GeneratedLinkController extends BaseController {
     @GetMapping(value = AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        List<TraceAppEntity> traces = this.appEntityRetrievalService
+            .retrieveTracesInProjectVersion(projectVersion);
         return this.appEntityRetrievalService
             .retrieveTracesInProjectVersion(projectVersion)
             .stream()

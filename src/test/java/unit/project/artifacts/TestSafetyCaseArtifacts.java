@@ -3,7 +3,7 @@ package unit.project.artifacts;
 import java.util.Hashtable;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.SafetyCaseType;
+import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;

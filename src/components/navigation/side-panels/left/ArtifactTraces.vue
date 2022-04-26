@@ -1,59 +1,58 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-subheader>Parents</v-subheader>
-      <v-divider />
-      <p v-if="parents.length === 0" class="text-caption text-center mt-1">
-        No parents linked.
-      </p>
-      <v-list dense v-else>
-        <v-tooltip bottom v-for="parentName in parents" :key="parentName">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-on="on"
-              v-bind="attrs"
-              outlined
-              block
-              class="mb-1"
-              @click="handleArtifactClick(parentName)"
-            >
-              <span class="mb-1 text-ellipsis" style="max-width: 60px">
-                {{ parentName }}
-              </span>
-            </v-btn>
-          </template>
-          <span> {{ parentName }}</span>
-        </v-tooltip>
-      </v-list>
-    </v-col>
+  <div v-if="parents.length + children.length > 0">
+    <h2 class="text-h6">Trace Links</h2>
+    <v-divider />
 
-    <v-col>
-      <v-subheader>Children</v-subheader>
-      <v-divider />
-      <p v-if="children.length === 0" class="text-caption text-center mt-1">
-        No children linked.
-      </p>
-      <v-list dense v-else>
-        <v-tooltip bottom v-for="childName in children" :key="childName">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-on="on"
-              v-bind="attrs"
-              outlined
-              block
-              class="mb-1"
-              @click="handleArtifactClick(childName)"
-            >
-              <span class="mb-1 text-ellipsis" style="max-width: 60px">
-                {{ childName }}
-              </span>
-            </v-btn>
-          </template>
-          <span> {{ childName }}</span>
-        </v-tooltip>
-      </v-list>
-    </v-col>
-  </v-row>
+    <v-row>
+      <v-col v-if="parents.length !== 0">
+        <v-subheader style="height: 30px">Parents</v-subheader>
+        <v-divider />
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <v-tooltip bottom v-for="parentName in parents" :key="parentName">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                outlined
+                block
+                class="mb-1"
+                @click="handleArtifactClick(parentName)"
+              >
+                <span class="mb-1 text-ellipsis" style="max-width: 50px">
+                  {{ parentName }}
+                </span>
+              </v-btn>
+            </template>
+            <span> {{ parentName }}</span>
+          </v-tooltip>
+        </v-list>
+      </v-col>
+
+      <v-col v-if="children.length !== 0">
+        <v-subheader style="height: 30px">Children</v-subheader>
+        <v-divider />
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <v-tooltip bottom v-for="childName in children" :key="childName">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                outlined
+                block
+                class="mb-1"
+                @click="handleArtifactClick(childName)"
+              >
+                <span class="mb-1 text-ellipsis" style="max-width: 50px">
+                  {{ childName }}
+                </span>
+              </v-btn>
+            </template>
+            <span> {{ childName }}</span>
+          </v-tooltip>
+        </v-list>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="mb-10">
     <div v-if="selectedArtifact !== undefined">
       <artifact-title />
       <v-divider class="mb-2" />

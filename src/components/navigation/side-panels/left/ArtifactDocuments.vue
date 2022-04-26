@@ -1,6 +1,6 @@
 <template>
-  <div v-if="documents.length > 0">
-    <v-subheader>Documents</v-subheader>
+  <div v-if="documents.length > 0" class="mt-4">
+    <h2 class="text-h6">Documents</h2>
     <v-divider />
 
     <v-list>

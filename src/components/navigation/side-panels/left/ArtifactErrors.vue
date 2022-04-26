@@ -2,7 +2,7 @@
   <div v-if="selectedArtifactWarnings.length > 0">
     <v-row align="center" class="debug">
       <v-col>
-        <h2 class="text-h5">Warnings</h2>
+        <h2 class="text-h6">Warnings</h2>
       </v-col>
       <v-col class="flex-grow-0 mr-2">
         <v-icon color="secondary">mdi-hazard-lights</v-icon>
@@ -13,8 +13,8 @@
 
     <v-expansion-panels>
       <v-expansion-panel
-        v-for="warning in selectedArtifactWarnings"
-        :key="warning"
+        v-for="(warning, idx) in selectedArtifactWarnings"
+        :key="idx"
       >
         <v-expansion-panel-header class="text-body-1">
           {{ warning.ruleName }}

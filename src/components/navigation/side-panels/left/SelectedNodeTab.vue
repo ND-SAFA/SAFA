@@ -3,7 +3,7 @@
     <div v-if="selectedArtifact !== undefined">
       <artifact-title />
       <v-divider class="mb-2" />
-      <p class="text-body-1">{{ selectedArtifact.body }}</p>
+      <p class="text-body-1">{{ artifactBody }}</p>
       <artifact-traces />
       <artifact-documents />
       <artifact-errors />
@@ -38,6 +38,11 @@ export default Vue.extend({
      */
     selectedArtifact() {
       return artifactSelectionModule.getSelectedArtifact;
+    },
+    artifactBody(): string {
+      const isCode = this.selectedArtifact?.type.toLowerCase().includes("code");
+
+      return isCode ? "" : this.selectedArtifact?.body || "";
     },
   },
 });

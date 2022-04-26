@@ -6,7 +6,7 @@
 
     <v-expansion-panel-content>
       <artifact-delta-button
-        v-for="{ name, id } in artifacts"
+        v-for="{ name, id } in artifactFields"
         class="mr-1 mb-1"
         :key="name"
         :name="name"
@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DeltaType } from "@/types";
+import { Artifact, DeltaType, EntityModification } from "@/types";
 import { capitalize } from "@/util";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -37,7 +37,9 @@ export default Vue.extend({
       required: true,
     },
     artifacts: {
-      type: Array as PropType<Artifact[]>,
+      type: Object as PropType<
+        Record<string, Artifact | EntityModification<Artifact>>
+      >,
       required: true,
     },
   },
@@ -61,6 +63,15 @@ export default Vue.extend({
      */
     title(): string {
       return capitalize(this.deltaType);
+    },
+    artifactFields(): Pick<Artifact, "id" | "name">[] {
+      const artifacts = Object.values(this.artifacts);
+
+      return this.deltaType === "modified"
+        ? (artifacts as EntityModification<Artifact>[]).map(
+            ({ after: { id, name } }) => ({ id, name })
+          )
+        : (artifacts as Artifact[]).map(({ id, name }) => ({ id, name }));
     },
   },
 });

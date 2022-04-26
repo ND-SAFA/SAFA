@@ -7,18 +7,23 @@
         No parents linked.
       </p>
       <v-list dense v-else>
-        <v-btn
-          outlined
-          block
-          class="mb-1"
-          v-for="parentName in parents"
-          :key="parentName"
-          @click="handleArtifactClick(parentName)"
-        >
-          <span class="mb-1 text-ellipsis" style="max-width: 60px">
-            {{ parentName }}
-          </span>
-        </v-btn>
+        <v-tooltip bottom v-for="parentName in parents" :key="parentName">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              outlined
+              block
+              class="mb-1"
+              @click="handleArtifactClick(parentName)"
+            >
+              <span class="mb-1 text-ellipsis" style="max-width: 60px">
+                {{ parentName }}
+              </span>
+            </v-btn>
+          </template>
+          <span> {{ parentName }}</span>
+        </v-tooltip>
       </v-list>
     </v-col>
 
@@ -29,18 +34,23 @@
         No children linked.
       </p>
       <v-list dense v-else>
-        <v-btn
-          outlined
-          block
-          class="mb-1"
-          v-for="childName in children"
-          :key="childName"
-          @click="handleArtifactClick(childName)"
-        >
-          <span class="mb-1 text-ellipsis" style="max-width: 60px">
-            {{ childName }}
-          </span>
-        </v-btn>
+        <v-tooltip bottom v-for="childName in children" :key="childName">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              outlined
+              block
+              class="mb-1"
+              @click="handleArtifactClick(childName)"
+            >
+              <span class="mb-1 text-ellipsis" style="max-width: 60px">
+                {{ childName }}
+              </span>
+            </v-btn>
+          </template>
+          <span> {{ childName }}</span>
+        </v-tooltip>
       </v-list>
     </v-col>
   </v-row>

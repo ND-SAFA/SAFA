@@ -15,7 +15,7 @@
     </template>
     <template v-slot:actions>
       <v-row justify="end">
-        <v-btn color="primary" :disabled="!canSave" @click="onSubmit">
+        <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
           Save
         </v-btn>
       </v-row>
@@ -173,7 +173,7 @@ export default Vue.extend({
     /**
      * Attempts to save the artifact.
      */
-    onSubmit(): void {
+    handleSubmit(): void {
       const { documentId } = documentModule.document;
       const { logicType, safetyCaseType } = this.editedArtifact;
       const isUpdate = this.artifact !== undefined;

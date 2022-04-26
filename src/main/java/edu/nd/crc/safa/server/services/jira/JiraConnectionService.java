@@ -1,23 +1,32 @@
 package edu.nd.crc.safa.server.services.jira;
 
-
 /**
  * Template JIRA operations
  */
 public interface JiraConnectionService {
 
-	/**
-	 * Validate received credentials
-	 */
-	boolean checkCredentials(JiraAccessCredentials credentials);
+    /**
+     * Validate received credentials
+     *
+     * @param credentials The credentials to be checked.
+     * @return Whether given credentials are valid.
+     */
+    boolean checkCredentials(JiraAccessCredentials credentials);
 
-	/**
-	 * Retrieve a JIRA project by its id
-	 */
-	JiraProjectResponse retrieveJIRAProject(JiraAccessCredentials credentials, Long id);
+    /**
+     * Retrieve a JIRA project by its id
+     *
+     * @param credentials The credentials of the user accessing JIRA.
+     * @param id          The JIRA project id.
+     * @return JIRA API Response
+     */
+    JiraProjectResponse retrieveJIRAProject(JiraAccessCredentials credentials, Long id);
 
-	/**
-	 * Get new credentials based on old ones
-	 */
-	JiraAccessCredentials refreshAccessToken(JiraAccessCredentials credentials);
+    /**
+     * Get new credentials based on old ones
+     *
+     * @param credentials The credentials to refresh.
+     * @return Refreshed credentials.
+     */
+    JiraAccessCredentials refreshAccessToken(JiraAccessCredentials credentials);
 }

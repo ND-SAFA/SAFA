@@ -7,5 +7,5 @@ package edu.nd.crc.safa.utilities;
 @FunctionalInterface
 public interface ExecutorTask {
 
-	void run() throws Exception;
+    void run() throws Exception;
 }

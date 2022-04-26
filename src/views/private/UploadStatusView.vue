@@ -15,7 +15,13 @@
                 <v-row no-gutters>
                   <v-col cols="4"> {{ upload.name }} </v-col>
                   <v-col cols="8" class="text--secondary">
-                    <span v-if="isCompleted(upload.status)">
+                    <v-row v-if="isCancelled(upload.status)" no-gutters>
+                      <v-col cols="4"> Upload Cancelled </v-col>
+                      <v-col cols="4">
+                        {{ getUpdatedText(upload.lastUpdatedAt) }}
+                      </v-col>
+                    </v-row>
+                    <span v-else-if="isCompleted(upload.status)">
                       {{ getCompletedText(upload.completedAt) }}
                     </span>
                     <v-row v-else no-gutters>
@@ -86,9 +92,21 @@
                   </v-stepper-header>
                 </v-stepper>
 
-                <v-btn color="primary" :disabled="!isCompleted(upload.status)">
-                  View Project
-                </v-btn>
+                <div class="d-flex">
+                  <v-btn
+                    v-if="isInProgress(upload.status)"
+                    color="error"
+                    class="mr-1"
+                  >
+                    Cancel Upload
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    :disabled="!isCompleted(upload.status)"
+                  >
+                    View Project
+                  </v-btn>
+                </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </template>
@@ -102,6 +120,7 @@
 import Vue from "vue";
 import { navigateBack } from "@/router";
 import { PrivatePage } from "@/components";
+import { setTimeout } from "timers";
 
 /**
  * Displays project settings.
@@ -113,6 +132,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      timer: undefined as ReturnType<typeof setTimeout> | undefined,
       ellipse: "...",
       uploads: [
         {
@@ -135,6 +155,16 @@ export default Vue.extend({
           currentProgress: 100,
           currentStep: 5,
         },
+        {
+          id: "3",
+          name: "Project 3",
+          status: "Cancelled",
+          startedAt: "2022-04-27T10:00:00.000Z",
+          lastUpdatedAt: "2022-04-27T10:15:00.000Z",
+          completedAt: null,
+          currentProgress: 50,
+          currentStep: 3,
+        },
       ],
     };
   },
@@ -147,6 +177,12 @@ export default Vue.extend({
     },
     isCompleted(status: string) {
       return status === "Completed";
+    },
+    isInProgress(status: string) {
+      return status === "In Progress";
+    },
+    isCancelled(status: string) {
+      return status === "Cancelled";
     },
     getUpdatedText(timestamp: string) {
       return "Last Update: 10:00 AM, Apr 27, 2022";
@@ -162,21 +198,29 @@ export default Vue.extend({
         case "Completed":
           return "#64b5f6";
         case "In Progress":
-          return "#81c784";
+          return "#EEBC3D";
+        case "Cancelled":
+          return "#e57373";
         default:
           return "";
       }
     },
     getEllipse(): string {
-      setTimeout(() => {
-        if (this.ellipse.length === 3) {
-          this.ellipse = ".";
-        } else {
-          this.ellipse += ".";
-        }
-      }, 1000);
+      // if (!this.timer) {
+      //   this.timer = setTimeout(() => {
+      //     if (this.ellipse.length === 3) {
+      //       this.ellipse = ".";
+      //     } else {
+      //       this.ellipse += ".";
+      //     }
+      //
+      //     if (!this.timer) return;
+      //
+      //     clearTimeout(this.timer);
+      //   }, 1000);
+      // }
 
-      return this.ellipse.padEnd(3, " ");
+      return this.ellipse;
     },
   },
 });

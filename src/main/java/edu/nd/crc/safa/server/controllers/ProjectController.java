@@ -6,10 +6,10 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
+import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
@@ -54,14 +54,18 @@ public class ProjectController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
+    public ProjectVersionErrors createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
-        ProjectEntities projectEntities;
+        ProjectVersionErrors projectEntities;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            projectEntities = this.projectService.createNewProjectWithVersion(
-                payloadProject, payloadProjectVersion, project);
+            if (payloadProjectVersion != null
+                && payloadProjectVersion.hasValidVersion()
+                && payloadProjectVersion.hasValidId()) {
+                throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
+            }
+            projectEntities = this.projectService.createNewProjectWithVersion(payloadProject, project);
         } else {
             this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
             projectEntities = this.projectService.updateProjectAtVersion(

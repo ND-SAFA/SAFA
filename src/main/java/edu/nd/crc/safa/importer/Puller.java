@@ -16,8 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.importer.JIRA.Issue;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.EntityVersionService;
@@ -96,8 +96,9 @@ public class Puller {
                     });
             }
         }
-        entityVersionService.commitVersionArtifacts(projectVersion, artifacts);
-        entityVersionService.commitVersionTraces(projectVersion, traces);
+        entityVersionService.setProjectEntitiesAtVersion(projectVersion,
+            artifacts,
+            traces);
     }
 
     private String getIssueContent(Issue issue) {

@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
 import org.hibernate.annotations.Type;
 import org.json.JSONObject;

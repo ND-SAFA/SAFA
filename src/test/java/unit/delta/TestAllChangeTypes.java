@@ -2,7 +2,7 @@ package unit.delta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.server.entities.app.ProjectDelta;
+import edu.nd.crc.safa.server.entities.app.delta.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.DeltaService;

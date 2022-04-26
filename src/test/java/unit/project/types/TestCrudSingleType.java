@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
+import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 

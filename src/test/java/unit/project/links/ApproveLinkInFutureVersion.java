@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;

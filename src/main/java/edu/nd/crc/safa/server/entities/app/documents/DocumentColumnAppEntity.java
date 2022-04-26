@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.documents;
 
 import java.util.UUID;
 

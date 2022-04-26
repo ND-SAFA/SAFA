@@ -6,7 +6,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;

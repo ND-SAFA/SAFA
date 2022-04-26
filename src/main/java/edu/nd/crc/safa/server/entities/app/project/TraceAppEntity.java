@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.project;
 
 import java.util.Objects;
 import javax.validation.constraints.NotEmpty;

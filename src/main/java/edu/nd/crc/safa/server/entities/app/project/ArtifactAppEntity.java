@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.project;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -73,7 +73,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds = new ArrayList<>();
         this.customFields = new Hashtable<>();
     }
-    
+
     public ArtifactAppEntity(String artifactId,
                              String type,
                              String name,
@@ -179,6 +179,7 @@ public class ArtifactAppEntity implements IAppEntity {
         JSONObject json = new JSONObject();
         json.put("artifactId", id);
         json.put("name", name);
+        json.put("type", type);
         json.put("docType", documentType);
         json.put("customField", customFields);
         return json.toString();

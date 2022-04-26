@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
-import edu.nd.crc.safa.server.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
@@ -85,12 +85,12 @@ public class AppEntityRetrievalService {
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectVersionErrors retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
             .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
+        return new ProjectVersionErrors(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
     }
 
     /**

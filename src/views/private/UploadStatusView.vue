@@ -43,16 +43,36 @@
                 >
                   <v-stepper-header>
                     <v-stepper-step step="1">
-                      Project Initialized
+                      {{
+                        upload.currentStep !== 1
+                          ? "Project Initialized"
+                          : "Initializing Project..."
+                      }}
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="2">
-                      Artifacts Imported
+                      {{
+                        upload.currentStep !== 2
+                          ? "Artifacts Imported"
+                          : "Importing Artifacts..."
+                      }}
                     </v-stepper-step>
                     <v-divider />
-                    <v-stepper-step step="3"> Traces Imported </v-stepper-step>
+                    <v-stepper-step step="3">
+                      {{
+                        upload.currentStep !== 3
+                          ? "Traces Imported"
+                          : "Importing Traces..."
+                      }}
+                    </v-stepper-step>
                     <v-divider />
-                    <v-stepper-step step="4"> Traces Generated </v-stepper-step>
+                    <v-stepper-step step="4">
+                      {{
+                        upload.currentStep !== 4
+                          ? "Traces Generated"
+                          : "Generating Traces..."
+                      }}
+                    </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="5"> Project Imported </v-stepper-step>
                   </v-stepper-header>

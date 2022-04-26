@@ -1,0 +1,25 @@
+{
+    "DataFiles": {
+        "requirements": {
+            "File": "requirements.csv"
+        },
+        "designs": {
+            "File": "designs.csv"
+        },
+        "code": {
+            "File": "code.csv"
+        }
+    },
+    "designsTorequirements": {
+        "Source": "designs",
+        "Target": "requirements",
+        "File": "designs2requirements.csv",
+        "generateLinks": false
+    },
+    "codeTodesigns": {
+        "Source": "code",
+        "Target": "designs",
+        "File": "code2designs.csv",
+        "generateLinks": false
+    }
+}

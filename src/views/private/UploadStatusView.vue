@@ -36,25 +36,27 @@
               </v-expansion-panel-header>
 
               <v-expansion-panel-content>
-                <v-list>
-                  <template v-for="(step, idx) in upload.steps">
-                    <v-list-item :key="step.id">
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          {{ step.message }}
-                        </v-list-item-title>
-                      </v-list-item-content>
-                      <v-list-item-action>
-                        <v-list-item-action-text>
-                          {{ step.progress }}% |
-                          {{ stringifyTimestamp(step.timestamp) }}
-                        </v-list-item-action-text>
-                      </v-list-item-action>
-                    </v-list-item>
-
-                    <v-divider :key="idx" />
-                  </template>
-                </v-list>
+                <v-stepper
+                  alt-labels
+                  class="elevation-0"
+                  v-model="upload.currentStep"
+                >
+                  <v-stepper-header>
+                    <v-stepper-step step="1">
+                      Project Initialized
+                    </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="2">
+                      Artifacts Imported
+                    </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="3"> Traces Imported </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="4"> Traces Generated </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="5"> Project Imported </v-stepper-step>
+                  </v-stepper-header>
+                </v-stepper>
 
                 <v-btn color="primary" :disabled="!isCompleted(upload.status)">
                   View Project
@@ -90,31 +92,9 @@ export default Vue.extend({
           status: "In Progress",
           startedAt: "2022-04-27T10:00:00.000Z",
           lastUpdatedAt: "2022-04-27T10:10:00.000Z",
-          currentProgress: 50,
           completedAt: null,
-          steps: [
-            {
-              id: "3",
-              message:
-                "Trace links have been created. Beginning trace link generation.",
-              timestamp: "2022-04-27T10:10:00.000Z",
-              progress: 50,
-            },
-            {
-              id: "2",
-              message:
-                "Artifacts have been created. Beginning to create trace links.",
-              timestamp: "2022-04-27T10:05:00.000Z",
-              progress: 30,
-            },
-            {
-              id: "1",
-              message:
-                "Import has been submitted. Beginning to create artifacts.",
-              timestamp: "2022-04-27T10:00:00.000Z",
-              progress: 0,
-            },
-          ],
+          currentProgress: 50,
+          currentStep: 3,
         },
         {
           id: "2",
@@ -124,41 +104,7 @@ export default Vue.extend({
           lastUpdatedAt: "2022-04-27T10:15:00.000Z",
           completedAt: "2022-04-27T10:15:00.000Z",
           currentProgress: 100,
-          steps: [
-            {
-              id: "5",
-              message: "Project has been created.",
-              timestamp: "2022-04-27T10:15:00.000Z",
-              progress: 100,
-            },
-            {
-              id: "4",
-              message: "Trace links have been generated.",
-              timestamp: "2022-04-27T10:15:00.000Z",
-              progress: 75,
-            },
-            {
-              id: "3",
-              message:
-                "Trace links have been created. Beginning trace link generation.",
-              timestamp: "2022-04-27T10:10:00.000Z",
-              progress: 50,
-            },
-            {
-              id: "2",
-              message:
-                "Artifacts have been created. Beginning to create trace links.",
-              timestamp: "2022-04-27T10:05:00.000Z",
-              progress: 30,
-            },
-            {
-              id: "1",
-              message:
-                "Import has been submitted. Beginning to create artifacts.",
-              timestamp: "2022-04-27T10:00:00.000Z",
-              progress: 0,
-            },
-          ],
+          currentStep: 5,
         },
       ],
     };

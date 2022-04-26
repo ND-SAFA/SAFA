@@ -1,17 +1,21 @@
-package edu.nd.crc.safa.server.services.jira;
+package edu.nd.crc.safa.server.controllers;
 
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponse;
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.repositories.imports.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 

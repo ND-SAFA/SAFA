@@ -1,7 +1,9 @@
-package edu.nd.crc.safa.server.services.jira;
+package edu.nd.crc.safa.server.entities.api.jira;
 
 import java.nio.charset.StandardCharsets;
 import javax.validation.constraints.NotNull;
+
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

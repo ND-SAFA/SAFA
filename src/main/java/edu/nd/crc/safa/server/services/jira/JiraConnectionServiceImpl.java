@@ -4,6 +4,8 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponse;
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

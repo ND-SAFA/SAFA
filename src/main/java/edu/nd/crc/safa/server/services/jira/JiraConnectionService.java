@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.server.services.jira;
 
+import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponse;
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
+
 /**
  * Template JIRA operations
  */

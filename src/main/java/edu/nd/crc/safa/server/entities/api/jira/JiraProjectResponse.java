@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.services.jira;
+package edu.nd.crc.safa.server.entities.api.jira;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

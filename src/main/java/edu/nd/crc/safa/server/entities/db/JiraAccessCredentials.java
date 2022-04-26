@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.services.jira;
+package edu.nd.crc.safa.server.entities.db;
 
 import java.util.UUID;
 import javax.persistence.Column;
@@ -9,8 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import lombok.Getter;
 import lombok.Setter;

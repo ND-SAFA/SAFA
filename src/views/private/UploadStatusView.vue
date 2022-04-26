@@ -18,7 +18,7 @@
                     <span v-if="isCompleted(upload.status)">
                       {{ getCompletedText(upload.completedAt) }}
                     </span>
-                    <v-row v-else no-gutters justify="right">
+                    <v-row v-else no-gutters>
                       <v-col cols="4">
                         Upload Progress: {{ upload.currentProgress }}%
                       </v-col>
@@ -43,35 +43,43 @@
                 >
                   <v-stepper-header>
                     <v-stepper-step step="1">
-                      {{
-                        upload.currentStep !== 1
-                          ? "Project Initialized"
-                          : "Initializing Project..."
-                      }}
+                      <span style="width: 130px">
+                        {{
+                          upload.currentStep !== 1
+                            ? "Project Initialized"
+                            : `Initializing Project${getEllipse()}`
+                        }}
+                      </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="2">
-                      {{
-                        upload.currentStep !== 2
-                          ? "Artifacts Imported"
-                          : "Importing Artifacts..."
-                      }}
+                      <span style="width: 130px">
+                        {{
+                          upload.currentStep !== 2
+                            ? "Artifacts Imported"
+                            : `Importing Artifacts${getEllipse()}`
+                        }}
+                      </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="3">
-                      {{
-                        upload.currentStep !== 3
-                          ? "Traces Imported"
-                          : "Importing Traces..."
-                      }}
+                      <span style="width: 130px">
+                        {{
+                          upload.currentStep !== 3
+                            ? "Traces Imported"
+                            : `Importing Traces${getEllipse()}`
+                        }}
+                      </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="4">
-                      {{
-                        upload.currentStep !== 4
-                          ? "Traces Generated"
-                          : "Generating Traces..."
-                      }}
+                      <span style="width: 130px">
+                        {{
+                          upload.currentStep !== 4
+                            ? "Traces Generated"
+                            : `Generating Traces${getEllipse()}`
+                        }}
+                      </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="5"> Project Imported </v-stepper-step>
@@ -105,6 +113,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      ellipse: "...",
       uploads: [
         {
           id: "1",
@@ -157,6 +166,17 @@ export default Vue.extend({
         default:
           return "";
       }
+    },
+    getEllipse(): string {
+      setTimeout(() => {
+        if (this.ellipse.length === 3) {
+          this.ellipse = ".";
+        } else {
+          this.ellipse += ".";
+        }
+      }, 1000);
+
+      return this.ellipse.padEnd(3, " ");
     },
   },
 });

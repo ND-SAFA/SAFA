@@ -10,25 +10,26 @@ import { authHttpClient, Endpoint } from "@/api";
 /**
  * The formatted scopes of jira permissions being requested.
  */
-const scopes = [
-  // Current Jira API version:
-  "read:jira-work",
-  // Upcoming Jira API version:
-  // "read:issue-type:jira",
-  // "read:project:jira",
-  // "read:project.property:jira",
-  // "read:user:jira",
-  // "read:application-role:jira",
-  // "read:avatar:jira",
-  // "read:group:jira",
-  // "read:issue-type-hierarchy:jira",
-  // "read:project-category:jira",
-  // "read:project-version:jira",
-  // "read:project.component:jira",
-]
-  .map((scope) => scope.replace(/:/g, "%3A"))
-  .join("%20");
-
+const scopes = encodeURI(
+  [
+    // Current Jira API version:
+    "read:jira-work",
+    "read:jira-user",
+    "offline_access",
+    // Upcoming Jira API version:
+    // "read:issue-type:jira",
+    // "read:project:jira",
+    // "read:project.property:jira",
+    // "read:user:jira",
+    // "read:application-role:jira",
+    // "read:avatar:jira",
+    // "read:group:jira",
+    // "read:issue-type-hierarchy:jira",
+    // "read:project-category:jira",
+    // "read:project-version:jira",
+    // "read:project.component:jira",
+  ].join(" ")
+);
 /**
  * Runs a fetch call to the Atlassian API.
  *

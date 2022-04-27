@@ -8,10 +8,11 @@ export enum Routes {
   RESET_PASSWORD = "/reset",
   HOME = "/",
   ARTIFACT = "/project",
+  PROJECT_SETTINGS = "/project/settings",
   TRACE_LINK = "/links",
   ERROR = "/error",
   PROJECT_CREATOR = "/create",
-  PROJECT_SETTINGS = "/project/settings",
+  UPLOAD_STATUS = "/uploads",
 }
 
 /**

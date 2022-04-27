@@ -3,10 +3,11 @@
     :title="`Artifact Changes: ${name}`"
     :is-open="isOpen"
     :actions-height="0"
+    size="l"
     @close="$emit('close')"
   >
     <template v-slot:body>
-      <v-container class="mt-5">
+      <div class="mt-5">
         <code-diff
           v-if="deltaType === 'added'"
           :old-string="''"
@@ -31,7 +32,7 @@
           :output-format="outputFormat"
           :diff-style="diffStyle"
         />
-      </v-container>
+      </div>
     </template>
   </generic-modal>
 </template>

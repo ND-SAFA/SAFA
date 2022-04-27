@@ -1,38 +1,53 @@
 <template>
-  <v-row align="center">
-    <v-col>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <h1 v-on="on" v-bind="attrs" class="text-h4 artifact-title">
-            {{ selectedArtifact.name }}
-          </h1>
-        </template>
-        {{ selectedArtifact.name }}
-      </v-tooltip>
-    </v-col>
-    <v-col>
-      <v-row justify="end" class="mr-1">
-        <generic-icon-button
-          v-if="!selectedArtifact.logicType"
-          tooltip="Edit"
-          icon-id="mdi-pencil"
-          @click="handleEditArtifact"
-        />
-        <generic-icon-button
-          color="error"
-          tooltip="Delete"
-          icon-id="mdi-delete"
-          @click="handleDeleteArtifact"
-        />
-        <artifact-creator-modal
-          title="Edit Artifact Contents"
-          :is-open="isArtifactCreatorOpen"
-          :artifact="selectedArtifact"
-          @close="isArtifactCreatorOpen = false"
-        />
-      </v-row>
-    </v-col>
-  </v-row>
+  <div class="my-2">
+    <v-row justify="end" class="mr-1 mb-1">
+      <generic-icon-button
+        tooltip="View Artifact Body"
+        icon-id="mdi-code-tags"
+        @click="isArtifactBodyOpen = true"
+      />
+      <generic-icon-button
+        v-if="!selectedArtifact.logicType"
+        tooltip="Edit"
+        icon-id="mdi-pencil"
+        @click="isArtifactCreatorOpen = true"
+      />
+      <generic-icon-button
+        color="error"
+        tooltip="Delete"
+        icon-id="mdi-delete"
+        @click="handleDeleteArtifact"
+      />
+    </v-row>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <h1 v-on="on" v-bind="attrs" class="text-h6 artifact-title">
+          {{ selectedArtifactName }}
+        </h1>
+      </template>
+      {{ selectedArtifactName }}
+    </v-tooltip>
+
+    <artifact-creator-modal
+      title="Edit Artifact Contents"
+      :is-open="isArtifactCreatorOpen"
+      :artifact="selectedArtifact"
+      @close="isArtifactCreatorOpen = false"
+    />
+    <generic-modal
+      :is-open="isArtifactBodyOpen"
+      :title="selectedArtifactName"
+      :actionsHeight="0"
+      size="l"
+      @close="isArtifactBodyOpen = false"
+    >
+      <template v-slot:body>
+        <pre class="text-body-1 mt-2 overflow-auto">
+          {{ selectedArtifactBody }}
+        </pre>
+      </template>
+    </generic-modal>
+  </div>
 </template>
 
 <script lang="ts">
@@ -42,16 +57,22 @@ import { appModule, artifactSelectionModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import { ArtifactCreatorModal } from "@/components/artifact";
+import GenericModal from "@/components/common/generic/GenericModal.vue";
 
 /**
  * Displays the selected node's title and option buttons.
  */
 export default Vue.extend({
   name: "ArtifactTitle",
-  components: { GenericIconButton, ArtifactCreatorModal },
+  components: {
+    GenericModal,
+    GenericIconButton,
+    ArtifactCreatorModal,
+  },
   data() {
     return {
       isArtifactCreatorOpen: false,
+      isArtifactBodyOpen: false,
     };
   },
   computed: {
@@ -67,14 +88,14 @@ export default Vue.extend({
     selectedArtifactName(): string {
       return this.selectedArtifact?.name || "";
     },
+    /**
+     * @return The selected artifact's body.
+     */
+    selectedArtifactBody(): string {
+      return this.selectedArtifact?.body.trim() || "";
+    },
   },
   methods: {
-    /**
-     * Opens the artifact edit modal.
-     */
-    handleEditArtifact(): void {
-      this.isArtifactCreatorOpen = true;
-    },
     /**
      * Attempts to delete the selected artifact.
      */
@@ -93,6 +114,6 @@ export default Vue.extend({
 .artifact-title {
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 135px;
+  width: 230px;
 }
 </style>

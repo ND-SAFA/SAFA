@@ -54,12 +54,13 @@ function htmlFTA(data: ArtifactData): string {
 function htmlArtifact(data: ArtifactData): string {
   const hasFooter = !!(data.warnings?.length || data.hiddenChildren);
   const truncateLength = hasFooter ? 100 : 150;
+  const isCode = data.artifactType.toLowerCase().includes("code");
 
   return htmlContainer(
     [
       htmlHeader(data.artifactType),
       htmlSubheader(data.artifactName),
-      htmlBody(data.body, truncateLength),
+      htmlBody(isCode ? "" : data.body, truncateLength),
       htmlFooter(data),
       htmlStoplight(data),
     ],

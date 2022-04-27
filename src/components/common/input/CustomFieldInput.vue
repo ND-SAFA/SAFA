@@ -40,6 +40,8 @@ import ArtifactInput from "./ArtifactInput.vue";
 
 /**
  * An input for any custom fields defined in the current document.
+ *
+ * @emits-1 `change:custom` - Called when a custom field is changed.
  */
 export default Vue.extend({
   name: "CustomFieldInput",
@@ -83,6 +85,7 @@ export default Vue.extend({
         this.value.customFields = {};
       }
       this.value.customFields[columnId] = value;
+      this.$emit("change:custom");
     },
 
     /**
@@ -104,6 +107,7 @@ export default Vue.extend({
         this.value.customFields = {};
       }
       this.value.customFields[columnId] = value.join("||");
+      this.$emit("change:custom");
     },
 
     /**

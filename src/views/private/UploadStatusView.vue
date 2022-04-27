@@ -49,46 +49,74 @@
                 >
                   <v-stepper-header>
                     <v-stepper-step step="1">
-                      <span style="width: 130px">
+                      <span class="upload-step">
                         {{
-                          upload.currentStep !== 1
+                          upload.currentStep > 1
                             ? "Project Initialized"
-                            : `Initializing Project${getEllipse()}`
+                            : `Initializing Project`
                         }}
                       </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="2">
-                      <span style="width: 130px">
+                      <span class="upload-step">
                         {{
-                          upload.currentStep !== 2
+                          upload.currentStep > 2
                             ? "Artifacts Imported"
-                            : `Importing Artifacts${getEllipse()}`
+                            : `Importing Artifacts`
                         }}
                       </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="3">
-                      <span style="width: 130px">
+                      <span class="upload-step">
                         {{
-                          upload.currentStep !== 3
+                          upload.currentStep > 3
                             ? "Traces Imported"
-                            : `Importing Traces${getEllipse()}`
+                            : `Importing Traces`
                         }}
                       </span>
                     </v-stepper-step>
                     <v-divider />
                     <v-stepper-step step="4">
-                      <span style="width: 130px">
+                      <span class="upload-step">
                         {{
-                          upload.currentStep !== 4
+                          upload.currentStep > 4
                             ? "Traces Generated"
-                            : `Generating Traces${getEllipse()}`
+                            : `Generating Traces`
                         }}
                       </span>
                     </v-stepper-step>
                     <v-divider />
-                    <v-stepper-step step="5"> Project Imported </v-stepper-step>
+                    <v-stepper-step step="5">
+                      <span class="upload-step">
+                        {{
+                          upload.currentStep > 5
+                            ? "Layout Generated"
+                            : `Generating Layout`
+                        }}
+                      </span>
+                    </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="6">
+                      <span class="upload-step">
+                        {{
+                          upload.currentStep > 6
+                            ? "Documents Generated"
+                            : `Generating Documents`
+                        }}
+                      </span>
+                    </v-stepper-step>
+                    <v-divider />
+                    <v-stepper-step step="7">
+                      <span class="upload-step">
+                        {{
+                          upload.currentStep === 7
+                            ? "Project Imported"
+                            : "Importing Project"
+                        }}
+                      </span>
+                    </v-stepper-step>
                   </v-stepper-header>
                 </v-stepper>
 
@@ -133,7 +161,6 @@ export default Vue.extend({
   data() {
     return {
       timer: undefined as ReturnType<typeof setTimeout> | undefined,
-      ellipse: "...",
       uploads: [
         {
           id: "1",
@@ -153,7 +180,7 @@ export default Vue.extend({
           lastUpdatedAt: "2022-04-27T10:15:00.000Z",
           completedAt: "2022-04-27T10:15:00.000Z",
           currentProgress: 100,
-          currentStep: 5,
+          currentStep: 7,
         },
         {
           id: "3",
@@ -163,7 +190,7 @@ export default Vue.extend({
           lastUpdatedAt: "2022-04-27T10:15:00.000Z",
           completedAt: null,
           currentProgress: 50,
-          currentStep: 3,
+          currentStep: 0,
         },
       ],
     };
@@ -205,23 +232,13 @@ export default Vue.extend({
           return "";
       }
     },
-    getEllipse(): string {
-      // if (!this.timer) {
-      //   this.timer = setTimeout(() => {
-      //     if (this.ellipse.length === 3) {
-      //       this.ellipse = ".";
-      //     } else {
-      //       this.ellipse += ".";
-      //     }
-      //
-      //     if (!this.timer) return;
-      //
-      //     clearTimeout(this.timer);
-      //   }, 1000);
-      // }
-
-      return this.ellipse;
-    },
   },
 });
 </script>
+
+<style>
+.upload-step {
+  width: min-content;
+  text-align: center;
+}
+</style>

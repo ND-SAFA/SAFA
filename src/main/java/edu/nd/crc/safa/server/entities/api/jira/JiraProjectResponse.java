@@ -1,5 +1,4 @@
-package edu.nd.crc.safa.server.services.jira;
-
+package edu.nd.crc.safa.server.entities.api.jira;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class JiraProjectResponse {
 
-	private String id;
-	private String description;
-	private String key;
+    private String id;
+    private String description;
+    private String key;
 }

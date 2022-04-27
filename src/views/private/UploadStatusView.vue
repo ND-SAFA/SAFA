@@ -8,6 +8,7 @@
           Select a project below to see more detailed updates on the import
           status.
         </p>
+
         <v-expansion-panels>
           <template v-for="upload in uploads">
             <v-expansion-panel :key="upload.id">
@@ -35,9 +36,25 @@
                   </v-col>
                 </v-row>
                 <template v-slot:actions>
-                  <v-chip :color="getStatusColor(upload.status)">
-                    {{ upload.status }}
-                  </v-chip>
+                  <div style="width: 120px" class="d-flex justify-end">
+                    <v-chip :color="getStatusColor(upload.status)">
+                      <span class="mr-1">
+                        {{ upload.status }}
+                      </span>
+                      <v-progress-circular
+                        v-if="isInProgress(upload.status)"
+                        indeterminate
+                        size="16"
+                        class="mx-1"
+                      />
+                      <v-icon v-if="isCompleted(upload.status)">
+                        mdi-check-circle-outline
+                      </v-icon>
+                      <v-icon v-if="isCancelled(upload.status)">
+                        mdi-close-circle-outline
+                      </v-icon>
+                    </v-chip>
+                  </div>
                 </template>
               </v-expansion-panel-header>
 
@@ -212,13 +229,13 @@ export default Vue.extend({
       return status === "Cancelled";
     },
     getUpdatedText(timestamp: string) {
-      return "Last Update: 10:00 AM, Apr 27, 2022";
+      return "Last Update: 10:00 AM, Apr 27";
     },
     getCompletedText(timestamp: string) {
-      return "Upload Completed: 10:00 AM, Apr 27, 2022";
+      return "Upload Completed: 10:00 AM, Apr 27";
     },
     stringifyTimestamp(timestamp: string) {
-      return "10:00 AM, Apr 27, 2022";
+      return "10:00 AM, Apr 27";
     },
     getStatusColor(status: string) {
       switch (status) {

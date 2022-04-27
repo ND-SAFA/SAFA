@@ -12,7 +12,7 @@
         <v-expansion-panels>
           <template v-for="upload in uploads">
             <v-expansion-panel :key="upload.id">
-              <v-expansion-panel-header>
+              <v-expansion-panel-header disable-icon-rotate>
                 <v-row no-gutters>
                   <v-col cols="4"> {{ upload.name }} </v-col>
                   <v-col cols="8" class="text--secondary">

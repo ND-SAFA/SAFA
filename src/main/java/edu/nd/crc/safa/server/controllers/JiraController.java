@@ -8,7 +8,8 @@ import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
-import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponse;
+import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -21,8 +22,10 @@ import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -59,12 +62,12 @@ public class JiraController extends BaseController {
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
     public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") Long id) {
         DeferredResult<ProjectEntities> output = executorDelegate.createOutput(5000L);
-        SafaUser principal = safaUserService.getCurrentUser();
 
         executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
                 .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraProjectResponse response = jiraConnectionService.retrieveJIRAProject(credentials, id);
+            JiraProjectResponseDTO response = jiraConnectionService.retrieveJIRAProject(credentials, id);
             Project project = new Project();
 
             project.setName(response.getKey());
@@ -84,9 +87,9 @@ public class JiraController extends BaseController {
     @PostMapping(AppRoutes.Accounts.jiraCredentials)
     public DeferredResult<String> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<String> output = executorDelegate.createOutput(5000L);
-        SafaUser principal = safaUserService.getCurrentUser();
 
         executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = data.toEntity();
 
             boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
@@ -112,4 +115,29 @@ public class JiraController extends BaseController {
         return output;
     }
 
+    @PutMapping(AppRoutes.Accounts.jiraCredentials)
+    public DeferredResult<String> createCredentials() {
+        DeferredResult<String> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
+            JiraAccessCredentials credentials = accessCredentialsRepository
+                .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+
+            JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
+
+            if (!StringUtils.hasText(newCredentials.getAccessToken()) ||
+                !StringUtils.hasText(newCredentials.getRefreshToken())) {
+                throw new SafaError("Invalid credentials");
+            }
+
+            credentials.setBearerAccessToken(newCredentials.getAccessToken().getBytes());
+            credentials.setRefreshToken(newCredentials.getRefreshToken());
+            credentials = accessCredentialsRepository.save(credentials);
+
+            output.setResult("updated");
+        });
+
+        return output;
+    }
 }

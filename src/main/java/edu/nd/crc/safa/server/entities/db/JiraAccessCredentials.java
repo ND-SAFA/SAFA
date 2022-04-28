@@ -1,14 +1,8 @@
 package edu.nd.crc.safa.server.entities.db;
 
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +19,9 @@ public class JiraAccessCredentials {
     @Type(type = "uuid-char")
     @Column(name = "artifact_id")
     private UUID id;
+
+    @Version
+    private Short version;
 
     @Column(name = "cloud_id", length = 64)
     private String cloudId;

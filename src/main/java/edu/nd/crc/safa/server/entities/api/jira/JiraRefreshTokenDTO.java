@@ -16,7 +16,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class JiraRefreshTokenDTO {
 
-    @JsonProperty("access_token")
+    /**
+     * READ_ONLY since we are only interested in sending this field, not receiving it
+     */
+    @JsonProperty(value = "grant_type", access = JsonProperty.Access.READ_ONLY)
+    private String grantType;
+
+    /**
+     * WRITE_ONLY since we are only interested in receiving this field, not sending it
+     */
+    @JsonProperty(value = "access_token", access = JsonProperty.Access.WRITE_ONLY)
     private String accessToken;
 
     @JsonProperty("client_secret")
@@ -31,7 +40,6 @@ public class JiraRefreshTokenDTO {
     public static JiraRefreshTokenDTO fromEntity(JiraAccessCredentials credentials) {
         JiraRefreshTokenDTO dto = new JiraRefreshTokenDTO();
 
-        dto.setAccessToken(new String(credentials.getBearerAccessToken()));
         dto.setClientId(credentials.getClientId());
         dto.setClientSecret(credentials.getClientSecret());
         dto.setRefreshToken(credentials.getRefreshToken());

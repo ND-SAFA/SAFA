@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class JiraProjectResponse {
+public class JiraProjectResponseDTO {
 
     private String id;
     private String description;

@@ -10,7 +10,7 @@
         v-if="!selectedArtifact.logicType"
         tooltip="Edit"
         icon-id="mdi-pencil"
-        @click="isArtifactCreatorOpen = true"
+        @click="handleEditArtifact"
       />
       <generic-icon-button
         color="error"
@@ -28,12 +28,6 @@
       {{ selectedArtifactName }}
     </v-tooltip>
 
-    <artifact-creator-modal
-      title="Edit Artifact Contents"
-      :is-open="isArtifactCreatorOpen"
-      :artifact="selectedArtifact"
-      @close="isArtifactCreatorOpen = false"
-    />
     <generic-modal
       :is-open="isArtifactBodyOpen"
       :title="selectedArtifactName"
@@ -71,7 +65,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      isArtifactCreatorOpen: false,
       isArtifactBodyOpen: false,
     };
   },
@@ -105,6 +98,12 @@ export default Vue.extend({
           appModule.closePanel(PanelType.left);
         });
       }
+    },
+    /**
+     * Opens the artifact creator.
+     */
+    handleEditArtifact(): void {
+      appModule.openArtifactCreatorTo();
     },
   },
 });

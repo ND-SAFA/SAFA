@@ -127,8 +127,8 @@ export default class ProjectModule extends VuexModule {
    *
    * @param type - The type of panel.
    */
-  openArtifactCreatorTo(type: SafetyCaseType | FTANodeType): void {
-    this.SET_ARTIFACT_CREATOR(type);
+  openArtifactCreatorTo(type?: SafetyCaseType | FTANodeType): void {
+    this.SET_ARTIFACT_CREATOR(type || true);
   }
 
   @Mutation

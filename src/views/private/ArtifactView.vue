@@ -4,7 +4,9 @@
       <artifact-table />
       <artifact-tree />
       <artifact-creator-modal
+        :title="creatorTitle"
         :is-open="isArtifactCreatorOpen"
+        :artifact="selectedArtifact"
         @close="closeArtifactCreator"
       />
     </template>
@@ -13,7 +15,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appModule, artifactSelectionModule } from "@/store";
 import {
   ArtifactTree,
   ArtifactTable,
@@ -38,6 +40,20 @@ export default Vue.extend({
      */
     isArtifactCreatorOpen() {
       return appModule.getIsArtifactCreatorOpen;
+    },
+    /**
+     * @return The selected artifact.
+     */
+    selectedArtifact() {
+      return artifactSelectionModule.getSelectedArtifact;
+    },
+    /**
+     * @return The selected artifact.
+     */
+    creatorTitle() {
+      return artifactSelectionModule.getSelectedArtifact
+        ? "Edit Artifact"
+        : "Create Artifact";
     },
   },
   methods: {

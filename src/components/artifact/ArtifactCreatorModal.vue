@@ -61,7 +61,7 @@ export default Vue.extend({
     return {
       editedArtifact: createArtifact(this.artifact),
       parentId: "",
-      isNameValid: !!this.artifact?.name,
+      isNameValid: false,
       isLoading: false,
       canSave: false,
     };
@@ -146,6 +146,8 @@ export default Vue.extend({
       if (!openOrType) return;
 
       this.editedArtifact = createArtifactOfType(this.artifact, openOrType);
+      this.isNameValid = !!this.artifact?.name;
+      this.canSave = this.isValid;
     },
     /**
      * Checks whether the artifact is valid when it changes.

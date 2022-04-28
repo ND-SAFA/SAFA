@@ -98,13 +98,13 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         return this.blockOptional(
             WebClient.builder()
                 .codecs(configure -> {
-                    configure.defaultCodecs().enableLoggingRequestDetails(true);
+//                    configure.defaultCodecs().enableLoggingRequestDetails(true);
                     configure.defaultCodecs().jackson2JsonEncoder(
                         new Jackson2JsonEncoder(mapper, MediaType.APPLICATION_JSON));
                     configure.defaultCodecs().jackson2JsonDecoder(
                         new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
                 })
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()))
+//                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()))
                 .baseUrl(ATLASSIAN_AUTH_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADER_VALUE)
                 .build()

@@ -4,18 +4,18 @@
       large
       color="primary"
       :disabled="!!token"
-      @click="handleJiraAuthentication"
+      @click="handleAuthentication"
     >
       <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-      <span v-if="!token">Connect to Jira</span>
-      <span v-else>Connected to Jira</span>
+      <span v-if="!token">Connect to GitHub</span>
+      <span v-else>Connected to GitHub</span>
     </v-btn>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { authorizeJira } from "@/api";
+import { logModule } from "@/store";
 
 /**
  * Prompts the user to authenticate their Jira account.
@@ -29,8 +29,8 @@ export default Vue.extend({
     },
   },
   methods: {
-    handleJiraAuthentication(): void {
-      authorizeJira();
+    handleAuthentication(): void {
+      logModule.onInfo("Importing from GitHub is not yet enabled.");
     },
   },
 });

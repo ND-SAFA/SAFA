@@ -11,7 +11,7 @@
                 :key="stepIndex"
                 :editable="currentStep > stepIndex"
               >
-                {{ stepName }}
+                <span class="text-center">{{ stepName }}</span>
               </v-stepper-step>
               <v-divider
                 :key="`${stepName}-divider`"

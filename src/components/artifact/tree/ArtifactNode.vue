@@ -24,10 +24,8 @@ export default Vue.extend({
       type: Object as PropType<Artifact>,
       required: true,
     },
-    opacity: {
-      type: Number,
-      required: true,
-    },
+    hidden: Boolean,
+    faded: Boolean,
   },
   computed: {
     /**
@@ -79,7 +77,7 @@ export default Vue.extend({
           artifactType: type,
           artifactDeltaState: this.artifactDeltaState,
           isSelected: this.isSelected,
-          opacity: this.opacity,
+          opacity: this.hidden ? 0 : this.faded ? 0.1 : 1,
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,
           childDeltaStates: hiddenChildDeltaStates,

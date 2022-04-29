@@ -11,10 +11,13 @@ import {
 
 export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
+    selector: "edge[?faded]",
+    style: { opacity: 0.1 },
+  },
+  {
     selector: ".eh-hover",
     style: {},
   },
-
   {
     selector: ".eh-source",
     style: {
@@ -22,7 +25,6 @@ export const EdgeHandlesStyle: (Stylesheet | CytoStyleSheet)[] = [
       "border-color": SOURCE_SELECTION_COLOR,
     },
   },
-
   {
     selector: ".eh-target",
     style: {

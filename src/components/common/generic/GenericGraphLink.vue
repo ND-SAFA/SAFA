@@ -23,6 +23,7 @@ export default Vue.extend({
       type: Number,
       required: false,
     },
+    faded: Boolean,
   },
   computed: {
     /**
@@ -50,6 +51,7 @@ export default Vue.extend({
           target: sourceId,
           count,
           deltaType,
+          faded: this.faded,
         },
         classes: sourceId === targetId ? ["loop"] : [],
       };

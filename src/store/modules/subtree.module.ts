@@ -137,24 +137,22 @@ export default class SubtreeModule extends VuexModule {
    */
   async showSubtree(rootId: string): Promise<void> {
     const subtreeNodes = this.getSubtreeByArtifactId(rootId);
+    const hiddenNodes = this.hiddenSubtreeNodes.filter(
+      (n) => !subtreeNodes.includes(n)
+    );
 
+    this.SET_HIDDEN_SUBTREE_NODES(hiddenNodes);
+    this.SET_COLLAPSED_PARENT_NODES(
+      this.collapsedParentNodes.filter((n) => n !== rootId)
+    );
     this.SET_SUBTREE_LINKS(
       this.subtreeLinks.filter(
         (link) =>
           link.rootNode !== rootId &&
           // Make sure that phantom links created by other parent nodes are removed.
-          !(
-            subtreeNodes.includes(link.sourceId) &&
-            subtreeNodes.includes(link.targetId)
-          )
+          (hiddenNodes.includes(link.sourceId) ||
+            hiddenNodes.includes(link.targetId))
       )
-    );
-
-    this.SET_HIDDEN_SUBTREE_NODES(
-      this.hiddenSubtreeNodes.filter((n) => !subtreeNodes.includes(n))
-    );
-    this.SET_COLLAPSED_PARENT_NODES(
-      this.collapsedParentNodes.filter((n) => n !== rootId)
     );
     cySetDisplay(subtreeNodes, true);
   }

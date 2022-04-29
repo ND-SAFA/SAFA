@@ -106,7 +106,6 @@ export default Vue.extend({
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
     },
-
     /**
      * @return The artifact ids currently in view.
      */

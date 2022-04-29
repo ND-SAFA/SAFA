@@ -84,7 +84,7 @@ function connect(
       { host: WEBSOCKET_URL() },
       () => {
         if (currentReconnectAttempts > 1) {
-          logModule.onSuccess("Web Socket reconnected to server.");
+          logModule.onDevMessage("Web Socket reconnected to server.");
         }
         logModule.onDevMessage("Websocket connection successful.");
         clearInterval(recInterval);
@@ -104,7 +104,7 @@ function connect(
             clearInterval(recInterval);
             const error =
               "Web Socket lost connection to server, please reload page.";
-            logModule.onError(error);
+            logModule.onDevError(error);
             reject(error);
           }
         }, reconnectWaitTime);

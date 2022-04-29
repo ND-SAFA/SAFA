@@ -21,11 +21,6 @@ export default class ArtifactSelectionModule extends VuexModule {
    * The currently selected group of nodes.
    */
   private selectedGroupIds: string[] = [];
-
-  /**
-   * The opacity of unselected artifact nodes.
-   */
-  private unselectedNodeOpacity = 0.1;
   /**
    * Types to ignore.
    */
@@ -185,13 +180,6 @@ export default class ArtifactSelectionModule extends VuexModule {
    */
   get getSelectedSubtreeIds(): string[] {
     return this.selectedSubtreeIds;
-  }
-
-  /**
-   * @return The node opacity for unselected artifacts.
-   */
-  get getUnselectedNodeOpacity(): number {
-    return this.unselectedNodeOpacity;
   }
 
   /**

@@ -156,6 +156,9 @@ export async function createJiraProject(
       cloudId,
       projectId,
       bearerAccessToken: accessToken,
+      clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
+      clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
+      refreshToken: "", // TODO
     }),
   });
 }

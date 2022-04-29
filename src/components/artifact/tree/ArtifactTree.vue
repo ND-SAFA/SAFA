@@ -8,12 +8,14 @@
         v-for="artifact in artifacts"
         :key="artifact.id"
         :artifact-definition="artifact"
-        :opacity="getArtifactOpacity(artifact.id)"
+        :hidden="isArtifactHidden(artifact.id)"
+        :faded="isArtifactFaded(artifact.id)"
       />
       <generic-graph-link
         v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
+        :faded="isTraceLinkFaded(traceLink)"
         @click:right="handleLinkRightClick"
       />
       <generic-graph-link
@@ -42,7 +44,6 @@ import {
 import {
   appModule,
   artifactModule,
-  artifactSelectionModule,
   deltaModule,
   documentModule,
   subtreeModule,
@@ -105,18 +106,11 @@ export default Vue.extend({
     subtreeLinks() {
       return subtreeModule.getSubtreeLinks;
     },
-
     /**
      * @return The artifact ids currently in view.
      */
     nodesInView(): string[] {
       return viewportModule.getNodesInView;
-    },
-    /**
-     * @return The opacity of unselected nodes.
-     */
-    unselectedNodeOpacity(): number {
-      return artifactSelectionModule.getUnselectedNodeOpacity;
     },
     /**
      * @return The artifact ids that are currently hidden in closed subtrees.
@@ -147,18 +141,31 @@ export default Vue.extend({
       this.artifactsInView = this.nodesInView;
     },
     /**
-     * Returns the opacity of an artifact.
-     * @param id - The artifact to get the opacity for.
-     * @return The artifact's opacity.
+     * Returns whether to fade an artifact.
+     * @param id - The artifact to check.
+     * @return Whether to fade.
      */
-    getArtifactOpacity(id: string): number {
-      if (this.hiddenSubtreeIds.includes(id)) {
-        return 0;
-      } else if (this.artifactsInView.includes(id)) {
-        return 1;
-      } else {
-        return this.unselectedNodeOpacity;
-      }
+    isArtifactFaded(id: string): boolean {
+      return !this.artifactsInView.includes(id);
+    },
+    /**
+     * Returns whether to hide an artifact.
+     * @param id - The artifact to check.
+     * @return Whether to hide.
+     */
+    isArtifactHidden(id: string): boolean {
+      return this.hiddenSubtreeIds.includes(id);
+    },
+    /**
+     * Returns whether to fade a trace link.
+     * @param link - The trace link to check.
+     * @return Whether to fade.
+     */
+    isTraceLinkFaded(link: TraceLink): boolean {
+      return (
+        !this.artifactsInView.includes(link.targetId) ||
+        !this.artifactsInView.includes(link.sourceId)
+      );
     },
     /**
      * Selects a clicked trace link and opens the link modal.

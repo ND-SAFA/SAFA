@@ -7,9 +7,7 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <p class="mx-auto text-caption" style="width: fit-content">
-          This page is a work in progress.
-        </p>
+        <git-hub-authentication :token="token" />
       </v-stepper-content>
 
       <v-stepper-content step="2">
@@ -32,6 +30,7 @@ import Vue from "vue";
 import { StepState } from "@/types";
 import { handleImportGitHubProject } from "@/api";
 import { GenericStepper } from "@/components/common";
+import { GitHubAuthentication } from "@/components/project/creator/steps";
 
 // TODO: properly define and remove.
 type GitHubOrganization = Record<string, any>;
@@ -44,6 +43,7 @@ export default Vue.extend({
   name: "GitHubCreatorStepper",
   components: {
     GenericStepper,
+    GitHubAuthentication,
   },
   data() {
     return {

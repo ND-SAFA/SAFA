@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.project;
 
 /**
  * Enumerates the types of nodes used in a safety case

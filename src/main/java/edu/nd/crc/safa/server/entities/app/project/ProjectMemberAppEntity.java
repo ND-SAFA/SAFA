@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.project;
 
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;

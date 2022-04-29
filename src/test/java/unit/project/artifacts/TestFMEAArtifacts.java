@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;

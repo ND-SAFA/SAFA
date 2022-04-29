@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.EntityDelta;
-import edu.nd.crc.safa.server.entities.app.ProjectDelta;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
+import edu.nd.crc.safa.server.entities.app.delta.ProjectDelta;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;

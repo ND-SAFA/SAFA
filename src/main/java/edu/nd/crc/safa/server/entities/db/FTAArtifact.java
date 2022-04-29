@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.server.entities.app.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

@@ -13,7 +13,7 @@ import unit.SampleProjectConstants;
 /**
  * Tests that system is able to parse artifact and trace files containing no errors.
  */
-public class TestUseCase extends ParseBaseTest {
+public class TestArtifactAndTraceFileParse extends ParseBaseTest {
 
     /**
      * Tests that an artifact files contains as many artifacts as were defined within in.
@@ -22,7 +22,8 @@ public class TestUseCase extends ParseBaseTest {
      */
     @Test
     public void testArtifactEntities() throws Exception {
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.FlatFiles.parseArtifactFile).withArtifactType("Designs").get();
+        String baseRoute = AppRoutes.Projects.FlatFiles.parseArtifactFile;
+        String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType("Designs").get();
         String fileName = "Design.csv";
 
         //Step - Upload file, parse artifacts, and collect them
@@ -42,7 +43,8 @@ public class TestUseCase extends ParseBaseTest {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
-        JSONObject responseBody = parseFileAndReturnBody(AppRoutes.Projects.FlatFiles.parseTraceFile, fileName);
+        String route = AppRoutes.Projects.FlatFiles.parseTraceFile;
+        JSONObject responseBody = parseFileAndReturnBody(route, fileName);
 
         // VP - Verify that message contains constraint
         JSONArray traces = responseBody.getJSONArray("traces");

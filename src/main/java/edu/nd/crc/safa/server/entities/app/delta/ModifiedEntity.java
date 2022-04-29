@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.app;
+package edu.nd.crc.safa.server.entities.app.delta;
 
 /**
  * Represents a generic modification done to some entity.

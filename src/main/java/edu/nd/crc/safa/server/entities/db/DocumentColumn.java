@@ -11,8 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
-import edu.nd.crc.safa.server.entities.app.DocumentColumnDataType;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

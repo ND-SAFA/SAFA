@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.builders;
 
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,7 +17,7 @@ public class CommitBuilder {
     private final ProjectCommit projectCommit;
 
     public CommitBuilder(ProjectVersion projectVersion) {
-        projectCommit = new ProjectCommit(projectVersion);
+        projectCommit = new ProjectCommit(projectVersion, true);
     }
 
     public static CommitBuilder withVersion(ProjectVersion projectVersion) {

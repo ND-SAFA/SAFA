@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.entities.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.ErrorApplicationEntity;
@@ -12,6 +13,12 @@ public class ProjectParsingErrors {
     List<ErrorApplicationEntity> tim;
     List<ErrorApplicationEntity> artifacts;
     List<ErrorApplicationEntity> traces;
+
+    public ProjectParsingErrors() {
+        this.tim = new ArrayList<>();
+        this.artifacts = new ArrayList<>();
+        this.traces = new ArrayList<>();
+    }
 
     public ProjectParsingErrors(List<ErrorApplicationEntity> tim,
                                 List<ErrorApplicationEntity> artifacts,
@@ -43,5 +50,13 @@ public class ProjectParsingErrors {
 
     public void setTraces(List<ErrorApplicationEntity> traces) {
         this.traces = traces;
+    }
+
+    public List<ErrorApplicationEntity> getAllErrors() {
+        List<ErrorApplicationEntity> allErrors = new ArrayList<>();
+        allErrors.addAll(this.tim);
+        allErrors.addAll(this.artifacts);
+        allErrors.addAll(this.traces);
+        return allErrors;
     }
 }

@@ -6,10 +6,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.server.entities.app.DocumentColumnAppEntity;
-import edu.nd.crc.safa.server.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
+import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;

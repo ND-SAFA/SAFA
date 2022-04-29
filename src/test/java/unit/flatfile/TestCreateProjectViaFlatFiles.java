@@ -14,7 +14,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectParsingActivities;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
@@ -148,63 +148,9 @@ public class TestCreateProjectViaFlatFiles extends ApplicationBaseTest {
         List<CommitError> commitErrors = commitErrorRepository.findByProjectVersion(projectVersion);
         assertThat(commitErrors.size()).as("requirement parsing errors").isEqualTo(1);
         CommitError error = commitErrors.get(0);
-        assertThat(error.getApplicationActivity()).isEqualTo(ProjectParsingActivities.PARSING_TRACES);
+        assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntity.TRACES);
 
         List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
         assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
-
-        projectService.deleteProject(project);
-    }
-
-    /**
-     * Creates three project versions and uploads to the middle one checking that
-     * the first has no entities while the last has all the entities but no changes.
-     *
-     * @throws Exception If https request fails.
-     */
-    @Test
-    public void testUpdateProjectViaFlatFiles() throws Exception {
-        String projectName = "test-project";
-
-        // Step - Create project with three versions
-        dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .newVersion(projectName)
-            .newVersion(projectName);
-        Project project = dbEntityBuilder.getProject(projectName);
-        ProjectVersion emptyVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion updateVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
-        ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
-
-        // Step - Create request to update project via flat files
-        uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
-
-        // VP - Verify that no artifacts associated with empty version
-        List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
-        assertThat(initialBodies.size())
-            .as("no bodies at init")
-            .isEqualTo(0);
-
-        // VP - Verify that artifacts are constructed and associated with update version
-        List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
-        assertThat(updateBodies.size())
-            .as("bodies created in later version")
-            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
-        List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
-
-        // Step - Create request to parse same flat files at different version
-        uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
-
-        // VP - No new artifacts were created
-        List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);
-        assertThat(noChangeBodies.size())
-            .as("no changes were detected in project versions")
-            .isEqualTo(0);
-
-        // VP - No new trace links were created
-        List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
     }
 }

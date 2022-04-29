@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
@@ -83,6 +84,11 @@ public class ArtifactVersionRepositoryImpl
             artifactAppEntity.summary,
             artifactAppEntity.body,
             jsonHelper.stringify(artifactAppEntity.customFields));
+    }
+
+    @Override
+    protected ProjectEntity getProjectActivity() {
+        return ProjectEntity.ARTIFACTS;
     }
 
     @Override

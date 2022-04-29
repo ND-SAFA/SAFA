@@ -6,9 +6,9 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.EntityDelta;
-import edu.nd.crc.safa.server.entities.app.ModifiedEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
+import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 

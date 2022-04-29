@@ -6,22 +6,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.tracegenerator.vsm.Controller;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
-import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,51 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TraceLinkGenerator {
 
-    private final ArtifactVersionRepository artifactVersionRepository;
-    private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final AppEntityRetrievalService appEntityRetrievalService;
-
     @Autowired
-    public TraceLinkGenerator(TraceLinkVersionRepository traceLinkVersionRepository,
-                              ArtifactVersionRepository artifactVersionRepository,
-                              AppEntityRetrievalService appEntityRetrievalService) {
-        this.artifactVersionRepository = artifactVersionRepository;
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.appEntityRetrievalService = appEntityRetrievalService;
-    }
-
-    public List<TraceAppEntity> generateTraceLinksToFile(ProjectVersion projectVersion,
-                                                         Pair<ArtifactType, ArtifactType> artifactTypes) {
-        String DELIMITER = "*";
-        List<TraceAppEntity> generatedLinks = generateLinksBetweenTypes(projectVersion, artifactTypes);
-        List<String> approvedLinks = appEntityRetrievalService
-            .retrieveTracesInProjectVersion(projectVersion)
-            .stream()
-            .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
-            .map(link -> link.sourceName + DELIMITER + link.targetName)
-            .collect(Collectors.toList());
-
-        return generatedLinks
-            .stream()
-            .filter(t -> {
-                String tId = t.sourceName + DELIMITER + t.targetName;
-                return !approvedLinks.contains(tId);
-            })
-            .collect(Collectors.toList());
-    }
-
-    public List<TraceAppEntity> generateLinksBetweenTypes(ProjectVersion projectVersion,
-                                                          Pair<ArtifactType, ArtifactType> artifactTypes) {
-        List<ArtifactVersion> artifactsInVersion =
-            this.artifactVersionRepository.retrieveVersionEntitiesByProjectVersion(projectVersion);
-        Map<Artifact, Collection<String>> sTokens = tokenizeArtifactOfType(artifactsInVersion,
-            artifactTypes.getValue0());
-        Map<Artifact, Collection<String>> tTokens = tokenizeArtifactOfType(artifactsInVersion,
-            artifactTypes.getValue1());
-        TraceLinkConstructor<Artifact, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
-            new TraceAppEntity().asGeneratedTrace(score).betweenArtifacts(s.getName(), t.getName());
-
-        return generateLinksFromTokens(sTokens, tTokens, traceLinkConstructor);
+    public TraceLinkGenerator() {
     }
 
     public List<TraceAppEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,
@@ -105,25 +53,6 @@ public class TraceLinkGenerator {
             }
         }
         return generatedLinks;
-    }
-
-    private Map<Artifact, Collection<String>> tokenizeArtifactOfType(List<ArtifactVersion> artifacts,
-                                                                     ArtifactType artifactType) {
-        List<ArtifactVersion> artifactsWithType =
-            artifacts
-                .stream()
-                .filter(a -> a.getArtifact().getType().equals(artifactType))
-                .collect(Collectors.toList());
-        return tokenizeArtifacts(artifactsWithType);
-    }
-
-    private Map<Artifact, Collection<String>> tokenizeArtifacts(List<ArtifactVersion> artifacts) {
-        Map<Artifact, Collection<String>> artifactTokens = new HashMap<>();
-        for (ArtifactVersion artifactVersion : artifacts) {
-            Artifact artifact = artifactVersion.getArtifact();
-            artifactTokens.put(artifact, getWordsInArtifactBody(artifactVersion));
-        }
-        return artifactTokens;
     }
 
     public Map<String, Collection<String>> tokenizeArtifactAppEntities(List<ArtifactAppEntity> artifacts) {

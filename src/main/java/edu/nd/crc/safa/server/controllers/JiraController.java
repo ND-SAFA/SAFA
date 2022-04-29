@@ -1,15 +1,15 @@
 package edu.nd.crc.safa.server.controllers;
 
+
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
-import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -19,10 +19,8 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,8 +58,8 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") Long id) {
-        DeferredResult<ProjectEntities> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<ProjectVersionErrors> pullJiraProject(@PathVariable("id") Long id) {
+        DeferredResult<ProjectVersionErrors> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
@@ -75,7 +73,7 @@ public class JiraController extends BaseController {
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
             ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
-            ProjectEntities projectEntities = appEntityRetrievalService
+            ProjectVersionErrors projectEntities = appEntityRetrievalService
                 .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
             output.setResult(projectEntities);

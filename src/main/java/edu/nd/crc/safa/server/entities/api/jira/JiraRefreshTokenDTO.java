@@ -1,8 +1,9 @@
 package edu.nd.crc.safa.server.entities.api.jira;
 
-import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JiraRefreshTokenDTO {
 
     /**

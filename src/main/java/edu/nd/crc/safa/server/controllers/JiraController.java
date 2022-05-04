@@ -129,7 +129,6 @@ public class JiraController extends BaseController {
 
     @PutMapping(AppRoutes.Accounts.jiraCredentials)
     public DeferredResult<String> createCredentials() {
-//        throw new SafaError("Unsupported operation currently");
         DeferredResult<String> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {

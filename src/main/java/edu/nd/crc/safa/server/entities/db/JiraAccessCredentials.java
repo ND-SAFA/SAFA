@@ -1,12 +1,11 @@
 package edu.nd.crc.safa.server.entities.db;
 
-import java.util.UUID;
-
-import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "jira_access_credentials")

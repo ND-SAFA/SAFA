@@ -17,7 +17,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JiraRefreshTokenDTO {
-
     /**
      * READ_ONLY since we are only interested in sending this field, not receiving it
      */

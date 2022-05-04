@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.Objects;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +31,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.async.DeferredResult;
-
-import javax.validation.Valid;
-import java.util.Objects;
 
 
 /**
@@ -71,7 +71,7 @@ public class JiraController extends BaseController {
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
-                    .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+                .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
             JiraProjectResponseDTO response = jiraConnectionService.retrieveJIRAProject(credentials, id);
             Project project = new Project();
 
@@ -81,7 +81,7 @@ public class JiraController extends BaseController {
 
             ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
             ProjectVersionErrors projectEntities = appEntityRetrievalService
-                    .retrieveProjectEntitiesAtProjectVersion(projectVersion);
+                .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
             output.setResult(projectEntities);
         });
@@ -134,12 +134,12 @@ public class JiraController extends BaseController {
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
-                    .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+                .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
 
             JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
 
-            if (!StringUtils.hasText(newCredentials.getAccessToken()) ||
-                    !StringUtils.hasText(newCredentials.getRefreshToken())) {
+            if (!StringUtils.hasText(newCredentials.getAccessToken())
+                || !StringUtils.hasText(newCredentials.getRefreshToken())) {
                 throw new SafaError("Invalid credentials");
             }
 

@@ -1,11 +1,19 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Table(name = "jira_access_credentials")

@@ -3,6 +3,7 @@ package edu.nd.crc.safa.config;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

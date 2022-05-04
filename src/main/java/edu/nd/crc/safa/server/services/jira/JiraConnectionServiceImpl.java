@@ -1,16 +1,23 @@
 package edu.nd.crc.safa.server.services.jira;
 
+import java.util.Optional;
+import javax.annotation.PostConstruct;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
@@ -18,10 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-
-import javax.annotation.PostConstruct;
-import java.util.Optional;
-
 
 public class JiraConnectionServiceImpl implements JiraConnectionService {
 
@@ -48,9 +51,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     @PostConstruct
     private void init() {
         this.apiWebClient = WebClient.builder()
-                .baseUrl(ATLASSIAN_API_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADER_VALUE)
-                .build();
+            .baseUrl(ATLASSIAN_API_URL)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADER_VALUE)
+            .build();
 
         log.info("Web client initialised");
     }
@@ -59,13 +62,13 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECT);
 
         return this.blockOptional(
-                this.apiWebClient
-                        .method(ApiRoute.PROJECT.getMethod())
-                        .uri(uri, id)
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
-                        .retrieve()
-                        .bodyToMono(JiraProjectResponseDTO.class)
+            this.apiWebClient
+                .method(ApiRoute.PROJECT.getMethod())
+                .uri(uri, id)
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
+                .retrieve()
+                .bodyToMono(JiraProjectResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve JIRA project"));
     }
 
@@ -73,14 +76,14 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.MYSELF);
 
         HttpStatus code = this.blockOptional(
-                this.apiWebClient
-                        .method(ApiRoute.MYSELF.getMethod())
-                        .uri(uri)
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
-                        .retrieve()
-                        .toBodilessEntity()
-                        .map(ResponseEntity::getStatusCode)
+            this.apiWebClient
+                .method(ApiRoute.MYSELF.getMethod())
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
+                .retrieve()
+                .toBodilessEntity()
+                .map(ResponseEntity::getStatusCode)
         ).orElseGet(() -> HttpStatus.BAD_REQUEST);
 
         return HttpStatus.OK.equals(code);
@@ -95,24 +98,24 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         log.info("Initialising jira auth web client");
 
         return this.blockOptional(
-                WebClient.builder()
-                        .codecs(configure -> {
-                            configure.defaultCodecs().enableLoggingRequestDetails(true);
-                            configure.defaultCodecs().jackson2JsonEncoder(
-                                    new Jackson2JsonEncoder(mapper, MediaType.APPLICATION_JSON));
-                            configure.defaultCodecs().jackson2JsonDecoder(
-                                    new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
-                        })
-                        .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
-                        .baseUrl(ATLASSIAN_AUTH_URL)
-                        .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                        .defaultHeader(HttpHeaders.ACCEPT, "*/*")
-                        .build()
-                        .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                        .uri(ApiRoute.REFRESH_TOKEN.getPath())
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(JiraRefreshTokenDTO.class)
+            WebClient.builder()
+                .codecs(configure -> {
+                    configure.defaultCodecs().enableLoggingRequestDetails(true);
+                    configure.defaultCodecs().jackson2JsonEncoder(
+                        new Jackson2JsonEncoder(mapper, MediaType.APPLICATION_JSON));
+                    configure.defaultCodecs().jackson2JsonDecoder(
+                        new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
+                })
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
+                .baseUrl(ATLASSIAN_AUTH_URL)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .defaultHeader(HttpHeaders.ACCEPT, "*/*")
+                .build()
+                .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                .uri(ApiRoute.REFRESH_TOKEN.getPath())
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(JiraRefreshTokenDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh JIRA credentials"));
     }
 

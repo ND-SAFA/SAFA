@@ -18,7 +18,7 @@
                 class="mb-1"
                 @click="handleArtifactClick(parentName)"
               >
-                <span class="mb-1 text-ellipsis" style="max-width: 50px">
+                <span class="mb-1 text-ellipsis" :style="style">
                   {{ parentName }}
                 </span>
               </v-btn>
@@ -42,7 +42,7 @@
                 class="mb-1"
                 @click="handleArtifactClick(childName)"
               >
-                <span class="mb-1 text-ellipsis" style="max-width: 50px">
+                <span class="mb-1 text-ellipsis" :style="style">
                   {{ childName }}
                 </span>
               </v-btn>
@@ -90,6 +90,14 @@ export default Vue.extend({
       return traceModule.traces
         .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
         .map(({ sourceName }) => sourceName);
+    },
+    /**
+     * Determines the width of trace link buttons.
+     */
+    style(): string {
+      return this.children.length > 0 && this.parents.length > 0
+        ? "max-width: 50px"
+        : "max-width: 190px";
     },
   },
   methods: {

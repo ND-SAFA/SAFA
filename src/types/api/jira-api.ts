@@ -6,6 +6,10 @@ export interface JiraAccessToken {
    * The API bearer access token.
    */
   access_token: string;
+  /**
+   * The API refresh token.
+   */
+  refresh_token: string;
 }
 
 /**

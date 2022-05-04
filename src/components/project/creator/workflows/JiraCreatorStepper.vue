@@ -7,7 +7,7 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <jira-authentication :token="token" />
+        <jira-authentication :token="token" :is-loading="isLoading" />
       </v-stepper-content>
 
       <v-stepper-content step="2">
@@ -34,7 +34,6 @@ import Vue from "vue";
 import { JiraCloudSite, JiraProject, StepState } from "@/types";
 import { getParam, QueryParams } from "@/router";
 import {
-  getJiraToken,
   getJiraProjects,
   getJiraCloudSites,
   handleImportJiraProject,
@@ -45,6 +44,7 @@ import {
   JiraSiteSelector,
   JiraProjectSelector,
 } from "@/components/project/creator/steps";
+import { handleAuthorizeJira } from "@/api/handlers/integration-handler";
 
 /**
  * Allows for creating a project from Jira.
@@ -61,6 +61,7 @@ export default Vue.extend({
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
       token: "",
+      isLoading: true,
 
       sites: [] as JiraCloudSite[],
       sitesLoading: false,
@@ -82,13 +83,17 @@ export default Vue.extend({
    * If a jira access code is found in the query, loads the Jira authorization token and sites for the user.
    */
   mounted() {
-    if (!this.accessCode) return;
-
-    this.loadToken().then(async () => {
-      this.setStepIsValid(0, true);
-      this.currentStep = 2;
-
-      await this.loadSites();
+    handleAuthorizeJira(this.accessCode, {
+      onSuccess: (token) => {
+        this.isLoading = false;
+        this.token = token;
+        this.currentStep = 2;
+        this.setStepIsValid(0, true);
+        this.loadSites();
+      },
+      onError: () => {
+        this.isLoading = false;
+      },
     });
   },
   methods: {
@@ -107,14 +112,6 @@ export default Vue.extend({
       this.token = "";
       this.sites = [];
       this.projects = [];
-    },
-    /**
-     * Loads a Jira authorization token.
-     */
-    async loadToken() {
-      if (!this.accessCode) return;
-
-      this.token = await getJiraToken(String(this.accessCode));
     },
     /**
      * Loads a user's Jira sites.

@@ -4,7 +4,16 @@ package edu.nd.crc.safa.server.entities.api;
  * Enumerates all the possible types of jobs.
  */
 public enum JobType {
-
+    FLAT_FILE_PROJECT_CREATION {
+        public String toString() {
+            return "FLAT_FILE_PROJECT_CREATION";
+        }
+    },
+    JIRA_PROJECT_CREATION {
+        public String toString() {
+            return "JIRA_PROJECT_CREATION";
+        }
+    },
     PROJECT_CREATION {
         public String toString() {
             return "PROJECT_CREATION";

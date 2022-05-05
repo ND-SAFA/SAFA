@@ -25,12 +25,17 @@ public class WebsocketController {
         this.notificationService = notificationService;
     }
 
+    /**
+     * Responds to subscription to job with the current job update.
+     *
+     * @param jobId The job id being subscribed to.
+     * @return The latest job status.
+     * @throws SafaError Throws error if not job found with given id.
+     */
     @SubscribeMapping("/jobs/{jobId}")
     public Job chat(@DestinationVariable UUID jobId) throws SafaError {
-        System.out.println("Subscriber mapping!");
         Optional<Job> jobOption = this.jobRepository.findById(jobId);
         if (jobOption.isPresent()) {
-            System.out.println("Returning job message!");
             return jobOption.get();
         }
         throw new SafaError("Could not find job with id:" + jobId);

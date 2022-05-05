@@ -1,14 +1,14 @@
 package edu.nd.crc.safa.server.entities.api;
 
 import java.lang.reflect.Method;
-import java.util.Hashtable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
-import edu.nd.crc.safa.utilities.MethodNameParser;
 
 /**
  * Uses reflection to parse and run steps
@@ -47,11 +47,11 @@ public abstract class JobWorker extends Thread {
     }
 
     public void run() {
-        List<Method> classMethods = this.getStepMethods();
-        for (int i = 0; i < classMethods.size(); i++) {
+        String[] stepNames = JobSteps.getJobSteps(this.job.getJobType());
+        for (int i = 0; i < stepNames.length; i++) {
             try {
-                Method method = classMethods.get(i);
-                boolean isLastStep = i == classMethods.size() - 1;
+                Method method = getMethodFromStep(stepNames[i]);
+                boolean isLastStep = i == stepNames.length - 1;
 
                 // Step - Mark step as started and update
                 this.jobService.startStep(job);
@@ -64,7 +64,7 @@ public abstract class JobWorker extends Thread {
                 this.notificationService.broadUpdateJobMessage(job);
 
                 if (isLastStep) {
-                    this.jobService.completeJob(job);
+                    this.onComplete();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,18 +73,25 @@ public abstract class JobWorker extends Thread {
         }
     }
 
-    public List<String> getStepNames() {
-        return this.getStepMethods().stream().map(Method::getName).collect(Collectors.toList());
+    public Method getMethodFromStep(String stepName) {
+        String query = stepName.replace(" ", "").toLowerCase();
+        List<Method> methodQuery = Arrays
+            .stream(this.getClass().getDeclaredMethods())
+            .filter(m -> m.getName().toLowerCase().contains(query))
+            .collect(Collectors.toList());
+        int methodQuerySize = methodQuery.size();
+
+        if (methodQuerySize == 0) {
+            throw new RuntimeException("Could not find implementation for step: " + stepName);
+        } else if (methodQuery.size() == 1) {
+            return methodQuery.get(0);
+        } else {
+            String error = String.format("Found more than one implementation for step: %s\n%s", stepName, methodQuery);
+            throw new RuntimeException(error);
+        }
     }
 
-    private List<Method> getStepMethods() {
-        Hashtable<Integer, Method> stepTable = new Hashtable<>();
-        for (Method method : this.getClass().getDeclaredMethods()) {
-            if (method.getName().startsWith(STEP_KEYWORD)) {
-                int stepNumber = MethodNameParser.getNumberAfterPrefix(method.getName(), STEP_KEYWORD);
-                stepTable.put(stepNumber, method);
-            }
-        }
-        return List.copyOf(stepTable.values());
+    protected void onComplete() {
+        this.jobService.completeJob(job);
     }
 }

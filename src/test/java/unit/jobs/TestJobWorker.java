@@ -1,8 +1,6 @@
 package unit.jobs;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.nd.crc.safa.server.entities.api.JobType;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
@@ -34,7 +32,21 @@ public class TestJobWorker extends ApplicationBaseTest {
 
     @Test
     public void testCreateProjectWorker() {
-        ProjectCreationWorker projectCreationWorker = new ProjectCreationWorker(
+        ProjectCreationWorker projectCreationWorker = buildProjectCreationWorker();
+        for (String stepName : JobSteps.getJobSteps(JobType.PROJECT_CREATION)) {
+            projectCreationWorker.getMethodFromStep(stepName);
+        }
+    }
+
+    @Test
+    public void notYetImplemented() {
+        assertThrows(RuntimeException.class, () -> {
+            buildProjectCreationWorker().getMethodFromStep("no exist");
+        });
+    }
+
+    private ProjectCreationWorker buildProjectCreationWorker() {
+        return new ProjectCreationWorker(
             new Job(),
             new ProjectCommit(),
             jobService,
@@ -42,9 +54,5 @@ public class TestJobWorker extends ApplicationBaseTest {
             entityVersionService,
             appEntityRetrievalService
         );
-        List<String> stepNames = projectCreationWorker.getStepNames();
-        for (String stepName : JobSteps.getJobSteps(JobType.PROJECT_CREATION)) {
-            assertThat(stepNames.contains(stepName)).isTrue();
-        }
     }
 }

@@ -7,8 +7,6 @@ import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 public class ProjectCreationWorker extends JobWorker {
-
-
     /**
      * The project version of the
      */
@@ -41,21 +39,26 @@ public class ProjectCreationWorker extends JobWorker {
         this.appEntityRetrievalService = appEntityRetrievalService;
     }
 
-    public void step1CreateArtifacts() throws SafaError {
+    public void savingArtifacts() throws SafaError {
         this.entityVersionService.setArtifactsAtVersionAndSaveErrors(
             projectCommit.getCommitVersion(),
             projectCommit.getArtifacts().getAdded());
     }
 
-    public void step2CreateTraces() throws SafaError {
+    public void savingTraces() throws SafaError {
         this.entityVersionService.setTracesAtVersionAndSaveErrors(
             projectCommit.getCommitVersion(),
             projectCommit.getTraces().getAdded());
     }
 
-    public void step3RetrieveProject() {
+    @Override
+    protected void onComplete() {
+        super.onComplete();
         this.projectEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );
+    }
+
+    public void generatingLayout() {
     }
 }

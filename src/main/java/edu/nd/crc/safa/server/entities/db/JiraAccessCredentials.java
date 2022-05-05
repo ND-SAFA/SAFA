@@ -15,6 +15,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+/**
+ * Data required to access the JIRA api for a user on an JIRA application identified by its cloud id
+ */
 @Entity
 @Table(name = "jira_access_credentials")
 @Getter

@@ -19,4 +19,9 @@ public enum JobStatus {
             return "CANCELLED";
         }
     },
+    FAILED {
+        public String toString() {
+            return "FAILED";
+        }
+    }
 }

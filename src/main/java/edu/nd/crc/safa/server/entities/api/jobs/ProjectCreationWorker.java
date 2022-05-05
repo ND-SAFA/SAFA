@@ -1,9 +1,10 @@
-package edu.nd.crc.safa.server.entities.api;
+package edu.nd.crc.safa.server.entities.api.jobs;
 
+import edu.nd.crc.safa.server.entities.api.ProjectCommit;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.services.EntityVersionService;
-import edu.nd.crc.safa.server.services.JobService;
-import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 public class ProjectCreationWorker extends JobWorker {
@@ -18,25 +19,15 @@ public class ProjectCreationWorker extends JobWorker {
     ProjectEntities projectEntities;
 
     /**
-     * Service used to commit artifacts and traces.
+     * The service used for creating entities.
      */
     EntityVersionService entityVersionService;
-
-    /**
-     * Service used to retrieve all created entities.
-     */
-    AppEntityRetrievalService appEntityRetrievalService;
-
+    
     public ProjectCreationWorker(Job job,
-                                 ProjectCommit projectCommit,
-                                 JobService jobService,
-                                 NotificationService notificationService,
-                                 EntityVersionService entityVersionService,
-                                 AppEntityRetrievalService appEntityRetrievalService) {
-        super(job, jobService, notificationService);
+                                 ProjectCommit projectCommit) {
+        super(job);
         this.projectCommit = projectCommit;
-        this.entityVersionService = entityVersionService;
-        this.appEntityRetrievalService = appEntityRetrievalService;
+        this.entityVersionService = EntityVersionService.getInstance();
     }
 
     public void savingArtifacts() throws SafaError {
@@ -51,14 +42,14 @@ public class ProjectCreationWorker extends JobWorker {
             projectCommit.getTraces().getAdded());
     }
 
+    public void generatingLayout() {
+    }
+
     @Override
     protected void onComplete() {
         super.onComplete();
-        this.projectEntities = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(
+        this.projectEntities = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );
-    }
-
-    public void generatingLayout() {
     }
 }

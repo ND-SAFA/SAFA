@@ -3,9 +3,10 @@ package edu.nd.crc.safa.server.services;
 import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.server.entities.api.JobType;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.repositories.JobRepository;
@@ -19,11 +20,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobService {
 
+    private static JobService instance;
     JobRepository jobRepository;
 
     @Autowired
     public JobService(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
+    }
+
+    public static JobService getInstance() {
+        return instance;
     }
 
     public Job retrieveJob(UUID jobId) throws SafaError {
@@ -35,9 +41,9 @@ public class JobService {
         throw new SafaError("No job exist with id:" + jobId);
     }
 
-    public Job createProjectCreationJob() {
+    public Job createNewJob(JobType jobType) {
         Job job = new Job(
-            JobType.PROJECT_CREATION,
+            jobType,
             JobStatus.IN_PROGRESS,
             now(),
             now(),
@@ -68,7 +74,19 @@ public class JobService {
         this.jobRepository.save(job);
     }
 
+    public void failJob(Job job) {
+        job.setStatus(JobStatus.FAILED);
+        job.setCurrentProgress(-1);
+        job.setLastUpdatedAt(now());
+        this.jobRepository.save(job);
+    }
+
     public Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 }

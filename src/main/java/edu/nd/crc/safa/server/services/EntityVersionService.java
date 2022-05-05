@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
@@ -33,24 +34,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class EntityVersionService {
 
+    public static EntityVersionService instance;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final CommitErrorRepository commitErrorRepository;
-
     private final AppEntityRetrievalService appEntityRetrievalService;
-    private final JobService jobService;
 
     @Autowired
     public EntityVersionService(ArtifactVersionRepository artifactVersionRepository,
                                 TraceLinkVersionRepository traceLinkVersionRepository,
                                 CommitErrorRepository commitErrorRepository,
-                                AppEntityRetrievalService appEntityRetrievalService,
-                                JobService jobService) {
+                                AppEntityRetrievalService appEntityRetrievalService) {
         this.artifactVersionRepository = artifactVersionRepository;
         this.commitErrorRepository = commitErrorRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.appEntityRetrievalService = appEntityRetrievalService;
-        this.jobService = jobService;
+    }
+
+    public static EntityVersionService getInstance() {
+        return instance;
     }
 
     /**
@@ -129,4 +131,10 @@ public class EntityVersionService {
             }
         }
     }
+
+    @PostConstruct
+    void init() {
+        instance = this;
+    }
+
 }

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.api;
+package edu.nd.crc.safa.server.entities.api.jobs;
 
 /**
  * Enumerates all the possible types of jobs.

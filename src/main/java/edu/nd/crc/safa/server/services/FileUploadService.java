@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -20,6 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 public class FileUploadService {
+
+    private static FileUploadService instance;
+
+    public static FileUploadService getInstance() {
+        return instance;
+    }
 
     /**
      * Uploads given files to disk and associates them with given project.
@@ -47,5 +54,10 @@ public class FileUploadService {
                 throw new SafaError(error, e);
             }
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 }

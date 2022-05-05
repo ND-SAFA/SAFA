@@ -2,9 +2,9 @@ package unit.jobs;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.nd.crc.safa.server.entities.api.JobType;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.ProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.api.jobs.ProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.services.EntityVersionService;
@@ -48,11 +48,7 @@ public class TestJobWorker extends ApplicationBaseTest {
     private ProjectCreationWorker buildProjectCreationWorker() {
         return new ProjectCreationWorker(
             new Job(),
-            new ProjectCommit(),
-            jobService,
-            notificationService,
-            entityVersionService,
-            appEntityRetrievalService
+            new ProjectCommit()
         );
     }
 }

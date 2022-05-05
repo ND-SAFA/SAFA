@@ -1,32 +1,40 @@
 package unit.jobs;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.JobRepository;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.ApplicationBaseTest;
+import unit.flatfile.FlatFileBaseTest;
 
-public class TestProjectCreationJob extends ApplicationBaseTest {
+public class TestFlatFileProjectCreationWorker extends FlatFileBaseTest {
 
     @Autowired
     JobRepository jobRepository;
 
     @Test
     public void basicProjectCreation() throws Exception {
-        ProjectCommit projectCommit = new ProjectCommit();
-        String route = AppRoutes.Jobs.createProject;
-        JSONObject response = sendPost(route, projectCommit, status().isOk());
+
+        // Step - Create project
+        String projectName = "test-before-files";
+        ProjectVersion projectVersion = dbEntityBuilder
+            .newProject(projectName)
+            .newVersionWithReturn(projectName);
+
+        // Step - Send request to upload flat files to project
+        JSONObject response = uploadFlatFilesToVersion(projectVersion,
+            ProjectPaths.PATH_TO_BEFORE_FILES,
+            AppRoutes.Jobs.flatFileProjectUpdateJob);
 
         // Step - Find Job
         String jobId = response.getString("id");
@@ -45,7 +53,7 @@ public class TestProjectCreationJob extends ApplicationBaseTest {
 
         // VP - Verify that job has finished.
         Job job = getJob(jobId);
-        assertThat(job.getCurrentStep()).isEqualTo(3);
+        assertThat(job.getCurrentStep()).isEqualTo(6);
         assertThat(job.getCurrentProgress()).isEqualTo(100);
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -53,6 +61,9 @@ public class TestProjectCreationJob extends ApplicationBaseTest {
         assert job.getCompletedAt() != null;
         int comparison = job.getCompletedAt().compareTo(job.getStartedAt());
         assertThat(comparison).isEqualTo(1);
+
+        // VP - Verify that all entities were created
+        verifyBeforeEntities(projectVersion.getProject());
     }
 
     public Job getJob(String jobIdStr) {

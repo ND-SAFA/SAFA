@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import edu.nd.crc.safa.server.entities.api.JobType;
+import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 
 /**
  * Enumerates all the steps for each job

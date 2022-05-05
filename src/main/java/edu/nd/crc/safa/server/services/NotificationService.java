@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
+import javax.annotation.PostConstruct;
+
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
+    private static NotificationService instance;
     private final SimpMessagingTemplate messagingTemplate;
     private final SafaUserService safaUserService;
 
@@ -57,6 +60,15 @@ public class NotificationService {
      */
     public static String getJobTopic(Job job) {
         return String.format("/app/jobs/%s", job.getId());
+    }
+
+    public static NotificationService getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 
     /**

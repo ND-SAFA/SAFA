@@ -1,10 +1,12 @@
-package edu.nd.crc.safa.server.entities.api;
+package edu.nd.crc.safa.server.entities.api.jobs;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.services.JobService;
@@ -14,8 +16,6 @@ import edu.nd.crc.safa.server.services.NotificationService;
  * Uses reflection to parse and run steps
  */
 public abstract class JobWorker extends Thread {
-
-    private static final String STEP_KEYWORD = "step";
 
     /**
      * The job identifying information that is being performed.
@@ -32,10 +32,10 @@ public abstract class JobWorker extends Thread {
      */
     NotificationService notificationService;
 
-    public JobWorker(Job job, JobService jobService, NotificationService notificationService) {
+    public JobWorker(Job job) {
         this.job = job;
-        this.jobService = jobService;
-        this.notificationService = notificationService;
+        this.jobService = JobService.getInstance();
+        this.notificationService = NotificationService.getInstance();
     }
 
     public Job getJob() {
@@ -47,6 +47,12 @@ public abstract class JobWorker extends Thread {
     }
 
     public void run() {
+        try {
+            this.init();
+        } catch (Exception e) {
+            this.jobService.failJob(job);
+            throw new RuntimeException(e);
+        }
         String[] stepNames = JobSteps.getJobSteps(this.job.getJobType());
         for (int i = 0; i < stepNames.length; i++) {
             try {
@@ -67,6 +73,7 @@ public abstract class JobWorker extends Thread {
                     this.onComplete();
                 }
             } catch (Exception e) {
+                this.jobService.failJob(job);
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
@@ -76,7 +83,7 @@ public abstract class JobWorker extends Thread {
     public Method getMethodFromStep(String stepName) {
         String query = stepName.replace(" ", "").toLowerCase();
         List<Method> methodQuery = Arrays
-            .stream(this.getClass().getDeclaredMethods())
+            .stream(this.getClass().getMethods())
             .filter(m -> m.getName().toLowerCase().contains(query))
             .collect(Collectors.toList());
         int methodQuerySize = methodQuery.size();
@@ -86,7 +93,8 @@ public abstract class JobWorker extends Thread {
         } else if (methodQuery.size() == 1) {
             return methodQuery.get(0);
         } else {
-            String error = String.format("Found more than one implementation for step: %s\n%s", stepName, methodQuery);
+            List<String> methodNames = methodQuery.stream().map(Method::getName).collect(Collectors.toList());
+            String error = String.format("Found more than one implementation for step: %s\n%s", stepName, methodNames);
             throw new RuntimeException(error);
         }
     }
@@ -94,4 +102,8 @@ public abstract class JobWorker extends Thread {
     protected void onComplete() {
         this.jobService.completeJob(job);
     }
+
+    public void init() throws SafaError, IOException {
+    }
+
 }

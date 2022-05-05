@@ -4,12 +4,11 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.ProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.Job;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
@@ -19,10 +18,15 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for submitting jobs and retrieving their results.
@@ -82,32 +86,26 @@ public class JobController extends BaseController {
     /**
      * Parses given job payload by the jobType and returns the job created.
      *
-     * @param projectCommit The project entities to create.
+     * @param versionId The project version to save the entities to.
+     * @param files     The flat files to be parsed and uploaded.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.createProject)
-    public JobAppEntity createNewJob(ProjectCommit projectCommit) throws SafaError,
+    @PostMapping(AppRoutes.Jobs.flatFileProjectUpdateJob)
+    @ResponseStatus(HttpStatus.CREATED)
+    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
+                                                 @RequestParam MultipartFile[] files) throws SafaError,
         IllegalAccessException {
         // Step 1 - Fetch version and assert permissions
-        Project project = new Project();
-        project.setName("New Project");
-        project.setDescription("Some description");
-        this.projectRepository.save(project);
-        ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
-        projectCommit.setCommitVersion(projectVersion);
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
         // Step 2 - Create new job
-        Job job = this.jobService.createProjectCreationJob();
+        Job job = this.jobService.createNewJob(JobType.FLAT_FILE_PROJECT_CREATION);
 
         // Step 3 - Create job worker
-        ProjectCreationWorker jobCreationThread = new ProjectCreationWorker(
-            job,
-            projectCommit,
-            jobService,
-            notificationService,
-            entityVersionService,
-            appEntityRetrievalService);
+        FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(job,
+            projectVersion,
+            files);
         jobCreationThread.start();
 
         // Step 4 - Create job response

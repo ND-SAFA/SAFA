@@ -13,7 +13,7 @@ public class AppRoutes {
 
     public static class Jobs {
         private static final String jobRoot = "/jobs";
-        public static final String createNewJob = jobRoot;
+        public static final String createProject = jobRoot;
         private static final String jobId = jobRoot + "/{jobId}";
         public static final String getJobStatus = jobId + "/status";
         public static final String deleteJob = jobId;

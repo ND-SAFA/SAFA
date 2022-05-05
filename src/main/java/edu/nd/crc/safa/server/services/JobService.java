@@ -1,9 +1,12 @@
 package edu.nd.crc.safa.server.services;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.server.entities.api.JobType;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.repositories.JobRepository;
 
@@ -30,5 +33,42 @@ public class JobService {
             return jobOptional.get();
         }
         throw new SafaError("No job exist with id:" + jobId);
+    }
+
+    public Job createProjectCreationJob() {
+        Job job = new Job(
+            JobType.PROJECT_CREATION,
+            JobStatus.IN_PROGRESS,
+            now(),
+            now(),
+            null,
+            0,
+            0
+        );
+        this.jobRepository.save(job);
+        return job;
+    }
+
+    public void startStep(Job job) {
+        job.setLastUpdatedAt(now());
+        this.jobRepository.save(job);
+    }
+
+    public void endStep(Job job) {
+        job.incrementStep();
+        job.setLastUpdatedAt(now());
+        this.jobRepository.save(job);
+    }
+
+    public void completeJob(Job job) {
+        job.setStatus(JobStatus.COMPLETED);
+        job.setCurrentProgress(100);
+        job.setCompletedAt(now());
+        job.setLastUpdatedAt(now());
+        this.jobRepository.save(job);
+    }
+
+    public Timestamp now() {
+        return new Timestamp(System.currentTimeMillis());
     }
 }

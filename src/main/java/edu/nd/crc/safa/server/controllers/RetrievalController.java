@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
@@ -40,7 +40,7 @@ public class RetrievalController extends BaseController {
      * @throws SafaError Throws error if no version is associated with given id.
      */
     @GetMapping(AppRoutes.Projects.Entities.getProjectInVersion)
-    public ProjectVersionErrors getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
+    public ProjectEntities getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }

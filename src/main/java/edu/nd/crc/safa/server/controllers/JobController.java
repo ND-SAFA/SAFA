@@ -4,12 +4,19 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.JobSubmission;
-import edu.nd.crc.safa.server.entities.api.JobType;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
+import edu.nd.crc.safa.server.entities.api.ProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
+import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.JobService;
+import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,19 +31,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController extends BaseController {
 
     JobService jobService;
+    EntityVersionService entityVersionService;
+    ProjectService projectService;
+    ProjectRepository projectRepository; //TODO: Extract into service?
+    AppEntityRetrievalService appEntityRetrievalService;
+    NotificationService notificationService;
 
     @Autowired
-    public JobController(ResourceBuilder resourceBuilder, JobService jobService) {
+    public JobController(ResourceBuilder resourceBuilder,
+                         JobService jobService,
+                         EntityVersionService entityVersionService,
+                         ProjectService projectService,
+                         ProjectRepository projectRepository,
+                         AppEntityRetrievalService appEntityRetrievalService,
+                         NotificationService notificationService) {
         super(resourceBuilder);
         this.jobService = jobService;
+        this.entityVersionService = entityVersionService;
+        this.projectService = projectService;
+        this.projectRepository = projectRepository;
+        this.appEntityRetrievalService = appEntityRetrievalService;
+        this.notificationService = notificationService;
     }
 
     private static <T> T convertInstanceOfObject(Object o, Class<T> clazz) {
-        try {
-            return clazz.cast(o);
-        } catch (ClassCastException e) {
-            return null;
-        }
+        return clazz.cast(o);
     }
 
     @GetMapping(AppRoutes.Jobs.getJobStatus)
@@ -60,16 +79,38 @@ public class JobController extends BaseController {
         throw new SafaError("Stopping jobs is under construction");
     }
 
-    @PostMapping(AppRoutes.Jobs.createNewJob)
-    public Job createNewJob(JobSubmission jobSubmission) throws SafaError {
-        JobType jobType = jobSubmission.getJobType();
-        switch (jobType) {
-            case PROJECT_CREATION:
-                ProjectCommit projectCommit = convertInstanceOfObject(jobSubmission.getPayload(), ProjectCommit.class);
-                
-                throw new SafaError("Stopping jobs is under construction");
-            default:
-                throw new RuntimeException("Job type not implemented:" + jobType);
-        }
+    /**
+     * Parses given job payload by the jobType and returns the job created.
+     *
+     * @param projectCommit The project entities to create.
+     * @return The current status of the job created.
+     * @throws SafaError Throws error if job failed to start or is under construction.
+     */
+    @PostMapping(AppRoutes.Jobs.createProject)
+    public JobAppEntity createNewJob(ProjectCommit projectCommit) throws SafaError,
+        IllegalAccessException {
+        // Step 1 - Fetch version and assert permissions
+        Project project = new Project();
+        project.setName("New Project");
+        project.setDescription("Some description");
+        this.projectRepository.save(project);
+        ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
+        projectCommit.setCommitVersion(projectVersion);
+
+        // Step 2 - Create new job
+        Job job = this.jobService.createProjectCreationJob();
+
+        // Step 3 - Create job worker
+        ProjectCreationWorker jobCreationThread = new ProjectCreationWorker(
+            job,
+            projectCommit,
+            jobService,
+            notificationService,
+            entityVersionService,
+            appEntityRetrievalService);
+        jobCreationThread.start();
+
+        // Step 4 - Create job response
+        return JobAppEntity.createFromJob(job);
     }
 }

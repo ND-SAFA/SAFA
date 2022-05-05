@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
+import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.NotificationService;
@@ -110,6 +111,18 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     }
 
     /**
+     * Subscribes client with associated id to the given project version.
+     *
+     * @param clientId The ID given to client subscribing to project version.
+     * @param job      The job whose updates are listened for.
+     * @return The test instance allowing for the builder pattern.
+     */
+    public WebSocketBaseTest subscribeToJob(String clientId, Job job) {
+        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(job);
+        return this.subscribe(clientId, projectVersionSubscriptionDestination);
+    }
+
+    /**
      * Returns the next message in the queue associated with given client id.
      *
      * @param clientId    The Id of the client whose queue we're reading.
@@ -121,6 +134,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      */
     public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
         String response = getNextMessage(clientId);
+        System.out.println("WEBSOCKET:" + response);
         return toClass(response, targetClass);
     }
 

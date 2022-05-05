@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.controllers;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.JIRAProjectPullRequest;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.ProjectService;
@@ -33,7 +33,7 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public ProjectVersionErrors pullJiraProject(@RequestBody JIRAProjectPullRequest jiraProjectPullRequest) {
+    public ProjectEntities pullJiraProject(@RequestBody JIRAProjectPullRequest jiraProjectPullRequest) {
         Project project = new Project();
         project.setName("DUMMY NAME");
         project.setDescription("DUMMY DESCRIPTION");

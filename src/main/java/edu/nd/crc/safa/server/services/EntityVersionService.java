@@ -3,12 +3,13 @@ package edu.nd.crc.safa.server.services;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
+import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
@@ -37,16 +38,19 @@ public class EntityVersionService {
     private final CommitErrorRepository commitErrorRepository;
 
     private final AppEntityRetrievalService appEntityRetrievalService;
+    private final JobService jobService;
 
     @Autowired
     public EntityVersionService(ArtifactVersionRepository artifactVersionRepository,
                                 TraceLinkVersionRepository traceLinkVersionRepository,
                                 CommitErrorRepository commitErrorRepository,
-                                AppEntityRetrievalService appEntityRetrievalService) {
+                                AppEntityRetrievalService appEntityRetrievalService,
+                                JobService jobService) {
         this.artifactVersionRepository = artifactVersionRepository;
         this.commitErrorRepository = commitErrorRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.appEntityRetrievalService = appEntityRetrievalService;
+        this.jobService = jobService;
     }
 
     /**
@@ -60,12 +64,26 @@ public class EntityVersionService {
      * @throws SafaError Throws error is a problem occurs while saving artifacts or traces.
      */
     @Transactional
-    public ProjectVersionErrors setProjectEntitiesAtVersion(ProjectVersion projectVersion,
-                                                            @NotNull List<ArtifactAppEntity> artifacts,
-                                                            @NotNull List<TraceAppEntity> traces) throws SafaError {
+    public ProjectEntities setProjectEntitiesAtVersion(ProjectVersion projectVersion,
+                                                       @NotNull List<ArtifactAppEntity> artifacts,
+                                                       @NotNull List<TraceAppEntity> traces) throws SafaError {
+        this.setArtifactsAtVersionAndSaveErrors(projectVersion, artifacts);
+        this.setTracesAtVersionAndSaveErrors(projectVersion, traces);
+        return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+    }
+
+    @Transactional
+    public ProjectEntities setProjectEntitiesAtVersion(ProjectVersion projectVersion,
+                                                       @NotNull List<ArtifactAppEntity> artifacts,
+                                                       @NotNull List<TraceAppEntity> traces,
+                                                       Job job) throws SafaError {
+        int totalEntities = artifacts.size() + traces.size();
+        int artifactStepProgress = (int) (artifacts.size() / (double) totalEntities) * 90;
+        int traceStepProgress = (int) (artifacts.size() / (double) totalEntities) * 90;
 
         this.setArtifactsAtVersionAndSaveErrors(projectVersion, artifacts);
         this.setTracesAtVersionAndSaveErrors(projectVersion, traces);
+
         return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
@@ -77,8 +95,8 @@ public class EntityVersionService {
      * @param projectArtifacts List of artifact's in a project whose version will be stored.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    private void setArtifactsAtVersionAndSaveErrors(ProjectVersion projectVersion,
-                                                    List<ArtifactAppEntity> projectArtifacts) throws SafaError {
+    public void setArtifactsAtVersionAndSaveErrors(ProjectVersion projectVersion,
+                                                   List<ArtifactAppEntity> projectArtifacts) throws SafaError {
         List<Pair<ArtifactVersion, CommitError>> commitResponse = this.artifactVersionRepository
             .commitAllAppEntitiesToProjectVersion(projectVersion, projectArtifacts);
         for (Pair<ArtifactVersion, CommitError> commitPayload : commitResponse) {
@@ -98,8 +116,8 @@ public class EntityVersionService {
      * @param traces         List of artifact's in a project whose version will be stored.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    private void setTracesAtVersionAndSaveErrors(ProjectVersion projectVersion,
-                                                 List<TraceAppEntity> traces) throws SafaError {
+    public void setTracesAtVersionAndSaveErrors(ProjectVersion projectVersion,
+                                                List<TraceAppEntity> traces) throws SafaError {
         List<Pair<TraceLinkVersion, CommitError>> commitResponse = this.traceLinkVersionRepository
             .commitAllAppEntitiesToProjectVersion(projectVersion, traces);
 

@@ -14,20 +14,20 @@ import edu.nd.crc.safa.warnings.RuleName;
  * 3. Any errors occurring in the project.
  * 4. Any warnings about the current project version.
  */
-public class ProjectVersionErrors {
+public class ProjectEntities {
 
     ProjectAppEntity project;
     ProjectVersion projectVersion;
     ProjectParsingErrors errors;
     Map<String, List<RuleName>> warnings;
 
-    public ProjectVersionErrors() {
+    public ProjectEntities() {
     }
 
-    public ProjectVersionErrors(ProjectAppEntity project,
-                                ProjectVersion projectVersion,
-                                ProjectParsingErrors errors,
-                                Map<String, List<RuleName>> warnings) {
+    public ProjectEntities(ProjectAppEntity project,
+                           ProjectVersion projectVersion,
+                           ProjectParsingErrors errors,
+                           Map<String, List<RuleName>> warnings) {
         this.project = project;
         this.projectVersion = projectVersion;
         this.errors = errors;

@@ -48,6 +48,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             e.printStackTrace();
             return;
         }
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }

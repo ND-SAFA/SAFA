@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * regarded as unaccounted for.
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
-public class SafaError extends Exception {
+public class SafaError extends RuntimeException {
     Exception exception;
     List<String> errors;
     String details;

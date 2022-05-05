@@ -20,7 +20,6 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,28 +40,34 @@ public class JiraController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(JiraController.class);
 
-    @Autowired
     private AppEntityRetrievalService appEntityRetrievalService;
 
-    @Autowired
     private ProjectService projectService;
 
-    @Autowired
     private SafaUserService safaUserService;
 
-    @Autowired
     private JiraAccessCredentialsRepository accessCredentialsRepository;
 
-    @Autowired
     private JiraConnectionService jiraConnectionService;
 
     @Autowired
-    private ExecutorDelegate executorDelegate;
-
-    @Autowired
-    public JiraController(ResourceBuilder resourceBuilder) {
+    public JiraController(ResourceBuilder resourceBuilder,
+                          AppEntityRetrievalService appEntityRetrievalService,
+                          ProjectService projectService,
+                          SafaUserService safaUserService,
+                          JiraAccessCredentialsRepository accessCredentialsRepository,
+                          JiraConnectionService jiraConnectionService,
+                          ExecutorDelegate executorDelegate) {
         super(resourceBuilder);
+        this.appEntityRetrievalService = appEntityRetrievalService;
+        this.projectService = projectService;
+        this.safaUserService = safaUserService;
+        this.accessCredentialsRepository = accessCredentialsRepository;
+        this.jiraConnectionService = jiraConnectionService;
+        this.executorDelegate = executorDelegate;
     }
+
+    private ExecutorDelegate executorDelegate;
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
     public DeferredResult<ProjectVersionErrors> pullJiraProject(@PathVariable("id") Long id) {

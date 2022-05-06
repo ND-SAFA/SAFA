@@ -23,7 +23,7 @@ public class TestFlatFileProjectCreationWorker extends FlatFileBaseTest {
     JobRepository jobRepository;
 
     @Test
-    public void basicProjectCreation() throws Exception {
+    public void uploadBeforeProject() throws Exception {
 
         // Step - Create project
         String projectName = "test-before-files";

@@ -19,9 +19,8 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,7 +42,7 @@ public class JobController extends BaseController {
     ProjectRepository projectRepository; //TODO: Extract into service?
     AppEntityRetrievalService appEntityRetrievalService;
     NotificationService notificationService;
-    ApplicationContext applicationContext;
+    TaskExecutor taskExecutor;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -53,7 +52,7 @@ public class JobController extends BaseController {
                          ProjectRepository projectRepository,
                          AppEntityRetrievalService appEntityRetrievalService,
                          NotificationService notificationService,
-                         ApplicationContext applicationContext) {
+                         TaskExecutor taskExecutor) {
         super(resourceBuilder);
         this.jobService = jobService;
         this.entityVersionService = entityVersionService;
@@ -61,7 +60,7 @@ public class JobController extends BaseController {
         this.projectRepository = projectRepository;
         this.appEntityRetrievalService = appEntityRetrievalService;
         this.notificationService = notificationService;
-        this.applicationContext = applicationContext;
+        this.taskExecutor = taskExecutor;
     }
 
     @GetMapping(AppRoutes.Jobs.getJobs)
@@ -104,7 +103,6 @@ public class JobController extends BaseController {
             projectVersion,
             files);
 
-        ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("taskExecutor");
         taskExecutor.execute(jobCreationThread);
 
         // Step 4 - Create job response

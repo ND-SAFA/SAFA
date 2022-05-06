@@ -15,7 +15,7 @@ import edu.nd.crc.safa.server.services.NotificationService;
 /**
  * Uses reflection to parse and run steps
  */
-public abstract class JobWorker extends Thread {
+public abstract class JobWorker implements Runnable {
 
     /**
      * The job identifying information that is being performed.

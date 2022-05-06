@@ -1,14 +1,15 @@
 package edu.nd.crc.safa.server.services;
 
 import java.sql.Timestamp;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,27 +23,27 @@ public class JobService {
 
     private static JobService instance;
     JobRepository jobRepository;
+    SafaUserService safaUserService;
 
     @Autowired
-    public JobService(JobRepository jobRepository) {
+    public JobService(JobRepository jobRepository, SafaUserService safaUserService) {
         this.jobRepository = jobRepository;
+        this.safaUserService = safaUserService;
     }
 
     public static JobService getInstance() {
         return instance;
     }
 
-    public Job retrieveJob(UUID jobId) throws SafaError {
-        Optional<Job> jobOptional = this.jobRepository.findById(jobId);
-
-        if (jobOptional.isPresent()) {
-            return jobOptional.get();
-        }
-        throw new SafaError("No job exist with id:" + jobId);
+    public List<Job> retrieveCurrentUserJobs() throws SafaError {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        return this.jobRepository.findByUser(currentUser);
     }
 
     public Job createNewJob(JobType jobType) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
         Job job = new Job(
+            currentUser,
             jobType,
             JobStatus.IN_PROGRESS,
             now(),

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
@@ -18,7 +19,9 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +43,7 @@ public class JobController extends BaseController {
     ProjectRepository projectRepository; //TODO: Extract into service?
     AppEntityRetrievalService appEntityRetrievalService;
     NotificationService notificationService;
+    ApplicationContext applicationContext;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -48,7 +52,8 @@ public class JobController extends BaseController {
                          ProjectService projectService,
                          ProjectRepository projectRepository,
                          AppEntityRetrievalService appEntityRetrievalService,
-                         NotificationService notificationService) {
+                         NotificationService notificationService,
+                         ApplicationContext applicationContext) {
         super(resourceBuilder);
         this.jobService = jobService;
         this.entityVersionService = entityVersionService;
@@ -56,20 +61,12 @@ public class JobController extends BaseController {
         this.projectRepository = projectRepository;
         this.appEntityRetrievalService = appEntityRetrievalService;
         this.notificationService = notificationService;
+        this.applicationContext = applicationContext;
     }
 
-    private static <T> T convertInstanceOfObject(Object o, Class<T> clazz) {
-        return clazz.cast(o);
-    }
-
-    @GetMapping(AppRoutes.Jobs.getJobStatus)
-    public Job getJobStatus(UUID jobId) throws SafaError {
-        return this.jobService.retrieveJob(jobId);
-    }
-
-    @GetMapping(AppRoutes.Jobs.getJobResult)
-    public <T> T jobJobResult(UUID jobId) throws SafaError {
-        throw new SafaError("Retrieving job result is under construction");
+    @GetMapping(AppRoutes.Jobs.getJobs)
+    public List<Job> getJobStatus() throws SafaError {
+        return this.jobService.retrieveCurrentUserJobs();
     }
 
     /**
@@ -106,9 +103,12 @@ public class JobController extends BaseController {
         FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(job,
             projectVersion,
             files);
-        jobCreationThread.start();
+
+        ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("taskExecutor");
+        taskExecutor.execute(jobCreationThread);
 
         // Step 4 - Create job response
+        System.out.println("Returning from endpoint....");
         return JobAppEntity.createFromJob(job);
     }
 }

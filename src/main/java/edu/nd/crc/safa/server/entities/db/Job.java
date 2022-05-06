@@ -7,12 +7,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /**
@@ -21,7 +26,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "job")
 public class Job {
-
     /**
      * The name of job (e.g. project creation).
      */
@@ -74,16 +78,26 @@ public class Job {
     @Column(name = "current_step", nullable = false)
     int currentStep;
 
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    @JoinColumn(
+        name = "user_id",
+        nullable = false)
+    SafaUser user;
+
     public Job() {
     }
 
-    public Job(JobType jobType,
+    public Job(SafaUser user,
+               JobType jobType,
                JobStatus status,
                Timestamp startedAt,
                Timestamp lastUpdatedAt,
                @Nullable Timestamp completedAt,
                int currentProgress,
                int currentStep) {
+        this.user = user;
         this.jobType = jobType;
         this.status = status;
         this.startedAt = startedAt;

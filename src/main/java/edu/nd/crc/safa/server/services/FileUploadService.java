@@ -48,9 +48,9 @@ public class FileUploadService {
                 parentFile.mkdirs();
                 newFile.createNewFile();
                 requestFile.transferTo(newFile);
-
             } catch (IOException e) {
                 String error = String.format("Could not upload file: %s", requestFile.getOriginalFilename());
+                e.printStackTrace();
                 throw new SafaError(error, e);
             }
         }

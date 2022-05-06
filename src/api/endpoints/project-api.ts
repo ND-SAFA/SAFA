@@ -7,47 +7,7 @@ import {
   ProjectMembership,
   ProjectRole,
 } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
-
-/**
- * Creates a new project from the given flat files.
- *
- * @param formData - Form data containing the project files.
- * @return The created project.
- */
-export async function createProjectFromFlatFiles(
-  formData: FormData
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    Endpoint.createProjectFromFlatFiles,
-    {
-      method: "POST",
-      body: formData,
-    },
-    false
-  );
-}
-
-/**
- * Updates an existing project from the given flat files.
- *
- * @param versionId - The project version to update.
- * @param formData - Form data containing the project files.
- * @return The updated project.
- */
-export async function updateProjectThroughFlatFiles(
-  versionId: string,
-  formData: FormData
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
-    {
-      method: "POST",
-      body: formData,
-    },
-    false
-  );
-}
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * Creates or updates the given project.

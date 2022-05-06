@@ -1,7 +1,7 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
-import { ProjectMessage, VersionMessage } from "@/types";
-import { logModule, projectModule, sessionModule } from "@/store";
+import { Job, ProjectMessage, VersionMessage } from "@/types";
+import { jobModule, logModule, projectModule, sessionModule } from "@/store";
 import { baseURL } from "@/api/util";
 import {
   getProjectMembers,
@@ -204,4 +204,28 @@ async function projectMessageHandler(
     case "DOCUMENTS":
       return handleDocumentReload(projectId);
   }
+}
+
+/**
+ * Subscribes to updates for job with given id.
+ * @param jobId The id for the job whose updates we want to process.
+ */
+export function connectAndSubscribeToJob(jobId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (!jobId) {
+      resolve();
+      return;
+    }
+    connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then(() => {
+      clearSubscriptions();
+      const jobSubscription = `/app/jobs/${jobId}`;
+      stompClient.subscribe(jobSubscription, jobMessageHandler);
+      resolve();
+    });
+  });
+}
+
+function jobMessageHandler(frame: Frame): void {
+  const message: Job = JSON.parse(frame.body) as Job;
+  jobModule.addOrUpdateJob(message);
 }

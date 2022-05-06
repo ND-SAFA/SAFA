@@ -1,7 +1,8 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { updateProjectThroughFlatFiles, handleSetProject } from "@/api";
+import { updateProjectThroughFlatFiles } from "@/api";
 import { connectAndSubscribeToVersion } from "@/api/notifications";
+import { handleJobSubmission } from "@/api/handlers/job-handler";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -35,7 +36,7 @@ export async function handleUploadProjectVersion(
     const uploadFlatFiles = async () => {
       const res = await updateProjectThroughFlatFiles(versionId, formData);
 
-      logModule.onSuccess(`Flat files have been uploaded: ${res.project.name}`);
+      logModule.onSuccess(`Job has been successfully submitted.`);
 
       return res;
     };
@@ -48,11 +49,11 @@ export async function handleUploadProjectVersion(
         );
         // Note that changing the order below will cause the project to not properly render initially.
         await navigateTo(Routes.ARTIFACT);
-        const res = await uploadFlatFiles();
-        await handleSetProject(res);
+        const job = await uploadFlatFiles();
+        await handleJobSubmission(job);
       } catch (e) {
         logModule.onError(e.message);
-        await navigateTo(Routes.PROJECT_CREATOR);
+        await navigateTo(Routes.UPLOAD_STATUS);
       } finally {
         appModule.onLoadEnd();
       }

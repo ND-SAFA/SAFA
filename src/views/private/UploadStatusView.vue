@@ -14,7 +14,9 @@
             <v-expansion-panel :key="upload.id">
               <v-expansion-panel-header disable-icon-rotate>
                 <v-row no-gutters>
-                  <v-col cols="4"> {{ upload.name }} </v-col>
+                  <v-col cols="4">
+                    {{ getPrintableJobType(upload.jobType) }}
+                  </v-col>
                   <v-col cols="8" class="text--secondary">
                     <v-row v-if="isCancelled(upload.status)" no-gutters>
                       <v-col cols="4"> Upload Cancelled </v-col>
@@ -65,75 +67,14 @@
                   v-model="upload.currentStep"
                 >
                   <v-stepper-header>
-                    <v-stepper-step step="1">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 1
-                            ? "Project Initialized"
-                            : `Initializing Project`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="2">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 2
-                            ? "Artifacts Imported"
-                            : `Importing Artifacts`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="3">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 3
-                            ? "Traces Imported"
-                            : `Importing Traces`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="4">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 4
-                            ? "Traces Generated"
-                            : `Generating Traces`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="5">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 5
-                            ? "Layout Generated"
-                            : `Generating Layout`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="6">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep > 6
-                            ? "Documents Generated"
-                            : `Generating Documents`
-                        }}
-                      </span>
-                    </v-stepper-step>
-                    <v-divider />
-                    <v-stepper-step step="7">
-                      <span class="upload-step">
-                        {{
-                          upload.currentStep === 7
-                            ? "Project Imported"
-                            : "Importing Project"
-                        }}
-                      </span>
-                    </v-stepper-step>
+                    <template v-for="(step, stepIndex) in upload.steps">
+                      <v-stepper-step :key="step" :step="stepIndex">
+                        <span class="upload-step">
+                          {{ upload.steps[upload.currentStep] }}
+                        </span>
+                      </v-stepper-step>
+                      <v-divider :key="step" />
+                    </template>
                   </v-stepper-header>
                 </v-stepper>
 
@@ -166,6 +107,9 @@ import Vue from "vue";
 import { navigateBack } from "@/router";
 import { PrivatePage } from "@/components";
 import { setTimeout } from "timers";
+import { getUserJobs } from "@/api";
+import { Job, JobStatus, JobType } from "@/types";
+import { jobModule } from "@/store";
 
 /**
  * Displays project settings.
@@ -178,39 +122,11 @@ export default Vue.extend({
   data() {
     return {
       timer: undefined as ReturnType<typeof setTimeout> | undefined,
-      uploads: [
-        {
-          id: "1",
-          name: "Project 1",
-          status: "In Progress",
-          startedAt: "2022-04-27T10:00:00.000Z",
-          lastUpdatedAt: "2022-04-27T10:10:00.000Z",
-          completedAt: null,
-          currentProgress: 50,
-          currentStep: 3,
-        },
-        {
-          id: "2",
-          name: "Project 2",
-          status: "Completed",
-          startedAt: "2022-04-27T10:00:00.000Z",
-          lastUpdatedAt: "2022-04-27T10:15:00.000Z",
-          completedAt: "2022-04-27T10:15:00.000Z",
-          currentProgress: 100,
-          currentStep: 7,
-        },
-        {
-          id: "3",
-          name: "Project 3",
-          status: "Cancelled",
-          startedAt: "2022-04-27T10:00:00.000Z",
-          lastUpdatedAt: "2022-04-27T10:15:00.000Z",
-          completedAt: null,
-          currentProgress: 50,
-          currentStep: 0,
-        },
-      ],
+      uploads: [] as Job[],
     };
+  },
+  mounted() {
+    this.reloadJobs();
   },
   methods: {
     /**
@@ -219,14 +135,20 @@ export default Vue.extend({
     handleGoBack() {
       navigateBack();
     },
-    isCompleted(status: string) {
-      return status === "Completed";
+    getPrintableJobType(jobType: JobType) {
+      return jobType
+        .split("_")
+        .map((s) => s.toLowerCase())
+        .join(" ");
     },
-    isInProgress(status: string) {
-      return status === "In Progress";
+    isCompleted(status: JobStatus) {
+      return status === JobStatus.COMPLETED;
     },
-    isCancelled(status: string) {
-      return status === "Cancelled";
+    isInProgress(status: JobStatus) {
+      return status === JobStatus.IN_PROGRESS;
+    },
+    isCancelled(status: JobStatus) {
+      return status === JobStatus.CANCELLED;
     },
     getUpdatedText(timestamp: string) {
       return "Last Update: 10:00 AM, Apr 27";
@@ -248,6 +170,12 @@ export default Vue.extend({
         default:
           return "";
       }
+    },
+    reloadJobs() {
+      getUserJobs().then((jobs) => {
+        this.uploads = jobs;
+        jobModule.SET_JOBS(jobs);
+      });
     },
   },
 });

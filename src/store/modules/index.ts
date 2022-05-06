@@ -12,3 +12,4 @@ export { default as CommitModule } from "./commit.module";
 export { default as DocumentModule } from "./document.module";
 export { default as ArtifactModule } from "./artifact.module";
 export { default as TraceModule } from "./trace.module";
+export { default as JobModule } from "./job.module";

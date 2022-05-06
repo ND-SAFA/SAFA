@@ -69,11 +69,13 @@ export default Vue.extend({
      */
     artifacts(): Artifact[] {
       const artifacts = artifactModule.artifacts;
+      const lowercaseSearch = this.searchText.toLowerCase();
 
-      return this.searchText
+      return lowercaseSearch
         ? artifacts.filter(
             ({ name, body }) =>
-              name.includes(this.searchText) || body.includes(this.searchText)
+              name.toLowerCase().includes(lowercaseSearch) ||
+              body.toLowerCase().includes(lowercaseSearch)
           )
         : artifacts;
     },

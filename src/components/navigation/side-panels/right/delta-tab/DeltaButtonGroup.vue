@@ -6,7 +6,7 @@
 
     <v-expansion-panel-content>
       <artifact-delta-button
-        v-for="{ name, id } in artifactFields"
+        v-for="{ name, id } in itemFields"
         class="mr-1 mb-1"
         :key="name"
         :name="name"
@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DeltaType, EntityModification } from "@/types";
+import { Artifact, DeltaType, EntityModification, TraceLink } from "@/types";
 import { capitalize } from "@/util";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -36,12 +36,14 @@ export default Vue.extend({
       type: String as PropType<DeltaType>,
       required: true,
     },
-    artifacts: {
+    items: {
       type: Object as PropType<
-        Record<string, Artifact | EntityModification<Artifact>>
+        Record<string, Artifact | EntityModification<Artifact> | TraceLink>
       >,
       required: true,
     },
+    // If true, items will be interpreted as traces instead of artifacts.
+    isTraces: Boolean,
   },
   data() {
     return {
@@ -64,14 +66,23 @@ export default Vue.extend({
     title(): string {
       return capitalize(this.deltaType);
     },
-    artifactFields(): Pick<Artifact, "id" | "name">[] {
-      const artifacts = Object.values(this.artifacts);
+    itemFields(): { id: string; name: string }[] {
+      const items = Object.values(this.items);
 
-      return this.deltaType === "modified"
-        ? (artifacts as EntityModification<Artifact>[]).map(
-            ({ after: { id, name } }) => ({ id, name })
-          )
-        : (artifacts as Artifact[]).map(({ id, name }) => ({ id, name }));
+      if (this.isTraces) {
+        return (items as TraceLink[]).map(
+          ({ traceLinkId, sourceName, targetName }) => ({
+            id: traceLinkId,
+            name: `${sourceName} > ${targetName}`,
+          })
+        );
+      } else {
+        return this.deltaType === "modified"
+          ? (items as EntityModification<Artifact>[]).map(
+              ({ after: { id, name } }) => ({ id, name })
+            )
+          : (items as Artifact[]).map(({ id, name }) => ({ id, name }));
+      }
     },
   },
 });

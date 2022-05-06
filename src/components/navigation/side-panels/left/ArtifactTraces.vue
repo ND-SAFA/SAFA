@@ -96,8 +96,8 @@ export default Vue.extend({
      */
     style(): string {
       return this.children.length > 0 && this.parents.length > 0
-        ? "max-width: 50px"
-        : "max-width: 190px";
+        ? "max-width: 75px"
+        : "max-width: 240px";
     },
   },
   methods: {

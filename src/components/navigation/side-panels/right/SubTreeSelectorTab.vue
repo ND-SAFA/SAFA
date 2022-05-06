@@ -1,54 +1,49 @@
 <template>
   <v-container>
     <h1 class="text-h4 my-2">Artifact Hierarchy</h1>
-    <v-col>
-      <v-row>
-        <v-text-field
-          label="Search"
-          solo
-          rounded
-          class="mt-5"
-          dense
-          prepend-inner-icon="mdi-magnify"
-          v-model="searchText"
-        />
-      </v-row>
-      <v-row>
-        <v-list class="search-container full-width">
-          <v-list-group
-            v-for="type in artifactTypes"
-            :key="type"
-            :prepend-icon="getIconName(type)"
-          >
-            <template v-slot:activator>
-              <v-list-item-title>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <span v-on="on" v-bind="attrs">
-                      {{ getTypePrintName(type) }}
-                    </span>
-                  </template>
-                  <span>{{ getTypePrintName(type) }}</span>
-                </v-tooltip>
-              </v-list-item-title>
-            </template>
-            <v-list-item
-              v-for="artifact in artifactTypeHashTable[type]"
-              :key="artifact.name"
-              @click="handleArtifactClick(artifact)"
-            >
-              <v-list-item-content>
-                <v-list-item-title>{{ artifact.name }}</v-list-item-title>
+    <v-divider class="mb-4" />
 
-                <v-list-item-subtitle class="text-wrap">
-                  {{ artifact.body }}</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-group>
-        </v-list>
-      </v-row>
-    </v-col>
+    <v-text-field
+      label="Search"
+      solo
+      rounded
+      prepend-inner-icon="mdi-magnify"
+      v-model="searchText"
+    />
+
+    <v-list class="search-container full-width">
+      <v-list-group
+        v-for="type in artifactTypes"
+        :key="type"
+        :prepend-icon="getIconName(type)"
+      >
+        <template v-slot:activator>
+          <v-list-item-title>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <span v-on="on" v-bind="attrs">
+                  {{ getTypePrintName(type) }}
+                </span>
+              </template>
+              <span>{{ getTypePrintName(type) }}</span>
+            </v-tooltip>
+          </v-list-item-title>
+        </template>
+        <v-list-item
+          v-for="artifact in artifactTypeHashTable[type]"
+          :key="artifact.name"
+          @click="handleArtifactClick(artifact)"
+        >
+          <v-list-item-content>
+            <v-list-item-title>{{ artifact.name }}</v-list-item-title>
+
+            <v-list-item-subtitle class="text-wrap">
+              {{ artifact.body }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
+    </v-list>
   </v-container>
 </template>
 

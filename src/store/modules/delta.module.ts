@@ -160,6 +160,13 @@ export default class ErrorModule extends VuexModule {
   }
 
   /**
+   * @return A mapping of trace IDs and the traces removed.
+   */
+  get removedTraces(): Record<string, TraceLink> {
+    return this.projectDelta.traces.removed;
+  }
+
+  /**
    * @return The current version that deltas are made to.
    */
   get deltaVersion(): ProjectVersion | undefined {

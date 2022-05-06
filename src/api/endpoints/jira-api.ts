@@ -184,11 +184,15 @@ export async function createJiraProject(
   cloudId: string,
   projectId: string
 ): Promise<void> {
+  const refreshToken = localStorage.getItem(
+    LocalStorageKeys.JIRA_REFRESH_TOKEN
+  );
   return authHttpClient<void>(Endpoint.jiraProject, {
     method: "POST",
     body: JSON.stringify({
       cloudId,
       projectId,
+      refreshToken,
       bearerAccessToken: accessToken,
       clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
       clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,

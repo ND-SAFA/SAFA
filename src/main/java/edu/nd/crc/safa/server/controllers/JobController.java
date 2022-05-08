@@ -103,7 +103,7 @@ public class JobController extends BaseController {
             projectVersion,
             files);
 
-        taskExecutor.execute(jobCreationThread);
+        jobCreationThread.run();
 
         // Step 4 - Create job response
         System.out.println("Returning from endpoint....");

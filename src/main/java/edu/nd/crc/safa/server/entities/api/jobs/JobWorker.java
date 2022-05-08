@@ -12,6 +12,8 @@ import edu.nd.crc.safa.server.entities.db.Job;
 import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
 
+import org.springframework.scheduling.annotation.Async;
+
 /**
  * Uses reflection to parse and run steps
  */
@@ -46,6 +48,7 @@ public abstract class JobWorker implements Runnable {
         this.job = job;
     }
 
+    @Async
     public void run() {
         try {
             this.init();

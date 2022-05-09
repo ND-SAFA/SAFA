@@ -3,7 +3,8 @@
     <v-btn
       large
       color="primary"
-      :disabled="!!token"
+      :disabled="isDisabled"
+      :loading="isLoading"
       @click="handleJiraAuthentication"
     >
       <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
@@ -27,10 +28,25 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
+    /**
+     * Opens the jira authentication window.
+     */
     handleJiraAuthentication(): void {
       authorizeJira();
+    },
+  },
+  computed: {
+    /**
+     * Returns whether the button is enabled.
+     */
+    isDisabled(): boolean {
+      return !!this.token || this.isLoading;
     },
   },
 });

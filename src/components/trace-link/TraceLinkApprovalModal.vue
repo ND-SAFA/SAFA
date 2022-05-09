@@ -1,15 +1,16 @@
 <template>
   <generic-modal
-    title="Approve Link"
+    title="Trace Link"
     :is-open="isOpen"
     :actions-height="0"
     @close="$emit('close')"
   >
     <template v-slot:body>
       <trace-link-display
+        v-if="!!link"
         :link="link"
-        :source-body="link.sourceBody"
-        :target-body="link.targetBody"
+        :source-body="sourceBody"
+        :target-body="targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
         @link:approve="handleApprove"
@@ -21,15 +22,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  TraceApproval,
-  TraceLink,
-  TraceLinkDisplayData,
-  TraceType,
-} from "@/types";
+import { TraceApproval, TraceLink, TraceType } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common/generic";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
+import { artifactModule } from "@/store";
 
 /**
  * A modal for approving trace links.
@@ -44,9 +41,22 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    link: {
-      type: Object as PropType<TraceLinkDisplayData>,
-      required: true,
+    link: Object as PropType<TraceLink>,
+  },
+  data() {
+    return {
+      sourceBody: "",
+      targetBody: "",
+    };
+  },
+  watch: {
+    isOpen(isOpen: boolean) {
+      if (!isOpen || !this.link) return;
+
+      const artifactsById = artifactModule.getArtifactsById;
+
+      this.sourceBody = artifactsById[this.link.sourceId].body;
+      this.targetBody = artifactsById[this.link.targetId].body;
     },
   },
   computed: {
@@ -54,7 +64,7 @@ export default Vue.extend({
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
-      return this.link.traceType === TraceType.GENERATED;
+      return this.link?.traceType === TraceType.GENERATED;
     },
     /**
      * @return Whether this link can be approved.
@@ -62,7 +72,7 @@ export default Vue.extend({
     canBeApproved(): boolean {
       return (
         this.canBeModified &&
-        this.link.approvalStatus !== TraceApproval.APPROVED
+        this.link?.approvalStatus !== TraceApproval.APPROVED
       );
     },
     /**
@@ -71,7 +81,7 @@ export default Vue.extend({
     canBeDeclined(): boolean {
       return (
         this.canBeModified &&
-        this.link.approvalStatus !== TraceApproval.DECLINED
+        this.link?.approvalStatus !== TraceApproval.DECLINED
       );
     },
   },

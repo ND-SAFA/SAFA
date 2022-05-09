@@ -1,10 +1,16 @@
 <template>
   <v-container>
     <h1 class="text-h4 my-2">Type Options</h1>
+    <v-divider class="mb-2" />
+
     <div v-for="entry in artifactDirections" :key="entry.type">
       <h2 class="text-h5 mb-2">{{ entry.label }}</h2>
 
-      <h3 class="text-h6">{{ entry.label }} Can Trace To</h3>
+      <v-divider />
+
+      <v-subheader class="pl-0" style="height: 30px">
+        {{ entry.label }} Traces To
+      </v-subheader>
 
       <v-chip-group column>
         <v-chip
@@ -16,14 +22,15 @@
           {{ getTypeLabel(type) }}
         </v-chip>
       </v-chip-group>
-
       <v-chip v-if="entry.allowedTypes.length === 0">
         Any Type of Artifact
       </v-chip>
 
-      <h3 class="text-h6 mb-1">{{ entry.label }} Icon</h3>
+      <v-subheader class="pl-0" style="height: 30px">
+        {{ entry.label }} Icon
+      </v-subheader>
 
-      <v-btn-toggle v-model="entry.iconIndex">
+      <v-btn-toggle v-model="entry.iconIndex" class="mb-4" borderless>
         <v-btn
           v-for="option in icons"
           :key="option"
@@ -32,8 +39,6 @@
           <v-icon>{{ option }}</v-icon>
         </v-btn>
       </v-btn-toggle>
-
-      <v-divider class="my-4" />
     </div>
   </v-container>
 </template>

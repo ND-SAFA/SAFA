@@ -1,57 +1,63 @@
 <template>
-  <div v-if="parents.length + children.length > 0">
+  <div v-if="parents.length + children.length > 0" class="mb-2">
     <h2 class="text-h6">Trace Links</h2>
-    <v-divider />
+    <v-divider class="mb-2" />
 
-    <v-row>
-      <v-col v-if="parents.length !== 0">
-        <v-subheader style="height: 30px">Parents</v-subheader>
-        <v-divider />
-        <v-list dense style="max-height: 300px" class="overflow-y-auto">
-          <v-tooltip bottom v-for="parentName in parents" :key="parentName">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                v-on="on"
-                v-bind="attrs"
-                outlined
-                block
-                class="mb-1"
-                @click="handleArtifactClick(parentName)"
-              >
-                <span class="mb-1 text-ellipsis" style="max-width: 50px">
-                  {{ parentName }}
-                </span>
-              </v-btn>
-            </template>
-            <span> {{ parentName }}</span>
-          </v-tooltip>
-        </v-list>
-      </v-col>
+    <v-expansion-panels>
+      <v-expansion-panel v-if="parents.length > 0">
+        <v-expansion-panel-header class="text-body-1">
+          {{ parentTitle }}
+        </v-expansion-panel-header>
+        <v-expansion-panel-content class="text-body-1">
+          <v-list dense style="max-height: 300px" class="overflow-y-auto">
+            <v-tooltip bottom v-for="parentName in parents" :key="parentName">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  outlined
+                  block
+                  class="mb-1"
+                  @click="handleArtifactClick(parentName)"
+                >
+                  <span class="mb-1 text-ellipsis" style="max-width: 160px">
+                    {{ parentName }}
+                  </span>
+                </v-btn>
+              </template>
+              <span> {{ parentName }}</span>
+            </v-tooltip>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
 
-      <v-col v-if="children.length !== 0">
-        <v-subheader style="height: 30px">Children</v-subheader>
-        <v-divider />
-        <v-list dense style="max-height: 300px" class="overflow-y-auto">
-          <v-tooltip bottom v-for="childName in children" :key="childName">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                v-on="on"
-                v-bind="attrs"
-                outlined
-                block
-                class="mb-1"
-                @click="handleArtifactClick(childName)"
-              >
-                <span class="mb-1 text-ellipsis" style="max-width: 50px">
-                  {{ childName }}
-                </span>
-              </v-btn>
-            </template>
-            <span> {{ childName }}</span>
-          </v-tooltip>
-        </v-list>
-      </v-col>
-    </v-row>
+      <v-expansion-panel v-if="children.length > 0">
+        <v-expansion-panel-header class="text-body-1">
+          {{ childTitle }}
+        </v-expansion-panel-header>
+        <v-expansion-panel-content class="text-body-1">
+          <v-list dense style="max-height: 300px" class="overflow-y-auto">
+            <v-tooltip bottom v-for="childName in children" :key="childName">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  outlined
+                  block
+                  class="mb-1"
+                  @click="handleArtifactClick(childName)"
+                >
+                  <span class="mb-1 text-ellipsis" style="max-width: 160px">
+                    {{ childName }}
+                  </span>
+                </v-btn>
+              </template>
+              <span> {{ childName }}</span>
+            </v-tooltip>
+          </v-list>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </div>
 </template>
 
@@ -90,6 +96,30 @@ export default Vue.extend({
       return traceModule.traces
         .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
         .map(({ sourceName }) => sourceName);
+    },
+    /**
+     * Determines the width of trace link buttons.
+     */
+    style(): string {
+      return this.children.length > 0 && this.parents.length > 0
+        ? "max-width: 75px"
+        : "max-width: 240px";
+    },
+    /**
+     * Generates the name of the parent dropdown.
+     */
+    parentTitle(): string {
+      const length = this.parents.length;
+
+      return length === 1 ? "1 Parent" : `${length} Parents`;
+    },
+    /**
+     * Generates the name of the child dropdown.
+     */
+    childTitle(): string {
+      const length = this.children.length;
+
+      return length === 1 ? "1 Child" : `${length} Children`;
     },
   },
   methods: {

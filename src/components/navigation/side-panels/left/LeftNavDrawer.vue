@@ -7,7 +7,7 @@
     left
     stateless
     :value="isLeftOpen"
-    width="250"
+    width="300"
     height="100%"
   >
     <selected-node-tab />

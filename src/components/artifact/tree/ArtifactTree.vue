@@ -24,7 +24,6 @@
         :trace-definition="traceLink"
       />
       <trace-link-approval-modal
-        v-if="selectedLink !== undefined"
         :is-open="isTraceModalOpen"
         :link="selectedLink"
         @close="handleTraceModalClose"
@@ -35,12 +34,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  TraceLink,
-  TraceLinkDisplayData,
-  Artifact,
-  CytoCoreGraph,
-} from "@/types";
+import { TraceLink, Artifact, CytoCoreGraph } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -69,7 +63,7 @@ export default Vue.extend({
   data() {
     return {
       isTraceModalOpen: false,
-      selectedLink: undefined as TraceLinkDisplayData | undefined,
+      selectedLink: undefined as TraceLink | undefined,
       artifactsInView: [] as string[],
     };
   },
@@ -172,13 +166,7 @@ export default Vue.extend({
      * @param traceLink - The trace link to select.
      */
     handleLinkRightClick(traceLink: TraceLink): void {
-      const artifactsById = artifactModule.getArtifactsById;
-
-      this.selectedLink = {
-        ...traceLink,
-        sourceBody: artifactsById[traceLink.sourceId].body,
-        targetBody: artifactsById[traceLink.targetId].body,
-      };
+      this.selectedLink = traceLink;
       this.isTraceModalOpen = true;
     },
     /**

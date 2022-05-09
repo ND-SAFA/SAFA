@@ -22,6 +22,19 @@
         item-value="id"
       />
       <artifact-input v-model="editingDocument.artifactIds" />
+      <v-switch
+        class="my-0 py-0"
+        label="Include artifact children"
+        v-model="includeChildren"
+      />
+      <v-autocomplete
+        v-if="includeChildren"
+        filled
+        multiple
+        label="Included Child Types"
+        v-model="includedChildTypes"
+        :items="artifactTypes"
+      />
     </template>
     <template v-slot:actions>
       <v-btn
@@ -48,7 +61,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectDocument } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { documentModule } from "@/store";
+import { documentModule, typeOptionsModule } from "@/store";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
@@ -73,6 +86,8 @@ export default Vue.extend({
       confirmDelete: false,
       isValid: false,
       types: documentTypeOptions(),
+      includeChildren: false,
+      includedChildTypes: [] as string[],
     };
   },
   computed: {
@@ -115,6 +130,12 @@ export default Vue.extend({
     deleteButtonText(): string {
       return this.confirmDelete ? "Delete" : "Delete Document";
     },
+    /**
+     * @return All types of artifacts
+     */
+    artifactTypes(): string[] {
+      return typeOptionsModule.artifactTypes;
+    },
   },
   methods: {
     /**
@@ -129,9 +150,14 @@ export default Vue.extend({
      * Attempts to save the document.
      */
     handleSubmit() {
-      handleSaveDocument(this.editingDocument, this.isEditMode, {
-        onSuccess: () => this.resetModalData(),
-      });
+      handleSaveDocument(
+        this.editingDocument,
+        this.isEditMode,
+        this.includeChildren ? this.includedChildTypes : [],
+        {
+          onSuccess: () => this.resetModalData(),
+        }
+      );
     },
     /**
      * Attempts to delete the document, after confirming.
@@ -163,6 +189,8 @@ export default Vue.extend({
       if (!open) return;
 
       this.editingDocument = createDocument(this.document);
+      this.includeChildren = false;
+      this.includedChildTypes = [];
     },
   },
 });

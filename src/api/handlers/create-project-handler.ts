@@ -3,9 +3,9 @@ import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
   createJiraProject,
-  saveProject,
   handleSetProject,
   handleUploadProjectVersion,
+  saveProject,
 } from "@/api";
 
 /**
@@ -83,8 +83,9 @@ export function handleImportJiraProject(
   appModule.onLoadStart();
 
   createJiraProject(accessToken, cloudId, projectId)
-    .then(() => {
+    .then(async () => {
       logModule.onSuccess(`Jira project has been created: ${projectId}`);
+      await navigateTo(Routes.UPLOAD_STATUS);
       onSuccess?.();
     })
     .catch((e) => {

@@ -1,8 +1,8 @@
+import { TraceLink } from "@/types";
+
 /**
  * Enumerates the allowed trace link directions between artifact types.
  */
-import { TraceLink } from "@/types";
-
 export type ArtifactTypeDirections = Record<string, string[]>;
 
 /**
@@ -77,3 +77,10 @@ export enum ConfirmationType {
  * General type for representing an empty callback
  */
 export type EmptyLambda = () => void;
+
+/**
+ * Enumerates keys used in local storage.
+ */
+export enum LocalStorageKeys {
+  JIRA_REFRESH_TOKEN = "jrt",
+}

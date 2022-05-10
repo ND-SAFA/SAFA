@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
@@ -78,7 +78,7 @@ public class EntityVersionService {
     public ProjectEntities setProjectEntitiesAtVersion(ProjectVersion projectVersion,
                                                        @NotNull List<ArtifactAppEntity> artifacts,
                                                        @NotNull List<TraceAppEntity> traces,
-                                                       Job job) throws SafaError {
+                                                       JobDbEntity jobDbEntity) throws SafaError {
         int totalEntities = artifacts.size() + traces.size();
         int artifactStepProgress = (int) (artifacts.size() / (double) totalEntities) * 90;
         int traceStepProgress = (int) (artifacts.size() / (double) totalEntities) * 90;

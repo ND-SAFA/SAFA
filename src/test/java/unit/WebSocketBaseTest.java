@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.NotificationService;
@@ -113,12 +113,12 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     /**
      * Subscribes client with associated id to the given project version.
      *
-     * @param clientId The ID given to client subscribing to project version.
-     * @param job      The job whose updates are listened for.
+     * @param clientId    The ID given to client subscribing to project version.
+     * @param jobDbEntity The job whose updates are listened for.
      * @return The test instance allowing for the builder pattern.
      */
-    public WebSocketBaseTest subscribeToJob(String clientId, Job job) {
-        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(job);
+    public WebSocketBaseTest subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
+        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(jobDbEntity);
         return this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 
@@ -166,6 +166,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     }
 
     private WebSocketBaseTest subscribe(String id, String topic) {
+        System.out.println("Is connected:" + idToSession.get(id).isConnected());
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
                 return byte[].class;

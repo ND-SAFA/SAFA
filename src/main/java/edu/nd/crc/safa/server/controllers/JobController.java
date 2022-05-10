@@ -8,8 +8,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.app.JobAppEntity;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.app.JobDbEntityAppEntity;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
@@ -18,7 +18,15 @@ import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,6 +51,9 @@ public class JobController extends BaseController {
     AppEntityRetrievalService appEntityRetrievalService;
     NotificationService notificationService;
     TaskExecutor taskExecutor;
+    @Autowired
+    @Qualifier("myJobLauncher")
+    private JobLauncher jobLauncher;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -64,7 +75,7 @@ public class JobController extends BaseController {
     }
 
     @GetMapping(AppRoutes.Jobs.getJobs)
-    public List<Job> getJobStatus() throws SafaError {
+    public List<JobDbEntityAppEntity> getJobStatus() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
     }
 
@@ -75,8 +86,8 @@ public class JobController extends BaseController {
      * @throws SafaError Throws error because still in construction.
      */
     @DeleteMapping(AppRoutes.Jobs.deleteJob)
-    public void stopJob(UUID jobId) throws SafaError {
-        throw new SafaError("Stopping jobs is under construction");
+    public void deleteJob(UUID jobId) throws SafaError {
+        this.jobService.deleteJob(jobId);
     }
 
     /**
@@ -89,24 +100,40 @@ public class JobController extends BaseController {
      */
     @PostMapping(AppRoutes.Jobs.flatFileProjectUpdateJob)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws SafaError,
-        IllegalAccessException {
+    public JobDbEntityAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
+                                                         @RequestParam MultipartFile[] files) throws SafaError,
+        IllegalAccessException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         // Step 1 - Fetch version and assert permissions
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
         // Step 2 - Create new job
-        Job job = this.jobService.createNewJob(JobType.FLAT_FILE_PROJECT_CREATION);
+        String name = "Uploading flat files to: " + projectVersion.getProject().getName();
+        JobDbEntity jobDbEntity = this.jobService.createNewJob(JobType.FLAT_FILE_PROJECT_CREATION, name);
 
         // Step 3 - Create job worker
-        FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(job,
+        FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(jobDbEntity,
             projectVersion,
             files);
 
-        jobCreationThread.run();
+        JobParameters jobParameters =
+            new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis()).toJobParameters();
+        jobLauncher.run(jobCreationThread, jobParameters);
 
         // Step 4 - Create job response
         System.out.println("Returning from endpoint....");
-        return JobAppEntity.createFromJob(job);
+        return JobDbEntityAppEntity.createFromJob(jobDbEntity);
     }
+
+//    /**
+//     * Responds to subscription to job with the current job update.
+//     *
+//     * @param jobId The job id being subscribed to.
+//     * @return The latest job status.
+//     * @throws SafaError Throws error if not job found with given id.
+//     */
+//    @SubscribeMapping("/jobs/{jobId}")
+//    public Job chat(@DestinationVariable UUID jobId) throws SafaError {
+//        return this.jobService.getJobById(jobId);
+//    }
 }

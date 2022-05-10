@@ -16,6 +16,8 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -25,13 +27,20 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "job")
-public class Job {
+@Getter
+@Setter
+public class JobDbEntity {
     /**
      * The name of job (e.g. project creation).
      */
     @NotNull
     @Column(name = "job_type", nullable = false)
     protected JobType jobType;
+    /**
+     * The name of the job used for as a human readable description / id.
+     */
+    @Column(name = "name", nullable = false)
+    String name;
     /**
      * The unique identifier for job.
      */
@@ -86,89 +95,26 @@ public class Job {
         nullable = false)
     SafaUser user;
 
-    public Job() {
+    public JobDbEntity() {
     }
 
-    public Job(SafaUser user,
-               JobType jobType,
-               JobStatus status,
-               Timestamp startedAt,
-               Timestamp lastUpdatedAt,
-               @Nullable Timestamp completedAt,
-               int currentProgress,
-               int currentStep) {
+    public JobDbEntity(SafaUser user,
+                       String name,
+                       JobType jobType,
+                       JobStatus status,
+                       Timestamp startedAt,
+                       Timestamp lastUpdatedAt,
+                       @Nullable Timestamp completedAt,
+                       int currentProgress,
+                       int currentStep) {
         this.user = user;
+        this.name = name;
         this.jobType = jobType;
         this.status = status;
         this.startedAt = startedAt;
         this.lastUpdatedAt = lastUpdatedAt;
         this.completedAt = completedAt;
         this.currentProgress = currentProgress;
-        this.currentStep = currentStep;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public JobType getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(JobType jobType) {
-        this.jobType = jobType;
-    }
-
-    public JobStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(JobStatus status) {
-        this.status = status;
-    }
-
-    public Timestamp getStartedAt() {
-        return startedAt;
-    }
-
-    public void setStartedAt(Timestamp startedAt) {
-        this.startedAt = startedAt;
-    }
-
-    public Timestamp getLastUpdatedAt() {
-        return lastUpdatedAt;
-    }
-
-    public void setLastUpdatedAt(Timestamp lastUpdatedAt) {
-        this.lastUpdatedAt = lastUpdatedAt;
-    }
-
-    @Nullable
-    public Timestamp getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(@Nullable Timestamp completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public int getCurrentProgress() {
-        return currentProgress;
-    }
-
-    public void setCurrentProgress(int currentProgress) {
-        this.currentProgress = currentProgress;
-    }
-
-    public int getCurrentStep() {
-        return currentStep;
-    }
-
-    public void setCurrentStep(int currentStep) {
         this.currentStep = currentStep;
     }
 

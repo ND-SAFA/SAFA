@@ -6,7 +6,7 @@ import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.api.jobs.ProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
@@ -19,7 +19,7 @@ import unit.ApplicationBaseTest;
  * Responsible for testing that the generic job worker is parsing
  * step correctly.
  */
-public class TestJobWorker extends ApplicationBaseTest {
+public class TestJobDbEntityWorker extends ApplicationBaseTest {
 
     @Autowired
     JobService jobService;
@@ -34,20 +34,20 @@ public class TestJobWorker extends ApplicationBaseTest {
     public void testCreateProjectWorker() {
         ProjectCreationWorker projectCreationWorker = buildProjectCreationWorker();
         for (String stepName : JobSteps.getJobSteps(JobType.PROJECT_CREATION)) {
-            projectCreationWorker.getMethodFromStep(stepName);
+            projectCreationWorker.getMethodForStepByName(stepName);
         }
     }
 
     @Test
     public void notYetImplemented() {
         assertThrows(RuntimeException.class, () -> {
-            buildProjectCreationWorker().getMethodFromStep("no exist");
+            buildProjectCreationWorker().getMethodForStepByName("no exist");
         });
     }
 
     private ProjectCreationWorker buildProjectCreationWorker() {
         return new ProjectCreationWorker(
-            new Job(),
+            new JobDbEntity(),
             new ProjectCommit()
         );
     }

@@ -2,15 +2,20 @@ package edu.nd.crc.safa.server.services;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.app.JobDbEntityAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.JobRepository;
+import edu.nd.crc.safa.server.repositories.JobDbRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +27,12 @@ import org.springframework.stereotype.Service;
 public class JobService {
 
     private static JobService instance;
-    JobRepository jobRepository;
+    JobDbRepository jobDbRepository;
     SafaUserService safaUserService;
 
     @Autowired
-    public JobService(JobRepository jobRepository, SafaUserService safaUserService) {
-        this.jobRepository = jobRepository;
+    public JobService(JobDbRepository jobDbRepository, SafaUserService safaUserService) {
+        this.jobDbRepository = jobDbRepository;
         this.safaUserService = safaUserService;
     }
 
@@ -35,15 +40,32 @@ public class JobService {
         return instance;
     }
 
-    public List<Job> retrieveCurrentUserJobs() throws SafaError {
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
-        return this.jobRepository.findByUser(currentUser);
+    public void deleteJob(UUID jobId) {
+        this.jobDbRepository.deleteById(jobId);
     }
 
-    public Job createNewJob(JobType jobType) {
+    public List<JobDbEntityAppEntity> retrieveCurrentUserJobs() throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
-        Job job = new Job(
+        return this.jobDbRepository
+            .findByUser(currentUser)
+            .stream()
+            .map(j -> {
+                try {
+                    return JobDbEntityAppEntity.createFromJob(j);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    public JobDbEntity createNewJob(JobType jobType, String name) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        JobDbEntity jobDbEntity = new JobDbEntity(
             currentUser,
+            name,
             jobType,
             JobStatus.IN_PROGRESS,
             now(),
@@ -52,38 +74,46 @@ public class JobService {
             0,
             0
         );
-        this.jobRepository.save(job);
-        return job;
+        this.jobDbRepository.save(jobDbEntity);
+        return jobDbEntity;
     }
 
-    public void startStep(Job job) {
-        job.setLastUpdatedAt(now());
-        this.jobRepository.save(job);
+    public void startStep(JobDbEntity jobDbEntity) {
+        jobDbEntity.setLastUpdatedAt(now());
+        this.jobDbRepository.save(jobDbEntity);
     }
 
-    public void endStep(Job job) {
-        job.incrementStep();
-        job.setLastUpdatedAt(now());
-        this.jobRepository.save(job);
+    public void endStep(JobDbEntity jobDbEntity) {
+        jobDbEntity.incrementStep();
+        jobDbEntity.setLastUpdatedAt(now());
+        this.jobDbRepository.save(jobDbEntity);
     }
 
-    public void completeJob(Job job) {
-        job.setStatus(JobStatus.COMPLETED);
-        job.setCurrentProgress(100);
-        job.setCompletedAt(now());
-        job.setLastUpdatedAt(now());
-        this.jobRepository.save(job);
+    public void completeJob(JobDbEntity jobDbEntity) {
+        jobDbEntity.setStatus(JobStatus.COMPLETED);
+        jobDbEntity.setCurrentProgress(100);
+        jobDbEntity.setCompletedAt(now());
+        jobDbEntity.setLastUpdatedAt(now());
+        this.jobDbRepository.save(jobDbEntity);
     }
 
-    public void failJob(Job job) {
-        job.setStatus(JobStatus.FAILED);
-        job.setCurrentProgress(-1);
-        job.setLastUpdatedAt(now());
-        this.jobRepository.save(job);
+    public void failJob(JobDbEntity jobDbEntity) {
+        jobDbEntity.setStatus(JobStatus.FAILED);
+        jobDbEntity.setCurrentProgress(-1);
+        jobDbEntity.setLastUpdatedAt(now());
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     public Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    public JobDbEntity getJobById(UUID jobId) throws SafaError {
+        Optional<JobDbEntity> jobOption = this.jobDbRepository.findById(jobId);
+        if (jobOption.isPresent()) {
+            return jobOption.get();
+        }
+        throw new SafaError("Could not find job with id:" + jobId);
     }
 
     @PostConstruct

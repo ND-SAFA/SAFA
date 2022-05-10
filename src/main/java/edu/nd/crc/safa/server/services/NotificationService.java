@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -55,11 +55,11 @@ public class NotificationService {
     /**
      * Returns the topic for receiving job updates for given job.
      *
-     * @param job The job to subscribe to.
+     * @param jobDbEntity The job to subscribe to.
      * @return String representing websocket topic.
      */
-    public static String getJobTopic(Job job) {
-        return String.format("/app/jobs/%s", job.getId());
+    public static String getJobTopic(JobDbEntity jobDbEntity) {
+        return String.format("/topic/jobs/%s", jobDbEntity.getId());
     }
 
     public static NotificationService getInstance() {
@@ -101,11 +101,11 @@ public class NotificationService {
     /**
      * Sends job to topic subscribers.
      *
-     * @param job The job to broadcast.
+     * @param jobDbEntity The job to broadcast.
      */
-    public void broadUpdateJobMessage(Job job) {
-        System.out.println("SENDING JOB MESSAGE:");
-        String versionTopicDestination = getJobTopic(job);
-        messagingTemplate.convertAndSend(versionTopicDestination, job);
+    public void broadUpdateJobMessage(JobDbEntity jobDbEntity) {
+        String jobTopic = getJobTopic(jobDbEntity);
+        System.out.println("Sending message to:" + jobTopic);
+        messagingTemplate.convertAndSend(jobTopic, jobDbEntity);
     }
 }

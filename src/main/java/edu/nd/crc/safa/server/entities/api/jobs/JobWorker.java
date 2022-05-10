@@ -8,21 +8,25 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
 
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.scheduling.annotation.Async;
 
 /**
  * Uses reflection to parse and run steps
  */
-public abstract class JobWorker implements Runnable {
+public abstract class JobWorker implements Job {
 
     /**
      * The job identifying information that is being performed.
      */
-    Job job;
+    JobDbEntity jobDbEntity;
 
     /**
      * The service object for modifying job instance.
@@ -34,56 +38,68 @@ public abstract class JobWorker implements Runnable {
      */
     NotificationService notificationService;
 
-    public JobWorker(Job job) {
-        this.job = job;
+    public JobWorker(JobDbEntity jobDbEntity) {
+        this.jobDbEntity = jobDbEntity;
         this.jobService = JobService.getInstance();
         this.notificationService = NotificationService.getInstance();
     }
 
-    public Job getJob() {
-        return job;
+    public JobDbEntity getJob() {
+        return jobDbEntity;
     }
 
-    public void setJob(Job job) {
-        this.job = job;
+    public void setJob(JobDbEntity jobDbEntity) {
+        this.jobDbEntity = jobDbEntity;
     }
 
+    @Override
     @Async
-    public void run() {
+    public void execute(JobExecution execution) {
         try {
-            this.init();
+            this.initJobData();
         } catch (Exception e) {
-            this.jobService.failJob(job);
+            this.jobService.failJob(jobDbEntity);
             throw new RuntimeException(e);
         }
-        String[] stepNames = JobSteps.getJobSteps(this.job.getJobType());
+        String[] stepNames = JobSteps.getJobSteps(this.jobDbEntity.getJobType());
         for (int i = 0; i < stepNames.length; i++) {
             try {
-                Method method = getMethodFromStep(stepNames[i]);
+                Method method = getMethodForStepByName(stepNames[i]);
                 boolean isLastStep = i == stepNames.length - 1;
 
                 // Step - Mark step as started and update
-                this.jobService.startStep(job);
-                this.notificationService.broadUpdateJobMessage(job);
+                this.jobService.startStep(jobDbEntity);
+                this.notificationService.broadUpdateJobMessage(jobDbEntity);
+
+                //TODO: Remove this after testing
+                Thread.sleep(1 * 1000);
 
                 method.invoke(this);
 
                 // Step - Mark step as done and broadcast.
-                this.jobService.endStep(job);
-                this.notificationService.broadUpdateJobMessage(job);
-
                 if (isLastStep) {
                     this.onComplete();
+                } else {
+                    this.jobService.endStep(jobDbEntity);
                 }
+                this.notificationService.broadUpdateJobMessage(jobDbEntity);
+
             } catch (Exception e) {
-                this.jobService.failJob(job);
+                this.jobService.failJob(jobDbEntity);
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
     }
 
-    public Method getMethodFromStep(String stepName) {
+    /**
+     * Returns the method responsible for running step with given name.
+     * Name is matches step if lower case versions of each match.
+     *
+     * @param stepName The name of the step to retrieve method for.
+     * @return The method matching given step name.
+     */
+    public Method getMethodForStepByName(String stepName) {
         String query = stepName.replace(" ", "").toLowerCase();
         List<Method> methodQuery = Arrays
             .stream(this.getClass().getMethods())
@@ -103,10 +119,37 @@ public abstract class JobWorker implements Runnable {
     }
 
     protected void onComplete() {
-        this.jobService.completeJob(job);
+        this.jobService.completeJob(jobDbEntity);
     }
 
-    public void init() throws SafaError, IOException {
+    /**
+     * Responsible for initializing any data needed to run the job steps.
+     *
+     * @throws SafaError   Error occurring during job initialization.
+     * @throws IOException Error occurring during
+     */
+    public void initJobData() throws SafaError {
+    }
+
+    @Override
+    public String getName() {
+        return this.jobDbEntity.getName();
+    }
+
+    @Override
+    public boolean isRestartable() {
+        return false;
+    }
+
+    @Override
+    public JobParametersIncrementer getJobParametersIncrementer() {
+        return (params) -> params;
+    }
+
+    @Override
+    public JobParametersValidator getJobParametersValidator() {
+        return (params) -> {
+        };
     }
 
 }

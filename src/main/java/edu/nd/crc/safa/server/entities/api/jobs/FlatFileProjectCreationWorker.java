@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.entities.api.jobs;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
-import edu.nd.crc.safa.server.entities.db.Job;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -68,8 +67,8 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
      */
     List<TraceGenerationRequest> traceGenerationRequests;
 
-    public FlatFileProjectCreationWorker(Job job, ProjectVersion projectVersion, MultipartFile[] files) {
-        super(job, new ProjectCommit(projectVersion, true));
+    public FlatFileProjectCreationWorker(JobDbEntity jobDbEntity, ProjectVersion projectVersion, MultipartFile[] files) {
+        super(jobDbEntity, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;
         this.projectService = ProjectService.getInstance();
@@ -78,19 +77,33 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
     }
 
     @Override
-    public void init() throws SafaError, IOException {
-        super.init();
+    public void initJobData() throws SafaError {
+        super.initJobData();
+
         Project project = this.projectVersion.getProject();
+        uploadFlatFiles(project);
+
+        parseTimFile();
+    }
+
+    private void uploadFlatFiles(Project project) {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+    }
+
+    private void parseTimFile() {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
-        // Step - Create project parser
-        String timFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
-        JSONObject timFileJson = new JSONObject(timFileContent);
-        this.timParser = new TIMParser(timFileJson);
-        this.timParser.parse();
+
+        try {
+            String timFileContent = new String(Files.readAllBytes(Paths.get(this.pathToTIMFile)));
+            JSONObject timFileJson = new JSONObject(timFileContent);
+            this.timParser = new TIMParser(timFileJson);
+            this.timParser.parse();
+        } catch (Exception e) {
+            throw new SafaError("Could not parse");
+        }
     }
 
     public void parsingArtifactFiles() throws SafaError {

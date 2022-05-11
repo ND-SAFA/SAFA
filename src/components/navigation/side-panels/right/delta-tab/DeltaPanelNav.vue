@@ -1,30 +1,31 @@
 <template>
   <v-container>
     <h1 class="text-h4 my-2">Delta View</h1>
-    <v-row justify="center">
-      <v-switch
-        color="primary"
-        @click="handleChange"
-        :value="isDeltaViewEnabled"
-        :error-messages="errorMessage"
-        readonly
-      >
-        <template v-slot:label> Enable Delta View Mode </template>
-      </v-switch>
-    </v-row>
-    <v-row justify="center" v-if="isDeltaViewEnabled">
-      <v-btn
-        v-if="isProjectDefined"
-        color="primary"
-        @click="isModalOpen = true"
-        class="pt-6 pb-6"
-      >
-        <v-icon class="pr-2">mdi-source-branch</v-icon>
-        Compare Against <br />
-        {{ afterVersion }}
-      </v-btn>
-      <p v-else>No project has been selected.</p>
-    </v-row>
+    <v-divider class="mb-2" />
+
+    <v-btn
+      v-if="!isDeltaViewEnabled"
+      block
+      large
+      :disabled="!isProjectDefined"
+      color="primary"
+      @click="handleChange"
+    >
+      <v-icon class="pr-2">mdi-source-branch</v-icon>
+      Compare Versions
+    </v-btn>
+    <v-btn
+      v-else
+      block
+      large
+      outlined
+      :disabled="!isProjectDefined"
+      @click="handleChange"
+    >
+      <v-icon class="pr-2">mdi-close</v-icon>
+      Hide Delta View
+    </v-btn>
+
     <delta-versions-modal
       v-if="isProjectDefined"
       :is-open="isModalOpen"
@@ -92,12 +93,8 @@ export default Vue.extend({
      */
     handleChange(): void {
       if (!this.isDeltaViewEnabled) {
-        if (this.isProjectDefined) {
-          deltaModule.setIsDeltaViewEnabled(true);
-          this.isModalOpen = true;
-        } else {
-          this.errorMessage = "Please select a baseline project version";
-        }
+        deltaModule.setIsDeltaViewEnabled(true);
+        this.isModalOpen = true;
       } else {
         deltaModule.setIsDeltaViewEnabled(false);
         handleReloadProject();

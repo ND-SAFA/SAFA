@@ -3,6 +3,7 @@ import {
   JiraCloudSite,
   JiraProject,
   JiraProjectList,
+  LocalStorageKeys,
 } from "@/types";
 import { logModule, sessionModule } from "@/store";
 import { authHttpClient, Endpoint } from "@/api";
@@ -43,7 +44,7 @@ async function fetchAtlassian<T>(
   const resJson = (await response.json()) as T;
 
   if (!response.ok) {
-    logModule.onError("Unable to connect to Atlassian.");
+    logModule.onDevError("Unable to connect to Atlassian.");
     throw Error("Unable to connect to Atlassian.");
   } else {
     return resJson;
@@ -86,6 +87,39 @@ export async function getJiraToken(accessCode: string): Promise<string> {
         client_id: process.env.VUE_APP_JIRA_CLIENT_ID,
         client_secret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
         redirect_uri: process.env.VUE_APP_JIRA_REDIRECT_LINK,
+      }),
+    }
+  );
+
+  localStorage.setItem(
+    LocalStorageKeys.JIRA_REFRESH_TOKEN,
+    authorization.refresh_token
+  );
+
+  return authorization.access_token;
+}
+
+/**
+ * Exchanges an Atlassian refresh token for an auth token.
+ *
+ * @return The Jira access token.
+ */
+export async function getJiraRefreshToken(): Promise<string> {
+  const refreshToken = localStorage.getItem(
+    LocalStorageKeys.JIRA_REFRESH_TOKEN
+  );
+  const authorization = await fetchAtlassian<JiraAccessToken>(
+    "https://auth.atlassian.com/oauth/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        refresh_token: refreshToken,
+        grant_type: "refresh_token",
+        client_id: process.env.VUE_APP_JIRA_CLIENT_ID,
+        client_secret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
       }),
     }
   );
@@ -150,15 +184,18 @@ export async function createJiraProject(
   cloudId: string,
   projectId: string
 ): Promise<void> {
+  const refreshToken = localStorage.getItem(
+    LocalStorageKeys.JIRA_REFRESH_TOKEN
+  );
   return authHttpClient<void>(Endpoint.jiraProject, {
     method: "POST",
     body: JSON.stringify({
       cloudId,
       projectId,
+      refreshToken,
       bearerAccessToken: accessToken,
       clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
       clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
-      refreshToken: "", // TODO
     }),
   });
 }

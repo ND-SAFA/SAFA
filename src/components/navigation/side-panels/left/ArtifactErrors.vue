@@ -9,7 +9,7 @@
       </v-col>
     </v-row>
 
-    <v-divider />
+    <v-divider class="mb-2" />
 
     <v-expansion-panels>
       <v-expansion-panel
@@ -55,9 +55,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped>
-.v-expansion-panel::before {
-  box-shadow: none;
-}
-</style>

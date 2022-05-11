@@ -8,7 +8,7 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  * @param formData - Form data containing the project files.
  * @return The updated project.
  */
-export async function updateProjectThroughFlatFiles(
+export async function submitFlatFileUploadJob(
   versionId: string,
   formData: FormData
 ): Promise<Job> {
@@ -26,11 +26,16 @@ export async function updateProjectThroughFlatFiles(
  * Returns list of jobs created by user.
  */
 export async function getUserJobs(): Promise<Job[]> {
-  return authHttpClient<Job[]>(
-    fillEndpoint(Endpoint.getUserJobs, {}),
-    {
-      method: "GET",
-    },
-    false
-  );
+  return authHttpClient<Job[]>(fillEndpoint(Endpoint.getUserJobs, {}), {
+    method: "GET",
+  });
+}
+
+/**
+ * Deletes job with given id
+ */
+export async function deleteJobById(jobId: string): Promise<void> {
+  return authHttpClient<void>(fillEndpoint(Endpoint.deleteJobById, { jobId }), {
+    method: "DELETE",
+  });
 }

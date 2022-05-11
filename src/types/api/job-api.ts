@@ -7,6 +7,10 @@ export interface Job {
    */
   id: string;
   /**
+   * A readable name for the job.
+   */
+  name: string;
+  /**
    * The type of job being performed.
    */
   jobType: JobType;

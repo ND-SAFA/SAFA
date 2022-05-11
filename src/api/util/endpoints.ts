@@ -18,6 +18,7 @@ export enum Endpoint {
   // Jobs
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
+  deleteJobById = "jobs/:jobId",
 
   // Projects
   project = "projects",

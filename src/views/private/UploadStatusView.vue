@@ -9,13 +9,13 @@
           status.
         </p>
 
-        <v-expansion-panels>
+        <v-expansion-panels v-model="selectedJobs" multiple>
           <template v-for="upload in uploads">
             <v-expansion-panel :key="upload.id">
               <v-expansion-panel-header disable-icon-rotate>
                 <v-row no-gutters>
                   <v-col cols="4">
-                    {{ getPrintableJobType(upload.jobType) }}
+                    {{ upload.name }}
                   </v-col>
                   <v-col cols="8" class="text--secondary">
                     <v-row v-if="isCancelled(upload.status)" no-gutters>
@@ -41,7 +41,7 @@
                   <div style="width: 120px" class="d-flex justify-end">
                     <v-chip :color="getStatusColor(upload.status)">
                       <span class="mr-1">
-                        {{ upload.status }}
+                        {{ formatStatus(upload.status) }}
                       </span>
                       <v-progress-circular
                         v-if="isInProgress(upload.status)"
@@ -68,9 +68,9 @@
                 >
                   <v-stepper-header>
                     <template v-for="(step, stepIndex) in upload.steps">
-                      <v-stepper-step :key="step" :step="stepIndex">
+                      <v-stepper-step :key="stepIndex" :step="stepIndex">
                         <span class="upload-step">
-                          {{ upload.steps[upload.currentStep] }}
+                          {{ upload.steps[stepIndex] }}
                         </span>
                       </v-stepper-step>
                       <v-divider :key="step" />
@@ -79,12 +79,8 @@
                 </v-stepper>
 
                 <div class="d-flex">
-                  <v-btn
-                    v-if="isInProgress(upload.status)"
-                    color="error"
-                    class="mr-1"
-                  >
-                    Cancel Upload
+                  <v-btn color="error" class="mr-1" @click="deleteJob(upload)">
+                    Delete Job
                   </v-btn>
                   <v-btn
                     color="primary"
@@ -107,9 +103,10 @@ import Vue from "vue";
 import { navigateBack } from "@/router";
 import { PrivatePage } from "@/components";
 import { setTimeout } from "timers";
-import { getUserJobs } from "@/api";
+import { connectAndSubscribeToJob, deleteJobById, getUserJobs } from "@/api";
 import { Job, JobStatus, JobType } from "@/types";
 import { jobModule } from "@/store";
+import { capitalize } from "@/util";
 
 /**
  * Displays project settings.
@@ -122,11 +119,29 @@ export default Vue.extend({
   data() {
     return {
       timer: undefined as ReturnType<typeof setTimeout> | undefined,
-      uploads: [] as Job[],
+      selectedJobs: [] as number[],
     };
   },
   mounted() {
     this.reloadJobs();
+  },
+  computed: {
+    uploads(): Job[] {
+      return jobModule.jobs;
+    },
+    selectedJobIndex(): number {
+      // allows us to watch it below
+      return jobModule.selectedJob;
+    },
+  },
+  watch: {
+    selectedJobIndex(newIndex: number): void {
+      if (newIndex == -1) {
+        this.selectedJobs = [];
+      } else {
+        this.selectedJobs = [newIndex];
+      }
+    },
   },
   methods: {
     /**
@@ -135,11 +150,13 @@ export default Vue.extend({
     handleGoBack() {
       navigateBack();
     },
-    getPrintableJobType(jobType: JobType) {
-      return jobType
-        .split("_")
-        .map((s) => s.toLowerCase())
-        .join(" ");
+    formatJobType(jobType: JobType) {
+      return capitalize(
+        jobType
+          .split("_")
+          .map((s) => s.toLowerCase())
+          .join(" ")
+      );
     },
     isCompleted(status: JobStatus) {
       return status === JobStatus.COMPLETED;
@@ -151,31 +168,51 @@ export default Vue.extend({
       return status === JobStatus.CANCELLED;
     },
     getUpdatedText(timestamp: string) {
-      return "Last Update: 10:00 AM, Apr 27";
+      return `Last Update: ${this.stringifyTimestamp(timestamp)}`;
     },
     getCompletedText(timestamp: string) {
-      return "Upload Completed: 10:00 AM, Apr 27";
+      return `Upload Completed: ${this.stringifyTimestamp(timestamp)}`;
+    },
+    formatStatus(status: JobStatus): string {
+      return capitalize(status.toLowerCase().split("_").join(" "));
     },
     stringifyTimestamp(timestamp: string) {
-      return "10:00 AM, Apr 27";
+      const options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+        hour: "numeric",
+        minute: "numeric",
+      };
+      const date = new Date(timestamp);
+      return date.toLocaleDateString("en-US", options);
     },
-    getStatusColor(status: string) {
+    getStatusColor(status: JobStatus) {
       switch (status) {
-        case "Completed":
+        case JobStatus.COMPLETED:
           return "#64b5f6";
-        case "In Progress":
+        case JobStatus.IN_PROGRESS:
           return "#EEBC3D";
-        case "Cancelled":
+        case JobStatus.CANCELLED:
           return "#e57373";
         default:
           return "";
       }
     },
-    reloadJobs() {
-      getUserJobs().then((jobs) => {
-        this.uploads = jobs;
-        jobModule.SET_JOBS(jobs);
-      });
+    async deleteJob(job: Job): Promise<void> {
+      await deleteJobById(job.id);
+      jobModule.deleteJob(job);
+    },
+    async reloadJobs() {
+      const jobs = await getUserJobs();
+      let currentJob = jobs[0];
+      jobModule.SET_JOBS(jobs);
+      for (const job of jobs) {
+        await connectAndSubscribeToJob(job.id);
+        currentJob = job;
+      }
+      jobModule.selectJob(currentJob);
     },
   },
 });

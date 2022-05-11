@@ -89,6 +89,7 @@ function connect(
         logModule.onDevMessage("Websocket connection successful.");
         clearInterval(recInterval);
         currentReconnectAttempts = 0;
+        console.log("Subscriptions:", stomp.subscriptions);
         resolve();
       },
       () => {
@@ -218,7 +219,7 @@ export function connectAndSubscribeToJob(jobId: string): Promise<void> {
     }
     connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then(() => {
       clearSubscriptions();
-      const jobSubscription = `/app/jobs/${jobId}`;
+      const jobSubscription = `/topic/jobs/${jobId}`;
       stompClient.subscribe(jobSubscription, jobMessageHandler);
       resolve();
     });
@@ -228,4 +229,5 @@ export function connectAndSubscribeToJob(jobId: string): Promise<void> {
 function jobMessageHandler(frame: Frame): void {
   const message: Job = JSON.parse(frame.body) as Job;
   jobModule.addOrUpdateJob(message);
+  console.log("New Job message:", message);
 }

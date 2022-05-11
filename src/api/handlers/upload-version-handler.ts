@@ -1,6 +1,5 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { updateProjectThroughFlatFiles } from "@/api";
 import { connectAndSubscribeToVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/job-handler";
 
@@ -34,23 +33,18 @@ export async function handleUploadProjectVersion(
     }
 
     const uploadFlatFiles = async () => {
-      const res = await updateProjectThroughFlatFiles(versionId, formData);
-
+      const job = await handleJobSubmission(versionId, formData);
       logModule.onSuccess(`Job has been successfully submitted.`);
 
-      return res;
+      return job;
     };
 
     if (setVersionIfSuccessful) {
       try {
         appModule.onLoadStart();
-        connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
-          logModule.onError(e.message)
-        );
-        // Note that changing the order below will cause the project to not properly render initially.
-        await navigateTo(Routes.ARTIFACT);
-        const job = await uploadFlatFiles();
-        await handleJobSubmission(job);
+        await connectAndSubscribeToVersion(projectId, versionId);
+        await navigateTo(Routes.UPLOAD_STATUS);
+        await uploadFlatFiles();
       } catch (e) {
         logModule.onError(e.message);
         await navigateTo(Routes.UPLOAD_STATUS);

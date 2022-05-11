@@ -87,6 +87,7 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.deleteJob)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
+        //TODO: Find a way to stop jobs
         this.jobService.deleteJob(jobId);
     }
 

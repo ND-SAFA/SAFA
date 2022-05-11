@@ -22,6 +22,7 @@ import org.springframework.batch.core.JobParametersValidator;
 /**
  * Responsible for finding methods corresponding to steps in job and running them
  * by providing a default execution method.
+ *
  * <p>TODO: Create annotation to specify step implementations over reflection.
  */
 public abstract class JobWorker implements Job {

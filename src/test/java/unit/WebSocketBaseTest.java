@@ -115,11 +115,10 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      *
      * @param clientId    The ID given to client subscribing to project version.
      * @param jobDbEntity The job whose updates are listened for.
-     * @return The test instance allowing for the builder pattern.
      */
-    public WebSocketBaseTest subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
+    public void subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
         String projectVersionSubscriptionDestination = NotificationService.getJobTopic(jobDbEntity);
-        return this.subscribe(clientId, projectVersionSubscriptionDestination);
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 
     /**
@@ -134,7 +133,6 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
      */
     public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
         String response = getNextMessage(clientId);
-        System.out.println("WEBSOCKET:" + response);
         return toClass(response, targetClass);
     }
 
@@ -166,7 +164,6 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     }
 
     private WebSocketBaseTest subscribe(String id, String topic) {
-        System.out.println("Is connected:" + idToSession.get(id).isConnected());
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
                 return byte[].class;

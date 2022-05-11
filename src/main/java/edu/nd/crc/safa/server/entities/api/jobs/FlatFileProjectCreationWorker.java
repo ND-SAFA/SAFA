@@ -29,6 +29,11 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Responsible for providing step implementations for parsing flat files
+ * to use the project creation worker.
+ * TODO: Implement default spring steps.
+ */
 public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
 
     /**
@@ -47,17 +52,14 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
      * The service used to create project.
      */
     ProjectService projectService;
-
     /**
      * The service used to store flat files while parsing.
      */
     FileUploadService fileUploadService;
-
     /**
      * The service used to parse flat files into entities.
      */
     FlatFileService flatFileService;
-
     /**
      * The parser used to parse time file.
      */
@@ -67,7 +69,9 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
      */
     List<TraceGenerationRequest> traceGenerationRequests;
 
-    public FlatFileProjectCreationWorker(JobDbEntity jobDbEntity, ProjectVersion projectVersion, MultipartFile[] files) {
+    public FlatFileProjectCreationWorker(JobDbEntity jobDbEntity,
+                                         ProjectVersion projectVersion,
+                                         MultipartFile[] files) {
         super(jobDbEntity, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;
@@ -105,7 +109,7 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
             throw new SafaError("Could not parse");
         }
     }
-
+    
     public void parsingArtifactFiles() throws SafaError {
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
             ArtifactFileParser.getInstance().parseArtifactFiles(projectVersion, this.timParser);

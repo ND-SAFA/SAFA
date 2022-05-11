@@ -8,7 +8,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.app.JobDbEntityAppEntity;
+import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
@@ -26,7 +27,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,9 +51,7 @@ public class JobController extends BaseController {
     AppEntityRetrievalService appEntityRetrievalService;
     NotificationService notificationService;
     TaskExecutor taskExecutor;
-    @Autowired
-    @Qualifier("myJobLauncher")
-    private JobLauncher jobLauncher;
+    JobLauncher jobLauncher;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -63,7 +61,8 @@ public class JobController extends BaseController {
                          ProjectRepository projectRepository,
                          AppEntityRetrievalService appEntityRetrievalService,
                          NotificationService notificationService,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         JobLauncher jobLauncher) {
         super(resourceBuilder);
         this.jobService = jobService;
         this.entityVersionService = entityVersionService;
@@ -72,10 +71,11 @@ public class JobController extends BaseController {
         this.appEntityRetrievalService = appEntityRetrievalService;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
+        this.jobLauncher = jobLauncher;
     }
 
     @GetMapping(AppRoutes.Jobs.getJobs)
-    public List<JobDbEntityAppEntity> getJobStatus() throws SafaError {
+    public List<JobAppEntity> getJobStatus() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
     }
 
@@ -86,7 +86,7 @@ public class JobController extends BaseController {
      * @throws SafaError Throws error because still in construction.
      */
     @DeleteMapping(AppRoutes.Jobs.deleteJob)
-    public void deleteJob(UUID jobId) throws SafaError {
+    public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
     }
 
@@ -100,9 +100,10 @@ public class JobController extends BaseController {
      */
     @PostMapping(AppRoutes.Jobs.flatFileProjectUpdateJob)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobDbEntityAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                         @RequestParam MultipartFile[] files) throws SafaError,
-        IllegalAccessException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
+                                                 @RequestParam MultipartFile[] files) throws SafaError,
+        JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
+        JobParametersInvalidException, JobRestartException {
         // Step 1 - Fetch version and assert permissions
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
@@ -115,25 +116,26 @@ public class JobController extends BaseController {
             projectVersion,
             files);
 
+        runJobWorker(jobDbEntity, jobCreationThread);
+
+        // Step 4 - Create job response
+        return JobAppEntity.createFromJob(jobDbEntity);
+    }
+
+    private void runJobWorker(JobDbEntity jobDbEntity,
+                              JobWorker jobCreationThread) throws
+        JobExecutionAlreadyRunningException, JobRestartException,
+        JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         JobParameters jobParameters =
             new JobParametersBuilder()
                 .addLong("time", System.currentTimeMillis()).toJobParameters();
+
+        try {
+            jobCreationThread.initJobData();
+        } catch (Exception e) {
+            this.jobService.failJob(jobDbEntity);
+            throw new SafaError("Failed to start job.");
+        }
         jobLauncher.run(jobCreationThread, jobParameters);
-
-        // Step 4 - Create job response
-        System.out.println("Returning from endpoint....");
-        return JobDbEntityAppEntity.createFromJob(jobDbEntity);
     }
-
-//    /**
-//     * Responds to subscription to job with the current job update.
-//     *
-//     * @param jobId The job id being subscribed to.
-//     * @return The latest job status.
-//     * @throws SafaError Throws error if not job found with given id.
-//     */
-//    @SubscribeMapping("/jobs/{jobId}")
-//    public Job chat(@DestinationVariable UUID jobId) throws SafaError {
-//        return this.jobService.getJobById(jobId);
-//    }
 }

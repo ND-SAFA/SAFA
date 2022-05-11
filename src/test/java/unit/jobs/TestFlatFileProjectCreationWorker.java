@@ -4,59 +4,39 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.JobService;
-import edu.nd.crc.safa.server.services.NotificationService;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import unit.flatfile.FlatFileBaseTest;
 
-public class TestFlatFileProjectCreationWorker extends FlatFileBaseTest {
+public class TestFlatFileProjectCreationWorker extends JobBaseTest {
 
-    @Autowired
-    JobService jobService;
 
-    @Autowired
-    NotificationService notificationService;
-
+    /**
+     * Tests that uploading default project as job completes.
+     *
+     * @throws Exception Throws exception if:
+     *                   1. Upload fails
+     *                   2. Connection to job messages fails
+     *                   3. Receiving web socket messages
+     *                   4. Sleeping thread to wait for job to finish fails.
+     */
     @Test
-    public void uploadBeforeProject() throws Exception {
-
-        // Step - Create project
-        String projectName = "test-before-files";
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
-        // Step - Send request to upload flat files to project
-        JSONObject response = uploadFlatFilesToVersion(projectVersion,
-            ProjectPaths.PATH_TO_BEFORE_FILES,
-            AppRoutes.Jobs.flatFileProjectUpdateJob);
+    public void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = UUID.fromString(response.getString("id"));
+        UUID jobId = createJobFromDefaultProject();
 
         // Step - Get Job and subscribe for updates
         createNewConnection(currentUsername)
             .subscribeToJob(currentUsername, jobService.getJobById(jobId));
 
-        // VP - Verify that current update sent
-        JobDbEntity message = getNextMessage(currentUsername, JobDbEntity.class);
-        assertThat(message).isNotNull();
-        assertThat(message.getCurrentStep()).isEqualTo(1);
-
         // Step - Allow job to run
-        Thread.sleep(500);
+        Thread.sleep(600);
 
         // VP - Verify that job has finished.
         JobDbEntity jobDbEntity = jobService.getJobById(jobId);
-        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(6);
+        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(7);
         assertThat(jobDbEntity.getCurrentProgress()).isEqualTo(100);
         assertThat(jobDbEntity.getStatus()).isEqualTo(JobStatus.COMPLETED);
 

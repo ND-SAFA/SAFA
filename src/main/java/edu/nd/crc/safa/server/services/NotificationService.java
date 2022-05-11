@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.services;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
@@ -105,7 +106,7 @@ public class NotificationService {
      */
     public void broadUpdateJobMessage(JobDbEntity jobDbEntity) {
         String jobTopic = getJobTopic(jobDbEntity);
-        System.out.println("Sending message to:" + jobTopic);
-        messagingTemplate.convertAndSend(jobTopic, jobDbEntity);
+        JobAppEntity jobAppEntity = JobAppEntity.createFromJob(jobDbEntity);
+        messagingTemplate.convertAndSend(jobTopic, jobAppEntity);
     }
 }

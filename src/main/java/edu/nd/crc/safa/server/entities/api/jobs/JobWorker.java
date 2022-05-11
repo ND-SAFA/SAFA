@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.server.entities.api.jobs;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
@@ -12,27 +12,30 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.scheduling.annotation.Async;
 
 /**
- * Uses reflection to parse and run steps
+ * Responsible for finding methods corresponding to steps in job and running them
+ * by providing a default execution method.
+ * <p>TODO: Create annotation to specify step implementations over reflection.
  */
 public abstract class JobWorker implements Job {
 
     /**
      * The job identifying information that is being performed.
      */
+    @Getter
+    @Setter
     JobDbEntity jobDbEntity;
-
     /**
      * The service object for modifying job instance.
      */
     JobService jobService;
-
     /**
      * Service used to send job updates.
      */
@@ -44,52 +47,30 @@ public abstract class JobWorker implements Job {
         this.notificationService = NotificationService.getInstance();
     }
 
-    public JobDbEntity getJob() {
-        return jobDbEntity;
-    }
-
-    public void setJob(JobDbEntity jobDbEntity) {
-        this.jobDbEntity = jobDbEntity;
-    }
-
     @Override
-    @Async
     public void execute(JobExecution execution) {
-        try {
-            this.initJobData();
-        } catch (Exception e) {
-            this.jobService.failJob(jobDbEntity);
-            throw new RuntimeException(e);
-        }
         String[] stepNames = JobSteps.getJobSteps(this.jobDbEntity.getJobType());
-        for (int i = 0; i < stepNames.length; i++) {
+        for (String stepName : stepNames) {
             try {
-                Method method = getMethodForStepByName(stepNames[i]);
-                boolean isLastStep = i == stepNames.length - 1;
-
-                // Step - Mark step as started and update
+                // Pre-step
+                Method method = getMethodForStepByName(stepName);
                 this.jobService.startStep(jobDbEntity);
                 this.notificationService.broadUpdateJobMessage(jobDbEntity);
 
-                //TODO: Remove this after testing
-                Thread.sleep(1 * 1000);
-
+                // Step
                 method.invoke(this);
 
-                // Step - Mark step as done and broadcast.
-                if (isLastStep) {
-                    this.onComplete();
-                } else {
-                    this.jobService.endStep(jobDbEntity);
-                }
+                // Post-step
+                this.jobService.endStep(jobDbEntity);
                 this.notificationService.broadUpdateJobMessage(jobDbEntity);
-
             } catch (Exception e) {
                 this.jobService.failJob(jobDbEntity);
                 e.printStackTrace();
+                this.notificationService.broadUpdateJobMessage(jobDbEntity);
                 throw new RuntimeException(e);
             }
         }
+        this.done();
     }
 
     /**
@@ -118,20 +99,20 @@ public abstract class JobWorker implements Job {
         }
     }
 
-    protected void onComplete() {
+    public void done() {
         this.jobService.completeJob(jobDbEntity);
     }
 
     /**
      * Responsible for initializing any data needed to run the job steps.
      *
-     * @throws SafaError   Error occurring during job initialization.
-     * @throws IOException Error occurring during
+     * @throws SafaError Error occurring during job initialization.
      */
     public void initJobData() throws SafaError {
     }
 
     @Override
+    @NotNull
     public String getName() {
         return this.jobDbEntity.getName();
     }
@@ -151,5 +132,4 @@ public abstract class JobWorker implements Job {
         return (params) -> {
         };
     }
-
 }

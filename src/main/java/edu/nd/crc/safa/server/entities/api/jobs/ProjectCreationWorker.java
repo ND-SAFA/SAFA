@@ -7,17 +7,19 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
+/**
+ * The worker responsible for providing method implementations for
+ * the steps to create projects.
+ */
 public class ProjectCreationWorker extends JobWorker {
     /**
      * The project version of the
      */
     ProjectCommit projectCommit;
-
     /**
      * The entities created during job.
      */
     ProjectEntities projectEntities;
-
     /**
      * The service used for creating entities.
      */
@@ -46,8 +48,8 @@ public class ProjectCreationWorker extends JobWorker {
     }
 
     @Override
-    protected void onComplete() {
-        super.onComplete();
+    public void done() {
+        super.done();
         this.projectEntities = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );

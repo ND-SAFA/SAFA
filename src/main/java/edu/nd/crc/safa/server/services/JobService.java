@@ -2,7 +2,6 @@ package edu.nd.crc.safa.server.services;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -11,7 +10,7 @@ import javax.annotation.PostConstruct;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.app.JobDbEntityAppEntity;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -26,8 +25,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobService {
 
+    /**
+     * Singleton enabling the static use of this service.
+     */
     private static JobService instance;
+    /**
+     * Repository for creating job entities in the database.
+     */
     JobDbRepository jobDbRepository;
+    /**
+     * Service used to add authenticated user to job.
+     */
     SafaUserService safaUserService;
 
     @Autowired
@@ -44,23 +52,30 @@ public class JobService {
         this.jobDbRepository.deleteById(jobId);
     }
 
-    public List<JobDbEntityAppEntity> retrieveCurrentUserJobs() throws SafaError {
+    /**
+     * Returns list of the jobs the current user has created.
+     *
+     * @return List of jobs created by currently authenticated user.
+     */
+    public List<JobAppEntity> retrieveCurrentUserJobs() {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         return this.jobDbRepository
             .findByUser(currentUser)
             .stream()
-            .map(j -> {
-                try {
-                    return JobDbEntityAppEntity.createFromJob(j);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
+            .map(JobAppEntity::createFromJob)
             .collect(Collectors.toList());
     }
 
+    /**
+     * Creates new job with:
+     * - current authenticated user as creator
+     * - status as In Progress
+     * - current progress equals 0
+     *
+     * @param jobType The type of job being performed.
+     * @param name    The name of the job.
+     * @return The saved job db entity.
+     */
     public JobDbEntity createNewJob(JobType jobType, String name) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         JobDbEntity jobDbEntity = new JobDbEntity(
@@ -78,36 +93,55 @@ public class JobService {
         return jobDbEntity;
     }
 
+    /**
+     * Saves job with lastUpdated date at time of save.
+     *
+     * @param jobDbEntity The job whose lastUpdated property is being modified.
+     */
     public void startStep(JobDbEntity jobDbEntity) {
-        jobDbEntity.setLastUpdatedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
+        saveJob(jobDbEntity);
     }
 
+    /**
+     * Moves job to next step and saves job.
+     *
+     * @param jobDbEntity The job to update its step.
+     */
     public void endStep(JobDbEntity jobDbEntity) {
         jobDbEntity.incrementStep();
-        jobDbEntity.setLastUpdatedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
+        saveJob(jobDbEntity);
     }
 
+    /**
+     * Marks status as complete, sets progress to 100, and sets completed at property.
+     *
+     * @param jobDbEntity The job to complete.
+     */
     public void completeJob(JobDbEntity jobDbEntity) {
         jobDbEntity.setStatus(JobStatus.COMPLETED);
         jobDbEntity.setCurrentProgress(100);
         jobDbEntity.setCompletedAt(now());
-        jobDbEntity.setLastUpdatedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
+        saveJob(jobDbEntity);
     }
 
+    /**
+     * Sets status of job to failed and saves it.
+     *
+     * @param jobDbEntity The job to fail.
+     */
     public void failJob(JobDbEntity jobDbEntity) {
         jobDbEntity.setStatus(JobStatus.FAILED);
         jobDbEntity.setCurrentProgress(-1);
-        jobDbEntity.setLastUpdatedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
+        saveJob(jobDbEntity);
     }
 
-    public Timestamp now() {
-        return new Timestamp(System.currentTimeMillis());
-    }
-
+    /**
+     * Returns job database entity with given id.
+     *
+     * @param jobId The id of the job to retrieve.
+     * @return The job database entity.
+     * @throws SafaError Throws error is jobs with id not found.
+     */
     public JobDbEntity getJobById(UUID jobId) throws SafaError {
         Optional<JobDbEntity> jobOption = this.jobDbRepository.findById(jobId);
         if (jobOption.isPresent()) {
@@ -116,8 +150,20 @@ public class JobService {
         throw new SafaError("Could not find job with id:" + jobId);
     }
 
+    /**
+     * Sets static instance to be used in non-components.
+     */
     @PostConstruct
     public void init() {
         instance = this;
+    }
+
+    private void saveJob(JobDbEntity jobDbEntity) {
+        jobDbEntity.setLastUpdatedAt(now());
+        this.jobDbRepository.save(jobDbEntity);
+    }
+
+    private Timestamp now() {
+        return new Timestamp(System.currentTimeMillis());
     }
 }

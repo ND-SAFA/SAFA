@@ -20,13 +20,15 @@ public class JobSteps {
     private static final String[] projectCreationSteps = {
         "Saving Artifacts",
         "Saving Traces",
-        "Generating Layout"
+        "Generating Layout",
+        "Done"
     };
 
     private static final String[] modelTrainingSteps = {
         "Gather related documents",
         "Create training data",
-        "Model training"
+        "Model training",
+        "Done"
     };
 
     public static String[] getJobSteps(JobType jobType) {

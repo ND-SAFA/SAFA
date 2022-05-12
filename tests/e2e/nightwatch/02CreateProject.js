@@ -9,122 +9,98 @@ CreateProject.js - Created by: Jeremy Arellano
 ***********************************************************************************************************/
 
 module.exports = {
+    '@disabled': false,
     '@tags' : ['SAFA'],
     'Create Project Test'(browser) {
+        const page = browser.page.UI_Interaction();
+
         /* Our constants will go here */
         const urlLandingPage = "http://localhost:8080/login";
         const projectCreatorButtonName = 'Continue';
-        const HazardsFileName = 'Hazards.csv';
+        const HazardsFileName = 'Hazard.csv';
+        const TestDataLocation = 'tests/e2e/nightwatch/TestData/';
+        const screenShotDestination = '/02CreateProject/';
+
 
         /* Our test will occur here */
-        browser
-            .url(urlLandingPage) // Note, succsess in running the program so far
-            .waitForElementVisible('body', "WebAPI: URL loaded successfully")
+        page
+            .navigate()
+            .waitForElementVisible('@loginImageIcon', 5000, "WebAPI: URL loaded successfully")
             .assert.titleEquals('SAFA', 'UI: Title is correct') // Note, succsess in running the program so far
-        
-        loginSession(browser);
-        fillInTextBox('Project Name', 'SAFA', browser);
-        fillInTextBox('Project description', 'Saftey Artifact Forest Analysis', browser);
-        takeScreenShot('ProjectNameEntered.png')
-        //browser
-            //.useXpath()
-            //.getAttribute(`//*[contains(text(),'${projectCreatorButtonName}')][not(@disabled)]`, 'disabled', function(result) {this.assert.equal(result.value, null, "Button is Disabled");}) // This currently does not work
-            //.useCss()
-        clickButton(projectCreatorButtonName, browser);
-        browser.waitForElementVisible('body')
-        takeScreenShot('ProjectFileUpload.png')
+            .loginSession(screenShotDestination, 'Login_Success.png')
 
-        /* Now lets test if we can succsesfully upload a file */
-        clickButton(' Create new artifact', browser);
-        fillInTextBox('Artifact Name', 'Hazards', browser);
-        clickButton(' Create Artifact ', browser);
-        takeScreenShot('ArtifactUploadScreen.png')
-        uploadFile('File', HazardsFileName, browser);
-        takeScreenShot('ArtifactUploaded.png')
+            .fillInTextBox('SAFA', 'Project Name')
+            .fillInTextBox('Safety Artifact Forest Analysis', 'Project description')
+            .takeScreenShot(screenShotDestination + 'ProjectNameEntered.png')
+            .clickButton(projectCreatorButtonName)  
+            .takeScreenShot(screenShotDestination + 'ProjectFileUpload.png')
 
+            /* Now lets test if we can succsesfully upload a file for Hazards */
+            .clickButton(' Create new artifact')
+            .fillInTextBox('Hazards', 'Artifact Name')
+            .clickButton(' Create Artifact ')
+            .takeScreenShot(screenShotDestination + 'ArtifactUploadScreen.png')
+            .uploadFileWithParameters('@HazardsUploadButton', TestDataLocation, HazardsFileName)
+            .pause(1000)
 
-    },
+            .clickButton(' Create new artifact')
+            .fillInTextBox('Requirements', 'Artifact Name')
+            .clickButton(' Create Artifact ')
+            .uploadFileWithParameters('@RequirementsUploadButton', TestDataLocation, 'Requirement.csv')
+            .pause(1000)
 
-        
+            .clickButton(' Create new artifact')
+            .fillInTextBox('Designs', 'Artifact Name')
+            .clickButton(' Create Artifact ')
+            .uploadFileWithParameters('@DesignsUploadButton', TestDataLocation, 'Design.csv')
+            .pause(1000)
+    
+            .clickButton(' Create new artifact')
+            .fillInTextBox('Environmental Assumptions', 'Artifact Name')
+            .clickButton(' Create Artifact ')
+            .uploadFileWithParameters('@EnvironmentalAssumptionsUploadButton', TestDataLocation, 'EnvironmentalAssumption.csv')
+            .pause(1000)
 
+            .clickButton(projectCreatorButtonName)
+            .pause(500)
+            .takeScreenShot(screenShotDestination + 'Artifacts_Successfully_Uploaded.png')
+
+            /* Now lets upload the Trace Links */
+            .clickButton(' Create new trace link')
+            .clickButton(' Select Source ')
+            .pause(100)
+            .useXpath()
+            .click(`//*[contains(text(),'Requirements') and @class="v-btn__content" ]`)
+            .clickButton(' Select Target ')
+            .useXpath()
+            .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
+            .clickButton('Create Link')
+            .uploadFileWithParameters('@Requirement2HazardsUploadButton', TestDataLocation, 'Requirement2Hazard.csv')
+            .pause(100)
+            .takeScreenShot(screenShotDestination + 'Error.png')
+            
+            
+            .clickButton(' Create new trace link')
+            .clickButton(' Select Source ')
+            .pause(100)
+            .useXpath()
+            .click(`//*[contains(text(),'Environmental Assumptions') and @class="v-btn__content" ]`)
+            .clickButton(' Select Target ')
+            .useXpath()
+            .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
+            .clickButton('Create Link')
+            .uploadFileWithParameters('@Environmental2HazardsUploadButton', TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
+            .pause(90000)
+            
+            /*
+            .pause(100)
+            .useXpath()
+            .click(`//*[contains(text(),'Design')]`)
+            .useCss()
+            .clickButton(' Select Target ')
+            .pause(100)
+            .clickButton('Requirements')
+            .clickButton('Create Link')
+        */
+    }
 };
-
-function clickButton(lableName, browser) {
-    browser.useXpath();
-    browser.assert.visible(`//*[contains(text(),'${lableName}')]`, function(results){
-        if (results.value) {
-            //console.log("Button is visible");
-            browser.click(`//*[contains(text(),'${lableName}')]`);
-            browser.useCss();
-            return "UI: Login Button is visible";
-        } else {
-            browser.useCss();
-            return "UI: Login Button is not visible";
-        } 
-        
-    }); 
-}
-
-function fillInTextBox(textBoxName, textBoxValue, browser) {
-    browser.useXpath();
-    browser.assert.visible(`//*[contains(text(),'${textBoxName}')]`, results => {
-        if (results.value) {
-            const textBoxLocation = `//*[contains(text(),'${textBoxName}')]/following-sibling::input`;
-            browser.setValue( textBoxLocation, textBoxValue);
-            browser.useCss();
-            return "UI: {textBoxName} is visible";
-        } else {
-            browser.useCss();
-            return "UI: {textBoxName} is not visible";
-        } 
-        
-    }); 
-}
-
-function takeScreenShot(fileName) {
-    browser.saveScreenshot(`tests/e2e/nightwatch/screenshots/CreateProject/${fileName}`);
-}
-
-function loginSession(browser) {
-    /* Our constants will go here */
-    const userNameFilledInBox = 'jarella2@nd.edu'
-    const userNameFilledInBoxPassword = 'Cps44342847'
-    const loginButtonName = ' Login ';
-
-    fillInTextBox('Email', userNameFilledInBox, browser)
-    fillInTextBox('Password', userNameFilledInBoxPassword, browser)
-    takeScreenShot('CredetialsEntered.png');
-    clickButton(loginButtonName, browser)
-    browser.waitForElementVisible('body')
-}
-
-function uploadFile(textBoxName,fileName ,browser) {
-    /* This function will upload a file to the project */
-    browser
-        .click(`button[type="button"][aria-label="prepend icon"]`)
-        .execute(`document.querySelectorAll('input[type=file]')[0].style.display = 'block'`)
-        .pause(1000)
-        .useXpath()
-        .waitForElementVisible(`//*[contains(text(),'${textBoxName}')]`) ////*[contains(text(),'File')]/following-sibling::input[@type="file"]
-        //.waitForElementVisible(`//*[contains(text(),'${textBoxName}')]/following-sibling::input[@type="file"]`)
-        .useCss()
-        .setValue(`input[type=file]`, require('path').resolve(__dirname +'../TestData/' + fileName))
-        .pause(1000)
-
-
-    
-    /*
-    results => {
-        if (results.value) {
-            const textBoxLocation = `//*[contains(text(),'File')]/following-sibling::input[@type="file"]`;
-            browser.click(`//*[contains(text(),'File')]/`).setValue( textBoxLocation, require('path').resolve(__dirname + '../TestData/' + fileName));
-            browser.useCss();
-            return "UI: {textBoxName} Uploaded succsessfully";
-        } else {
-            browser.useCss();
-            return "UI: {textBoxName} failed to upload";
-        } 
-    
-    });
-    */
-}

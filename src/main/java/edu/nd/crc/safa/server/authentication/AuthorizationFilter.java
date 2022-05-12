@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.authentication;
 
-import static edu.nd.crc.safa.config.SecurityConstants.AUTHORIZATION_HEADER;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import io.jsonwebtoken.Claims;
@@ -34,7 +34,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(AUTHORIZATION_HEADER);
+        String header = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
 
         if (header == null) {
             chain.doFilter(request, response);
@@ -60,7 +60,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
      * @return Successful authorization token if successful otherwise null.
      */
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws SafaError {
-        String token = request.getHeader(AUTHORIZATION_HEADER);
+        String token = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
         if (token != null) {
             Claims userClaims = this.tokenService.getTokenClaims(token);
             return new UsernamePasswordAuthenticationToken(userClaims, null, new ArrayList<>());

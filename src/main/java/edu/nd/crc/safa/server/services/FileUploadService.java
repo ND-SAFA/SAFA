@@ -12,6 +12,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * parsing, and deleting flat files.
  */
 @Service
+@Scope("singleton")
 public class FileUploadService {
 
     private static FileUploadService instance;

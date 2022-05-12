@@ -17,12 +17,14 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobDbRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for creating units-of-work to be used in JobController.
  */
 @Service
+@Scope("singleton")
 public class JobService {
 
     /**

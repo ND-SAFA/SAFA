@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.services.EntityVersionService;
 
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
  * validating, and storing their data.
  */
 @Component
+@Scope("singleton")
 public class ArtifactFileParser {
 
     private static ArtifactFileParser instance;

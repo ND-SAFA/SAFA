@@ -26,6 +26,7 @@ import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
  * validating, and storing their data.
  */
 @Service
+@Scope("singleton")
 public class FlatFileService {
 
     private static FlatFileService instance;

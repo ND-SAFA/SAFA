@@ -34,6 +34,7 @@ import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Service;
  * 7. ProjectWarnings
  */
 @Service
+@Scope("singleton")
 public class AppEntityRetrievalService {
 
     private static AppEntityRetrievalService instance;

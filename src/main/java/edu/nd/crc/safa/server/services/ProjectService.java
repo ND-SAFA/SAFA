@@ -25,6 +25,7 @@ import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Responsible for updating, deleting, and retrieving project identifiers.
  */
 @Service
+@Scope("singleton")
 public class ProjectService {
 
     private static ProjectService instance;

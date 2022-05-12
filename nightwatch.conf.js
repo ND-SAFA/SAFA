@@ -6,7 +6,7 @@ This may be outdated (Using a reference from nightwatch 1.0.0), but I will updat
 ***********************************************************************************************/
 module.exports = {
   'src_folders': ['tests/e2e/nightwatch'],
-  //'page_objects_path': ['page-objects'],
+  'page_objects_path': ['tests/e2e/nightwatch/page-objects'],
 
   'webdriver': {
       'start_process': true,

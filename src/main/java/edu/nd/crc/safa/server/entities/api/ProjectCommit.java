@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
@@ -14,7 +13,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  * The model used to commit a change to the versioning system.
  */
 public class ProjectCommit {
-    @NotNull
     ProjectVersion commitVersion;
     ProjectChange<ArtifactAppEntity> artifacts;
     ProjectChange<TraceAppEntity> traces;

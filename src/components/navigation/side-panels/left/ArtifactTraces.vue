@@ -1,6 +1,10 @@
 <template>
   <div v-if="parents.length + children.length > 0" class="mb-2">
-    <h2 class="text-h6">Trace Links</h2>
+    <div class="d-flex flex-row">
+      <v-icon color="primary">mdi-ray-start-arrow</v-icon>
+      <h2 class="text-h6 ml-1">Trace Links</h2>
+    </div>
+
     <v-divider class="mb-2" />
 
     <v-expansion-panels>
@@ -10,23 +14,27 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content class="text-body-1">
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <v-tooltip bottom v-for="parentName in parents" :key="parentName">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-on="on"
-                  v-bind="attrs"
-                  outlined
-                  block
-                  class="mb-1"
-                  @click="handleArtifactClick(parentName)"
-                >
-                  <span class="mb-1 text-ellipsis" style="max-width: 160px">
-                    {{ parentName }}
-                  </span>
-                </v-btn>
-              </template>
-              <span> {{ parentName }}</span>
-            </v-tooltip>
+            <template v-for="(parentName, idx) in parents">
+              <v-divider :key="parentName + '-div'" v-if="idx !== 0" />
+              <v-tooltip
+                bottom
+                :key="parentName"
+                :disabled="parentName.length < 30"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-list-item
+                    v-on="on"
+                    v-bind="attrs"
+                    @click="handleArtifactClick(parentName)"
+                  >
+                    <v-list-item-title>
+                      {{ parentName }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+                <span> {{ parentName }}</span>
+              </v-tooltip>
+            </template>
           </v-list>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -37,23 +45,27 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content class="text-body-1">
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <v-tooltip bottom v-for="childName in children" :key="childName">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-on="on"
-                  v-bind="attrs"
-                  outlined
-                  block
-                  class="mb-1"
-                  @click="handleArtifactClick(childName)"
-                >
-                  <span class="mb-1 text-ellipsis" style="max-width: 160px">
-                    {{ childName }}
-                  </span>
-                </v-btn>
-              </template>
-              <span> {{ childName }}</span>
-            </v-tooltip>
+            <template v-for="(childName, idx) in children">
+              <v-divider :key="childName + '-div'" v-if="idx !== 0" />
+              <v-tooltip
+                bottom
+                :key="childName"
+                :disabled="childName.length < 30"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-list-item
+                    v-on="on"
+                    v-bind="attrs"
+                    @click="handleArtifactClick(childName)"
+                  >
+                    <v-list-item-title>
+                      {{ childName }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+                <span> {{ childName }}</span>
+              </v-tooltip>
+            </template>
           </v-list>
         </v-expansion-panel-content>
       </v-expansion-panel>

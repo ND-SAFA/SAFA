@@ -2,12 +2,12 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="blue-grey" v-if="doShowGraphButtons" />
+      <v-divider class="blue-grey mt-1" v-if="doShowGraphButtons" />
       <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 
     <template v-slot:extension v-if="doShowGraphButtons">
-      <v-row dense class="pt-1 full-width">
+      <v-row dense class="full-width">
         <v-col cols="8">
           <div class="d-flex flex-row">
             <generic-icon-button

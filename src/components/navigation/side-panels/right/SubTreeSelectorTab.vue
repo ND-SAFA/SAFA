@@ -4,7 +4,7 @@
     <v-divider class="mb-4" />
 
     <v-text-field
-      label="Search"
+      label="Search Artifacts"
       solo
       rounded
       prepend-inner-icon="mdi-magnify"

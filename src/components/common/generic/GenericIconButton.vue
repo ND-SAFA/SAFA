@@ -7,7 +7,7 @@
         :color="color"
         :icon="!fab"
         :fab="fab"
-        :disabled="disabled"
+        :class="disabled ? 'disable-events' : ''"
         :small="small"
         @click="$emit('click')"
       >

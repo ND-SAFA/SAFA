@@ -21,7 +21,11 @@
     </v-row>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <h1 v-on="on" v-bind="attrs" class="text-h6 artifact-title">
+        <h1
+          v-on="on"
+          v-bind="attrs"
+          class="text-h6 text-ellipsis artifact-title"
+        >
           {{ selectedArtifactName }}
         </h1>
       </template>
@@ -111,8 +115,6 @@ export default Vue.extend({
 
 <style scoped>
 .artifact-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
   width: 230px;
 }
 </style>

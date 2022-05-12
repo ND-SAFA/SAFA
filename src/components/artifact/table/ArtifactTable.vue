@@ -1,5 +1,8 @@
 <template>
-  <v-container v-if="isTableView">
+  <v-container
+    v-if="isTableView"
+    :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
+  >
     <v-data-table
       class="elevation-1"
       :headers="headers"
@@ -13,15 +16,16 @@
           @filter="selectedDeltaTypes = $event"
         />
       </template>
+      <template v-slot:item.type="{ item }">
+        <artifact-table-chip :text="item.type" />
+      </template>
       <template
         v-for="{ id, dataType, required } in columns"
         v-slot:[`item.${id}`]="{ item }"
       >
-        <v-divider
-          v-if="required && !item[id]"
-          :key="id"
-          :style="`border-color: ${errorColor}; width: 40px`"
-        />
+        <v-icon v-if="required && !item[id]" :key="id" :color="errorColor">
+          mdi-information-outline
+        </v-icon>
         <span v-if="isFreeText(dataType)" class="text-body-1" :key="id">
           {{ item[id] || "" }}
         </span>
@@ -41,6 +45,11 @@
         </div>
       </template>
       <template v-slot:item.actions="{ item }">
+        <generic-icon-button
+          icon-id="mdi-dots-vertical"
+          tooltip="View"
+          @click="handleView(item)"
+        />
         <generic-icon-button
           icon-id="mdi-pencil"
           tooltip="Edit"
@@ -84,7 +93,13 @@ import {
   FlatArtifact,
 } from "@/types";
 import { ThemeColors } from "@/util";
-import { artifactModule, deltaModule, documentModule } from "@/store";
+import {
+  appModule,
+  artifactModule,
+  artifactSelectionModule,
+  deltaModule,
+  documentModule,
+} from "@/store";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
@@ -113,6 +128,12 @@ export default Vue.extend({
   },
   computed: {
     /**
+     * @return Whether to render the artifact table.
+     */
+    isVisible(): boolean {
+      return !appModule.getIsLoading && documentModule.isTableDocument;
+    },
+    /**
      * @return Whether delta view is enabled.
      */
     inDeltaView(): boolean {
@@ -134,6 +155,10 @@ export default Vue.extend({
           text: "Name",
           value: "name",
         },
+        {
+          text: "Type",
+          value: "type",
+        },
         ...documentModule.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,
@@ -141,7 +166,7 @@ export default Vue.extend({
         {
           text: "Actions",
           value: "actions",
-          width: "120px",
+          width: "150px",
         },
       ];
     },
@@ -181,6 +206,13 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Opens the view artifact side panel.
+     * @param artifact - The artifact to view.
+     */
+    handleView(artifact: Artifact) {
+      artifactSelectionModule.selectArtifact(artifact.id);
+    },
     /**
      * Opens the edit artifact window.
      * @param artifact - The artifact to edit.

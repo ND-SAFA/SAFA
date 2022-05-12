@@ -17,6 +17,11 @@
   text-overflow: ellipsis;
 }
 
+.disable-events {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 // Fixes code-diff's broken styling
 code.hljs {
   min-height: 26px;

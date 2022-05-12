@@ -5,17 +5,17 @@
 
     <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
       <delta-button-group
-        deltaType="added"
+        delta-type="added"
         :items="addedArtifacts"
         @click="handleAddedSelect"
       />
       <delta-button-group
-        deltaType="removed"
+        delta-type="removed"
         :items="removedArtifacts"
         @click="handleRemovedSelect"
       />
       <delta-button-group
-        deltaType="modified"
+        delta-type="modified"
         :items="modifiedArtifacts"
         @click="handleModifiedSelect"
       />

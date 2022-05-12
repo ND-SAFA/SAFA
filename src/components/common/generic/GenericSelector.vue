@@ -69,11 +69,9 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
-//waiting for generics to be added to vue: https://github.com/vuejs/rfcs/pull/310
-import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
-import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
+import { DataItemProps, DataTableHeader } from "vuetify";
+import GenericIconButton from "./GenericIconButton.vue";
 
 /**
  * Displays a generic selector.
@@ -85,7 +83,7 @@ import GenericIconButton from "@/components/common/generic/GenericIconButton.vue
  * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
-  name: "generic-selector",
+  name: "GenericSelector",
   components: { GenericIconButton },
   props: {
     headers: {
@@ -147,10 +145,18 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Clears all selected data.
+     */
     clearData() {
       this.selected = [];
       this.search = "";
     },
+    /**
+     * Returns whether delete is enabled for the given item.
+     * @param item - The item to check.
+     * @return Whether the item is deletable.
+     */
     isDeleteEnabled(item: DataItemProps): boolean {
       const index = this.items.indexOf(item);
       const isNotLastItem = index !== this.items.length - 1;
@@ -161,6 +167,9 @@ export default Vue.extend({
       );
     },
   },
+  /**
+   * If no item is selected, the first item will be selected on mount.
+   */
   mounted() {
     if (this.selected.length === 0 && this.items.length > 0) {
       this.selected = [this.items[0]];
@@ -168,15 +177,21 @@ export default Vue.extend({
     }
   },
   watch: {
+    /**
+     * Select the first item when new items are loaded.
+     */
     items(newItems: DataItemProps[]) {
       this.selected = [this.items[0]];
       this.previousItems = newItems;
       this.$emit("item:select", { item: this.items[0], value: true });
     },
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
+    /**
+     * Clears data when the selector opens.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
     },
   },
 });

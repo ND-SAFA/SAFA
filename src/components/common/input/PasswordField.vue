@@ -20,7 +20,7 @@ import Vue from "vue";
  * @emits `enter` - On submit.
  */
 export default Vue.extend({
-  name: "password-field",
+  name: "PasswordField",
   props: {
     value: {
       type: String,
@@ -34,6 +34,15 @@ export default Vue.extend({
     };
   },
   watch: {
+    /**
+     * Updates the model if the value changes.
+     */
+    value(currentValue: string) {
+      this.model = currentValue;
+    },
+    /**
+     * Emits changes to the model.
+     */
     model(currentValue: string) {
       this.$emit("input", currentValue);
     },

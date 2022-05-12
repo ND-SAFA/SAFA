@@ -1,6 +1,7 @@
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
 import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/onComplete";
 import { CollectionReturnValue, NodeSingular } from "cytoscape";
+import { appModule } from "@/store";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
@@ -44,14 +45,24 @@ export function getEdgeHandlesCore(): EdgeHandleCore | undefined {
  * Enables edge drawing mode.
  */
 export function enableDrawMode(): void {
-  getEdgeHandlesCore()?.enable();
-  getEdgeHandlesCore()?.enableDrawMode();
+  const core = getEdgeHandlesCore();
+
+  if (!core) return;
+
+  core.enable();
+  core.enableDrawMode();
+  appModule.SET_CREATE_LINK_ENABLED(true);
 }
 
 /**
  * Disables edge drawing mode.
  */
 export function disableDrawMode(): void {
-  getEdgeHandlesCore()?.disableDrawMode();
-  getEdgeHandlesCore()?.disable();
+  const core = getEdgeHandlesCore();
+
+  if (!core) return;
+
+  core.disableDrawMode();
+  core.disable();
+  appModule.SET_CREATE_LINK_ENABLED(false);
 }

@@ -1,18 +1,21 @@
 import { Project, ProjectCreationResponse } from "@/types";
 import { createProject } from "@/util";
+import { QueryParams, updateParam } from "@/router";
 import {
   appModule,
   artifactSelectionModule,
   deltaModule,
+  documentModule,
   errorModule,
   projectModule,
   subtreeModule,
+  typeOptionsModule,
   viewportModule,
 } from "@/store";
 import {
   connectAndSubscribeToVersion,
-  reloadTraceMatrices,
-  loadVersionIfExistsHandler,
+  handleLoadTraceMatrices,
+  handleLoadVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
 
@@ -21,7 +24,7 @@ import { disableDrawMode } from "@/cytoscape";
  *
  * @param isDifferentProject - If true, all nodes will be unhidden and the viewport will be reset.
  */
-export async function resetGraphFocus(
+export async function handleResetGraph(
   isDifferentProject = true
 ): Promise<void> {
   if (isDifferentProject) {
@@ -42,42 +45,50 @@ export async function resetGraphFocus(
  *
  * @param project - The project to set.
  */
-export async function setAndSubscribeToProject(
+export async function handleProjectSubscription(
   project: Project
 ): Promise<void> {
-  const isDifferentProject = projectModule.projectId !== project.projectId;
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
+  const isDifferentProject = projectModule.versionId !== versionId;
 
   await connectAndSubscribeToVersion(projectId, versionId);
   await projectModule.initializeProject(project);
-  await resetGraphFocus(isDifferentProject);
-  await reloadTraceMatrices();
+  await handleResetGraph(isDifferentProject);
+  await handleLoadTraceMatrices();
+  await updateParam(QueryParams.VERSION, versionId);
 }
 
 /**
  * Clears project store data.
  */
-export async function clearProject(): Promise<void> {
+export async function handleClearProject(): Promise<void> {
   const project = createProject();
 
   await projectModule.initializeProject(project);
+  await handleResetGraph();
+  typeOptionsModule.clearData();
+  await subtreeModule.clearSubtrees();
 }
 
 /**
  * Sets a newly created project.
+ *
  * @param res - The created project and warnings.
  */
-export async function setCreatedProject(
+export async function handleSetProject(
   res: ProjectCreationResponse
 ): Promise<void> {
-  await setAndSubscribeToProject(res.project);
+  await handleProjectSubscription(res.project);
   errorModule.setArtifactWarnings(res.warnings);
 }
 
 /**
  * Reloads the current project.
  */
-export async function reloadProject(): Promise<void> {
-  await loadVersionIfExistsHandler(projectModule.versionId);
+export async function handleReloadProject(): Promise<void> {
+  const document = documentModule.document;
+
+  await handleLoadVersion(projectModule.versionId);
+  await documentModule.switchDocuments(document);
 }

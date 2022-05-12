@@ -3,10 +3,11 @@
     :title="`Artifact Changes: ${name}`"
     :is-open="isOpen"
     :actions-height="0"
+    size="l"
     @close="$emit('close')"
   >
     <template v-slot:body>
-      <v-container class="mt-5">
+      <div class="mt-5">
         <code-diff
           v-if="deltaType === 'added'"
           :old-string="''"
@@ -31,7 +32,7 @@
           :output-format="outputFormat"
           :diff-style="diffStyle"
         />
-      </v-container>
+      </div>
     </template>
   </generic-modal>
 </template>
@@ -39,11 +40,14 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import CodeDiff from "vue-code-diff";
-import { Artifact, DeltaType, EntityModification } from "@/types";
+import {
+  Artifact,
+  DeltaArtifact,
+  DeltaType,
+  EntityModification,
+} from "@/types";
 import { isArtifact, isModifiedArtifact, splitIntoLines } from "@/util";
 import { GenericModal } from "@/components/common";
-
-type InputArtifact = Artifact | EntityModification<Artifact>;
 
 /**
  * Displays artifact delta code diffs.
@@ -51,6 +55,7 @@ type InputArtifact = Artifact | EntityModification<Artifact>;
  * @emits `close` - On close.
  */
 export default Vue.extend({
+  name: "ArtifactDeltaDiff",
   components: { GenericModal, CodeDiff },
   props: {
     isOpen: {
@@ -58,7 +63,7 @@ export default Vue.extend({
       required: true,
     },
     inputArtifact: {
-      type: Object as PropType<InputArtifact>,
+      type: Object as PropType<DeltaArtifact>,
       required: true,
     },
     name: {
@@ -79,20 +84,27 @@ export default Vue.extend({
     };
   },
   computed: {
-    artifact(): Artifact | undefined {
-      if (isArtifact(this.inputArtifact)) {
-        return this.inputArtifact;
-      }
-      return undefined;
+    /**
+     * Returns the current artifact.
+     */
+    artifact(): DeltaArtifact | undefined {
+      return isArtifact(this.inputArtifact) ? this.inputArtifact : undefined;
     },
+    /**
+     * Returns the current modified artifact.
+     */
     modification(): EntityModification<Artifact> | undefined {
-      if (isModifiedArtifact(this.inputArtifact)) {
-        return this.inputArtifact;
-      }
-      return undefined;
+      return isModifiedArtifact(this.inputArtifact)
+        ? this.inputArtifact
+        : undefined;
     },
   },
   methods: {
+    /**
+     * Splits a string into separate links.
+     * @param str - The strong to split.
+     * @return The split string.
+     */
     splitIntoLines(str: string): string {
       return splitIntoLines(str, this.maxWordCount);
     },

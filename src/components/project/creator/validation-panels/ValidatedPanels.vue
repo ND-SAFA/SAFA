@@ -32,6 +32,7 @@ import { ThemeColors } from "@/util";
  * @emits-3 `add` - On add.
  */
 export default Vue.extend({
+  name: "ValidatedPanels",
   props: {
     itemName: {
       type: String,
@@ -54,16 +55,24 @@ export default Vue.extend({
       default: false,
     },
   },
+  data() {
+    return {
+      errorColor: ThemeColors.error,
+    };
+  },
   computed: {
-    errorColor(): string {
-      return ThemeColors.error;
-    },
+    /**
+     * @return Whether the panel is valid.
+     */
     isValid(): boolean {
       if (this.isValidStates.length === 0) return this.defaultValidState;
       return this.isValidStates.filter((isValid) => !isValid).length === 0;
     },
   },
   watch: {
+    /**
+     * Emits changes when a panel changes is validated status.
+     */
     isValid(isValid: boolean): void {
       if (isValid) {
         this.$emit("upload:valid");

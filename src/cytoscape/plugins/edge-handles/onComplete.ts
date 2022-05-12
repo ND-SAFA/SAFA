@@ -7,7 +7,7 @@ import {
   TraceLink,
   TraceType,
 } from "@/types";
-import { createLink } from "@/api";
+import { handleCreateLink } from "@/api";
 import { disableDrawMode } from "./edgeHandlesCore";
 
 /**
@@ -41,9 +41,7 @@ export function onArtifactTreeEdgeComplete(
 
   disableDrawMode();
 
-  createLink(traceLink)
-    .then(async () => {
-      addedEdge.remove();
-    })
-    .catch((e) => console.error(e));
+  addedEdge.remove();
+
+  handleCreateLink(traceLink);
 }

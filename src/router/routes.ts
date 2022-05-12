@@ -8,10 +8,21 @@ export enum Routes {
   RESET_PASSWORD = "/reset",
   HOME = "/",
   ARTIFACT = "/project",
+  PROJECT_SETTINGS = "/project/settings",
   TRACE_LINK = "/links",
   ERROR = "/error",
   PROJECT_CREATOR = "/create",
-  PROJECT_SETTINGS = "/project/settings",
+  UPLOAD_STATUS = "/uploads",
+}
+
+/**
+ * Enumerates query parameters used in the app.
+ */
+export enum QueryParams {
+  LOGIN_PATH = "to",
+  TAB = "tab",
+  VERSION = "version",
+  JIRA_TOKEN = "code",
 }
 
 export const routesWithRequiredProject: string[] = [

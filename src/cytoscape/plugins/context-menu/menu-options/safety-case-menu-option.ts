@@ -23,23 +23,23 @@ export const safetyCaseMenuOption: MenuItem = {
     {
       id: "sc-goal-node",
       content: "Goal Node",
-      tooltipText: "Asserts all conditions must be met.",
+      tooltipText: "Define an expected system property.",
       onClickFunction(): void {
         appModule.openArtifactCreatorTo(SafetyCaseType.GOAL);
       },
     },
     {
-      id: "sc-solution-node",
-      content: "Solution Node",
-      tooltipText: "Depicts the safety strategy of argument",
+      id: "sc-strategy-node",
+      content: "Strategy Node",
+      tooltipText: "Define the safety strategy of an argument.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION);
+        appModule.openArtifactCreatorTo(SafetyCaseType.STRATEGY);
       },
     },
     {
       id: "sc-context-node",
       content: "Context Node",
-      tooltipText: "Expected system environment assumptions",
+      tooltipText: "Define the expected system environment assumptions.",
       onClickFunction(): void {
         appModule.openArtifactCreatorTo(SafetyCaseType.CONTEXT);
       },
@@ -47,9 +47,9 @@ export const safetyCaseMenuOption: MenuItem = {
     {
       id: "sc-evidence-node",
       content: "Evidence Node",
-      tooltipText: "Container for ground-truth resources",
+      tooltipText: "Define a container for ground-truth resources.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.STRATEGY);
+        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION);
       },
     },
   ],

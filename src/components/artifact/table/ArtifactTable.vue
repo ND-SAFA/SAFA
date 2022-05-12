@@ -1,10 +1,17 @@
 <template>
-  <v-container>
-    <v-data-table class="elevation-1" :headers="headers" :items="items">
+  <v-container v-if="isTableView">
+    <v-data-table
+      class="elevation-1"
+      :headers="headers"
+      :items="items"
+      :search="searchText"
+      :item-class="getItemBackground"
+    >
       <template v-slot:top>
-        <v-container class="flex">
-          <table-column-editor class="ml-auto"
-        /></v-container>
+        <artifact-table-header
+          @search="searchText = $event"
+          @filter="selectedDeltaTypes = $event"
+        />
       </template>
       <template
         v-for="{ id, dataType, required } in columns"
@@ -60,7 +67,7 @@
           :title="artifactCreatorTitle"
           :is-open="createDialogueOpen"
           :artifact="selectedArtifact"
-          @close="handleCloseModal"
+          @close="handleCloseCreate"
         />
       </template>
     </v-data-table>
@@ -69,13 +76,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ColumnDataType, DocumentType } from "@/types";
-import { artifactModule, documentModule } from "@/store";
-import { deleteArtifactFromCurrentVersion } from "@/api";
-import { ArtifactCreatorModal, GenericIconButton } from "@/components/common";
-import ArtifactTableChip from "@/components/artifact/table/ArtifactTableChip.vue";
-import TableColumnEditor from "@/components/artifact/table/TableColumnEditor.vue";
+import {
+  Artifact,
+  ArtifactDeltaState,
+  ColumnDataType,
+  DocumentType,
+  FlatArtifact,
+} from "@/types";
 import { ThemeColors } from "@/util";
+import { artifactModule, deltaModule, documentModule } from "@/store";
+import { handleDeleteArtifact } from "@/api";
+import { GenericIconButton } from "@/components/common";
+import ArtifactTableChip from "./ArtifactTableChip.vue";
+import ArtifactTableHeader from "./ArtifactTableHeader.vue";
+import ArtifactCreatorModal from "../ArtifactCreatorModal.vue";
 
 /**
  * Represents a table of artifacts.
@@ -83,7 +97,7 @@ import { ThemeColors } from "@/util";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
-    TableColumnEditor,
+    ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
     ArtifactCreatorModal,
@@ -92,9 +106,28 @@ export default Vue.extend({
     return {
       selectedArtifact: undefined as Artifact | undefined,
       createDialogueOpen: false as boolean | DocumentType.FMEA,
+      searchText: "",
+      selectedDeltaTypes: [] as ArtifactDeltaState[],
+      errorColor: ThemeColors.error,
     };
   },
   computed: {
+    /**
+     * @return Whether delta view is enabled.
+     */
+    inDeltaView(): boolean {
+      return deltaModule.inDeltaView;
+    },
+    /**
+     * @return Whether table view is enabled.
+     */
+    isTableView(): boolean {
+      return documentModule.isTableDocument;
+    },
+
+    /**
+     * @return The artifact table's headers.
+     */
     headers() {
       return [
         {
@@ -112,55 +145,120 @@ export default Vue.extend({
         },
       ];
     },
+    /**
+     * @return The artifact table's columns.
+     */
     columns() {
       return documentModule.tableColumns;
     },
-    items() {
-      return artifactModule.artifacts.map((artifact) => ({
-        ...artifact,
-        ...artifact.customFields,
-      }));
+    /**
+     * @return The artifact table's items.
+     */
+    items(): FlatArtifact[] {
+      return artifactModule.artifacts
+        .filter(
+          (item) =>
+            !this.inDeltaView ||
+            this.selectedDeltaTypes.length === 0 ||
+            this.selectedDeltaTypes.includes(
+              deltaModule.getArtifactDeltaType(item.id)
+            )
+        )
+        .map(
+          (artifact) =>
+            ({
+              ...artifact,
+              ...artifact.customFields,
+            } as FlatArtifact)
+        );
     },
+
+    /**
+     * @return The title of the artifact creator.
+     */
     artifactCreatorTitle(): string {
       return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
     },
-    errorColor(): string {
-      return ThemeColors.error;
-    },
   },
   methods: {
+    /**
+     * Opens the edit artifact window.
+     * @param artifact - The artifact to edit.
+     */
     handleEdit(artifact: Artifact) {
       this.selectedArtifact = artifact;
       this.createDialogueOpen = true;
     },
+    /**
+     * Opens the delete artifact window.
+     * @param artifact - The artifact to delete.
+     */
     handleDelete(artifact: Artifact) {
-      deleteArtifactFromCurrentVersion(artifact);
+      handleDeleteArtifact(artifact);
     },
+    /**
+     * Opens the create artifact window.
+     */
     handleCreate() {
       this.createDialogueOpen = DocumentType.FMEA;
     },
-    handleCloseModal() {
+    /**
+     * Closes the create artifact window.
+     */
+    handleCloseCreate() {
       this.createDialogueOpen = false;
       this.selectedArtifact = undefined;
     },
 
+    /**
+     * @param dataType - The data type to check.
+     * @return Whether the data type is free text.
+     */
     isFreeText(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.FREE_TEXT;
     },
+    /**
+     * @param dataType - The data type to check.
+     * @return Whether the data type is a relation.
+     */
     isRelation(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.RELATION;
     },
+    /**
+     * @param dataType - The data type to check.
+     * @return Whether the data type is a select.
+     */
     isSelect(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.SELECT;
     },
+
+    /**
+     * Returns the artifact name of the given artifact id.
+     * @param id - The artifact to find.
+     * @return The artifact name.
+     */
     getArtifactName(id: string): string {
       return artifactModule.getArtifactById(id).name;
     },
+    /**
+     * Returns the value of an array custom field.
+     * @param itemValue - The stored array value.
+     * @return The stored value as an array.
+     */
     getArrayValue(itemValue?: string): string[] {
       return itemValue?.split("||") || [];
+    },
+
+    /**
+     * Returns the background class name of an artifact row.
+     * @param item - The artifact to display.
+     * @return The class name to add to the artifact.
+     */
+    getItemBackground(item: Artifact): string {
+      const deltaState = deltaModule.getArtifactDeltaType(item.id);
+
+      return `artifact-${deltaState.toLowerCase()}`;
     },
   },
 });
 </script>
-
-<style scoped></style>

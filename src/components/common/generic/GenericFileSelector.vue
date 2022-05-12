@@ -3,11 +3,11 @@
     clearable
     outlined
     small-chips
-    label="File"
+    label="Upload Files"
     :multiple="multiple"
     truncate-length="30"
     class="mt-3"
-    @change="onChangeFiles"
+    @change="handleChangeFiles"
     @click:clear="$emit('clear')"
   />
 </template>
@@ -22,7 +22,7 @@ import Vue from "vue";
  * @emits-2 `change:files` - On file change.
  */
 export default Vue.extend({
-  name: "generic-file-selector",
+  name: "GenericFileSelector",
   props: {
     multiple: {
       type: Boolean,
@@ -31,7 +31,11 @@ export default Vue.extend({
     },
   },
   methods: {
-    onChangeFiles(files: File[]) {
+    /**
+     * Emits files when the change.
+     * @param files - The updated files.
+     */
+    handleChangeFiles(files: File[]) {
       this.$emit("change:files", files);
     },
   },

@@ -22,6 +22,19 @@
         item-value="id"
       />
       <artifact-input v-model="editingDocument.artifactIds" />
+      <v-switch
+        class="my-0 py-0"
+        label="Include artifact children"
+        v-model="includeChildren"
+      />
+      <v-autocomplete
+        v-if="includeChildren"
+        filled
+        multiple
+        label="Included Child Types"
+        v-model="includedChildTypes"
+        :items="artifactTypes"
+      />
     </template>
     <template v-slot:actions>
       <v-btn
@@ -31,7 +44,7 @@
         :outlined="confirmDelete"
         @click="handleDelete"
       >
-        {{ confirmDelete ? "Delete" : "Delete Document" }}
+        {{ deleteButtonText }}
       </v-btn>
       <v-btn outlined v-if="confirmDelete" @click="confirmDelete = false">
         Cancel
@@ -48,8 +61,8 @@
 import Vue, { PropType } from "vue";
 import { ProjectDocument } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { addNewDocument, deleteAndSwitchDocuments, editDocument } from "@/api";
-import { documentModule, logModule } from "@/store";
+import { documentModule, typeOptionsModule } from "@/store";
+import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
 /**
@@ -72,93 +85,112 @@ export default Vue.extend({
       editingDocument: createDocument(this.document),
       confirmDelete: false,
       isValid: false,
+      types: documentTypeOptions(),
+      includeChildren: false,
+      includedChildTypes: [] as string[],
     };
   },
   computed: {
+    /**
+     * @return Whether the document is in edit mode.
+     */
     isEditMode(): boolean {
       return !!this.document;
     },
+    /**
+     * @return The modal title.
+     */
     title(): string {
       return this.isEditMode ? "Edit Document" : "Add Document";
     },
-    types: documentTypeOptions,
-
+    /**
+     * @return Whether the current document name is valid.
+     */
     isNameValid(): boolean {
       return (
         !documentModule.doesDocumentExist(this.document?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },
+    /**
+     * @return Whether the current document is valid.
+     */
     isDocumentValid(): boolean {
       return !!this.editingDocument.name && this.isNameValid;
     },
+    /**
+     * @return Document name errors to display.
+     */
     nameErrors(): string[] {
       return this.isNameValid ? [] : ["This name already exists"];
     },
+    /**
+     * @return The text to display on the delete button.
+     */
+    deleteButtonText(): string {
+      return this.confirmDelete ? "Delete" : "Delete Document";
+    },
+    /**
+     * @return All types of artifacts
+     */
+    artifactTypes(): string[] {
+      return typeOptionsModule.artifactTypes;
+    },
   },
   methods: {
+    /**
+     * Resets all modal data.
+     */
     resetModalData() {
       this.editingDocument = createDocument(this.document);
       this.confirmDelete = false;
       this.$emit("close");
     },
+    /**
+     * Attempts to save the document.
+     */
     handleSubmit() {
-      if (this.isEditMode) {
-        editDocument(this.editingDocument)
-          .then(() => {
-            logModule.onSuccess(
-              `Document edited: ${this.editingDocument.name}`
-            );
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(
-              `Unable to edit document: ${this.editingDocument.name}`
-            );
-          });
-      } else {
-        const { name, type, artifactIds } = this.editingDocument;
-
-        addNewDocument(name, type, artifactIds)
-          .then(() => {
-            logModule.onSuccess(`Document created: ${name}`);
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(`Unable to create document: ${name}`);
-          });
-      }
+      handleSaveDocument(
+        this.editingDocument,
+        this.isEditMode,
+        this.includeChildren ? this.includedChildTypes : [],
+        {
+          onSuccess: () => this.resetModalData(),
+        }
+      );
     },
+    /**
+     * Attempts to delete the document, after confirming.
+     */
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else if (this.editingDocument) {
-        deleteAndSwitchDocuments(this.editingDocument)
-          .then(() => {
-            logModule.onSuccess(
-              `Document Deleted: ${this.editingDocument.name}`
-            );
-            this.resetModalData();
-          })
-          .catch(() => {
-            logModule.onError(
-              `Unable to delete document: ${this.editingDocument.name}`
-            );
-          });
+        handleDeleteDocument(this.editingDocument, {
+          onSuccess: () => this.resetModalData(),
+        });
       }
     },
   },
   watch: {
+    /**
+     * Whenever any document field changes, check whether the document is valid.
+     */
     editingDocument: {
       handler() {
         this.isValid = this.isDocumentValid;
       },
       deep: true,
     },
+    /**
+     * Reset the document when the modal is opened.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 
       this.editingDocument = createDocument(this.document);
+      this.includeChildren = false;
+      this.includedChildTypes = [];
     },
   },
 });

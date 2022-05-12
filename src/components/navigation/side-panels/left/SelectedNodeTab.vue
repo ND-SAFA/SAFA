@@ -1,257 +1,49 @@
 <template>
-  <v-container>
+  <v-container class="mb-10">
     <div v-if="selectedArtifact !== undefined">
-      <v-row align="center">
-        <v-col>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <h1 v-on="on" v-bind="attrs" class="text-h4 artifact-title">
-                {{ selectedArtifact.name }}
-              </h1>
-            </template>
-            {{ selectedArtifact.name }}
-          </v-tooltip>
-        </v-col>
-        <v-col>
-          <v-row justify="end" class="mr-1">
-            <generic-icon-button
-              v-if="!selectedArtifact.logicType"
-              tooltip="Edit"
-              icon-id="mdi-pencil"
-              @click="onArtifactEdit"
-            />
-            <generic-icon-button
-              color="error"
-              tooltip="Delete"
-              icon-id="mdi-delete"
-              @click="onDeleteArtifact"
-            />
-          </v-row>
-        </v-col>
-      </v-row>
-
+      <artifact-title />
       <v-divider class="mb-2" />
-
-      <p class="text-body-1">
-        {{ selectedArtifact.body }}
-      </p>
-
-      <v-row>
-        <v-col>
-          <v-subheader>Parents</v-subheader>
-          <v-divider />
-          <p v-if="parents.length === 0" class="text-caption text-center mt-1">
-            No parents linked.
-          </p>
-          <v-list dense v-else>
-            <v-btn
-              outlined
-              block
-              class="mb-1"
-              v-for="parentName in parents"
-              :key="parentName"
-              @click="onArtifactClick(parentName)"
-            >
-              <span class="mb-1 text-ellipsis" style="max-width: 60px">
-                {{ parentName }}
-              </span>
-            </v-btn>
-          </v-list>
-        </v-col>
-
-        <v-col>
-          <v-subheader>Children</v-subheader>
-          <v-divider />
-          <p v-if="children.length === 0" class="text-caption text-center mt-1">
-            No children linked.
-          </p>
-          <v-list dense v-else>
-            <v-btn
-              outlined
-              block
-              class="mb-1"
-              v-for="childName in children"
-              :key="childName"
-              @click="onArtifactClick(childName)"
-            >
-              <span class="mb-1 text-ellipsis" style="max-width: 60px">
-                {{ childName }}
-              </span>
-            </v-btn>
-          </v-list>
-        </v-col>
-      </v-row>
-
-      <div v-if="documents.length > 0">
-        <v-subheader>Documents</v-subheader>
-        <v-divider />
-
-        <v-list>
-          <v-list-item
-            v-for="doc in documents"
-            :key="doc.documentId"
-            @click="onSwitchDocument(doc)"
-          >
-            <v-list-item-title>
-              {{ doc.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ documentTypeName(doc.type) }}
-            </v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
-      </div>
-
-      <div v-if="selectedArtifactWarnings.length > 0">
-        <v-row align="center" class="debug">
-          <v-col>
-            <v-subheader>Warnings</v-subheader>
-          </v-col>
-          <v-col class="flex-grow-0 mr-2">
-            <v-icon color="secondary">mdi-hazard-lights</v-icon>
-          </v-col>
-        </v-row>
-
-        <v-divider />
-
-        <v-expansion-panels>
-          <v-expansion-panel
-            v-for="warning in selectedArtifactWarnings"
-            :key="warning"
-          >
-            <v-expansion-panel-header class="text-body-1">
-              {{ warning.ruleName }}
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="text-body-1">
-              {{ warning.ruleMessage }}
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </div>
-
-      <artifact-creator-modal
-        title="Edit Artifact Contents"
-        :is-open="isArtifactCreatorOpen"
-        :artifact="selectedArtifact"
-        @close="isArtifactCreatorOpen = false"
-      />
+      <p class="text-body-1">{{ artifactBody }}</p>
+      <artifact-traces />
+      <artifact-documents />
+      <artifact-errors />
     </div>
 
-    <p v-else class="text-body-1">No artifact is selected.</p>
+    <p v-else class="text-caption">No artifact is selected.</p>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  ArtifactWarning,
-  PanelType,
-  ProjectDocument,
-  ProjectWarnings,
-} from "@/types";
-import { deleteArtifactFromCurrentVersion } from "@/api";
-import {
-  appModule,
-  artifactModule,
-  artifactSelectionModule,
-  documentModule,
-  errorModule,
-  traceModule,
-} from "@/store";
-import { GenericIconButton, ArtifactCreatorModal } from "@/components/common";
-import { documentTypeOptions } from "@/util";
+import { artifactSelectionModule } from "@/store";
+import ArtifactTitle from "./ArtifactTitle.vue";
+import ArtifactTraces from "./ArtifactTraces.vue";
+import ArtifactDocuments from "./ArtifactDocuments.vue";
+import ArtifactErrors from "./ArtifactErrors.vue";
 
+/**
+ * Displays the selected node tab.
+ */
 export default Vue.extend({
-  components: { GenericIconButton, ArtifactCreatorModal },
-  data() {
-    return {
-      previousArtifact: undefined as Artifact | undefined,
-      isArtifactCreatorOpen: false,
-    };
+  name: "SelectedNodeTab",
+  components: {
+    ArtifactErrors,
+    ArtifactDocuments,
+    ArtifactTraces,
+    ArtifactTitle,
   },
   computed: {
-    selectedArtifact(): Artifact | undefined {
+    /**
+     * @return The selected artifact.
+     */
+    selectedArtifact() {
       return artifactSelectionModule.getSelectedArtifact;
     },
-    selectedArtifactName(): string | undefined {
-      return this.selectedArtifact === undefined
-        ? undefined
-        : this.selectedArtifact.name;
-    },
-    parents(): string[] {
-      const selectedArtifact = this.selectedArtifact;
-      if (selectedArtifact !== undefined) {
-        const query = traceModule.traces.filter(
-          ({ sourceName }) => sourceName === selectedArtifact.name
-        );
-        return query.map((l) => l.targetName);
-      } else {
-        return [];
-      }
-    },
-    children(): string[] {
-      const selectedArtifactName = this.selectedArtifactName;
-      if (selectedArtifactName !== undefined) {
-        const query = traceModule.traces.filter(
-          ({ targetName }) => targetName === selectedArtifactName
-        );
-        return query.map((l) => l.sourceName);
-      } else {
-        return [];
-      }
-    },
-    documents(): ProjectDocument[] {
-      if (!this.selectedArtifact) return [];
+    artifactBody(): string {
+      const isCode = this.selectedArtifact?.type.toLowerCase().includes("code");
 
-      return documentModule.projectDocuments.filter(({ documentId }) =>
-        this.selectedArtifact?.documentIds.includes(documentId)
-      );
-    },
-    projectWarnings(): ProjectWarnings {
-      return errorModule.getArtifactWarnings;
-    },
-    selectedArtifactWarnings(): ArtifactWarning[] {
-      const id = this.selectedArtifact?.id || "";
-
-      return this.projectWarnings[id] || [];
-    },
-  },
-  methods: {
-    onArtifactEdit(): void {
-      this.isArtifactCreatorOpen = true;
-    },
-    onArtifactClick(artifactName: string): void {
-      const artifact = artifactModule.getArtifactByName(artifactName);
-
-      artifactSelectionModule.selectArtifact(artifact.id);
-    },
-    onDeleteArtifact(): void {
-      if (this.selectedArtifact !== undefined) {
-        deleteArtifactFromCurrentVersion(this.selectedArtifact).then(() => {
-          appModule.closePanel(PanelType.left);
-        });
-      }
-    },
-    onSwitchDocument(document: ProjectDocument): void {
-      documentModule.switchDocuments(document);
-    },
-    documentTypeName(typeId: string): string {
-      return (
-        documentTypeOptions().find(({ id }) => id === typeId)?.name || typeId
-      );
+      return isCode ? "" : this.selectedArtifact?.body || "";
     },
   },
 });
 </script>
-
-<style scoped>
-.v-expansion-panel::before {
-  box-shadow: none;
-}
-.artifact-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 135px;
-}
-</style>

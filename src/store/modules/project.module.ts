@@ -15,9 +15,10 @@ import {
   subtreeModule,
   traceModule,
   typeOptionsModule,
+  viewportModule,
 } from "@/store";
 import { Artifact, TraceLink } from "@/types";
-import { reloadDocumentArtifacts } from "@/api";
+import { handleDocumentReload } from "@/api";
 
 @Module({ namespaced: true, name: "project" })
 /**
@@ -58,7 +59,7 @@ export default class ProjectModule extends VuexModule {
     ];
 
     this.SET_ARTIFACTS(updatedArtifacts);
-    await reloadDocumentArtifacts();
+    await handleDocumentReload();
     await artifactModule.addOrUpdateArtifacts(updatedArtifacts);
     await subtreeModule.updateSubtreeMap();
   }
@@ -97,6 +98,7 @@ export default class ProjectModule extends VuexModule {
     this.SET_TRACES(updatedTraces);
     await traceModule.addOrUpdateTraceLinks(updatedTraces);
     await subtreeModule.updateSubtreeMap();
+    viewportModule.applyAutomove();
   }
 
   @Action
@@ -137,7 +139,7 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
-   * Sets a new project.
+   * Updates the project identifier.
    *
    * @param project - The new project to track.
    */
@@ -216,26 +218,27 @@ export default class ProjectModule extends VuexModule {
   /**
    * @return The current version id.
    */
-  get versionId(): string | undefined {
-    return this.project.projectVersion?.versionId;
+  get versionId(): string {
+    return this.project.projectVersion?.versionId || "";
   }
 
   /**
-   * Returns the version ID, and logs an error if there isnt one.
+   * Returns the version ID, and logs an error if there isn't one.
+   *
    * @return The current version id.
    */
-  get versionIdWithLog(): string | undefined {
+  get versionIdWithLog(): string {
     if (!this.versionId) {
       logModule.onWarning("Please select a project version.");
+
+      return "";
     }
 
     return this.versionId;
   }
 
   /**
-   * Returns whether project is defined
-   *
-   * @returns Boolean representing whether project is defined.
+   * @returns Whether project is defined.
    */
   get isProjectDefined(): boolean {
     return this.project.projectId !== "";

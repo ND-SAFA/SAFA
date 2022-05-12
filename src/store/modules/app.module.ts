@@ -24,6 +24,10 @@ export default class ProjectModule extends VuexModule {
    */
   private isErrorDisplayOpen = false;
   /**
+   * Whether currently in create trace link mode.
+   */
+  private isCreateLinkEnabled = false;
+  /**
    * Whether the artifact creator is open.
    * If the value is set to a safety case or FTA node type, then the
    * artifact creator will open to that type set.
@@ -44,6 +48,14 @@ export default class ProjectModule extends VuexModule {
    */
   onLoadEnd(): void {
     this.SET_IS_LOADING(false);
+  }
+
+  @Action
+  /**
+   * Closes the side panels.
+   */
+  openErrorDisplay(): void {
+    this.openPanel(PanelType.errorDisplay);
   }
 
   @Action
@@ -69,6 +81,22 @@ export default class ProjectModule extends VuexModule {
   closeSidePanels(): void {
     this.closePanel(PanelType.left);
     this.closePanel(PanelType.right);
+  }
+
+  @Action
+  /**
+   * Closes the side panels.
+   */
+  closeCreator(): void {
+    this.closePanel(PanelType.artifactCreator);
+  }
+
+  @Action
+  /**
+   * Closes the side panels.
+   */
+  closeErrorDisplay(): void {
+    this.closePanel(PanelType.errorDisplay);
   }
 
   @Action
@@ -103,8 +131,18 @@ export default class ProjectModule extends VuexModule {
    *
    * @param type - The type of panel.
    */
-  openArtifactCreatorTo(type: SafetyCaseType | FTANodeType): void {
-    this.SET_ARTIFACT_CREATOR(type);
+  openArtifactCreatorTo(type?: SafetyCaseType | FTANodeType): void {
+    this.SET_ARTIFACT_CREATOR(type || true);
+  }
+
+  @Mutation
+  /**
+   * Sets whether trace link draw mode is enabled.
+   *
+   * @param enabled - Whether to enable the draw mode.
+   */
+  SET_CREATE_LINK_ENABLED(enabled: boolean): void {
+    this.isCreateLinkEnabled = enabled;
   }
 
   @Mutation
@@ -206,5 +244,12 @@ export default class ProjectModule extends VuexModule {
    */
   get getIsErrorDisplayOpen(): boolean {
     return this.isErrorDisplayOpen;
+  }
+
+  /**
+   * @return Whether trace link draw mode is currently enabled.
+   */
+  get getIsCreateLinkEnabled(): boolean {
+    return this.isCreateLinkEnabled;
   }
 }

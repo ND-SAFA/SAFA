@@ -16,6 +16,13 @@ export enum TraceType {
 }
 
 /**
+ * Enumerates the type of traces used internally.
+ */
+export enum InternalTraceType {
+  SUBTREE = "SUBTREE",
+}
+
+/**
  * Defines a link.
  */
 export interface Link {
@@ -78,7 +85,7 @@ export interface TraceLinkDisplayData extends TraceLink {
  * of some root node.
  */
 export interface SubtreeLink extends TraceLink {
-  type: "SUBTREE";
+  type: InternalTraceType.SUBTREE;
   /**
    * The id of the artifact.
    */

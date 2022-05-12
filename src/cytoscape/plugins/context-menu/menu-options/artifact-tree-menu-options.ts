@@ -8,10 +8,10 @@ import {
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { Artifact, ArtifactData, PanelType } from "@/types";
+import { Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape";
 import { EventObject } from "cytoscape";
-import { deleteArtifactFromCurrentVersion } from "@/api";
+import { handleDeleteArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 
@@ -26,7 +26,8 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     onClickFunction(): void {
       if (projectModule.isProjectDefined) {
-        appModule.openPanel(PanelType.artifactCreator);
+        artifactSelectionModule.clearSelections();
+        appModule.openArtifactCreatorTo();
       } else {
         logModule.onWarning("Please select a project to create artifacts.");
       }
@@ -62,6 +63,22 @@ export const artifactTreeMenuItems: MenuItem[] = [
     },
   },
   {
+    id: "edit-artifact",
+    content: "Edit Artifact",
+    tooltipText: "Edit Artifact",
+    selector: "node",
+    coreAsWell: false,
+    onClickFunction(event: EventObject): void {
+      handleOnClick(event, async (artifact: Artifact) => {
+        artifactSelectionModule.selectArtifact(artifact.id);
+        appModule.openArtifactCreatorTo();
+      });
+    },
+    isVisible(artifactData: ArtifactData | undefined): boolean {
+      return artifactData !== undefined;
+    },
+  },
+  {
     id: "delete-artifact",
     content: "Delete Artifact",
     tooltipText: "Delete Artifact",
@@ -69,7 +86,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
-        await deleteArtifactFromCurrentVersion(artifact);
+        await handleDeleteArtifact(artifact);
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

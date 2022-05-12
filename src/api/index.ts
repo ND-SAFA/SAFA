@@ -3,3 +3,4 @@ export * from "./endpoints";
 export * from "./commits";
 export * from "./handlers";
 export * from "./notifications";
+export * from "./uploaders";

@@ -16,20 +16,27 @@ import { deltaModule } from "@/store";
  * @emits `click:right` - On right click.
  */
 export default Vue.extend({
-  name: "trace-link",
+  name: "TraceLink",
   props: {
     traceDefinition: Object as PropType<TraceLink>,
     count: {
       type: Number,
       required: false,
     },
+    faded: Boolean,
   },
   computed: {
+    /**
+     * @return The trace link's selector.
+     */
     selector() {
       const { traceLinkId } = this.traceDefinition;
 
       return deltaModule.getTraceDeltaType(traceLinkId);
     },
+    /**
+     * @return The trace link's data definition.
+     */
     definition() {
       const { sourceId, targetId, traceLinkId } = this.traceDefinition;
       const count = this.count ? this.count : 1;
@@ -44,6 +51,7 @@ export default Vue.extend({
           target: sourceId,
           count,
           deltaType,
+          faded: this.faded,
         },
         classes: sourceId === targetId ? ["loop"] : [],
       };

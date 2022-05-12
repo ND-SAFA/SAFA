@@ -4,7 +4,7 @@
     :isOpen="isOpen"
     :actionsHeight="0"
     :isLoading="isLoading"
-    @close="onClose"
+    @close="handleClose"
   >
     <template v-slot:body>
       <v-list disabled>
@@ -22,11 +22,14 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { PanelType } from "@/types";
 import { appModule } from "@/store";
 import { GenericModal } from "@/components/common/generic";
 
+/**
+ * Renders server errors.
+ */
 export default Vue.extend({
+  name: "ServerErrorModal",
   components: {
     GenericModal,
   },
@@ -40,8 +43,8 @@ export default Vue.extend({
     errors: Array as PropType<string[]>,
   },
   methods: {
-    onClose() {
-      appModule.closePanel(PanelType.errorDisplay);
+    handleClose() {
+      appModule.closeErrorDisplay();
     },
   },
 });

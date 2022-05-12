@@ -11,7 +11,7 @@
                 :key="stepIndex"
                 :editable="currentStep > stepIndex"
               >
-                {{ stepName }}
+                <span class="text-center">{{ stepName }}</span>
               </v-stepper-step>
               <v-divider
                 :key="`${stepName}-divider`"
@@ -57,10 +57,10 @@ import Vue, { PropType } from "vue";
  * @emits-2 `submit` - On submit.
  */
 export default Vue.extend({
-  name: "generic-stepper",
+  name: "GenericStepper",
   props: {
     value: {
-      // current step number
+      // Current step number
       type: Number,
       required: true,
     },
@@ -75,9 +75,15 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Moves one step backward.
+     */
     onStepBack(): void {
       this.currentStep--;
     },
+    /**
+     * Moves one step forward, or submits if on the last step.
+     */
     onStepForward(): void {
       if (this.currentStep >= this.numberOfSteps) {
         this.$emit("submit");
@@ -87,15 +93,27 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return Whether the current step is done.
+     */
     isStepDone(): boolean {
       return this.steps[this.value - 1][1];
     },
+    /**
+     * @return WThe total number of steps.
+     */
     numberOfSteps(): number {
       return this.steps.length;
     },
+    /**
+     * @return All step names.
+     */
     stepNames(): string[] {
       return this.steps.map((s) => s[0]);
     },
+    /**
+     * @return The current step, which emits its value when changed.
+     */
     currentStep: {
       get(): number {
         return this.value;

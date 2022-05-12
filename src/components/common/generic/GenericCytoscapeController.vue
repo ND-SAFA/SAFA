@@ -15,11 +15,10 @@ import { CytoCore, CytoCoreGraph } from "@/types";
 import { logModule } from "@/store";
 
 /**
- * Abstracts setting up a cytoscape instance and corresponding
- * plugins.
- *
+ * Abstracts setting up a cytoscape instance and corresponding plugins.
  */
 export default Vue.extend({
+  name: "GenericCytoscapeController",
   props: {
     cytoCoreGraph: {
       type: Object as PropType<CytoCoreGraph>,
@@ -27,6 +26,10 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Initializes all plugins.
+     * @param cy - The cytoscape instance.
+     */
     preConfig(cy: CytoCore) {
       this.cytoCoreGraph.plugins.forEach((plugin) => {
         try {
@@ -36,6 +39,10 @@ export default Vue.extend({
         }
       });
     },
+    /**
+     * Finalizes all plugins.
+     * @param cy - The cytoscape instance.
+     */
     async afterCreated(cy: CytoCore) {
       if (this.cytoCoreGraph.saveCy) {
         this.cytoCoreGraph.saveCy(cy);

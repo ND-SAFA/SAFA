@@ -7,8 +7,9 @@
         :color="color"
         :icon="!fab"
         :fab="fab"
-        @click="$emit('click')"
         :disabled="disabled"
+        :small="small"
+        @click="$emit('click')"
       >
         <v-icon>{{ iconId }}</v-icon>
       </v-btn>
@@ -26,7 +27,7 @@ import Vue from "vue";
  * @emits `click` - On button click.
  */
 export default Vue.extend({
-  name: "generic-icon-button",
+  name: "GenericIconButton",
   props: {
     tooltip: {
       type: String,
@@ -38,9 +39,13 @@ export default Vue.extend({
     },
     color: String,
     fab: Boolean,
+    small: Boolean,
     isDisabled: Boolean,
   },
   computed: {
+    /**
+     * @return Whether the button is disabled.
+     */
     disabled(): boolean {
       return this.isDisabled === undefined ? false : this.isDisabled;
     },

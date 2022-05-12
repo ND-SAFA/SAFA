@@ -47,52 +47,50 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { loadLastProject } from "@/api";
-import { login } from "@/api/handlers/session-handler";
+import { handleLogin } from "@/api";
+import { CardPage, PasswordField } from "@/components";
 
 /**
- * Presents the login page.
+ * Displays the login page.
  */
 export default Vue.extend({
-  name: "login-view",
+  name: "LoginView",
   components: { PasswordField, CardPage },
-  data: () => ({
-    email: "",
-    password: "",
-    isError: false,
-    isLoading: false,
-  }),
+  data() {
+    return {
+      email: "",
+      password: "",
+      isError: false,
+      isLoading: false,
+    };
+  },
   methods: {
-    handleLogin() {
-      const goToPage = new URLSearchParams(window.location.search).get("to");
-
-      this.isLoading = true;
-
-      login({
-        email: this.email,
-        password: this.password,
-      })
-        .then(async () => {
-          this.isLoading = false;
-
-          if (goToPage && goToPage !== Routes.ARTIFACT) {
-            await navigateTo(goToPage);
-          } else {
-            await loadLastProject();
-          }
-        })
-        .catch(() => {
-          this.isError = true;
-          this.isLoading = false;
-        });
-    },
+    /**
+     * Navigate to the sign up page.
+     */
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);
     },
+    /**
+     * Navigate to the forgot password page.
+     */
     handleForgotPassword() {
       navigateTo(Routes.FORGOT_PASSWORD);
+    },
+    /**
+     * Attempts to log the user in.
+     */
+    handleLogin() {
+      this.isLoading = true;
+
+      handleLogin({
+        email: this.email,
+        password: this.password,
+      })
+        .then(() => (this.isError = false))
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

@@ -25,6 +25,14 @@ $graph-border-radius: 8px;
 .artifact-border {
   border-radius: $graph-border-radius;
   border: $graph-border-width solid $color-border;
+  box-shadow: 0 0 0;
+
+  &:hover {
+    box-shadow:
+      0 6px 2px -4px rgb(0 0 0 / 20%),
+      0 4px 4px 0 rgb(0 0 0 / 14%),
+      0 2px 10px 0 rgb(0 0 0 / 12%);
+  }
 }
 
 .artifact-header {
@@ -75,15 +83,27 @@ $graph-border-radius: 8px;
 }
 
 .artifact-added {
-  background: $color-added;
+  background: $color-added !important;
+
+  &:hover {
+    background: darken($color-added, 10) !important;
+  }
 }
 
 .artifact-removed {
-  background: $color-removed;
+  background: $color-removed !important;
+
+  &:hover {
+    background: darken($color-removed, 10) !important;
+  }
 }
 
 .artifact-modified {
-  background: $color-modified;
+  background: $color-modified !important;
+
+  &:hover {
+    background: darken($color-modified, 10) !important;
+  }
 }
 
 .artifact-stoplight {
@@ -117,5 +137,5 @@ $graph-border-radius: 8px;
 .cy-container,
 #cytoscape-div {
   height: 100% !important;
-  max-height: 100% !important;
+  max-height: 100vh !important;
 }

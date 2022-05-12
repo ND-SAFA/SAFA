@@ -1,10 +1,11 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { DocumentColumn, Project, ProjectDocument } from "@/types";
-import { ColumnDataType, DocumentType } from "@/types";
+import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
-import { appModule, artifactModule, traceModule } from "@/store";
-import { resetGraphFocus } from "@/api";
+import { artifactModule, traceModule } from "@/store";
+import { handleResetGraph } from "@/api";
+import { artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "document" })
 /**
@@ -32,7 +33,7 @@ export default class DocumentModule extends VuexModule {
     const {
       artifacts,
       traces,
-      currentDocumentId = "",
+      currentDocumentId = this.currentDocument.documentId,
       documents = [],
     } = project;
 
@@ -94,14 +95,10 @@ export default class DocumentModule extends VuexModule {
   async switchDocuments(document: ProjectDocument): Promise<void> {
     const currentArtifactIds = document.artifactIds;
 
-    appModule.onLoadStart();
-
     this.SET_CURRENT_DOCUMENT(document);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
-    await resetGraphFocus();
-
-    setTimeout(appModule.onLoadEnd, 200);
+    await handleResetGraph();
   }
 
   @Action

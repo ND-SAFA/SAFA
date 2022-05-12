@@ -1,15 +1,18 @@
 import { Commit } from "@/types";
 import { projectModule, commitModule } from "@/store";
-import { persistCommit } from "./commit-api";
+import { persistCommit } from "@/api";
 
 /**
  * Saves commit to the application store, and persist the commit.
  *
  * @param commit - The commit to save.
+ * @return The saved commit.
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
   const commitResponse = await persistCommit(commit);
+
   await commitModule.saveCommit(commitResponse);
+
   return commitResponse;
 }
 
@@ -19,6 +22,7 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
 export async function undoCommit(): Promise<void> {
   const commit = await commitModule.undoLastCommit();
   const commitResponse = await persistCommit(commit);
+
   await applyArtifactChanges(commitResponse);
 }
 
@@ -28,13 +32,24 @@ export async function undoCommit(): Promise<void> {
 export async function redoCommit(): Promise<void> {
   const commit = await commitModule.redoLastUndoneCommit();
   const commitResponse = await persistCommit(commit);
+
   await applyArtifactChanges(commitResponse);
 }
 
+/**
+ * Applies all artifact changes from a commit.
+ *
+ * @param commit - The commit to apply.
+ */
 async function applyArtifactChanges(commit: Commit): Promise<void> {
-  const artifactsAddedOrModified = commit.artifacts.added.concat(
-    commit.artifacts.modified
-  );
-  await projectModule.addOrUpdateArtifacts(artifactsAddedOrModified);
+  await projectModule.addOrUpdateArtifacts([
+    ...commit.artifacts.added,
+    ...commit.artifacts.modified,
+  ]);
   await projectModule.deleteArtifacts(commit.artifacts.removed);
+  await projectModule.addOrUpdateTraceLinks([
+    ...commit.traces.added,
+    ...commit.traces.modified,
+  ]);
+  await projectModule.deleteTraceLinks(commit.traces.removed);
 }

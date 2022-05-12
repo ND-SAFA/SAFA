@@ -53,20 +53,31 @@ export function createSession(): SessionModel {
 }
 
 /**
- * @return An empty project delta.
+ * @return An empty project identifier.
  */
-export function createProject(): Project {
+export function createProjectIdentifier(
+  identifier?: Partial<ProjectIdentifier>
+): ProjectIdentifier {
   return {
-    name: "Untitled",
-    projectId: "",
-    description: "",
-    owner: "",
-    members: [],
-    artifacts: [],
-    traces: [],
-    projectVersion: undefined,
-    artifactTypes: [],
-    documents: [],
+    name: identifier?.name || "",
+    projectId: identifier?.projectId || "",
+    description: identifier?.description || "",
+    owner: identifier?.owner || "",
+    members: identifier?.members || [],
+  };
+}
+
+/**
+ * @return An empty project.
+ */
+export function createProject(project?: Partial<Project>): Project {
+  return {
+    ...createProjectIdentifier(project),
+    artifacts: project?.artifacts || [],
+    traces: project?.traces || [],
+    projectVersion: project?.projectVersion || undefined,
+    artifactTypes: project?.artifactTypes || [],
+    documents: project?.documents || [],
   };
 }
 
@@ -104,6 +115,44 @@ export function createArtifact(artifact?: Partial<Artifact>): Artifact {
     logicType: artifact?.logicType || FTANodeType.AND,
     customFields: artifact?.customFields || {},
   };
+}
+
+/**
+ * Creates an artifact that may be initialized to a specific document type.
+ *
+ * @param artifact - The base artifact to create from.
+ * @param type - If true or matching no values, a normal artifact will be created.
+ *               If equal to an `FTANodeType`, an FTA node will be created.
+ *               If equal to a `SafetyCaseType`, a safety case node will be created.
+ *               If equal to a `DocumentType.FMEA`, an FMEA node will be created.
+ * @return An artifact initialized to the given props.
+ */
+export function createArtifactOfType(
+  artifact: Partial<Artifact> | undefined,
+  type: true | string
+): Artifact {
+  if (typeof type === "string") {
+    if (type in FTANodeType) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.FTA,
+        logicType: type as FTANodeType,
+      });
+    } else if (type in SafetyCaseType) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.SAFETY_CASE,
+        safetyCaseType: type as SafetyCaseType,
+      });
+    } else if (type === DocumentType.FMEA) {
+      return createArtifact({
+        ...artifact,
+        documentType: DocumentType.FMEA,
+      });
+    }
+  }
+
+  return createArtifact(artifact);
 }
 
 /**

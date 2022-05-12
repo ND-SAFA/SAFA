@@ -8,7 +8,9 @@
       </div>
     </v-col>
     <v-col cols="3">
-      <v-btn @click="onSubmit" color="primary" class="ml-10">Create Link</v-btn>
+      <v-btn @click="handleSubmit" color="primary" class="ml-10">
+        Create Trace Matrix
+      </v-btn>
     </v-col>
   </v-row>
 </template>
@@ -26,6 +28,7 @@ import { ButtonRow } from "@/components/common";
  * @emits-2 `submit` ({ source: string, target: string }) - On submit.
  */
 export default Vue.extend({
+  name: "TraceFileCreator",
   components: {
     ButtonRow,
   },
@@ -50,66 +53,82 @@ export default Vue.extend({
     };
   },
   methods: {
-    onSubmit(): void {
-      if (this.source !== "" && this.target !== "") {
-        const traceLink: Link = {
-          sourceName: this.source,
-          sourceId: this.source,
-          targetName: this.target,
-          targetId: this.target,
-        };
-        this.$emit("submit", traceLink);
-        this.$emit("close");
-      } else {
+    /**
+     * Attempts to create a new trace file panel.
+     */
+    handleSubmit(): void {
+      if (this.source === "" || this.target === "") {
         logModule.onWarning(
           "Please select valid source and target artifact types."
         );
+        return;
       }
+
+      this.$emit("close");
+      this.$emit("submit", {
+        sourceName: this.source,
+        sourceId: this.source,
+        targetName: this.target,
+        targetId: this.target,
+      } as Link);
     },
   },
   watch: {
-    isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.source = "";
-        this.target = "";
-      }
+    /**
+     * Resets trace direction data when opened.
+     */
+    isOpen(open: boolean): void {
+      if (!open) return;
+
+      this.source = "";
+      this.target = "";
     },
   },
   computed: {
+    /**
+     * Returns all target artifact types.
+     */
     targetTypes(): string[] {
+      if (this.source === "") {
+        return [];
+      }
+
       const traceIds = this.traceFiles.map(
         (f) => `${f.sourceId}-${f.targetId}`
       );
-      if (this.source === "") {
-        return [];
-      } else {
-        return this.artifactTypes.filter((t) => {
-          const currentTraceId = `${this.source}-${t}`;
-          return !traceIds.includes(currentTraceId);
-        });
-      }
+
+      return this.artifactTypes.filter((t) => {
+        const currentTraceId = `${this.source}-${t}`;
+        return !traceIds.includes(currentTraceId);
+      });
     },
+    /**
+     * Defines the source button.
+     */
     sourceDefinition(): ButtonDefinition {
       return {
         type: ButtonType.LIST_MENU,
         label: this.source === "" ? "Select Source" : this.source,
-        menuItems: this.artifactTypes,
-        menuHandlers: this.artifactTypes.map(
-          (type) => () => (this.source = type)
-        ),
+        menuItems: this.artifactTypes.map((type) => ({
+          name: type,
+          onClick: () => (this.source = type),
+        })),
         buttonColor: "primary",
         buttonIsText: false,
         showSelectedValue: true,
       };
     },
+    /**
+     * Defines the target button.
+     */
     targetDefinition(): ButtonDefinition {
       return {
         type: ButtonType.LIST_MENU,
         label: this.target === "" ? "Select Target" : this.target,
-        menuItems: this.targetTypes,
-        menuHandlers: this.targetTypes.map(
-          (type) => () => (this.target = type)
-        ),
+        menuItems: this.targetTypes.map((type) => ({
+          name: type,
+          onClick: () => (this.target = type),
+        })),
         buttonColor: "primary",
         buttonIsText: false,
         showSelectedValue: true,

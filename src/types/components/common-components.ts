@@ -41,11 +41,19 @@ export interface IconDefinition extends BaseButtonDefinition {
 }
 
 /**
+ * Local representation of generated menu items.
+ */
+export interface ButtonMenuItem {
+  name: string;
+  tooltip?: string;
+  onClick: EmptyLambda;
+}
+
+/**
  * Defines an menu button.
  */
 interface MenuDefinition extends BaseButtonDefinition {
-  menuItems?: string[];
-  menuHandlers?: EmptyLambda[];
+  menuItems?: ButtonMenuItem[];
   buttonIsText?: boolean;
   itemColor?: string;
   showSelectedValue?: boolean;

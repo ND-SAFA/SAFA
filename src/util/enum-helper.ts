@@ -1,4 +1,5 @@
 import {
+  ArtifactDeltaState,
   ColumnDataType,
   DocumentType,
   FTANodeType,
@@ -98,5 +99,19 @@ export function columnTypeOptions(): SelectOption[] {
     createEnumOption(ColumnDataType.FREE_TEXT, "Text"),
     createEnumOption(ColumnDataType.RELATION),
     createEnumOption(ColumnDataType.SELECT),
+  ];
+}
+
+/**
+ * Returns display names for each column type.
+ *
+ * @return The select option names and ids.
+ */
+export function deltaTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(ArtifactDeltaState.NO_CHANGE),
+    createEnumOption(ArtifactDeltaState.ADDED),
+    createEnumOption(ArtifactDeltaState.MODIFIED),
+    createEnumOption(ArtifactDeltaState.REMOVED),
   ];
 }

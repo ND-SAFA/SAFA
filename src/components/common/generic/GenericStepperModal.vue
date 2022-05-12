@@ -36,7 +36,7 @@ import GenericStepper from "./GenericStepper.vue";
  * @emits-4 `submit` - On submit.
  */
 export default Vue.extend({
-  name: "generic-stepper-modal",
+  name: "GenericStepperModal",
   components: {
     GenericModal,
     GenericStepper,
@@ -71,6 +71,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return The current step, and emits the current step when changed.
+     */
     currentStep: {
       get(): number {
         return this.value;
@@ -81,10 +84,13 @@ export default Vue.extend({
     },
   },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.$emit("reset");
-      }
+    /**
+     * Emits a call to reset when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.$emit("reset");
     },
   },
 });

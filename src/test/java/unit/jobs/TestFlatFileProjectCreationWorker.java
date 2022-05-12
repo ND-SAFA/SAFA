@@ -45,6 +45,10 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
         int comparison = jobDbEntity.getCompletedAt().compareTo(jobDbEntity.getStartedAt());
         assertThat(comparison).isEqualTo(1);
 
+        // Step - Assert that lastUpdatedBy is after start.
+        comparison = jobDbEntity.getLastUpdatedAt().compareTo(jobDbEntity.getStartedAt());
+        assertThat(comparison).isEqualTo(1);
+
         // VP - Verify that all entities were created
         verifyBeforeEntities(projectVersion.getProject());
     }

@@ -21,6 +21,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Responsible for storing the information needed to create jobs.
@@ -67,6 +68,7 @@ public class JobDbEntity {
      */
     @NotNull
     @Column(name = "last_updated_at", nullable = false)
+    @UpdateTimestamp
     Timestamp lastUpdatedAt;
     /**
      * The datetime that the job was completed at, null otherwise.

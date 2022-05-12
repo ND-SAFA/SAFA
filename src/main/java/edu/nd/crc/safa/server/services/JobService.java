@@ -101,7 +101,7 @@ public class JobService {
      * @param jobDbEntity The job whose lastUpdated property is being modified.
      */
     public void startStep(JobDbEntity jobDbEntity) {
-        saveJob(jobDbEntity);
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     /**
@@ -111,7 +111,7 @@ public class JobService {
      */
     public void endStep(JobDbEntity jobDbEntity) {
         jobDbEntity.incrementStep();
-        saveJob(jobDbEntity);
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     /**
@@ -123,7 +123,7 @@ public class JobService {
         jobDbEntity.setStatus(JobStatus.COMPLETED);
         jobDbEntity.setCurrentProgress(100);
         jobDbEntity.setCompletedAt(now());
-        saveJob(jobDbEntity);
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     /**
@@ -134,7 +134,7 @@ public class JobService {
     public void failJob(JobDbEntity jobDbEntity) {
         jobDbEntity.setStatus(JobStatus.FAILED);
         jobDbEntity.setCurrentProgress(-1);
-        saveJob(jobDbEntity);
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     /**
@@ -158,11 +158,6 @@ public class JobService {
     @PostConstruct
     public void init() {
         instance = this;
-    }
-
-    private void saveJob(JobDbEntity jobDbEntity) {
-        jobDbEntity.setLastUpdatedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
     }
 
     private Timestamp now() {

@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +10,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 
 /**
- * Bean definition for services
+ * Configures the threads used to serve the requests
+ * to the server.
  */
 @Configuration
 public class ThreadConfiguration {
@@ -38,10 +37,5 @@ public class ThreadConfiguration {
     @Bean
     public ExecutorDelegate executorDelegate() {
         return new ExecutorDelegate(controllerExecutor());
-    }
-
-    @Bean
-    public JiraConnectionService jiraConnectionService() {
-        return new JiraConnectionServiceImpl();
     }
 }

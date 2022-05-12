@@ -10,7 +10,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -66,7 +66,7 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectVersionErrors updateProjectVersionFromFlatFiles(
+    public ProjectEntities updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
@@ -74,7 +74,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectVersionErrors response = this.uploadAndCreateProjectFromFlatFiles(
+        ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,
             files);
@@ -91,7 +91,7 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.projectFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectVersionErrors createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
+    public ProjectEntities createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {
             throw new SafaError("Could not create project because no files were received.");
         }
@@ -100,7 +100,7 @@ public class FlatFileController extends BaseController {
         this.projectService.saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = projectService.createBaseProjectVersion(project);
 
-        ProjectVersionErrors response = this.uploadAndCreateProjectFromFlatFiles(project,
+        ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
@@ -117,9 +117,9 @@ public class FlatFileController extends BaseController {
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
-    private ProjectVersionErrors uploadAndCreateProjectFromFlatFiles(Project project,
-                                                                     ProjectVersion projectVersion,
-                                                                     MultipartFile[] files)
+    private ProjectEntities uploadAndCreateProjectFromFlatFiles(Project project,
+                                                                ProjectVersion projectVersion,
+                                                                MultipartFile[] files)
         throws SafaError {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);

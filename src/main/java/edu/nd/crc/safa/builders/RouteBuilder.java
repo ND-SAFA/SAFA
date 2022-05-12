@@ -3,10 +3,10 @@ package edu.nd.crc.safa.builders;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Document;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
 
 /**
  * Given a route template, allows the users to specify the needed parameters and validates the final path.
@@ -57,28 +57,8 @@ public class RouteBuilder {
         return this;
     }
 
-    public RouteBuilder withTraceLink(TraceLink traceLink) {
-        this.path = this.path.replace("{traceLinkId}", traceLink.getTraceLinkId().toString());
-        return this;
-    }
-
-    public RouteBuilder withSourceName(String sourceId) {
-        this.path = this.path.replace("{sourceId}", sourceId);
-        return this;
-    }
-
-    public RouteBuilder withTargetName(String sourceId) {
-        this.path = this.path.replace("{targetId}", sourceId);
-        return this;
-    }
-
     public RouteBuilder withArtifactId(Artifact artifact) {
         this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
-        return this;
-    }
-
-    public RouteBuilder withArtifactName(String artifactName) {
-        this.path = this.path.replace("{artifactName}", artifactName);
         return this;
     }
 
@@ -97,8 +77,8 @@ public class RouteBuilder {
         return this;
     }
 
-    public RouteBuilder withTraceMatrixId(String traceMatrixId) {
-        this.path = this.path.replace("{traceMatrixId}", traceMatrixId);
+    public RouteBuilder withJob(JobDbEntity job) {
+        this.path = this.path.replace("{jobId}", job.getId().toString());
         return this;
     }
 

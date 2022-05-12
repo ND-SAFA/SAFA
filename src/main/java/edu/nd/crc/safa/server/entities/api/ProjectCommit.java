@@ -13,7 +13,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  * The model used to commit a change to the versioning system.
  */
 public class ProjectCommit {
-
     ProjectVersion commitVersion;
     ProjectChange<ArtifactAppEntity> artifacts;
     ProjectChange<TraceAppEntity> traces;

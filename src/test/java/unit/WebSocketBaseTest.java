@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.NotificationService;
@@ -107,6 +108,17 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     public WebSocketBaseTest subscribeToVersion(String clientId, ProjectVersion projectVersion) {
         String projectVersionSubscriptionDestination = NotificationService.getVersionTopic(projectVersion);
         return this.subscribe(clientId, projectVersionSubscriptionDestination);
+    }
+
+    /**
+     * Subscribes client with associated id to the given project version.
+     *
+     * @param clientId    The ID given to client subscribing to project version.
+     * @param jobDbEntity The job whose updates are listened for.
+     */
+    public void subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
+        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(jobDbEntity);
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 
     /**

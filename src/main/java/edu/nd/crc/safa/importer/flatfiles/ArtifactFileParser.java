@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -13,6 +14,7 @@ import edu.nd.crc.safa.server.services.EntityVersionService;
 
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,8 +22,10 @@ import org.springframework.stereotype.Component;
  * validating, and storing their data.
  */
 @Component
+@Scope("singleton")
 public class ArtifactFileParser {
 
+    private static ArtifactFileParser instance;
     EntityVersionService entityVersionService;
 
     @Autowired
@@ -29,13 +33,22 @@ public class ArtifactFileParser {
         this.entityVersionService = entityVersionService;
     }
 
+    public static ArtifactFileParser getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
+    }
+
     public EntityCreation<ArtifactAppEntity, String> parseArtifactFiles(ProjectVersion projectVersion,
-                                                                        ProjectTIMParser ProjectTIMParser)
+                                                                        TIMParser TIMParser)
         throws JSONException, SafaError {
 
         Map<String, ArtifactAppEntity> artifacts = new Hashtable<>();
         List<String> errors = new ArrayList<>();
-        for (ArtifactFile artifactDefinitionJson : ProjectTIMParser.getArtifactTypeDefinitions()) {
+        for (ArtifactFile artifactDefinitionJson : TIMParser.getArtifactTypeDefinitions()) {
             EntityCreation<ArtifactAppEntity, String> entityCreationResponse =
                 artifactDefinitionJson.parseArtifacts(projectVersion);
             for (ArtifactAppEntity artifactAppEntity : entityCreationResponse.getEntities()) {

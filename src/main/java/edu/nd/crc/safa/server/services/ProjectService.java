@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
@@ -24,6 +25,7 @@ import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -31,8 +33,10 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Responsible for updating, deleting, and retrieving project identifiers.
  */
 @Service
+@Scope("singleton")
 public class ProjectService {
 
+    private static ProjectService instance;
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
@@ -54,6 +58,10 @@ public class ProjectService {
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
         this.entityVersionService = entityVersionService;
+    }
+
+    public static ProjectService getInstance() {
+        return instance;
     }
 
     /**
@@ -88,10 +96,10 @@ public class ProjectService {
             .collect(Collectors.toList());
     }
 
-    public ProjectVersionErrors updateProjectAtVersion(Project project,
-                                                       ProjectVersion projectVersion,
-                                                       ProjectAppEntity payload) throws SafaError {
-        ProjectVersionErrors response;
+    public ProjectEntities updateProjectAtVersion(Project project,
+                                                  ProjectVersion projectVersion,
+                                                  ProjectAppEntity payload) throws SafaError {
+        ProjectEntities response;
         Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
         persistentProject.setName(project.getName());
         persistentProject.setDescription(project.getDescription());
@@ -102,7 +110,7 @@ public class ProjectService {
                 && payload.artifacts.size() > 0)) {
                 throw new SafaError("Cannot update artifacts because project version not defined");
             }
-            response = new ProjectVersionErrors(payload, null, null, null);
+            response = new ProjectEntities(payload, null, null, null);
         } else if (!projectVersion.hasValidId()) {
             throw new SafaError("Invalid Project version: must have a valid ID.");
         } else if (!projectVersion.hasValidVersion()) {
@@ -126,9 +134,9 @@ public class ProjectService {
      * @return ProjectEntities containing all saved entities.
      * @throws SafaError Throws error is something occurs while creating artifacts or traces.
      */
-    public ProjectVersionErrors createNewProjectWithVersion(Project project,
-                                                            ProjectAppEntity entities) throws SafaError {
-        ProjectVersionErrors projectEntities;
+    public ProjectEntities createNewProjectWithVersion(Project project,
+                                                       ProjectAppEntity entities) throws SafaError {
+        ProjectEntities projectEntities;
 
         this.saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = this.createBaseProjectVersion(project);
@@ -230,5 +238,10 @@ public class ProjectService {
             return projectMembership;
         }
         return null;
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 }

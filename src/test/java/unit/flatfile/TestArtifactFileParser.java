@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.ProjectTIMParser;
+import edu.nd.crc.safa.importer.flatfiles.TIMParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -35,11 +35,11 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
-        ProjectTIMParser ProjectTIMParser = new ProjectTIMParser(jsonSpec);
-        ProjectTIMParser.parse();
+        TIMParser TIMParser = new TIMParser(jsonSpec);
+        TIMParser.parse();
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
             artifactFileParser.parseArtifactFiles(projectVersion,
-                ProjectTIMParser);
+                TIMParser);
 
         // VP - Verify that all design artifacts are created
         assertThat(artifactCreationResponse.getEntities().size())
@@ -53,9 +53,9 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
 
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
 
-        ProjectTIMParser ProjectTIMParser = new ProjectTIMParser(jsonSpec);
+        TIMParser TIMParser = new TIMParser(jsonSpec);
 
-        Exception exception = assertThrows(SafaError.class, ProjectTIMParser::parse);
+        Exception exception = assertThrows(SafaError.class, TIMParser::parse);
         assertThat(exception.getMessage()).contains("file");
         projectService.deleteProject(projectVersion.getProject());
     }

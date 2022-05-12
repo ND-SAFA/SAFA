@@ -1,10 +1,14 @@
 package edu.nd.crc.safa.server.services;
 
+import javax.annotation.PostConstruct;
+
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
+    private static NotificationService instance;
     private final SimpMessagingTemplate messagingTemplate;
     private final SafaUserService safaUserService;
 
@@ -49,6 +54,25 @@ public class NotificationService {
     }
 
     /**
+     * Returns the topic for receiving job updates for given job.
+     *
+     * @param jobDbEntity The job to subscribe to.
+     * @return String representing websocket topic.
+     */
+    public static String getJobTopic(JobDbEntity jobDbEntity) {
+        return String.format("/topic/jobs/%s", jobDbEntity.getId());
+    }
+
+    public static NotificationService getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
+    }
+
+    /**
      * Notifies all subscribers of given version to update the defined project entity.
      *
      * @param projectVersion     The version whose subscribers will be notified of update.
@@ -73,5 +97,16 @@ public class NotificationService {
         String versionTopicDestination = getProjectTopic(project);
         ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntityTypes);
         messagingTemplate.convertAndSend(versionTopicDestination, message);
+    }
+
+    /**
+     * Sends job to topic subscribers.
+     *
+     * @param jobDbEntity The job to broadcast.
+     */
+    public void broadUpdateJobMessage(JobDbEntity jobDbEntity) {
+        String jobTopic = getJobTopic(jobDbEntity);
+        JobAppEntity jobAppEntity = JobAppEntity.createFromJob(jobDbEntity);
+        messagingTemplate.convertAndSend(jobTopic, jobAppEntity);
     }
 }

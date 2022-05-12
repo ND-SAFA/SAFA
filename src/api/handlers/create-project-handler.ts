@@ -68,21 +68,17 @@ export function handleBulkImportProject(
 /**
  * Imports a Jira project, sets related app state, and logs the status.
  *
- * @param accessToken - The access token received from authorizing Jira.
- * @param cloudId - The Jira cloud id for the current company.
  * @param projectId - The Jira project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportJiraProject(
-  accessToken: string,
-  cloudId: string,
   projectId: string,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appModule.onLoadStart();
 
-  createJiraProject(accessToken, cloudId, projectId)
+  createJiraProject(projectId)
     .then(async () => {
       logModule.onSuccess(`Jira project has been created: ${projectId}`);
       await navigateTo(Routes.UPLOAD_STATUS);

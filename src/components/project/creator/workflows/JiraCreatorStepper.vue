@@ -31,20 +31,24 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { JiraCloudSite, JiraProject, StepState } from "@/types";
-import { getParam, QueryParams } from "@/router";
 import {
-  getJiraProjects,
-  getJiraCloudSites,
-  handleImportJiraProject,
-} from "@/api";
+  JiraAccessToken,
+  JiraCloudSite,
+  JiraProject,
+  StepState,
+} from "@/types";
+import { getParam, QueryParams } from "@/router";
+import { getJiraCloudSites, handleImportJiraProject } from "@/api";
 import { GenericStepper } from "@/components/common";
 import {
   JiraAuthentication,
   JiraSiteSelector,
   JiraProjectSelector,
 } from "@/components/project/creator/steps";
-import { handleAuthorizeJira } from "@/api/handlers/integration-handler";
+import {
+  handleAuthorizeJira,
+  handleLoadJiraProjects,
+} from "@/api/handlers/integration-handler";
 
 /**
  * Allows for creating a project from Jira.
@@ -60,7 +64,7 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
-      token: "",
+      token: undefined as JiraAccessToken | undefined,
       isLoading: true,
 
       sites: [] as JiraCloudSite[],
@@ -109,7 +113,7 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.token = "";
+      this.token = undefined;
       this.sites = [];
       this.projects = [];
     },
@@ -120,7 +124,7 @@ export default Vue.extend({
       if (!this.token) return;
 
       this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.token);
+      this.sites = await getJiraCloudSites(this.token.access_token);
       this.sitesLoading = false;
     },
     /**
@@ -130,8 +134,14 @@ export default Vue.extend({
       if (!this.selectedSite || !this.token) return;
 
       this.projectsLoading = true;
-      this.projects = await getJiraProjects(this.token, this.selectedSite.id);
-      this.projectsLoading = false;
+
+      handleLoadJiraProjects(this.token, this.selectedSite.id, {
+        onSuccess: (projects) => {
+          this.projects = projects;
+          this.projectsLoading = false;
+        },
+        onError: () => (this.projectsLoading = false),
+      });
     },
     /**
      * Selects a Jira site to load projects from.
@@ -165,14 +175,9 @@ export default Vue.extend({
     handleSaveProject(): void {
       if (!this.token || !this.selectedSite || !this.selectedProject) return;
 
-      handleImportJiraProject(
-        this.token,
-        this.selectedSite.id,
-        this.selectedProject.id,
-        {
-          onSuccess: () => this.clearData(),
-        }
-      );
+      handleImportJiraProject(this.selectedProject.id, {
+        onSuccess: () => this.clearData(),
+      });
     },
   },
 });

@@ -6,7 +6,7 @@ import {
   LocalStorageKeys,
 } from "@/types";
 import { logModule, sessionModule } from "@/store";
-import { authHttpClient, Endpoint } from "@/api";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * The formatted scopes of jira permissions being requested.
@@ -73,7 +73,9 @@ export function authorizeJira(): void {
  * @param accessCode - The access code received from authorizing Jira.
  * @return The Jira access token.
  */
-export async function getJiraToken(accessCode: string): Promise<string> {
+export async function getJiraToken(
+  accessCode: string
+): Promise<JiraAccessToken> {
   const authorization = await fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
@@ -96,7 +98,7 @@ export async function getJiraToken(accessCode: string): Promise<string> {
     authorization.refresh_token
   );
 
-  return authorization.access_token;
+  return authorization;
 }
 
 /**
@@ -104,11 +106,11 @@ export async function getJiraToken(accessCode: string): Promise<string> {
  *
  * @return The Jira access token.
  */
-export async function getJiraRefreshToken(): Promise<string> {
+export async function getJiraRefreshToken(): Promise<JiraAccessToken> {
   const refreshToken = localStorage.getItem(
     LocalStorageKeys.JIRA_REFRESH_TOKEN
   );
-  const authorization = await fetchAtlassian<JiraAccessToken>(
+  return fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -123,8 +125,6 @@ export async function getJiraRefreshToken(): Promise<string> {
       }),
     }
   );
-
-  return authorization.access_token;
 }
 
 /**
@@ -173,29 +173,37 @@ export async function getJiraProjects(
 }
 
 /**
- * Creates a new project based on a Jira project.
+ * Saves a user's Jira credentials and primary organization.
  *
- * @param accessToken - The access token received from authorizing Jira.
+ * @param token - The access and refresh token received from authorizing Jira.
  * @param cloudId - The Jira cloud id for the current site.
- * @param projectId - The Jira project id to import.
  */
-export async function createJiraProject(
-  accessToken: string,
-  cloudId: string,
-  projectId: string
+export async function saveJiraCredentials(
+  token: JiraAccessToken,
+  cloudId: string
 ): Promise<void> {
-  const refreshToken = localStorage.getItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN
-  );
-  return authHttpClient<void>(Endpoint.jiraProject, {
-    method: "POST",
+  return authHttpClient<void>(Endpoint.jiraCredentials, {
+    method: "PUT",
     body: JSON.stringify({
+      refreshToken: token.refresh_token,
+      bearerAccessToken: token.access_token,
       cloudId,
-      projectId,
-      refreshToken,
-      bearerAccessToken: accessToken,
       clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
       clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
     }),
   });
+}
+
+/**
+ * Creates a new project based on a Jira project.
+ *
+ * @param projectId - The Jira project id to import.
+ */
+export async function createJiraProject(projectId: string): Promise<void> {
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.jiraProject, { projectId }),
+    {
+      method: "POST",
+    }
+  );
 }

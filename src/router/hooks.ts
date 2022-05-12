@@ -1,5 +1,6 @@
 import { QueryParams, Routes } from "@/router/routes";
 import router from "@/router/router";
+import { URLParameter } from "@/types";
 
 /**
  * Navigates app to given route, if app is already on the route then
@@ -39,9 +40,7 @@ export function getParams(): Record<string, string | (string | null)[]> {
  * @param key - The query param key.
  * @return The query parameter value.
  */
-export function getParam(
-  key: QueryParams
-): string | (string | null)[] | undefined {
+export function getParam(key: QueryParams): URLParameter {
   return router.currentRoute.query[key];
 }
 

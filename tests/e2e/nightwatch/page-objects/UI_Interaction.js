@@ -26,7 +26,7 @@ module.exports = {
         RequirementsUploadButton                : '#input-199[type="file"]',
         DesignsUploadButton                     : '#input-236[type="file"]',
         EnvironmentalAssumptionsUploadButton    : '#input-273[type="file"]',
-        Requirement2HazardsUploadButton          : '#input-346[type="file"]',
+        Requirement2HazardsUploadButton         : '#input-346[type="file"]',
         Environmental2HazardsUploadButton       : '#input-411[type="file"]',
     },
 
@@ -108,12 +108,13 @@ module.exports = {
 
         },
 
-        uploadFileWithParameters(buttonLocation, fileLocation, fileName) {
+        uploadFileWithParameters(fileLocation, fileName) {
             const page = this;
 
             page
-                .uploadFile(buttonLocation, require('path').resolve(fileLocation + fileName))
-            
+                .useXpath()
+                .uploadFile(`//*[contains(text(),'File')]/following-sibling::input`, require('path').resolve(fileLocation + fileName))
+                .useCss();
 
             return this;
         }

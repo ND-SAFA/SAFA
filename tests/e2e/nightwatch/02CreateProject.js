@@ -40,25 +40,25 @@ module.exports = {
             .fillInTextBox('Hazards', 'Artifact Name')
             .clickButton(' Create Artifact ')
             .takeScreenShot(screenShotDestination + 'ArtifactUploadScreen.png')
-            .uploadFileWithParameters('@HazardsUploadButton', TestDataLocation, HazardsFileName)
+            .uploadFileWithParameters(TestDataLocation, HazardsFileName)
             .pause(1000)
 
             .clickButton(' Create new artifact')
             .fillInTextBox('Requirements', 'Artifact Name')
             .clickButton(' Create Artifact ')
-            .uploadFileWithParameters('@RequirementsUploadButton', TestDataLocation, 'Requirement.csv')
+            .uploadFileWithParameters(TestDataLocation, 'Requirement.csv')
             .pause(1000)
 
             .clickButton(' Create new artifact')
             .fillInTextBox('Designs', 'Artifact Name')
             .clickButton(' Create Artifact ')
-            .uploadFileWithParameters('@DesignsUploadButton', TestDataLocation, 'Design.csv')
+            .uploadFileWithParameters(TestDataLocation, 'Design.csv')
             .pause(1000)
     
             .clickButton(' Create new artifact')
             .fillInTextBox('Environmental Assumptions', 'Artifact Name')
             .clickButton(' Create Artifact ')
-            .uploadFileWithParameters('@EnvironmentalAssumptionsUploadButton', TestDataLocation, 'EnvironmentalAssumption.csv')
+            .uploadFileWithParameters(TestDataLocation, 'EnvironmentalAssumption.csv')
             .pause(1000)
 
             .clickButton(projectCreatorButtonName)
@@ -75,7 +75,7 @@ module.exports = {
             .useXpath()
             .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
             .clickButton('Create Link')
-            .uploadFileWithParameters('@Requirement2HazardsUploadButton', TestDataLocation, 'Requirement2Hazard.csv')
+            .uploadFileWithParameters(TestDataLocation, 'Requirement2Hazard.csv')
             .pause(100)
             .takeScreenShot(screenShotDestination + 'Error.png')
             
@@ -89,18 +89,7 @@ module.exports = {
             .useXpath()
             .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
             .clickButton('Create Link')
-            .uploadFileWithParameters('@Environmental2HazardsUploadButton', TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
+            .uploadFileWithParameters(TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
             .pause(90000)
-            
-            /*
-            .pause(100)
-            .useXpath()
-            .click(`//*[contains(text(),'Design')]`)
-            .useCss()
-            .clickButton(' Select Target ')
-            .pause(100)
-            .clickButton('Requirements')
-            .clickButton('Create Link')
-        */
     }
 };

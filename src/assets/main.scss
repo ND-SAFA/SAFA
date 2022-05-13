@@ -12,9 +12,25 @@
   width: 100%;
 }
 
+.width {
+  &-min {
+    width: min-content;
+  }
+  &-max {
+    width: max-content;
+  }
+  &-fit {
+    width: fit-content;
+  }
+}
+
 .text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.faded {
+  opacity: 0.6;
 }
 
 .disable-events {

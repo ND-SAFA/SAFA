@@ -2,7 +2,7 @@
   <v-main class="primary fill-height">
     <v-container class="fill-height">
       <v-card rounded elevation="2" class="mx-auto py-4 px-6" width="30em">
-        <v-card-title style="width: max-content" class="mx-auto">
+        <v-card-title class="mx-auto width-max">
           <safa-icon />
           <h1 class="text-h2 font-weight-bold primary-text">SAFA</h1>
         </v-card-title>

@@ -11,15 +11,11 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <p class="mx-auto text-caption" style="width: fit-content">
-          [Select an Organization.]
-        </p>
+        <p class="mx-auto text-caption width-fit">[Select an Organization.]</p>
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <p class="mx-auto text-caption" style="width: fit-content">
-          [Select a Project.]
-        </p>
+        <p class="mx-auto text-caption width-fit">[Select a Project.]</p>
       </v-stepper-content>
     </template>
   </generic-stepper>

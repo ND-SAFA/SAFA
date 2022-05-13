@@ -8,7 +8,7 @@
         <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
       </v-col>
     </v-row>
-    <v-container class="elevation-3" style="max-height: 50vh; overflow: hidden">
+    <v-container class="elevation-3 overflow-hidden" style="max-height: 50vh">
       <generic-cytoscape-controller
         :cyto-core-graph="cytoCoreGraph"
         style="max-height: 50vh !important"

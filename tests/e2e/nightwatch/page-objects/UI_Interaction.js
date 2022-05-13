@@ -84,7 +84,7 @@ module.exports = {
                         results = "UI: {lableName} is not visible";
                     }
                 });
-
+            page.pause(500)
             /* Return the page object */
             return this;
         },
@@ -113,9 +113,26 @@ module.exports = {
 
             page
                 .useXpath()
-                .uploadFile(`//*[contains(text(),'File')]/following-sibling::input`, require('path').resolve(fileLocation + fileName))
+                .uploadFile(`(//*[contains(text(),'File')]/following-sibling::input)[last()]`, require('path').resolve(fileLocation + fileName))
                 .useCss();
 
+            return this;
+        },
+
+        clickSelectorButton(sourceName, targetName) {
+            const page = this;
+
+            page
+                .clickButton(' Create new trace matrix')
+                .clickButton(' Select Source ')
+                .useXpath()
+                .click(`//*[contains(text(),'${sourceName}') and @class="v-btn__content" ]`)
+                .clickButton(' Select Target ')
+                .useXpath()
+                .click(`(//*[contains(text(),'${targetName}') and @class="v-btn__content" ])[last()]`)
+                .clickButton(' Create Trace Matrix ')
+                .useCss()
+                .pause(1000)
             return this;
         }
 

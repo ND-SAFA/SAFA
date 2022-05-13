@@ -29,6 +29,7 @@ module.exports = {
             .assert.titleEquals('SAFA', 'UI: Title is correct') // Note, succsess in running the program so far
             .loginSession(screenShotDestination, 'Login_Success.png')
 
+
             .fillInTextBox('SAFA', 'Project Name')
             .fillInTextBox('Safety Artifact Forest Analysis', 'Project description')
             .takeScreenShot(screenShotDestination + 'ProjectNameEntered.png')
@@ -65,31 +66,43 @@ module.exports = {
             .pause(500)
             .takeScreenShot(screenShotDestination + 'Artifacts_Successfully_Uploaded.png')
 
-            /* Now lets upload the Trace Links */
-            .clickButton(' Create new trace link')
-            .clickButton(' Select Source ')
-            .pause(100)
-            .useXpath()
-            .click(`//*[contains(text(),'Requirements') and @class="v-btn__content" ]`)
-            .clickButton(' Select Target ')
-            .useXpath()
-            .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
-            .clickButton('Create Link')
+            /***************** Now lets upload the Trace Links ****************************/
+            .clickSelectorButton('Requirements', 'Hazards')
             .uploadFileWithParameters(TestDataLocation, 'Requirement2Hazard.csv')
-            .pause(100)
-            .takeScreenShot(screenShotDestination + 'Error.png')
-            
-            
-            .clickButton(' Create new trace link')
-            .clickButton(' Select Source ')
-            .pause(100)
             .useXpath()
-            .click(`//*[contains(text(),'Environmental Assumptions') and @class="v-btn__content" ]`)
-            .clickButton(' Select Target ')
-            .useXpath()
-            .click(`//*[contains(text(),'Hazards') and @class="v-btn__content"]`)
-            .clickButton('Create Link')
+            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+
+            .clickSelectorButton(' Environmental Assumptions ', ' Hazards ')
             .uploadFileWithParameters(TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
-            .pause(90000)
+            .useXpath()
+            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+            
+
+            .clickSelectorButton(' Designs ', ' Designs ')
+            .uploadFileWithParameters(TestDataLocation, 'Design2Design.csv')
+            .useXpath()
+            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+
+            .clickSelectorButton(' Requirements ', ' Requirements ')
+            .uploadFileWithParameters(TestDataLocation, 'Requirement2Requirement.csv')
+            .useXpath()
+            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+
+            .clickSelectorButton(' Hazards ', ' Hazards ')
+            .uploadFileWithParameters(TestDataLocation, 'Hazard2Hazard.csv')
+            .useXpath()
+            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+
+            .clickButton(projectCreatorButtonName)
+            .pause(1000)
+            .takeScreenShot(screenShotDestination + 'TraceLinks_Successfully_Uploaded.png')
+
+            .clickButton(' Create Project ')
+
+            .pause(100000)
+            
+            /* Now lets test if we can drag and drop the artifacts */
+            .useCss()
+            .dragAndDrop()
     }
 };

@@ -95,13 +95,13 @@ export default Vue.extend({
         this.isLoading = false;
         this.credentials = credentials;
         this.loadSites();
+        this.setStepIsValid(0, true);
 
         if (credentials.cloudId) {
-          this.setStepIsValid(1, true);
           this.currentStep = 3;
+          this.setStepIsValid(1, true);
           this.loadProjects();
         } else {
-          this.setStepIsValid(0, true);
           this.currentStep = 2;
         }
       },

@@ -46,18 +46,18 @@
       </template>
       <template v-slot:item.actions="{ item }">
         <generic-icon-button
-          icon-id="mdi-dots-vertical"
-          tooltip="View"
+          icon-id="mdi-view-split-vertical"
+          :tooltip="`View '${item.name}'`"
           @click="handleView(item)"
         />
         <generic-icon-button
           icon-id="mdi-pencil"
-          tooltip="Edit"
+          :tooltip="`Edit '${item.name}'`"
           @click="handleEdit(item)"
         />
         <generic-icon-button
           icon-id="mdi-delete"
-          tooltip="Delete"
+          :tooltip="`Delete '${item.name}'`"
           @click="handleDelete(item)"
         />
       </template>
@@ -211,7 +211,11 @@ export default Vue.extend({
      * @param artifact - The artifact to view.
      */
     handleView(artifact: Artifact) {
-      artifactSelectionModule.selectArtifact(artifact.id);
+      if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
+        artifactSelectionModule.clearSelections();
+      } else {
+        artifactSelectionModule.selectArtifact(artifact.id);
+      }
     },
     /**
      * Opens the edit artifact window.
@@ -287,6 +291,10 @@ export default Vue.extend({
      * @return The class name to add to the artifact.
      */
     getItemBackground(item: Artifact): string {
+      if (artifactSelectionModule.getSelectedArtifactId === item.id) {
+        return "artifact-selected";
+      }
+
       const deltaState = deltaModule.getArtifactDeltaType(item.id);
 
       return `artifact-${deltaState.toLowerCase()}`;

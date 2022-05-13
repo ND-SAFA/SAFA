@@ -7,7 +7,10 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <jira-authentication :token="token" :is-loading="isLoading" />
+        <jira-authentication
+          :has-credentials="!!credentials"
+          :is-loading="isLoading"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="2">
@@ -32,7 +35,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  JiraAccessToken,
+  InternalJiraCredentials,
   JiraCloudSite,
   JiraProject,
   StepState,
@@ -64,7 +67,7 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
-      token: undefined as JiraAccessToken | undefined,
+      credentials: undefined as InternalJiraCredentials | undefined,
       isLoading: true,
 
       sites: [] as JiraCloudSite[],
@@ -88,12 +91,19 @@ export default Vue.extend({
    */
   mounted() {
     handleAuthorizeJira(this.accessCode, {
-      onSuccess: (token) => {
+      onSuccess: (credentials) => {
         this.isLoading = false;
-        this.token = token;
-        this.currentStep = 2;
-        this.setStepIsValid(0, true);
+        this.credentials = credentials;
         this.loadSites();
+
+        if (credentials.cloudId) {
+          this.setStepIsValid(1, true);
+          this.currentStep = 3;
+          this.loadProjects();
+        } else {
+          this.setStepIsValid(0, true);
+          this.currentStep = 2;
+        }
       },
       onError: () => {
         this.isLoading = false;
@@ -113,7 +123,7 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.token = undefined;
+      this.credentials = undefined;
       this.sites = [];
       this.projects = [];
     },
@@ -121,21 +131,25 @@ export default Vue.extend({
      * Loads a user's Jira sites.
      */
     async loadSites() {
-      if (!this.token) return;
+      if (!this.credentials) return;
 
       this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.token.access_token);
+      this.sites = await getJiraCloudSites(this.credentials.accessToken);
       this.sitesLoading = false;
     },
     /**
      * Loads a user's Jira projects for a selected site.
      */
     async loadProjects() {
-      if (!this.selectedSite || !this.token) return;
+      if (!this.credentials) return;
 
       this.projectsLoading = true;
 
-      handleLoadJiraProjects(this.token, this.selectedSite.id, {
+      if (this.selectedSite) {
+        this.credentials.cloudId = this.selectedSite.id;
+      }
+
+      handleLoadJiraProjects(this.credentials, {
         onSuccess: (projects) => {
           this.projects = projects;
           this.projectsLoading = false;
@@ -173,7 +187,7 @@ export default Vue.extend({
      * Attempts to import a jira project.
      */
     handleSaveProject(): void {
-      if (!this.token || !this.selectedSite || !this.selectedProject) return;
+      if (!this.credentials || !this.selectedProject) return;
 
       handleImportJiraProject(this.selectedProject.id, {
         onSuccess: () => this.clearData(),

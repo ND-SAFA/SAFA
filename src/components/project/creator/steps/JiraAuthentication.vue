@@ -8,7 +8,7 @@
       @click="handleJiraAuthentication"
     >
       <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-      <span v-if="!token">Connect to Jira</span>
+      <span v-if="!hasCredentials">Connect to Jira</span>
       <span v-else>Connected to Jira</span>
     </v-btn>
   </v-container>
@@ -24,8 +24,8 @@ import { authorizeJira } from "@/api";
 export default Vue.extend({
   name: "JiraAuthentication",
   props: {
-    token: {
-      type: String,
+    hasCredentials: {
+      type: Boolean,
       required: true,
     },
     isLoading: {
@@ -46,7 +46,7 @@ export default Vue.extend({
      * Returns whether the button is enabled.
      */
     isDisabled(): boolean {
-      return !!this.token || this.isLoading;
+      return this.hasCredentials || this.isLoading;
     },
   },
 });

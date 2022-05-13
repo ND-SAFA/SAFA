@@ -2,6 +2,7 @@ $color-warning: #EEBC3D;
 $color-added: #81c784;
 $color-removed: #e57373;
 $color-modified: #64b5f6;
+$color-selected: #CCCCCC;
 $color-border: #888888;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
@@ -103,6 +104,14 @@ $graph-border-radius: 8px;
 
   &:hover {
     background: darken($color-modified, 10) !important;
+  }
+}
+
+.artifact-selected {
+  background: $color-selected !important;
+
+  &:hover {
+    background: darken($color-selected, 10) !important;
   }
 }
 

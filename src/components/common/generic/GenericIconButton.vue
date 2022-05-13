@@ -11,7 +11,7 @@
         :small="small"
         @click="$emit('click')"
       >
-        <v-icon>{{ iconId }}</v-icon>
+        <v-icon :style="iconStyle">{{ iconId }}</v-icon>
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -38,6 +38,7 @@ export default Vue.extend({
       required: true,
     },
     color: String,
+    iconStyle: String,
     fab: Boolean,
     small: Boolean,
     isDisabled: Boolean,

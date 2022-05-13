@@ -1,4 +1,5 @@
 import {
+  InternalJiraCredentials,
   JiraAccessToken,
   JiraCloudSite,
   JiraProject,
@@ -76,7 +77,7 @@ export function authorizeJira(): void {
 export async function getJiraToken(
   accessCode: string
 ): Promise<JiraAccessToken> {
-  const authorization = await fetchAtlassian<JiraAccessToken>(
+  return fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -92,24 +93,17 @@ export async function getJiraToken(
       }),
     }
   );
-
-  localStorage.setItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN,
-    authorization.refresh_token
-  );
-
-  return authorization;
 }
 
 /**
  * Exchanges an Atlassian refresh token for an auth token.
  *
+ * @param refreshToken - The atlassian refresh token.
  * @return The Jira access token.
  */
-export async function getJiraRefreshToken(): Promise<JiraAccessToken> {
-  const refreshToken = localStorage.getItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN
-  );
+export async function getJiraRefreshToken(
+  refreshToken: string
+): Promise<JiraAccessToken> {
   return fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
@@ -175,22 +169,14 @@ export async function getJiraProjects(
 /**
  * Saves a user's Jira credentials and primary organization.
  *
- * @param token - The access and refresh token received from authorizing Jira.
- * @param cloudId - The Jira cloud id for the current site.
+ * @param credentials - The access and refresh token received from authorizing Jira.
  */
 export async function saveJiraCredentials(
-  token: JiraAccessToken,
-  cloudId: string
+  credentials: InternalJiraCredentials
 ): Promise<void> {
   return authHttpClient<void>(Endpoint.jiraCredentials, {
     method: "PUT",
-    body: JSON.stringify({
-      refreshToken: token.refresh_token,
-      bearerAccessToken: token.access_token,
-      cloudId,
-      clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
-      clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
-    }),
+    body: JSON.stringify(credentials),
   });
 }
 

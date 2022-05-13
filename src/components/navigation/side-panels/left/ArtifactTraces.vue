@@ -1,7 +1,9 @@
 <template>
   <div v-if="parents.length + children.length > 0" class="mb-2">
     <div class="d-flex flex-row">
-      <v-icon color="primary">mdi-ray-start-arrow</v-icon>
+      <v-icon color="primary" style="transform: rotate(-45deg)">
+        mdi-ray-start-arrow
+      </v-icon>
       <h2 class="text-h6 ml-1">Trace Links</h2>
     </div>
 

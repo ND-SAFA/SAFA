@@ -184,7 +184,7 @@ export default Vue.extend({
       }
     },
     /**
-     * Attempts to import a jira project.
+     * Attempts to import a Jira project.
      */
     handleSaveProject(): void {
       if (!this.credentials || !this.selectedProject) return;

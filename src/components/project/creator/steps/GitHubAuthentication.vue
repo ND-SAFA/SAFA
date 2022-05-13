@@ -3,11 +3,12 @@
     <v-btn
       large
       color="primary"
-      :disabled="!!token"
+      :disabled="isDisabled"
+      :loading="isLoading"
       @click="handleAuthentication"
     >
       <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-      <span v-if="!token">Connect to GitHub</span>
+      <span v-if="!hasCredentials">Connect to GitHub</span>
       <span v-else>Connected to GitHub</span>
     </v-btn>
   </v-container>
@@ -15,7 +16,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logModule } from "@/store";
+import { authorizeGitHub } from "@/api";
 
 /**
  * Prompts the user to authenticate their Jira account.
@@ -23,14 +24,20 @@ import { logModule } from "@/store";
 export default Vue.extend({
   name: "JiraAuthentication",
   props: {
-    token: {
-      type: String,
-      required: true,
-    },
+    hasCredentials: Boolean,
+    isLoading: Boolean,
   },
   methods: {
     handleAuthentication(): void {
-      logModule.onInfo("Importing from GitHub is not yet enabled.");
+      authorizeGitHub();
+    },
+  },
+  computed: {
+    /**
+     * Returns whether the button is enabled.
+     */
+    isDisabled(): boolean {
+      return this.hasCredentials || this.isLoading;
     },
   },
 });

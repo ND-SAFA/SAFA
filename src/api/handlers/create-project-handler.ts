@@ -1,4 +1,4 @@
-import { IOHandlerCallback, Project } from "@/types";
+import { InternalGitHubCredentials, IOHandlerCallback, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
@@ -95,14 +95,14 @@ export function handleImportJiraProject(
 /**
  * Imports a GitHub project, sets related app state, and logs the status.
  *
- * @param accessToken - The access token received from authorizing GitHub.
+ * @param credentials - The access token received from authorizing GitHub.
  * @param orgId - The GitHub organization id for the current company.
  * @param projectId - The GitHub project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportGitHubProject(
-  accessToken: string,
+  credentials: InternalGitHubCredentials,
   orgId: string,
   projectId: string,
   { onSuccess, onError }: IOHandlerCallback

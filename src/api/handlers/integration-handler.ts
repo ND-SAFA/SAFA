@@ -1,4 +1,5 @@
 import {
+  InternalGitHubCredentials,
   InternalJiraCredentials,
   IOHandlerCallback,
   JiraAccessToken,
@@ -7,6 +8,7 @@ import {
   URLParameter,
 } from "@/types";
 import {
+  getGitHubToken,
   getJiraProjects,
   getJiraRefreshToken,
   getJiraToken,
@@ -16,8 +18,8 @@ import {
 /**
  * Handles Jira authentication when the app loads.
  *
- * @param accessCode -The Jira access code, if noe exists.
- * @param onSuccess - Called if the action is successful, with the jira authorization token.
+ * @param accessCode -The Jira access code, if one exists.
+ * @param onSuccess - Called if the action is successful, with the Jira authorization token.
  * @param onError - Called if the action fails.
  */
 export function handleAuthorizeJira(
@@ -72,4 +74,23 @@ export function handleLoadJiraProjects(
       onSuccess?.(projects);
     })
     .catch(onError);
+}
+
+/**
+ * Handles GitHub authentication when the app loads.
+ *
+ * @param accessCode -The GitHub access code, if one exists.
+ * @param onSuccess - Called if the action is successful, with the GitHub authorization token.
+ * @param onError - Called if the action fails.
+ */
+export function handleAuthorizeGitHub(
+  accessCode: URLParameter,
+  { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentials>
+): void {
+  if (!accessCode) {
+    onError?.(new Error("No access code exists."));
+    return;
+  }
+
+  getGitHubToken(String(accessCode)).then(onSuccess).catch(onError);
 }

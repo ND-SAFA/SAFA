@@ -4,9 +4,8 @@ import {
   JiraCloudSite,
   JiraProject,
   JiraProjectList,
-  LocalStorageKeys,
 } from "@/types";
-import { logModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -45,7 +44,6 @@ async function fetchAtlassian<T>(
   const resJson = (await response.json()) as T;
 
   if (!response.ok) {
-    logModule.onDevError("Unable to connect to Atlassian.");
     throw Error("Unable to connect to Atlassian.");
   } else {
     return resJson;
@@ -69,7 +67,7 @@ export function authorizeJira(): void {
 }
 
 /**
- * Exchanges an Atlassian access code for a API token.
+ * Exchanges an Atlassian access code for an API token.
  *
  * @param accessCode - The access code received from authorizing Jira.
  * @return The Jira access token.
@@ -124,7 +122,7 @@ export async function getJiraRefreshToken(
 /**
  * Exchanges an Atlassian access code for the list of cloud sites associated with the given user.
  *
- * @param accessToken - The access token received from authorizing jira.
+ * @param accessToken - The access token received from authorizing Jira.
  * @return The Jira sites for this user.
  */
 export async function getJiraCloudSites(

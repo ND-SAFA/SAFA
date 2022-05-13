@@ -14,11 +14,11 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <p class="mx-auto text-caption width-fit">[Select an Organization.]</p>
+        <git-hub-installation-selector :installations="installations" />
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <p class="mx-auto text-caption width-fit">[Select a Project.]</p>
+        <git-hub-repository-selector :repositories="repositories" />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -37,10 +37,14 @@ import {
   getGitHubRepositories,
   handleImportGitHubProject,
 } from "@/api";
-import { GenericStepper } from "@/components/common";
-import { GitHubAuthentication } from "@/components/project/creator/steps";
 import { getParam, QueryParams } from "@/router";
 import { handleAuthorizeGitHub } from "@/api/handlers/integration-handler";
+import { GenericStepper } from "@/components/common";
+import {
+  GitHubAuthentication,
+  GitHubRepositorySelector,
+  GitHubInstallationSelector,
+} from "@/components/project/creator/steps";
 
 /**
  * Allows for creating a project from GitHub.
@@ -48,6 +52,8 @@ import { handleAuthorizeGitHub } from "@/api/handlers/integration-handler";
 export default Vue.extend({
   name: "GitHubCreatorStepper",
   components: {
+    GitHubRepositorySelector,
+    GitHubInstallationSelector,
     GenericStepper,
     GitHubAuthentication,
   },

@@ -17,9 +17,17 @@ export interface InternalGitHubCredentials {
  */
 export interface GitHubInstallation {
   /**
-   * The installation id.
+   * The installation's id.
    */
   id: string;
+  /**
+   * The installation's name.
+   */
+  name: string;
+  /**
+   * The installation's url.
+   */
+  url: string;
 }
 
 /**
@@ -48,6 +56,10 @@ export interface GitHubRepository {
    * The project's name.
    */
   name: string;
+  /**
+   * The project's full name.
+   */
+  full_name: string;
   /**
    * The project's avatar.
    */

@@ -6,8 +6,8 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -54,11 +54,11 @@ public class ProjectController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectVersionErrors createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
+    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
         Project payloadProject = Project.fromAppEntity(project);
         ProjectVersion payloadProjectVersion = project.projectVersion;
 
-        ProjectVersionErrors projectEntities;
+        ProjectEntities projectEntities;
         if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
             if (payloadProjectVersion != null
                 && payloadProjectVersion.hasValidVersion()

@@ -39,14 +39,22 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {
+        uploadFlatFilesToVersion(projectVersion,
+            pathToFileDir,
+            AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles);
+    }
+
+    public JSONObject uploadFlatFilesToVersion(ProjectVersion projectVersion,
+                                               String pathToFileDir,
+                                               String baseRoute) throws Exception {
         assertTokenExists();
         String path = RouteBuilder
-            .withRoute(AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
+            .withRoute(baseRoute)
             .withVersion(projectVersion)
             .get();
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
             pathToFileDir);
-        sendRequest(beforeRequest, status().isCreated(), this.token);
+        return sendRequest(beforeRequest, status().isCreated(), this.token);
     }
 
     public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws SafaError, IOException {

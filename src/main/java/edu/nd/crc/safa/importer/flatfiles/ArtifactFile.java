@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.importer.flatfiles;
 
-import static edu.nd.crc.safa.importer.flatfiles.ProjectTIMParser.FILE_PARAM;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -24,12 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for reading and parsing artifact files.
  */
 public class ArtifactFile {
-    public static String NAME_PARAM = "id";
-    public static String SUMMARY_PARAM = "summary";
-    public static String CONTENT_PARAM = "content";
-    private static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
-    public static String[] REQUIRED_KEYS = {FILE_PARAM};
 
+    public static final String[] REQUIRED_KEYS = {TIMParser.FILE_PARAM};
+    private static final String NAME_PARAM = "id";
+    private static final String SUMMARY_PARAM = "summary";
+    private static final String CONTENT_PARAM = "content";
+    private static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
     String name;
     String file;
 

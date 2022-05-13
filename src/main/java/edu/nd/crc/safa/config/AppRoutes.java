@@ -9,15 +9,15 @@ public class AppRoutes {
         public static final String loginLink = "/login";
         private static final String accountPrefix = "/accounts";
         public static final String createNewUser = accountPrefix + "/create";
+        public static final String jiraCredentials = accountPrefix + "/jira/credentials";
     }
 
     public static class Jobs {
         private static final String jobRoot = "/jobs";
-        public static final String createNewJob = jobRoot;
+        public static final String flatFileProjectUpdateJob = jobRoot + "/projects/versions/{versionId}";
+        public static final String getJobs = jobRoot;
         private static final String jobId = jobRoot + "/{jobId}";
-        public static final String getJobStatus = jobId + "/status";
         public static final String deleteJob = jobId;
-        public static final String getJobResult = jobId + "/result";
     }
 
     public static class Projects {
@@ -28,7 +28,7 @@ public class AppRoutes {
 
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";
-            public static final String pullJiraProject = importPrefix + "/jira";
+            public static final String pullJiraProject = importPrefix + "/jira/{id}";
         }
 
         public static class Membership {

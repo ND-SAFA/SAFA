@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
@@ -25,6 +26,7 @@ import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,12 +34,12 @@ import org.springframework.stereotype.Service;
  * validating, and storing their data.
  */
 @Service
+@Scope("singleton")
 public class FlatFileService {
 
+    private static FlatFileService instance;
     private final CommitErrorRepository commitErrorRepository;
-
     private final EntityVersionService entityVersionService;
-
     private final ArtifactFileParser artifactFileParser;
     private final TraceLinkGenerator traceLinkGenerator;
 
@@ -50,6 +52,15 @@ public class FlatFileService {
         this.entityVersionService = entityVersionService;
         this.artifactFileParser = artifactFileParser;
         this.traceLinkGenerator = traceLinkGenerator;
+    }
+
+    public static FlatFileService getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 
     /**
@@ -98,8 +109,8 @@ public class FlatFileService {
         }
     }
 
-    private List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
-                                                    List<TraceGenerationRequest> traceGenerationRequests) {
+    public List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
+                                                   List<TraceGenerationRequest> traceGenerationRequests) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
 
         for (TraceGenerationRequest request : traceGenerationRequests) {
@@ -122,8 +133,8 @@ public class FlatFileService {
         return generatedLinks;
     }
 
-    private List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
-                                                               List<TraceAppEntity> generatedLinks) {
+    public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
+                                                              List<TraceAppEntity> generatedLinks) {
         String DELIMITER = "*";
         List<String> approvedLinks = manualLinks.stream()
             .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
@@ -139,19 +150,19 @@ public class FlatFileService {
             .collect(Collectors.toList());
     }
 
-    private Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMIntoCommit(ProjectVersion projectVersion,
-                                                                                 JSONObject timFileJson
+    public Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMIntoCommit(ProjectVersion projectVersion,
+                                                                                JSONObject timFileJson
     ) throws SafaError {
         // Step - Create project parser
-        ProjectTIMParser ProjectTIMParser = new ProjectTIMParser(timFileJson);
-        ProjectTIMParser.parse();
+        TIMParser TIMParser = new TIMParser(timFileJson);
+        TIMParser.parse();
 
         // Step - parse artifacts then traces
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
             artifactFileParser.parseArtifactFiles(projectVersion,
-                ProjectTIMParser);
+                TIMParser);
         Pair<List<TraceAppEntity>, List<TraceGenerationRequest>> traceResponse =
-            ProjectTIMParser.parseTraces(projectVersion);
+            TIMParser.parseTraces(projectVersion);
         List<TraceAppEntity> traces = traceResponse.getValue0();
 
         // Step - Create project commit with parsed artifacts and traces

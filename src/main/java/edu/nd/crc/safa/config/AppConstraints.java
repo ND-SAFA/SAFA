@@ -24,15 +24,16 @@ public class AppConstraints {
     public static final String NULL_VALUE = "NULL not allowed for column";
 
     public static final String[] registeredConstraints = new String[]{
-        UNIQUE_ARTIFACT_NAME_PER_PROJECT,
-        UNIQUE_ARTIFACT_TYPE_PER_PROJECT,
-        SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET,
-        UNIQUE_ARTIFACT_BODY_PER_VERSION,
-        UNIQUE_VERSION_ID_PER_PROJECT,
-        SINGLE_ROLE_PER_PROJECT,
-        SINGLE_TRACE_VERSION_PER_PROJECT_VERSION,
-        UNIQUE_TRACE_MATRIX_PER_PROJECT,
-        NULL_VALUE
+        AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT,
+        AppConstraints.UNIQUE_ARTIFACT_TYPE_PER_PROJECT,
+        AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET,
+        AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION,
+        AppConstraints.UNIQUE_VERSION_ID_PER_PROJECT,
+        AppConstraints.SINGLE_ROLE_PER_PROJECT,
+        AppConstraints.SINGLE_TRACE_VERSION_PER_PROJECT_VERSION,
+        AppConstraints.UNIQUE_TRACE_MATRIX_PER_PROJECT,
+        AppConstraints.UNIQUE_ARTIFACT_PER_DOCUMENT,
+        AppConstraints.NULL_VALUE
     };
 
     public static String getConstraintError(DataIntegrityViolationException e) {
@@ -49,23 +50,25 @@ public class AppConstraints {
 
     private static String getErrorMessage(String constraintId, String cause) {
         switch (constraintId) {
-            case UNIQUE_ARTIFACT_NAME_PER_PROJECT:
+            case AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT:
                 return "artifact with given name already exists.";
-            case UNIQUE_ARTIFACT_TYPE_PER_PROJECT:
+            case AppConstraints.UNIQUE_ARTIFACT_TYPE_PER_PROJECT:
                 return "Artifact type is already defined in project.";
-            case SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET:
+            case AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET:
                 return "Found duplicate trace link defined between source and target.";
-            case UNIQUE_ARTIFACT_BODY_PER_VERSION:
+            case AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION:
                 return "Found duplicate version of given artifact.";
-            case UNIQUE_VERSION_ID_PER_PROJECT:
+            case AppConstraints.UNIQUE_VERSION_ID_PER_PROJECT:
                 return "version already exists in project.";
-            case SINGLE_ROLE_PER_PROJECT:
+            case AppConstraints.SINGLE_ROLE_PER_PROJECT:
                 return "A user with given email already exists in the project.";
-            case SINGLE_TRACE_VERSION_PER_PROJECT_VERSION:
+            case AppConstraints.SINGLE_TRACE_VERSION_PER_PROJECT_VERSION:
                 return "This trace link already contains an entry for this project version";
-            case UNIQUE_TRACE_MATRIX_PER_PROJECT:
+            case AppConstraints.UNIQUE_TRACE_MATRIX_PER_PROJECT:
                 return "Trace matrix between given types is already created";
-            case NULL_VALUE:
+            case AppConstraints.UNIQUE_ARTIFACT_PER_DOCUMENT:
+                return "This artifact has already been added to this document.";
+            case AppConstraints.NULL_VALUE:
                 return createNullError(cause);
             default:
                 throw new RuntimeException("Constrain friendly name is not defined.");
@@ -73,7 +76,8 @@ public class AppConstraints {
     }
 
     private static String createNullError(String cause) {
-        int startIndex = cause.indexOf(NULL_VALUE) + NULL_VALUE.length() + 2; // acounnts for space and start quote
+        // accounts for space and start quote
+        int startIndex = cause.indexOf(AppConstraints.NULL_VALUE) + AppConstraints.NULL_VALUE.length() + 2; //
         int endIndex = cause.indexOf("\"", startIndex);
         String columnName = cause.substring(startIndex, endIndex);
         return String.format("Expected %s to have a non-null value.", columnName);

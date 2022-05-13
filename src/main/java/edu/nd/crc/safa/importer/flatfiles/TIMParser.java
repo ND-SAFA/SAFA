@@ -19,7 +19,7 @@ import org.json.JSONObject;
 /**
  * Responsible for parsing a project from a TIM definition.
  */
-public class ProjectTIMParser {
+public class TIMParser {
 
     public static final String FILE_PARAM = "file";
     private final List<TraceFileParser> traceFileParsers;
@@ -27,13 +27,13 @@ public class ProjectTIMParser {
     private boolean parsed;
     private JSONObject timFileJson;
 
-    public ProjectTIMParser() {
+    public TIMParser() {
         this.artifactTypeDefinitions = new ArrayList<>();
         this.traceFileParsers = new ArrayList<>();
         this.parsed = false;
     }
 
-    public ProjectTIMParser(JSONObject timFileJson) {
+    public TIMParser(JSONObject timFileJson) {
         this();
         this.timFileJson = FileUtilities.toLowerCase(timFileJson);
     }

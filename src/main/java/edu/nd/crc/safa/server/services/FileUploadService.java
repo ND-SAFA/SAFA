@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
  * parsing, and deleting flat files.
  */
 @Service
+@Scope("singleton")
 public class FileUploadService {
+
+    private static FileUploadService instance;
+
+    public static FileUploadService getInstance() {
+        return instance;
+    }
 
     /**
      * Uploads given files to disk and associates them with given project.
@@ -41,11 +50,16 @@ public class FileUploadService {
                 parentFile.mkdirs();
                 newFile.createNewFile();
                 requestFile.transferTo(newFile);
-
             } catch (IOException e) {
                 String error = String.format("Could not upload file: %s", requestFile.getOriginalFilename());
+                e.printStackTrace();
                 throw new SafaError(error, e);
             }
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        instance = this;
     }
 }

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
-import edu.nd.crc.safa.server.entities.api.ProjectVersionErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -33,6 +34,7 @@ import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,8 +48,10 @@ import org.springframework.stereotype.Service;
  * 7. ProjectWarnings
  */
 @Service
+@Scope("singleton")
 public class AppEntityRetrievalService {
 
+    private static AppEntityRetrievalService instance;
     private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
@@ -79,18 +83,27 @@ public class AppEntityRetrievalService {
         this.warningService = warningService;
     }
 
+    public static AppEntityRetrievalService getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    void init() {
+        instance = this;
+    }
+
     /**
      * Finds project, artifact, traces, errors, and warnings related with given project version.
      *
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectVersionErrors retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
             .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        return new ProjectVersionErrors(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
+        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
     }
 
     /**

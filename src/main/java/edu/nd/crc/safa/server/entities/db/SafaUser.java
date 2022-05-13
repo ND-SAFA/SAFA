@@ -18,10 +18,12 @@ import org.json.JSONObject;
 @Table(name = "safa_user")
 public class SafaUser implements Serializable {
 
+    public static final String ID_COLUMN = "user_id";
+
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
-    @Column(name = "user_id")
+    @Column(name = ID_COLUMN)
     UUID userId;
 
     @Column(name = "email", nullable = false, unique = true)

@@ -10,6 +10,7 @@ public class AppRoutes {
         private static final String accountPrefix = "/accounts";
         public static final String createNewUser = accountPrefix + "/create";
         public static final String jiraCredentials = accountPrefix + "/jira/credentials";
+        public static final String jiraCredentialsRefresh = accountPrefix + "/jira/credentials/{cloudId}";
     }
 
     public static class Jobs {
@@ -28,7 +29,7 @@ public class AppRoutes {
 
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";
-            public static final String pullJiraProject = importPrefix + "/jira/{id}";
+            public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";
         }
 
         public static class Membership {

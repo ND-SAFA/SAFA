@@ -1,7 +1,7 @@
 <template>
   <v-row v-if="isOpen" class="my-3" align="center">
     <v-col cols="9">
-      <div class="d-flex" style="width: min-content">
+      <div class="d-flex width-min">
         <button-row :definitions="[sourceDefinition]" />
         <v-icon class="mx-2">mdi-arrow-right</v-icon>
         <button-row :definitions="[targetDefinition]" />

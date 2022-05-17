@@ -5,17 +5,17 @@
 
     <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
       <delta-button-group
-        deltaType="added"
+        delta-type="added"
         :items="addedArtifacts"
         @click="handleAddedSelect"
       />
       <delta-button-group
-        deltaType="removed"
+        delta-type="removed"
         :items="removedArtifacts"
         @click="handleRemovedSelect"
       />
       <delta-button-group
-        deltaType="modified"
+        delta-type="modified"
         :items="modifiedArtifacts"
         @click="handleModifiedSelect"
       />
@@ -134,8 +134,14 @@ export default Vue.extend({
      * When the delta artifacts change, set all panels to open.
      */
     isDeltaMode() {
+      const panels: number[] = [];
+
+      if (Object.keys(this.addedArtifacts).length > 0) panels.push(0);
+      if (Object.keys(this.removedArtifacts).length > 0) panels.push(1);
+      if (Object.keys(this.modifiedArtifacts).length > 0) panels.push(2);
+
+      this.openPanels = panels;
       this.$emit("open");
-      this.openPanels = [0, 1, 2];
     },
   },
 });

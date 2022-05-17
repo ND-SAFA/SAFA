@@ -9,64 +9,21 @@
         :artifact="selectedArtifact"
         @close="closeArtifactCreator"
       />
-      <v-speed-dial
-        fixed
-        bottom
-        right
-        v-model="fab"
-        transition="scroll-y-transition"
-      >
-        <template v-slot:activator>
-          <v-btn
-            v-model="fab"
-            :color="isCreateLinkEnabled ? 'secondary darken-1' : 'primary'"
-            dark
-            fab
-          >
-            <v-icon v-if="fab"> mdi-close </v-icon>
-            <v-icon v-else-if="isCreateLinkEnabled">
-              mdi-ray-start-arrow
-            </v-icon>
-            <v-icon v-else>mdi-plus</v-icon>
-          </v-btn>
-        </template>
-        <generic-icon-button
-          fab
-          small
-          :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
-          :tooltip="
-            isCreateLinkEnabled ? 'Cancel Trace Link' : 'Add Trace Link'
-          "
-          @click="handleAddTraceLink"
-        />
-        <generic-icon-button
-          fab
-          small
-          icon-id="mdi-folder-plus-outline"
-          tooltip="Add Artifact"
-          @click="handleAddArtifact"
-        />
-      </v-speed-dial>
+      <artifact-tree-fab />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  appModule,
-  artifactSelectionModule,
-  logModule,
-  projectModule,
-} from "@/store";
+import { appModule, artifactSelectionModule } from "@/store";
 import {
   ArtifactTree,
   ArtifactTable,
   PrivatePage,
   ArtifactCreatorModal,
-  GenericIconButton,
+  ArtifactTreeFab,
 } from "@/components";
-import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
 /**
  * Displays the artifact tree and table.
@@ -74,14 +31,11 @@ import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 export default Vue.extend({
   name: "ArtifactView",
   components: {
+    ArtifactTreeFab,
     ArtifactTable,
     PrivatePage,
     ArtifactTree,
     ArtifactCreatorModal,
-    GenericIconButton,
-  },
-  data() {
-    return { fab: false };
   },
   computed: {
     /**
@@ -104,12 +58,6 @@ export default Vue.extend({
         ? "Edit Artifact"
         : "Create Artifact";
     },
-    /**
-     * @return Whether trace link draw mode is currently enabled.
-     */
-    isCreateLinkEnabled(): boolean {
-      return appModule.getIsCreateLinkEnabled;
-    },
   },
   methods: {
     /**
@@ -117,31 +65,6 @@ export default Vue.extend({
      */
     closeArtifactCreator(): void {
       appModule.closeCreator();
-    },
-    /**
-     * Opens the add artifact window.
-     */
-    handleAddArtifact(): void {
-      if (projectModule.isProjectDefined) {
-        artifactSelectionModule.clearSelections();
-        appModule.openArtifactCreatorTo();
-      } else {
-        logModule.onWarning("Please select a project to create artifacts.");
-      }
-    },
-    /**
-     * Enables the trace link creator.
-     */
-    handleAddTraceLink(): void {
-      if (projectModule.isProjectDefined) {
-        if (this.isCreateLinkEnabled) {
-          disableDrawMode();
-        } else {
-          enableDrawMode();
-        }
-      } else {
-        logModule.onWarning("Please select a project to create trace links.");
-      }
     },
   },
 });

@@ -22,7 +22,8 @@ export enum Endpoint {
   updateProjectThroughFlatFiles = "projects/versions/:versionId/flat-files",
   getProjectMembers = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
-  jiraProject = "projects/import/jira",
+  jiraCredentials = "accounts/jira/credentials",
+  jiraProject = "projects/import/jira/:projectId",
 
   // Commits
   commit = "projects/versions/:versionId/commit",

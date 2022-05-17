@@ -7,19 +7,24 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <git-hub-authentication :token="token" />
+        <git-hub-authentication
+          :has-credentials="!!credentials"
+          :is-loading="isLoading"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <p class="mx-auto text-caption" style="width: fit-content">
-          [Select an Organization.]
-        </p>
+        <git-hub-installation-selector
+          :installations="installations"
+          @select="handleInstallationSelect($event)"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <p class="mx-auto text-caption" style="width: fit-content">
-          [Select a Project.]
-        </p>
+        <git-hub-repository-selector
+          :repositories="repositories"
+          @select="handleProjectSelect($event)"
+        />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -27,14 +32,25 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { StepState } from "@/types";
-import { handleImportGitHubProject } from "@/api";
+import {
+  GitHubInstallation,
+  GitHubRepository,
+  InternalGitHubCredentials,
+  StepState,
+} from "@/types";
+import {
+  getGitHubInstallations,
+  getGitHubRepositories,
+  handleImportGitHubProject,
+} from "@/api";
+import { getParam, QueryParams } from "@/router";
+import { handleAuthorizeGitHub } from "@/api/handlers/integration-handler";
 import { GenericStepper } from "@/components/common";
-import { GitHubAuthentication } from "@/components/project/creator/steps";
-
-// TODO: properly define and remove.
-type GitHubOrganization = Record<string, any>;
-type GitHubProject = Record<string, any>;
+import {
+  GitHubAuthentication,
+  GitHubRepositorySelector,
+  GitHubInstallationSelector,
+} from "@/components/project/creator/steps";
 
 /**
  * Allows for creating a project from GitHub.
@@ -42,36 +58,49 @@ type GitHubProject = Record<string, any>;
 export default Vue.extend({
   name: "GitHubCreatorStepper",
   components: {
+    GitHubRepositorySelector,
+    GitHubInstallationSelector,
     GenericStepper,
     GitHubAuthentication,
   },
   data() {
     return {
-      accessCode: "",
-      token: "",
+      accessCode: getParam(QueryParams.GITHUB_TOKEN),
+      credentials: undefined as InternalGitHubCredentials | undefined,
+      isLoading: true,
 
-      organizations: [] as GitHubOrganization[],
-      organizationsLoading: false,
-      selectedOrganization: undefined as GitHubOrganization | undefined,
+      installations: [] as GitHubInstallation[],
+      installationsLoading: false,
+      selectedInstallation: undefined as GitHubInstallation | undefined,
 
-      projects: [] as GitHubProject[],
-      projectsLoading: false,
-      selectedProject: undefined as GitHubProject | undefined,
+      repositories: [] as GitHubRepository[],
+      repositoriesLoading: false,
+      selectedRepository: undefined as GitHubRepository | undefined,
 
       steps: [
         ["Connect to GitHub", false],
-        ["Select Organization", false],
-        ["Select Project", false],
+        ["Select Installation", false],
+        ["Select Repository", false],
       ] as StepState[],
       currentStep: 1,
     };
   },
   /**
-   * TODO
-   * If a jira access code is found in the query, loads the Jira authorization token and sites for the user.
+   * If a GitHub access code is found in the query, loads the GitHub authorization token and sites for the user.
    */
   mounted() {
-    console.log("This will load github authentication redirects.");
+    handleAuthorizeGitHub(this.accessCode, {
+      onSuccess: (credentials) => {
+        this.credentials = credentials;
+        this.isLoading = false;
+        this.currentStep = 2;
+        this.setStepIsValid(0, true);
+        this.loadInstallations();
+      },
+      onError: () => {
+        this.isLoading = false;
+      },
+    });
   },
   methods: {
     /**
@@ -83,72 +112,79 @@ export default Vue.extend({
       Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
     },
     /**
-     * TODO
      * Clears stepper data.
      */
     clearData(): void {
-      console.log("This will clear data.");
+      this.credentials = undefined;
+      this.installations = [];
+      this.repositories = [];
     },
     /**
-     * TODO
-     * Loads a GitHub authorization token.
-     */
-    async loadToken() {
-      this.token = "";
-    },
-    /**
-     * TODO
      * Loads a user's GitHub organizations.
      */
-    async loadOrganizations() {
-      this.selectedOrganization = undefined;
+    async loadInstallations() {
+      if (!this.credentials) return;
+
+      this.installationsLoading = true;
+      this.installations = await getGitHubInstallations(
+        this.credentials.accessToken
+      );
+      this.installationsLoading = false;
     },
     /**
-     * TODO
      * Loads a user's GitHub projects for a selected organization.
      */
     async loadProjects() {
-      this.selectedProject = undefined;
+      if (!this.credentials || !this.selectedInstallation) return;
+
+      this.repositoriesLoading = true;
+      this.repositories = await getGitHubRepositories(
+        this.credentials.accessToken,
+        this.selectedInstallation.id
+      );
+      this.repositoriesLoading = false;
     },
     /**
-     * TODO
      * Selects a GitHub organization to load projects from.
      */
-    handleOrganizationSelect(org: GitHubOrganization) {
-      if (this.selectedOrganization?.id !== org.id) {
-        this.selectedOrganization = org;
+    handleInstallationSelect(org: GitHubInstallation) {
+      if (this.selectedInstallation?.id !== org.id) {
+        this.selectedInstallation = org;
         this.setStepIsValid(1, true);
         this.currentStep = 3;
         this.loadProjects();
       } else {
-        this.selectedOrganization = undefined;
+        this.selectedInstallation = undefined;
         this.setStepIsValid(1, false);
       }
     },
     /**
-     * TODO
      * Selects a GitHub project to import.
      */
-    handleProjectSelect(project: GitHubProject) {
-      if (this.selectedProject?.id !== project.id) {
-        this.selectedProject = project;
+    handleProjectSelect(project: GitHubRepository) {
+      if (this.selectedRepository?.id !== project.id) {
+        this.selectedRepository = project;
         this.setStepIsValid(2, true);
       } else {
-        this.selectedProject = undefined;
+        this.selectedRepository = undefined;
         this.setStepIsValid(2, false);
       }
     },
     /**
-     * Attempts to import a jira project.
+     * Attempts to import a GitHub project.
      */
     handleSaveProject(): void {
-      if (!this.token || !this.selectedOrganization || !this.selectedProject)
+      if (
+        !this.credentials ||
+        !this.selectedInstallation ||
+        !this.selectedRepository
+      )
         return;
 
       handleImportGitHubProject(
-        this.token,
-        this.selectedOrganization.id,
-        this.selectedProject.id,
+        this.credentials,
+        this.selectedInstallation.id,
+        this.selectedRepository.id,
         {
           onSuccess: () => this.clearData(),
         }

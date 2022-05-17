@@ -64,3 +64,8 @@ export interface IOHandlerCallback<Res = void> {
    */
   onError?: (err: Error) => void;
 }
+
+/**
+ * Represents a url parameter in the app's web address.
+ */
+export type URLParameter = string | (string | null)[] | undefined;

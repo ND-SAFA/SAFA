@@ -22,9 +22,7 @@
           {{ getTypeLabel(type) }}
         </v-chip>
       </v-chip-group>
-      <v-chip v-if="entry.allowedTypes.length === 0">
-        Any Type of Artifact
-      </v-chip>
+      <v-chip v-if="entry.allowedTypes.length === 0"> Any Type </v-chip>
 
       <v-subheader class="pl-0" style="height: 30px">
         {{ entry.label }} Icon

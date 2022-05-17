@@ -103,3 +103,29 @@ export interface JiraProjectList {
    */
   values: JiraProject[];
 }
+
+/**
+ * Represents the internally stored Jira credentials.
+ */
+export interface InternalJiraCredentials {
+  /**
+   * The API bearer access token.
+   */
+  accessToken: string;
+  /**
+   * The API refresh token.
+   */
+  refreshToken: string;
+  /**
+   * The Jira cloud id, if one is set.
+   */
+  cloudId: string;
+  /**
+   * Our Jira app client id.
+   */
+  clientId: string;
+  /**
+   * Our Jira app client secret.
+   */
+  clientSecret: string;
+}

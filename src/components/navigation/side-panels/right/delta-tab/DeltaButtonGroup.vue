@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <h2 class="text-h6">{{ title }}</h2>
+      <h2 class="text-body-1">{{ title }}</h2>
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
@@ -61,10 +61,16 @@ export default Vue.extend({
   },
   computed: {
     /**
+     * @return The number of items.
+     */
+    itemCount(): number {
+      return Object.keys(this.items).length;
+    },
+    /**
      * @return The button group title.
      */
     title(): string {
-      return capitalize(this.deltaType);
+      return `${this.itemCount} ${capitalize(this.deltaType)}`;
     },
     itemFields(): { id: string; name: string }[] {
       const items = Object.values(this.items);

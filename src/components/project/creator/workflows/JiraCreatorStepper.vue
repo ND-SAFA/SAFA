@@ -7,7 +7,10 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <jira-authentication :token="token" :is-loading="isLoading" />
+        <jira-authentication
+          :has-credentials="!!credentials"
+          :is-loading="isLoading"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="2">
@@ -31,20 +34,24 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { JiraCloudSite, JiraProject, StepState } from "@/types";
-import { getParam, QueryParams } from "@/router";
 import {
-  getJiraProjects,
-  getJiraCloudSites,
-  handleImportJiraProject,
-} from "@/api";
+  InternalJiraCredentials,
+  JiraCloudSite,
+  JiraProject,
+  StepState,
+} from "@/types";
+import { getParam, QueryParams } from "@/router";
+import { getJiraCloudSites, handleImportJiraProject } from "@/api";
 import { GenericStepper } from "@/components/common";
 import {
   JiraAuthentication,
   JiraSiteSelector,
   JiraProjectSelector,
 } from "@/components/project/creator/steps";
-import { handleAuthorizeJira } from "@/api/handlers/integration-handler";
+import {
+  handleAuthorizeJira,
+  handleLoadJiraProjects,
+} from "@/api/handlers/integration-handler";
 
 /**
  * Allows for creating a project from Jira.
@@ -60,7 +67,7 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
-      token: "",
+      credentials: undefined as InternalJiraCredentials | undefined,
       isLoading: true,
 
       sites: [] as JiraCloudSite[],
@@ -84,12 +91,19 @@ export default Vue.extend({
    */
   mounted() {
     handleAuthorizeJira(this.accessCode, {
-      onSuccess: (token) => {
+      onSuccess: (credentials) => {
         this.isLoading = false;
-        this.token = token;
-        this.currentStep = 2;
-        this.setStepIsValid(0, true);
+        this.credentials = credentials;
         this.loadSites();
+        this.setStepIsValid(0, true);
+
+        if (credentials.cloudId) {
+          this.currentStep = 3;
+          this.setStepIsValid(1, true);
+          this.loadProjects();
+        } else {
+          this.currentStep = 2;
+        }
       },
       onError: () => {
         this.isLoading = false;
@@ -109,7 +123,7 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.token = "";
+      this.credentials = undefined;
       this.sites = [];
       this.projects = [];
     },
@@ -117,21 +131,31 @@ export default Vue.extend({
      * Loads a user's Jira sites.
      */
     async loadSites() {
-      if (!this.token) return;
+      if (!this.credentials) return;
 
       this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.token);
+      this.sites = await getJiraCloudSites(this.credentials.accessToken);
       this.sitesLoading = false;
     },
     /**
      * Loads a user's Jira projects for a selected site.
      */
     async loadProjects() {
-      if (!this.selectedSite || !this.token) return;
+      if (!this.credentials) return;
 
       this.projectsLoading = true;
-      this.projects = await getJiraProjects(this.token, this.selectedSite.id);
-      this.projectsLoading = false;
+
+      if (this.selectedSite) {
+        this.credentials.cloudId = this.selectedSite.id;
+      }
+
+      handleLoadJiraProjects(this.credentials, {
+        onSuccess: (projects) => {
+          this.projects = projects;
+          this.projectsLoading = false;
+        },
+        onError: () => (this.projectsLoading = false),
+      });
     },
     /**
      * Selects a Jira site to load projects from.
@@ -160,19 +184,14 @@ export default Vue.extend({
       }
     },
     /**
-     * Attempts to import a jira project.
+     * Attempts to import a Jira project.
      */
     handleSaveProject(): void {
-      if (!this.token || !this.selectedSite || !this.selectedProject) return;
+      if (!this.credentials || !this.selectedProject) return;
 
-      handleImportJiraProject(
-        this.token,
-        this.selectedSite.id,
-        this.selectedProject.id,
-        {
-          onSuccess: () => this.clearData(),
-        }
-      );
+      handleImportJiraProject(this.selectedProject.id, {
+        onSuccess: () => this.clearData(),
+      });
     },
   },
 });

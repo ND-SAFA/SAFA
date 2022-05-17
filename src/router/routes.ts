@@ -23,6 +23,7 @@ export enum QueryParams {
   TAB = "tab",
   VERSION = "version",
   JIRA_TOKEN = "code",
+  GITHUB_TOKEN = "code",
 }
 
 export const routesWithRequiredProject: string[] = [

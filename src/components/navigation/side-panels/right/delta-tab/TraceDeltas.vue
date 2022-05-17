@@ -91,8 +91,13 @@ export default Vue.extend({
      * When the delta traces change, set all panels to open.
      */
     isDeltaMode() {
+      const panels: number[] = [];
+
+      if (Object.keys(this.addedTraces).length > 0) panels.push(0);
+      if (Object.keys(this.removedTraces).length > 0) panels.push(1);
+
+      this.openPanels = panels;
       this.$emit("open");
-      this.openPanels = [0, 1];
     },
   },
 });

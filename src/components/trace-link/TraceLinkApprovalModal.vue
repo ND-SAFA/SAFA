@@ -4,6 +4,7 @@
     :is-open="isOpen"
     :actions-height="0"
     @close="$emit('close')"
+    size="l"
   >
     <template v-slot:body>
       <trace-link-display
@@ -13,8 +14,11 @@
         :target-body="targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
+        :show-delete="!canBeModified"
         @link:approve="handleApprove"
         @link:decline="handleDecline"
+        @link:delete="handleDecline"
+        @close="$emit('close')"
       />
     </template>
   </generic-modal>

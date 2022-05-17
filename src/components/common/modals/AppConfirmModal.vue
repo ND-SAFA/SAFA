@@ -7,7 +7,7 @@
   >
     <template v-slot:body>{{ body }}</template>
     <template v-slot:actions>
-      <v-row justify="center">
+      <v-row justify="end">
         <v-btn outlined color="primary" @click="handleConfirm">
           I accept
         </v-btn>

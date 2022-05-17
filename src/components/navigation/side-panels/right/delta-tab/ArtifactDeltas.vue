@@ -134,8 +134,14 @@ export default Vue.extend({
      * When the delta artifacts change, set all panels to open.
      */
     isDeltaMode() {
+      const panels: number[] = [];
+
+      if (Object.keys(this.addedArtifacts).length > 0) panels.push(0);
+      if (Object.keys(this.removedArtifacts).length > 0) panels.push(1);
+      if (Object.keys(this.modifiedArtifacts).length > 0) panels.push(2);
+
+      this.openPanels = panels;
       this.$emit("open");
-      this.openPanels = [0, 1, 2];
     },
   },
 });

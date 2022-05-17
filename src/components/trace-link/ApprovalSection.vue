@@ -1,8 +1,11 @@
 <template>
   <v-container>
-    <h1 class="text-h4 text-center">{{ title }}</h1>
+    <div class="d-flex flex-row justify-space-between full-width">
+      <h1 class="text-h5 text-center">{{ title }}</h1>
+      <section-controls @open:all="openAll" @close:all="closeAll" />
+    </div>
 
-    <section-controls @open:all="openAll" @close:all="closeAll" />
+    <v-divider />
 
     <v-row class="pt-5">
       <v-expansion-panels multiple v-model="openLinks">

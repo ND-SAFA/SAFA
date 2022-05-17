@@ -1,4 +1,3 @@
-import { ArtifactData } from "@/types/domain";
 import { CytoCoreElementData } from "@/types";
 
 /**

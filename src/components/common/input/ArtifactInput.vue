@@ -13,19 +13,10 @@
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:item="{ item }">
-      <v-list-item-content style="max-width: 500px">
-        <v-list-item-title
-          v-html="`${getTypePrintName(item.type)} - ${item.name}`"
-        />
-        <v-list-item-subtitle v-if="!isExpanded(item)" v-html="item.body" />
-        <v-list-item-content v-if="isExpanded(item)" v-html="item.body" />
-        <v-list-item-action class="ma-0">
-          <v-spacer />
-          <v-btn text small @click.stop="handleSeeMore(item)">
-            {{ isExpanded(item) ? "See Less" : "See More" }}
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item-content>
+      <generic-artifact-body-display
+        :body="item.body"
+        :title="getTitle(item)"
+      />
     </template>
   </v-autocomplete>
 </template>
@@ -35,6 +26,7 @@ import Vue from "vue";
 import { Artifact } from "@/types";
 import { artifactModule } from "@/store";
 import { getArtifactTypePrintName } from "@/util";
+import { GenericArtifactBodyDisplay } from "@/components";
 
 /**
  * An input for artifacts.
@@ -44,6 +36,9 @@ import { getArtifactTypePrintName } from "@/util";
  */
 export default Vue.extend({
   name: "ArtifactInput",
+  components: {
+    GenericArtifactBodyDisplay,
+  },
   props: {
     value: {
       type: [Array, String],
@@ -66,7 +61,6 @@ export default Vue.extend({
     return {
       model: this.value,
       showPassword: false,
-      expandedId: "",
     };
   },
   methods: {
@@ -93,19 +87,12 @@ export default Vue.extend({
       );
     },
     /**
-     * Opens up the expanded display for an artifact.
-     * @param artifact - The artifact to view.
-     */
-    handleSeeMore(artifact: Artifact) {
-      this.expandedId = artifact.id === this.expandedId ? "" : artifact.id;
-    },
-    /**
      * Returns whether the artifact has its display expanded.
      * @param artifact - The artifact to check.
      * @return Whether its display is expanded.
      */
-    isExpanded(artifact: Artifact): boolean {
-      return artifact.id === this.expandedId;
+    getTitle(artifact: Artifact): string {
+      return `${this.getTypePrintName(artifact.type)} - ${artifact.name}`;
     },
   },
   computed: {

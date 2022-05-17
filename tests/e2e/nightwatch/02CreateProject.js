@@ -9,7 +9,7 @@ CreateProject.js - Created by: Jeremy Arellano
 ***********************************************************************************************************/
 
 module.exports = {
-    '@disabled': false,
+    '@disabled': true,
     '@tags' : ['SAFA'],
     'Create Project Test'(browser) {
         const page = browser.page.UI_Interaction();
@@ -98,11 +98,9 @@ module.exports = {
             .takeScreenShot(screenShotDestination + 'TraceLinks_Successfully_Uploaded.png')
 
             .clickButton(' Create Project ')
-
-            .pause(100000)
             
-            /* Now lets test if we can drag and drop the artifacts */
-            .useCss()
-            .dragAndDrop()
+            /* End Test */
+            .end();
+
     }
 };

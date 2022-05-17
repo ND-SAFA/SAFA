@@ -28,6 +28,13 @@ module.exports = {
         EnvironmentalAssumptionsUploadButton    : '#input-273[type="file"]',
         Requirement2HazardsUploadButton         : '#input-346[type="file"]',
         Environmental2HazardsUploadButton       : '#input-411[type="file"]',
+
+        /* Tim Graph Elements */
+        timGraph                                : 'canvas[data-id="layer1-drag"]',
+        zoomInButton                            : 'button[id="zoom-in"]',
+        centerGraphButton                       : `(//*[@aria-expanded="false" and @type="button" and @class="v-btn v-btn--icon v-btn--round theme--light v-size--default secondary--text"])[5]`,
+        
+
     },
 
     commands: [ {
@@ -43,6 +50,7 @@ module.exports = {
                         const textBoxLocation = `//*[contains(text(),'${textBoxName}')]/following-sibling::input`;
                         page.setValue( textBoxLocation, textBoxValue);
                         page.useCss();
+                        page.pause(100)
                         return "UI: {textBoxName} is visible";
                     } else {
                         page.useCss();
@@ -76,7 +84,9 @@ module.exports = {
                 .assert.visible(`//*[contains(text(),'${lableName}')]`, results => {
                     if (results.value) {
                         /* Click the button */
+                        page.pause(500)
                         page.click(`//*[contains(text(),'${lableName}')]`);
+                        page.pause(500);
                         page.useCss();
                         results = "UI: {lableName} is visible";
                     } else {
@@ -84,7 +94,6 @@ module.exports = {
                         results = "UI: {lableName} is not visible";
                     }
                 });
-            page.pause(500)
             /* Return the page object */
             return this;
         },
@@ -116,6 +125,19 @@ module.exports = {
                 .uploadFile(`(//*[contains(text(),'File')]/following-sibling::input)[last()]`, require('path').resolve(fileLocation + fileName))
                 .useCss();
 
+            return this;
+        },
+
+        clickSelector(selectorName, selectorValue) {
+            const page = this;
+
+            page
+                .clickButton(selectorName)
+                .pause(500)
+                .useXpath()
+                .click(`(//*[contains(text(),'${selectorValue}') and @class="v-btn__content" ])[last()]`)
+                .useCss()
+                .pause(500)
             return this;
         },
 

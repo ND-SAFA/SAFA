@@ -42,5 +42,8 @@ module.exports = {
             .useXpath()
             .waitForElementVisible('//*[contains(text(), "Login")]', 1000, 'UI: Login Button is visible').useCss()
             .takeScreenShot("Logout_Visibility.png")
+
+            /* End of test */
+            .end();
     },
 };

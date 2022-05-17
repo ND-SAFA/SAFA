@@ -20,7 +20,7 @@
 import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
 import { logModule } from "@/store";
-import { GenericModal } from "@/components/common/generic";
+import GenericModal from "./GenericModal.vue";
 
 /**
  * Displays a modal for confirming sensitive actions.

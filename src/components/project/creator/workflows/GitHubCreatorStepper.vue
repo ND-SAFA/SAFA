@@ -14,11 +14,17 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <git-hub-installation-selector :installations="installations" />
+        <git-hub-installation-selector
+          :installations="installations"
+          @select="handleInstallationSelect($event)"
+        />
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <git-hub-repository-selector :repositories="repositories" />
+        <git-hub-repository-selector
+          :repositories="repositories"
+          @select="handleProjectSelect($event)"
+        />
       </v-stepper-content>
     </template>
   </generic-stepper>

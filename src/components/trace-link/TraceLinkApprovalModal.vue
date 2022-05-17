@@ -24,7 +24,7 @@
 import Vue, { PropType } from "vue";
 import { TraceApproval, TraceLink, TraceType } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
-import { GenericModal } from "@/components/common/generic";
+import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import { artifactModule } from "@/store";
 

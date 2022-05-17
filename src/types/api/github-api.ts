@@ -25,6 +25,10 @@ export interface GitHubInstallation {
    */
   name: string;
   /**
+   * The installation's slug id.
+   */
+  app_slug: string;
+  /**
    * The installation's url.
    */
   url: string;
@@ -63,7 +67,7 @@ export interface GitHubRepository {
   /**
    * The project's avatar.
    */
-  avatar_url: string;
+  avatar_url?: string;
   /**
    * The project's url.
    */
@@ -72,6 +76,14 @@ export interface GitHubRepository {
    * The project's size.
    */
   size: number;
+  /**
+   * A timestamp for the project was created.
+   */
+  created_at: string;
+  /**
+   * A timestamp for the project was last updated.
+   */
+  updated_at: string;
 }
 
 /**

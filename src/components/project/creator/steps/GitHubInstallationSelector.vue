@@ -1,38 +1,31 @@
 <template>
-  <v-container>
-    <h1 class="text-h5">GitHub Installations</h1>
-    <v-divider />
-    <v-progress-circular
-      v-if="loading"
-      indeterminate
-      size="48"
-      class="mx-auto my-2 d-block"
-    />
-    <p v-else-if="installations.length === 0" class="text-caption">
-      There are no installations.
-    </p>
-    <v-list>
-      <v-list-item-group>
-        <template v-for="installation in installations">
-          <v-list-item
-            :key="installation.id"
-            @click="handleInstallationSelect(installation)"
-          >
-            <v-list-item-content>
-              <v-list-item-title v-text="installation.name" />
-
-              <v-list-item-subtitle v-text="installation.url" />
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list-item-group>
-    </v-list>
-  </v-container>
+  <generic-stepper-list-step
+    title="GitHub Installations"
+    :item-count="installations.length"
+    empty-message="There are no installations."
+  >
+    <template slot="items">
+      <template v-for="installation in installations">
+        <v-list-item
+          :key="installation.id"
+          @click="handleInstallationSelect(installation)"
+        >
+          <v-list-item-content>
+            <v-list-item-title
+              v-text="installation.name || installation.app_slug"
+            />
+            <v-list-item-subtitle v-text="installation.url" />
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+    </template>
+  </generic-stepper-list-step>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GitHubInstallation } from "@/types";
+import { GenericStepperListStep } from "@/components/common";
 
 /**
  * Allows for selecting a GitHub installation.
@@ -41,6 +34,9 @@ import { GitHubInstallation } from "@/types";
  */
 export default Vue.extend({
   name: "GitHubInstallationSelector",
+  components: {
+    GenericStepperListStep,
+  },
   props: {
     installations: {
       type: Array as PropType<GitHubInstallation[]>,
@@ -52,8 +48,12 @@ export default Vue.extend({
     },
   },
   methods: {
-    handleInstallationSelect(site: GitHubInstallation) {
-      this.$emit("select", site);
+    /**
+     * Handles a click to select an installation.
+     * @param installation - The installation to select.
+     */
+    handleInstallationSelect(installation: GitHubInstallation) {
+      this.$emit("select", installation);
     },
   },
 });

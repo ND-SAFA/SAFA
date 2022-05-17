@@ -63,6 +63,12 @@ export async function getGitHubToken(
 
   const params = new URLSearchParams(await res.text());
 
+  if (params.get("error")) {
+    throw new Error(
+      params.get("error_description") || "Unable to connect to GitHub."
+    );
+  }
+
   return {
     accessToken: params.get("access_token") || "",
     refreshToken: params.get("refresh_token") || "",
@@ -78,7 +84,7 @@ export async function getGitHubToken(
 export async function getGitHubInstallations(
   accessToken: string
 ): Promise<GitHubInstallation[]> {
-  const { installations } = await fetchGitHub<GitHubInstallationList>(
+  const items = await fetchGitHub<GitHubInstallationList>(
     "https://api.github.com/user/installations",
     {
       method: "GET",
@@ -89,7 +95,7 @@ export async function getGitHubInstallations(
     }
   );
 
-  return installations;
+  return items.installations;
 }
 
 /**

@@ -1,28 +1,26 @@
 <template>
-  <v-container class="d-flex justify-center">
-    <v-btn
-      large
-      color="primary"
-      :disabled="isDisabled"
-      :loading="isLoading"
-      @click="handleJiraAuthentication"
-    >
-      <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-      <span v-if="!hasCredentials">Connect to Jira</span>
-      <span v-else>Connected to Jira</span>
-    </v-btn>
-  </v-container>
+  <generic-stepper-authentication
+    connected-title="Connected to Jira"
+    disconnected-title="Connect to Jira"
+    :is-loading="isLoading"
+    :has-credentials="hasCredentials"
+    @click="handleJiraAuthentication"
+  />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { authorizeJira } from "@/api";
+import { GenericStepperAuthentication } from "@/components";
 
 /**
  * Prompts the user to authenticate their Jira account.
  */
 export default Vue.extend({
   name: "JiraAuthentication",
+  components: {
+    GenericStepperAuthentication,
+  },
   props: {
     hasCredentials: {
       type: Boolean,
@@ -39,14 +37,6 @@ export default Vue.extend({
      */
     handleJiraAuthentication(): void {
       authorizeJira();
-    },
-  },
-  computed: {
-    /**
-     * Returns whether the button is enabled.
-     */
-    isDisabled(): boolean {
-      return this.hasCredentials || this.isLoading;
     },
   },
 });

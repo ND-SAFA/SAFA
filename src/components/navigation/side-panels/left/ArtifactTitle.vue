@@ -53,9 +53,7 @@ import Vue from "vue";
 import { PanelType } from "@/types";
 import { appModule, artifactSelectionModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
-import { ArtifactCreatorModal } from "@/components/artifact";
-import GenericModal from "@/components/common/generic/GenericModal.vue";
+import { GenericIconButton, GenericModal } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -65,7 +63,6 @@ export default Vue.extend({
   components: {
     GenericModal,
     GenericIconButton,
-    ArtifactCreatorModal,
   },
   data() {
     return {

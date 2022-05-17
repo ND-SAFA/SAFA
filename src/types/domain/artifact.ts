@@ -2,11 +2,17 @@ import { ArtifactDeltaState } from "./delta";
 import { CytoCoreElementData } from "@/types/cytoscape";
 import { DocumentType } from "@/types/domain/document";
 
+/**
+ * Enumerates the types of FTA nodes.
+ */
 export enum FTANodeType {
   OR = "OR",
   AND = "AND",
 }
 
+/**
+ * Enumerates the types of safety cases.
+ */
 export enum SafetyCaseType {
   GOAL = "GOAL",
   SOLUTION = "SOLUTION",

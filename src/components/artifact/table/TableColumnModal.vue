@@ -50,10 +50,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DocumentColumn } from "@/types";
-import { documentModule } from "@/store";
-import { GenericModal } from "@/components/common/generic";
 import { columnTypeOptions, createColumn } from "@/util";
+import { documentModule } from "@/store";
 import { handleColumnDelete, handleColumnSave } from "@/api";
+import { GenericModal } from "@/components/common";
 
 /**
  * Represents a modal for editing a table column.

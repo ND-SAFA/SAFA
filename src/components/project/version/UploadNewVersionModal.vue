@@ -19,20 +19,6 @@
         />
       </v-stepper-content>
     </template>
-
-    <template v-slot:action:main>
-      <v-checkbox
-        v-if="currentStep === 3"
-        v-model="setAsNewVersion"
-        color="secondary"
-      >
-        <template v-slot:label>
-          <label style="color: black" class="ma-0 pa-0">
-            Set as current version
-          </label>
-        </template>
-      </v-checkbox>
-    </template>
   </project-version-stepper-modal>
 </template>
 

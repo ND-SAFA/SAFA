@@ -2,14 +2,14 @@ import { Core, EventObject, LayoutOptions, Layouts } from "cytoscape";
 import {
   AutoMoveOptions,
   AutoMoveRule,
+  CytoContextMenu,
   EdgeHandleCore,
   EdgeHandlersOptions,
   HtmlDefinition,
   KlayLayoutOptions,
+  ContextMenuOptions,
 } from "@/types/cytoscape";
-import { TimNodeData } from "@/types/components/tim-tree";
-import { ArtifactData } from "@/types";
-import { ContextMenuOptions } from "@/types/cytoscape/plugins/context-menus";
+import { ArtifactData, TimNodeData } from "@/types";
 
 /**
  * The HtmlDefinitions used with in the application.
@@ -26,7 +26,7 @@ type AppHtmlDefinitions = (
 export interface CytoCore extends Core {
   nodeHtmlLabel(defs: AppHtmlDefinitions): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
-  contextMenus(options: ContextMenuOptions | "get"): any; //todo: add types for return
+  contextMenus(options: ContextMenuOptions | "get"): CytoContextMenu;
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }
@@ -276,12 +276,10 @@ export interface CytoCoreElementData {
    * A unique identifier for the element with cytoscape instance.
    */
   id: string;
-
   /*
    * The type of element being represented.
    */
   type: "node" | "edge";
-
   /*
    * The cytoscape label placed within nodes and besides edges.
    */

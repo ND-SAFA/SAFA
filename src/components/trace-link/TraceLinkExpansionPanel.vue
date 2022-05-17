@@ -10,6 +10,7 @@
         :target-body="targetBody"
         :show-decline="showDecline"
         :show-approve="showApprove"
+        :show-delete="false"
         @link:approve="$emit('link:approve', $event)"
         @link:decline="$emit('link:decline', $event)"
       />

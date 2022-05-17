@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="d-flex justify-center">
+  <div class="d-flex flex-row">
     <generic-icon-button
       color="error"
       tooltip="Collapse All"
@@ -12,7 +12,7 @@
       icon-id="mdi-arrow-expand-all"
       @click="$emit('open:all')"
     />
-  </v-flex>
+  </div>
 </template>
 
 <script lang="ts">

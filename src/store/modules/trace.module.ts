@@ -1,10 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
+  DocumentTraces,
   LinkFinder,
   LinkValidator,
   TraceLink,
-  DocumentTraces,
 } from "@/types";
 import { TraceApproval } from "@/types";
 import { documentModule } from "@/store";

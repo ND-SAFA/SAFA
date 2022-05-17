@@ -5,13 +5,16 @@ import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, traceModule } from "@/store";
 import { handleResetGraph } from "@/api";
-import { artifactTreeCyPromise } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "document" })
 /**
  * This module defines the state of the currently visible document within a project.
  */
 export default class DocumentModule extends VuexModule {
+  /**
+   * Whether the document is currently in table view.
+   */
+  private isTableView = false;
   /**
    * The currently visible document.
    */
@@ -127,6 +130,14 @@ export default class DocumentModule extends VuexModule {
     }
   }
 
+  @Action
+  /**
+   * Toggles whether the current document is in table view.
+   */
+  toggleTableView(): void {
+    this.SET_TABLE_VIEW(!this.isTableView);
+  }
+
   @Mutation
   /**
    * Sets the current document.
@@ -149,6 +160,14 @@ export default class DocumentModule extends VuexModule {
    */
   SET_BASE_DOCUMENT(document: ProjectDocument): void {
     this.baseDocument = document;
+  }
+
+  @Mutation
+  /**
+   * Sets whether the document is in table view.
+   */
+  SET_TABLE_VIEW(isTableView: boolean): void {
+    this.isTableView = isTableView;
   }
 
   /**
@@ -192,7 +211,7 @@ export default class DocumentModule extends VuexModule {
    * Returns whether the current document type is for rendering a table.
    */
   get isTableDocument(): boolean {
-    return isTableDocument(this.currentDocument.type);
+    return this.isTableView || isTableDocument(this.currentDocument.type);
   }
 
   /**

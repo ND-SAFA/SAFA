@@ -25,6 +25,10 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "arrow-scale": 2,
     },
   },
+  {
+    selector: "edge[?faded]",
+    style: { opacity: 0.1 },
+  },
   // Edges - Generated
   {
     selector: GENERATED_LINK_SELECTOR,

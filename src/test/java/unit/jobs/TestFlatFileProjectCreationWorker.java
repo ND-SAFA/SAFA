@@ -32,7 +32,7 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
             .subscribeToJob(currentUsername, jobService.getJobById(jobId));
 
         // Step - Allow job to run
-        Thread.sleep(1000);
+        Thread.sleep(1500);
 
         // VP - Verify that job has finished.
         JobDbEntity jobDbEntity = jobService.getJobById(jobId);

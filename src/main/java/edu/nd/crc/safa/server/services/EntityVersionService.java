@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * Responsible for providing an interface to modify artifacts in a project by calculating
- * and storing their changes between the previous version.
- *
- * @author Alberto Rodriguez
+ * Provides a layer of abstraction above a commit for setting artifacts and traces at a version.w
  */
 @Service
 @Scope("singleton")

@@ -6,6 +6,7 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 
 import org.junit.jupiter.api.Test;
+import unit.SampleProjectConstants;
 
 public class TestParsingErrors extends ParseBaseTest {
 
@@ -21,10 +22,10 @@ public class TestParsingErrors extends ParseBaseTest {
 
     @Test
     public void errorForWrongColumnsInTraceFile() throws Exception {
-        String fileName = "Design.csv";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadTraceFileAndGetError(AppRoutes.Projects.FlatFiles.parseTraceFile, fileName);
+        String c = uploadTraceFileAndGetError(AppRoutes.Projects.FlatFiles.parseTraceFile,
+            SampleProjectConstants.DESIGN_FILE);
         assertThat(c).contains("source, target");
     }
 

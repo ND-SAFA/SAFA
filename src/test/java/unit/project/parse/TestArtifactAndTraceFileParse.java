@@ -23,16 +23,15 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
     @Test
     public void testArtifactEntities() throws Exception {
         String baseRoute = AppRoutes.Projects.FlatFiles.parseArtifactFile;
-        String fileName = "Design.csv";
         String type = "Design";
 
         //Step - Upload file, parse artifacts, and collect them
         String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).get();
-        JSONArray artifacts = uploadArtifactFileAndGetArtifacts(routeName, fileName);
+        JSONArray artifacts = uploadArtifactFileAndGetArtifacts(routeName, SampleProjectConstants.DESIGN_FILE);
 
         //VP - Verify that all artifacts were parsed
         assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
-
+        
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
             assertThat(artifact.getString("type")).isEqualTo(type);

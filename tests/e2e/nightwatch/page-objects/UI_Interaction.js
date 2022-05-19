@@ -8,6 +8,8 @@
  *     - This file is currently being used in the tests
  *      folder.
  *    - This objects file will constantly evolve as more functions are simplified
+ *    - moveToElement() function is being used since there is a bug with Nightwatch 
+ *      with element clicks being intercepted. This function prevents this bug from happening.
  */
 
 module.exports = {
@@ -17,46 +19,43 @@ module.exports = {
     url: 'http://localhost:8080/',
 
     elements: {
-        loginImageIcon                          : '[src="/img/SAFA.28196e73.png"]',
-        checkProjectNumberSteps                 : '.v-stepper__header',
         checkContinueButtonDisabled             : '.container [type="button"].v-btn--outlined',
         ProfilePictureAttributes                : 'button[type="button"][role="button"]',
         TestDataLocation                        : 'tests/e2e/nightwatch/TestData/',
-        HazardsUploadButton                     : '#input-162[type="file"]',
-        RequirementsUploadButton                : '#input-199[type="file"]',
-        DesignsUploadButton                     : '#input-236[type="file"]',
-        EnvironmentalAssumptionsUploadButton    : '#input-273[type="file"]',
-        Requirement2HazardsUploadButton         : '#input-346[type="file"]',
-        Environmental2HazardsUploadButton       : '#input-411[type="file"]',
+        emailInputField                         : 'input[id="input-150"]',
+        projectCreationSteps                    : '.v-stepper__header',
+        webTitleGlobal                          : 'h1[class="text-h4 white--text ml-4"]',
+        artifactCreatorWarning                  : 'div[class="col"][style="white-space: nowrap;"]',
+        artifactCreatorNameWarning              : 'div[class="v-messages__message"]',
+        traceLinkCreatorWarning                 : 'div[class="col"][style="white-space: nowrap;"]',
+
+        /* Image Elements */
+        loginImageIcon                          : '[src="/img/SAFA.28196e73.png"]',
+        checkMarkIcon                           : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-check theme--light success--text"]:last-child',
+        dropDownIcon                            : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-chevron-down theme--light"]',
 
         /* Tim Graph Elements */
         timGraph                                : 'canvas[data-id="layer1-drag"]',
         zoomInButton                            : 'button[id="zoom-in"]',
-        centerGraphButton                       : `(//*[@aria-expanded="false" and @type="button" and @class="v-btn v-btn--icon v-btn--round theme--light v-size--default secondary--text"])[5]`,
+        centerGraphButton                       : '(//*[@aria-expanded="false" and @type="button" and @class="v-btn v-btn--icon v-btn--round theme--light v-size--default secondary--text"])[5]',
         
 
     },
 
     commands: [ {
+
         fillInTextBox(textBoxValue, textBoxName) {
             /* Set the page constant */
             const page = this;
             
+            const textBoxLocation = `//*[contains(text(),'${textBoxName}')]`;
+            const textBoxLocationInput = `//*[contains(text(),'${textBoxName}')]/following-sibling::*[1]`;
             /* Set the text box location */
             page
                 .useXpath()
-                .assert.visible(`//*[contains(text(),'${textBoxName}')]`, results => {
-                    if (results.value) {
-                        const textBoxLocation = `//*[contains(text(),'${textBoxName}')]/following-sibling::input`;
-                        page.setValue( textBoxLocation, textBoxValue);
-                        page.useCss();
-                        page.pause(100)
-                        return "UI: {textBoxName} is visible";
-                    } else {
-                        page.useCss();
-                        return "UI: {textBoxName} is not visible";
-                    }
-                });
+                .moveToElement(textBoxLocation, undefined, undefined)
+                .setValue(textBoxLocationInput, textBoxValue)
+                .useCss();
 
             /* Return the page object */
             return this;
@@ -75,43 +74,36 @@ module.exports = {
         },
 
         clickButton(lableName) {
-            /* Set the page constant */
             const page = this;
+            const labelNameLocation = `//*[contains(text(),'${lableName}')]`;
 
-            /* Set the button location */
             page
                 .useXpath()
-                .assert.visible(`//*[contains(text(),'${lableName}')]`, results => {
-                    if (results.value) {
-                        /* Click the button */
-                        page.pause(500)
-                        page.click(`//*[contains(text(),'${lableName}')]`);
-                        page.pause(500);
-                        page.useCss();
-                        results = "UI: {lableName} is visible";
-                    } else {
-                        page.useCss();
-                        results = "UI: {lableName} is not visible";
-                    }
-                });
-            /* Return the page object */
+                .moveToElement(labelNameLocation, undefined, undefined)
+                .click(labelNameLocation)
+                .useCss();
+
             return this;
         },
     
-        loginSession(screenShotDestination, screenShotName) {
+        loginSession(screenShotDestination, screenShotName, userName, password, useDefaultCredentials) {
             /* Set the page constant */
             const page = this;
-            const userName = 'tester@test.com';
-            const password = '\\+sX,^]ptK~-"4vn';
+
+            if (!useDefaultCredentials) {
+                userName = 'tester@test.com';             // Remove these once account deletion is added
+                password = '\\+sX,^]ptK~-"4vn';
+            }
 
             /* Login to the website */
             page
                 .fillInTextBox(userName, 'Email')
+                .buttonNotClickable('Login', "UI: Login button is disabled without a valid password entered")
                 .fillInTextBox(password, 'Password')
                 .clickButton('Login')
-                .waitForElementVisible('@ProfilePictureAttributes', 2000, "UI: Profile Picture is visible")
-                .takeScreenShot(screenShotDestination + screenShotName);
-
+                .waitForElementVisible('@ProfilePictureAttributes', 2000, "UI: Profile picture is visible after login")
+                .takeScreenShot(screenShotDestination + screenShotName)
+                .useCss();
             /* Return the page object */
             return this;
 
@@ -119,25 +111,26 @@ module.exports = {
 
         uploadFileWithParameters(fileLocation, fileName) {
             const page = this;
-
+            const fileUploadLocation = `(//*[contains(text(),'File')]/following-sibling::input)[last()]`;
             page
                 .useXpath()
-                .uploadFile(`(//*[contains(text(),'File')]/following-sibling::input)[last()]`, require('path').resolve(fileLocation + fileName))
-                .useCss();
+                .moveToElement(fileUploadLocation, undefined, undefined)
+                .uploadFile(fileUploadLocation, require('path').resolve(fileLocation + fileName))
+                .useCss()
 
             return this;
         },
 
         clickSelector(selectorName, selectorValue) {
             const page = this;
+            const selectorValueLocation  = `(//*[contains(text(),'${selectorValue}') and @class="v-btn__content" ])[last()]`;
 
             page
                 .clickButton(selectorName)
-                .pause(500)
                 .useXpath()
-                .click(`(//*[contains(text(),'${selectorValue}') and @class="v-btn__content" ])[last()]`)
-                .useCss()
-                .pause(500)
+                .moveToElement(selectorValueLocation, undefined, undefined)
+                .click(selectorValueLocation)
+                .useCss();
             return this;
         },
 
@@ -156,7 +149,60 @@ module.exports = {
                 .useCss()
                 .pause(1000)
             return this;
-        }
+        },
+
+        buttonNotClickable(buttonName, message) {
+            /* NOTE: This function uses a REGEX expression to find the element "true" */
+            const page = this;
+            const buttonLocation = `//*[contains(text(),'` + buttonName + `')]/parent::button`;
+            page
+                .useXpath()
+                .expect.element(buttonLocation)
+                .to.have.property('disabled', message)
+                .matches(/true\b/);
+            
+            page.useCss();
+            
+            return this;
+        },
+
+        buttonClickable(buttonName, message) {
+            /* NOTE: This function uses a REGEX expression to find the element "true" */
+            const page = this;
+            const buttonLocation = `//*[contains(text(),'` + buttonName + `')]/parent::button`;
+            page
+                .useXpath()
+                .expect.element(buttonLocation)
+                .to.have.property('disabled', message)
+                .matches(/false\b/);
+            
+            page.useCss();
+            
+            return this;
+        },
+
+        logToConsole(message) {
+            const page = this;
+
+            page
+                .perform(function() {
+                    console.log(message);
+                });
+            
+            return this;
+        },
+
+        checkText(textName, message) {
+            const page = this;
+            const elementLocation = `//*[contains(text(),'` + textName + `')]`;
+            page
+                .useXpath()
+                .assert.visible(elementLocation, message);
+            
+            page.useCss();
+
+            return this;
+        },
 
     }]
 

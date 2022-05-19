@@ -10,7 +10,7 @@ TestingTIMGraph.js - Created by: Jeremy Arellano
 *********************************************************/
  
 module.exports = {
-    '@disabled': false,
+    '@disabled': true,
     '@tags' : ['SAFA'],
     'TIM Graph Test'(browser) {
         const page = browser.page.UI_Interaction();

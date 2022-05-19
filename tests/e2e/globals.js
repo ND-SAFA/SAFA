@@ -100,4 +100,31 @@ module.exports = {
     cb();
   }
    */
+
+  /* Adding Nightwatch Configurations */
+  'src_folders': ['tests/e2e/nightwatch'],
+  'page_objects_path': ['tests/e2e/nightwatch/page-objects'],
+
+  'webdriver': {
+      'start_process': true,
+      'server_path': require('chromedriver').path,
+      'port': 9515
+  },
+
+  'test_settings': {
+      'default': {
+          'screenshots': {
+              'enabled': true,
+              'on_failure': true,
+              'on_error': true,
+              'path': 'tests_output/screenshots'
+          }, 
+          'desiredCapabilities': {
+              'browserName': 'chrome',
+              /*'chromeOptions': {
+                  'args': ['--headless']
+              } */
+          }
+      }
+  }
 };

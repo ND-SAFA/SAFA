@@ -2,30 +2,23 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="blue-grey" v-if="doShowGraphButtons" />
+      <v-divider class="blue-grey mt-1" v-if="doShowGraphButtons" />
       <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 
     <template v-slot:extension v-if="doShowGraphButtons">
-      <v-row dense class="pt-1 full-width">
-        <v-col cols="4">
-          <v-row dense align="center">
-            <v-col class="flex-grow-0">
-              <generic-icon-button
-                color="secondary"
-                :tooltip="leftPanelTooltip"
-                :icon-id="leftPanelIcon"
-                :is-disabled="doDisableButtons"
-                @click="handleLeftPanelClick"
-              />
-            </v-col>
-            <v-col>
-              <document-selector />
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="4">
-          <graph-buttons />
+      <v-row dense class="full-width">
+        <v-col cols="8">
+          <div class="d-flex flex-row">
+            <generic-icon-button
+              color="secondary"
+              :tooltip="leftPanelTooltip"
+              :icon-id="leftPanelIcon"
+              @click="handleLeftPanelClick"
+            />
+            <document-selector />
+            <graph-buttons />
+          </div>
         </v-col>
         <v-col cols="4">
           <v-row justify="end" class="ma-0 pa-0">

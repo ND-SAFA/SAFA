@@ -2,11 +2,12 @@ $color-warning: #EEBC3D;
 $color-added: #81c784;
 $color-removed: #e57373;
 $color-modified: #64b5f6;
+$color-selected: #CCCCCC;
 $color-border: #888888;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
-.artifact-tree {
+.artifact-view {
   opacity: 0;
 
   &.visible {
@@ -29,9 +30,9 @@ $graph-border-radius: 8px;
 
   &:hover {
     box-shadow:
-      0 6px 2px -4px rgb(0 0 0 / 20%),
-      0 4px 4px 0 rgb(0 0 0 / 14%),
-      0 2px 10px 0 rgb(0 0 0 / 12%);
+      rgba(0, 0, 0, 0.2) 0px 8px 9px -5px,
+      rgba(0, 0, 0, 0.14) 0px 15px 22px 2px,
+      rgba(0, 0, 0, 0.12) 0px 6px 28px 5px;
   }
 }
 
@@ -103,6 +104,14 @@ $graph-border-radius: 8px;
 
   &:hover {
     background: darken($color-modified, 10) !important;
+  }
+}
+
+.artifact-selected {
+  background: $color-selected !important;
+
+  &:hover {
+    background: darken($color-selected, 10) !important;
   }
 }
 

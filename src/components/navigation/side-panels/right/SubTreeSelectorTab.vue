@@ -4,7 +4,7 @@
     <v-divider class="mb-4" />
 
     <v-text-field
-      label="Search"
+      label="Search Artifacts"
       solo
       rounded
       prepend-inner-icon="mdi-magnify"
@@ -37,7 +37,10 @@
           <v-list-item-content>
             <v-list-item-title>{{ artifact.name }}</v-list-item-title>
 
-            <v-list-item-subtitle class="text-wrap">
+            <v-list-item-subtitle
+              class="text-wrap text-ellipsis"
+              style="max-height: 100px"
+            >
               {{ artifact.body }}
             </v-list-item-subtitle>
           </v-list-item-content>

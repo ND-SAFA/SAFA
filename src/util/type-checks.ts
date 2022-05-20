@@ -1,31 +1,45 @@
-import { Artifact, ArtifactData, EntityModification } from "@/types/domain";
 import {
+  Artifact,
+  ArtifactData,
+  DeltaArtifact,
+  EntityModification,
   IGenericFilePanel,
   ProjectFile,
   TraceFile,
   TracePanel,
-} from "@/types/components";
+} from "@/types";
 
 /**
- * Returns whether the given ArtifactDelta is an modified artifact.
+ * Returns whether the given artifact or delta is a modified artifact.
  *
- * @param obj - The artifact to check.
- *
- * @return Whether this item is an modified artifact.
+ * @param artifact - The artifact to check.
+ * @return Whether this item is a modified artifact.
  */
 export function isModifiedArtifact(
-  obj: any
-): obj is EntityModification<Artifact> {
+  artifact: DeltaArtifact
+): artifact is EntityModification<Artifact> {
   const requiredFields = ["before", "after"];
-  return containsFields(obj, requiredFields);
+  return containsFields(artifact, requiredFields);
 }
 
-export function isArtifact(obj: any): obj is Artifact {
+/**
+ * Returns whether the given artifact or delta is an artifact.
+ *
+ * @param artifact - The artifact to check.
+ * @return Whether this item is an artifact.
+ */
+export function isArtifact(artifact: DeltaArtifact): artifact is Artifact {
   const requiredFields = ["id", "summary", "body", "type"];
-  return containsFields(obj, requiredFields);
+  return containsFields(artifact, requiredFields);
 }
 
-export function isArtifactData(obj: any): obj is ArtifactData {
+/**
+ * Returns whether the given cytoscape data is an artifact.
+ *
+ * @param artifact - The artifact to check.
+ * @return Whether this item is an artifact.
+ */
+export function isArtifactData(artifact: unknown): artifact is ArtifactData {
   const requiredFields = [
     "body",
     "artifactName",
@@ -34,12 +48,19 @@ export function isArtifactData(obj: any): obj is ArtifactData {
     "isSelected",
     "opacity",
   ];
-  return containsFields(obj, requiredFields);
+  return containsFields(artifact, requiredFields);
 }
 
-function containsFields(obj: any, fields: string[]): boolean {
+/**
+ * Returns whether an object contains certain fields.
+ *
+ * @param object - The object to check.
+ * @param fields - The fields required to exist on the object.
+ * @return Whether this object has all required fields.
+ */
+function containsFields(object: unknown, fields: string[]): boolean {
   return fields
-    .map((field) => field in obj)
+    .map((field) => field in (object as Record<string, unknown>))
     .reduce((prev, curr) => prev && curr, true);
 }
 
@@ -63,7 +84,7 @@ export function isTraceFile(file: ProjectFile): file is TraceFile {
  * @return Whether this panel is a trace panel.
  */
 export function isTracePanel(
-  panel: IGenericFilePanel<any, any>
+  panel: IGenericFilePanel<Record<string, unknown>, ProjectFile>
 ): panel is TracePanel {
   return isTraceFile(panel.projectFile);
 }

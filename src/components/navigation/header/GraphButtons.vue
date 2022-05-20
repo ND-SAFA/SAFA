@@ -1,27 +1,41 @@
 <template>
-  <v-row class="ma-0 pa-0" justify="center" style="flex-wrap: nowrap">
-    <v-col
-      v-for="definition in definitions"
-      :key="definition.label"
-      :cols="12 / definitions.length"
-    >
-      <v-row justify="center">
-        <generic-icon-button
-          v-if="definition.handler"
-          color="secondary"
-          :tooltip="definition.label"
-          :icon-id="definition.icon"
-          @click="definition.handler"
-          :is-disabled="isButtonDisabled(definition)"
-        />
-        <checkmark-menu
-          v-else
-          :definition="definition"
-          :is-disabled="isButtonDisabled(definition)"
-        />
-      </v-row>
-    </v-col>
-  </v-row>
+  <div class="d-flex flex-row">
+    <v-divider inset vertical class="secondary mx-1 faded" />
+
+    <template v-for="definition in changeButtons">
+      <generic-icon-button
+        v-if="definition.handler"
+        :key="definition.label"
+        color="secondary"
+        :tooltip="definition.label"
+        :icon-id="definition.icon"
+        @click="definition.handler"
+        :is-disabled="isButtonDisabled(definition)"
+      />
+    </template>
+
+    <v-divider inset vertical class="secondary mx-1 faded" />
+
+    <template v-for="definition in viewButtons">
+      <generic-icon-button
+        v-if="definition.handler"
+        :key="definition.label"
+        color="secondary"
+        :tooltip="definition.label"
+        :icon-id="definition.icon"
+        @click="definition.handler"
+        :is-disabled="isButtonDisabled(definition)"
+      />
+    </template>
+
+    <v-divider inset vertical class="secondary mx-1 faded" />
+
+    <checkmark-menu
+      :key="filterButton.label"
+      :definition="filterButton"
+      :is-disabled="isButtonDisabled(filterButton)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -63,19 +77,33 @@ export default Vue.extend({
       return artifactModule.artifacts;
     },
     /**
-     * @return The graph button definitions to display.
+     * @return The change buttons.
      */
-    definitions(): ButtonDefinition[] {
+    changeButtons(): ButtonDefinition[] {
       return [
         {
           type: ButtonType.ICON,
           handler: () => {
             undoCommit().then();
           },
-          label: "Undo Commit",
+          label: "Undo",
           icon: "mdi-undo",
           isDisabled: !commitModule.canUndo,
         },
+        {
+          type: ButtonType.ICON,
+          handler: () => redoCommit().then(),
+          label: "Redo",
+          icon: "mdi-redo",
+          isDisabled: !commitModule.canRedo,
+        },
+      ];
+    },
+    /**
+     * @return The view buttons.
+     */
+    viewButtons(): ButtonDefinition[] {
+      return [
         {
           type: ButtonType.ICON,
           handler: () => cyZoomIn(),
@@ -105,24 +133,22 @@ export default Vue.extend({
           label: "Reformat Graph",
           icon: "mdi-refresh",
         },
-        {
-          type: ButtonType.CHECKMARK_MENU,
-          label: "Filter Artifacts",
-          icon: "mdi-filter",
-          menuItems: this.menuItems.map(([name], itemIndex) => ({
-            name,
-            onClick: () => this.filterTypeHandler(itemIndex),
-          })),
-          checkmarkValues: this.menuItems.map((i) => i[1]),
-        },
-        {
-          type: ButtonType.ICON,
-          handler: () => redoCommit().then(),
-          label: "Redo Commit",
-          icon: "mdi-redo",
-          isDisabled: !commitModule.canRedo,
-        },
       ];
+    },
+    /**
+     * @return The filter button.
+     */
+    filterButton(): ButtonDefinition {
+      return {
+        type: ButtonType.CHECKMARK_MENU,
+        label: "Filter Artifacts",
+        icon: "mdi-filter",
+        menuItems: this.menuItems.map(([name], itemIndex) => ({
+          name,
+          onClick: () => this.filterTypeHandler(itemIndex),
+        })),
+        checkmarkValues: this.menuItems.map((i) => i[1]),
+      };
     },
   },
   methods: {

@@ -12,25 +12,25 @@
   >
     <template v-slot:selection> {{ selectDisplay }} </template>
     <template v-slot:item="{ item }">
-      <v-row dense align="center">
-        <v-col @click.stop="handleEditOpen(item)">
-          {{ item.name }}
-        </v-col>
-        <v-col @click.stop="">
-          <generic-icon-button
-            :is-disabled="isFirstItem(item)"
-            icon-id="mdi-arrow-up"
-            :tooltip="`Move '${item.name}' Up`"
-            @click="handleMove(item, true)"
-          />
-          <generic-icon-button
-            :is-disabled="isLastItem(item)"
-            icon-id="mdi-arrow-down"
-            :tooltip="`Move '${item.name}' Down`"
-            @click="handleMove(item, false)"
-          />
-        </v-col>
-      </v-row>
+      <v-list-item-title @click.stop="handleEditOpen(item)">
+        {{ item.name }}
+      </v-list-item-title>
+      <v-list-item-action class="d-flex flex-row pr-2">
+        <generic-icon-button
+          small
+          :is-disabled="isFirstItem(item)"
+          icon-id="mdi-menu-up"
+          :tooltip="`Move '${item.name}' Up`"
+          @click="handleMove(item, true)"
+        />
+        <generic-icon-button
+          small
+          :is-disabled="isLastItem(item)"
+          icon-id="mdi-menu-down"
+          :tooltip="`Move '${item.name}' Down`"
+          @click="handleMove(item, false)"
+        />
+      </v-list-item-action>
     </template>
 
     <template v-slot:append-item>
@@ -76,7 +76,9 @@ export default Vue.extend({
      * @return The select display name.
      */
     selectDisplay(): string {
-      return `${documentModule.tableColumns.length} Columns`;
+      return documentModule.tableColumns.length === 1
+        ? "1 Custom Column"
+        : `${documentModule.tableColumns.length} Custom Columns`;
     },
     /**
      * Emulates a select value to open the column editor on click.

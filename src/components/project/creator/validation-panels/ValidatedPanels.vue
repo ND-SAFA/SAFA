@@ -3,7 +3,7 @@
     <v-row>
       <slot name="panels" />
     </v-row>
-    <v-row align="center" class="mx-auto" style="width: fit-content">
+    <v-row align="center" class="mx-auto width-fit">
       <v-col>
         <v-btn
           color="primary"

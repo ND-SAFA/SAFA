@@ -14,7 +14,6 @@
         @link:approve="handleApprove"
         @link:decline="handleDecline"
       />
-      <v-divider class="mt-5" />
       <approval-section
         show-approve
         title="Declined Trace Links"
@@ -24,7 +23,6 @@
         :artifacts="artifactsById"
         @link:approve="handleApproveDeclined"
       />
-      <v-divider class="mt-5" />
       <approval-section
         show-decline
         title="Approved Trace Links"
@@ -34,7 +32,6 @@
         :artifacts="artifactsById"
         @link:decline="handleDeclineApproved"
       />
-      <v-divider class="mt-5 mb-10" />
     </template>
   </private-page>
 </template>

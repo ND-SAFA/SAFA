@@ -3,6 +3,9 @@
  */
 import { Artifact, TraceLink } from "@/types";
 
+/**
+ * Enumerates the types of delta state.
+ */
 export enum ArtifactDeltaState {
   NO_CHANGE = "NO_CHANGE",
   MODIFIED = "MODIFIED",

@@ -1,0 +1,62 @@
+<template>
+  <v-container class="d-flex justify-center">
+    <v-btn
+      large
+      color="primary"
+      :disabled="isDisabled"
+      :loading="isLoading"
+      @click="handleClick"
+    >
+      <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
+      <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
+      <span v-else>{{ connectedTitle }}</span>
+    </v-btn>
+  </v-container>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+
+/**
+ * Displays an authentication stepper step.
+ *
+ * @emits `click` - On button click.
+ */
+export default Vue.extend({
+  name: "GenericStepperAuthentication",
+  props: {
+    hasCredentials: {
+      type: Boolean,
+      required: true,
+    },
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
+    disconnectedTitle: {
+      type: String,
+      required: true,
+    },
+    connectedTitle: {
+      type: String,
+      required: true,
+    },
+  },
+  methods: {
+    /**
+     * Opens the authentication window.
+     */
+    handleClick(): void {
+      this.$emit("click");
+    },
+  },
+  computed: {
+    /**
+     * Returns whether the button is enabled.
+     */
+    isDisabled(): boolean {
+      return this.hasCredentials || this.isLoading;
+    },
+  },
+});
+</script>

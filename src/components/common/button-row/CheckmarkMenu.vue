@@ -8,7 +8,7 @@
             v-bind="attrs"
             color="secondary"
             icon
-            :disabled="isDisabled"
+            :class="isDisabled ? 'disable-events' : ''"
           >
             <v-icon>{{ definition.icon }}</v-icon>
           </v-btn>

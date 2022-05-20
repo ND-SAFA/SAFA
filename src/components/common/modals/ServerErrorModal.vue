@@ -23,7 +23,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { appModule } from "@/store";
-import { GenericModal } from "@/components/common/generic";
+import GenericModal from "./GenericModal.vue";
 
 /**
  * Renders server errors.

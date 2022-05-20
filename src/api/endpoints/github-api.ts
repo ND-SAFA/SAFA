@@ -29,6 +29,37 @@ async function fetchGitHub<T>(...args: Parameters<typeof fetch>): Promise<T> {
 }
 
 /**
+ * Runs a fetch call to the GitHub API using form data and returning params.
+ *
+ * @param data - The data to include in the body.
+ * @param args - The fetch parameters to use.
+ * @return The returned data.
+ */
+async function fetchGitHubForm(
+  data: Record<string, string>,
+  ...args: Parameters<typeof fetch>
+): Promise<URLSearchParams> {
+  const body = new FormData();
+
+  Object.entries(data).forEach(([key, val]) => body.append(key, val));
+
+  const res = await fetch(args[0], {
+    ...args[1],
+    body,
+  });
+
+  const params = new URLSearchParams(await res.text());
+
+  if (params.get("error")) {
+    throw new Error(
+      params.get("error_description") || "Unable to connect to GitHub."
+    );
+  }
+
+  return params;
+}
+
+/**
  * Opens an external link to authorize GitHub.
  */
 export function authorizeGitHub(): void {
@@ -49,25 +80,46 @@ export function authorizeGitHub(): void {
 export async function getGitHubToken(
   accessCode: string
 ): Promise<InternalGitHubCredentials> {
-  const data = new FormData();
+  const params = await fetchGitHubForm(
+    {
+      code: accessCode,
+      client_id: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
+      client_secret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
+      redirect_uri: process.env.VUE_APP_GITHUB_REDIRECT_LINK || "",
+    },
+    "https://github.com/login/oauth/access_token",
+    {
+      method: "POST",
+    }
+  );
 
-  data.append("code", accessCode);
-  data.append("client_id", process.env.VUE_APP_GITHUB_CLIENT_ID || "");
-  data.append("client_secret", process.env.VUE_APP_GITHUB_CLIENT_SECRET || "");
-  data.append("redirect_uri", process.env.VUE_APP_GITHUB_REDIRECT_LINK || "");
+  return {
+    accessToken: params.get("access_token") || "",
+    refreshToken: params.get("refresh_token") || "",
+  };
+}
 
-  const res = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    body: data,
-  });
-
-  const params = new URLSearchParams(await res.text());
-
-  if (params.get("error")) {
-    throw new Error(
-      params.get("error_description") || "Unable to connect to GitHub."
-    );
-  }
+/**
+ * Exchanges a GitHub refresh token for an API token.
+ *
+ * @param refreshToken - The refresh token received from GitHub.
+ * @return The GitHub access token.
+ */
+export async function getGitHubRefreshToken(
+  refreshToken: string
+): Promise<InternalGitHubCredentials> {
+  const params = await fetchGitHubForm(
+    {
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
+      client_secret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
+    },
+    "https://github.com/login/oauth/access_token",
+    {
+      method: "POST",
+    }
+  );
 
   return {
     accessToken: params.get("access_token") || "",

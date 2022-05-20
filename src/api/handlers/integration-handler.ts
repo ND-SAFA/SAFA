@@ -8,6 +8,7 @@ import {
   URLParameter,
 } from "@/types";
 import {
+  getGitHubRefreshToken,
   getGitHubToken,
   getJiraProjects,
   getJiraRefreshToken,
@@ -52,7 +53,7 @@ export function handleAuthorizeJira(
 }
 
 /**
- * Handles Jira authentication when the app loads.
+ * Loads jira projects and sets the currently selected cloud id.
  *
  * @param credentials - The access and refresh token received from authorizing Jira.
  * @param onSuccess - Called if the action is successful, with the jira project list.
@@ -87,10 +88,21 @@ export function handleAuthorizeGitHub(
   accessCode: URLParameter,
   { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentials>
 ): void {
-  if (!accessCode) {
-    onError?.(new Error("No access code exists."));
-    return;
-  }
+  const handleSuccess = (token: InternalGitHubCredentials) => {
+    onSuccess?.(token);
 
-  getGitHubToken(String(accessCode)).then(onSuccess).catch(onError);
+    localStorage.setItem(
+      LocalStorageKeys.GIT_HUB_REFRESH_TOKEN,
+      token.refreshToken
+    );
+  };
+
+  if (accessCode) {
+    getGitHubToken(String(accessCode)).then(handleSuccess).catch(onError);
+  } else {
+    const refreshToken =
+      localStorage.getItem(LocalStorageKeys.GIT_HUB_REFRESH_TOKEN) || "";
+
+    getGitHubRefreshToken(refreshToken).then(handleSuccess).catch(onError);
+  }
 }

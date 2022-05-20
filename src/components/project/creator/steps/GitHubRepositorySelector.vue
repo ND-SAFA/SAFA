@@ -2,6 +2,7 @@
   <generic-stepper-list-step
     title="GitHub Repositories"
     :item-count="repositories.length"
+    :loading="loading"
     empty-message="There are no repositories."
   >
     <template slot="items">

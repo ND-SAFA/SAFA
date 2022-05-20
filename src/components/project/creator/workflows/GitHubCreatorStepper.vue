@@ -16,6 +16,7 @@
       <v-stepper-content step="2">
         <git-hub-installation-selector
           :installations="installations"
+          :loading="installationsLoading"
           @select="handleInstallationSelect($event)"
         />
       </v-stepper-content>
@@ -23,6 +24,7 @@
       <v-stepper-content step="3">
         <git-hub-repository-selector
           :repositories="repositories"
+          :loading="repositoriesLoading"
           @select="handleProjectSelect($event)"
         />
       </v-stepper-content>

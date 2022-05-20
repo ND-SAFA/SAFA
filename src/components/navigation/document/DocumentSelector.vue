@@ -1,47 +1,56 @@
 <template>
-  <v-select
-    ref="documentSelector"
-    v-model="select"
-    :items="items"
-    label="Document"
-    outlined
-    color="secondary"
-    dense
-    hide-details
-    dark
-    style="width: 200px"
-    item-text="name"
-  >
-    <template v-slot:item="{ item }">
-      <v-row dense align="center">
-        <v-col>
-          {{ item.name }}
-        </v-col>
-        <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
-          <generic-icon-button
-            v-if="item.name !== 'Default'"
-            icon-id="mdi-dots-horizontal"
-            :tooltip="`Edit ${item.name}`"
-          />
-        </v-col>
-      </v-row>
-    </template>
+  <div class="d-flex flex-row align-center">
+    <v-select
+      ref="documentSelector"
+      v-model="select"
+      :items="items"
+      label="Document"
+      outlined
+      color="secondary"
+      dense
+      hide-details
+      dark
+      style="max-width: 200px"
+      class="mx-1"
+      item-text="name"
+    >
+      <template v-slot:item="{ item }">
+        <v-row dense align="center">
+          <v-col>
+            {{ item.name }}
+          </v-col>
+          <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
+            <generic-icon-button
+              v-if="item.name !== 'Default'"
+              icon-id="mdi-dots-horizontal"
+              :tooltip="`Edit ${item.name}`"
+            />
+          </v-col>
+        </v-row>
+      </template>
 
-    <template v-slot:append-item>
-      <v-btn text block color="primary" @click="handleCreateOpen">
-        <v-icon>mdi-plus</v-icon>
-        Add Document
-      </v-btn>
+      <template v-slot:append-item>
+        <v-btn text block color="primary" @click="handleCreateOpen">
+          <v-icon>mdi-plus</v-icon>
+          Add Document
+        </v-btn>
 
-      <document-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
+        <document-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
 
-      <document-modal
-        :is-open="isEditOpen"
-        :document="editingDocument"
-        @close="handleCloseMenu"
-      />
-    </template>
-  </v-select>
+        <document-modal
+          :is-open="isEditOpen"
+          :document="editingDocument"
+          @close="handleCloseMenu"
+        />
+      </template>
+    </v-select>
+    <generic-icon-button
+      color="secondary"
+      :icon-id="toggleViewIcon"
+      :tooltip="toggleViewTooltip"
+      @click="handleToggleTableView"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -65,6 +74,22 @@ export default Vue.extend({
      */
     items() {
       return documentModule.projectDocuments;
+    },
+    /**
+     * @return The toggle document view icon.
+     */
+    toggleViewIcon(): string {
+      return documentModule.isTableDocument
+        ? "mdi-file-tree"
+        : "mdi-table-multiple";
+    },
+    /**
+     * @return The toggle document view tooltip.
+     */
+    toggleViewTooltip(): string {
+      return documentModule.isTableDocument
+        ? "Switch to tree view"
+        : "Switch to table view";
     },
     /**
      * Switches documents when a document is selected.
@@ -104,6 +129,12 @@ export default Vue.extend({
     handleEditOpen(document: ProjectDocument) {
       this.editingDocument = document;
       this.isEditOpen = true;
+    },
+    /**
+     * Switches between document views.
+     */
+    handleToggleTableView() {
+      documentModule.toggleTableView();
     },
   },
 });

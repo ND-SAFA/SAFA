@@ -1,12 +1,12 @@
 import {
+  InternalJiraCredentials,
   JiraAccessToken,
   JiraCloudSite,
   JiraProject,
   JiraProjectList,
-  LocalStorageKeys,
 } from "@/types";
-import { logModule, sessionModule } from "@/store";
-import { authHttpClient, Endpoint } from "@/api";
+import { sessionModule } from "@/store";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * The formatted scopes of jira permissions being requested.
@@ -44,7 +44,6 @@ async function fetchAtlassian<T>(
   const resJson = (await response.json()) as T;
 
   if (!response.ok) {
-    logModule.onDevError("Unable to connect to Atlassian.");
     throw Error("Unable to connect to Atlassian.");
   } else {
     return resJson;
@@ -68,13 +67,15 @@ export function authorizeJira(): void {
 }
 
 /**
- * Exchanges an Atlassian access code for a API token.
+ * Exchanges an Atlassian access code for an API token.
  *
  * @param accessCode - The access code received from authorizing Jira.
  * @return The Jira access token.
  */
-export async function getJiraToken(accessCode: string): Promise<string> {
-  const authorization = await fetchAtlassian<JiraAccessToken>(
+export async function getJiraToken(
+  accessCode: string
+): Promise<JiraAccessToken> {
+  return fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -90,25 +91,18 @@ export async function getJiraToken(accessCode: string): Promise<string> {
       }),
     }
   );
-
-  localStorage.setItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN,
-    authorization.refresh_token
-  );
-
-  return authorization.access_token;
 }
 
 /**
  * Exchanges an Atlassian refresh token for an auth token.
  *
+ * @param refreshToken - The atlassian refresh token.
  * @return The Jira access token.
  */
-export async function getJiraRefreshToken(): Promise<string> {
-  const refreshToken = localStorage.getItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN
-  );
-  const authorization = await fetchAtlassian<JiraAccessToken>(
+export async function getJiraRefreshToken(
+  refreshToken: string
+): Promise<JiraAccessToken> {
+  return fetchAtlassian<JiraAccessToken>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -123,14 +117,12 @@ export async function getJiraRefreshToken(): Promise<string> {
       }),
     }
   );
-
-  return authorization.access_token;
 }
 
 /**
  * Exchanges an Atlassian access code for the list of cloud sites associated with the given user.
  *
- * @param accessToken - The access token received from authorizing jira.
+ * @param accessToken - The access token received from authorizing Jira.
  * @return The Jira sites for this user.
  */
 export async function getJiraCloudSites(
@@ -173,29 +165,29 @@ export async function getJiraProjects(
 }
 
 /**
+ * Saves a user's Jira credentials and primary organization.
+ *
+ * @param credentials - The access and refresh token received from authorizing Jira.
+ */
+export async function saveJiraCredentials(
+  credentials: InternalJiraCredentials
+): Promise<void> {
+  return authHttpClient<void>(Endpoint.jiraCredentials, {
+    method: "PUT",
+    body: JSON.stringify(credentials),
+  });
+}
+
+/**
  * Creates a new project based on a Jira project.
  *
- * @param accessToken - The access token received from authorizing Jira.
- * @param cloudId - The Jira cloud id for the current site.
  * @param projectId - The Jira project id to import.
  */
-export async function createJiraProject(
-  accessToken: string,
-  cloudId: string,
-  projectId: string
-): Promise<void> {
-  const refreshToken = localStorage.getItem(
-    LocalStorageKeys.JIRA_REFRESH_TOKEN
+export async function createJiraProject(projectId: string): Promise<void> {
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.jiraProject, { projectId }),
+    {
+      method: "POST",
+    }
   );
-  return authHttpClient<void>(Endpoint.jiraProject, {
-    method: "POST",
-    body: JSON.stringify({
-      cloudId,
-      projectId,
-      refreshToken,
-      bearerAccessToken: accessToken,
-      clientId: process.env.VUE_APP_JIRA_CLIENT_ID,
-      clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
-    }),
-  });
 }

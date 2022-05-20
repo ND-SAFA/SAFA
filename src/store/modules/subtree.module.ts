@@ -282,10 +282,6 @@ export default class SubtreeModule extends VuexModule {
    */
   get getHiddenChildrenByParentId(): (parentId: string) => string[] {
     return (parentId) => {
-      if (!this.collapsedParentNodes.includes(parentId)) {
-        return [];
-      }
-
       const childNodes = this.getSubtreeByArtifactId(parentId);
       const hiddenNodes = this.getHiddenSubtreeIds;
 

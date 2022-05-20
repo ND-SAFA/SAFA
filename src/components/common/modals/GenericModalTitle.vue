@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GenericIconButton from "./GenericIconButton.vue";
+import GenericIconButton from "../generic/GenericIconButton.vue";
 
 /**
  * Displays a generic modal title.

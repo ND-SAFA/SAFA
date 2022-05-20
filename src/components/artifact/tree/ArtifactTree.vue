@@ -1,7 +1,7 @@
 <template>
   <generic-cytoscape-controller
     :cyto-core-graph="cytoCoreGraph"
-    :class="isVisible ? 'artifact-tree visible' : 'artifact-tree'"
+    :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <template v-slot:elements>
       <artifact-node
@@ -69,10 +69,10 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return Whether the app is currently loading.
+     * @return Whether to render the artifact tree.
      */
-    isLoading(): boolean {
-      return appModule.getIsLoading;
+    isVisible(): boolean {
+      return !appModule.getIsLoading && !documentModule.isTableDocument;
     },
     /**
      * @return The artifact tree graph.
@@ -111,12 +111,6 @@ export default Vue.extend({
      */
     hiddenSubtreeIds(): string[] {
       return subtreeModule.getHiddenSubtreeIds;
-    },
-    /**
-     * @return Whether to render the artifact tree.
-     */
-    isVisible(): boolean {
-      return !this.isLoading && !documentModule.isTableDocument;
     },
   },
   mounted() {

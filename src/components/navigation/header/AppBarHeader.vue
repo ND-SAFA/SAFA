@@ -2,10 +2,8 @@
   <v-flex class="d-flex flex-row align-center">
     <v-flex class="d-flex flex-row align-center">
       <safa-icon />
-      <div>
-        <h1 class="text-h5 white--text pl-4">SAFA</h1>
-        <button-row :definitions="definitions" justify="start" />
-      </div>
+      <h1 class="text-h4 white--text ml-4">SAFA</h1>
+      <button-row :definitions="definitions" class="mx-3" />
     </v-flex>
 
     <div class="mr-5">

@@ -104,3 +104,19 @@ export interface MenuItem {
    */
   submenu?: MenuItem[];
 }
+
+/**
+ * Defines the cytoscape context menu instance.
+ */
+export interface CytoContextMenu {
+  /**
+   * Shows a menu item.
+   * @param id - The item id to show.
+   */
+  showMenuItem(id: string): void;
+  /**
+   * Hides a menu item.
+   * @param id - The item id to hide.
+   */
+  hideMenuItem(id: string): void;
+}

@@ -44,6 +44,7 @@ import { handleSetProjectDelta } from "@/api/handlers/delta-handler";
  * A modal for displaying delta versions.
  *
  * @emits `close` - On close.
+ * @emits `submit` - On submit.
  */
 export default Vue.extend({
   name: "DeltaVersionsModal",
@@ -94,7 +95,10 @@ export default Vue.extend({
         handleSetProjectDelta(
           this.project.projectVersion,
           this.selectedVersion,
-          () => this.$emit("close")
+          () => {
+            this.$emit("close");
+            this.$emit("submit");
+          }
         );
       }
     },

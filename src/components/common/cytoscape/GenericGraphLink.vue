@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import { TraceLink } from "@/types";
 import Vue, { PropType } from "vue";
+import { ArtifactDeltaState, TraceCytoCoreElement, TraceLink } from "@/types";
 import { deltaModule } from "@/store";
 
 /**
@@ -18,39 +18,43 @@ import { deltaModule } from "@/store";
 export default Vue.extend({
   name: "TraceLink",
   props: {
-    traceDefinition: Object as PropType<TraceLink>,
-    count: {
-      type: Number,
-      required: false,
+    traceDefinition: {
+      type: Object as PropType<TraceLink>,
+      required: true,
     },
+    count: Number,
     faded: Boolean,
   },
   computed: {
     /**
-     * @return The trace link's selector.
+     * @return The delta state of this trace link.
      */
-    selector() {
-      const { traceLinkId } = this.traceDefinition;
+    linkDeltaState(): ArtifactDeltaState {
+      if (!deltaModule.inDeltaView) {
+        return ArtifactDeltaState.NO_CHANGE;
+      }
 
-      return deltaModule.getTraceDeltaType(traceLinkId);
+      return (
+        deltaModule.getTraceDeltaType(this.traceDefinition.traceLinkId) ||
+        ArtifactDeltaState.NO_CHANGE
+      );
     },
     /**
      * @return The trace link's data definition.
      */
-    definition() {
+    definition(): TraceCytoCoreElement {
       const { sourceId, targetId, traceLinkId } = this.traceDefinition;
-      const count = this.count ? this.count : 1;
-      const deltaType = deltaModule.getTraceDeltaType(traceLinkId);
 
       return {
         data: {
           ...this.traceDefinition,
+          type: "edge",
           id: traceLinkId,
           // Reversed to show arrow toward parent.
           source: targetId,
           target: sourceId,
-          count,
-          deltaType,
+          count: this.count || 1,
+          deltaType: this.linkDeltaState,
           faded: this.faded,
         },
         classes: sourceId === targetId ? ["loop"] : [],

@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ModalSize } from "@/types";
-import GenericModal from "./GenericModal.vue";
+import GenericModal from "../modals/GenericModal.vue";
 import GenericStepper from "./GenericStepper.vue";
 
 /**

@@ -31,6 +31,7 @@
       :is-open="isModalOpen"
       :project="project"
       @close="isModalOpen = false"
+      @submit="handleSubmit"
     />
   </v-container>
 </template>
@@ -93,12 +94,17 @@ export default Vue.extend({
      */
     handleChange(): void {
       if (!this.isDeltaViewEnabled) {
-        deltaModule.setIsDeltaViewEnabled(true);
         this.isModalOpen = true;
       } else {
         deltaModule.setIsDeltaViewEnabled(false);
         handleReloadProject();
       }
+    },
+    /**
+     * Enables delta view.
+     */
+    handleSubmit(): void {
+      deltaModule.setIsDeltaViewEnabled(true);
     },
   },
   watch: {

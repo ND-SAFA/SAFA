@@ -83,4 +83,5 @@ export type EmptyLambda = () => void;
  */
 export enum LocalStorageKeys {
   JIRA_REFRESH_TOKEN = "jrt",
+  JIRA_CLOUD_ID = "jci",
 }

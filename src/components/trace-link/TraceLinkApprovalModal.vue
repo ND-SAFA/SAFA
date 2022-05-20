@@ -4,6 +4,7 @@
     :is-open="isOpen"
     :actions-height="0"
     @close="$emit('close')"
+    size="l"
   >
     <template v-slot:body>
       <trace-link-display
@@ -13,8 +14,11 @@
         :target-body="targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
+        :show-delete="!canBeModified"
         @link:approve="handleApprove"
         @link:decline="handleDecline"
+        @link:delete="handleDecline"
+        @close="$emit('close')"
       />
     </template>
   </generic-modal>
@@ -24,7 +28,7 @@
 import Vue, { PropType } from "vue";
 import { TraceApproval, TraceLink, TraceType } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
-import { GenericModal } from "@/components/common/generic";
+import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import { artifactModule } from "@/store";
 

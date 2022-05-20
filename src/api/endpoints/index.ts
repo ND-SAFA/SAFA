@@ -8,3 +8,4 @@ export * from "./document-api";
 export * from "./jira-api";
 export * from "./warning-api";
 export * from "./job-api";
+export * from "./github-api";

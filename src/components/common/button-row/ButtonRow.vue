@@ -1,28 +1,25 @@
 <template>
-  <v-row class="ma-0 pa-0">
-    <v-col
-      v-for="definition in definitions"
-      :key="definition.label"
-      :cols="12 / definitions.length"
-    >
-      <v-row :justify="justify">
-        <icon-button
-          v-if="!definition.isHidden && definition.type === iconType"
-          :definition="definition"
-        />
-        <checkmark-menu
-          v-else-if="
-            !definition.isHidden && definition.type === checkmarkMenuType
-          "
-          :definition="definition"
-        />
-        <list-menu
-          v-else-if="!definition.isHidden && definition.type === listMenuType"
-          :definition="definition"
-        />
-      </v-row>
-    </v-col>
-  </v-row>
+  <div class="d-flex flex-row">
+    <template v-for="definition in definitions">
+      <icon-button
+        v-if="!definition.isHidden && definition.type === iconType"
+        :key="definition.label"
+        :definition="definition"
+      />
+      <checkmark-menu
+        v-else-if="
+          !definition.isHidden && definition.type === checkmarkMenuType
+        "
+        :key="definition.label"
+        :definition="definition"
+      />
+      <list-menu
+        v-else-if="!definition.isHidden && definition.type === listMenuType"
+        :key="definition.label"
+        :definition="definition"
+      />
+    </template>
+  </div>
 </template>
 
 <script lang="ts">
@@ -40,11 +37,7 @@ export default Vue.extend({
   components: { IconButton, CheckmarkMenu, ListMenu },
   props: {
     definitions: Array as PropType<ButtonDefinition[]>,
-    justify: {
-      type: String,
-      required: false,
-      default: "center",
-    },
+    large: Boolean,
   },
   data() {
     return {

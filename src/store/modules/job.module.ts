@@ -10,16 +10,18 @@ export default class JobModule extends VuexModule {
   /**
    * The list of user jobs.
    */
-  private _jobs: Job[] = [];
-
-  private _selectedJobIndex = -1;
+  private jobs: Job[] = [];
+  /**
+   * The index of the selected job.
+   */
+  private selectedJob = -1;
 
   @Action
   /**
    * Adds job to list of jobs if new job, otherwise updates previous one.
    */
   addOrUpdateJob(job: Job): void {
-    const newJobs = this._jobs.filter((j) => j.id !== job.id).concat([job]);
+    const newJobs = this.jobs.filter((j) => j.id !== job.id).concat([job]);
     this.SET_JOBS(newJobs);
   }
 
@@ -28,7 +30,7 @@ export default class JobModule extends VuexModule {
    * Selects the given job if exists in jobs.
    */
   selectJob(job: Job): void {
-    this._jobs.forEach((j, i) => {
+    this.jobs.forEach((j, i) => {
       if (j.id === job.id) {
         this.SET_SELECT_JOB_INDEX(i);
       }
@@ -37,12 +39,12 @@ export default class JobModule extends VuexModule {
 
   @Action
   /**
-   * Removes job matching id of given job
+   * Removes job matching id of given job.
    */
   deleteJob(job: Job): void {
     this.SET_SELECT_JOB_INDEX(-1);
     setTimeout(() => {
-      this.SET_JOBS(this._jobs.filter((j) => j.id != job.id));
+      this.SET_JOBS(this.jobs.filter((j) => j.id != job.id));
     }, 500);
   }
 
@@ -51,7 +53,7 @@ export default class JobModule extends VuexModule {
    * Sets the current user's jobs.
    */
   SET_JOBS(jobs: Job[]): void {
-    this._jobs = jobs;
+    this.jobs = jobs;
   }
 
   @Mutation
@@ -59,24 +61,29 @@ export default class JobModule extends VuexModule {
    * Sets the currently selected job index, otherwise -1.
    */
   SET_SELECT_JOB_INDEX(index: number): void {
-    this._selectedJobIndex = index;
+    this.selectedJob = index;
   }
 
   /**
-   * @returns Returns job with given id if it exists.
-   * IndexOutOfBounds otherwise.
+   * @returns The job with given id.
    */
   get getJob(): (id: string) => Job {
     return (jobId: string) => {
-      return this._jobs.filter((j) => j.id === jobId)[0];
+      return this.jobs.filter((j) => j.id === jobId)[0];
     };
   }
 
-  get jobs(): Job[] {
-    return this._jobs;
+  /**
+   * @returns All current jobs.
+   */
+  get currentJobs(): Job[] {
+    return this.jobs;
   }
 
-  get selectedJob(): number {
-    return this._selectedJobIndex;
+  /**
+   * @returns The index of the selected job.
+   */
+  get selectedJobIndex(): number {
+    return this.selectedJob;
   }
 }

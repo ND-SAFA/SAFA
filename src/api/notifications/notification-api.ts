@@ -2,15 +2,15 @@ import SockJS from "sockjs-client";
 import Stomp, { Client, Frame } from "webstomp-client";
 import { Job, ProjectMessage, VersionMessage } from "@/types";
 import { jobModule, logModule, projectModule, sessionModule } from "@/store";
-import { baseURL } from "@/api/util";
+import { baseURL, Endpoint, fillEndpoint } from "@/api/util";
 import {
   getProjectMembers,
   getProjectVersion,
   handleDocumentReload,
-  handleReloadWarnings,
-  handleSetProject,
   handleReloadArtifacts,
   handleReloadTraceLinks,
+  handleReloadWarnings,
+  handleSetProject,
 } from "@/api";
 
 const WEBSOCKET_URL = () => `${baseURL}/websocket`;
@@ -87,15 +87,14 @@ function connect(
           logModule.onDevMessage("Web Socket reconnected to server.");
         }
         logModule.onDevMessage("Websocket connection successful.");
+        logModule.onDevMessage(`Subscriptions: ${stomp.subscriptions}`);
         clearInterval(recInterval);
         currentReconnectAttempts = 0;
-        console.log("Subscriptions:", stomp.subscriptions);
         resolve();
       },
       () => {
         logModule.onDevMessage("Re-connecting with WebSocket.");
         clearInterval(recInterval);
-        //TODO: Check if out of date during time disconnected.
         recInterval = setInterval(function () {
           if (currentReconnectAttempts < maxReconnectAttempts) {
             connect(maxReconnectAttempts, reconnectWaitTime, true)
@@ -143,14 +142,18 @@ export function connectAndSubscribeToVersion(
     connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME)
       .then(() => {
         clearSubscriptions();
-        const projectSubscription = `/topic/projects/${projectId}`;
-        const versionSubscription = `/topic/revisions/${versionId}`;
-        stompClient.subscribe(projectSubscription, async (frame) => {
-          await projectMessageHandler(projectId, frame);
-        });
-        stompClient.subscribe(versionSubscription, async (frame) => {
-          await versionMessageHandler(versionId, frame);
-        });
+        stompClient.subscribe(
+          fillEndpoint(Endpoint.submitJobProject, { projectId }),
+          async (frame) => {
+            await projectMessageHandler(projectId, frame);
+          }
+        );
+        stompClient.subscribe(
+          fillEndpoint(Endpoint.submitJobVersion, { projectId }),
+          async (frame) => {
+            await versionMessageHandler(versionId, frame);
+          }
+        );
         resolve();
       })
       .catch(reject);
@@ -219,8 +222,10 @@ export function connectAndSubscribeToJob(jobId: string): Promise<void> {
     }
     connect(MAX_RECONNECT_ATTEMPTS, RECONNECT_WAIT_TIME).then(() => {
       clearSubscriptions();
-      const jobSubscription = `/topic/jobs/${jobId}`;
-      stompClient.subscribe(jobSubscription, jobMessageHandler);
+      stompClient.subscribe(
+        fillEndpoint(Endpoint.listenForJob, { jobId }),
+        jobMessageHandler
+      );
       resolve();
     });
   });
@@ -229,5 +234,5 @@ export function connectAndSubscribeToJob(jobId: string): Promise<void> {
 function jobMessageHandler(frame: Frame): void {
   const message: Job = JSON.parse(frame.body) as Job;
   jobModule.addOrUpdateJob(message);
-  console.log("New Job message:", message);
+  logModule.onDevMessage(`New Job message: ${message}`);
 }

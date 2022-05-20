@@ -34,7 +34,8 @@ export async function handleUploadProjectVersion(
 
     const uploadFlatFiles = async () => {
       const job = await handleJobSubmission(versionId, formData);
-      logModule.onSuccess(`Job has been successfully submitted.`);
+
+      logModule.onSuccess(`Project upload has been submitted.`);
 
       return job;
     };
@@ -43,12 +44,11 @@ export async function handleUploadProjectVersion(
       try {
         appModule.onLoadStart();
         await connectAndSubscribeToVersion(projectId, versionId);
-        await navigateTo(Routes.UPLOAD_STATUS);
         await uploadFlatFiles();
       } catch (e) {
         logModule.onError(e.message);
-        await navigateTo(Routes.UPLOAD_STATUS);
       } finally {
+        await navigateTo(Routes.UPLOAD_STATUS);
         appModule.onLoadEnd();
       }
     } else {

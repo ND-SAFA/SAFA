@@ -11,3 +11,4 @@ export * from "./create-project-handler";
 export * from "./load-version-handler";
 export * from "./edit-project-handler";
 export * from "./member-handler";
+export * from "./job-handler";

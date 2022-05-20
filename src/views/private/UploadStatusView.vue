@@ -80,7 +80,7 @@
 
                 <div class="d-flex">
                   <v-btn color="error" class="mr-1" @click="deleteJob(upload)">
-                    Delete Job
+                    Delete Upload
                   </v-btn>
                   <v-btn
                     color="primary"
@@ -103,7 +103,7 @@ import Vue from "vue";
 import { navigateBack } from "@/router";
 import { PrivatePage } from "@/components";
 import { setTimeout } from "timers";
-import { connectAndSubscribeToJob, deleteJobById, getUserJobs } from "@/api";
+import { connectAndSubscribeToJob, getUserJobs, handleDeleteJob } from "@/api";
 import { Job, JobStatus, JobType } from "@/types";
 import { jobModule } from "@/store";
 import { capitalize } from "@/util";
@@ -126,15 +126,23 @@ export default Vue.extend({
     this.reloadJobs();
   },
   computed: {
+    /**
+     * Returns the current jobs.
+     */
     uploads(): Job[] {
-      return jobModule.jobs;
+      return jobModule.currentJobs;
     },
+    /**
+     * Returns the current selected job index.
+     */
     selectedJobIndex(): number {
-      // allows us to watch it below
-      return jobModule.selectedJob;
+      return jobModule.selectedJobIndex;
     },
   },
   watch: {
+    /**
+     * Synchronizes what jobs are selected with the selected index.
+     */
     selectedJobIndex(newIndex: number): void {
       if (newIndex == -1) {
         this.selectedJobs = [];
@@ -150,6 +158,9 @@ export default Vue.extend({
     handleGoBack() {
       navigateBack();
     },
+    /**
+     * @return The display name for a job type.
+     */
     formatJobType(jobType: JobType) {
       return capitalize(
         jobType
@@ -158,24 +169,47 @@ export default Vue.extend({
           .join(" ")
       );
     },
+    /**
+     * @returns Whether the status is completed.
+     */
     isCompleted(status: JobStatus) {
       return status === JobStatus.COMPLETED;
     },
+    /**
+     * @returns Whether the status is in progress.
+     */
     isInProgress(status: JobStatus) {
       return status === JobStatus.IN_PROGRESS;
     },
+    /**
+     * @returns Whether the status is cancelled.
+     */
     isCancelled(status: JobStatus) {
       return status === JobStatus.CANCELLED;
     },
+    /**
+     * @returns The display name for when this job was updated.
+     */
     getUpdatedText(timestamp: string) {
       return `Last Update: ${this.stringifyTimestamp(timestamp)}`;
     },
+    /**
+     * @returns The display name for when this job was completed.
+     */
     getCompletedText(timestamp: string) {
       return `Upload Completed: ${this.stringifyTimestamp(timestamp)}`;
     },
+    /**
+     * // TODO: generalize
+     * @returns The display name for a job status.
+     */
     formatStatus(status: JobStatus): string {
       return capitalize(status.toLowerCase().split("_").join(" "));
     },
+    /**
+     * // TODO: generalize
+     * @returns The display name for a timestamp.
+     */
     stringifyTimestamp(timestamp: string) {
       const options = {
         year: "numeric",
@@ -188,6 +222,10 @@ export default Vue.extend({
       const date = new Date(timestamp);
       return date.toLocaleDateString("en-US", options);
     },
+    /**
+     * // TODO: generalize
+     * @returns The color for a job status.
+     */
     getStatusColor(status: JobStatus) {
       switch (status) {
         case JobStatus.COMPLETED:
@@ -200,19 +238,25 @@ export default Vue.extend({
           return "";
       }
     },
-    async deleteJob(job: Job): Promise<void> {
-      await deleteJobById(job.id);
-      jobModule.deleteJob(job);
+    /**
+     * Attempts to delete a job.
+     * @param job - The job to delete.
+     */
+    deleteJob(job: Job): void {
+      handleDeleteJob(job, {});
     },
+    /**
+     * Reloads the list of jobs.
+     */
     async reloadJobs() {
       const jobs = await getUserJobs();
-      let currentJob = jobs[0];
-      jobModule.SET_JOBS(jobs);
+
       for (const job of jobs) {
         await connectAndSubscribeToJob(job.id);
-        currentJob = job;
       }
-      jobModule.selectJob(currentJob);
+
+      jobModule.SET_JOBS(jobs);
+      jobModule.selectJob(jobs[jobs.length - 1]);
     },
   },
 });

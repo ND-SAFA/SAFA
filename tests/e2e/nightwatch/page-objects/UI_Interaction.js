@@ -28,12 +28,16 @@ module.exports = {
         artifactCreatorWarning                  : 'div[class="col"][style="white-space: nowrap;"]',
         artifactCreatorNameWarning              : 'div[class="v-messages__message"]',
         traceLinkCreatorWarning                 : 'div[class="col"][style="white-space: nowrap;"]',
+        traceLinkNoInputWarning                 : 'div[class="ma-1 pa-0 text-center white--text col col-9 align-self-center"]',
+        projectSelectionMessage                 : 'td[colspan="5"]',
 
         /* Image Elements */
         loginImageIcon                          : '[src="/img/SAFA.28196e73.png"]',
         checkMarkIcon                           : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-check theme--light success--text"]:last-child',
+        errorMarkIcon                           : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-close theme--light error--text"]:last-child',
         dropDownIcon                            : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-chevron-down theme--light"]',
-
+        deleteProjectIcon                       : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]',
+        closeWindowIcon                         : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-close theme--light"]',
         /* Tim Graph Elements */
         timGraph                                : 'canvas[data-id="layer1-drag"]',
         zoomInButton                            : 'button[id="zoom-in"]',
@@ -75,7 +79,7 @@ module.exports = {
 
         clickButton(lableName) {
             const page = this;
-            const labelNameLocation = `//*[contains(text(),'${lableName}')]`;
+            const labelNameLocation = `(//span[contains(text(),'${lableName}')])[last()]`;
 
             page
                 .useXpath()
@@ -134,20 +138,30 @@ module.exports = {
             return this;
         },
 
-        clickSelectorButton(sourceName, targetName) {
+        clickSelectorTraceLinks(sourceName, targetName) {
             const page = this;
 
+            /* Element Names */
+            const createNewTraceLinkButton      = 'Create new trace matrix';
+            const sourceTraceLinkButton         = ' Select Source ';
+            const targetTraceLinkButton         = ' Select Target ';
+            const createTraceLinkButton         = 'Create Trace Matrix ';
+            /* Xpaths */
+            const sourceOptionXpath             = `//*[contains(text(),'${sourceName}') and @class="v-btn__content" ]`;
+            const targetOptionXpath             = `(//*[contains(text(),'${targetName}') and @class="v-btn__content" ])[last()]`;
             page
-                .clickButton(' Create new trace matrix')
-                .clickButton(' Select Source ')
+                .clickButton(createNewTraceLinkButton)
+                .clickButton(sourceTraceLinkButton)
                 .useXpath()
-                .click(`//*[contains(text(),'${sourceName}') and @class="v-btn__content" ]`)
-                .clickButton(' Select Target ')
+                .moveToElement(sourceOptionXpath, undefined, undefined)
+                .click(sourceOptionXpath)
+                .clickButton(targetTraceLinkButton)
                 .useXpath()
-                .click(`(//*[contains(text(),'${targetName}') and @class="v-btn__content" ])[last()]`)
-                .clickButton(' Create Trace Matrix ')
-                .useCss()
-                .pause(1000)
+                .moveToElement(targetOptionXpath, undefined, undefined)
+                .click(targetOptionXpath)
+                .clickButton(createTraceLinkButton)
+                .useCss();
+            
             return this;
         },
 
@@ -200,6 +214,33 @@ module.exports = {
                 .assert.visible(elementLocation, message);
             
             page.useCss();
+
+            return this;
+        },
+
+        checkUploadSuccess(message) {
+            const page = this;
+            const checkMarkIcon = `(.//div//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-check theme--light success--text"])[last()]`
+
+            page    
+                .useXpath()
+                .assert.visible(checkMarkIcon, message)
+                .useCss();
+
+            return this;
+        },
+
+        checkUploadFailure(message) {
+            const page = this;
+            const checkMarkIcon = `(.//div//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-close theme--light error--text"])[last()]`
+
+            page
+                .useXpath()
+                .expect.element(checkMarkIcon)
+                .to.be.visible
+
+                .assert.not.visible(checkMarkIcon, message)
+                .useCss();
 
             return this;
         },

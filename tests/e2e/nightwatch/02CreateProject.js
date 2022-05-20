@@ -67,28 +67,28 @@ module.exports = {
             .takeScreenShot(screenShotDestination + 'Artifacts_Successfully_Uploaded.png')
 
             /***************** Now lets upload the Trace Links ****************************/
-            .clickSelectorButton('Requirements', 'Hazards')
+            .clickSelectorTraceLink('Requirements', 'Hazards')
             .uploadFileWithParameters(TestDataLocation, 'Requirement2Hazard.csv')
             .useXpath()
             .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
 
-            .clickSelectorButton(' Environmental Assumptions ', ' Hazards ')
+            .clickSelectorTraceLink(' Environmental Assumptions ', ' Hazards ')
             .uploadFileWithParameters(TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
             .useXpath()
             .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
             
 
-            .clickSelectorButton(' Designs ', ' Designs ')
+            .clickSelectorTraceLink(' Designs ', ' Designs ')
             .uploadFileWithParameters(TestDataLocation, 'Design2Design.csv')
             .useXpath()
             .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
 
-            .clickSelectorButton(' Requirements ', ' Requirements ')
+            .clickSelectorTraceLink(' Requirements ', ' Requirements ')
             .uploadFileWithParameters(TestDataLocation, 'Requirement2Requirement.csv')
             .useXpath()
             .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
 
-            .clickSelectorButton(' Hazards ', ' Hazards ')
+            .clickSelectorTraceLink(' Hazards ', ' Hazards ')
             .uploadFileWithParameters(TestDataLocation, 'Hazard2Hazard.csv')
             .useXpath()
             .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)

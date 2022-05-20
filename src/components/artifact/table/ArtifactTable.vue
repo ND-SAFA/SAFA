@@ -16,9 +16,26 @@
           @filter="selectedDeltaTypes = $event"
         />
       </template>
+
+      <!--      <template v-slot:item.TEST1="{ item }">-->
+      <!--        <span>Top</span>-->
+      <!--        <v-divider />-->
+      <!--        <span>Bottom</span>-->
+      <!--      </template>-->
+      <!--      <template v-slot:item.TEST2="{ item }">-->
+      <!--        <span>1</span>-->
+      <!--        <v-divider />-->
+      <!--        <span>2</span>-->
+      <!--        <v-divider />-->
+      <!--        <span>3</span>-->
+      <!--        <v-divider />-->
+      <!--        <span>4</span>-->
+      <!--      </template>-->
+
       <template v-slot:item.type="{ item }">
         <artifact-table-chip :text="item.type" />
       </template>
+
       <template
         v-for="{ id, dataType, required } in columns"
         v-slot:[`item.${id}`]="{ item }"
@@ -44,6 +61,7 @@
           />
         </div>
       </template>
+
       <template v-slot:item.actions="{ item }">
         <generic-icon-button
           icon-id="mdi-view-split-vertical"
@@ -61,6 +79,7 @@
           @click="handleDelete(item)"
         />
       </template>
+
       <template v-slot:footer>
         <v-row justify="end" class="mr-2 mt-1">
           <generic-icon-button
@@ -155,6 +174,14 @@ export default Vue.extend({
           text: "Name",
           value: "name",
         },
+        // {
+        //   text: "Test 1",
+        //   value: "TEST1",
+        // },
+        // {
+        //   text: "Test 2",
+        //   value: "TEST2",
+        // },
         {
           text: "Type",
           value: "type",

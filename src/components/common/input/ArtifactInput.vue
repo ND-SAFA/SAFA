@@ -26,7 +26,7 @@ import Vue from "vue";
 import { Artifact } from "@/types";
 import { artifactModule } from "@/store";
 import { getArtifactTypePrintName } from "@/util";
-import { GenericArtifactBodyDisplay } from "@/components";
+import { GenericArtifactBodyDisplay } from "@/components/common/generic";
 
 /**
  * An input for artifacts.

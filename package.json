@@ -11,6 +11,7 @@
     "serve:bend": "vue-cli-service serve --mode=bend",
     "build": "vue-cli-service build",
     "test": "nightwatch",
+    "test:debug": "node --inspect-brk node_modules/nightwatch/bin/nightwatch",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",

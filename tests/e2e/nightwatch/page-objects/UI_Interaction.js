@@ -30,7 +30,9 @@ module.exports = {
         traceLinkCreatorWarning                 : 'div[class="col"][style="white-space: nowrap;"]',
         traceLinkNoInputWarning                 : 'div[class="ma-1 pa-0 text-center white--text col col-9 align-self-center"]',
         projectSelectionMessage                 : 'td[colspan="5"]',
-
+        projectCreationSuccessfulMessage        : 'div[class="ma-1 pa-0 text-center white--text col col-9 align-self-center"]',
+        rightClickMenu                          : `button[id="add-artifact"]`,
+        artifactTypeDropDown                    : `div[class="v-select__slot"] label[class="v-label theme--light"]`,
         /* Image Elements */
         loginImageIcon                          : '[src="/img/SAFA.28196e73.png"]',
         checkMarkIcon                           : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-check theme--light success--text"]:last-child',
@@ -38,11 +40,12 @@ module.exports = {
         dropDownIcon                            : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-chevron-down theme--light"]',
         deleteProjectIcon                       : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]',
         closeWindowIcon                         : 'i[aria-hidden="true"][class="v-icon notranslate mdi mdi-close theme--light"]',
+        
         /* Tim Graph Elements */
         timGraph                                : 'canvas[data-id="layer1-drag"]',
         zoomInButton                            : 'button[id="zoom-in"]',
         centerGraphButton                       : '(//*[@aria-expanded="false" and @type="button" and @class="v-btn v-btn--icon v-btn--round theme--light v-size--default secondary--text"])[5]',
-        
+        addArtifactButton                       : 'button[id="add-artifact"]',
 
     },
 
@@ -52,8 +55,8 @@ module.exports = {
             /* Set the page constant */
             const page = this;
             
-            const textBoxLocation = `//*[contains(text(),'${textBoxName}')]`;
-            const textBoxLocationInput = `//*[contains(text(),'${textBoxName}')]/following-sibling::*[1]`;
+            const textBoxLocation = `//label[contains(text(),'${textBoxName}')]`;
+            const textBoxLocationInput = `//label[contains(text(),'${textBoxName}')]/following-sibling::*[1]`;
             /* Set the text box location */
             page
                 .useXpath()
@@ -244,6 +247,22 @@ module.exports = {
 
             return this;
         },
+
+        findAndTestTIMNode(nodeName, TIMNodelocation, suppressOutput, message) {
+            const page = this;
+            const nodeLocation = `(//span[contains(text(), '${nodeName}') and @class="artifact-sub-header text-body-1"])[position()=1]`
+            TIMNodelocation[nodeName] = nodeLocation;
+            
+            page.useXpath();
+            
+            if (!suppressOutput) {
+                page.assert.visible(nodeLocation, message);
+            }
+
+            page.useCss();
+
+            return this;
+        }
 
     }]
 

@@ -14,6 +14,8 @@ FullTest.js - Created by: Jeremy Arellano
             be commented back into the test.
         - Line 163 is commented out due to a bug with generating the TIM Grpah, this will be uncommented in future releases.
           However, on a normal run the test would fail because of this since this is an test failure condition.
+        - Some of the elements on the website currently could be renamed to have more distinction accrose from each other, this
+           will make some elements separated from each other and easier to test.
 
 *********************************************************/
 
@@ -64,11 +66,24 @@ module.exports = {
         const OpenProjectButton                 = 'Open Project';
         const deleteingProjectInputField        = `Type "${projectName}"`;
         const deleteProjectButton               = 'Delete';
+        const F4NodeName                        = 'F4';
+        const addArtifactButton                 = 'Add Artifact';
+        const addArtifactInputField             = 'Artifact Name';
+        
         
         /* Element Xpath Values */
         const dropDownIcon_traceLink            = '(.//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-chevron-down theme--light"])[9]'; // Note, this will only work for one specific use
-
-
+        const centerGraphButton                 = `span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-graphql theme--light"]`;
+        const addArtifactHazardsOptionDropDown  = `(//div[contains(text(),'Hazard.csv') ])[last()]`
+        let TIMNodelocation                     = {};
+        const artifactTypeDropDown              = `(//label[contains(text(), 'Artifact Type')]/following-sibling::input)[1]`;
+        const deleteProjectIcon                 = `button[class="v-btn v-btn--icon v-btn--round theme--light v-size--default"] span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]`
+        const deleteProjectdeleteButton         = `button[type="button"][class="ml-auto v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default error"] span[class="v-btn__content"]`;
+        const openProjectCloseWindowButton      = `(.//button[@type="button"][@class="v-btn v-btn--icon v-btn--round theme--light v-size--default"]//span[@class="v-btn__content"]//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-close theme--light"])[2]`;
+        const artifactViewerTitle               = `h1[class="text-h6 artifact-title"]`
+        const artifactViewerDescription         = `p[class="text-body-1"]`  
+        
+        
         page 
             /*  Navigate to the website and verify elements have properly loaded */
             .logToConsole('Navigating to the website')
@@ -224,19 +239,56 @@ module.exports = {
             .clickButton(createProjectButton)
             .pause(2000)
             .waitForElementPresent('@timGraph', 5000, false, "UI: TIM Graph is visible")
-            .takeScreenShot(screenShotDestination + 'Project_Creation_Successful.png')
             .pause(5000)
+            .waitForElementPresent('@projectCreationSuccessfulMessage', 5000, true, "UI: Project success message appears in view")
+            .takeScreenShot(screenShotDestination + 'Project_Creation_Successful.png')
+            
+            /* Testing TIM Graph Node */
+            .logToConsole('Testing TIM Graph Node')
+            .click(centerGraphButton)
+            .findAndTestTIMNode(F4NodeName, TIMNodelocation, 0, 'UI: F4 Node was found and interactable')
+            .useXpath().rightClick(TIMNodelocation.F4).useCss()
+            .waitForElementVisible('@rightClickMenu', 5000, true, "UI: Right click menu is visible")
+            .takeScreenShot(screenShotDestination + 'TIM_Node_Right_Click_Menu.png')
 
+            /* Adding a new node to the graph */
+            .logToConsole('Adding a new node to the graph')
+            .click('@addArtifactButton')
+            .fillInTextBox('Test_Node', addArtifactInputField)
+            .useXpath().click(artifactTypeDropDown).useCss()
+            .useXpath().click(addArtifactHazardsOptionDropDown).useCss()
+            .fillInTextBox('This is a new node', 'Artifact Summary')
+            .fillInTextBox('This is a new node', 'Artifact Body')
+            .clickButton('Save')
+            .click(centerGraphButton)
+            .findAndTestTIMNode('Test_Node', TIMNodelocation, 0, 'UI: Test_Node was found and interactable')
 
+            /* View Details of an Artifact */
+            .logToConsole('Viewing Details of an Artifact')
+            .useXpath().rightClick(TIMNodelocation.TestNode).useCss()
+            .clickButton('View Artifact')
+            .waitForElementVisible(artifactViewerTitle, 5000, "UI: Artifact Viewer is Visible")
+            .waitForElementVisible(artifactViewerDescription, 5000, "UI: Artifact Description is Visible")
+            .takeScreenShot(screenShotDestination + 'ArtifactViewer.png')
+            
+            /* Drag and Drop an Artifact */
+            .logToConsole('Drag and Drop an Artifact')
+            .click(centerGraphButton)
+            .useXpath().moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
+            .dragAndDrop(TIMNodelocation.Test_Node, {x: 100, y: 100}).useCss()
+            .takeScreenShot(screenShotDestination + 'F15Node_Dragged.png')
 
-            /* Deleting the project */
+            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
+
+            /* Deleting the project (Add 1 to the closewindowiconbutton to every window open)*/
             .logToConsole('Deleting the project')
             .clickSelector(projectDropDownGloabl, OpenProjectButton)
-            .click('@deleteProjectIcon')
+            .click(deleteProjectIcon)
             .fillInTextBox(projectName, deleteingProjectInputField)
-            .clickButton(deleteProjectButton)
+            .click(deleteProjectdeleteButton)
+            .takeScreenShot(screenShotDestination + 'Project_Deletion_Successful.png')
             .assert.visible('@projectSelectionMessage', "WebAPI: Project has successfully been deleted")
-            .click('@closeWindowIcon')
+            .useXpath().click(openProjectCloseWindowButton).useCss()
 
 
             /* Logout of the website */

@@ -1,0 +1,933 @@
+id,summary,content
+FullMissionPlan.java,,"package edu.nd.dronology.services.extensions.missionplanning.v1;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.json.JSONException;
+
+import edu.nd.dronology.core.DronologyConstants;
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.vehicle.IUAVProxy;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+import edu.nd.dronology.services.extensions.missionplanning.plan.IExecuteableMissionPlan;
+import edu.nd.dronology.services.extensions.missionplanning.plan.MissionUtil;
+import edu.nd.dronology.services.extensions.missionplanning.plan.UAVMissionPlan;
+import edu.nd.dronology.services.extensions.missionplanning.sync.SynchronizationManager;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.TaskFactory;
+import edu.nd.dronology.services.instances.dronesetup.DroneSetupService;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
+
+/**
+ * 
+ * Manages a mission plan. Each Mission plan has one <code>FullMissionPlan</code> instance, and one <code>UAVMissionPlan</code> instance for each UAV in the Mission plan. <br>
+ * Each of the UAV's individual mission plans are composed of MissionTasks. <br>
+ * Once the entire mission plan is loaded, a thread is created which checks each of the individual UAVMissionPlans to determine if they can start the next task.
+ * 
+ *@author Jane Cleland-Huang
+ */
+@Deprecated
+public class FullMissionPlan implements IExecuteableMissionPlan {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(FullMissionPlan.class);
+
+	private Map<String, UAVMissionPlan> uavMissionPlans;
+	private SynchronizationManager synchPointMgr;
+	private String mission;
+
+	/**
+	 * Constructs the CoordinatedMission instance. A mission consists of one or more UAVs, each of which has a set of assigned tasks and synchronization points.
+	 * 
+	 * @param mission
+	 */
+	public FullMissionPlan(String mission) {
+		this.mission = mission;
+		uavMissionPlans = new HashMap<>();
+		synchPointMgr = SynchronizationManager.getInstance();
+
+	}
+
+	/**
+	 * Loads mission from JSON file. Currently hard coded. 
+	 * 
+	 * @param mission
+	 * @throws MissionExecutionException
+	 */
+	private void loadMission(String mission) throws MissionExecutionException {
+		JSONMissionPlanReader jsonReader = new JSONMissionPlanReader(this);
+		try {
+			jsonReader.parseMission(mission);
+		} catch (IOException | JSONException e) {
+			throw new MissionExecutionException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Adds an additional UAV to the mission plan. Creates the <code>UAVMissionTasks</code> instance and passes it a reference to the <code>synchPointMgr</code>
+	 * 
+	 * @param uavID
+	 *          the ID of the UAV
+	 * @throws MissionExecutionException
+	 */
+	public void addUAV(String uavID) throws MissionExecutionException {
+		UAVMissionPlan plan = new UAVMissionPlan(uavID, synchPointMgr);
+		if (uavMissionPlans.containsKey(uavID)) {
+			throw new MissionExecutionException(""Mission Plan for UAV '"" + uavID + ""' already defined"");
+		}
+		uavMissionPlans.put(uavID, plan);
+	}
+
+	public void removeUAV(String uavID) {
+		uavMissionPlans.remove(uavID);
+	}
+
+	/**
+	 * Assigns a task to a specific UAV
+	 * 
+	 * @param uavID
+	 *          UAV Identifier
+	 * @param task
+	 *          Task to perform (e.g., Route, Waypoint, Synchronize, FlightPattern)
+	 * @param taskID
+	 *          Task specifics (e.g., specific waypoint, route name etc)
+	 * @throws MissionExecutionException
+	 */
+	public void addTask(String uavID, String task, String taskID, Object... params) throws MissionExecutionException {
+		for (UAVMissionPlan plan : uavMissionPlans.values()) {
+			if (plan.getUavID().equals(uavID)) {
+				plan.addTask(TaskFactory.getTask(task, uavID, taskID, params), synchPointMgr);
+				return;
+			}
+		}
+		throw new MissionExecutionException(""UAVMissionPlan '"" + uavID + ""' not available!"");
+	}
+
+	@Override
+	public boolean isMissionActive() {
+		for (UAVMissionPlan plan : uavMissionPlans.values()) {
+			if (plan.hasTasks()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Build all synch points
+	 */
+	private void buildAllSynchPoints() {
+		uavMissionPlans.forEach((uavId, plan) -> {
+			plan.buildSynchPoints();
+		});
+	}
+
+	/**
+	 * Activates next task in each UAV mission, if there is no unfinished active task
+	 * 
+	 * @throws MissionExecutionException
+	 */
+	@Override
+	public void checkAndActivateTask() throws MissionExecutionException {
+		for (UAVMissionPlan plan : uavMissionPlans.values()) {
+			if (!plan.hasActiveTask()) {
+				plan.activateNextTask();
+			}
+		}
+	}
+
+	/**
+	 * Expands flight pattern tasks (e.g., coordinatedTakeOff or coordinatedLanding)
+	 * 
+	 * @throws MissionExecutionException
+	 *   
+	 */
+	private void expandAllTasks() throws MissionExecutionException {
+		for (UAVMissionPlan plan : uavMissionPlans.values()) {
+			plan.expandTaskList();
+		}
+	}
+
+	public void build() throws MissionExecutionException {
+		loadMission(mission);
+		expandAllTasks();
+		buildAllSynchPoints();
+		synchPointMgr.activateAllSynchPoints();
+		runPreChecks();
+
+	}
+
+	private void runPreChecks() throws MissionExecutionException {
+		for (Entry<String, UAVMissionPlan> e : uavMissionPlans.entrySet()) {
+			checkDistance(e.getKey(), e.getValue());
+		}
+	}
+
+	private void checkDistance(String uavid, UAVMissionPlan plan) throws MissionExecutionException {
+		LlaCoordinate coordinate = plan.getStartingRouteWaypoint();
+		IUAVProxy uav = null;
+		if (coordinate == null) {
+			throw new MissionExecutionException(""Error when retrieving first waypoint for uav '"" + uavid + ""'"");
+		}
+		try {
+			uav = DroneSetupService.getInstance().getActiveUAV(uavid);
+		} catch (DronologyServiceException e) {
+			throw new MissionExecutionException(e.getMessage());
+		}
+		double distanceToFirstWaypoint = uav.getCoordinates().distance(coordinate);
+		if (distanceToFirstWaypoint > DronologyConstants.MISSION_MAX_STARTING_DISTANCE) {
+			throw new MissionExecutionException(
+					""Distance to first waypoint exceeds maximum safety distance: "" + distanceToFirstWaypoint + ""m"");
+		}
+		LOGGER.info(""Precheck passed -- Distance to first waypoint: "" + distanceToFirstWaypoint);
+
+	}
+
+	@Override
+	public void cancelMission() {
+		LOGGER.missionError(""Mission cancelled!"");
+		for (UAVMissionPlan plan : uavMissionPlans.values()) {
+			String uavid = plan.getUavID();
+			MissionUtil.stopUAV(uavid);
+		}
+	}
+
+}
+"
+JSONMissionPlanReader.java,,"package edu.nd.dronology.services.extensions.missionplanning.v1;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
+
+import com.google.gson.Gson;
+
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+
+/**
+ * Simple JSON Reader that converts a json String into a {@link FullMissionPlan} object.
+ * 
+ * @author Jane Cleland-Huang
+ *
+ */
+@SuppressWarnings(""rawtypes"")
+public class JSONMissionPlanReader {
+
+	FullMissionPlan coordinatedMission;
+	// String fileName;
+
+	public JSONMissionPlanReader(FullMissionPlan coordinatedMission) {
+		this.coordinatedMission = coordinatedMission;
+	}
+
+	public void parseMission(String content)
+			throws FileNotFoundException, IOException, JSONException, MissionExecutionException {
+		// parsing input file
+		// Object obj = new JSONParser().parse(content);
+
+		Map valueMap = new Gson().fromJson(content, Map.class);
+
+		List plans = (List) valueMap.get(""plans"");
+
+		for (Object object : plans) {
+			Map jo2 = (Map) object;
+			String uavid = (String) jo2.get(""id"");
+			coordinatedMission.addUAV(uavid);
+
+			List tasks = (List) jo2.get(""tasks"");
+			for (Object task : tasks) {
+				parseTasks(task, uavid);
+			}
+		}
+
+	}
+
+	private void parseTasks(Object item, String uavid) throws MissionExecutionException {
+		Map jsnObject = (Map) item;
+		String task = (String) jsnObject.get(""task"");
+		String taskID;
+
+		taskID = (String) jsnObject.get(""name"");
+		String duration = (String) jsnObject.get(""duration"");
+
+		if (duration != null) {
+			coordinatedMission.addTask(uavid, task, taskID, duration);
+		} else {
+			coordinatedMission.addTask(uavid, task, taskID);
+		}
+	}
+
+}
+"
+TaskList.java,,"package edu.nd.dronology.services.extensions.missionplanning.patterns;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import edu.nd.dronology.services.extensions.missionplanning.tasks.IMissionTask;
+
+/**
+ * Contains a list of {@link IMissionTask} part mission.
+ * 
+ * @author Jane Cleland-Huang
+ *
+ */
+public class TaskList {
+
+	List<IMissionTask> tasks = new ArrayList<>();
+
+	public List<IMissionTask> getTasks() {
+		return Collections.unmodifiableList(tasks);
+	}
+
+	public void addTask(IMissionTask task) {
+		tasks.add(task);
+
+	}
+
+}
+"
+IMissionTask.java,,"package edu.nd.dronology.services.extensions.missionplanning.tasks;
+
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+
+/**
+ * 
+ * @author A specific task in a mission for a UAV.
+ *
+ */
+public interface IMissionTask {
+
+	/**
+	 * 
+	 * @return The id of the UAV the task belongs to.
+	 */
+	String getUAVId();
+
+	/**
+	 * 
+	 * @return The name of the task.
+	 */
+	String getTaskName();
+
+	/**
+	 * 
+	 * @return The waypoint associated with the task.
+	 */
+	LlaCoordinate getWaypoint();
+
+}"
+TaskFactory.java,,"package edu.nd.dronology.services.extensions.missionplanning.tasks;
+
+import java.io.Serializable;
+import java.util.Map;
+
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+
+public class TaskFactory {
+
+	public static final String FLIGHTPATTERN = ""FLIGHTPATTERN"";
+	public static final String ROUTE = ""ROUTE"";
+	public static final String SYNC = ""SYNC"";
+	public static final String WAYPOINT = ""WAYPOINT"";
+	public static final String TAKEOFF = ""TAKEOFF"";
+	public static final String LAND = ""LAND"";
+	public static final String DELAY = ""DELAY"";
+
+	@Deprecated
+	public static IMissionTask getTask(String type, String uavid, String taskname, Object... params)
+			throws MissionExecutionException {
+		switch (type) {
+		case FLIGHTPATTERN:
+			return new PatternTask(uavid, taskname);
+
+		case ROUTE:
+			return new RouteTask(uavid, taskname);
+
+		case SYNC:
+			return new SyncTask(uavid, taskname);
+
+		case DELAY:
+			if (params.length != 1) {
+				throw new MissionExecutionException(""missing duration parameter"");
+			}
+			double duration = Double.parseDouble(params[0].toString());
+			return new DelayTask(uavid, taskname, duration);
+
+		default:
+			throw new MissionExecutionException(""Type "" + type + "" not supported"");
+		}
+	}
+
+	
+	
+	public static IMissionTask getTask(String type, String uavid, String taskname,Map<String, Serializable> params)
+			throws MissionExecutionException {
+		switch (type) {
+		case FLIGHTPATTERN:
+			return new PatternTask(uavid, taskname);
+
+		case ROUTE:
+			return new RouteTask(uavid, taskname);
+
+		case SYNC:
+			return new SyncTask(uavid, taskname);
+
+		case DELAY:
+			if (!params.containsKey(""duration"")) {
+				throw new MissionExecutionException(""missing duration parameer"");
+			}
+			double duration = Double.parseDouble(params.get(""duration"").toString());
+			return new DelayTask(uavid, taskname, duration);
+
+		default:
+			throw new MissionExecutionException(""Type "" + type + "" not supported"");
+		}
+	}
+
+	public static IMissionTask getTask(String type, String uavid, LlaCoordinate coordinate) {
+		switch (type) {
+		case WAYPOINT:
+			return new WaypointTask(uavid, coordinate);
+
+		case TAKEOFF:
+			return new TakeoffTask(uavid, coordinate);
+
+		case LAND:
+			return new LandTask(uavid, coordinate);
+
+		default:
+			throw new IllegalArgumentException(""Type "" + type + "" not supported"");
+		}
+	}
+
+}
+"
+DelayTask.java,,"package edu.nd.dronology.services.extensions.missionplanning.tasks;
+
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
+
+/**
+ * Delay tasks specifying a delay after a route has been executed before commencing with the next round. 
+ * 
+ * @author Michael Vierhauser
+ *
+ */
+public class DelayTask extends AbstractMissionTask {
+	private static final ILogger LOGGER = LoggerProvider.getLogger(DelayTask.class);
+
+	private final double duration;
+	private long startTime;
+
+	/**
+	 * 
+	 * @param uavID
+	 * @param taskName
+	 * @param duration
+	 *          in seconds
+	 */
+	protected DelayTask(String uavID, String taskName, double duration) {
+		super(uavID, taskName);
+		this.duration = duration;
+	}
+
+	public double getDuration() {
+		return duration;
+	}
+
+	public void startDelayTask() {
+		LOGGER.info(""Delay started for UAV '"" + getUAVId() + ""' duration: "" + duration);
+		startTime = System.currentTimeMillis();
+	}
+
+	public boolean isFinished() {
+		boolean finished = System.currentTimeMillis() - startTime > duration * 1000;
+
+		if (finished) {
+			LOGGER.info(""Delay finished for UAV '"" + getUAVId() + ""'"");
+		}
+		return finished;
+
+	}
+
+}"
+UAVMissionPlan.java,,"package edu.nd.dronology.services.extensions.missionplanning.plan;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.services.core.info.FlightInfo;
+import edu.nd.dronology.services.core.info.FlightRouteInfo;
+import edu.nd.dronology.services.core.util.DronologyServiceException;
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+import edu.nd.dronology.services.extensions.missionplanning.patterns.IFlightPattern;
+import edu.nd.dronology.services.extensions.missionplanning.patterns.PatternFactory;
+import edu.nd.dronology.services.extensions.missionplanning.patterns.PatternFactory.PatternType;
+import edu.nd.dronology.services.extensions.missionplanning.patterns.TaskList;
+import edu.nd.dronology.services.extensions.missionplanning.sync.SynchronizationManager;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.DelayTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.IMissionTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.LandTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.PatternTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.RouteTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.SyncTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.TakeoffTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.WaypointTask;
+import edu.nd.dronology.services.instances.flightmanager.FlightManagerService;
+import edu.nd.dronology.services.instances.flightroute.FlightRouteplanningService;
+import net.mv.logging.ILogger;
+import net.mv.logging.LoggerProvider;
+
+/**
+ * Mission plan for an individual UAV. Part of an {@link IExecuteableMissionPlan}.
+ * 
+ * @author Jane Cleland-Huang
+ *
+ */
+public class UAVMissionPlan {
+
+	private static final ILogger LOGGER = LoggerProvider.getLogger(UAVMissionPlan.class);
+ 
+	private IMissionTask activeTask = null;
+	private final String uavid;
+	private List<IMissionTask> taskList;
+	private LlaCoordinate homeLocation;
+	private LlaCoordinate firstWaypointLocation;
+
+	private int coordinationAltitude = 0;
+	private final transient SynchronizationManager synchMgr;
+
+	public UAVMissionPlan(String uavID, SynchronizationManager synchMgr) {
+		this.uavid = uavID;
+		taskList = new LinkedList<>();
+		this.synchMgr = synchMgr;
+	}
+
+	/**
+	 * Check if task if finished
+	 * 
+	 * @return
+	 * @throws MissionExecutionException
+	 */
+	private boolean isExecutingTask() throws MissionExecutionException {
+		FlightInfo info;
+		try {
+			info = FlightManagerService.getInstance().getFlightInfo(uavid);
+		} catch (DronologyServiceException e) {
+			LOGGER.error(e);
+			throw new MissionExecutionException(e.getMessage());
+		}
+		return info.getCurrentFlights() != null;
+
+	}
+
+	/**
+	 * Needs to actually activate the flight route. NOTE: Needs to handle ROUTE, WAYPOINT, TAKEOFF, and LAND (Synch is done internally and shouldn't need any extra coordination).
+	 * 
+	 * @throws Exception
+	 */
+	public void activateNextTask() throws MissionExecutionException {
+		activeTask = null;
+		if (!taskList.isEmpty()) {
+			activeTask = taskList.get(0);
+			taskList.remove(0);
+
+			// Now execute the task. This will depend on whether it is a waypoint, entire
+			// route, or synch point
+			if (activeTask instanceof SyncTask) {
+				LOGGER.missionInfo(""UAV "" + uavid + "" waiting at SYNCH POINT: "" + activeTask.getTaskName());
+				synchMgr.uavVisitedSynchPoint(uavid, activeTask.getTaskName()); // Marks this uav as synched
+
+				if (synchMgr.isFullySynched(activeTask.getTaskName())) {
+					LOGGER.missionInfo(""All UAVs released from "" + activeTask.getTaskName());
+					activeTask = null; // Free to move on.
+				}
+
+			} else if (activeTask instanceof RouteTask) {
+				MissionUtil.activateRoute(activeTask);
+			} else if (activeTask instanceof DelayTask) { 
+				((DelayTask) activeTask).startDelayTask();
+			} else if (activeTask instanceof WaypointTask || activeTask instanceof TakeoffTask
+					|| activeTask instanceof LandTask) {
+				LOGGER.missionInfo(""ACTIVATED FLIGHT TO WAYPOINT: "" + uavid + "" "" + activeTask.getTaskName());
+				MissionUtil.activateWaypoint(activeTask);
+			} else {
+				throw new UnsupportedOperationException(""Task '"" + activeTask.getClass() + ""' not supported"");
+			}
+
+		}
+
+	}
+
+	public String getUavID() {
+		return uavid;
+	}
+
+	public void setCoordinationAltitude(int alt) {
+		coordinationAltitude = alt;
+	}
+
+	public int getCoordinationAltitude() {
+		return coordinationAltitude; // Add error if null.
+	}
+
+	public boolean hasActiveTask() throws MissionExecutionException {
+		if (activeTask == null) {
+			return false;
+		}
+		if (activeTask instanceof SyncTask) {
+			String synchName = activeTask.getTaskName();
+			if (!synchMgr.synchPointExists(synchName)) {
+				LOGGER.missionError(""Missing synch point"");
+				return false;
+			} else if (synchMgr.isFullySynched(synchName)) {
+				return false;
+			}
+			return true;
+
+		} else if (activeTask instanceof DelayTask) {
+			return !((DelayTask) activeTask).isFinished();
+		} else {// Waypoint or Route
+			return isExecutingTask();
+		}
+	}
+
+	public void addTask(IMissionTask task, SynchronizationManager synchMgr) throws MissionExecutionException { // Remove
+		// SynchMgr
+		taskList.add(task);
+		if (firstWaypointLocation == null && task instanceof RouteTask) {
+			firstWaypointLocation = MissionUtil.getFirstWayPoint(task.getTaskName());
+		}
+	}
+
+	public void buildSynchPoints() {
+		taskList.forEach(task -> {
+			if (task instanceof SyncTask) {
+				synchMgr.createSynchronizationPoint(task.getTaskName());
+				synchMgr.addSynchItem(task.getUAVId(), task.getTaskName());
+			}
+		});
+	}
+
+	public boolean hasTasks() {
+		return activeTask != null || taskList.size() > 0;
+
+	}
+
+	public int taskCount() {
+		return taskList.size();
+	}
+
+	/**
+	 * Expand the task list with PATTERNS. Currently supports two different patterns ""SynchronizedTakeoff"" and ""SynchronizedLanding"" Assumptions: SynchronizedTakeoff has a ROUTE definied immediately
+	 * after. SynchronizedLanding has a ROUTE defined immediately prior.
+	 * 
+	 * @throws MissionExecutionException
+	 */
+	public void expandTaskList() throws MissionExecutionException {
+		List<IMissionTask> allTasks = new ArrayList<>();
+		for (IMissionTask task : taskList) {
+			homeLocation = MissionUtil.getHome(task.getUAVId());
+			if (task instanceof PatternTask) {
+				if (task.getTaskName().equals(""SynchronizedTakeoff"")) {
+					IFlightPattern pattern = PatternFactory.getPattern(PatternType.COORDINATED_TAKEOFF);
+					pattern.initialize(synchMgr);
+					if (firstWaypointLocation != null) // Currently it only expands IF we have at least one ROUTE. It
+						// treats the first waypoint as the target waypoint.
+						pattern.expandFlightPattern(this, homeLocation, firstWaypointLocation);
+					TaskList list = pattern.getTaskList();
+					allTasks.addAll(list.getTasks());
+				} else if (task.getTaskName().equals(""SynchronizedLanding"")) {
+					IFlightPattern pattern = PatternFactory.getPattern(PatternType.COORDINATED_LANDING);
+					pattern.initialize(synchMgr);
+					LlaCoordinate currentFinalWaypoint;
+					currentFinalWaypoint = MissionUtil.getFinalWaypoint(allTasks);
+					pattern.expandFlightPattern(this, currentFinalWaypoint, homeLocation);
+					TaskList list = pattern.getTaskList();
+					allTasks.addAll(list.getTasks());
+
+				}
+			} else {
+				allTasks.add(task);
+			}
+		}
+		taskList = allTasks;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// self check
+		if (this == o)
+			return true;
+		// null check
+		if (o == null)
+			return false;
+		// type check and cast
+		if (getClass() != o.getClass())
+			return false;
+		UAVMissionPlan that = (UAVMissionPlan) o;
+		return this.uavid.equals(that.uavid);
+	}
+
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		int result = 1;
+		result = prime * result + ((uavid == null) ? 0 : uavid.hashCode());
+		return result;
+	}
+
+	public LlaCoordinate getStartingRouteWaypoint() throws MissionExecutionException {
+		for (IMissionTask t : taskList) {
+			if (t instanceof RouteTask) {
+				try {
+					FlightRouteInfo route = FlightRouteplanningService.getInstance().getRouteByName(t.getTaskName());
+					LlaCoordinate coord = route.getWaypoints().get(0).getCoordinate();
+					return coord;
+				} catch (DronologyServiceException e) {
+					throw new MissionExecutionException(""Error when getting initial waypoint for '"" + t.getTaskName() + ""'"");
+				}
+
+			}
+		}
+		LOGGER.error(""No RouteTask found in Mission"");
+		return taskList.get(0).getWaypoint();
+
+	}
+
+}"
+IFlightPattern.java,,"package edu.nd.dronology.services.extensions.missionplanning.patterns;
+
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+import edu.nd.dronology.services.extensions.missionplanning.plan.UAVMissionPlan;
+import edu.nd.dronology.services.extensions.missionplanning.sync.SynchronizationManager;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.IMissionTask;
+
+/**
+ * Interface for all flight pattern implementations that can be expanded into several different {@link IMissionTask}.
+ * 
+ * @author Michael Vierhauser
+ *
+ */
+public interface IFlightPattern {
+
+	void initialize(SynchronizationManager synchMgr);
+
+	/**
+	 * Coordinates the flight of multiple UAVs across a potentially overlapping space consisting of a currentLocation and a targetLocation for each UAV. FOR NOW: We assume that currentCoordinates and
+	 * targetWayPoints for all UAVs are unique and sufficiently separated from each other. Paths to move from current to target positions may overlap. We should add this check in later on.
+	 * 
+	 * @param uavMission
+	 *          The mission plan the pattern belongs to.
+	 * @param currentLocation
+	 *          The current location from which the pattern starts.
+	 * @param targetLocation
+	 *          The target location when the pattern is completed.
+	 * @throws MissionExecutionException
+	 */
+	public void expandFlightPattern(UAVMissionPlan uavMission, LlaCoordinate currentLocation,
+			LlaCoordinate targetLocation) throws MissionExecutionException;
+
+	/**
+	 * 
+	 * @return A {@link TaskList } containing the tasks part of that pattern.
+	 */
+	public TaskList getTaskList();
+
+}
+"
+CoordinatedLandingPattern.java,,"package edu.nd.dronology.services.extensions.missionplanning.patterns;
+
+import edu.nd.dronology.core.coordinate.LlaCoordinate;
+import edu.nd.dronology.core.monitoring.DronologyMonitoringManager;
+import edu.nd.dronology.core.monitoring.MessageMarshaller;
+import edu.nd.dronology.core.monitoring.messages.UAVMonitorableMessage.MessageType;
+import edu.nd.dronology.services.extensions.missionplanning.MissionExecutionException;
+import edu.nd.dronology.services.extensions.missionplanning.plan.UAVMissionPlan;
+import edu.nd.dronology.services.extensions.missionplanning.sync.SyncConstants;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.PatternTask;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.TaskFactory;
+import edu.nd.dronology.services.extensions.missionplanning.v1.FullMissionPlan;
+
+/**
+ * 
+ * Predefined pattern for coordinated landing that is expanded as part of a {@link PatternTask} in a {@link FullMissionPlan}.<br>
+ * 
+ * @author Michael Vierhauser
+ *
+ */
+public class CoordinatedLandingPattern extends AbstractFlightPattern implements IFlightPattern {
+	CoordinatedLandingPattern() {
+
+	}
+
+	@Override
+	public void expandFlightPattern(UAVMissionPlan uavMission, LlaCoordinate currentLocation,
+			LlaCoordinate targetLocation) throws MissionExecutionException {
+
+		if (uavMission.getCoordinationAltitude() == 0) {
+			uavMission.setCoordinationAltitude(synchPointMgr.getNextAltitude());
+		}
+
+		LlaCoordinate targetWaypoint1 = new LlaCoordinate(currentLocation.getLatitude(), currentLocation.getLongitude(),
+				uavMission.getCoordinationAltitude());
+		DronologyMonitoringManager.getInstance()
+				.publish(MessageMarshaller.createMessage(MessageType.MISSION_WAYPOINT, uavMission.getUavID(), targetWaypoint1));
+
+		LlaCoordinate targetWaypoint2 = new LlaCoordinate(targetLocation.getLatitude(), targetLocation.getLongitude(),
+				uavMission.getCoordinationAltitude());
+		DronologyMonitoringManager.getInstance()
+				.publish(MessageMarshaller.createMessage(MessageType.MISSION_WAYPOINT, uavMission.getUavID(), targetWaypoint2));
+
+		LlaCoordinate landWaypoint = new LlaCoordinate(targetLocation.getLatitude(), targetLocation.getLongitude(),
+				targetLocation.getAltitude());
+		DronologyMonitoringManager.getInstance()
+				.publish(MessageMarshaller.createMessage(MessageType.MISSION_WAYPOINT, uavMission.getUavID(), landWaypoint));
+
+		addTask(TaskFactory.getTask(TaskFactory.WAYPOINT, uavMission.getUavID(), targetWaypoint1));
+		addTask(TaskFactory.getTask(TaskFactory.SYNC, uavMission.getUavID(), SyncConstants.LANDING_ASC_REACHED));
+
+		addTask(TaskFactory.getTask(TaskFactory.WAYPOINT, uavMission.getUavID(), targetWaypoint2));
+		addTask(TaskFactory.getTask(TaskFactory.SYNC, uavMission.getUavID(), SyncConstants.LANDING_LONLAT_REACHED));
+
+		addTask(TaskFactory.getTask(TaskFactory.LAND, uavMission.getUavID(), landWaypoint));
+		addTask(TaskFactory.getTask(TaskFactory.SYNC, uavMission.getUavID(), SyncConstants.LANDING_HOME_REACHED));
+
+	}
+
+	@Override
+	protected void doCreateSyncPoints() {
+		addSyncPoint(""SP-TakeOff-AscentTargetReached"");
+		addSyncPoint(""SP-TakeOff-LonLatReached"");
+		addSyncPoint(""SP-TakeOff-FirstWayPointReached"");
+
+	}
+
+}
+"
+PatternFactory.java,,"package edu.nd.dronology.services.extensions.missionplanning.patterns;
+
+/**
+ * Factory class for predefined {@link IFlightPattern}.
+ * 
+ * @author Michael Vierhauser
+ *
+ */
+public class PatternFactory {
+
+	public enum PatternType {
+		COORDINATED_TAKEOFF, COORDINATED_LANDING
+	}
+
+	/**
+	 * 
+	 * @param type
+	 *          The {@link PatternType} of the flight pattern to create.
+	 * @return A flight pattern for the given pattern type.
+	 * @throws An
+	 * @{@link IllegalArgumentException} in case the pattern is not supported.
+	 */
+	public static IFlightPattern getPattern(PatternType type) {
+		switch (type) {
+			case COORDINATED_TAKEOFF:
+				return new CoordinatedTakeoffPattern();
+
+			case COORDINATED_LANDING:
+				return new CoordinatedLandingPattern();
+
+			default:
+				throw new IllegalArgumentException(""Type "" + type + "" not supported"");
+		}
+	}
+
+}
+"
+SyncConstants.java,,"package edu.nd.dronology.services.extensions.missionplanning.sync;
+
+/**
+ * Synchronization IDs for predefined, built-in {@link SynchronizationPoint} .
+ * 
+ * @author Michael Vierhauser 
+ * 
+ * 
+ *
+ */
+public class SyncConstants {
+ 
+	public static final String LANDING_ASC_REACHED = ""SP-Landing-AscentTargetReached"";
+	public static final String LANDING_LONLAT_REACHED = ""SP-Landing-LonLatReached"";
+	public static final String LANDING_HOME_REACHED = ""SP-Landing-HomeReached"";
+
+	public static final String TAKEOFF_ASC_REACHED = ""SP-TakeOff-AscentTargetReached"";
+	public static final String TAKEOFF_LATLON_REACHED = ""SP-TakeOff-LonLatReached"";
+	public static final String TAKEOFF_WP_REACHED = ""SP-TakeOff-FirstWayPointReached"";
+
+}
+"
+AbstractFlightPattern.java,,"package edu.nd.dronology.services.extensions.missionplanning.patterns;
+
+import edu.nd.dronology.services.extensions.missionplanning.sync.SynchronizationManager;
+import edu.nd.dronology.services.extensions.missionplanning.tasks.IMissionTask;
+
+/**
+ * Base class for all predefined flight patterns that can be exanded
+ * 
+ * @author Michael Vierhauser
+ *
+ */
+public abstract class AbstractFlightPattern implements IFlightPattern {
+
+	protected SynchronizationManager synchPointMgr;
+	private TaskList taskList = new TaskList();
+
+	@Override
+	public void initialize(SynchronizationManager synchPointMgr) {
+		this.synchPointMgr = synchPointMgr;
+		doCreateSyncPoints();
+	}
+
+	protected abstract void doCreateSyncPoints();
+
+	protected void addSyncPoint(String pointname) {
+		synchPointMgr.createSynchronizationPoint(pointname);
+
+	}
+
+	protected void addTask(IMissionTask task) {
+		taskList.addTask(task);
+
+	}
+
+	@Override
+	public TaskList getTaskList() {
+		return taskList;
+	}
+
+}
+"
+PatternTask.java,,"package edu.nd.dronology.services.extensions.missionplanning.tasks;
+
+/**
+ * A {@link PatternTask} represents a predefined pattern that is expanded when the mission is created.
+ * 
+ * @author Michael Vierhausers
+ * 
+ */
+public class PatternTask extends AbstractMissionTask {
+
+	protected PatternTask(String uavID, String taskName) {
+		super(uavID, taskName);
+	}
+}"

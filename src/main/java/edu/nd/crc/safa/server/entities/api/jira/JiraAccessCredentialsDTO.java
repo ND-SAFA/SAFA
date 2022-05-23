@@ -5,19 +5,12 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
+import lombok.Data;
 
 /**
  * Describes the information needed to import a project from JIRA.
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@ToString
+@Data
 public class JiraAccessCredentialsDTO {
 
     /**

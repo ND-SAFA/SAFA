@@ -11,17 +11,16 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.Type;
+
 
 /**
  * Data required to access the JIRA api for a user on an JIRA application identified by its cloud id
  */
 @Entity
 @Table(name = "jira_access_credentials")
-@Getter
-@Setter
+@Data
 public class JiraAccessCredentials {
 
     @Id

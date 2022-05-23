@@ -1,8 +1,9 @@
 package edu.nd.crc.safa.server.controllers;
 
-import javax.validation.Valid;
-
+import java.util.List;
 import java.util.Objects;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -21,11 +22,13 @@ import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -68,7 +71,7 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") Long id,
+    public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") @NotNull Long id,
                                                            @PathVariable("cloudId") String cloudId) {
         DeferredResult<ProjectEntities> output = executorDelegate.createOutput(5000L);
 
@@ -79,6 +82,8 @@ public class JiraController extends BaseController {
             JiraProjectResponseDTO response = jiraConnectionService.retrieveJIRAProject(credentials, id);
             Project project = new Project();
 
+            // Should probably also specify this is a JIRA pulled project
+            // Maybe save the cloud id and JIRA project id, so we can later update it?
             project.setName(response.getKey());
             project.setDescription(response.getDescription());
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
@@ -133,7 +138,7 @@ public class JiraController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
-    public DeferredResult<String> createCredentials(@PathVariable("cloudId") String cloudId) {
+    public DeferredResult<String> createCredentials(@PathVariable("cloudId") @NotNull String cloudId) {
         DeferredResult<String> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
@@ -153,6 +158,41 @@ public class JiraController extends BaseController {
             credentials = accessCredentialsRepository.save(credentials);
 
             output.setResult("updated");
+        });
+
+        return output;
+    }
+
+    @GetMapping(AppRoutes.Projects.retrieveJIRAProjects)
+    public DeferredResult<List<JiraProjectResponseDTO>> retrieveJIRAProjects(@PathVariable("cloudId") String cloudId) {
+        DeferredResult<List<JiraProjectResponseDTO>> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
+            JiraAccessCredentials credentials = accessCredentialsRepository
+                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+            List<JiraProjectResponseDTO> response = jiraConnectionService.retrieveJIRAProjectsPreview(credentials);
+
+            output.setResult(response);
+        });
+
+        return output;
+    }
+
+    @PostMapping(AppRoutes.Accounts.jiraCredentialsValidate)
+    public DeferredResult<Boolean> validateJIRACredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
+        DeferredResult<Boolean> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            JiraAccessCredentials credentials = data.toEntity();
+
+            try {
+                boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
+
+                output.setResult(areCredentialsValid);
+            } catch (Exception ex) {
+                output.setResult(false);
+            }
         });
 
         return output;

@@ -85,3 +85,22 @@ export function enumToDisplay(value: string): string {
     .map((word) => capitalize(word.toLowerCase()))
     .join(" ");
 }
+/**
+ * Converts a timestamp to a display value.
+ *
+ * @param timestamp - The timestamp to convert.
+ * @return The displayable value.
+ */
+export function timestampToDisplay(timestamp: string): string {
+  const date = new Date(timestamp);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+  };
+
+  return date.toLocaleDateString("en-US", options);
+}

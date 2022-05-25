@@ -16,7 +16,7 @@ COPY tsconfig.json ./
 COPY .eslintrc.js ./
 COPY vue.config.js ./
 
-RUN touch ./.env.production &&
+RUN touch ./.env.production && \
   echo -e "\
 VUE_APP_API_ENDPOINT=$API_ENDPOINT\n\
 VUE_APP_JIRA_CLIENT_ID=$JIRA_CLIENT_ID\n\

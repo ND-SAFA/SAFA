@@ -46,6 +46,9 @@ module.exports = {
         zoomInButton                            : 'button[id="zoom-in"]',
         centerGraphButton                       : '(//*[@aria-expanded="false" and @type="button" and @class="v-btn v-btn--icon v-btn--round theme--light v-size--default secondary--text"])[5]',
         addArtifactButton                       : 'button[id="add-artifact"]',
+        viewArtifactButton                      : 'button[id="view-artifact"]',
+        addLinkButton                           : 'button[id="add-link"]',
+        linktoNodeIcon                          : 'button[id="view-link"]', // Unknown currently
 
     },
 
@@ -250,13 +253,14 @@ module.exports = {
 
         findAndTestTIMNode(nodeName, TIMNodelocation, suppressOutput, message) {
             const page = this;
-            const nodeLocation = `(//span[contains(text(), '${nodeName}') and @class="artifact-sub-header text-body-1"])[position()=1]`
+            nodeLocation = `(//span[contains(text(), '${nodeName}') and @class="artifact-sub-header text-body-1"])[position()=1]`
             TIMNodelocation[nodeName] = nodeLocation;
-            
+            page.logToConsole(TIMNodelocation);
+
             page.useXpath();
             
             if (!suppressOutput) {
-                page.assert.visible(nodeLocation, message);
+                page.waitForElementVisible(nodeLocation, 5000, false, message);
             }
 
             page.useCss();

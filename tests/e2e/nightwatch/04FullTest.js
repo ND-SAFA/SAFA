@@ -69,6 +69,12 @@ module.exports = {
         const F4NodeName                        = 'F4';
         const addArtifactButton                 = 'Add Artifact';
         const addArtifactInputField             = 'Artifact Name';
+        const addArtifactTypeField              = 'Artifact Type';
+        const addArtifactSummaryField           = 'Artifact Summary';
+        const addArtifactBodyField              = 'Artifact Body';
+        const testNodeName                      = 'Test_Node';
+        const testNodeDescription               = 'This is a new node';
+        const addArtifactSaveButton             = 'Save';
         
         
         /* Element Xpath Values */
@@ -80,8 +86,9 @@ module.exports = {
         const deleteProjectIcon                 = `button[class="v-btn v-btn--icon v-btn--round theme--light v-size--default"] span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]`
         const deleteProjectdeleteButton         = `button[type="button"][class="ml-auto v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default error"] span[class="v-btn__content"]`;
         const openProjectCloseWindowButton      = `(.//button[@type="button"][@class="v-btn v-btn--icon v-btn--round theme--light v-size--default"]//span[@class="v-btn__content"]//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-close theme--light"])[2]`;
-        const artifactViewerTitle               = `h1[class="text-h6 artifact-title"]`
-        const artifactViewerDescription         = `p[class="text-body-1"]`  
+        const artifactViewerTitle               = `.//h1[contains(text(), '${testNodeName}')]`;
+        const artifactViewerDescription         = `.//p[contains(text(), '${testNodeDescription}')]`;  
+        const newNodeArtifactTypeHazardOption   = '(//span[contains(text(), "Hazard")])[last()]';
         
         
         page 
@@ -254,31 +261,64 @@ module.exports = {
             /* Adding a new node to the graph */
             .logToConsole('Adding a new node to the graph')
             .click('@addArtifactButton')
-            .fillInTextBox('Test_Node', addArtifactInputField)
-            .useXpath().click(artifactTypeDropDown).useCss()
-            .useXpath().click(addArtifactHazardsOptionDropDown).useCss()
-            .fillInTextBox('This is a new node', 'Artifact Summary')
-            .fillInTextBox('This is a new node', 'Artifact Body')
-            .clickButton('Save')
+            .fillInTextBox(testNodeName, addArtifactInputField)
+            .fillInTextBox('Hazard.csv', addArtifactTypeField)
+            .useXpath().click(newNodeArtifactTypeHazardOption).useCss()
+            .fillInTextBox(testNodeDescription, addArtifactSummaryField)
+            .fillInTextBox(testNodeDescription, addArtifactBodyField)
+            .clickButton(addArtifactSaveButton)
             .click(centerGraphButton)
-            .findAndTestTIMNode('Test_Node', TIMNodelocation, 0, 'UI: Test_Node was found and interactable')
+            .pause(1000)
+            //.useXpath().waitForElementVisible(`//*[contains(text(),'${testNodeName}')]`, 5000, true, "UI: New node was added to the graph").useCss()            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
+             
+            .findAndTestTIMNode(testNodeName, TIMNodelocation, 0, 'UI: Test_Node was found and interactable')
 
+            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger))
             /* View Details of an Artifact */
             .logToConsole('Viewing Details of an Artifact')
-            .useXpath().rightClick(TIMNodelocation.TestNode).useCss()
-            .clickButton('View Artifact')
-            .waitForElementVisible(artifactViewerTitle, 5000, "UI: Artifact Viewer is Visible")
-            .waitForElementVisible(artifactViewerDescription, 5000, "UI: Artifact Description is Visible")
+            .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
+            .moveToElement('@viewArtifactButton', undefined, undefined)
+            .click('@viewArtifactButton')
+
+            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
+
+            .useXpath().waitForElementVisible(artifactViewerTitle, 5000, false, "UI: Artifact Viewer is Visible")
+            .waitForElementVisible(artifactViewerDescription, 5000, false, "UI: Artifact Description is Visible").useCss()
             .takeScreenShot(screenShotDestination + 'ArtifactViewer.png')
+
+            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
             
             /* Drag and Drop an Artifact */
             .logToConsole('Drag and Drop an Artifact')
             .click(centerGraphButton)
-            .useXpath().moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
-            .dragAndDrop(TIMNodelocation.Test_Node, {x: 100, y: 100}).useCss()
-            .takeScreenShot(screenShotDestination + 'F15Node_Dragged.png')
+            .useXpath().moveToElement(`//*[contains(text(), '${testNodeName}')]`, undefined, undefined)
+            .dragAndDrop(`//*[contains(text(), '${testNodeName}')]`, {x: 100, y: 100}).useCss()
+            .takeScreenShot(screenShotDestination + 'Test_Node_Dragged.png')
 
             .perform(() => { debugger; }) // This will hault execution in the chrome debugger
+
+            /* Adding a Link to an Artifact */
+            .logToConsole('Adding a Link to an Artifact')
+            .click(centerGraphButton)
+
+            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
+
+            .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
+
+            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
+            
+            .moveToElement('@addLinkButton', undefined, undefined)
+            .click('@addLinkButton')
+            .useXpath().dragAndDrop(`//*[contains(text(), '${testNodeName}')]`, TIMNodelocation.F4).useCss()
+            //.assert.visible('@linktoNodeIcon', "UI: Link was Successfully made") // cannot currently find the name of the arrow icon
+            .takeScreenShot(screenShotDestination + 'Link_Added.png')
+
+
+            /* Highlight Artifact Subtree (On Hold - Currently a Bug) */
+
+            /* Hide Artifact Subtree (On Hold- Currently a Bug) */
+
+            /* Delete Artifact (On Hold - Currently a Bug)*/
 
             /* Deleting the project (Add 1 to the closewindowiconbutton to every window open)*/
             .logToConsole('Deleting the project')

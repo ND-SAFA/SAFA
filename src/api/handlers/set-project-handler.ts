@@ -18,6 +18,7 @@ import {
   handleLoadVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
+import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -51,6 +52,8 @@ export async function handleProjectSubscription(
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
   const isDifferentProject = projectModule.versionId !== versionId;
+
+  project.artifactTypes = await getProjectArtifactTypes(projectId);
 
   await connectAndSubscribeToVersion(projectId, versionId);
   await projectModule.initializeProject(project);

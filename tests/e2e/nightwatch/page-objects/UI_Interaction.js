@@ -7,7 +7,6 @@
  *  Some Notes:
  *     - This file is currently being used in the tests
  *      folder.
- *    - This objects file will constantly evolve as more functions are simplified
  *    - moveToElement() function is being used since there is a bug with Nightwatch 
  *      with element clicks being intercepted. This function prevents this bug from happening.
  */
@@ -16,7 +15,7 @@ module.exports = {
     '@disabled': true, // this will prevent this from being run as a test
 
 
-    url: 'http://localhost:8080/',
+    url: 'http://localhost:8080/', 
 
     elements: {
         checkContinueButtonDisabled             : '.container [type="button"].v-btn--outlined',
@@ -255,8 +254,8 @@ module.exports = {
             const page = this;
             nodeLocation = `(//span[contains(text(), '${nodeName}') and @class="artifact-sub-header text-body-1"])[position()=1]`
             TIMNodelocation[nodeName] = nodeLocation;
-            page.logToConsole(TIMNodelocation);
-
+            
+            //page.logToConsole(TIMNodelocation);
             page.useXpath();
             
             if (!suppressOutput) {

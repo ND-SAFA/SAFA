@@ -12,10 +12,10 @@ FullTest.js - Created by: Jeremy Arellano
         - Currently, there is no way to delete an account, therefore the Create account section of the test 
             will be skipped as to avoid creating too many spam accounts. In the later future, this section can
             be commented back into the test.
-        - Line 163 is commented out due to a bug with generating the TIM Grpah, this will be uncommented in future releases.
-          However, on a normal run the test would fail because of this since this is an test failure condition.
-        - Some of the elements on the website currently could be renamed to have more distinction accrose from each other, this
+        - Some of the elements on the website currently could be renamed to have more distinction across from each other, this
            will make some elements separated from each other and easier to test.
+        - There is a bug with the TIM Grpah when trying to view the subtree/ hide the subtree of a node. Once this bug is fixed,
+          some assertion statements can be added.
 
 *********************************************************/
 
@@ -77,7 +77,7 @@ module.exports = {
         const addArtifactSaveButton             = 'Save';
         
         
-        /* Element Xpath Values */
+        /* Element Xpath/CSS Values */
         const dropDownIcon_traceLink            = '(.//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-chevron-down theme--light"])[9]'; // Note, this will only work for one specific use
         const centerGraphButton                 = `span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-graphql theme--light"]`;
         const addArtifactHazardsOptionDropDown  = `(//div[contains(text(),'Hazard.csv') ])[last()]`
@@ -244,7 +244,6 @@ module.exports = {
             /* Creating the project */
             .logToConsole('Creating the project')
             .clickButton(createProjectButton)
-            .pause(2000)
             .waitForElementPresent('@timGraph', 5000, false, "UI: TIM Graph is visible")
             .pause(5000)
             .waitForElementPresent('@projectCreationSuccessfulMessage', 5000, true, "UI: Project success message appears in view")
@@ -268,51 +267,51 @@ module.exports = {
             .fillInTextBox(testNodeDescription, addArtifactBodyField)
             .clickButton(addArtifactSaveButton)
             .click(centerGraphButton)
-            .pause(1000)
-            //.useXpath().waitForElementVisible(`//*[contains(text(),'${testNodeName}')]`, 5000, true, "UI: New node was added to the graph").useCss()            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
-             
+            .pause(2000)
             .findAndTestTIMNode(testNodeName, TIMNodelocation, 0, 'UI: Test_Node was found and interactable')
 
-            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger))
             /* View Details of an Artifact */
             .logToConsole('Viewing Details of an Artifact')
             .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
             .moveToElement('@viewArtifactButton', undefined, undefined)
             .click('@viewArtifactButton')
-
-            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
-
             .useXpath().waitForElementVisible(artifactViewerTitle, 5000, false, "UI: Artifact Viewer is Visible")
             .waitForElementVisible(artifactViewerDescription, 5000, false, "UI: Artifact Description is Visible").useCss()
             .takeScreenShot(screenShotDestination + 'ArtifactViewer.png')
 
-            //.perform(() => { debugger; }) // This will hault execution in the chrome debugger
-            
             /* Drag and Drop an Artifact */
             .logToConsole('Drag and Drop an Artifact')
             .click(centerGraphButton)
-            .useXpath().moveToElement(`//*[contains(text(), '${testNodeName}')]`, undefined, undefined)
-            .dragAndDrop(`//*[contains(text(), '${testNodeName}')]`, {x: 100, y: 100}).useCss()
+            .useXpath().moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
+            .dragAndDrop(TIMNodelocation.Test_Node, {x: 100, y: 100}).useCss()
             .takeScreenShot(screenShotDestination + 'Test_Node_Dragged.png')
-
-            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
 
             /* Adding a Link to an Artifact */
             .logToConsole('Adding a Link to an Artifact')
             .click(centerGraphButton)
-
-            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
-
             .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
-
-            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
-            
             .moveToElement('@addLinkButton', undefined, undefined)
             .click('@addLinkButton')
-            .useXpath().dragAndDrop(`//*[contains(text(), '${testNodeName}')]`, TIMNodelocation.F4).useCss()
+            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
+            .useXpath()
+            .moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
+            .perform(function() {
+                const actions = this.actions({async: true});
+                
+                return actions
+                .pause(100)
+                .press()
+            })
+            .moveToElement(TIMNodelocation.F4, undefined, undefined)
+            .perform(function() {
+                const actions = this.actions({async: true});
+
+                return actions
+                .pause(100)
+                .release()
+            })
             //.assert.visible('@linktoNodeIcon', "UI: Link was Successfully made") // cannot currently find the name of the arrow icon
             .takeScreenShot(screenShotDestination + 'Link_Added.png')
-
 
             /* Highlight Artifact Subtree (On Hold - Currently a Bug) */
 
@@ -322,6 +321,7 @@ module.exports = {
 
             /* Deleting the project (Add 1 to the closewindowiconbutton to every window open)*/
             .logToConsole('Deleting the project')
+
             .clickSelector(projectDropDownGloabl, OpenProjectButton)
             .click(deleteProjectIcon)
             .fillInTextBox(projectName, deleteingProjectInputField)
@@ -333,6 +333,7 @@ module.exports = {
 
             /* Logout of the website */
             .logToConsole('Logging out of the website')
+
             .click('@ProfilePictureAttributes')
             .clickButton('Logout')
             .waitForElementVisible('@loginImageIcon', 5000, "WebAPI: User successfully logged out")
@@ -340,8 +341,5 @@ module.exports = {
 
             /* End of test */
             .end();
-        
-
-
     }
 };

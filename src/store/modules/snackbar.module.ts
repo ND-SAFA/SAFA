@@ -174,7 +174,7 @@ export default class SnackbarModule extends VuexModule {
   /**
    * @return The current snackbar message.
    */
-  get getMessage(): SnackbarMessage | undefined {
+  get getMessage(): SnackbarMessage {
     return this.snackbarMessage;
   }
 

@@ -102,9 +102,13 @@ export function handleImportJiraProject(
  * @param onError - Called if the action fails.
  */
 export function handleImportGitHubProject(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   credentials: InternalGitHubCredentials,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   projectId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   console.log("Importing from GitHub is not yet enabled.");

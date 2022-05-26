@@ -140,6 +140,8 @@ export async function getJiraCloudSites(
 }
 
 /**
+ * TODO: update to internal GET `/projects/jira/{cloudId}`
+ *
  * Returns all Jira projects for the given user and cloud site.
  *
  * @param accessToken - The access token received from authorizing Jira.

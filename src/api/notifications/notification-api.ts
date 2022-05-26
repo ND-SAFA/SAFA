@@ -215,7 +215,7 @@ async function projectMessageHandler(
  * @param jobId The id for the job whose updates we want to process.
  */
 export function connectAndSubscribeToJob(jobId: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!jobId) {
       resolve();
       return;

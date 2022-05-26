@@ -1,4 +1,3 @@
-import { NodeCollection } from "cytoscape";
 import {
   KlayLayoutSettings,
   LayoutHook,

@@ -111,7 +111,7 @@ export interface InternalJiraCredentials {
   /**
    * The API bearer access token.
    */
-  accessToken: string;
+  bearerAccessToken: string;
   /**
    * The API refresh token.
    */

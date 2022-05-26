@@ -34,7 +34,7 @@ export function handleAuthorizeJira(
     );
 
     onSuccess?.({
-      accessToken: token.access_token,
+      bearerAccessToken: token.access_token,
       refreshToken: token.refresh_token,
       cloudId: localStorage.getItem(LocalStorageKeys.JIRA_CLOUD_ID) || "",
       clientId: process.env.VUE_APP_JIRA_CLIENT_ID || "",
@@ -68,7 +68,7 @@ export function handleLoadJiraProjects(
   saveJiraCredentials(credentials)
     .then(async () => {
       const projects = await getJiraProjects(
-        credentials.accessToken,
+        credentials.bearerAccessToken,
         credentials.cloudId
       );
 

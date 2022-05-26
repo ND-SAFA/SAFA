@@ -173,7 +173,7 @@ export async function saveJiraCredentials(
   credentials: InternalJiraCredentials
 ): Promise<void> {
   return authHttpClient<void>(Endpoint.jiraCredentials, {
-    method: "PUT",
+    method: "POST",
     body: JSON.stringify(credentials),
   });
 }

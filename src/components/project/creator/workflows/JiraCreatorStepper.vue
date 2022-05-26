@@ -134,7 +134,7 @@ export default Vue.extend({
       if (!this.credentials) return;
 
       this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.credentials.accessToken);
+      this.sites = await getJiraCloudSites(this.credentials.bearerAccessToken);
       this.sitesLoading = false;
     },
     /**

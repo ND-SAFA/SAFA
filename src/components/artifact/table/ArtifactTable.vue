@@ -223,7 +223,7 @@ export default Vue.extend({
      * @param artifact - The artifact to delete.
      */
     handleDelete(artifact: Artifact) {
-      handleDeleteArtifact(artifact);
+      handleDeleteArtifact(artifact, {});
     },
     /**
      * Opens the create artifact window.

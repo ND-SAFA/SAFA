@@ -105,6 +105,7 @@ export function createProjectDelta(): ProjectDelta {
 export function createArtifact(artifact?: Partial<Artifact>): Artifact {
   return {
     id: artifact?.id || "",
+    baseEntityId: artifact?.baseEntityId || "",
     name: artifact?.name || "",
     summary: artifact?.summary || "",
     body: artifact?.body || "",

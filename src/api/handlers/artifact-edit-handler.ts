@@ -76,26 +76,59 @@ export async function handleSaveArtifact(
 }
 
 /**
+ * Duplicates an artifact, and updates the app state.
+ *
+ * @param artifact  - The artifact to duplicate.
+ * @param onSuccess - Called if the duplicate is successful.
+ * @param onError - Called if the duplicate fails.
+ */
+export function handleDuplicateArtifact(
+  artifact: Artifact,
+  { onSuccess, onError }: IOHandlerCallback
+): Promise<void> {
+  return handleSaveArtifact(
+    {
+      ...artifact,
+      name: artifact.name + " (Copy)",
+      id: "",
+      baseEntityId: "",
+    },
+    false,
+    undefined,
+    { onSuccess, onError }
+  );
+}
+
+/**
  * Deletes an artifact, and updates the app state.
  *
  * @param artifact  - The artifact to delete.
+ * @param onSuccess - Called if the delete is successful.
+ * @param onError - Called if the delete fails.
  */
-export function handleDeleteArtifact(artifact: Artifact): Promise<void> {
+export function handleDeleteArtifact(
+  artifact: Artifact,
+  { onSuccess, onError }: IOHandlerCallback
+): Promise<void> {
   return new Promise((resolve, reject) => {
     logModule.SET_CONFIRMATION_MESSAGE({
       type: ConfirmationType.INFO,
       title: `Delete ${artifact.name}?`,
       body: `Deleting this artifact cannot be undone in this version of SAFA.`,
       statusCallback: (isConfirmed: boolean) => {
-        if (isConfirmed) {
-          deleteArtifact(artifact)
-            .then(async () => {
-              await projectModule.deleteArtifacts([artifact]);
-              await artifactSelectionModule.UNSELECT_ARTIFACT();
-            })
-            .then(resolve)
-            .catch(reject);
-        }
+        if (!isConfirmed) return;
+
+        deleteArtifact(artifact)
+          .then(async () => {
+            await projectModule.deleteArtifacts([artifact]);
+            await artifactSelectionModule.UNSELECT_ARTIFACT();
+            onSuccess?.();
+            resolve();
+          })
+          .catch((e) => {
+            onError?.(e);
+            reject(e);
+          });
       },
     });
   });

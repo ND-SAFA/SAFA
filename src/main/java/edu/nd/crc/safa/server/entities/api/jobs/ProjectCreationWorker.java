@@ -49,9 +49,10 @@ public class ProjectCreationWorker extends JobWorker {
 
     @Override
     public void done() {
-        super.done();
         this.projectEntities = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );
+        this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());
+        super.done();
     }
 }

@@ -25,7 +25,7 @@ export function handlers(projectId: string, versionId: string): Promise<void> {
       .then(() => {
         clearSubscriptions();
         stompClient.subscribe(
-          fillEndpoint(Endpoint.submitJobProject, { projectId }),
+          fillEndpoint(Endpoint.projectTopic, { projectId }),
           async (frame) => {
             await projectMessageHandler(projectId, frame);
           }

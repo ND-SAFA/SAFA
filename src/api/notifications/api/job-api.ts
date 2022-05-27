@@ -22,7 +22,7 @@ export function connectAndSubscribeToJob(jobId: string): Promise<void> {
     connect().then(() => {
       //clearSubscriptions();
       stompClient.subscribe(
-        fillEndpoint(Endpoint.listenForJob, { jobId }),
+        fillEndpoint(Endpoint.jobTopic, { jobId }),
         jobMessageHandler
       );
       resolve();

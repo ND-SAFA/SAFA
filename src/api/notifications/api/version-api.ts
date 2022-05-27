@@ -26,7 +26,6 @@ export async function versionApi(
     case "WARNINGS":
       return handleReloadWarnings(versionId);
   }
-
   // Handlers for manual entity updates.
   if (sessionModule.userEmail !== message.user) {
     switch (message.type) {

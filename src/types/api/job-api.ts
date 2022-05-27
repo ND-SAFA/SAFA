@@ -42,6 +42,10 @@ export interface Job {
    * Integer percentage of current progress of the job.
    */
   currentProgress: number;
+  /**
+   * The UUID of the entity completed or updated by this job.
+   */
+  completedEntityId?: string;
 }
 
 /**

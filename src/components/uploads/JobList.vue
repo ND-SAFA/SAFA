@@ -3,7 +3,7 @@
     <p v-if="uploads.length === 0" class="text-caption">
       There aren't any uploads yet.
     </p>
-    <job-panel v-for="upload in uploads" :key="upload.id" :upload="upload" />
+    <job-panel v-for="upload in uploads" :key="upload.id" :job="upload" />
   </v-expansion-panels>
 </template>
 

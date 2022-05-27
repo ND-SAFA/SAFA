@@ -3,44 +3,44 @@
     <v-expansion-panel-header disable-icon-rotate>
       <v-row no-gutters>
         <v-col cols="4">
-          {{ upload.name }}
+          {{ job.name }}
         </v-col>
         <v-col cols="8" class="text--secondary">
-          <v-row v-if="isCancelled(upload.status)" no-gutters>
+          <v-row v-if="isCancelled(job.status)" no-gutters>
             <v-col cols="4"> Upload Cancelled </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(upload.lastUpdatedAt) }}
+              {{ getUpdatedText(job.lastUpdatedAt) }}
             </v-col>
           </v-row>
-          <span v-else-if="isCompleted(upload.status)">
-            {{ getCompletedText(upload.completedAt) }}
+          <span v-else-if="isCompleted(job.status)">
+            {{ getCompletedText(job.completedAt) }}
           </span>
           <v-row v-else no-gutters>
             <v-col cols="4">
-              Upload Progress: {{ upload.currentProgress }}%
+              Upload Progress: {{ job.currentProgress }}%
             </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(upload.lastUpdatedAt) }}
+              {{ getUpdatedText(job.lastUpdatedAt) }}
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <template v-slot:actions>
         <div style="width: 120px" class="d-flex justify-end">
-          <v-chip :color="getStatusColor(upload.status)">
+          <v-chip :color="getStatusColor(job.status)">
             <span class="mr-1">
-              {{ formatStatus(upload.status) }}
+              {{ formatStatus(job.status) }}
             </span>
             <v-progress-circular
-              v-if="isInProgress(upload.status)"
+              v-if="isInProgress(job.status)"
               indeterminate
               size="16"
               class="mx-1"
             />
-            <v-icon v-if="isCompleted(upload.status)">
+            <v-icon v-if="isCompleted(job.status)">
               mdi-check-circle-outline
             </v-icon>
-            <v-icon v-if="isCancelled(upload.status)">
+            <v-icon v-if="isCancelled(job.status)">
               mdi-close-circle-outline
             </v-icon>
           </v-chip>
@@ -49,12 +49,12 @@
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
-      <v-stepper alt-labels class="elevation-0" v-model="upload.currentStep">
+      <v-stepper alt-labels class="elevation-0" v-model="job.currentStep">
         <v-stepper-header>
-          <template v-for="(step, stepIndex) in upload.steps">
+          <template v-for="(step, stepIndex) in job.steps">
             <v-stepper-step :key="stepIndex" :step="stepIndex">
               <span class="upload-step">
-                {{ upload.steps[stepIndex] }}
+                {{ job.steps[stepIndex] }}
               </span>
             </v-stepper-step>
             <v-divider :key="step" />
@@ -63,10 +63,14 @@
       </v-stepper>
 
       <div class="d-flex">
-        <v-btn color="error" class="mr-1" @click="deleteJob(upload)">
+        <v-btn color="error" class="mr-1" @click="deleteJob(job)">
           Delete Upload
         </v-btn>
-        <v-btn color="primary" :disabled="!isCompleted(upload.status)">
+        <v-btn
+          color="primary"
+          :disabled="!isCompleted(job.status)"
+          @click="viewProject(job)"
+        >
           View Project
         </v-btn>
       </div>
@@ -78,15 +82,17 @@
 import Vue, { PropType } from "vue";
 import { Job, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
-import { handleDeleteJob } from "@/api";
+import { handleDeleteJob, handleLoadVersion } from "@/api";
+import { logModule } from "@/store";
 
 /**
  * Displays a project import job.
+ * TODO: Close panel before deleting job.
  */
 export default Vue.extend({
   name: "JobPanel",
   props: {
-    upload: {
+    job: {
       type: Object as PropType<Job>,
       required: true,
     },
@@ -140,6 +146,16 @@ export default Vue.extend({
      */
     deleteJob(job: Job): void {
       handleDeleteJob(job, {});
+    },
+    /**
+     * Navigates user to the completed project.
+     */
+    viewProject(job: Job): void {
+      if (job.completedEntityId) {
+        handleLoadVersion(job.completedEntityId).then();
+      } else {
+        logModule.onError("Project creation contains empty ID.");
+      }
     },
   },
 });

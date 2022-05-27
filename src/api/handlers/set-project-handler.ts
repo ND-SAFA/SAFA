@@ -12,11 +12,7 @@ import {
   typeOptionsModule,
   viewportModule,
 } from "@/store";
-import {
-  connectAndSubscribeToVersion,
-  handleLoadTraceMatrices,
-  handleLoadVersion,
-} from "@/api";
+import { handlers, handleLoadTraceMatrices, handleLoadVersion } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
 import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
 
@@ -55,7 +51,7 @@ export async function handleProjectSubscription(
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
 
-  await connectAndSubscribeToVersion(projectId, versionId);
+  await handlers(projectId, versionId);
   await projectModule.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();

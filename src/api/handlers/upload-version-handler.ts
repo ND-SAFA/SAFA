@@ -1,6 +1,6 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { connectAndSubscribeToVersion } from "@/api/notifications";
+import { handlers } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/job-handler";
 
 /**
@@ -27,9 +27,7 @@ export async function handleUploadProjectVersion(
     });
 
     if (setVersionIfSuccessful) {
-      connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
-        logModule.onError(e.message)
-      );
+      handlers(projectId, versionId).catch((e) => logModule.onError(e.message));
     }
 
     const uploadFlatFiles = async () => {
@@ -43,7 +41,7 @@ export async function handleUploadProjectVersion(
     if (setVersionIfSuccessful) {
       try {
         appModule.onLoadStart();
-        await connectAndSubscribeToVersion(projectId, versionId);
+        await handlers(projectId, versionId);
         await uploadFlatFiles();
       } catch (e) {
         logModule.onError(e.message);

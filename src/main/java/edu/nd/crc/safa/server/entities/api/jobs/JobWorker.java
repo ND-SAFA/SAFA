@@ -54,6 +54,7 @@ public abstract class JobWorker implements Job {
         for (String stepName : stepNames) {
             try {
                 // Pre-step
+                Thread.sleep(1000);
                 Method method = getMethodForStepByName(stepName);
                 this.jobService.startStep(jobDbEntity);
                 this.notificationService.broadUpdateJobMessage(jobDbEntity);

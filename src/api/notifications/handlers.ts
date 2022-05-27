@@ -31,7 +31,7 @@ export function handlers(projectId: string, versionId: string): Promise<void> {
           }
         );
         stompClient.subscribe(
-          fillEndpoint(Endpoint.submitJobVersion, { projectId }),
+          fillEndpoint(Endpoint.versionTopic, { versionId }),
           async (frame) => {
             await versionApi(versionId, frame);
           }

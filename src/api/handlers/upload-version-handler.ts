@@ -1,6 +1,6 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { handlers } from "@/api/notifications";
+import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/job-handler";
 
 /**
@@ -27,21 +27,21 @@ export async function handleUploadProjectVersion(
     });
 
     if (setVersionIfSuccessful) {
-      handlers(projectId, versionId).catch((e) => logModule.onError(e.message));
+      handleSelectVersion(projectId, versionId).catch((e) =>
+        logModule.onError(e.message)
+      );
     }
 
     const uploadFlatFiles = async () => {
       const job = await handleJobSubmission(versionId, formData);
-
       logModule.onSuccess(`Project upload has been submitted.`);
-
       return job;
     };
 
     if (setVersionIfSuccessful) {
       try {
         appModule.onLoadStart();
-        await handlers(projectId, versionId);
+        await handleSelectVersion(projectId, versionId);
         await uploadFlatFiles();
       } catch (e) {
         logModule.onError(e.message);

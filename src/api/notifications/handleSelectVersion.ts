@@ -14,7 +14,10 @@ import {
  * @param projectId - The project ID to connect to.
  * @param versionId - The project version ID to connect to.
  */
-export function handlers(projectId: string, versionId: string): Promise<void> {
+export function handleSelectVersion(
+  projectId: string,
+  versionId: string
+): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!projectId || !versionId) {
       resolve();

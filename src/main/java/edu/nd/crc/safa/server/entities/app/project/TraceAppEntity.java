@@ -7,11 +7,15 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.json.JSONObject;
 
 /**
  * Represents the front-end model of a trace link.
  */
+@Getter
+@Setter
 public class TraceAppEntity implements IAppEntity {
     @NotNull
     public String traceLinkId; // TODO: Convert to UUID
@@ -65,70 +69,6 @@ public class TraceAppEntity implements IAppEntity {
         this.setSourceName(sourceName);
         this.setTargetName(targetName);
         return this;
-    }
-
-    public TraceApproval getApprovalStatus() {
-        return approvalStatus;
-    }
-
-    public void setApprovalStatus(TraceApproval approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
-    public TraceType getTraceType() {
-        return traceType;
-    }
-
-    public void setTraceType(TraceType traceType) {
-        this.traceType = traceType;
-    }
-
-    public String getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    public String getTargetId() {
-        return targetId;
-    }
-
-    public void setTargetId(String targetId) {
-        this.targetId = targetId;
-    }
-
-    public String getSourceName() {
-        return this.sourceName;
-    }
-
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
-    }
-
-    public String getTargetName() {
-        return this.targetName;
-    }
-
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
-    }
-
-    public String getTraceLinkId() {
-        return traceLinkId;
-    }
-
-    public void setTraceLinkId(String traceLinkId) {
-        this.traceLinkId = traceLinkId;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
     }
 
     public String toString() {

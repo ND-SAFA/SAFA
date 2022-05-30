@@ -15,6 +15,7 @@ import javax.validation.constraints.Positive;
 
 import edu.nd.crc.safa.config.AppConstraints;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -42,6 +43,7 @@ public class ProjectVersion implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
+    @JsonIgnore
     Project project;
 
     @NotNull

@@ -16,6 +16,7 @@ import javax.persistence.UniqueConstraint;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
+import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -32,6 +33,7 @@ import org.json.JSONObject;
         }, name = AppConstraints.SINGLE_TRACE_VERSION_PER_PROJECT_VERSION)
     }
 )
+@Data
 public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEntity> {
 
     @Id
@@ -138,12 +140,9 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return this;
     }
 
-    public UUID getTraceLinkVersionId() {
-        return traceLinkVersionId;
-    }
-
-    public void setTraceLinkVersionId(UUID traceLinkVersionId) {
-        this.traceLinkVersionId = traceLinkVersionId;
+    public TraceLinkVersion withApprovalStatus(ApprovalStatus approvalStatus) {
+        this.setApprovalStatus(approvalStatus);
+        return this;
     }
 
     public TraceLink getTraceLink() {
@@ -186,24 +185,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         json.put("approved", getApprovalStatus());
         json.put("type", this.traceType);
         return json + "\n";
-    }
-
-    @Override
-    public ProjectVersion getProjectVersion() {
-        return this.projectVersion;
-    }
-
-    public void setProjectVersion(ProjectVersion projectVersion) {
-        this.projectVersion = projectVersion;
-    }
-
-    @Override
-    public ModificationType getModificationType() {
-        return this.modificationType;
-    }
-
-    public void setModificationType(ModificationType modificationType) {
-        this.modificationType = modificationType;
     }
 
     @Override

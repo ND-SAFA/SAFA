@@ -4,7 +4,7 @@ import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class TraceAppEntity implements IAppEntity {
     @NotEmpty
     public String targetName;
     public String targetId;
-    public TraceApproval approvalStatus;
+    public ApprovalStatus approvalStatus;
     public double score;
     public TraceType traceType;
 
@@ -38,7 +38,7 @@ public class TraceAppEntity implements IAppEntity {
                           String sourceId,
                           String targetName,
                           String targetId,
-                          TraceApproval traceApproval,
+                          ApprovalStatus approvalStatus,
                           double score,
                           TraceType traceType) {
         this.traceLinkId = traceLinkId;
@@ -46,20 +46,20 @@ public class TraceAppEntity implements IAppEntity {
         this.sourceId = sourceId;
         this.targetName = targetName;
         this.targetId = targetId;
-        this.approvalStatus = traceApproval;
+        this.approvalStatus = approvalStatus;
         this.score = score;
         this.traceType = traceType;
     }
 
     public TraceAppEntity asManualTrace() {
-        this.setApprovalStatus(TraceApproval.APPROVED);
+        this.setApprovalStatus(ApprovalStatus.APPROVED);
         this.setScore(1);
         this.setTraceType(TraceType.MANUAL);
         return this;
     }
 
     public TraceAppEntity asGeneratedTrace(double score) {
-        this.setApprovalStatus(TraceApproval.UNREVIEWED);
+        this.setApprovalStatus(ApprovalStatus.UNREVIEWED);
         this.setScore(score);
         this.setTraceType(TraceType.GENERATED);
         return this;

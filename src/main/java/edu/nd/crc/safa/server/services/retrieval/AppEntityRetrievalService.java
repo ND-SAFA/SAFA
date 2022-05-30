@@ -14,13 +14,13 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
@@ -262,7 +262,7 @@ public class AppEntityRetrievalService {
             this.traceLinkVersionRepository
                 .retrieveVersionEntitiesByProjectVersion(projectVersion)
                 .stream()
-                .filter(t -> t.getApprovalStatus() == TraceApproval.APPROVED)
+                .filter(t -> t.getApprovalStatus() == ApprovalStatus.APPROVED)
                 .map(TraceLinkVersion::getTraceLink)
                 .collect(Collectors.toList());
         return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);

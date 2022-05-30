@@ -13,10 +13,10 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.json.JSONArray;
@@ -83,10 +83,10 @@ public class TestLinkApproval extends TraceBaseTest {
         Optional<TraceLinkVersion> unreviewedLinkQuery = traceLinkVersionRepository
             .findByProjectVersionAndTraceLink(projectVersion, generatedLink.getTraceLink());
         assertThat(unreviewedLinkQuery.isPresent()).isTrue();
-        assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.UNREVIEWED);
+        assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.UNREVIEWED);
 
         // Step - Set trace link status to approved
-        generatedLink.setApprovalStatus(TraceApproval.APPROVED);
+        generatedLink.setApprovalStatus(ApprovalStatus.APPROVED);
 
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
@@ -101,10 +101,10 @@ public class TestLinkApproval extends TraceBaseTest {
                 projectVersion,
                 generatedLink.getTraceLink());
         assertThat(approvedLinkQuery.isPresent()).isTrue();
-        assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
+        assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.APPROVED);
 
         // Step - Set trace link status to decline d
-        generatedLink.setApprovalStatus(TraceApproval.DECLINED);
+        generatedLink.setApprovalStatus(ApprovalStatus.DECLINED);
 
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLink = this.traceLinkVersionRepository
@@ -118,7 +118,7 @@ public class TestLinkApproval extends TraceBaseTest {
             projectVersion,
             generatedLink.getTraceLink());
         assertThat(declinedLinkQuery.isPresent()).isTrue();
-        assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.DECLINED);
+        assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.DECLINED);
     }
 
     /**

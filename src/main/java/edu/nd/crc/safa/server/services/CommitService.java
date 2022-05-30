@@ -64,7 +64,7 @@ public class CommitService {
         for (ArtifactAppEntity artifact : projectCommit.getArtifacts().getRemoved()) {
             List<TraceAppEntity> linksToArtifact = this.appEntityRetrievalService
                 .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
-            projectCommit.addTraceToDelete(linksToArtifact);
+            projectCommit.addRemovedTraces(linksToArtifact);
         }
 
         // Commit artifact and trace changes.

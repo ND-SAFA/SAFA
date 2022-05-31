@@ -24,7 +24,7 @@ export function handleSaveProject(
   { onSuccess, onError }: IOHandlerCallback<Project>
 ): void {
   saveProject(project)
-    .then(({ project }: ProjectEntities) => {
+    .then((project: Project) => {
       logModule.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })

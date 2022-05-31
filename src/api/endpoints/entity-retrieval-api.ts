@@ -1,4 +1,4 @@
-import { Artifact, ProjectEntities, TraceLink } from "@/types";
+import { Artifact, Project, TraceLink } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
@@ -7,10 +7,8 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
  * @param versionId - The project version ID to get.
  * @return The matching project.
  */
-export async function getProjectVersion(
-  versionId: string
-): Promise<ProjectEntities> {
-  return authHttpClient<ProjectEntities>(
+export async function getProjectVersion(versionId: string): Promise<Project> {
+  return authHttpClient<Project>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );

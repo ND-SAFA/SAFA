@@ -77,11 +77,11 @@ export async function handleClearProject(): Promise<void> {
 /**
  * Sets a newly created project.
  *
- * @param res - The created project and warnings.
+ * @param project - Project created containing entities.
  */
-export async function handleSetProject(res: ProjectEntities): Promise<void> {
-  await handleProjectSubscription(res.project);
-  errorModule.setArtifactWarnings(res.warnings);
+export async function handleSetProject(project: Project): Promise<void> {
+  await handleProjectSubscription(project);
+  errorModule.setArtifactWarnings(project.warnings);
 }
 
 /**

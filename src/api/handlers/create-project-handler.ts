@@ -22,10 +22,10 @@ export function handleImportProject(
   appModule.onLoadStart();
 
   saveProject(project)
-    .then(async (res) => {
+    .then(async (projectCreated) => {
       logModule.onSuccess(`Project has been created: ${project.name}`);
       await navigateTo(Routes.ARTIFACT);
-      await handleSetProject(res);
+      await handleSetProject(projectCreated);
       onSuccess?.();
     })
     .catch((e) => {
@@ -45,7 +45,10 @@ export function handleImportProject(
  * @param onError - Called if the action fails.
  */
 export function handleBulkImportProject(
-  project: Pick<Project, "projectId" | "name" | "description">,
+  project: Pick<
+    Project,
+    "projectId" | "name" | "description" | "projectVersion"
+  >,
   files: File[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
@@ -54,8 +57,8 @@ export function handleBulkImportProject(
   saveProject(project)
     .then(async (project) =>
       handleUploadProjectVersion(
-        project.project.projectId,
-        project.projectVersion.versionId,
+        project.projectId,
+        project.projectVersion?.versionId || "",
         files,
         true
       )

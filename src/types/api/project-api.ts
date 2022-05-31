@@ -15,10 +15,6 @@ export interface ProjectEntities {
    * The created project.
    */
   project: Project;
-  /**
-   * A collection of warnings on project artifacts.
-   */
-  warnings: Record<string, ArtifactWarning[]>;
 }
 
 /**

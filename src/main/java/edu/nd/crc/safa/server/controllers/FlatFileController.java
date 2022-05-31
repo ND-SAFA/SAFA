@@ -98,7 +98,7 @@ public class FlatFileController extends BaseController {
 
         Project project = new Project("", "");
         this.projectService.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = projectService.createBaseProjectVersion(project);
+        ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
 
         ProjectEntities response = this.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,

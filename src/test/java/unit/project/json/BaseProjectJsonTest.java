@@ -18,10 +18,13 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
     protected final int N_TRACES = 1;
     protected final String a1Type = "requirement";
     protected final String a1Name = "RE-8";
+    protected final String a1Body = "this is a requirement";
     protected final String a2Type = "design";
     protected final String a2Name = "DD-10";
+    protected final String a2Body = "this is a design";
     protected final String projectName = "test-project";
     protected final String projectDescription = "test-description";
+    protected final String EMPTY = "";
 
     protected JSONObject postProjectJson(JSONObject projectJson) throws Exception {
         return postProjectJson(projectJson, status().isCreated());
@@ -29,22 +32,35 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
 
     protected JSONObject postProjectJson(JSONObject projectJson,
                                          ResultMatcher expectedStatus) throws Exception {
-        return sendPost(AppRoutes.Projects.createOrUpdateProjects, projectJson, expectedStatus);
+        return sendPost(AppRoutes.Projects.createOrUpdateProjectMeta, projectJson, expectedStatus);
     }
 
     /**
-     * Creates a project containing two a requirement and design, a trace link between them, the the baseline
-     * project version.
+     * Creates a project containing two artifacts and a trace link between them.
+     * The artifacts are of type requirement and design.
      *
      * @return JSONObject formatted for a ProjectAppEntity
      */
     protected JSONObject createBaseProjectJson() {
+        return createBaseProjectJson(EMPTY, a1Body, EMPTY, a2Body);
+
+    }
+
+    protected JSONObject createBaseProjectWithUpdatedArtifactJson(String a1Id, String a1Body) {
+        return createBaseProjectJson(a1Id, a1Body, EMPTY, a2Body);
+    }
+
+    private JSONObject createBaseProjectJson(
+        String a1Id,
+        String a1Body,
+        String a2Id,
+        String a2Body) {
         String emptyArtifactId = "";
         return jsonBuilder
             .withProject("", projectName, projectDescription)
-            .withArtifact(projectName, emptyArtifactId, a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, emptyArtifactId, a2Name, a2Type, "this is a design")
+            .withArtifact(projectName, a1Id, a1Name, a1Type, a1Body)
+            .withArtifact(projectName, a2Id, a2Name, a2Type, a2Body)
             .withTrace(projectName, a1Name, a2Name)
-            .getPayload(projectName);
+            .getProjectJson(projectName);
     }
 }

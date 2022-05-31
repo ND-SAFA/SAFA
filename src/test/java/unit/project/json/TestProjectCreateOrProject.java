@@ -45,8 +45,10 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
      */
     @Test
     public void updateEntities() throws Exception {
-        // Step - Create Project containing:
+        // Step - Create Project JSON
         JSONObject projectJson = createBaseProjectJson();
+
+        // Step - Create project via JSON
         JSONObject responseContent = postProjectJson(projectJson);
         String projectId = responseContent
             .getJSONObject("project")
@@ -55,32 +57,21 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
             .getJSONObject("projectVersion")
             .getString("versionId");
         Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
-        testProjectArtifactsCreated(project, 1);
         List<ArtifactVersion> artifactBodiesQuery =
             this.artifactVersionRepository.getBodiesWithName(project, a1Name);
         assertThat(artifactBodiesQuery.size()).as("# of bodies on init").isEqualTo(1);
 
         // Step - Create Updated Request and Send
         String newProjectName = "new-project-name";
-        String newArtifactBody = "new-artifact-body";
-        String artifactId = artifactBodiesQuery.get(0).getArtifact().getArtifactId().toString();
         JSONObject updateRequestJson = jsonBuilder
             .withProject(projectId, newProjectName, projectDescription)
             .withProjectVersion(newProjectName, versionId, 1, 1, 2)
-            .withArtifact(newProjectName, artifactId, a1Name, a1Type, newArtifactBody)
-            .getPayload(newProjectName);
+            .getProjectJson(newProjectName);
         postProjectJson(updateRequestJson);
 
         // VP - Verify that project name has changed
         Project updatedProject = this.projectRepository.findByProjectId(UUID.fromString(projectId));
         assertThat(updatedProject.getName()).isEqualTo(newProjectName);
-        // VP - Verify that entities still exist and no other version was created
-        testProjectArtifactsCreated(project, 1);
-        // VP - Verify that artifact has two versions and the latest has updated body.
-        artifactBodiesQuery =
-            this.artifactVersionRepository.getBodiesWithName(project, a1Name);
-        assertThat(artifactBodiesQuery.size()).as("# of bodies on update").isEqualTo(1);
-        assertThat(artifactBodiesQuery.get(0).getContent()).isEqualTo(newArtifactBody);
     }
 
     private void testProjectArtifactsCreated(Project project, int expectedVersions) {

@@ -44,35 +44,39 @@ public class ProjectController extends BaseController {
     }
 
     /**
-     * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
-     * not specified are assumed to be removed if version is specified.
+     * Creates or updates project meta information via JSON.
+     * Project is created if no project ID is given. Otherwise, update is assumed.
      *
      * @param project The project entity containing artifacts, traces, name, and descriptions.
      * @return The project and associated entities created.
      * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
      *                   payload.
      */
-    @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
+    @PostMapping(AppRoutes.Projects.createOrUpdateProjectMeta)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
-        Project payloadProject = Project.fromAppEntity(project);
-        ProjectVersion payloadProjectVersion = project.projectVersion;
+    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project)
+        throws SafaError {
 
-        ProjectEntities projectEntities;
-        if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            if (payloadProjectVersion != null
-                && payloadProjectVersion.hasValidVersion()
-                && payloadProjectVersion.hasValidId()) {
-                throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
-            }
-            projectEntities = this.projectService.createNewProjectWithVersion(payloadProject, project);
+        ProjectVersion payloadProjectVersion = project.projectVersion;
+        ProjectEntities response;
+
+
+        if (project.projectId.equals("")) { // new projects expected to have no projectId or projectVersion
+            Project projectEntity = Project.fromAppEntity(project);
+            projectService.saveProjectWithCurrentUserAsOwner(projectEntity);
+            ProjectVersion projectVersion = projectService.createInitialProjectVersion(projectEntity);
+            project.setProjectId(projectEntity.getProjectId().toString());
+            response = new ProjectEntities(project, projectVersion);
         } else {
-            this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
-            projectEntities = this.projectService.updateProjectAtVersion(
-                payloadProject, payloadProjectVersion, project);
+            UUID projectId = UUID.fromString(project.getProjectId());
+            Project persistentProject = this.projectRepository.findByProjectId(projectId);
+            persistentProject.setName(project.getName());
+            persistentProject.setDescription(project.getDescription());
+            this.projectRepository.save(persistentProject);
+            response = new ProjectEntities(project, project.getProjectVersion());
         }
 
-        return projectEntities;
+        return response;
     }
 
     /**

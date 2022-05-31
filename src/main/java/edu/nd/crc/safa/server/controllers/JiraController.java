@@ -47,7 +47,7 @@ public class JiraController extends BaseController {
     private final ProjectService projectService;
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
-    
+
     private final ExecutorDelegate executorDelegate;
 
     @Autowired
@@ -82,7 +82,7 @@ public class JiraController extends BaseController {
             project.setDescription(response.getDescription());
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
-            ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
+            ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
             ProjectEntities projectEntities = appEntityRetrievalService
                 .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 

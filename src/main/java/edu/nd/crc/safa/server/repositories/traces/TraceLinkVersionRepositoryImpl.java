@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -52,7 +53,8 @@ public class TraceLinkVersionRepositoryImpl
                 .withProjectVersion(projectVersion)
                 .withTraceLink(traceLink)
                 .withModificationType(ModificationType.REMOVED)
-                .withManualTraceType();
+                .withManualTraceType()
+                .withApprovalStatus(ApprovalStatus.DECLINED);
         }
         return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
             modificationType,

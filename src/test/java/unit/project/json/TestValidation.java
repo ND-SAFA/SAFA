@@ -32,7 +32,7 @@ public class TestValidation extends BaseProjectJsonTest {
             .withArtifact(projectName, "", a2Name, a2Type, "this is a design")
             .withTrace(projectName, a1Name, a2Name)
             .withProjectVersion(projectName, mockVersionId, 1, 1, 1)
-            .getPayload(projectName);
+            .getProjectJson(projectName);
 
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
         String errorMessage = response.getString("message");
@@ -59,7 +59,7 @@ public class TestValidation extends BaseProjectJsonTest {
             .withArtifact(projectName, "", a2Name, a2Type, "this is a design")
             .withTrace(projectName, a1Name, a2Name)
             .withProjectVersion(projectName, "", 1, 1, 1)
-            .getPayload(projectName);
+            .getProjectJson(projectName);
 
         // Step - Send update request
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
@@ -88,7 +88,7 @@ public class TestValidation extends BaseProjectJsonTest {
         JSONObject payload = jsonBuilder
             .withProject(projectId, projectName, projectDescription)
             .withProjectVersion(projectName, mockVersionId, 1, -1, 0)
-            .getPayload(projectName);
+            .getProjectJson(projectName);
 
         // Step - Send project creation request
         JSONObject response = postProjectJson(payload, status().is4xxClientError());
@@ -183,7 +183,7 @@ public class TestValidation extends BaseProjectJsonTest {
         List<JSONObject> artifacts,
         List<JSONObject> traces) throws Exception {
         // Step - Setup constants
-        String url = AppRoutes.Projects.createOrUpdateProjects;
+        String url = AppRoutes.Projects.createOrUpdateProjectMeta;
         JSONObject projectJson = new JSONObject();
 
         // Step - Create project payload

@@ -41,6 +41,7 @@ public class ProjectService {
     private final ProjectVersionRepository projectVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserRepository safaUserRepository;
+    private final CommitService commitService;
 
     private final SafaUserService safaUserService;
     private final EntityVersionService entityVersionService;
@@ -96,9 +97,9 @@ public class ProjectService {
             .collect(Collectors.toList());
     }
 
-    public ProjectEntities updateProjectAtVersion(Project project,
-                                                  ProjectVersion projectVersion,
-                                                  ProjectAppEntity payload) throws SafaError {
+    public Project updateProjectAtVersion(Project project,
+                                          ProjectVersion projectVersion,
+                                          ProjectAppEntity payload) throws SafaError {
         ProjectEntities response;
         Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
         persistentProject.setName(project.getName());
@@ -110,7 +111,7 @@ public class ProjectService {
                 && payload.artifacts.size() > 0)) {
                 throw new SafaError("Cannot update artifacts because project version not defined");
             }
-            response = new ProjectEntities(payload, null, null, null);
+            response = new ProjectEntities(payload, null, null);
         } else if (!projectVersion.hasValidId()) {
             throw new SafaError("Invalid Project version: must have a valid ID.");
         } else if (!projectVersion.hasValidVersion()) {
@@ -122,6 +123,7 @@ public class ProjectService {
             response = entityVersionService.setProjectEntitiesAtVersion(projectVersion,
                 payload.getArtifacts(),
                 payload.getTraces());
+            commitService
         }
         return response;
     }
@@ -139,7 +141,7 @@ public class ProjectService {
         ProjectEntities projectEntities;
 
         this.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.createBaseProjectVersion(project);
+        ProjectVersion projectVersion = this.createInitialProjectVersion(project);
         projectEntities = entityVersionService.setProjectEntitiesAtVersion(
             projectVersion,
             entities.getArtifacts(),
@@ -152,7 +154,7 @@ public class ProjectService {
         this.setCurrentUserAsOwner(project);
     }
 
-    public ProjectVersion createBaseProjectVersion(Project project) {
+    public ProjectVersion createInitialProjectVersion(Project project) {
         ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
         this.projectVersionRepository.save(projectVersion);
         return projectVersion;

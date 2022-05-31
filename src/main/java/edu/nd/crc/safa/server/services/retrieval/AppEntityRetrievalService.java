@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -59,7 +58,6 @@ public class AppEntityRetrievalService {
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final DocumentColumnRepository documentColumnRepository;
-    private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final WarningService warningService;
 
     @Autowired
@@ -70,7 +68,6 @@ public class AppEntityRetrievalService {
                                      ArtifactVersionRepository artifactVersionRepository,
                                      ArtifactTypeRepository artifactTypeRepository,
                                      DocumentColumnRepository documentColumnRepository,
-                                     CommitErrorRetrievalService commitErrorRetrievalService,
                                      WarningService warningService) {
         this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
@@ -79,7 +76,6 @@ public class AppEntityRetrievalService {
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.documentColumnRepository = documentColumnRepository;
-        this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
     }
 
@@ -100,10 +96,8 @@ public class AppEntityRetrievalService {
      */
     public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
-            .collectionProjectErrors(projectVersion);
         Map<String, List<RuleName>> projectWarnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
+        return new ProjectEntities(projectAppEntity, projectVersion, projectWarnings);
     }
 
     /**

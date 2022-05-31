@@ -1,4 +1,4 @@
-import { Artifact, ProjectCreationResponse, TraceLink } from "@/types";
+import { Artifact, ProjectEntities, TraceLink } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
@@ -9,8 +9,8 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
  */
 export async function getProjectVersion(
   versionId: string
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
+): Promise<ProjectEntities> {
+  return authHttpClient<ProjectEntities>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );

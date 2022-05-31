@@ -1,4 +1,4 @@
-import { Project, ProjectCreationResponse } from "@/types";
+import { Project, ProjectEntities } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
@@ -79,9 +79,7 @@ export async function handleClearProject(): Promise<void> {
  *
  * @param res - The created project and warnings.
  */
-export async function handleSetProject(
-  res: ProjectCreationResponse
-): Promise<void> {
+export async function handleSetProject(res: ProjectEntities): Promise<void> {
   await handleProjectSubscription(res.project);
   errorModule.setArtifactWarnings(res.warnings);
 }

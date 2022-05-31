@@ -11,15 +11,11 @@ import {
 /**
  * Defines the response for a created project.
  */
-export interface ProjectCreationResponse {
+export interface ProjectEntities {
   /**
    * The created project.
    */
   project: Project;
-  /**
-   * Any errors from creation.
-   */
-  errors: ProjectErrors;
   /**
    * The version of the project.
    */

@@ -1,7 +1,7 @@
 import {
   MemberRequest,
   Project,
-  ProjectCreationResponse,
+  ProjectEntities,
   ProjectDelta,
   ProjectIdentifier,
   ProjectMembership,
@@ -17,8 +17,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function saveProject(
   project: Pick<Project, "projectId" | "name" | "description">
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(Endpoint.project, {
+): Promise<ProjectEntities> {
+  return authHttpClient<ProjectEntities>(Endpoint.project, {
     method: "POST",
     body: JSON.stringify(project),
   });

@@ -4,7 +4,6 @@ import {
   ArtifactDeltaState,
   TraceLink,
   Project,
-  ProjectErrors,
   ProjectVersion,
 } from "@/types/domain";
 
@@ -16,10 +15,6 @@ export interface ProjectEntities {
    * The created project.
    */
   project: Project;
-  /**
-   * The version of the project.
-   */
-  projectVersion: ProjectVersion;
   /**
    * A collection of warnings on project artifacts.
    */

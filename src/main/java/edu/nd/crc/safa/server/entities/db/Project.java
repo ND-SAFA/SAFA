@@ -10,8 +10,9 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for uniquely identifying which
@@ -19,70 +20,56 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "project")
+@NoArgsConstructor
+@Data
 public class Project implements Serializable {
 
+    /**
+     * Unique identifier for project.
+     */
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "project_id")
     UUID projectId;
-
+    /**
+     * Name of project.
+     */
     @Column(name = "name", nullable = false)
     String name;
-
+    /**
+     * Description of project.
+     */
     @Column(name = "description", nullable = false)
     String description;
-
-    public Project() {
-    }
 
     public Project(String name, String description) {
         this.setName(name);
         this.setDescription(description);
     }
 
-    public static Project fromAppEntity(ProjectAppEntity appEntity) {
+    /**
+     * Creates project entity copying overlapping fields from given entity.
+     *
+     * @param projectAppEntity The project whose fields are copied.
+     * @return Newly created project.
+     */
+    public static Project fromAppEntity(ProjectAppEntity projectAppEntity) {
         Project project = new Project();
-        if (!appEntity.getProjectId().equals("")) {
-            project.projectId = UUID.fromString(appEntity.getProjectId());
-        }
-        project.name = appEntity.getName();
-        project.description = appEntity.getDescription();
+        project.updateFromAppEntity(projectAppEntity);
         return project;
     }
 
-    public UUID getProjectId() {
-        return this.projectId;
-    }
-
-    public void setProjectId(UUID projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean hasDefinedId() {
-        return this.projectId != null && !this.projectId.toString().equals("");
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("projectId", projectId);
-        json.put("name", name);
-        return json.toString();
+    /**
+     * Sets the overlapping fields in given entity.
+     *
+     * @param projectAppEntity The project to update from.
+     */
+    public void updateFromAppEntity(ProjectAppEntity projectAppEntity) {
+        if (!projectAppEntity.getProjectId().equals("")) {
+            this.projectId = UUID.fromString(projectAppEntity.getProjectId());
+        }
+        this.name = projectAppEntity.getName();
+        this.description = projectAppEntity.getDescription();
     }
 }

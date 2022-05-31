@@ -17,28 +17,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that user is able to create and update a project via JSON.
+ * Tests that user is able to submit a project creation job via JSON.
  */
-public class TestProjectCreateOrProject extends BaseProjectJsonTest {
-
-
-    /**
-     * Tests that all entities in the given request created. Namely,
-     * - a source artifact + requirement type
-     * - a target artifact + design type
-     * - a trace link (between artifacts)
-     */
-    @Test
-    public void createEntitiesFromJson() throws Exception {
-        JSONObject projectJson = createBaseProjectJson();
-        JSONObject responseContent = postProjectJson(projectJson);
-        String projectId = responseContent
-            .getJSONObject("project")
-            .getString("projectId");
-        Project project = this.projectRepository.findByProjectId(UUID.fromString(projectId));
-        testProjectArtifactsCreated(project, 1);
-        projectService.deleteProject(project);
-    }
+public class TestJSONJobUpload extends BaseProjectJsonTest {
 
     /**
      * Test that user is able to update project with checks for:
@@ -70,9 +51,9 @@ public class TestProjectCreateOrProject extends BaseProjectJsonTest {
         postProjectJson(updateRequestJson);
 
         // VP - Verify that project name has changed
-        Project updatedProject = this.projectRepository.findByProjectId(UUID.fromString(projectId));
-        assertThat(updatedProject.getName()).isEqualTo(newProjectName);
+        verifyProjectInformation(UUID.fromString(projectId), newProjectName, projectDescription);
     }
+
 
     private void testProjectArtifactsCreated(Project project, int expectedVersions) {
         // VP - Resources were created

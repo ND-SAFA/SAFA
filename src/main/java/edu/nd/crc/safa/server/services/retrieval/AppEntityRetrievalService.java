@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -94,10 +93,11 @@ public class AppEntityRetrievalService {
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        Map<String, List<RuleName>> projectWarnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectWarnings);
+        Map<String, List<RuleName>> warnings = this.retrieveWarningsInProjectVersion(projectVersion);
+        projectAppEntity.setWarnings(warnings);
+        return projectAppEntity;
     }
 
     /**

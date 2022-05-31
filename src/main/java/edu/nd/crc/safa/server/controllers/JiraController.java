@@ -6,11 +6,11 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -68,8 +68,8 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") Long id) {
-        DeferredResult<ProjectEntities> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") Long id) {
+        DeferredResult<ProjectAppEntity> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
@@ -83,7 +83,7 @@ public class JiraController extends BaseController {
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
             ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
-            ProjectEntities projectEntities = appEntityRetrievalService
+            ProjectAppEntity projectEntities = appEntityRetrievalService
                 .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
             output.setResult(projectEntities);

@@ -1,8 +1,12 @@
 package unit.project.json;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -46,8 +50,10 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
 
     }
 
-    protected JSONObject createBaseProjectWithUpdatedArtifactJson(String a1Id, String a1Body) {
-        return createBaseProjectJson(a1Id, a1Body, EMPTY, a2Body);
+    protected void verifyProjectInformation(UUID projectId, String name, String description) {
+        Project updatedProject = this.projectRepository.findByProjectId(projectId);
+        assertThat(updatedProject.getName()).isEqualTo(name);
+        assertThat(updatedProject.getDescription()).isEqualTo(description);
     }
 
     private JSONObject createBaseProjectJson(
@@ -55,7 +61,6 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
         String a1Body,
         String a2Id,
         String a2Body) {
-        String emptyArtifactId = "";
         return jsonBuilder
             .withProject("", projectName, projectDescription)
             .withArtifact(projectName, a1Id, a1Name, a1Type, a1Body)

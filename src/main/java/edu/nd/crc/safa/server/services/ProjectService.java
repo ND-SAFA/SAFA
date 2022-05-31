@@ -8,10 +8,8 @@ import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
@@ -37,28 +35,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProjectService {
 
     private static ProjectService instance;
+
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserRepository safaUserRepository;
-    private final CommitService commitService;
 
     private final SafaUserService safaUserService;
-    private final EntityVersionService entityVersionService;
 
     @Autowired
     public ProjectService(ProjectRepository projectRepository,
                           ProjectVersionRepository projectVersionRepository,
                           ProjectMembershipRepository projectMembershipRepository,
                           SafaUserRepository safaUserRepository,
-                          SafaUserService safaUserService,
-                          EntityVersionService entityVersionService) {
+                          SafaUserService safaUserService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
-        this.entityVersionService = entityVersionService;
     }
 
     public static ProjectService getInstance() {
@@ -95,58 +90,6 @@ public class ProjectService {
                 return new ProjectIdentifier(project, members);
             })
             .collect(Collectors.toList());
-    }
-
-    public Project updateProjectAtVersion(Project project,
-                                          ProjectVersion projectVersion,
-                                          ProjectAppEntity payload) throws SafaError {
-        ProjectEntities response;
-        Project persistentProject = this.projectRepository.findByProjectId(project.getProjectId());
-        persistentProject.setName(project.getName());
-        persistentProject.setDescription(project.getDescription());
-        this.projectRepository.save(persistentProject);
-        //TODO: Revisit why we have so many error checks.
-        if (projectVersion == null) {
-            if ((payload.artifacts != null
-                && payload.artifacts.size() > 0)) {
-                throw new SafaError("Cannot update artifacts because project version not defined");
-            }
-            response = new ProjectEntities(payload, null, null);
-        } else if (!projectVersion.hasValidId()) {
-            throw new SafaError("Invalid Project version: must have a valid ID.");
-        } else if (!projectVersion.hasValidVersion()) {
-            throw new SafaError("Invalid Project version: must contain positive major, minor, and revision "
-                + "numbers.");
-        } else {
-            projectVersion.setProject(project);
-            this.projectVersionRepository.save(projectVersion);
-            response = entityVersionService.setProjectEntitiesAtVersion(projectVersion,
-                payload.getArtifacts(),
-                payload.getTraces());
-            commitService
-        }
-        return response;
-    }
-
-    /**
-     * Creates a base version, saves entities to version, and returns result.
-     *
-     * @param project  The project identifier to relate to version and entities.
-     * @param entities The entities to save to project version.
-     * @return ProjectEntities containing all saved entities.
-     * @throws SafaError Throws error is something occurs while creating artifacts or traces.
-     */
-    public ProjectEntities createNewProjectWithVersion(Project project,
-                                                       ProjectAppEntity entities) throws SafaError {
-        ProjectEntities projectEntities;
-
-        this.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.createInitialProjectVersion(project);
-        projectEntities = entityVersionService.setProjectEntitiesAtVersion(
-            projectVersion,
-            entities.getArtifacts(),
-            entities.getTraces());
-        return projectEntities;
     }
 
     public void saveProjectWithCurrentUserAsOwner(Project project) {

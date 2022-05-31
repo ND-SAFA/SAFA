@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.entities.app.project;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -9,16 +10,19 @@ import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.warnings.RuleName;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.json.JSONObject;
+import lombok.ToString;
 
 /**
  * Represents the front-end model of a project.
  */
 @Getter
 @Setter
+@ToString
 public class ProjectAppEntity {
     @NotNull
     public String projectId;
@@ -32,9 +36,14 @@ public class ProjectAppEntity {
     public List<@Valid @NotNull ArtifactAppEntity> artifacts;
     @NotNull
     public List<@Valid @NotNull TraceAppEntity> traces;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public List<ProjectMemberAppEntity> members;
-    public List<DocumentAppEntity> documents;
-    public List<ArtifactType> artifactTypes;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public List<@Valid @NotNull DocumentAppEntity> documents;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public List<@Valid @NotNull ArtifactType> artifactTypes;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    Map<String, List<@Valid @NotNull RuleName>> warnings;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -61,14 +70,5 @@ public class ProjectAppEntity {
         this.members = members;
         this.documents = documents;
         this.artifactTypes = artifactTypes;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("projectId", this.projectId);
-        json.put("name", this.name);
-        json.put("artifacts", artifacts);
-        json.put("traces", traces);
-        return json.toString();
     }
 }

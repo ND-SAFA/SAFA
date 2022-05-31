@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
@@ -47,36 +46,39 @@ public class ProjectController extends BaseController {
      * Creates or updates project meta information via JSON.
      * Project is created if no project ID is given. Otherwise, update is assumed.
      *
-     * @param project The project entity containing artifacts, traces, name, and descriptions.
+     * @param projectAppEntity The project entity containing artifacts, traces, name, and descriptions.
      * @return The project and associated entities created.
      * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
      *                   payload.
      */
     @PostMapping(AppRoutes.Projects.createOrUpdateProjectMeta)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project)
+    public ProjectAppEntity createOrUpdateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity)
         throws SafaError {
 
-        ProjectVersion payloadProjectVersion = project.projectVersion;
-        ProjectEntities response;
+        ProjectVersion payloadProjectVersion = projectAppEntity.projectVersion;
+        ProjectAppEntity response;
 
-
-        if (project.projectId.equals("")) { // new projects expected to have no projectId or projectVersion
-            Project projectEntity = Project.fromAppEntity(project);
+        if (projectAppEntity.projectId.equals("")) { // new projects expected to have no projectId or projectVersion
+            // Step - Create project identifier
+            Project projectEntity = Project.fromAppEntity(projectAppEntity);
             projectService.saveProjectWithCurrentUserAsOwner(projectEntity);
+            projectAppEntity.setProjectId(projectEntity.getProjectId().toString());
+
+            // Step - Create version
             ProjectVersion projectVersion = projectService.createInitialProjectVersion(projectEntity);
-            project.setProjectId(projectEntity.getProjectId().toString());
-            response = new ProjectEntities(project, projectVersion);
+            projectAppEntity.setProjectVersion(projectVersion);
         } else {
-            UUID projectId = UUID.fromString(project.getProjectId());
-            Project persistentProject = this.projectRepository.findByProjectId(projectId);
-            persistentProject.setName(project.getName());
-            persistentProject.setDescription(project.getDescription());
-            this.projectRepository.save(persistentProject);
-            response = new ProjectEntities(project, project.getProjectVersion());
+            // Step - Finding project identifier
+            UUID projectId = UUID.fromString(projectAppEntity.getProjectId());
+            Project project = this.projectRepository.findByProjectId(projectId);
+
+            // Step - Update meta information
+            project.updateFromAppEntity(projectAppEntity);
+            this.projectRepository.save(project);
         }
 
-        return response;
+        return projectAppEntity;
     }
 
     /**

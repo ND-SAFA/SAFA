@@ -29,7 +29,7 @@ export enum Endpoint {
   getProjectMembers = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
   jiraCredentials = "accounts/jira/credentials",
-  jiraProject = "projects/import/jira/:projectId",
+  jiraProject = "projects/import/jira/:cloudId/:projectId",
 
   // Commits
   commit = "projects/versions/:versionId/commit",

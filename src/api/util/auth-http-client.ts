@@ -55,7 +55,7 @@ export default async function authHttpClient<T>(
       return {} as T;
     default:
       resContent = await fetchResponse.text();
-      if (resContent === "") {
+      if (resContent === "" || resContent === "created") {
         return {} as T;
       }
   }

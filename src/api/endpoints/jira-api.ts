@@ -183,11 +183,15 @@ export async function saveJiraCredentials(
 /**
  * Creates a new project based on a Jira project.
  *
+ * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
  */
-export async function createJiraProject(projectId: string): Promise<void> {
+export async function createJiraProject(
+  cloudId: string,
+  projectId: string
+): Promise<void> {
   return authHttpClient<void>(
-    fillEndpoint(Endpoint.jiraProject, { projectId }),
+    fillEndpoint(Endpoint.jiraProject, { cloudId, projectId }),
     {
       method: "POST",
     }

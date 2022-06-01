@@ -15,11 +15,11 @@ import { sessionModule } from "@/store";
  * @param versionId - The project version ID of the revision.
  * @param frame - The frame received by the version websocket channel.
  */
-export async function versionApi(
+export async function handleVersionMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const message: VersionMessage = JSON.parse(frame.body) as VersionMessage;
+  const message: VersionMessage = JSON.parse(frame.body);
 
   // Handlers for automatic entity updates.
   switch (message.type) {

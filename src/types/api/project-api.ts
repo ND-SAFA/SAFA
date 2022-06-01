@@ -1,6 +1,5 @@
 import {
   Artifact,
-  ArtifactWarning,
   ArtifactDeltaState,
   TraceLink,
   Project,

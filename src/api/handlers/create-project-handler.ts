@@ -114,5 +114,5 @@ export function handleImportGitHubProject(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  console.log("Importing from GitHub is not yet enabled.");
+  logModule.onDevMessage("Importing from GitHub is not yet enabled.");
 }

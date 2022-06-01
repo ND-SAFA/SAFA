@@ -3,7 +3,7 @@ export { default as SnackbarModule } from "./snackbar.module";
 export { default as ProjectModule } from "./project.module";
 export { default as DeltaModule } from "./delta.module";
 export { default as ArtifactSelectionModule } from "./artifact-selection.module";
-export { default as ErrorModule } from "./warningModule";
+export { default as ErrorModule } from "./warning.module";
 export { default as ViewportModule } from "./viewport.module";
 export { default as SessionModule } from "./session.module";
 export { default as SubtreeModule } from "./subtree.module";

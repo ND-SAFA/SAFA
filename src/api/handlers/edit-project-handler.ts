@@ -1,9 +1,4 @@
-import {
-  IOHandlerCallback,
-  Project,
-  ProjectEntities,
-  ProjectIdentifier,
-} from "@/types";
+import { IOHandlerCallback, Project, ProjectIdentifier } from "@/types";
 import { logModule, projectModule } from "@/store";
 import {
   deleteProject,

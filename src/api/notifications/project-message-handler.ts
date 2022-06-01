@@ -9,11 +9,11 @@ import { projectModule } from "@/store";
  * @param projectId - ID of project to update.
  * @param frame - The frame of the revision.
  */
-export async function projectMessageHandler(
+export async function handleProjectMessage(
   projectId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ProjectMessage = JSON.parse(frame.body) as ProjectMessage;
+  const message: ProjectMessage = JSON.parse(frame.body);
   switch (message.type) {
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);

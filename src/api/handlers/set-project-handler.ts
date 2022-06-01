@@ -1,4 +1,4 @@
-import { Project, ProjectEntities } from "@/types";
+import { Project } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {

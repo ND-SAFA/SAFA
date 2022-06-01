@@ -150,9 +150,9 @@ export default Vue.extend({
     /**
      * Navigates user to the completed project.
      */
-    viewProject(job: Job): void {
+    async viewProject(job: Job): Promise<void> {
       if (job.completedEntityId) {
-        handleLoadVersion(job.completedEntityId).then();
+        await handleLoadVersion(job.completedEntityId);
       } else {
         logModule.onError("Project creation contains empty ID.");
       }

@@ -14,4 +14,4 @@ export const RECONNECT_WAIT_TIME = 5000;
  * have been loaded.
  * @constructor
  */
-export const WEBSOCKET_URL: () => string = () => `${baseURL}/websocket`;
+export const WEBSOCKET_URL = (): string => `${baseURL}/websocket`;

@@ -1,10 +1,33 @@
 import { IOHandlerCallback, Job } from "@/types";
 import {
-  connectAndSubscribeToJob,
+  connect,
   createFlatFileUploadJob,
   deleteJobById,
+  Endpoint,
+  fillEndpoint,
+  stompClient,
 } from "@/api";
-import { jobModule } from "@/store";
+import { jobModule, logModule } from "@/store";
+
+/**
+ * Subscribes to updates for job with given id.
+ *
+ * @param jobId - The id for the job whose updates we want to process.
+ */
+export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
+  if (!jobId) {
+    return;
+  }
+
+  await connect();
+
+  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) => {
+    const incomingJob: Job = JSON.parse(frame.body);
+
+    jobModule.addOrUpdateJob(incomingJob);
+    logModule.onDevMessage(`New Job message: ${incomingJob.id}`);
+  });
+}
 
 /**
  * Submits new job to upload flat files to project version with given id.

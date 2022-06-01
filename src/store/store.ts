@@ -35,7 +35,7 @@ const store = new Vuex.Store({
     artifact: ArtifactModule,
     trace: TraceModule,
     delta: DeltaModule,
-    error: ErrorModule,
+    warning: ErrorModule,
     typeOptions: TypeOptionsModule,
     artifactSelection: ArtifactSelectionModule,
     viewport: ViewportModule,

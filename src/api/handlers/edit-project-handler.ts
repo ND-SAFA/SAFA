@@ -19,9 +19,9 @@ export function handleSaveProject(
   { onSuccess, onError }: IOHandlerCallback<Project>
 ): void {
   saveProject(project)
-    .then((project: Project) => {
-      logModule.onSuccess(`Project has been saved: ${project.name}`);
-      onSuccess?.(project);
+    .then((project) => {
+      logModule.onSuccess(`Project has been saved: ${project.project.name}`);
+      onSuccess?.(project.project);
     })
     .catch((e) => {
       logModule.onSuccess(`Unable to save project ${project.name}.`);

@@ -5,6 +5,7 @@ import {
   ProjectIdentifier,
   ProjectMembership,
   ProjectRole,
+  ProjectSummary,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
@@ -16,8 +17,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function saveProject(
   project: Pick<Project, "projectId" | "name" | "description">
-): Promise<Project> {
-  return authHttpClient<Project>(Endpoint.project, {
+): Promise<ProjectSummary> {
+  return authHttpClient<ProjectSummary>(Endpoint.project, {
     method: "POST",
     body: JSON.stringify(project),
   });

@@ -78,7 +78,6 @@ export function createProject(project?: Partial<Project>): Project {
     projectVersion: project?.projectVersion || undefined,
     artifactTypes: project?.artifactTypes || [],
     documents: project?.documents || [],
-    warnings: project?.warnings || {},
   };
 }
 

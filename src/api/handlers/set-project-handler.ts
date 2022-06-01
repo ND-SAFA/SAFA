@@ -1,4 +1,4 @@
-import { Project } from "@/types";
+import { Project, ProjectSummary } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
@@ -79,8 +79,8 @@ export async function handleClearProject(): Promise<void> {
  *
  * @param project - Project created containing entities.
  */
-export async function handleSetProject(project: Project): Promise<void> {
-  await handleProjectSubscription(project);
+export async function handleSetProject(project: ProjectSummary): Promise<void> {
+  await handleProjectSubscription(project.project);
   errorModule.setArtifactWarnings(project.warnings);
 }
 

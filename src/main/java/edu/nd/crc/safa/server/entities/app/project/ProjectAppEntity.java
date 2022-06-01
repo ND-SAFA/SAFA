@@ -1,11 +1,13 @@
 package edu.nd.crc.safa.server.entities.app.project;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -44,6 +46,8 @@ public class ProjectAppEntity {
     public List<@Valid @NotNull ArtifactType> artifactTypes;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, List<@Valid @NotNull RuleName>> warnings;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    ProjectParsingErrors errors;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -51,6 +55,8 @@ public class ProjectAppEntity {
         this.members = new ArrayList<>();
         this.documents = new ArrayList<>();
         this.artifactTypes = new ArrayList<>();
+        this.warnings = new Hashtable<>();
+        this.errors = new ProjectParsingErrors();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -58,17 +64,19 @@ public class ProjectAppEntity {
                             List<TraceAppEntity> traces,
                             List<ProjectMemberAppEntity> members,
                             List<DocumentAppEntity> documents,
-                            List<ArtifactType> artifactTypes) {
+                            List<ArtifactType> artifactTypes,
+                            ProjectParsingErrors errors) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
-        this.projectVersion = projectVersion;
         this.name = project.getName();
         this.description = project.getDescription();
+        this.projectVersion = projectVersion;
         this.artifacts = artifacts;
         this.traces = traces;
         this.members = members;
         this.documents = documents;
         this.artifactTypes = artifactTypes;
+        this.errors = errors;
     }
 }

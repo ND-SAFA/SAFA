@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -57,7 +58,9 @@ public class AppEntityRetrievalService {
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final DocumentColumnRepository documentColumnRepository;
+
     private final WarningService warningService;
+    private final CommitErrorRetrievalService commitErrorRetrievalService;
 
     @Autowired
     public AppEntityRetrievalService(DocumentRepository documentRepository,
@@ -67,7 +70,8 @@ public class AppEntityRetrievalService {
                                      ArtifactVersionRepository artifactVersionRepository,
                                      ArtifactTypeRepository artifactTypeRepository,
                                      DocumentColumnRepository documentColumnRepository,
-                                     WarningService warningService) {
+                                     WarningService warningService,
+                                     CommitErrorRetrievalService commitErrorRetrievalService) {
         this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.documentArtifactRepository = documentArtifactRepository;
@@ -76,6 +80,7 @@ public class AppEntityRetrievalService {
         this.projectMembershipRepository = projectMembershipRepository;
         this.documentColumnRepository = documentColumnRepository;
         this.warningService = warningService;
+        this.commitErrorRetrievalService = commitErrorRetrievalService;
     }
 
     public static AppEntityRetrievalService getInstance() {
@@ -126,7 +131,16 @@ public class AppEntityRetrievalService {
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
 
-        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents, artifactTypes);
+        // Version errors
+        ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
+
+        return new ProjectAppEntity(projectVersion,
+            artifacts,
+            traces,
+            projectMembers,
+            documents,
+            artifactTypes,
+            errors);
     }
 
     /**

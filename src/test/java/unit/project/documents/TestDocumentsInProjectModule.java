@@ -37,8 +37,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
             .withVersion(projectVersion)
             .get();
-        JSONObject response = sendGet(route, status().isOk());
-        JSONObject projectJson = response.getJSONObject("project");
+        JSONObject projectJson = sendGet(route, status().isOk());
 
         // VP - Verify that documents has empty list
         assertThat(projectJson.getJSONArray("documents").length()).isEqualTo(0);
@@ -50,8 +49,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
         dbEntityBuilder.newDocument(projectName, docName, docDescription, docType);
 
         // VP - Verify that project meta data contains a single document
-        response = sendGet(route, status().isOk());
-        projectJson = response.getJSONObject("project");
+        projectJson = sendGet(route, status().isOk());
         JSONArray documentsJson = projectJson.getJSONArray("documents");
         assertThat(documentsJson.length()).isEqualTo(1);
 

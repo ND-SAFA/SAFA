@@ -36,7 +36,7 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
 
         // VP - Verify that job has finished.
         JobDbEntity jobDbEntity = jobService.getJobById(jobId);
-        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(7);
+        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(6);
         assertThat(jobDbEntity.getCurrentProgress()).isEqualTo(100);
         assertThat(jobDbEntity.getStatus()).isEqualTo(JobStatus.COMPLETED);
 

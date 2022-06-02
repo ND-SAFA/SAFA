@@ -135,6 +135,10 @@ export interface Project extends ProjectIdentifier {
    * The artifact types present in the project.
    */
   artifactTypes: ArtifactType[];
+  /**
+   * A collection of warnings on project artifacts.
+   */
+  warnings: Record<string, ArtifactWarning[]>;
 }
 
 export interface ProjectSummary {
@@ -142,10 +146,7 @@ export interface ProjectSummary {
    * The project itself.
    */
   project: Project;
-  /**
-   * A collection of warnings on project artifacts.
-   */
-  warnings: Record<string, ArtifactWarning[]>;
+
   /**
    * A collection of errors on project artifacts.
    */

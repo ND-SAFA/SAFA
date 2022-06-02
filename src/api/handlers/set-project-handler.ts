@@ -1,4 +1,4 @@
-import { Project, ProjectSummary } from "@/types";
+import { Project } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
@@ -13,9 +13,9 @@ import {
   viewportModule,
 } from "@/store";
 import {
-  handleSelectVersion,
   handleLoadTraceMatrices,
   handleLoadVersion,
+  handleSelectVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
 import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
@@ -79,8 +79,8 @@ export async function handleClearProject(): Promise<void> {
  *
  * @param project - Project created containing entities.
  */
-export async function handleSetProject(project: ProjectSummary): Promise<void> {
-  await handleProjectSubscription(project.project);
+export async function handleSetProject(project: Project): Promise<void> {
+  await handleProjectSubscription(project);
   errorModule.setArtifactWarnings(project.warnings);
 }
 

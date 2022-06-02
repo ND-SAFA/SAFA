@@ -55,7 +55,7 @@ export function handleBulkImportProject(
   appModule.onLoadStart();
 
   saveProject(project)
-    .then(async ({ project }) =>
+    .then(async (project) =>
       handleUploadProjectVersion(
         project.projectId,
         project.projectVersion?.versionId || "",

@@ -7,16 +7,6 @@ import {
 } from "@/types/domain";
 
 /**
- * Defines the response for a created project.
- */
-export interface ProjectEntities {
-  /**
-   * The created project.
-   */
-  project: Project;
-}
-
-/**
  * Defines the response from checking if an artifact exists.
  */
 export interface ArtifactNameValidationResponse {

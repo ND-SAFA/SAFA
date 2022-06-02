@@ -20,8 +20,8 @@ export function handleSaveProject(
 ): void {
   saveProject(project)
     .then((project) => {
-      logModule.onSuccess(`Project has been saved: ${project.project.name}`);
-      onSuccess?.(project.project);
+      logModule.onSuccess(`Project has been saved: ${project.name}`);
+      onSuccess?.(project);
     })
     .catch((e) => {
       logModule.onSuccess(`Unable to save project ${project.name}.`);

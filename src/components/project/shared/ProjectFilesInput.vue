@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 30em">
-    <generic-file-selector v-bind:files.sync="selectedFiles" />
+    <generic-file-selector v-model="selectedFiles" />
     <v-btn
       block
       color="primary"

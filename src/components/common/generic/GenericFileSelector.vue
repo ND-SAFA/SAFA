@@ -7,36 +7,47 @@
     :multiple="multiple"
     truncate-length="30"
     class="mt-3"
-    @change="handleChangeFiles"
+    v-model="model"
     @click:clear="$emit('clear')"
   />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 
 /**
  * Displays a generic file selector.
  *
  * @emits-1 `clear` - On clear.
- * @emits-2 `update:files` (File[]) - On files change.
+ * @emits-2 `input` (File[] | File | null) - On file change.
  */
 export default Vue.extend({
   name: "GenericFileSelector",
   props: {
+    value: Array as PropType<File[] | File | null>,
     multiple: {
       type: Boolean,
       required: false,
       default: true,
     },
   },
-  methods: {
+  data() {
+    return {
+      model: this.value,
+    };
+  },
+  watch: {
     /**
-     * Emits files when the change.
-     * @param files - The updated files.
+     * Updates the model if the value changes.
      */
-    handleChangeFiles(files: File[]) {
-      this.$emit("update:files", files);
+    value(currentValue: File[] | File | null) {
+      this.model = currentValue;
+    },
+    /**
+     * Emits changes to the model.
+     */
+    model(currentValue: File[] | File | null) {
+      this.$emit("input", currentValue);
     },
   },
 });

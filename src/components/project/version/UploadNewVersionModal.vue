@@ -15,7 +15,7 @@
       <v-stepper-content step="3">
         <generic-file-selector
           v-if="selectedVersion !== undefined"
-          v-bind:files.sync="selectedFiles"
+          v-model="selectedFiles"
         />
       </v-stepper-content>
     </template>

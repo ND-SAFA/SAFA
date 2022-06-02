@@ -8,6 +8,9 @@ import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.server.entities.db.JiraProject;
+import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,8 +34,14 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
     private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
 
+    private final JiraProjectRepository jiraProjectRepository;
+
     @Autowired
     private WebClient webClient;
+
+    public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository) {
+        this.jiraProjectRepository = jiraProjectRepository;
+    }
 
     private String buildBaseURI(String cloudId) {
         return String.format("/ex/jira/%s/rest/api/%d", cloudId, API_VERSION);
@@ -51,13 +60,13 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long id) {
+    public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long jiraProjectId) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECT);
 
         return this.blockOptional(
             this.webClient
                 .method(ApiRoute.PROJECT.getMethod())
-                .uri(uri, id)
+                .uri(uri, jiraProjectId)
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
                 .retrieve()
@@ -139,6 +148,13 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
             log.error("Exception thrown while executing blocking call", ex);
             throw new SafaError("Exception thrown while executing blocking call", ex);
         }
+    }
+
+    @Override
+    public JiraProject createJiraProject(Project project, String jiraProjectId) {
+        JiraProject jiraProject = new JiraProject(project, jiraProjectId);
+        jiraProjectRepository.save(jiraProject);
+        return jiraProject;
     }
 
     @Getter

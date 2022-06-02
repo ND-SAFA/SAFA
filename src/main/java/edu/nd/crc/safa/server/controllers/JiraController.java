@@ -17,7 +17,7 @@ import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.imports.JiraAccessCredentialsRepository;
+import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -70,23 +70,37 @@ public class JiraController extends BaseController {
         this.executorDelegate = executorDelegate;
     }
 
+    /**
+     * Asynchronously calls JIRA instance, retrieves project in JIRA resource, and converts
+     * issues into artifacts and their associated links.
+     *
+     * @param jiraProjectId The project id for the project on JIRA
+     * @param cloudId       The id associated with the JIRA resource
+     * @return The project created from scraping JIRA project.
+     */
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long id,
+    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
                                                             @PathVariable("cloudId") String cloudId) {
         DeferredResult<ProjectAppEntity> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
+            // Step - Retrieve project
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
                 .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraProjectResponseDTO response = jiraConnectionService.retrieveJIRAProject(credentials, id);
-            Project project = new Project();
+            JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, jiraProjectId);
+
+            // Step - Save project
+            String projectName = jiraProjectResponse.getKey();
+            String projectDescription = jiraProjectResponse.getDescription();
+            Project project = new Project(projectName, projectDescription);
+            this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
             // Should probably also specify this is a JIRA pulled project
             // Maybe save the cloud id and JIRA project id, so we can later update it?
-            project.setName(response.getKey());
-            project.setDescription(response.getDescription());
-            this.projectService.saveProjectWithCurrentUserAsOwner(project);
+            project.setName(jiraProjectResponse.getKey());
+            project.setDescription(jiraProjectResponse.getDescription());
+
 
             ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
             ProjectAppEntity projectEntities = appEntityRetrievalService
@@ -109,7 +123,7 @@ public class JiraController extends BaseController {
             boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
 
             if (!areCredentialsValid) {
-                throw new SafaError("Invalid credentials");
+                throw new SafaError("Invalid JIRA credentials");
             }
 
             JiraAccessCredentials previousCredentials =

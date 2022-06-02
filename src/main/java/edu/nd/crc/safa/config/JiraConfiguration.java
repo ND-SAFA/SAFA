@@ -1,10 +1,12 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -25,10 +27,16 @@ public class JiraConfiguration {
     private static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
 
     private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
+    JiraProjectRepository jiraProjectRepository;
+
+    @Autowired
+    public JiraConfiguration(JiraProjectRepository jiraProjectRepository) {
+        this.jiraProjectRepository = jiraProjectRepository;
+    }
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
-        return new JiraConnectionServiceImpl();
+        return new JiraConnectionServiceImpl(jiraProjectRepository);
     }
 
     @Bean

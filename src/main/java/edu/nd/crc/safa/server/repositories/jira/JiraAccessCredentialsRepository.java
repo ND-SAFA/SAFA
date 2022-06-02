@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.imports;
+package edu.nd.crc.safa.server.repositories.jira;
 
 import java.util.Optional;
 import java.util.UUID;

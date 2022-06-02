@@ -43,7 +43,7 @@ public class ProjectController extends BaseController {
     }
 
     /**
-     * Creates or updates project meta information via JSON.
+     * Creates or updates project identifier information via JSON.
      * Project is created if no project ID is given. Otherwise, update is assumed.
      *
      * @param projectAppEntity The project entity containing artifacts, traces, name, and descriptions.

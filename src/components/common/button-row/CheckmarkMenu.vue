@@ -22,12 +22,14 @@
         v-for="(item, itemIndex) in definition.menuItems"
         :key="item.name"
       >
-        <v-list-item :style="hover ? `background-color: ${hoverColor};` : ''">
+        <v-list-item
+          :style="hover ? `background-color: ${hoverColor};` : ''"
+          @click.stop="item.onClick"
+        >
           <v-checkbox
             readonly
             :label="item.name"
             :input-value="definition.checkmarkValues[itemIndex]"
-            @click.stop="item.onClick"
           />
         </v-list-item>
       </v-hover>

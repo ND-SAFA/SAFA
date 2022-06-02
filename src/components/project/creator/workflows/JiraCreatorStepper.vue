@@ -134,7 +134,7 @@ export default Vue.extend({
       if (!this.credentials) return;
 
       this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.credentials.accessToken);
+      this.sites = await getJiraCloudSites(this.credentials.bearerAccessToken);
       this.sitesLoading = false;
     },
     /**
@@ -189,9 +189,13 @@ export default Vue.extend({
     handleSaveProject(): void {
       if (!this.credentials || !this.selectedProject) return;
 
-      handleImportJiraProject(this.selectedProject.id, {
-        onSuccess: () => this.clearData(),
-      });
+      handleImportJiraProject(
+        this.credentials.cloudId,
+        this.selectedProject.id,
+        {
+          onSuccess: () => this.clearData(),
+        }
+      );
     },
   },
 });

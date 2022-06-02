@@ -1,7 +1,7 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
-import { updateProjectThroughFlatFiles, handleSetProject } from "@/api";
-import { connectAndSubscribeToVersion } from "@/api/notifications";
+import { handleSelectVersion } from "@/api/notifications";
+import { handleJobSubmission } from "@/api/handlers/job-handler";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -27,33 +27,26 @@ export async function handleUploadProjectVersion(
     });
 
     if (setVersionIfSuccessful) {
-      connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
+      handleSelectVersion(projectId, versionId).catch((e) =>
         logModule.onError(e.message)
       );
     }
 
     const uploadFlatFiles = async () => {
-      const res = await updateProjectThroughFlatFiles(versionId, formData);
-
-      logModule.onSuccess(`Flat files have been uploaded: ${res.project.name}`);
-
-      return res;
+      const job = await handleJobSubmission(versionId, formData);
+      logModule.onSuccess(`Project upload has been submitted.`);
+      return job;
     };
 
     if (setVersionIfSuccessful) {
       try {
         appModule.onLoadStart();
-        connectAndSubscribeToVersion(projectId, versionId).catch((e) =>
-          logModule.onError(e.message)
-        );
-        // Note that changing the order below will cause the project to not properly render initially.
-        await navigateTo(Routes.ARTIFACT);
-        const res = await uploadFlatFiles();
-        await handleSetProject(res);
+        await handleSelectVersion(projectId, versionId);
+        await uploadFlatFiles();
       } catch (e) {
         logModule.onError(e.message);
-        await navigateTo(Routes.PROJECT_CREATOR);
       } finally {
+        await navigateTo(Routes.UPLOAD_STATUS);
         appModule.onLoadEnd();
       }
     } else {

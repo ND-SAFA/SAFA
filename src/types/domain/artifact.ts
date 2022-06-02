@@ -27,6 +27,10 @@ export interface Artifact {
    */
   id: string;
   /**
+   * A unique UUID identifying an artifact across versions.
+   */
+  baseEntityId?: string;
+  /**
    * The name of the artifact.
    */
   name: string;

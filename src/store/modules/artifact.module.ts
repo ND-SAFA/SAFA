@@ -7,6 +7,7 @@ import type {
 } from "@/types";
 import { getSingleQueryResult } from "@/util";
 import { artifactSelectionModule, documentModule } from "@/store";
+import { FlatArtifact } from "@/types";
 
 @Module({ namespaced: true, name: "artifact" })
 /**
@@ -107,6 +108,19 @@ export default class ArtifactModule extends VuexModule {
    */
   get artifacts(): Artifact[] {
     return this.currentArtifacts;
+  }
+
+  /**
+   * @return The flattened artifacts for the current document.
+   */
+  get flatArtifacts(): FlatArtifact[] {
+    return this.currentArtifacts.map(
+      (artifact) =>
+        ({
+          ...artifact,
+          ...artifact.customFields,
+        } as FlatArtifact)
+    );
   }
 
   /**

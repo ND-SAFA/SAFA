@@ -78,6 +78,7 @@ export function createProject(project?: Partial<Project>): Project {
     projectVersion: project?.projectVersion || undefined,
     artifactTypes: project?.artifactTypes || [],
     documents: project?.documents || [],
+    warnings: project?.warnings || {},
   };
 }
 
@@ -105,6 +106,7 @@ export function createProjectDelta(): ProjectDelta {
 export function createArtifact(artifact?: Partial<Artifact>): Artifact {
   return {
     id: artifact?.id || "",
+    baseEntityId: artifact?.baseEntityId || "",
     name: artifact?.name || "",
     summary: artifact?.summary || "",
     body: artifact?.body || "",

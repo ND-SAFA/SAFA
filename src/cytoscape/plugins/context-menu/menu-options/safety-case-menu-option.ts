@@ -1,6 +1,5 @@
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { EventObject } from "cytoscape";
-import { appModule, documentModule, logModule } from "@/store";
+import { appModule, documentModule } from "@/store";
 import { ArtifactData, DocumentType, SafetyCaseType } from "@/types";
 
 /**

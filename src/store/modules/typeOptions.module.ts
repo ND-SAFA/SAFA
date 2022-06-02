@@ -144,7 +144,6 @@ export default class TypeOptionsModule extends VuexModule {
    */
   get getArtifactTypeIcon(): (type: string) => string {
     return (type) =>
-      this.artifactTypeIcons[type.toLowerCase()] ||
-      this.artifactTypeIcons.default;
+      this.artifactTypeIcons[type] || this.artifactTypeIcons.default;
   }
 }

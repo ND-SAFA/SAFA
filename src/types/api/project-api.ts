@@ -1,34 +1,10 @@
 import {
   Artifact,
-  ArtifactWarning,
   ArtifactDeltaState,
   TraceLink,
   Project,
-  ProjectErrors,
   ProjectVersion,
 } from "@/types/domain";
-
-/**
- * Defines the response for a created project.
- */
-export interface ProjectCreationResponse {
-  /**
-   * The created project.
-   */
-  project: Project;
-  /**
-   * Any errors from creation.
-   */
-  errors: ProjectErrors;
-  /**
-   * The version of the project.
-   */
-  projectVersion: ProjectVersion;
-  /**
-   * A collection of warnings on project artifacts.
-   */
-  warnings: Record<string, ArtifactWarning[]>;
-}
 
 /**
  * Defines the response from checking if an artifact exists.

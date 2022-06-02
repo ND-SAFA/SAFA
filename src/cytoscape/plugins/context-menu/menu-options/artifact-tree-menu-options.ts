@@ -1,4 +1,5 @@
-import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
+import { EventObject } from "cytoscape";
+import { Artifact, ArtifactData, MenuItem } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -8,10 +9,8 @@ import {
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { Artifact, ArtifactData } from "@/types";
 import { enableDrawMode } from "@/cytoscape";
-import { EventObject } from "cytoscape";
-import { handleDeleteArtifact } from "@/api";
+import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 
@@ -86,7 +85,22 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
-        await handleDeleteArtifact(artifact);
+        await handleDeleteArtifact(artifact, {});
+      });
+    },
+    isVisible(artifactData: ArtifactData | undefined): boolean {
+      return artifactData !== undefined;
+    },
+  },
+  {
+    id: "duplicate-artifact",
+    content: "Duplicate Artifact",
+    tooltipText: "Duplicate Artifact",
+    selector: "node",
+    coreAsWell: false,
+    onClickFunction(event: EventObject): void {
+      handleOnClick(event, async (artifact: Artifact) => {
+        await handleDuplicateArtifact(artifact, {});
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

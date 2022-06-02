@@ -2,6 +2,7 @@
   <generic-stepper-list-step
     title="GitHub Installations"
     :item-count="installations.length"
+    :loading="loading"
     empty-message="There are no installations."
   >
     <template slot="items">

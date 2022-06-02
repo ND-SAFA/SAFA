@@ -1,28 +1,16 @@
-import type { ProjectWarnings, ProjectErrors, ArtifactWarning } from "@/types";
+import type { ProjectWarnings, ArtifactWarning } from "@/types";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
-@Module({ namespaced: true, name: "error" })
+@Module({ namespaced: true, name: "warning" })
 /**
- * This module defines the state of errors encountered within the loaded project.
+ * This module defines the state of warnings generated for
+ * artifacts and traces in this version.
  */
-export default class ErrorModule extends VuexModule {
+export default class WarningModule extends VuexModule {
   /**
    * A collection of warnings keyed by the associated artifact.
    */
   private artifactWarnings: ProjectWarnings = {};
-  /**
-   * A collection of errors encountered within different segments of the
-   * project files including:
-   *
-   * - tim.json file parsing
-   * - parsing artifacts from artifact data files
-   * - parsing traces from trace data files
-   */
-  private projectErrors: ProjectErrors = {
-    tim: [],
-    artifacts: [],
-    traces: [],
-  };
 
   @Action
   /**
@@ -49,13 +37,6 @@ export default class ErrorModule extends VuexModule {
    */
   get getArtifactWarnings(): ProjectWarnings {
     return this.artifactWarnings;
-  }
-
-  /**
-   * @return The current project errors.
-   */
-  get getProjectErrors(): ProjectErrors {
-    return this.projectErrors;
   }
 
   /**

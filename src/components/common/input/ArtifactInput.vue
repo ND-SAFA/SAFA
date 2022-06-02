@@ -80,6 +80,8 @@ export default Vue.extend({
       const lowercaseQuery = queryText.toLowerCase();
       const { name, type } = artifact;
 
+      if (this.value.includes(artifact.id)) return false;
+
       return (
         name.toLowerCase().includes(lowercaseQuery) ||
         type.toLowerCase().includes(lowercaseQuery) ||

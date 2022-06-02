@@ -15,10 +15,10 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 
@@ -137,7 +137,7 @@ public class FlatFileService {
                                                               List<TraceAppEntity> generatedLinks) {
         String DELIMITER = "*";
         List<String> approvedLinks = manualLinks.stream()
-            .filter(link -> link.approvalStatus.equals(TraceApproval.APPROVED))
+            .filter(link -> link.approvalStatus.equals(ApprovalStatus.APPROVED))
             .map(link -> link.sourceName + DELIMITER + link.targetName)
             .collect(Collectors.toList());
 

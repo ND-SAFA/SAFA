@@ -71,9 +71,9 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectEntities> pullJiraProject(@PathVariable("id") @NotNull Long id,
-                                                           @PathVariable("cloudId") String cloudId) {
-        DeferredResult<ProjectEntities> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long id,
+                                                            @PathVariable("cloudId") String cloudId) {
+        DeferredResult<ProjectAppEntity> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();

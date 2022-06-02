@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.IVersionRepository;
@@ -20,11 +20,11 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
     IVersionRepository<TraceLinkVersion, TraceAppEntity> {
 
     default List<TraceLinkVersion> getApprovedLinksInVersion(ProjectVersion projectVersion) {
-        return findByProjectVersionAndApprovalStatus(projectVersion, TraceApproval.APPROVED);
+        return findByProjectVersionAndApprovalStatus(projectVersion, ApprovalStatus.APPROVED);
     }
 
     default List<TraceLinkVersion> getApprovedLinksInProject(Project project) {
-        return findByProjectVersionProjectAndApprovalStatus(project, TraceApproval.APPROVED);
+        return findByProjectVersionProjectAndApprovalStatus(project, ApprovalStatus.APPROVED);
     }
 
     default List<TraceLinkVersion> getProjectLinks(Project project) {
@@ -38,10 +38,10 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
     List<TraceLinkVersion> findByTraceLinkTraceLinkId(UUID traceLinkId);
 
     List<TraceLinkVersion> findByProjectVersionProjectAndApprovalStatus(Project project,
-                                                                        TraceApproval approvalStatus);
+                                                                        ApprovalStatus approvalStatus);
 
     List<TraceLinkVersion> findByProjectVersionAndApprovalStatus(ProjectVersion projectVersion,
-                                                                 TraceApproval approvalStatus);
+                                                                 ApprovalStatus approvalStatus);
 
     Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
 }

@@ -97,6 +97,12 @@ public class JobDbEntity {
         nullable = false)
     SafaUser user;
 
+    /**
+     * The id of the entity that been created or modified with this job.
+     */
+    @Column(name = "completed_entity_id")
+    UUID completedEntityId;
+
     public JobDbEntity() {
     }
 
@@ -118,6 +124,7 @@ public class JobDbEntity {
         this.completedAt = completedAt;
         this.currentProgress = currentProgress;
         this.currentStep = currentStep;
+        this.completedEntityId = null;
     }
 
     public void incrementStep() {

@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
@@ -44,35 +43,42 @@ public class ProjectController extends BaseController {
     }
 
     /**
-     * Creates or updates project given creating or updating defined entities (e.g. artifacts, traces). Note, artifacts
-     * not specified are assumed to be removed if version is specified.
+     * Creates or updates project identifier information via JSON.
+     * Project is created if no project ID is given. Otherwise, update is assumed.
      *
-     * @param project The project entity containing artifacts, traces, name, and descriptions.
+     * @param projectAppEntity The project entity containing artifacts, traces, name, and descriptions.
      * @return The project and associated entities created.
      * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
      *                   payload.
      */
-    @PostMapping(AppRoutes.Projects.createOrUpdateProjects)
+    @PostMapping(AppRoutes.Projects.createOrUpdateProjectMeta)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectEntities createOrUpdateProject(@RequestBody @Valid ProjectAppEntity project) throws SafaError {
-        Project payloadProject = Project.fromAppEntity(project);
-        ProjectVersion payloadProjectVersion = project.projectVersion;
+    public ProjectAppEntity createOrUpdateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity)
+        throws SafaError {
 
-        ProjectEntities projectEntities;
-        if (!payloadProject.hasDefinedId()) { // new projects expected to have no projectId or projectVersion
-            if (payloadProjectVersion != null
-                && payloadProjectVersion.hasValidVersion()
-                && payloadProjectVersion.hasValidId()) {
-                throw new SafaError("Invalid ProjectVersion: cannot be defined when creating a new project.");
-            }
-            projectEntities = this.projectService.createNewProjectWithVersion(payloadProject, project);
+        ProjectVersion payloadProjectVersion = projectAppEntity.projectVersion;
+        ProjectAppEntity response;
+
+        if (projectAppEntity.projectId.equals("")) { // new projects expected to have no projectId or projectVersion
+            // Step - Create project identifier
+            Project projectEntity = Project.fromAppEntity(projectAppEntity);
+            projectService.saveProjectWithCurrentUserAsOwner(projectEntity);
+            projectAppEntity.setProjectId(projectEntity.getProjectId().toString());
+
+            // Step - Create version
+            ProjectVersion projectVersion = projectService.createInitialProjectVersion(projectEntity);
+            projectAppEntity.setProjectVersion(projectVersion);
         } else {
-            this.resourceBuilder.fetchProject(payloadProject.getProjectId()).withEditProject();
-            projectEntities = this.projectService.updateProjectAtVersion(
-                payloadProject, payloadProjectVersion, project);
+            // Step - Finding project identifier
+            UUID projectId = UUID.fromString(projectAppEntity.getProjectId());
+            Project project = this.projectRepository.findByProjectId(projectId);
+
+            // Step - Update meta information
+            project.updateFromAppEntity(projectAppEntity);
+            this.projectRepository.save(project);
         }
 
-        return projectEntities;
+        return projectAppEntity;
     }
 
     /**

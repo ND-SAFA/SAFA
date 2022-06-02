@@ -255,7 +255,7 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion The version whose app entities are retrieved.
      * @param appEntities    The set of all artifacts existing in given project version.
-     * @return List of pairs of VersionEntities or committ errors
+     * @return List of pairs of VersionEntities or commit errors
      */
 
     @Override
@@ -274,7 +274,7 @@ public abstract class GenericVersionRepository<
                 }
             }).collect(Collectors.toList());
 
-        List<Pair<VersionEntity, CommitError>> removedArtifactBodies = this.retrieveBaseEntitiesByProject(
+        List<Pair<VersionEntity, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
                 projectVersion.getProject())
             .stream()
             .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
@@ -283,7 +283,7 @@ public abstract class GenericVersionRepository<
                 baseEntity.getBaseEntityId()))
             .collect(Collectors.toList());
 
-        response.addAll(removedArtifactBodies);
+        response.addAll(removedVersionEntities);
 
         return response;
     }

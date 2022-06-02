@@ -2,6 +2,12 @@ package edu.nd.crc.safa.server.entities.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import edu.nd.crc.safa.server.entities.app.project.IAppEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Container for the possible changes that an entity could have
@@ -9,7 +15,7 @@ import java.util.List;
  *
  * @param <T> The type of entity that is changing.
  */
-public class ProjectChange<T> {
+public class ProjectChange<T extends IAppEntity> {
     List<T> added;
     List<T> removed;
     List<T> modified;
@@ -44,7 +50,16 @@ public class ProjectChange<T> {
         this.modified = modified;
     }
 
+    @JsonIgnore
     public int getSize() {
         return this.added.size() + this.modified.size() + this.removed.size();
+    }
+
+    public T filterAdded(Predicate<T> filter) {
+        return this.added
+            .stream()
+            .filter(filter)
+            .collect(Collectors.toList())
+            .get(0);
     }
 }

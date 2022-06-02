@@ -89,7 +89,7 @@ public class JobService {
             now(),
             null,
             0,
-            0
+            -1
         );
         this.jobDbRepository.save(jobDbEntity);
         return jobDbEntity;
@@ -101,6 +101,7 @@ public class JobService {
      * @param jobDbEntity The job whose lastUpdated property is being modified.
      */
     public void startStep(JobDbEntity jobDbEntity) {
+        jobDbEntity.incrementStep();
         this.jobDbRepository.save(jobDbEntity);
     }
 
@@ -110,7 +111,6 @@ public class JobService {
      * @param jobDbEntity The job to update its step.
      */
     public void endStep(JobDbEntity jobDbEntity) {
-        jobDbEntity.incrementStep();
         this.jobDbRepository.save(jobDbEntity);
     }
 

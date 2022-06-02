@@ -25,9 +25,7 @@ import unit.SampleProjectConstants;
 
 public class FlatFileBaseTest extends ApplicationBaseTest {
 
-    public Project verifyBeforeResponse(JSONObject responseBody) throws Exception {
-        // Step - Get JSON Response
-        JSONObject projectJson = responseBody.getJSONObject("project");
+    public Project verifyBeforeResponse(JSONObject projectJson) throws Exception {
 
         // VP - Project id is not null
         assertThat(projectJson).as("uploadedFiles non-null").isNotNull();
@@ -59,7 +57,7 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
             .isEqualTo(SampleProjectConstants.N_LINKS);
 
         // VP - Errors are present in response
-        JSONObject errors = responseBody.getJSONObject("errors");
+        JSONObject errors = projectJson.getJSONObject("errors");
         assertThat(errors.getJSONArray("tim").length())
             .as("tim file error")
             .isEqualTo(0);
@@ -76,7 +74,7 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
         assertThat(traceError.get("activity")).isNotNull();
 
         // VP - Project warnings present in response
-        JSONObject projectWarnings = responseBody.getJSONObject("warnings");
+        JSONObject projectWarnings = projectJson.getJSONObject("warnings");
         assertThat(projectWarnings.keySet().size()).isGreaterThanOrEqualTo(1);
 
         return project;

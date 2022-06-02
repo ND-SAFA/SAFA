@@ -8,13 +8,13 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO.JiraResponseMessage;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -73,9 +73,9 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<JiraResponseDTO<ProjectEntities>> pullJiraProject(@PathVariable("id") @NotNull Long id,
+    public DeferredResult<JiraResponseDTO<ProjectAppEntity>> pullJiraProject(@PathVariable("id") @NotNull Long id,
                                                            @PathVariable("cloudId") String cloudId) {
-        DeferredResult<JiraResponseDTO<ProjectEntities>> output = executorDelegate.createOutput(5000L);
+        DeferredResult<JiraResponseDTO<ProjectAppEntity>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
@@ -90,8 +90,8 @@ public class JiraController extends BaseController {
             project.setDescription(response.getDescription());
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
-            ProjectVersion projectVersion = this.projectService.createBaseProjectVersion(project);
-            ProjectEntities projectEntities = appEntityRetrievalService
+            ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
+            ProjectAppEntity projectEntities = appEntityRetrievalService
                 .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
             output.setResult(new JiraResponseDTO<>(projectEntities, JiraResponseMessage.IMPORTED));

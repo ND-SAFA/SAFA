@@ -9,9 +9,14 @@ import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * The model used to commit a change to the versioning system.
  */
+@Getter
+@Setter
 public class ProjectCommit {
     ProjectVersion commitVersion;
     ProjectChange<ArtifactAppEntity> artifacts;
@@ -45,52 +50,12 @@ public class ProjectCommit {
         this.failOnError = failOnError;
     }
 
-    public boolean isFailOnError() {
-        return failOnError;
-    }
-
-    public void setFailOnError(boolean failOnError) {
-        this.failOnError = failOnError;
-    }
-
-    public List<CommitError> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<CommitError> errors) {
-        this.errors = errors;
-    }
-
-    public ProjectVersion getCommitVersion() {
-        return commitVersion;
-    }
-
-    public void setCommitVersion(ProjectVersion commitVersion) {
-        this.commitVersion = commitVersion;
-    }
-
-    public ProjectChange<ArtifactAppEntity> getArtifacts() {
-        return artifacts;
-    }
-
-    public void setArtifacts(ProjectChange<ArtifactAppEntity> artifacts) {
-        this.artifacts = artifacts;
-    }
-
-    public ProjectChange<TraceAppEntity> getTraces() {
-        return traces;
-    }
-
-    public void setTraces(ProjectChange<TraceAppEntity> traces) {
-        this.traces = traces;
-    }
-
-    public void addTraceToDelete(List<TraceAppEntity> tracesToAdd) {
-        List<TraceAppEntity> tracesToDelete = this.getTraces().getRemoved();
-        List<TraceAppEntity> newTraces = tracesToAdd.stream()
-            .filter(t -> !tracesToDelete.contains(t))
+    public void addRemovedTraces(List<TraceAppEntity> tracesToDelete) {
+        List<TraceAppEntity> modifiedTraces = this.getTraces().getRemoved();
+        List<TraceAppEntity> newTraces = tracesToDelete.stream()
+            .filter(t -> !modifiedTraces.contains(t))
             .collect(Collectors.toList());
-        newTraces.addAll(tracesToDelete);
+        newTraces.addAll(modifiedTraces);
         this.getTraces().setRemoved(newTraces);
     }
 }

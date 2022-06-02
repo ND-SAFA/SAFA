@@ -70,7 +70,7 @@ public class JsonBuilder extends BaseBuilder {
         return this;
     }
 
-    public JSONObject getPayload(String projectName) {
+    public JSONObject getProjectJson(String projectName) {
         JSONObject project = this.projects.get(projectName);
         project.put("projectVersion", this.projectVersions.get(projectName));
         return project;

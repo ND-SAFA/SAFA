@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.server.entities.api.jobs;
 
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -19,7 +19,7 @@ public class ProjectCreationWorker extends JobWorker {
     /**
      * The entities created during job.
      */
-    ProjectEntities projectEntities;
+    ProjectAppEntity projectAppEntity;
     /**
      * The service used for creating entities.
      */
@@ -49,9 +49,10 @@ public class ProjectCreationWorker extends JobWorker {
 
     @Override
     public void done() {
-        super.done();
-        this.projectEntities = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
+        this.projectAppEntity = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );
+        this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());
+        super.done();
     }
 }

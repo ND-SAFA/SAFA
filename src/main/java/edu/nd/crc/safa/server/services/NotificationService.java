@@ -73,6 +73,19 @@ public class NotificationService {
     }
 
     /**
+     * Notifies all subscribers of given project to update the defined project entity.
+     *
+     * @param project            The project whose subscribers will be notified of update.
+     * @param projectEntityTypes The project entities to update.
+     */
+    public void broadUpdateProjectMessage(Project project, ProjectEntityTypes projectEntityTypes) {
+        SafaUser safaUser = this.safaUserService.getCurrentUser();
+        String versionTopicDestination = getProjectTopic(project);
+        ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntityTypes);
+        messagingTemplate.convertAndSend(versionTopicDestination, message);
+    }
+
+    /**
      * Notifies all subscribers of given version to update the defined project entity.
      *
      * @param projectVersion     The version whose subscribers will be notified of update.
@@ -83,19 +96,6 @@ public class NotificationService {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
         String versionTopicDestination = getVersionTopic(projectVersion);
         VersionMessage message = new VersionMessage(safaUser.getEmail(), versionEntityTypes);
-        messagingTemplate.convertAndSend(versionTopicDestination, message);
-    }
-
-    /**
-     * Notifies all subscribers of given project to update the defined project entity.
-     *
-     * @param project            The project whose subscribers will be notified of update.
-     * @param projectEntityTypes The project entities to update.
-     */
-    public void broadUpdateProjectMessage(Project project, ProjectEntityTypes projectEntityTypes) {
-        SafaUser safaUser = this.safaUserService.getCurrentUser();
-        String versionTopicDestination = getProjectTopic(project);
-        ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntityTypes);
         messagingTemplate.convertAndSend(versionTopicDestination, message);
     }
 

@@ -16,6 +16,7 @@ import javax.persistence.UniqueConstraint;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
+import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -32,6 +33,7 @@ import org.json.JSONObject;
         }, name = AppConstraints.SINGLE_TRACE_VERSION_PER_PROJECT_VERSION)
     }
 )
+@Data
 public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEntity> {
 
     @Id
@@ -65,14 +67,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     TraceType traceType;
 
     @Column(name = "approval_status")
-    TraceApproval approvalStatus;
+    ApprovalStatus approvalStatus;
 
     @Column(name = "score")
     double score;
 
     public TraceLinkVersion() {
         this.traceType = TraceType.GENERATED;
-        this.approvalStatus = TraceApproval.UNREVIEWED;
+        this.approvalStatus = ApprovalStatus.UNREVIEWED;
         this.score = 0;
     }
 
@@ -86,7 +88,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.traceLink = traceLink;
         traceLinkVersion.score = score;
         traceLinkVersion.traceType = TraceType.GENERATED;
-        traceLinkVersion.approvalStatus = TraceApproval.UNREVIEWED;
+        traceLinkVersion.approvalStatus = ApprovalStatus.UNREVIEWED;
 
         return traceLinkVersion;
     }
@@ -109,11 +111,11 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return traceLinkVersion;
     }
 
-    private static TraceApproval getDefaultApprovalStatus(TraceType traceType) {
+    private static ApprovalStatus getDefaultApprovalStatus(TraceType traceType) {
         if (traceType == TraceType.MANUAL) {
-            return TraceApproval.APPROVED;
+            return ApprovalStatus.APPROVED;
         }
-        return TraceApproval.UNREVIEWED;
+        return ApprovalStatus.UNREVIEWED;
     }
 
     public TraceLinkVersion withProjectVersion(ProjectVersion projectVersion) {
@@ -133,17 +135,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public TraceLinkVersion withManualTraceType() {
         setTraceType(TraceType.MANUAL);
-        setApprovalStatus(TraceApproval.APPROVED);
+        setApprovalStatus(ApprovalStatus.APPROVED);
         setScore(1);
         return this;
     }
 
-    public UUID getTraceLinkVersionId() {
-        return traceLinkVersionId;
-    }
-
-    public void setTraceLinkVersionId(UUID traceLinkVersionId) {
-        this.traceLinkVersionId = traceLinkVersionId;
+    public TraceLinkVersion withApprovalStatus(ApprovalStatus approvalStatus) {
+        this.setApprovalStatus(approvalStatus);
+        return this;
     }
 
     public TraceLink getTraceLink() {
@@ -170,11 +169,11 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         this.score = score;
     }
 
-    public TraceApproval getApprovalStatus() {
+    public ApprovalStatus getApprovalStatus() {
         return this.approvalStatus;
     }
 
-    public void setApprovalStatus(TraceApproval approvalStatus) {
+    public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
 
@@ -186,24 +185,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         json.put("approved", getApprovalStatus());
         json.put("type", this.traceType);
         return json + "\n";
-    }
-
-    @Override
-    public ProjectVersion getProjectVersion() {
-        return this.projectVersion;
-    }
-
-    public void setProjectVersion(ProjectVersion projectVersion) {
-        this.projectVersion = projectVersion;
-    }
-
-    @Override
-    public ModificationType getModificationType() {
-        return this.modificationType;
-    }
-
-    public void setModificationType(ModificationType modificationType) {
-        this.modificationType = modificationType;
     }
 
     @Override
@@ -250,12 +231,12 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     private boolean hasSameContent(String sourceName,
                                    String targetName,
                                    TraceType traceType,
-                                   TraceApproval traceApproval,
+                                   ApprovalStatus approvalStatus,
                                    double score) {
         return this.traceLink.sourceArtifact.getName().equals(sourceName)
             && this.traceLink.targetArtifact.getName().equals(targetName)
             && this.traceType == traceType
-            && this.approvalStatus == traceApproval
+            && this.approvalStatus == approvalStatus
             && areEqualWithDelta(this.score, score, 0.001);
     }
 

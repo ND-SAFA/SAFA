@@ -10,8 +10,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
@@ -48,7 +48,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
         JSONObject link = links.getJSONObject(0);
 
         // Step - Set link to approved
-        link.put("approvalStatus", TraceApproval.APPROVED);
+        link.put("approvalStatus", ApprovalStatus.APPROVED);
         TraceAppEntity traceAppEntity = toClass(link.toString(), TraceAppEntity.class);
 
         // Step - Commit link change to new version
@@ -67,7 +67,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
 
         // VP - Verify that
         TraceLinkVersion modifiedTraceLinkVersion = linkVersions.get(1);
-        assertThat(modifiedTraceLinkVersion.getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
+        assertThat(modifiedTraceLinkVersion.getApprovalStatus()).isEqualTo(ApprovalStatus.APPROVED);
     }
 
     @Test
@@ -93,10 +93,10 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
         Optional<TraceLinkVersion> unreviewedLinkQuery = traceLinkVersionRepository
             .findByProjectVersionAndTraceLink(projectVersion, generatedLink.getTraceLink());
         assertThat(unreviewedLinkQuery.isPresent()).isTrue();
-        assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.UNREVIEWED);
+        assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.UNREVIEWED);
 
         // Step - Set trace link status to approved
-        generatedLink.setApprovalStatus(TraceApproval.APPROVED);
+        generatedLink.setApprovalStatus(ApprovalStatus.APPROVED);
 
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
@@ -111,10 +111,10 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
                 projectVersion,
                 generatedLink.getTraceLink());
         assertThat(approvedLinkQuery.isPresent()).isTrue();
-        assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.APPROVED);
+        assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.APPROVED);
 
         // Step - Set trace link status to decline d
-        generatedLink.setApprovalStatus(TraceApproval.DECLINED);
+        generatedLink.setApprovalStatus(ApprovalStatus.DECLINED);
 
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLinkAppEntity = this.traceLinkVersionRepository
@@ -128,6 +128,6 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
             projectVersion,
             generatedLink.getTraceLink());
         assertThat(declinedLinkQuery.isPresent()).isTrue();
-        assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(TraceApproval.DECLINED);
+        assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.DECLINED);
     }
 }

@@ -11,4 +11,5 @@ public class SampleProjectConstants {
     public static final int N_ENV_ASSUMPTIONS = 1;
     public static final int N_ARTIFACTS = N_DESIGNS + N_REQUIREMENTS + N_HAZARDS + N_ENV_ASSUMPTIONS;
     public static final int N_LINKS = 22; //23 but there exist an invalid one
+    public static final String DESIGN_FILE = "Design.csv";
 }

@@ -21,7 +21,9 @@ import unit.SampleProjectConstants;
 public class TestCSVReader extends EntityBaseTest {
     @Test
     public void readCSVFile() throws Exception {
-        String pathToFile = ProjectPaths.getPathToTestResources("Design.csv");
+        String pathToFile = ProjectPaths.getPathToTestResources(
+            SampleProjectConstants.DESIGN_FILE
+        );
         CSVParser designFile = FileUtilities.readCSVFile(pathToFile);
 
         //Verification points

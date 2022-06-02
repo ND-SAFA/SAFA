@@ -84,8 +84,8 @@ public class ParseDataFileController extends BaseController {
             CSVParser fileCSV = ArtifactFile.readArtifactFile(file);
             EntityCreation<ArtifactAppEntity, String> entityCreationResponse =
                 ArtifactFile.parseArtifactFileIntoApplicationEntities(
-                    file.getOriginalFilename(),
                     artifactType,
+                    file.getOriginalFilename(),
                     fileCSV);
             response.setArtifacts(entityCreationResponse.getEntities());
             response.setErrors(entityCreationResponse.getErrors());

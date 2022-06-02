@@ -11,9 +11,8 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import org.junit.jupiter.api.Test;
 
 public class TestFlatFileProjectCreationWorker extends JobBaseTest {
-
-
-    /**
+    
+    /*
      * Tests that uploading default project as job completes.
      *
      * @throws Exception Throws exception if:
@@ -33,7 +32,7 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
             .subscribeToJob(currentUsername, jobService.getJobById(jobId));
 
         // Step - Allow job to run
-        Thread.sleep(1500);
+        Thread.sleep(5000);
 
         // VP - Verify that job has finished.
         JobDbEntity jobDbEntity = jobService.getJobById(jobId);

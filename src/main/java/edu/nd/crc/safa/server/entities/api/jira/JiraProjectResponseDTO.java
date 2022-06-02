@@ -1,19 +1,19 @@
 package edu.nd.crc.safa.server.entities.api.jira;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 
 /**
  * JIRA api response for the endpoint /project/{id}
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class JiraProjectResponseDTO {
 
-    private String id;
-    private String description;
-    private String key;
+    String id;
+    String description;
+    String key;
+    String name;
+    Boolean isPrivate;
+    String style;
+
 }

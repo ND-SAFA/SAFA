@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.repositories.imports;
+package edu.nd.crc.safa.server.repositories.jira;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JiraAccessCredentialsRepository extends JpaRepository<JiraAccessCredentials, UUID> {
 
-    Optional<JiraAccessCredentials> findByUser(SafaUser user);
+    Optional<JiraAccessCredentials> findByUserAndCloudId(SafaUser user, String cloudId);
 }

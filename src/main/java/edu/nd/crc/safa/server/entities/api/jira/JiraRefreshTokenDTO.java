@@ -4,17 +4,13 @@ import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 
 /**
- * POJO to be used as body payload and response when refreshing current credentials
+* POJO to be used as body payload and response when refreshing current credentials
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JiraRefreshTokenDTO {
     /**

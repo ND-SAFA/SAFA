@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -10,12 +12,14 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.imports.JiraAccessCredentialsRepository;
+import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -26,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -66,35 +71,44 @@ public class JiraController extends BaseController {
         this.jiraConnectionService = jiraConnectionService;
         this.executorDelegate = executorDelegate;
     }
-
+    
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") Long id) {
+    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
+                                                            @PathVariable("cloudId") String cloudId) {
         DeferredResult<ProjectAppEntity> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
+            // Step - Retrieve project
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraProjectResponseDTO response = jiraConnectionService.retrieveJIRAProject(credentials, id);
-            Project project = new Project();
+                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+            JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
+                jiraProjectId);
 
-            project.setName(response.getKey());
-            project.setDescription(response.getDescription());
+            // Step - Save project
+            String projectName = jiraProjectResponse.getKey();
+            String projectDescription = jiraProjectResponse.getDescription();
+            Project project = new Project(projectName, projectDescription);
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
-            ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
-            ProjectAppEntity projectEntities = appEntityRetrievalService
-                .retrieveProjectEntitiesAtProjectVersion(projectVersion);
+            // Step - Map JIRA project to SAFA project
+            this.jiraConnectionService.createJiraProjectMapping(project, jiraProjectId);
 
-            output.setResult(projectEntities);
+            // Step - Create initial version
+            ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
+
+            // Step - TODO: Save issues as artifacts and links
+
+            // Step - Respond with project
+            output.setResult(new ProjectAppEntity());
         });
 
         return output;
     }
 
     @PostMapping(AppRoutes.Accounts.jiraCredentials)
-    public DeferredResult<String> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
-        DeferredResult<String> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
+        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
@@ -103,10 +117,11 @@ public class JiraController extends BaseController {
             boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
 
             if (!areCredentialsValid) {
-                throw new SafaError("Invalid credentials");
+                throw new SafaError("Invalid JIRA credentials");
             }
 
-            JiraAccessCredentials previousCredentials = accessCredentialsRepository.findByUser(principal).orElse(null);
+            JiraAccessCredentials previousCredentials =
+                accessCredentialsRepository.findByUserAndCloudId(principal, credentials.getCloudId()).orElse(null);
 
             if (Objects.nonNull(previousCredentials)) {
                 log.info("Deleting previous JIRA credentials for {}", principal.getEmail());
@@ -124,20 +139,20 @@ public class JiraController extends BaseController {
                     status: <HttpCode>
                     message: <SafaMessage.EnumConstant>
              */
-            output.setResult("created");
+            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.CREATED));
         });
 
         return output;
     }
 
-    @PutMapping(AppRoutes.Accounts.jiraCredentials)
-    public DeferredResult<String> createCredentials() {
-        DeferredResult<String> output = executorDelegate.createOutput(5000L);
+    @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
+    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") @NotNull String cloudId) {
+        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUser(principal).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
 
             JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
 
@@ -150,7 +165,45 @@ public class JiraController extends BaseController {
             credentials.setRefreshToken(newCredentials.getRefreshToken());
             credentials = accessCredentialsRepository.save(credentials);
 
-            output.setResult("updated");
+            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.UPDATED));
+        });
+
+        return output;
+    }
+
+    @GetMapping(AppRoutes.Projects.retrieveJIRAProjects)
+    public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
+        @PathVariable("cloudId") String cloudId) {
+        DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
+            executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
+            JiraAccessCredentials credentials = accessCredentialsRepository
+                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+            List<JiraProjectResponseDTO> response = jiraConnectionService.retrieveJIRAProjectsPreview(credentials);
+
+            output.setResult(new JiraResponseDTO<>(response, JiraResponseMessage.OK));
+        });
+
+        return output;
+    }
+
+    @PostMapping(AppRoutes.Accounts.jiraCredentialsValidate)
+    public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
+        @RequestBody @Valid JiraAccessCredentialsDTO data) {
+        DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            JiraAccessCredentials credentials = data.toEntity();
+
+            try {
+                boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
+
+                output.setResult(new JiraResponseDTO<>(areCredentialsValid, JiraResponseMessage.OK));
+            } catch (Exception ex) {
+                output.setResult(new JiraResponseDTO<>(false, JiraResponseMessage.ERROR));
+            }
         });
 
         return output;

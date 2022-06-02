@@ -6,7 +6,7 @@
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    :has-delete-for-indexes="hasDeleteForIndexes"
+    :has-delete-for-indexes="deletableProjects"
     :has-delete="false"
     @item:edit="handleEditProject"
     @item:select="handleSelectProject"
@@ -46,7 +46,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, ProjectIdentifier, ProjectRole } from "@/types";
-import { sessionModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -81,6 +81,7 @@ export default Vue.extend({
     return {
       selected: undefined as ProjectIdentifier | undefined,
       projects: [] as ProjectIdentifier[],
+      deletableProjects: [] as number[],
       headers: [
         { text: "Name", value: "name", sortable: true, isSelectable: true },
         {
@@ -110,6 +111,9 @@ export default Vue.extend({
     this.fetchProjects();
   },
   watch: {
+    userEmail() {
+      this.fetchProjects();
+    },
     /**
      * When opened, fetches projects and selects the first if there is only one.
      */
@@ -123,24 +127,22 @@ export default Vue.extend({
       this.$emit("selected", this.projects[0], false);
     },
   },
-  computed: {
+  methods: {
     /**
-     * Returns the indexes that the current user has delete permissions for.
+     * @returns The indexes that the current user has delete permissions for.
      */
-    hasDeleteForIndexes(): number[] {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
+    getDeletableProjects(): number[] {
+      const userEmail = sessionModule.userEmail;
 
       return this.projects
         .map((project, projectIndex) => {
-          const projectMembershipQuery = project.members.filter(
+          const adminMember = project.members.find(
             (m) => m.email === userEmail && m.role === ProjectRole.OWNER
           );
-          return projectMembershipQuery.length === 1 ? projectIndex : -1;
+          return adminMember ? projectIndex : -1;
         })
         .filter((idx) => idx !== -1);
     },
-  },
-  methods: {
     /**
      * Emits changes to the selected item.
      * @param item - The selected project.
@@ -228,6 +230,10 @@ export default Vue.extend({
       getProjects()
         .then((projects) => {
           this.projects = projects;
+          this.deletableProjects = this.getDeletableProjects();
+        })
+        .catch((e) => {
+          logModule.onDevError(e);
         })
         .finally(() => (this.isLoading = false));
     },

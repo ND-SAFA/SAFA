@@ -5,7 +5,6 @@ import {
   ProjectIdentifier,
   ProjectMembership,
   ProjectRole,
-  ProjectSummary,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 

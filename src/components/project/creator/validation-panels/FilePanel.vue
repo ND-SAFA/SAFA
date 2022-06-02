@@ -26,7 +26,7 @@
         <v-row v-if="showFileUploader">
           <generic-file-selector
             :multiple="false"
-            @change:files="emitChangeFiles"
+            @update:files="emitChangeFiles"
           />
         </v-row>
 

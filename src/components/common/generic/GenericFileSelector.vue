@@ -19,7 +19,7 @@ import Vue from "vue";
  * Displays a generic file selector.
  *
  * @emits-1 `clear` - On clear.
- * @emits-2 `change:files` - On file change.
+ * @emits-2 `update:files` (File[]) - On files change.
  */
 export default Vue.extend({
   name: "GenericFileSelector",
@@ -36,7 +36,7 @@ export default Vue.extend({
      * @param files - The updated files.
      */
     handleChangeFiles(files: File[]) {
-      this.$emit("change:files", files);
+      this.$emit("update:files", files);
     },
   },
 });

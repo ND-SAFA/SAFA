@@ -6,7 +6,6 @@ import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.JiraProject;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 /**
@@ -61,7 +60,6 @@ public interface JiraConnectionService {
      *
      * @param project       The safa project associated with the JIRA project.
      * @param jiraProjectId The id of the JIRA project.
-     * @return JiraProject mapping safa and jira project
      */
-    JiraProject createJiraProject(Project project, String jiraProjectId);
+    void createJiraProjectMapping(Project project, Long jiraProjectId);
 }

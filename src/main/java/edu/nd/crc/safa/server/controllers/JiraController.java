@@ -71,15 +71,7 @@ public class JiraController extends BaseController {
         this.jiraConnectionService = jiraConnectionService;
         this.executorDelegate = executorDelegate;
     }
-
-    /**
-     * Asynchronously calls JIRA instance, retrieves project in JIRA resource, and converts
-     * issues into artifacts and their associated links.
-     *
-     * @param jiraProjectId The project id for the project on JIRA
-     * @param cloudId       The id associated with the JIRA resource
-     * @return The project created from scraping JIRA project.
-     */
+    
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
     public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
                                                             @PathVariable("cloudId") String cloudId) {
@@ -90,7 +82,8 @@ public class JiraController extends BaseController {
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentials credentials = accessCredentialsRepository
                 .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, jiraProjectId);
+            JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
+                jiraProjectId);
 
             // Step - Save project
             String projectName = jiraProjectResponse.getKey();
@@ -98,17 +91,16 @@ public class JiraController extends BaseController {
             Project project = new Project(projectName, projectDescription);
             this.projectService.saveProjectWithCurrentUserAsOwner(project);
 
-            // Should probably also specify this is a JIRA pulled project
-            // Maybe save the cloud id and JIRA project id, so we can later update it?
-            project.setName(jiraProjectResponse.getKey());
-            project.setDescription(jiraProjectResponse.getDescription());
+            // Step - Map JIRA project to SAFA project
+            this.jiraConnectionService.createJiraProjectMapping(project, jiraProjectId);
 
-
+            // Step - Create initial version
             ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
-            ProjectAppEntity projectEntities = appEntityRetrievalService
-                .retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
-            output.setResult(new JiraResponseDTO<>(projectEntities, JiraResponseMessage.IMPORTED));
+            // Step - TODO: Save issues as artifacts and links
+
+            // Step - Respond with project
+            output.setResult(new ProjectAppEntity());
         });
 
         return output;

@@ -151,10 +151,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraProject createJiraProject(Project project, String jiraProjectId) {
+    public void createJiraProjectMapping(Project project, Long jiraProjectId) {
         JiraProject jiraProject = new JiraProject(project, jiraProjectId);
         jiraProjectRepository.save(jiraProject);
-        return jiraProject;
     }
 
     @Getter

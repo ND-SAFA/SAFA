@@ -41,9 +41,9 @@ public class JiraProject {
      * ID of associated jira project
      */
     @Column(name = "jira_project_id", nullable = false, unique = true)
-    String jiraProjectId;
+    Long jiraProjectId;
 
-    public JiraProject(Project project, String jiraProjectId) {
+    public JiraProject(Project project, Long jiraProjectId) {
         this.project = project;
         this.jiraProjectId = jiraProjectId;
     }

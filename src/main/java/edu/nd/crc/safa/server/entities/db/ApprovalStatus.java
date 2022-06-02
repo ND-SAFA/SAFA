@@ -6,7 +6,7 @@ import java.io.Serializable;
  * The state of approving a trace links for trace links. Note,
  * manual links are defaulted to be approved.
  */
-public enum TraceApproval implements Serializable {
+public enum ApprovalStatus implements Serializable {
     /**
      * The state of a generated trace link that has not been
      * approved or declined.

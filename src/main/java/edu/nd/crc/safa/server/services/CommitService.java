@@ -61,10 +61,10 @@ public class CommitService {
         List<CommitError> errors;
 
         // Pre-processing: Add related trace links to be removed.
-        for (ArtifactAppEntity artifactAppEntity : projectCommit.getArtifacts().getRemoved()) {
-            List<TraceAppEntity> associatedLinks = this.appEntityRetrievalService
-                .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifactAppEntity.getName());
-            projectCommit.addTraceToDelete(associatedLinks);
+        for (ArtifactAppEntity artifact : projectCommit.getArtifacts().getRemoved()) {
+            List<TraceAppEntity> linksToArtifact = this.appEntityRetrievalService
+                .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
+            projectCommit.addRemovedTraces(linksToArtifact);
         }
 
         // Commit artifact and trace changes.

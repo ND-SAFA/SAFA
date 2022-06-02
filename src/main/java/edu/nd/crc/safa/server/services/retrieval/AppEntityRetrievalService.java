@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
@@ -14,13 +13,13 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectMemberAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceApproval;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
@@ -59,8 +58,9 @@ public class AppEntityRetrievalService {
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final DocumentColumnRepository documentColumnRepository;
-    private final CommitErrorRetrievalService commitErrorRetrievalService;
+
     private final WarningService warningService;
+    private final CommitErrorRetrievalService commitErrorRetrievalService;
 
     @Autowired
     public AppEntityRetrievalService(DocumentRepository documentRepository,
@@ -70,8 +70,8 @@ public class AppEntityRetrievalService {
                                      ArtifactVersionRepository artifactVersionRepository,
                                      ArtifactTypeRepository artifactTypeRepository,
                                      DocumentColumnRepository documentColumnRepository,
-                                     CommitErrorRetrievalService commitErrorRetrievalService,
-                                     WarningService warningService) {
+                                     WarningService warningService,
+                                     CommitErrorRetrievalService commitErrorRetrievalService) {
         this.documentRepository = documentRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.documentArtifactRepository = documentArtifactRepository;
@@ -79,8 +79,8 @@ public class AppEntityRetrievalService {
         this.artifactTypeRepository = artifactTypeRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.documentColumnRepository = documentColumnRepository;
-        this.commitErrorRetrievalService = commitErrorRetrievalService;
         this.warningService = warningService;
+        this.commitErrorRetrievalService = commitErrorRetrievalService;
     }
 
     public static AppEntityRetrievalService getInstance() {
@@ -98,12 +98,11 @@ public class AppEntityRetrievalService {
      * @param projectVersion Version whose artifacts are used to generate warnings and error
      * @return ProjectCreationResponse containing all relevant project entities
      */
-    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        ProjectParsingErrors projectParsingErrors = this.commitErrorRetrievalService
-            .collectionProjectErrors(projectVersion);
-        Map<String, List<RuleName>> projectWarnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        return new ProjectEntities(projectAppEntity, projectVersion, projectParsingErrors, projectWarnings);
+        Map<String, List<RuleName>> warnings = this.retrieveWarningsInProjectVersion(projectVersion);
+        projectAppEntity.setWarnings(warnings);
+        return projectAppEntity;
     }
 
     /**
@@ -132,7 +131,16 @@ public class AppEntityRetrievalService {
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
 
-        return new ProjectAppEntity(projectVersion, artifacts, traces, projectMembers, documents, artifactTypes);
+        // Version errors
+        ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
+
+        return new ProjectAppEntity(projectVersion,
+            artifacts,
+            traces,
+            projectMembers,
+            documents,
+            artifactTypes,
+            errors);
     }
 
     /**
@@ -262,7 +270,7 @@ public class AppEntityRetrievalService {
             this.traceLinkVersionRepository
                 .retrieveVersionEntitiesByProjectVersion(projectVersion)
                 .stream()
-                .filter(t -> t.getApprovalStatus() == TraceApproval.APPROVED)
+                .filter(t -> t.getApprovalStatus() == ApprovalStatus.APPROVED)
                 .map(TraceLinkVersion::getTraceLink)
                 .collect(Collectors.toList());
         return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);

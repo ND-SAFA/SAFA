@@ -30,7 +30,7 @@ public class CommitErrorRetrievalService {
      * @param projectVersion The ProjectVersion which returned errors are associated with.
      * @return Separated errors by ApplicationActivity.
      */
-    public ProjectParsingErrors collectionProjectErrors(ProjectVersion projectVersion) {
+    public ProjectParsingErrors collectErrorsInVersion(ProjectVersion projectVersion) {
 
         List<ErrorApplicationEntity> timErrors = this.commitErrorRepository
             .findByProjectVersionAndApplicationActivity(projectVersion, ProjectEntity.TIM)

@@ -22,10 +22,10 @@ export function handleImportProject(
   appModule.onLoadStart();
 
   saveProject(project)
-    .then(async (res) => {
+    .then(async (projectCreated) => {
       logModule.onSuccess(`Project has been created: ${project.name}`);
       await navigateTo(Routes.ARTIFACT);
-      await handleSetProject(res);
+      await handleSetProject(projectCreated);
       onSuccess?.();
     })
     .catch((e) => {
@@ -45,7 +45,10 @@ export function handleImportProject(
  * @param onError - Called if the action fails.
  */
 export function handleBulkImportProject(
-  project: Pick<Project, "projectId" | "name" | "description">,
+  project: Pick<
+    Project,
+    "projectId" | "name" | "description" | "projectVersion"
+  >,
   files: File[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
@@ -54,8 +57,8 @@ export function handleBulkImportProject(
   saveProject(project)
     .then(async (project) =>
       handleUploadProjectVersion(
-        project.project.projectId,
-        project.projectVersion.versionId,
+        project.projectId,
+        project.projectVersion?.versionId || "",
         files,
         true
       )
@@ -68,17 +71,19 @@ export function handleBulkImportProject(
 /**
  * Imports a Jira project, sets related app state, and logs the status.
  *
+ * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportJiraProject(
+  cloudId: string,
   projectId: string,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appModule.onLoadStart();
 
-  createJiraProject(projectId)
+  createJiraProject(cloudId, projectId)
     .then(async () => {
       logModule.onSuccess(`Jira project has been created: ${projectId}`);
       await navigateTo(Routes.UPLOAD_STATUS);
@@ -102,10 +107,14 @@ export function handleImportJiraProject(
  * @param onError - Called if the action fails.
  */
 export function handleImportGitHubProject(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   credentials: InternalGitHubCredentials,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   projectId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  console.log("Importing from GitHub is not yet enabled.");
+  logModule.onDevMessage("Importing from GitHub is not yet enabled.");
 }

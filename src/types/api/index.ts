@@ -3,4 +3,5 @@ export * from "./project-api";
 export * from "./session-api";
 export * from "./websocket-api";
 export * from "./jira-api";
+export * from "./job-api";
 export * from "./github-api";

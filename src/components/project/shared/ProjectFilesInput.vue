@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 30em">
-    <generic-file-selector @change:files="handleChangeFiles" />
+    <generic-file-selector v-model="selectedFiles" />
     <v-btn
       block
       color="primary"
@@ -45,6 +45,7 @@ export default Vue.extend({
       isLoading: false,
     };
   },
+
   computed: {
     /**
      * Whether the submit button is disabled.
@@ -54,13 +55,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    /**
-     * Saves changed files.
-     * @param files - The changed files.
-     */
-    handleChangeFiles(files: File[]) {
-      this.selectedFiles = files;
-    },
     /**
      * Attempts to save the project.
      */
@@ -78,6 +72,8 @@ export default Vue.extend({
           onSuccess: () => {
             this.selectedFiles = [];
             this.isLoading = false;
+            this.$emit("update:name", "");
+            this.$emit("update:description", "");
           },
           onError: () => {
             this.isLoading = false;

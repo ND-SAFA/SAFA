@@ -8,7 +8,7 @@
       size="48"
       class="mx-auto my-2 d-block"
     />
-    <p v-if="itemCount === 0" class="text-caption">
+    <p v-if="itemCount === 0 && !loading" class="text-caption">
       {{ emptyMessage }}
     </p>
     <v-list>

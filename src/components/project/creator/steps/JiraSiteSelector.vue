@@ -2,6 +2,7 @@
   <generic-stepper-list-step
     empty-message="There are no domains."
     :item-count="sites.length"
+    :loading="loading"
     title="Jira Domains"
   >
     <template slot="items">

@@ -1,4 +1,9 @@
-import { ArtifactType, ProjectMembership, TraceLink } from "@/types";
+import {
+  ArtifactType,
+  ArtifactWarning,
+  ProjectMembership,
+  TraceLink,
+} from "@/types";
 import { Artifact } from "./artifact";
 import { ProjectDocument } from "./document";
 
@@ -41,6 +46,7 @@ export interface ProjectErrors {
   tim: ParserError[];
   artifacts: ParserError[];
   traces: ParserError[];
+  allErrors: ParserError[];
 }
 
 /**
@@ -129,6 +135,22 @@ export interface Project extends ProjectIdentifier {
    * The artifact types present in the project.
    */
   artifactTypes: ArtifactType[];
+  /**
+   * A collection of warnings on project artifacts.
+   */
+  warnings: Record<string, ArtifactWarning[]>;
+}
+
+export interface ProjectSummary {
+  /**
+   * The project itself.
+   */
+  project: Project;
+
+  /**
+   * A collection of errors on project artifacts.
+   */
+  errors: ProjectErrors;
 }
 
 export type VersionType = "major" | "minor" | "revision";

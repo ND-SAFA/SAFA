@@ -1,4 +1,4 @@
-import { Project, ProjectCreationResponse } from "@/types";
+import { Project } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
@@ -13,11 +13,12 @@ import {
   viewportModule,
 } from "@/store";
 import {
-  connectAndSubscribeToVersion,
   handleLoadTraceMatrices,
   handleLoadVersion,
+  handleSelectVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
+import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -52,7 +53,9 @@ export async function handleProjectSubscription(
   const versionId = project.projectVersion?.versionId || "";
   const isDifferentProject = projectModule.versionId !== versionId;
 
-  await connectAndSubscribeToVersion(projectId, versionId);
+  project.artifactTypes = await getProjectArtifactTypes(projectId);
+
+  await handleSelectVersion(projectId, versionId);
   await projectModule.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
@@ -74,13 +77,11 @@ export async function handleClearProject(): Promise<void> {
 /**
  * Sets a newly created project.
  *
- * @param res - The created project and warnings.
+ * @param project - Project created containing entities.
  */
-export async function handleSetProject(
-  res: ProjectCreationResponse
-): Promise<void> {
-  await handleProjectSubscription(res.project);
-  errorModule.setArtifactWarnings(res.warnings);
+export async function handleSetProject(project: Project): Promise<void> {
+  await handleProjectSubscription(project);
+  errorModule.setArtifactWarnings(project.warnings);
 }
 
 /**

@@ -15,15 +15,21 @@ export enum Endpoint {
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
 
+  // Jobs
+  updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
+  getUserJobs = "jobs",
+  deleteJobById = "jobs/:jobId",
+  jobTopic = "/topic/jobs/:jobId",
+  projectTopic = "/topic/projects/:projectId",
+  versionTopic = "/topic/revisions/:versionId",
+
   // Projects
   project = "projects",
   updateProject = "projects/:projectId",
-  createProjectFromFlatFiles = "projects/flat-files",
-  updateProjectThroughFlatFiles = "projects/versions/:versionId/flat-files",
   getProjectMembers = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
   jiraCredentials = "accounts/jira/credentials",
-  jiraProject = "projects/import/jira/:projectId",
+  jiraProject = "projects/import/jira/:cloudId/:projectId",
 
   // Commits
   commit = "projects/versions/:versionId/commit",

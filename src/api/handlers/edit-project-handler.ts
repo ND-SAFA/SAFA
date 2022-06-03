@@ -1,9 +1,4 @@
-import {
-  IOHandlerCallback,
-  Project,
-  ProjectCreationResponse,
-  ProjectIdentifier,
-} from "@/types";
+import { IOHandlerCallback, Project, ProjectIdentifier } from "@/types";
 import { logModule, projectModule } from "@/store";
 import {
   deleteProject,
@@ -24,7 +19,7 @@ export function handleSaveProject(
   { onSuccess, onError }: IOHandlerCallback<Project>
 ): void {
   saveProject(project)
-    .then(({ project }: ProjectCreationResponse) => {
+    .then((project) => {
       logModule.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })

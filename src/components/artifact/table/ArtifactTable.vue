@@ -16,9 +16,11 @@
           @filter="selectedDeltaTypes = $event"
         />
       </template>
+
       <template v-slot:item.type="{ item }">
         <artifact-table-chip :text="item.type" />
       </template>
+
       <template
         v-for="{ id, dataType, required } in columns"
         v-slot:[`item.${id}`]="{ item }"
@@ -44,6 +46,7 @@
           />
         </div>
       </template>
+
       <template v-slot:item.actions="{ item }">
         <generic-icon-button
           icon-id="mdi-view-split-vertical"
@@ -61,6 +64,7 @@
           @click="handleDelete(item)"
         />
       </template>
+
       <template v-slot:footer>
         <v-row justify="end" class="mr-2 mt-1">
           <generic-icon-button
@@ -180,24 +184,13 @@ export default Vue.extend({
      * @return The artifact table's items.
      */
     items(): FlatArtifact[] {
-      return artifactModule.artifacts
-        .filter(
-          (item) =>
-            !this.inDeltaView ||
-            this.selectedDeltaTypes.length === 0 ||
-            this.selectedDeltaTypes.includes(
-              deltaModule.getArtifactDeltaType(item.id)
-            )
-        )
-        .map(
-          (artifact) =>
-            ({
-              ...artifact,
-              ...artifact.customFields,
-            } as FlatArtifact)
-        );
+      const selectedTypes = this.inDeltaView ? [] : this.selectedDeltaTypes;
+      return artifactModule.flatArtifacts.filter(
+        ({ id }) =>
+          selectedTypes.length === 0 ||
+          selectedTypes.includes(deltaModule.getArtifactDeltaType(id))
+      );
     },
-
     /**
      * @return The title of the artifact creator.
      */
@@ -230,7 +223,7 @@ export default Vue.extend({
      * @param artifact - The artifact to delete.
      */
     handleDelete(artifact: Artifact) {
-      handleDeleteArtifact(artifact);
+      handleDeleteArtifact(artifact, {});
     },
     /**
      * Opens the create artifact window.
@@ -245,7 +238,6 @@ export default Vue.extend({
       this.createDialogueOpen = false;
       this.selectedArtifact = undefined;
     },
-
     /**
      * @param dataType - The data type to check.
      * @return Whether the data type is free text.
@@ -267,7 +259,6 @@ export default Vue.extend({
     isSelect(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.SELECT;
     },
-
     /**
      * Returns the artifact name of the given artifact id.
      * @param id - The artifact to find.
@@ -293,11 +284,11 @@ export default Vue.extend({
     getItemBackground(item: Artifact): string {
       if (artifactSelectionModule.getSelectedArtifactId === item.id) {
         return "artifact-selected";
+      } else {
+        const deltaState = deltaModule.getArtifactDeltaType(item.id);
+
+        return `artifact-${deltaState.toLowerCase()}`;
       }
-
-      const deltaState = deltaModule.getArtifactDeltaType(item.id);
-
-      return `artifact-${deltaState.toLowerCase()}`;
     },
   },
 });

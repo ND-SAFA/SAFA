@@ -95,8 +95,8 @@ export default Vue.extend({
      */
     handleDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
-        handleDeleteArtifact(this.selectedArtifact).then(() => {
-          appModule.closePanel(PanelType.left);
+        handleDeleteArtifact(this.selectedArtifact, {
+          onSuccess: () => appModule.closePanel(PanelType.left),
         });
       }
     },

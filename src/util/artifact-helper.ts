@@ -1,5 +1,4 @@
-import { Artifact, ArtifactDeltaState } from "@/types";
-import { ThemeColors } from "@/util/theme";
+import { Artifact } from "@/types";
 
 /**
  * Returns the artifact in list if single item exists.
@@ -20,23 +19,5 @@ export function getSingleQueryResult(
       throw Error(`Query resulted in empty results: ${queryName}`);
     default:
       throw Error(`Found more than one result in query: ${queryName}`);
-  }
-}
-
-/**
- * Returns the background color for the given delta state.
- * @param deltaState - The delta state to get the color for.
- * @return The color.
- */
-export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
-  switch (deltaState) {
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.artifactAdded;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.artifactRemoved;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.artifactModified;
-    default:
-      return ThemeColors.artifactDefault;
   }
 }

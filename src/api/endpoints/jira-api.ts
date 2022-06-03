@@ -140,6 +140,8 @@ export async function getJiraCloudSites(
 }
 
 /**
+ * TODO: update to internal GET `/projects/jira/{cloudId}`
+ *
  * Returns all Jira projects for the given user and cloud site.
  *
  * @param accessToken - The access token received from authorizing Jira.
@@ -173,7 +175,7 @@ export async function saveJiraCredentials(
   credentials: InternalJiraCredentials
 ): Promise<void> {
   return authHttpClient<void>(Endpoint.jiraCredentials, {
-    method: "PUT",
+    method: "POST",
     body: JSON.stringify(credentials),
   });
 }
@@ -181,11 +183,15 @@ export async function saveJiraCredentials(
 /**
  * Creates a new project based on a Jira project.
  *
+ * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
  */
-export async function createJiraProject(projectId: string): Promise<void> {
+export async function createJiraProject(
+  cloudId: string,
+  projectId: string
+): Promise<void> {
   return authHttpClient<void>(
-    fillEndpoint(Endpoint.jiraProject, { projectId }),
+    fillEndpoint(Endpoint.jiraProject, { cloudId, projectId }),
     {
       method: "POST",
     }

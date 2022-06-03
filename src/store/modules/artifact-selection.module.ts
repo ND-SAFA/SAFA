@@ -2,7 +2,7 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { Artifact, FilterAction } from "@/types";
 import { PanelType } from "@/types";
-import { appModule, artifactModule, viewportModule } from "@/store";
+import { appModule, artifactModule, logModule, viewportModule } from "@/store";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**
@@ -170,7 +170,7 @@ export default class ArtifactSelectionModule extends VuexModule {
       try {
         return artifactModule.getArtifactById(this.selectedArtifactId);
       } catch (e) {
-        console.log(e);
+        logModule.onError(e);
       }
     }
   }

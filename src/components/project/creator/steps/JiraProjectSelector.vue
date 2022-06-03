@@ -2,6 +2,7 @@
   <generic-stepper-list-step
     empty-message="There are no projects."
     :item-count="projects.length"
+    :loading="loading"
     title="Jira Projects"
   >
     <template slot="items">

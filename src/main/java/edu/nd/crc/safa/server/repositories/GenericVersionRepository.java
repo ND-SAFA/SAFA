@@ -170,6 +170,8 @@ public abstract class GenericVersionRepository<
                 baseEntity,
                 appEntity);
 
+            System.out.println("Version Entity:" + versionEntity);
+
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = baseEntity.getBaseEntityId();
@@ -264,15 +266,20 @@ public abstract class GenericVersionRepository<
         List<AppEntity> appEntities) {
 
         List<String> processedAppEntities = new ArrayList<>();
-
-        List<Pair<VersionEntity, CommitError>> response = appEntities
-            .stream()
-            .map(a -> this.commitAppEntityToProjectVersion(projectVersion, a))
-            .peek(commitResponse -> {
-                if (commitResponse.getValue1() == null) {
-                    processedAppEntities.add(commitResponse.getValue0().getBaseEntityId());
-                }
-            }).collect(Collectors.toList());
+        List<Pair<VersionEntity, CommitError>> response = new ArrayList<>();
+        for (AppEntity appEntity : appEntities) {
+            Pair<VersionEntity, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion,
+                appEntity);
+            CommitError error = commitResponse.getValue1();
+            VersionEntity entity = commitResponse.getValue0();
+            if (error == null && entity == null) {
+                System.out.println("Artifact App:" + appEntity);
+                throw new RuntimeException("Both entities are null!");
+            }
+            if (entity != null) {
+                processedAppEntities.add(entity.getBaseEntityId());
+            }
+        }
 
         List<Pair<VersionEntity, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
                 projectVersion.getProject())

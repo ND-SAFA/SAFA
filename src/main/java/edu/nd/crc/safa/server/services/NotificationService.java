@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
  * Responsible for sending notifications to subscribers of certain topics.
  */
 @Service
+@Scope("singleton")
 public class NotificationService {
 
     private static NotificationService instance;

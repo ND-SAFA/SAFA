@@ -5,6 +5,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.services.EntityVersionService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 /**
@@ -26,8 +27,9 @@ public class ProjectCreationWorker extends JobWorker {
     EntityVersionService entityVersionService;
 
     public ProjectCreationWorker(JobDbEntity jobDbEntity,
+                                 ServiceProvider serviceProvider,
                                  ProjectCommit projectCommit) {
-        super(jobDbEntity);
+        super(jobDbEntity, serviceProvider);
         this.projectCommit = projectCommit;
         this.entityVersionService = EntityVersionService.getInstance();
     }

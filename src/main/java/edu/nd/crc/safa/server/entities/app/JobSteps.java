@@ -16,25 +16,30 @@ public class JobSteps {
         "Parsing Trace Files",
         "Generating Traces",
     };
-
     private static final String[] projectCreationSteps = {
         "Saving Artifacts",
         "Saving Traces",
         "Generating Layout",
         "Done"
     };
-
     private static final String[] modelTrainingSteps = {
         "Gather related documents",
         "Create training data",
         "Model training",
         "Done"
     };
+    public static String[] jiraProjectCreationSteps = {
+        "Authenticate User Credentials",
+        "Retrieve Project Issues",
+        "Convert Issues To Artifacts And Trace Links"
+    };
 
     public static String[] getJobSteps(JobType jobType) {
         switch (jobType) {
             case FLAT_FILE_PROJECT_CREATION:
                 return concatWithStream(flatFileProjectCreation, projectCreationSteps);
+            case JIRA_PROJECT_CREATION:
+                return concatWithStream(jiraProjectCreationSteps, projectCreationSteps);
             case PROJECT_CREATION:
                 return projectCreationSteps;
             case TRAIN_MODEL:

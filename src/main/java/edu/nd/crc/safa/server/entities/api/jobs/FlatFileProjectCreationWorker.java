@@ -23,7 +23,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.FileUploadService;
-import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;
@@ -49,18 +49,6 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
      */
     String pathToTIMFile;
     /**
-     * The service used to create project.
-     */
-    ProjectService projectService;
-    /**
-     * The service used to store flat files while parsing.
-     */
-    FileUploadService fileUploadService;
-    /**
-     * The service used to parse flat files into entities.
-     */
-    FlatFileService flatFileService;
-    /**
      * The parser used to parse time file.
      */
     TIMParser timParser;
@@ -70,14 +58,12 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
     List<TraceGenerationRequest> traceGenerationRequests;
 
     public FlatFileProjectCreationWorker(JobDbEntity jobDbEntity,
+                                         ServiceProvider serviceProvider,
                                          ProjectVersion projectVersion,
                                          MultipartFile[] files) {
-        super(jobDbEntity, new ProjectCommit(projectVersion, true));
+        super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;
-        this.projectService = ProjectService.getInstance();
-        this.fileUploadService = FileUploadService.getInstance();
-        this.flatFileService = FlatFileService.getInstance();
     }
 
     @Override
@@ -91,7 +77,8 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
     }
 
     private void uploadFlatFiles(Project project) {
-        this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
+        FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
+        fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
     }
 
@@ -109,7 +96,7 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
             throw new SafaError("Could not parse");
         }
     }
-    
+
     public void parsingArtifactFiles() throws SafaError {
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
             ArtifactFileParser.getInstance().parseArtifactFiles(projectVersion, this.timParser);
@@ -131,6 +118,7 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
     }
 
     public void generatingTraces() {
+        FlatFileService flatFileService = this.getServiceProvider().getFlatFileService();
         List<TraceAppEntity> generatedLinks = flatFileService.generateTraceLinks(
             projectCommit.getArtifacts().getAdded(),
             traceGenerationRequests);

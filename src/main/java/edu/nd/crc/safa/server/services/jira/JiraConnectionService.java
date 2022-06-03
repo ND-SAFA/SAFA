@@ -8,9 +8,12 @@ import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.Project;
 
+import org.springframework.context.annotation.Scope;
+
 /**
  * Template JIRA operations
  */
+@Scope("singleton")
 public interface JiraConnectionService {
 
     /**

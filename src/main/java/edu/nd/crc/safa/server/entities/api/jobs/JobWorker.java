@@ -9,8 +9,9 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
+import edu.nd.crc.safa.server.services.jobs.JobService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,49 +26,47 @@ import org.springframework.batch.core.JobParametersValidator;
  *
  * <p>TODO: Create annotation to specify step implementations over reflection.
  */
+@Getter
+@Setter
 public abstract class JobWorker implements Job {
 
     /**
      * The job identifying information that is being performed.
      */
-    @Getter
-    @Setter
     JobDbEntity jobDbEntity;
-    /**
-     * The service object for modifying job instance.
-     */
-    JobService jobService;
     /**
      * Service used to send job updates.
      */
-    NotificationService notificationService;
+    ServiceProvider serviceProvider;
 
-    public JobWorker(JobDbEntity jobDbEntity) {
+    public JobWorker(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
-        this.jobService = JobService.getInstance();
-        this.notificationService = NotificationService.getInstance();
+        this.serviceProvider = serviceProvider;
     }
 
     @Override
     public void execute(JobExecution execution) {
+        JobService jobService = this.serviceProvider.getJobService();
+        NotificationService notificationService = this.serviceProvider.getNotificationService();
         String[] stepNames = JobSteps.getJobSteps(this.jobDbEntity.getJobType());
         for (String stepName : stepNames) {
             try {
                 // Pre-step
                 Method method = getMethodForStepByName(stepName);
-                this.jobService.startStep(jobDbEntity);
-                this.notificationService.broadUpdateJobMessage(jobDbEntity);
+                System.out.println("STEP NAME:" + stepName);
+                jobService.startStep(jobDbEntity);
+                notificationService.broadUpdateJobMessage(jobDbEntity);
 
                 // Step
                 method.invoke(this);
 
                 // Post-step
-                this.jobService.endStep(jobDbEntity);
-                this.notificationService.broadUpdateJobMessage(jobDbEntity);
+                jobService.endStep(jobDbEntity);
+                notificationService.broadUpdateJobMessage(jobDbEntity);
             } catch (Exception e) {
-                this.jobService.failJob(jobDbEntity);
+                jobService.failJob(jobDbEntity);
                 e.printStackTrace();
-                this.notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadUpdateJobMessage(jobDbEntity);
                 throw new RuntimeException(e);
             }
         }
@@ -101,7 +100,7 @@ public abstract class JobWorker implements Job {
     }
 
     public void done() {
-        this.jobService.completeJob(jobDbEntity);
+        this.serviceProvider.getJobService().completeJob(jobDbEntity);
     }
 
     /**

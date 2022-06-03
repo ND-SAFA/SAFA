@@ -11,6 +11,7 @@ import edu.nd.crc.safa.server.entities.db.Project;
  * Contains common full paths used through app.
  */
 public class ProjectPaths {
+    // Flat files
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
     public static final String PATH_TO_BUILD = ProjectPaths.PATH_TO_ROOT + "/build";
     public static final String PATH_TO_STORAGE = ProjectPaths.PATH_TO_BUILD + "/storage";
@@ -21,6 +22,9 @@ public class ProjectPaths {
     public static final String PATH_TO_AFTER_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/after";
     public static final String PATH_TO_TEST_2 = ProjectPaths.PATH_TO_TEST_RESOURCES + "/test2";
     public static final String PATH_TO_TEST_3 = ProjectPaths.PATH_TO_TEST_RESOURCES + "/test3";
+
+    // Jira
+    public static final String PATH_TO_DRONE_ISSUES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/jira/drone_response.json";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();

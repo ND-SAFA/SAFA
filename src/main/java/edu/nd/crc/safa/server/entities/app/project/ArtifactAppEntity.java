@@ -9,11 +9,12 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
-import org.json.JSONObject;
+import lombok.Data;
 
 /**
  * Represents the JSON model that is used on the front-end application.
  */
+@Data
 public class ArtifactAppEntity implements IAppEntity {
     /**
      * UUID uniquely identifying artifact.
@@ -91,46 +92,6 @@ public class ArtifactAppEntity implements IAppEntity {
         this.customFields = customFields;
     }
 
-    public Map<String, String> getCustomFields() {
-        return customFields;
-    }
-
-    public void setCustomFields(Map<String, String> customFields) {
-        this.customFields = customFields;
-    }
-
-    public DocumentType getDocumentType() {
-        return documentType;
-    }
-
-    public void setDocumentType(DocumentType documentType) {
-        this.documentType = documentType;
-    }
-
-    public SafetyCaseType getSafetyCaseType() {
-        return safetyCaseType;
-    }
-
-    public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
-        this.safetyCaseType = safetyCaseType;
-    }
-
-    public FTANodeType getLogicType() {
-        return logicType;
-    }
-
-    public void setLogicType(FTANodeType logicType) {
-        this.logicType = logicType;
-    }
-
-    public List<String> getDocumentIds() {
-        return documentIds;
-    }
-
-    public void setDocumentIds(List<String> documentIds) {
-        this.documentIds = documentIds;
-    }
-
     public void addDocumentId(String documentId) {
         this.documentIds.add(documentId);
     }
@@ -141,47 +102,5 @@ public class ArtifactAppEntity implements IAppEntity {
 
     public void setBaseEntityId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSummary() {
-        return this.summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public String getBody() {
-        return this.body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("artifactId", id);
-        json.put("name", name);
-        json.put("type", type);
-        json.put("docType", documentType);
-        json.put("customField", customFields);
-        return json.toString();
     }
 }

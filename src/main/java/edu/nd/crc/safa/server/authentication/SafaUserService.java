@@ -1,12 +1,14 @@
 package edu.nd.crc.safa.server.authentication;
 
 import java.util.Optional;
+import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -20,14 +22,25 @@ import org.springframework.stereotype.Service;
  * and resetting users.
  */
 @Service
+@Scope("singleton")
 public class SafaUserService implements UserDetailsService {
 
+    private static SafaUserService instance;
     private final SafaUserRepository safaUserRepository;
 
     @Autowired
     public SafaUserService(SafaUserRepository safaUserRepository
     ) {
         this.safaUserRepository = safaUserRepository;
+    }
+
+    public static SafaUserService getInstance() {
+        return instance;
+    }
+
+    @PostConstruct
+    void init() {
+        instance = this;
     }
 
     /**
@@ -53,7 +66,9 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser getCurrentUser() {
+        System.out.print("Content:" + SecurityContextHolder.getContext());
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authorization:" + user);
         String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);
     }

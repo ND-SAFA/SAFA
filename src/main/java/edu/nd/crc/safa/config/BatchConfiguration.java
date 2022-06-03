@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
@@ -19,6 +20,7 @@ public class BatchConfiguration {
 
     @Bean
     @Primary
+    @Scope("singleton")
     public JobLauncher simpleAsyncJobLauncher(@Autowired JobRepository jobRepository) throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
         jobLauncher.setJobRepository(jobRepository);

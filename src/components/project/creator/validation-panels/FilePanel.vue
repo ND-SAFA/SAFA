@@ -24,10 +24,7 @@
         </v-row>
 
         <v-row v-if="showFileUploader">
-          <generic-file-selector
-            :multiple="false"
-            @change:files="emitChangeFiles"
-          />
+          <generic-file-selector :multiple="false" @input="emitChangeFiles" />
         </v-row>
 
         <v-row justify="space-between" align="center" dense>

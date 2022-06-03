@@ -15,7 +15,7 @@
       <v-stepper-content step="3">
         <generic-file-selector
           v-if="selectedVersion !== undefined"
-          @change:files="handleChangeFiles"
+          v-model="selectedFiles"
         />
       </v-stepper-content>
     </template>
@@ -92,13 +92,6 @@ export default Vue.extend({
       this.selectedVersion = undefined;
       this.selectedFiles = [];
       this.$emit("close");
-    },
-    /**
-     * Updates the selected files.
-     * @param files - The files to select.
-     */
-    handleChangeFiles(files: File[]) {
-      this.selectedFiles = files;
     },
     /**
      * Attempts to upload a new project version.

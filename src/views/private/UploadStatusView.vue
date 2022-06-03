@@ -1,6 +1,10 @@
 <template>
   <private-page>
     <template v-slot:page>
+      <v-btn text @click="handleGoBack">
+        <v-icon left> mdi-arrow-left </v-icon>
+        Back To Project Creator
+      </v-btn>
       <v-container>
         <h1 class="text-h4">Current Uploads</h1>
         <v-divider />
@@ -16,8 +20,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { navigateBack } from "@/router";
-import { PrivatePage, JobList } from "@/components";
+import { navigateTo, Routes } from "@/router";
+import { JobList, PrivatePage } from "@/components";
 
 /**
  * Displays project uploads.
@@ -33,7 +37,7 @@ export default Vue.extend({
      * Goes back to the artifact page.
      */
     handleGoBack() {
-      navigateBack();
+      navigateTo(Routes.PROJECT_CREATOR);
     },
   },
 });

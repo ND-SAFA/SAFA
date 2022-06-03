@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+/* eslint-disable prettier/prettier */
 /*********************************************************
 FullTest.js - Created by: Jeremy Arellano
     This automated test will test the capabilities of the SAFA
@@ -20,326 +22,462 @@ FullTest.js - Created by: Jeremy Arellano
 *********************************************************/
 
 module.exports = {
-    '@disabled': false,
-    '@tags' : ['SAFA'],
-    'SAFA Website Demo Test'(browser) {
-        /* Page object file */
-        const page = browser.page.UI_Interaction();
+  "@disabled": false,
+  "@tags": ["SAFA"],
+  "SAFA Website Demo Test"(browser) {
+    /* Page object file */
+    const page = browser.page.UI_Interaction();
 
-        /* Screenshot Destination */
-        const screenShotDestination             = '/04FullTest/';
+    /* Screenshot Destination */
+    const screenShotDestination = "/04FullTest/";
 
-        /* Test Data Location + Names */
-        const TestDataLocation                       = 'tests/e2e/nightwatch/TestData/';
-        const HazardsFileName                        = 'Hazard.csv';
-        const RequirementsFileName                   = 'Requirement.csv';
-        const DesignsFileName                        = 'Design.csv';
-        const EnvironmentalAssumptionsFileName       = 'EnvironmentalAssumption.csv';
-        const Requirement2HazardFileName             = 'Requirement2Hazard.csv';
-        const EnvironmentalAssumption2HazardFileName = 'EnvironmentalAssumption2Hazard.csv';
-        const Design2DesignFileName                  = 'Design2Design.csv';
-        const Requirement2RequirementFileName        = 'Requirement2Requirement.csv';
-        const Hazard2HazardFileName                  = 'Hazard2Hazard.csv';
-        const projectName                            = 'Test Project';
+    /* Test Data Location + Names */
+    const TestDataLocation = "tests/e2e/nightwatch/TestData/";
+    const HazardsFileName = "Hazard.csv";
+    const RequirementsFileName = "Requirement.csv";
+    const DesignsFileName = "Design.csv";
+    const EnvironmentalAssumptionsFileName = "EnvironmentalAssumption.csv";
+    const Requirement2HazardFileName = "Requirement2Hazard.csv";
+    const EnvironmentalAssumption2HazardFileName =
+      "EnvironmentalAssumption2Hazard.csv";
+    const Design2DesignFileName = "Design2Design.csv";
+    const Requirement2RequirementFileName = "Requirement2Requirement.csv";
+    const Hazard2HazardFileName = "Hazard2Hazard.csv";
+    const projectName = "Test Project";
 
-        /* Login Information */
-        const userName                          = 'nightwatch1@test.com';
-        const password                          = 'nightwatch123!';
+    /* Login Information */
+    const userName = "nightwatch1@test.com";
+    const password = "nightwatch123!";
 
-        /* Element Text Values */
-        const accountCreationSuccessfulTitle    = 'Welcome to SAFA!';
-        const projectCreatorContinueButton      = 'Continue';
-        const projectCreatorName                = 'Project Name';
-        const projectCreatorDescription         = 'Project description';
-        const newArtifactButton                 = 'Create new artifact';
-        const createArtifactButton              = 'Create Artifact';
-        const createNewArtifactButton           = 'Create new artifact';
-        const artifactNameInputField            = 'Artifact Name';
-        const deleteArtifactButton              = 'Delete';
-        const newTraceLinkButton                = 'Create new trace matrix';
-        const traceLinkButton                   = ' Create Trace Matrix ';    
-        const sourceTraceLinkButton             = ' Select Source ';
-        const targetTraceLinkButton             = ' Select Target ';
-        const deleteTraceLinkButton             = ' Delete ';
-        const createProjectButton               = 'Create Project'
-        const projectDropDownGloabl             = 'Project';
-        const OpenProjectButton                 = 'Open Project';
-        const deleteingProjectInputField        = `Type "${projectName}"`;
-        const deleteProjectButton               = 'Delete';
-        const F4NodeName                        = 'F4';
-        const addArtifactButton                 = 'Add Artifact';
-        const addArtifactInputField             = 'Artifact Name';
-        const addArtifactTypeField              = 'Artifact Type';
-        const addArtifactSummaryField           = 'Artifact Summary';
-        const addArtifactBodyField              = 'Artifact Body';
-        const testNodeName                      = 'Test_Node';
-        const testNodeDescription               = 'This is a new node';
-        const addArtifactSaveButton             = 'Save';
-        
-        
-        /* Element Xpath/CSS Values */
-        const dropDownIcon_traceLink            = '(.//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-chevron-down theme--light"])[9]'; // Note, this will only work for one specific use
-        const centerGraphButton                 = `span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-graphql theme--light"]`;
-        const addArtifactHazardsOptionDropDown  = `(//div[contains(text(),'Hazard.csv') ])[last()]`
-        let TIMNodelocation                     = {};
-        const artifactTypeDropDown              = `(//label[contains(text(), 'Artifact Type')]/following-sibling::input)[1]`;
-        const deleteProjectIcon                 = `button[class="v-btn v-btn--icon v-btn--round theme--light v-size--default"] span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]`
-        const deleteProjectdeleteButton         = `button[type="button"][class="ml-auto v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default error"] span[class="v-btn__content"]`;
-        const openProjectCloseWindowButton      = `(.//button[@type="button"][@class="v-btn v-btn--icon v-btn--round theme--light v-size--default"]//span[@class="v-btn__content"]//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-close theme--light"])[2]`;
-        const artifactViewerTitle               = `.//h1[contains(text(), '${testNodeName}')]`;
-        const artifactViewerDescription         = `.//p[contains(text(), '${testNodeDescription}')]`;  
-        const newNodeArtifactTypeHazardOption   = '(//span[contains(text(), "Hazard")])[last()]';
-        
-        
-        page 
-            /*  Navigate to the website and verify elements have properly loaded */
-            .logToConsole('Navigating to the website')
-            .navigate()
-            .waitForElementVisible('@loginImageIcon', 5000, "WebAPI: URL loaded successfully")
-            .assert.titleEquals('SAFA', 'UI: Title is correct')
-            .buttonNotClickable('Login', 'UI: Login button is disabled')
-            .takeScreenShot(screenShotDestination + 'Login_Success.png')
+    /* Element Text Values */
+    const accountCreationSuccessfulTitle = "Welcome to SAFA!";
+    const projectCreatorContinueButton = "Continue";
+    const projectCreatorName = "Project Name";
+    const projectCreatorDescription = "Project description";
+    const newArtifactButton = "Create new artifact";
+    const createArtifactButton = "Create Artifact";
+    const createNewArtifactButton = "Create new artifact";
+    const artifactNameInputField = "Artifact Name";
+    const deleteArtifactButton = "Delete";
+    const newTraceLinkButton = "Create new trace matrix";
+    const traceLinkButton = " Create Trace Matrix ";
+    const sourceTraceLinkButton = " Select Source ";
+    const targetTraceLinkButton = " Select Target ";
+    const deleteTraceLinkButton = " Delete ";
+    const createProjectButton = "Create Project";
+    const projectDropDownGloabl = "Project";
+    const OpenProjectButton = "Open Project";
+    const deleteingProjectInputField = `Type "${projectName}"`;
+    const deleteProjectButton = "Delete";
+    const F4NodeName = "F4";
+    const addArtifactButton = "Add Artifact";
+    const addArtifactInputField = "Artifact Name";
+    const addArtifactTypeField = "Artifact Type";
+    const addArtifactSummaryField = "Artifact Summary";
+    const addArtifactBodyField = "Artifact Body";
+    const testNodeName = "Test_Node";
+    const testNodeDescription = "This is a new node";
+    const addArtifactSaveButton = "Save";
 
-            /* Create a new account */
-            .logToConsole('Creating a new account')
-            .logToConsole('    Skipping account creation for now')
-            //.clickButton('Sign Up')
-            //.fillInTextBox(userName, 'Email')
-            //.buttonNotClickable('Create Account', 'UI: Create Account button is disabled without entering a password')
-            //.fillInTextBox(password, 'Password')
-            //.takeScreenShot(screenShotDestination + 'CreateAccount.png')
-            //.clickButton('Create Account')
-            //.checkText(accountCreationSuccessfulTitle, "UI: Account Creation Successful")
-            //.clickButton('Login')
+    /* Element Xpath/CSS Values */
+    const dropDownIcon_traceLink =
+      '(.//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-chevron-down theme--light"])[9]'; // Note, this will only work for one specific use
+    const centerGraphButton = `span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-graphql theme--light"]`;
+    const addArtifactHazardsOptionDropDown = `(//div[contains(text(),'Hazard.csv') ])[last()]`;
+    let TIMNodelocation = {};
+    const artifactTypeDropDown = `(//label[contains(text(), 'Artifact Type')]/following-sibling::input)[1]`;
+    const deleteProjectIcon = `button[class="v-btn v-btn--icon v-btn--round theme--light v-size--default"] span[class="v-btn__content"] i[aria-hidden="true"][class="v-icon notranslate mdi mdi-delete theme--light"]`;
+    const deleteProjectdeleteButton = `button[type="button"][class="ml-auto v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default error"] span[class="v-btn__content"]`;
+    const openProjectCloseWindowButton = `(.//button[@type="button"][@class="v-btn v-btn--icon v-btn--round theme--light v-size--default"]//span[@class="v-btn__content"]//i[@aria-hidden="true"][@class="v-icon notranslate mdi mdi-close theme--light"])[2]`;
+    const artifactViewerTitle = `.//h1[contains(text(), '${testNodeName}')]`;
+    const artifactViewerDescription = `.//p[contains(text(), '${testNodeDescription}')]`;
+    const newNodeArtifactTypeHazardOption =
+      '(//span[contains(text(), "Hazard")])[last()]';
 
-            /* Login to the website */
-            .logToConsole('Logging into the website')
-            .loginSession(screenShotDestination, 'Login_Success.png', userName, password, true)
-            .waitForElementNotPresent('@emailInputField', 5000, "WebAPI: Email and Passwod fields are not visible")
-            .waitForElementVisible('@projectCreationSteps', 5000, "UI: Project creator is visible")
-            .assert.visible('@webTitleGlobal', 'UI: Web title is visible')
+    page
+      /*  Navigate to the website and verify elements have properly loaded */
+      .logToConsole("Navigating to the website")
+      .navigate()
+      .waitForElementVisible(
+        "@loginImageIcon",
+        5000,
+        "WebAPI: URL loaded successfully"
+      )
+      .assert.titleEquals("SAFA", "UI: Title is correct")
+      .buttonNotClickable("Login", "UI: Login button is disabled")
+      .takeScreenShot(screenShotDestination + "Login_Success.png")
 
-            /* Naming a New Project */
-            .logToConsole('Naming a new project')
-            .buttonNotClickable(projectCreatorContinueButton, 'UI: Cannot continue in project creator without naming our project')
-            .fillInTextBox(projectName, projectCreatorName)
-            .buttonClickable(projectCreatorContinueButton, 'UI: Continue button is enabled after naming our project without a description')
-            .fillInTextBox('This is a test project', projectCreatorDescription)
-            .clickButton(projectCreatorContinueButton)
-            .takeScreenShot(screenShotDestination + 'Nameing_successful.png')
+      /* Create a new account */
+      .logToConsole("Creating a new account")
+      .logToConsole("    Skipping account creation for now")
+      //.clickButton('Sign Up')
+      //.fillInTextBox(userName, 'Email')
+      //.buttonNotClickable('Create Account', 'UI: Create Account button is disabled without entering a password')
+      //.fillInTextBox(password, 'Password')
+      //.takeScreenShot(screenShotDestination + 'CreateAccount.png')
+      //.clickButton('Create Account')
+      //.checkText(accountCreationSuccessfulTitle, "UI: Account Creation Successful")
+      //.clickButton('Login')
 
-            /* Uploading Artifact */
-            .logToConsole('Uploading an artifact')
-            .assert.visible('@artifactCreatorWarning', 'UI: Artifact creator warning is visible')
-            .buttonNotClickable(projectCreatorContinueButton, 'UI: Cannot continue in project creator without creating at least one artifact')
-            .clickButton(newArtifactButton)
-            .takeScreenShot(screenShotDestination + 'Artifact_Name_Given.png')
-            .buttonNotClickable(createNewArtifactButton, 'UI: Cannot create an artifact without any information given')
-            .clickButton(createArtifactButton)
-            .assert.visible('@artifactCreatorWarning', 'UI: Artifact creator warning is visible when no name is given')
-            .takeScreenShot(screenShotDestination + 'Artifact_No_Name_Given.png')
-            .fillInTextBox(HazardsFileName, artifactNameInputField)
-            .clickButton(createArtifactButton)
-            .uploadFileWithParameters(TestDataLocation, HazardsFileName)
-            .checkUploadSuccess("UI: Hazards file upload was successful and without errors")
-            .buttonClickable(projectCreatorContinueButton, 'UI: Continue button is enabled after uploading one artifact')
-            .takeScreenShot(screenShotDestination + 'Artifact_Upload_Successful.png')
+      /* Login to the website */
+      .logToConsole("Logging into the website")
+      .loginSession(
+        screenShotDestination,
+        "Login_Success.png",
+        userName,
+        password,
+        true
+      )
+      .waitForElementNotPresent(
+        "@emailInputField",
+        5000,
+        "WebAPI: Email and Passwod fields are not visible"
+      )
+      .waitForElementVisible(
+        "@projectCreationSteps",
+        5000,
+        "UI: Project creator is visible"
+      )
+      .assert.visible("@webTitleGlobal", "UI: Web title is visible")
 
+      /* Naming a New Project */
+      .logToConsole("Naming a new project")
+      .buttonNotClickable(
+        projectCreatorContinueButton,
+        "UI: Cannot continue in project creator without naming our project"
+      )
+      .fillInTextBox(projectName, projectCreatorName)
+      .buttonClickable(
+        projectCreatorContinueButton,
+        "UI: Continue button is enabled after naming our project without a description"
+      )
+      .fillInTextBox("This is a test project", projectCreatorDescription)
+      .clickButton(projectCreatorContinueButton)
+      .takeScreenShot(screenShotDestination + "Nameing_successful.png")
 
-            /* Deleting an Artifact */
-            .logToConsole('Deleting an artifact')
-            .click('@dropDownIcon')
-            .clickButton(deleteArtifactButton)
-            .assert.not.elementPresent('@checkMarkIcon', "UI: Artifact was successfully deleted from the project creator")
+      /* Uploading Artifact */
+      .logToConsole("Uploading an artifact")
+      .assert.visible(
+        "@artifactCreatorWarning",
+        "UI: Artifact creator warning is visible"
+      )
+      .buttonNotClickable(
+        projectCreatorContinueButton,
+        "UI: Cannot continue in project creator without creating at least one artifact"
+      )
+      .clickButton(newArtifactButton)
+      .takeScreenShot(screenShotDestination + "Artifact_Name_Given.png")
+      .buttonNotClickable(
+        createNewArtifactButton,
+        "UI: Cannot create an artifact without any information given"
+      )
+      .clickButton(createArtifactButton)
+      .assert.visible(
+        "@artifactCreatorWarning",
+        "UI: Artifact creator warning is visible when no name is given"
+      )
+      .takeScreenShot(screenShotDestination + "Artifact_No_Name_Given.png")
+      .fillInTextBox(HazardsFileName, artifactNameInputField)
+      .clickButton(createArtifactButton)
+      .uploadFileWithParameters(TestDataLocation, HazardsFileName)
+      .checkUploadSuccess(
+        "UI: Hazards file upload was successful and without errors"
+      )
+      .buttonClickable(
+        projectCreatorContinueButton,
+        "UI: Continue button is enabled after uploading one artifact"
+      )
+      .takeScreenShot(screenShotDestination + "Artifact_Upload_Successful.png")
 
+      /* Deleting an Artifact */
+      .logToConsole("Deleting an artifact")
+      .click("@dropDownIcon")
+      .clickButton(deleteArtifactButton)
+      .assert.not.elementPresent(
+        "@checkMarkIcon",
+        "UI: Artifact was successfully deleted from the project creator"
+      )
 
-            /* Creating the rest of the artifacts for this test */
-            .logToConsole('Uploading the remaining artifacts')
-            .clickButton(newArtifactButton)
-            .fillInTextBox(RequirementsFileName, artifactNameInputField)
-            .clickButton(createArtifactButton)
-            .uploadFileWithParameters(TestDataLocation, RequirementsFileName)
-            .checkUploadSuccess("UI: Requirements file upload was successful and without errors")
+      /* Creating the rest of the artifacts for this test */
+      .logToConsole("Uploading the remaining artifacts")
+      .clickButton(newArtifactButton)
+      .fillInTextBox(RequirementsFileName, artifactNameInputField)
+      .clickButton(createArtifactButton)
+      .uploadFileWithParameters(TestDataLocation, RequirementsFileName)
+      .checkUploadSuccess(
+        "UI: Requirements file upload was successful and without errors"
+      )
 
-            .clickButton(newArtifactButton)
-            .fillInTextBox(DesignsFileName, artifactNameInputField)
-            .clickButton(createArtifactButton)
-            .uploadFileWithParameters(TestDataLocation, DesignsFileName)
-            .checkUploadSuccess("UI: Designs file upload was successful and without errors")
+      .clickButton(newArtifactButton)
+      .fillInTextBox(DesignsFileName, artifactNameInputField)
+      .clickButton(createArtifactButton)
+      .uploadFileWithParameters(TestDataLocation, DesignsFileName)
+      .checkUploadSuccess(
+        "UI: Designs file upload was successful and without errors"
+      )
 
-            .clickButton(newArtifactButton)
-            .fillInTextBox(EnvironmentalAssumptionsFileName, artifactNameInputField)
-            .clickButton(createArtifactButton)
-            .uploadFileWithParameters(TestDataLocation, EnvironmentalAssumptionsFileName)
-            .checkUploadSuccess("UI: Environmental Assumptions file upload was successful and without errors")
+      .clickButton(newArtifactButton)
+      .fillInTextBox(EnvironmentalAssumptionsFileName, artifactNameInputField)
+      .clickButton(createArtifactButton)
+      .uploadFileWithParameters(
+        TestDataLocation,
+        EnvironmentalAssumptionsFileName
+      )
+      .checkUploadSuccess(
+        "UI: Environmental Assumptions file upload was successful and without errors"
+      )
 
-            .clickButton(newArtifactButton)
-            .fillInTextBox(HazardsFileName, artifactNameInputField)
-            .clickButton(createArtifactButton)
-            .uploadFileWithParameters(TestDataLocation, HazardsFileName)
-            .checkUploadSuccess("UI: Hazards file upload was successful and without errors")
+      .clickButton(newArtifactButton)
+      .fillInTextBox(HazardsFileName, artifactNameInputField)
+      .clickButton(createArtifactButton)
+      .uploadFileWithParameters(TestDataLocation, HazardsFileName)
+      .checkUploadSuccess(
+        "UI: Hazards file upload was successful and without errors"
+      )
 
-            .takeScreenShot(screenShotDestination + 'Artifact_Creation_Successful.png')
-            .clickButton(projectCreatorContinueButton)
+      .takeScreenShot(
+        screenShotDestination + "Artifact_Creation_Successful.png"
+      )
+      .clickButton(projectCreatorContinueButton)
 
-            /* Upload Trace Links */
-            .logToConsole('Uploading Trace Link')
-            .assert.visible('@traceLinkCreatorWarning', 'UI: Trace Link creator warning is visible')
-            .buttonClickable(projectCreatorContinueButton, 'UI: Continue button is enabled wihtout any tracelinks')
-            .clickButton(newTraceLinkButton)
-            .clickButton(traceLinkButton)
-            .assert.visible('@traceLinkNoInputWarning', "UI: Trace Link cannot be created without a source and target")
-            .takeScreenShot(screenShotDestination + 'TraceLink_No_Input.png')
-            .clickSelector(sourceTraceLinkButton, RequirementsFileName)
-            .clickButton(traceLinkButton)
-            .assert.visible('@traceLinkNoInputWarning', "UI: Trace Link cannot be created without a target")
-            .clickSelector(targetTraceLinkButton, HazardsFileName)
-            .clickButton(traceLinkButton)
-            .uploadFileWithParameters(TestDataLocation, Requirement2HazardFileName)
-            .checkUploadSuccess("UI: Trace Link was successfully created")
-            .takeScreenShot(screenShotDestination + 'TraceLink_Creation_Successful.png')
+      /* Upload Trace Links */
+      .logToConsole("Uploading Trace Link")
+      .assert.visible(
+        "@traceLinkCreatorWarning",
+        "UI: Trace Link creator warning is visible"
+      )
+      .buttonClickable(
+        projectCreatorContinueButton,
+        "UI: Continue button is enabled wihtout any tracelinks"
+      )
+      .clickButton(newTraceLinkButton)
+      .clickButton(traceLinkButton)
+      .assert.visible(
+        "@traceLinkNoInputWarning",
+        "UI: Trace Link cannot be created without a source and target"
+      )
+      .takeScreenShot(screenShotDestination + "TraceLink_No_Input.png")
+      .clickSelector(sourceTraceLinkButton, RequirementsFileName)
+      .clickButton(traceLinkButton)
+      .assert.visible(
+        "@traceLinkNoInputWarning",
+        "UI: Trace Link cannot be created without a target"
+      )
+      .clickSelector(targetTraceLinkButton, HazardsFileName)
+      .clickButton(traceLinkButton)
+      .uploadFileWithParameters(TestDataLocation, Requirement2HazardFileName)
+      .checkUploadSuccess("UI: Trace Link was successfully created")
+      .takeScreenShot(
+        screenShotDestination + "TraceLink_Creation_Successful.png"
+      )
 
-            /* Deleting Trace Links */
-            .logToConsole('Deleting Trace Links')
-            .useXpath().click(dropDownIcon_traceLink).useCss()
-            .clickButton(deleteTraceLinkButton)
-            .assert.visible('@traceLinkCreatorWarning', "UI: Trace Link was successfully deleted from the project creator")
-            .takeScreenShot(screenShotDestination + 'TraceLink_Deletion_Successful.png')
+      /* Deleting Trace Links */
+      .logToConsole("Deleting Trace Links")
+      .useXpath()
+      .click(dropDownIcon_traceLink)
+      .useCss()
+      .clickButton(deleteTraceLinkButton)
+      .assert.visible(
+        "@traceLinkCreatorWarning",
+        "UI: Trace Link was successfully deleted from the project creator"
+      )
+      .takeScreenShot(
+        screenShotDestination + "TraceLink_Deletion_Successful.png"
+      )
 
-            /* Uploading the remaining Trace Links */
-            .logToConsole('Uploading the remaining Trace Links')
+      /* Uploading the remaining Trace Links */
+      .logToConsole("Uploading the remaining Trace Links")
 
-            .clickSelectorTraceLinks(RequirementsFileName, HazardsFileName)
-            .uploadFileWithParameters(TestDataLocation, 'Requirement2Hazard.csv')
-            .checkUploadSuccess("UI: Trace Link was successfully created")
+      .clickSelectorTraceLinks(RequirementsFileName, HazardsFileName)
+      .uploadFileWithParameters(TestDataLocation, "Requirement2Hazard.csv")
+      .checkUploadSuccess("UI: Trace Link was successfully created")
 
-            .clickSelectorTraceLinks(EnvironmentalAssumptionsFileName, HazardsFileName)
-            .uploadFileWithParameters(TestDataLocation, 'EnvironmentalAssumption2Hazard.csv')
-            .checkUploadSuccess("UI: Trace Link was successfully created")
+      .clickSelectorTraceLinks(
+        EnvironmentalAssumptionsFileName,
+        HazardsFileName
+      )
+      .uploadFileWithParameters(
+        TestDataLocation,
+        "EnvironmentalAssumption2Hazard.csv"
+      )
+      .checkUploadSuccess("UI: Trace Link was successfully created")
 
-            .clickSelectorTraceLinks(DesignsFileName, DesignsFileName)
-            .uploadFileWithParameters(TestDataLocation, 'Design2Design.csv')
-            .checkUploadSuccess("UI: Trace Link was successfully created")
+      .clickSelectorTraceLinks(DesignsFileName, DesignsFileName)
+      .uploadFileWithParameters(TestDataLocation, "Design2Design.csv")
+      .checkUploadSuccess("UI: Trace Link was successfully created")
 
-            .clickSelectorTraceLinks(RequirementsFileName, RequirementsFileName)
-            .uploadFileWithParameters(TestDataLocation, 'Requirement2Requirement.csv')
-            .checkUploadSuccess("UI: Trace Link was successfully created")              // Needs to be fixed
-            // Remove once bug is fixed
-            .useXpath()
-            .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
+      .clickSelectorTraceLinks(RequirementsFileName, RequirementsFileName)
+      .uploadFileWithParameters(TestDataLocation, "Requirement2Requirement.csv")
+      .checkUploadSuccess("UI: Trace Link was successfully created") // Needs to be fixed
+      // Remove once bug is fixed
+      .useXpath()
+      .click(`(//*[contains(text(),'Generate Trace Links')])[last()]`)
 
-            .clickSelectorTraceLinks(HazardsFileName, HazardsFileName)
-            .uploadFileWithParameters(TestDataLocation, 'Hazard2Hazard.csv')
-            .checkUploadSuccess("UI: Trace Link was successfully created")
+      .clickSelectorTraceLinks(HazardsFileName, HazardsFileName)
+      .uploadFileWithParameters(TestDataLocation, "Hazard2Hazard.csv")
+      .checkUploadSuccess("UI: Trace Link was successfully created")
 
-            .takeScreenShot(screenShotDestination + 'TraceLink_Upload_Successful.png')
-            .clickButton(projectCreatorContinueButton)
+      .takeScreenShot(screenShotDestination + "TraceLink_Upload_Successful.png")
+      .clickButton(projectCreatorContinueButton)
 
-            /* View TIM Step*/
-            .logToConsole('Viewing TIM')
-            .assert.visible('@timGraph', "UI: TIM Graph uploaded successfully")
-            .pause(1000)              // Can be set for longer if the user wants to observe the graph
-            .takeScreenShot(screenShotDestination + 'TIM_View.png')
+      /* View TIM Step*/
+      .logToConsole("Viewing TIM")
+      .assert.visible("@timGraph", "UI: TIM Graph uploaded successfully")
+      .pause(1000) // Can be set for longer if the user wants to observe the graph
+      .takeScreenShot(screenShotDestination + "TIM_View.png")
 
-            /* Creating the project */
-            .logToConsole('Creating the project')
-            .clickButton(createProjectButton)
-            .waitForElementPresent('@timGraph', 5000, false, "UI: TIM Graph is visible")
-            .pause(5000)
-            .waitForElementPresent('@projectCreationSuccessfulMessage', 5000, true, "UI: Project success message appears in view")
-            .takeScreenShot(screenShotDestination + 'Project_Creation_Successful.png')
-            
-            /* Testing TIM Graph Node */
-            .logToConsole('Testing TIM Graph Node')
-            .click(centerGraphButton)
-            .findAndTestTIMNode(F4NodeName, TIMNodelocation, 0, 'UI: F4 Node was found and interactable')
-            .useXpath().rightClick(TIMNodelocation.F4).useCss()
-            .waitForElementVisible('@rightClickMenu', 5000, true, "UI: Right click menu is visible")
-            .takeScreenShot(screenShotDestination + 'TIM_Node_Right_Click_Menu.png')
+      /* Creating the project */
+      .logToConsole("Creating the project")
+      .clickButton(createProjectButton)
+      .waitForElementPresent(
+        "@timGraph",
+        5000,
+        false,
+        "UI: TIM Graph is visible"
+      )
+      .pause(5000)
+      .waitForElementPresent(
+        "@projectCreationSuccessfulMessage",
+        5000,
+        true,
+        "UI: Project success message appears in view"
+      )
+      .takeScreenShot(screenShotDestination + "Project_Creation_Successful.png")
 
-            /* Adding a new node to the graph */
-            .logToConsole('Adding a new node to the graph')
-            .click('@addArtifactButton')
-            .fillInTextBox(testNodeName, addArtifactInputField)
-            .fillInTextBox('Hazard.csv', addArtifactTypeField)
-            .useXpath().click(newNodeArtifactTypeHazardOption).useCss()
-            .fillInTextBox(testNodeDescription, addArtifactSummaryField)
-            .fillInTextBox(testNodeDescription, addArtifactBodyField)
-            .clickButton(addArtifactSaveButton)
-            .click(centerGraphButton)
-            .pause(2000)
-            .findAndTestTIMNode(testNodeName, TIMNodelocation, 0, 'UI: Test_Node was found and interactable')
+      /* Testing TIM Graph Node */
+      .logToConsole("Testing TIM Graph Node")
+      .click(centerGraphButton)
+      .findAndTestTIMNode(
+        F4NodeName,
+        TIMNodelocation,
+        0,
+        "UI: F4 Node was found and interactable"
+      )
+      .useXpath()
+      .rightClick(TIMNodelocation.F4)
+      .useCss()
+      .waitForElementVisible(
+        "@rightClickMenu",
+        5000,
+        true,
+        "UI: Right click menu is visible"
+      )
+      .takeScreenShot(screenShotDestination + "TIM_Node_Right_Click_Menu.png")
 
-            /* View Details of an Artifact */
-            .logToConsole('Viewing Details of an Artifact')
-            .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
-            .moveToElement('@viewArtifactButton', undefined, undefined)
-            .click('@viewArtifactButton')
-            .useXpath().waitForElementVisible(artifactViewerTitle, 5000, false, "UI: Artifact Viewer is Visible")
-            .waitForElementVisible(artifactViewerDescription, 5000, false, "UI: Artifact Description is Visible").useCss()
-            .takeScreenShot(screenShotDestination + 'ArtifactViewer.png')
+      /* Adding a new node to the graph */
+      .logToConsole("Adding a new node to the graph")
+      .click("@addArtifactButton")
+      .fillInTextBox(testNodeName, addArtifactInputField)
+      .fillInTextBox("Hazard.csv", addArtifactTypeField)
+      .useXpath()
+      .click(newNodeArtifactTypeHazardOption)
+      .useCss()
+      .fillInTextBox(testNodeDescription, addArtifactSummaryField)
+      .fillInTextBox(testNodeDescription, addArtifactBodyField)
+      .clickButton(addArtifactSaveButton)
+      .click(centerGraphButton)
+      .pause(2000)
+      .findAndTestTIMNode(
+        testNodeName,
+        TIMNodelocation,
+        0,
+        "UI: Test_Node was found and interactable"
+      )
 
-            /* Drag and Drop an Artifact */
-            .logToConsole('Drag and Drop an Artifact')
-            .click(centerGraphButton)
-            .useXpath().moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
-            .dragAndDrop(TIMNodelocation.Test_Node, {x: 100, y: 100}).useCss()
-            .takeScreenShot(screenShotDestination + 'Test_Node_Dragged.png')
+      /* View Details of an Artifact */
+      .logToConsole("Viewing Details of an Artifact")
+      .useXpath()
+      .rightClick(TIMNodelocation.Test_Node)
+      .useCss()
+      .moveToElement("@viewArtifactButton", undefined, undefined)
+      .click("@viewArtifactButton")
+      .useXpath()
+      .waitForElementVisible(
+        artifactViewerTitle,
+        5000,
+        false,
+        "UI: Artifact Viewer is Visible"
+      )
+      .waitForElementVisible(
+        artifactViewerDescription,
+        5000,
+        false,
+        "UI: Artifact Description is Visible"
+      )
+      .useCss()
+      .takeScreenShot(screenShotDestination + "ArtifactViewer.png")
 
-            /* Adding a Link to an Artifact */
-            .logToConsole('Adding a Link to an Artifact')
-            .click(centerGraphButton)
-            .useXpath().rightClick(TIMNodelocation.Test_Node).useCss()
-            .moveToElement('@addLinkButton', undefined, undefined)
-            .click('@addLinkButton')
-            .perform(() => { debugger; }) // This will hault execution in the chrome debugger
-            .useXpath()
-            .moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
-            .perform(function() {
-                const actions = this.actions({async: true});
-                
-                return actions
-                .pause(100)
-                .press()
-            })
-            .moveToElement(TIMNodelocation.F4, undefined, undefined)
-            .perform(function() {
-                const actions = this.actions({async: true});
+      /* Drag and Drop an Artifact */
+      .logToConsole("Drag and Drop an Artifact")
+      .click(centerGraphButton)
+      .useXpath()
+      .moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
+      .dragAndDrop(TIMNodelocation.Test_Node, { x: 100, y: 100 })
+      .useCss()
+      .takeScreenShot(screenShotDestination + "Test_Node_Dragged.png")
 
-                return actions
-                .pause(100)
-                .release()
-            })
-            //.assert.visible('@linktoNodeIcon', "UI: Link was Successfully made") // cannot currently find the name of the arrow icon
-            .takeScreenShot(screenShotDestination + 'Link_Added.png')
+      /* Adding a Link to an Artifact */
+      .logToConsole("Adding a Link to an Artifact")
+      .click(centerGraphButton)
+      .useXpath()
+      .rightClick(TIMNodelocation.Test_Node)
+      .useCss()
+      .moveToElement("@addLinkButton", undefined, undefined)
+      .click("@addLinkButton")
+      .perform(() => {
+        debugger;
+      }) // This will hault execution in the chrome debugger
+      .useXpath()
+      .moveToElement(TIMNodelocation.Test_Node, undefined, undefined)
+      .perform(function () {
+        const actions = this.actions({ async: true });
 
-            /* Highlight Artifact Subtree (On Hold - Currently a Bug) */
+        return actions.pause(100).press();
+      })
+      .moveToElement(TIMNodelocation.F4, undefined, undefined)
+      .perform(function () {
+        const actions = this.actions({ async: true });
 
-            /* Hide Artifact Subtree (On Hold- Currently a Bug) */
+        return actions.pause(100).release();
+      })
+      //.assert.visible('@linktoNodeIcon', "UI: Link was Successfully made") // cannot currently find the name of the arrow icon
+      .takeScreenShot(screenShotDestination + "Link_Added.png")
 
-            /* Delete Artifact (On Hold - Currently a Bug)*/
+      /* Highlight Artifact Subtree (On Hold - Currently a Bug) */
 
-            /* Deleting the project (Add 1 to the closewindowiconbutton to every window open)*/
-            .logToConsole('Deleting the project')
+      /* Hide Artifact Subtree (On Hold- Currently a Bug) */
 
-            .clickSelector(projectDropDownGloabl, OpenProjectButton)
-            .click(deleteProjectIcon)
-            .fillInTextBox(projectName, deleteingProjectInputField)
-            .click(deleteProjectdeleteButton)
-            .takeScreenShot(screenShotDestination + 'Project_Deletion_Successful.png')
-            .assert.visible('@projectSelectionMessage', "WebAPI: Project has successfully been deleted")
-            .useXpath().click(openProjectCloseWindowButton).useCss()
+      /* Delete Artifact (On Hold - Currently a Bug)*/
 
+      /* Deleting the project (Add 1 to the closewindowiconbutton to every window open)*/
+      .logToConsole("Deleting the project")
 
-            /* Logout of the website */
-            .logToConsole('Logging out of the website')
+      .clickSelector(projectDropDownGloabl, OpenProjectButton)
+      .click(deleteProjectIcon)
+      .fillInTextBox(projectName, deleteingProjectInputField)
+      .click(deleteProjectdeleteButton)
+      .takeScreenShot(screenShotDestination + "Project_Deletion_Successful.png")
+      .assert.visible(
+        "@projectSelectionMessage",
+        "WebAPI: Project has successfully been deleted"
+      )
+      .useXpath()
+      .click(openProjectCloseWindowButton)
+      .useCss()
 
-            .click('@ProfilePictureAttributes')
-            .clickButton('Logout')
-            .waitForElementVisible('@loginImageIcon', 5000, "WebAPI: User successfully logged out")
-            .takeScreenShot(screenShotDestination + 'Logout_Success.png')
+      /* Logout of the website */
+      .logToConsole("Logging out of the website")
 
-            /* End of test */
-            .end();
-    }
+      .click("@ProfilePictureAttributes")
+      .clickButton("Logout")
+      .waitForElementVisible(
+        "@loginImageIcon",
+        5000,
+        "WebAPI: User successfully logged out"
+      )
+      .takeScreenShot(screenShotDestination + "Logout_Success.png")
+
+      /* End of test */
+      .end();
+  },
 };

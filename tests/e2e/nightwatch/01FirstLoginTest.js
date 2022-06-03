@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /**********************************************************
 FirstLoginTest.js - Created by: Jeremy Arellano
     This simple test will automate the login process and
@@ -12,38 +13,57 @@ FirstLoginTest.js - Created by: Jeremy Arellano
 ***********************************************************/
 
 module.exports = {
-    '@disabled': true,
-    '@tags' : ['SAFA'],
-    'Test 01: Login and Logoff Attempt'(browser) {
-        
-        /* Set the page constant */
-        const page = browser.page.UI_Interaction();
-        const userName = 'tester@test.com';
-        const password = '\+sX,^]ptK~-"4vn';
+  "@disabled": true,
+  "@tags": ["SAFA"],
+  "Test 01: Login and Logoff Attempt"(browser) {
+    /* Set the page constant */
+    const page = browser.page.UI_Interaction();
 
-        const screenShotDestination = '/01FirstLoginTest/';
+    const screenShotDestination = "/01FirstLoginTest/";
 
-        
-        /* Our test will occur here */
-        page
-            /* Login to our account */
-            .navigate()
-            .waitForElementVisible('@loginImageIcon', 1000, "UI: Front Page has loaded correctly")         // Wait for the page to load
-            .assert.titleEquals('SAFA', 'UI: Title is correct')                             
-            .loginSession(screenShotDestination, 'Login_Success.png')
+    /* Our test will occur here */
+    page
+      /* Login to our account */
+      .navigate()
+      .waitForElementVisible(
+        "@loginImageIcon",
+        1000,
+        "UI: Front Page has loaded correctly"
+      ) // Wait for the page to load
+      .assert.titleEquals("SAFA", "UI: Title is correct")
+      .loginSession(screenShotDestination, "Login_Success.png")
 
-            /* Now lets test some elements on the page */
-            .assert.urlContains('http://localhost:8080/', 'Param: URL has changed to display the project creator')
-            .assert.visible('@checkProjectNumberSteps', 'UI: Project Number Steps is visible')
-            .assert.attributeEquals('@checkContinueButtonDisabled', 'enabled', null, 'UI: Button is disabled')
-            .assert.visible('@ProfilePictureAttributes', 'UI: Profile Picture is visible')
-            .click('@ProfilePictureAttributes')
-            .takeScreenShot("Logout_Visibility.png")
-            .useXpath()
-            .waitForElementVisible('//*[contains(text(), "Login")]', 1000, 'UI: Login Button is visible').useCss()
-            .takeScreenShot("Logout_Visibility.png")
+      /* Now lets test some elements on the page */
+      .assert.urlContains(
+        "http://localhost:8080/",
+        "Param: URL has changed to display the project creator"
+      )
+      .assert.visible(
+        "@checkProjectNumberSteps",
+        "UI: Project Number Steps is visible"
+      )
+      .assert.attributeEquals(
+        "@checkContinueButtonDisabled",
+        "enabled",
+        null,
+        "UI: Button is disabled"
+      )
+      .assert.visible(
+        "@ProfilePictureAttributes",
+        "UI: Profile Picture is visible"
+      )
+      .click("@ProfilePictureAttributes")
+      .takeScreenShot("Logout_Visibility.png")
+      .useXpath()
+      .waitForElementVisible(
+        '//*[contains(text(), "Login")]',
+        1000,
+        "UI: Login Button is visible"
+      )
+      .useCss()
+      .takeScreenShot("Logout_Visibility.png")
 
-            /* End of test */
-            .end();
-    },
+      /* End of test */
+      .end();
+  },
 };

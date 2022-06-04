@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.config;
+package edu.nd.crc.safa.common;
 
 public class DefaultArtifactTypeIcons {
 

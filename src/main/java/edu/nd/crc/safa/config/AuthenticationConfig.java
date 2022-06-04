@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.server.authentication.SafaUserService;

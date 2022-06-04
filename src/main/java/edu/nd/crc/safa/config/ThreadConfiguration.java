@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 /**
@@ -16,9 +17,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ThreadConfiguration {
 
+    static {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+
     @Value("${task-executor.controller.core-pool-size}")
     private int controllerCorePoolSize;
-
     @Value("${task-executor.controller.max-pool-size}")
     private int controllerMaxPoolSize;
 

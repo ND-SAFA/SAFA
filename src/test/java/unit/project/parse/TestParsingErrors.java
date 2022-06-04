@@ -3,7 +3,7 @@ package unit.project.parse;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 
 import org.junit.jupiter.api.Test;
 import unit.SampleProjectConstants;

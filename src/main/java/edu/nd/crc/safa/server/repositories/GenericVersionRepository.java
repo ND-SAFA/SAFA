@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.common.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;
@@ -169,9 +169,7 @@ public abstract class GenericVersionRepository<
                 projectVersion,
                 baseEntity,
                 appEntity);
-
-            System.out.println("Version Entity:" + versionEntity);
-
+            
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = baseEntity.getBaseEntityId();
@@ -272,10 +270,6 @@ public abstract class GenericVersionRepository<
                 appEntity);
             CommitError error = commitResponse.getValue1();
             VersionEntity entity = commitResponse.getValue0();
-            if (error == null && entity == null) {
-                System.out.println("Artifact App:" + appEntity);
-                throw new RuntimeException("Both entities are null!");
-            }
             if (entity != null) {
                 processedAppEntities.add(entity.getBaseEntityId());
             }
@@ -344,7 +338,7 @@ public abstract class GenericVersionRepository<
             errorDescription =
                 "Could not parse entity " + entityName + ": " + AppConstraints.getConstraintError(e);
         } catch (Exception e) {
-            //TODO e.printStackTrace();
+            e.printStackTrace();
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {

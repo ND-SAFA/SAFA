@@ -30,7 +30,8 @@ public class JobSteps {
     };
     public static String[] jiraProjectCreationSteps = {
         "Authenticate User Credentials",
-        "Retrieve Project Issues",
+        "Retrieve JIRA project",
+        "Create SAFA Project",
         "Convert Issues To Artifacts And Trace Links"
     };
 

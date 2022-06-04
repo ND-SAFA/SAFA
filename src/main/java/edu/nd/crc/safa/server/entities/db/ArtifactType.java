@@ -11,8 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.config.DefaultArtifactTypeIcons;
+import edu.nd.crc.safa.common.AppConstraints;
+import edu.nd.crc.safa.common.DefaultArtifactTypeIcons;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;

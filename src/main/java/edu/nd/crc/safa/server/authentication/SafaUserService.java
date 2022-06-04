@@ -10,6 +10,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,8 +67,8 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser getCurrentUser() {
-        System.out.print("Content:" + SecurityContextHolder.getContext());
-        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication user = securityContext.getAuthentication();
         System.out.println("Authorization:" + user);
         String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);

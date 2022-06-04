@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;

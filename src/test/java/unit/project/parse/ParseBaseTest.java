@@ -2,7 +2,7 @@ package unit.project.parse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectPaths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

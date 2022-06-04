@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;

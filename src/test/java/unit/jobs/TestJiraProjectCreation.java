@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
 import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
@@ -42,6 +43,7 @@ public class TestJiraProjectCreation extends JobBaseTest {
 
     @BeforeEach
     public void setAuthorization() {
+
         Claims claims = Jwts.claims().setSubject(currentUsername);
         UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(claims,
             null,
@@ -70,7 +72,8 @@ public class TestJiraProjectCreation extends JobBaseTest {
 
         // Step - Override steps to skip authentication and project retrieval
         JobSteps.jiraProjectCreationSteps = new String[]{
-            JobSteps.jiraProjectCreationSteps[2]
+            JobSteps.jiraProjectCreationSteps[2],
+            JobSteps.jiraProjectCreationSteps[3]
         };
 
         // Step - Create job
@@ -101,7 +104,6 @@ public class TestJiraProjectCreation extends JobBaseTest {
         job.setIssues(issues);
         assertThat(issues.size()).isEqualTo(nArtifacts);
 
-
         // Step - Run steps
         serviceProvider.getJobService().runJobWorker(
             jobDbEntity,
@@ -114,6 +116,7 @@ public class TestJiraProjectCreation extends JobBaseTest {
 
         // VP - Verify that project created
         jobDbEntity = jobService.getJobById(jobDbEntity.getId());
+        assertThat(jobDbEntity.getStatus()).isEqualTo(JobStatus.COMPLETED);
         assertThat(jobDbEntity.getCurrentProgress()).isEqualTo(100);
 
         // VP - Verify that artifacts were created

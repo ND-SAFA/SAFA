@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.common.ProjectVariables;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;

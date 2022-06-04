@@ -53,6 +53,10 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
      */
     @Setter
     List<JiraIssueDTO> issues;
+    /**
+     * JIRA's response for downloading project
+     */
+    JiraProjectResponseDTO jiraProjectResponse;
 
     public JiraProjectCreationWorker(
         JobDbEntity jobDbEntity,
@@ -79,20 +83,30 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
 
     /**
      * Placeholder for retrieving project issues
-     * TODO: Collect all issues
      */
-    public void retrieveProjectIssues() {
+    public void retrieveJiraProject() {
         // Step - Get required services
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
+
+        // Step - Retrieve project information including issues
+        //TODO: Set project issues
+        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
+            jiraProjectId);
+    }
+
+    public void createSafaProject() {
         ProjectService projectService = this.serviceProvider.getProjectService();
 
-        //Step - Retrieve project data
-        JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
-            jiraProjectId);
+        // Step - Setting up testing data
+        // TODO: Delete once issues are collected
+        JiraProjectResponseDTO mockJiraResponse = new JiraProjectResponseDTO();
+        mockJiraResponse.setKey("Mock Project Name");
+        mockJiraResponse.setDescription("sample project description");
+        this.jiraProjectResponse = mockJiraResponse;
 
         // Step - Save as SAFA project
-        String projectName = jiraProjectResponse.getKey();
-        String projectDescription = jiraProjectResponse.getDescription();
+        String projectName = this.jiraProjectResponse.getKey();
+        String projectDescription = this.jiraProjectResponse.getDescription();
         Project project = new Project(projectName, projectDescription);
         projectService.saveProjectWithCurrentUserAsOwner(project);
 

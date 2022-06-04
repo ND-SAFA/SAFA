@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.common.ProjectVariables;
 import edu.nd.crc.safa.importer.tracegenerator.vsm.Controller;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.IArtifact;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;

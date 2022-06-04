@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 

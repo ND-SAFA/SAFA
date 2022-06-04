@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectIdentifier;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -100,6 +100,7 @@ public class ProjectService {
     public ProjectVersion createInitialProjectVersion(Project project) {
         ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
         this.projectVersionRepository.save(projectVersion);
+        projectVersion.setProject(project);
         return projectVersion;
     }
 

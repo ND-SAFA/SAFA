@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;

@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.common.AppRoutes;
+import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Artifact;

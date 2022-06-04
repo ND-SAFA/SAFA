@@ -3,7 +3,7 @@ package unit.project.parse;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
 
         //VP - Verify that all artifacts were parsed
         assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
-        
+
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
             assertThat(artifact.getString("type")).isEqualTo(type);

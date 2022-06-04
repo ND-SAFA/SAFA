@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.config;
+package edu.nd.crc.safa.common;
 
 /**
  * Holds constants to magic string variables that may arise

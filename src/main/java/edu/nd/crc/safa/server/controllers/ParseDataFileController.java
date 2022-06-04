@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.common.AppRoutes;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFile;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactTypeService;

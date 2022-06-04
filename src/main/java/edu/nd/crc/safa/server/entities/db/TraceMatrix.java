@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.common.AppConstraints;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -51,7 +51,7 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType sourceArtifactType;
-    
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(

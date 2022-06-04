@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.common.ProjectPaths;
+import edu.nd.crc.safa.common.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.importer.flatfiles.TIMParser;

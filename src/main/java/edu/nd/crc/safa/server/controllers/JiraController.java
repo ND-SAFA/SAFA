@@ -28,10 +28,6 @@ import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -57,7 +53,6 @@ public class JiraController extends BaseController {
     private final JiraConnectionService jiraConnectionService;
 
     private final ExecutorDelegate executorDelegate;
-    private final JobService jobService;
     private final ServiceProvider serviceProvider;
 
     @Autowired
@@ -66,25 +61,19 @@ public class JiraController extends BaseController {
                           JiraAccessCredentialsRepository accessCredentialsRepository,
                           JiraConnectionService jiraConnectionService,
                           ExecutorDelegate executorDelegate,
-                          JobService jobService,
                           ServiceProvider serviceProvider) {
         super(resourceBuilder);
         this.safaUserService = safaUserService;
         this.accessCredentialsRepository = accessCredentialsRepository;
         this.jiraConnectionService = jiraConnectionService;
         this.executorDelegate = executorDelegate;
-        this.jobService = jobService;
         this.serviceProvider = serviceProvider;
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
     public JobAppEntity pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
-                                        @PathVariable("cloudId") String cloudId) throws
-        JobInstanceAlreadyCompleteException,
-        JobExecutionAlreadyRunningException,
-        JobParametersInvalidException,
-        JobRestartException {
-
+                                        @PathVariable("cloudId") String cloudId) throws Exception {
+        JobService jobService = this.serviceProvider.getJobService();
         // Step - Create job identifier
         String jobName = JiraProjectCreationWorker.createJobName(jiraProjectId.toString());
         JobDbEntity jobDbEntity = jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);

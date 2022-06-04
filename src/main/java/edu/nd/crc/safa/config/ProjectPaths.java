@@ -17,7 +17,7 @@ public class ProjectPaths {
     public static final String PATH_TO_STORAGE = ProjectPaths.PATH_TO_BUILD + "/storage";
     public static final String PATH_TO_RESOURCES = ProjectPaths.PATH_TO_ROOT + "/resources";
     public static final String PATH_TO_TEST_RESOURCES = ProjectPaths.PATH_TO_RESOURCES + "/tests";
-    public static final String PATH_TO_BEFORE_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/before";
+    public static final String PATH_TO_DEFAULT_PROJECT = ProjectPaths.PATH_TO_TEST_RESOURCES + "/before";
     public static final String PATH_TO_MINI_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/mini";
     public static final String PATH_TO_AFTER_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/after";
     public static final String PATH_TO_TEST_2 = ProjectPaths.PATH_TO_TEST_RESOURCES + "/test2";
@@ -69,6 +69,6 @@ public class ProjectPaths {
     }
 
     public static String getPathToTestResources(String fileName) {
-        return pathHelper(PATH_TO_BEFORE_FILES, fileName);
+        return pathHelper(PATH_TO_DEFAULT_PROJECT, fileName);
     }
 }

@@ -54,7 +54,7 @@ public class ParseBaseTest extends ApplicationBaseTest {
 
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
-        String pathToFile = ProjectPaths.PATH_TO_BEFORE_FILES + "/" + fileName;
+        String pathToFile = ProjectPaths.PATH_TO_DEFAULT_PROJECT + "/" + fileName;
         MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToFile);
 
         // Step - Extract artifact and errors from body

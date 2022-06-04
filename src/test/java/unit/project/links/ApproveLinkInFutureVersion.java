@@ -40,7 +40,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
             .newVersionWithReturn(projectName);
 
         // Step - Upload before files containing generated links
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // Step - Get generated links
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));

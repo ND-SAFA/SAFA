@@ -1,11 +1,6 @@
 package unit.jobs;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import java.util.UUID;
-
-import edu.nd.crc.safa.server.entities.app.JobStatus;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,19 +27,7 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
         createNewConnection(currentUsername).subscribeToJob(currentUsername, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
-        JobDbEntity jobDbEntity = jobService.getJobById(jobId);
-        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(N_STEPS);
-        assertThat(jobDbEntity.getCurrentProgress()).isEqualTo(100);
-        assertThat(jobDbEntity.getStatus()).isEqualTo(JobStatus.COMPLETED);
-
-        // Step - Assert that start is before completed.
-        assert jobDbEntity.getCompletedAt() != null;
-        int comparison = jobDbEntity.getCompletedAt().compareTo(jobDbEntity.getStartedAt());
-        assertThat(comparison).isEqualTo(1);
-
-        // Step - Assert that lastUpdatedBy is after start.
-        comparison = jobDbEntity.getLastUpdatedAt().compareTo(jobDbEntity.getStartedAt());
-        assertThat(comparison).isEqualTo(1);
+        verifyJobWasCompleted(jobId, N_STEPS);
 
         // VP - Verify that all entities were created
         verifyDefaultProjectEntities(projectVersion.getProject());

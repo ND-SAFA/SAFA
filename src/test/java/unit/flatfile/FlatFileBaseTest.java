@@ -128,9 +128,9 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
             nArtifacts);
     }
 
-    private <T extends Object> List<T> verifyNumberOfItems(String itemName,
-                                                           Supplier<List<T>> findFunction,
-                                                           int nItems) {
+    protected <T extends Object> List<T> verifyNumberOfItems(String itemName,
+                                                             Supplier<List<T>> findFunction,
+                                                             int nItems) {
         String testName = "Verified # of" + itemName + ":" + nItems;
         List<T> items = findFunction.get();
         assertThat(items.size())

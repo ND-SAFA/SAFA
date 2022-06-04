@@ -196,34 +196,3 @@ public class JiraController extends BaseController {
         return output;
     }
 }
-//    public void playground() {
-//        final JiraRestClientFactory
-//            factory =
-//            new AsynchronousJiraRestClientFactory();
-//
-//        final JiraRestClient
-//            jiraRestClient =
-//            factory
-//                .createWithBasicHttpAuthentication(
-//                    new URI(Constants.JIRA_URL),
-//                    Constants.USERNAME,
-//                    Constants.TOKEN
-//                );
-//
-//        try (jiraRestClient) {
-//
-//            final SearchRestClient
-//                searchRestClient =
-//                jiraRestClient.getSearchClient();
-//
-//            final Filter
-//                filter =
-//                searchRestClient.getFilter(50447).claim();
-//
-//            final SearchResult
-//                searchResult =
-//                searchRestClient.searchJql(filter.getJql()).claim();
-//
-//            //Cycle through search result to print out the list of issues that match the filter
-//        }
-//    }

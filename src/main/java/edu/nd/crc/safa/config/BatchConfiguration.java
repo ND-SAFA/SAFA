@@ -20,7 +20,6 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 public class BatchConfiguration {
 
     @Bean
-//    @Primary TODO: Add back after testing
     @Scope("singleton")
     public JobLauncher simpleAsyncJobLauncher(@Autowired JobRepository jobRepository) throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();

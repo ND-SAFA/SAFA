@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
 /**
- * Responsible for testing that the generic job worker is parsing
- * step correctly.
+ * Tests that the generic job worker is parsing step correctly.
  */
 public class TestJobDbEntityWorker extends ApplicationBaseTest {
 

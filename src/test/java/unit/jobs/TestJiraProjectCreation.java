@@ -54,7 +54,7 @@ public class TestJiraProjectCreation extends JobBaseTest {
     @Test
     @WithMockUser(currentUsername)
     @WithUserDetails(currentUsername)
-    public void test() throws Exception {
+    public void testImportDroneResponse() throws Exception {
         // Step - Set constants
         String cloudId = "";
         Long jiraProjectId = (long) 1;

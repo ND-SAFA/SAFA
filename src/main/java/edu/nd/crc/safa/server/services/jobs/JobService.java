@@ -20,6 +20,7 @@ import edu.nd.crc.safa.server.services.ServiceProvider;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -169,6 +170,7 @@ public class JobService {
             serviceProvider.getJobService().failJob(jobDbEntity);
             throw new SafaError("Failed to start job.");
         }
-        serviceProvider.getJobLauncher().run(jobCreationThread, jobParameters);
+        JobLauncher jobLauncher = serviceProvider.getJobLauncher();
+        jobLauncher.run(jobCreationThread, jobParameters);
     }
 }

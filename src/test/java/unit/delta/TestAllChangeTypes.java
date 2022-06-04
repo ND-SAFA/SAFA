@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.server.entities.app.delta.ProjectDelta;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.DeltaService;
 
@@ -73,5 +74,12 @@ public class TestAllChangeTypes extends ApplicationBaseTest {
         assertThat(deltaThree.getArtifacts().getModified().size()).isEqualTo(0);
         assertThat(deltaThree.getArtifacts().getRemoved().size()).isEqualTo(0);
         assertThat(deltaThree.getArtifacts().getAdded().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void test() {
+        String projectName = "test-project";
+        Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
+        assertThat(project).isNotNull();
     }
 }

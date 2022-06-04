@@ -151,6 +151,11 @@ public class JobService {
         throw new SafaError("Could not find job with id:" + jobId);
     }
 
+    public void setJobName(JobDbEntity jobDbEntity, String newName) {
+        jobDbEntity.setName(newName);
+        this.jobDbRepository.save(jobDbEntity);
+    }
+
     private Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
     }

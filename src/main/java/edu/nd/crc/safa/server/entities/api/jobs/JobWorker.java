@@ -55,7 +55,6 @@ public abstract class JobWorker implements Job {
             try {
                 // Pre-step
                 Method method = getMethodForStepByName(stepName);
-                System.out.println("STEP NAME:" + stepName);
                 jobService.startStep(jobDbEntity);
                 notificationService.broadUpdateJobMessage(jobDbEntity);
 

@@ -69,6 +69,10 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
         this.issues = new ArrayList<>();
     }
 
+    public static String createJobName(String jiraProjectName) {
+        return "Importing JIRA project:" + jiraProjectName;
+    }
+
     public void authenticateUserCredentials() {
         // Step - Get services needed
         SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
@@ -89,7 +93,7 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
 
         // Step - Retrieve project information including issues
-        //TODO: Set project issues
+        //TODO: @Marcus Set project issues
         this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
             jiraProjectId);
     }
@@ -109,6 +113,9 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
         String projectDescription = this.jiraProjectResponse.getDescription();
         Project project = new Project(projectName, projectDescription);
         projectService.saveProjectWithCurrentUserAsOwner(project);
+
+        // Step - Update job name
+        this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map JIRA project to SAFA project
         this.serviceProvider.getJiraConnectionService().createJiraProjectMapping(project, jiraProjectId);
@@ -153,7 +160,6 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
             }
         }
 
-        System.out.println("# of artifacts" + artifacts.size());
         this.projectCommit.getArtifacts().getAdded().addAll(artifacts);
         this.projectCommit.getTraces().getAdded().addAll(traces);
     }

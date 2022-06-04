@@ -1,13 +1,19 @@
 package unit;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 
 import edu.nd.crc.safa.MainApplication;
 import edu.nd.crc.safa.server.controllers.ProjectController;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -26,4 +32,29 @@ public abstract class SpringBootBaseTest {
 
     @Autowired
     protected EntityManager entityManager;
+
+    @Autowired
+    protected ServiceProvider serviceProvider;
+
+    @Autowired
+    JobRepository jobRepository;
+
+
+    /**
+     * Sets the current job launcher to run job syncronously so that
+     *
+     * @throws Exception
+     */
+    @PostConstruct
+    public void afterConstruct() throws Exception {
+        serviceProvider.setJobLauncher(createSyncJobLauncher());
+    }
+
+    private JobLauncher createSyncJobLauncher() throws Exception {
+        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+        jobLauncher.afterPropertiesSet();
+        return jobLauncher;
+    }
 }

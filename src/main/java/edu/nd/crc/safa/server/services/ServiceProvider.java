@@ -9,6 +9,7 @@ import edu.nd.crc.safa.server.services.jobs.JobService;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @Getter
+@Setter
 @Scope("singleton")
 public class ServiceProvider {
     // Flat Files

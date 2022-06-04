@@ -86,7 +86,7 @@ public class JiraController extends BaseController {
         JobRestartException {
 
         // Step - Create job identifier
-        String jobName = "Importing JIRA project:" + jiraProjectId;
+        String jobName = JiraProjectCreationWorker.createJobName(jiraProjectId.toString());
         JobDbEntity jobDbEntity = jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);
 
         // Step - Create jira project creation job

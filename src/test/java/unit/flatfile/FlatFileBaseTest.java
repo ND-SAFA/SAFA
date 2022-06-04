@@ -6,18 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
-import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import unit.ApplicationBaseTest;
@@ -80,67 +77,65 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
         return project;
     }
 
-    public void verifyBeforeEntities(Project project) {
+    public void verifyDefaultProjectEntities(Project project) {
         // VP 3 - Resources were created
-        List<ProjectVersion> projectVersions = projectVersionRepository.findByProject(project);
-        assertThat(projectVersions.size()).as("# versions").isEqualTo(1);
-        ProjectVersion projectVersion = projectVersions.get(0);
+        ProjectVersion projectVersion = verifyNumberOfItems("Project Version",
+            () -> projectVersionRepository.findByProject(project), 1).get(0);
         assertThat(projectVersion).as("project version created").isNotNull();
 
         // VP - Project types
-        List<ArtifactType> projectTypes = artifactTypeRepository.findByProject(project);
-        assertThat(projectTypes.size()).as("all types created").isEqualTo(SampleProjectConstants.N_TYPES);
+        verifyNumberOfItems("Artifact Types",
+            () -> artifactTypeRepository.findByProject(project), SampleProjectConstants.N_TYPES);
 
         // VP - requirements created
-        Optional<ArtifactType> requirementType = artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, "requirement");
-        assertThat(requirementType.isPresent()).as("requirement type created").isTrue();
-        List<Artifact> requirements = artifactRepository.findByProjectAndType(project, requirementType.get());
-        assertThat(requirements.size()).as("requirements created").isEqualTo(SampleProjectConstants.N_REQUIREMENTS);
+        verifyArtifactType(project, "requirement", SampleProjectConstants.N_REQUIREMENTS);
+        verifyArtifactType(project, "design", SampleProjectConstants.N_DESIGNS);
+        verifyArtifactType(project, "hazard", SampleProjectConstants.N_HAZARDS);
+        verifyArtifactType(project, "environmentalassumption", SampleProjectConstants.N_ENV_ASSUMPTIONS);
 
-        // VP - design definitions created
-        Optional<ArtifactType> designType = artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, "design");
-        assertThat(designType.isPresent()).as("design type created").isTrue();
-        List<Artifact> designs = artifactRepository.findByProjectAndType(project, designType.get());
-        assertThat(designs.size())
-            .as("designs created)")
-            .isEqualTo(SampleProjectConstants.N_DESIGNS);
+        // VP - Verify that total number of artifacts is as expected.
+        verifyNumberOfItems("Artifacts",
+            () -> artifactRepository.getProjectArtifacts(project),
+            SampleProjectConstants.N_ARTIFACTS);
 
-        // VP - hazards created
-        Optional<ArtifactType> hazardType = artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, "HAZARD");
-        assertThat(hazardType.isPresent()).as("hazard type created").isTrue();
-        List<Artifact> hazards = artifactRepository.findByProjectAndType(project, hazardType.get());
-        assertThat(hazards.size())
-            .as("hazards created")
-            .isEqualTo(SampleProjectConstants.N_HAZARDS);
+        // VP - Verify that artifact body created for each artifact
+        verifyNumberOfItems("Artifact Version Entity",
+            () -> artifactVersionRepository.findByProjectVersion(projectVersion),
+            SampleProjectConstants.N_ARTIFACTS);
 
-        // VP - environment assumption artifacts created
-        Optional<ArtifactType> envAssumptionType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project,
-            "EnvironmentalAssumption");
-        assertThat(envAssumptionType.isPresent()).as("environment assumption type created")
-            .isTrue();
-        List<Artifact> envAssumptions = artifactRepository.findByProjectAndType(project, envAssumptionType.get());
-        assertThat(envAssumptions.size())
-            .as("env assumptions created")
-            .isEqualTo(SampleProjectConstants.N_ENV_ASSUMPTIONS);
+        // VP - Verify that link referencing unknown artifact FX1 in R2R
+        CommitError error = verifyNumberOfItems("Trace Errors",
+            () -> commitErrorRepository.findByProjectVersion(projectVersion),
+            1).get(0);
+        assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntity.TRACES);
+        assertThat(error.getDescription()).contains("FX1");
 
-        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(project);
-        assertThat(projectArtifacts.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        // VP - Verify that remaining links were created.
+        verifyNumberOfItems("Trace Links",
+            () -> traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion),
+            SampleProjectConstants.N_LINKS);
+    }
 
-        // VP - Artifact bodies
-        List<ArtifactVersion> artifactBodies = artifactVersionRepository.findByProjectVersion(projectVersion);
-        assertThat(artifactBodies.size())
-            .as("artifact bodies created")
-            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+    private void verifyArtifactType(Project project, String typeName, int nArtifacts) {
+        // VP - Verify that type is created
+        String typeTestName = "Artifact type created: " + typeName;
+        Optional<ArtifactType> artifactType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, typeName);
+        assertThat(artifactType.isPresent()).as(typeTestName).isTrue();
 
-        List<CommitError> commitErrors = commitErrorRepository.findByProjectVersion(projectVersion);
-        assertThat(commitErrors.size()).as("requirement parsing errors").isEqualTo(1);
-        CommitError error = commitErrors.get(0);
-        AssertionsForInterfaceTypes.assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntity.TRACES);
+        // VP - Verify that # of artifact is as expected.
+        verifyNumberOfItems(typeName,
+            () -> artifactRepository.findByProjectAndType(project, artifactType.get()),
+            nArtifacts);
+    }
 
-        List<TraceLinkVersion> traceLinks = traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion);
-        assertThat(traceLinks.size()).isEqualTo(SampleProjectConstants.N_LINKS);
+    private <T extends Object> List<T> verifyNumberOfItems(String itemName,
+                                                           Supplier<List<T>> findFunction,
+                                                           int nItems) {
+        String testName = "Verified # of" + itemName + ":" + nItems;
+        List<T> items = findFunction.get();
+        assertThat(items.size())
+            .as(testName)
+            .isEqualTo(nItems);
+        return items;
     }
 }

@@ -24,6 +24,6 @@ public class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
         Project project = verifyBeforeResponse(responseBody);
 
         // VP - Verify that entities were actually created
-        verifyBeforeEntities(project);
+        verifyDefaultProjectEntities(project);
     }
 }

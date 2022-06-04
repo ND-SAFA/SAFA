@@ -47,6 +47,6 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
         assertThat(comparison).isEqualTo(1);
 
         // VP - Verify that all entities were created
-        verifyBeforeEntities(projectVersion.getProject());
+        verifyDefaultProjectEntities(projectVersion.getProject());
     }
 }

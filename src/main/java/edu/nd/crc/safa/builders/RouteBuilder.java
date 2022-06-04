@@ -82,16 +82,6 @@ public class RouteBuilder {
         return this;
     }
 
-    public RouteBuilder withJiraProjectId(Long id) {
-        this.path = this.path.replace("{id}", id.toString());
-        return this;
-    }
-
-    public RouteBuilder withCloudId(String cloudId) {
-        this.path = this.path.replace("{cloudId}", cloudId);
-        return this;
-    }
-
     public String get() {
         if (this.path.contains("{")) {
             throw new RuntimeException("Path is not fully configured:" + this.path);

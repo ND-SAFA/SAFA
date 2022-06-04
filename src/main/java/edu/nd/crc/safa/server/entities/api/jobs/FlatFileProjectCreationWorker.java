@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.importer.flatfiles.TIMParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
@@ -99,7 +98,7 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
 
     public void parsingArtifactFiles() throws SafaError {
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
-            ArtifactFileParser.getInstance().parseArtifactFiles(projectVersion, this.timParser);
+            serviceProvider.getArtifactFileParser().parseArtifactFiles(projectVersion, this.timParser);
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
         List<CommitError> commitErrors =
             artifactCreationResponse

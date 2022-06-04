@@ -10,14 +10,10 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 
 public class TestJiraProjectCreation extends JiraBaseTest {
 
     @Test
-    @WithMockUser(currentUsername)
-    @WithUserDetails(currentUsername)
     public void testImportDroneResponse() throws Exception {
         // Step - Create job
         JobDbEntity jobDbEntity = createJIRAJob();

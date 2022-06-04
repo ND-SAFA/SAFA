@@ -18,8 +18,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Responsible for finding methods corresponding to steps in job and running them
@@ -130,9 +128,5 @@ public abstract class JobWorker implements Job {
     public JobParametersValidator getJobParametersValidator() {
         return (params) -> {
         };
-    }
-
-    public void setSecurityContent(SecurityContext securityContext) {
-        SecurityContextHolder.setContext(securityContext);
     }
 }

@@ -41,9 +41,9 @@ public class ProjectCreationWorker extends JobWorker {
     }
 
     public void savingTraces() throws SafaError {
-        this.entityVersionService.setTracesAtVersionAndSaveErrors(
-            projectCommit.getCommitVersion(),
-            projectCommit.getTraces().getAdded());
+//        this.entityVersionService.setTracesAtVersionAndSaveErrors(
+//            projectCommit.getCommitVersion(),
+//            projectCommit.getTraces().getAdded());
     }
 
     public void generatingLayout() {

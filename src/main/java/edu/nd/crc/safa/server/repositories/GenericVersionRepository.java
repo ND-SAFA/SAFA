@@ -169,7 +169,7 @@ public abstract class GenericVersionRepository<
                 projectVersion,
                 baseEntity,
                 appEntity);
-            
+
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = baseEntity.getBaseEntityId();
@@ -273,6 +273,7 @@ public abstract class GenericVersionRepository<
             if (entity != null) {
                 processedAppEntities.add(entity.getBaseEntityId());
             }
+            response.add(new Pair<>(entity, error));
         }
 
         List<Pair<VersionEntity, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
@@ -283,7 +284,6 @@ public abstract class GenericVersionRepository<
                 projectVersion,
                 baseEntity.getBaseEntityId()))
             .collect(Collectors.toList());
-
         response.addAll(removedVersionEntities);
 
         return response;

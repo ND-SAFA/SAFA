@@ -17,10 +17,10 @@ import edu.nd.crc.safa.common.AppConstraints;
 import edu.nd.crc.safa.common.ProjectVariables;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
+import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for storing an artifact's different contents
@@ -34,6 +34,7 @@ import org.json.JSONObject;
         }, name = AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION)
     }
 )
+@Data
 public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactAppEntity> {
     @Id
     @GeneratedValue
@@ -97,14 +98,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         this(projectVersion, ModificationType.ADDED, artifact, summary, content, customFields);
     }
 
-    public String getCustomFields() {
-        return customFields;
-    }
-
-    public void setCustomFields(String customFields) {
-        this.customFields = customFields;
-    }
-
+    @Override
     public UUID getVersionEntityId() {
         return this.entityVersionId;
     }
@@ -128,55 +122,6 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
 
     public String getTypeName() {
         return this.artifact.getType().getName();
-    }
-
-    public String getContent() {
-        return this.content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getSummary() {
-        return this.summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public Artifact getArtifact() {
-        return this.artifact;
-    }
-
-    public void setArtifact(Artifact artifact) {
-        this.artifact = artifact;
-    }
-
-    public ModificationType getModificationType() {
-        return this.modificationType;
-    }
-
-    public void setModificationType(ModificationType modificationType) {
-        this.modificationType = modificationType;
-    }
-
-    public ProjectVersion getProjectVersion() {
-        return this.projectVersion;
-    }
-
-    public void setProjectVersion(ProjectVersion projectVersion) {
-        this.projectVersion = projectVersion;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("artifact", artifact);
-        json.put("summary", this.summary);
-        json.put("body", this.content);
-        json.put("modificationType", modificationType);
-        return json.toString();
     }
 
     public boolean hasSameContent(IVersionEntity entityVersion) {

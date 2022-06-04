@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import edu.nd.crc.safa.common.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
@@ -43,7 +44,6 @@ public class TestJiraProjectCreation extends JobBaseTest {
 
     @BeforeEach
     public void setAuthorization() {
-
         Claims claims = Jwts.claims().setSubject(currentUsername);
         UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(claims,
             null,
@@ -58,11 +58,6 @@ public class TestJiraProjectCreation extends JobBaseTest {
         // Step - Set constants
         String cloudId = "";
         Long jiraProjectId = (long) 1;
-
-        // Step - Create project
-        ProjectVersion projectVersion = this.dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
@@ -104,15 +99,17 @@ public class TestJiraProjectCreation extends JobBaseTest {
         job.setIssues(issues);
         assertThat(issues.size()).isEqualTo(nArtifacts);
 
-        // Step - Run steps
+        // Step - Run job
         serviceProvider.getJobService().runJobWorker(
             jobDbEntity,
             serviceProvider,
             job
         );
 
-        // Step - Wait for project to save
-        Thread.sleep(2000);
+        // Step - Retrieve completed project
+        jobDbEntity = jobService.getJobById(job.getJobDbEntity().getId());
+        UUID versionId = jobDbEntity.getCompletedEntityId();
+        ProjectVersion projectVersion = projectVersionRepository.findByVersionId(versionId);
 
         // VP - Verify that project created
         jobDbEntity = jobService.getJobById(jobDbEntity.getId());

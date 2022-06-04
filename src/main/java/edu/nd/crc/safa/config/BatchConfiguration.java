@@ -7,7 +7,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -21,7 +20,7 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 public class BatchConfiguration {
 
     @Bean
-    @Primary
+//    @Primary TODO: Add back after testing
     @Scope("singleton")
     public JobLauncher simpleAsyncJobLauncher(@Autowired JobRepository jobRepository) throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.services;
 
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jobs.JobService;
@@ -25,6 +26,7 @@ public class ServiceProvider {
     private final NotificationService notificationService;
     private final JobService jobService;
     private final SafaUserService safaUserService;
+    private final CommitErrorRepository commitErrorRepository;
     // JIRA
     private final JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
     private final JiraConnectionService jiraConnectionService;

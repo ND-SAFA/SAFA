@@ -7,7 +7,6 @@ import edu.nd.crc.safa.MainApplication;
 import edu.nd.crc.safa.server.controllers.ProjectController;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,22 +38,18 @@ public abstract class SpringBootBaseTest {
     @Autowired
     JobRepository jobRepository;
 
-
     /**
-     * Sets the current job launcher to run job syncronously so that
+     * Sets the current job launcher to run job synchronously so that
      *
-     * @throws Exception
+     * @throws Exception Throws exception is error encountered during afterPropertiesSet.
      */
     @PostConstruct
     public void afterConstruct() throws Exception {
-        serviceProvider.setJobLauncher(createSyncJobLauncher());
-    }
-
-    private JobLauncher createSyncJobLauncher() throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
         jobLauncher.setJobRepository(jobRepository);
         jobLauncher.setTaskExecutor(new SyncTaskExecutor());
         jobLauncher.afterPropertiesSet();
-        return jobLauncher;
+
+        serviceProvider.setJobLauncher(jobLauncher);
     }
 }

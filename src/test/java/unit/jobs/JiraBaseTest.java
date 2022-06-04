@@ -21,9 +21,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Sets up internal SAFA and JIRA authentication in order to skip
+ * testing the API directly.
+ */
 public class JiraBaseTest extends JobBaseTest {
 
-    String projectName = "test-jira-project";
+    String jiraProjectName = "test-jira-project";
     int N_STEPS = 5;
     String cloudId = UUID.randomUUID().toString();
     Long jiraProjectId = (long) 1;
@@ -67,6 +71,6 @@ public class JiraBaseTest extends JobBaseTest {
     }
 
     public JobDbEntity createJIRAJob() {
-        return this.jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, "jira-test");
+        return this.jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jiraProjectName);
     }
 }

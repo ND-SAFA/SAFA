@@ -11,8 +11,18 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests that JIRA issues and links can be parsed from JSON
+ * and created in the form of artifacts and trace links.
+ */
 public class TestJiraProjectCreation extends JiraBaseTest {
 
+    /**
+     * Tests that the sample DroneResponse JSON file is able
+     * to be parsed and project created.
+     *
+     * @throws Exception Throws exception is error encountered while reading JSON file.
+     */
     @Test
     public void testImportDroneResponse() throws Exception {
         // Step - Create job

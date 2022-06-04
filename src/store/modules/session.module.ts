@@ -73,6 +73,7 @@ export default class SessionModule extends VuexModule {
     try {
       return jwt_decode(this.getToken) as AuthToken;
     } catch (e) {
+      logModule.onDevError(e);
       return undefined;
     }
   }

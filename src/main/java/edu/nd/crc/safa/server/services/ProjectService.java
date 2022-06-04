@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
@@ -34,8 +33,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Scope("singleton")
 public class ProjectService {
 
-    private static ProjectService instance;
-
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
@@ -54,10 +51,6 @@ public class ProjectService {
         this.projectMembershipRepository = projectMembershipRepository;
         this.safaUserRepository = safaUserRepository;
         this.safaUserService = safaUserService;
-    }
-
-    public static ProjectService getInstance() {
-        return instance;
     }
 
     /**
@@ -184,10 +177,5 @@ public class ProjectService {
             return projectMembership;
         }
         return null;
-    }
-
-    @PostConstruct
-    public void init() {
-        instance = this;
     }
 }

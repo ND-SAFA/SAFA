@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.authentication;
 
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
@@ -26,22 +25,12 @@ import org.springframework.stereotype.Service;
 @Scope("singleton")
 public class SafaUserService implements UserDetailsService {
 
-    private static SafaUserService instance;
     private final SafaUserRepository safaUserRepository;
 
     @Autowired
     public SafaUserService(SafaUserRepository safaUserRepository
     ) {
         this.safaUserRepository = safaUserRepository;
-    }
-
-    public static SafaUserService getInstance() {
-        return instance;
-    }
-
-    @PostConstruct
-    void init() {
-        instance = this;
     }
 
     /**

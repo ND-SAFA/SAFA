@@ -31,7 +31,7 @@ public class ProjectCreationWorker extends JobWorker {
                                  ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
         this.projectCommit = projectCommit;
-        this.entityVersionService = EntityVersionService.getInstance();
+        this.entityVersionService = serviceProvider.getEntityVersionService();
     }
 
     public void savingArtifacts() throws SafaError {
@@ -47,11 +47,13 @@ public class ProjectCreationWorker extends JobWorker {
     }
 
     public void generatingLayout() {
+        //TODO: Use Klayout Layout package to generate layout
     }
 
     @Override
     public void done() {
-        this.projectAppEntity = AppEntityRetrievalService.getInstance().retrieveProjectEntitiesAtProjectVersion(
+        AppEntityRetrievalService appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
+        this.projectAppEntity = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(
             projectCommit.getCommitVersion()
         );
         this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());

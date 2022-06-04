@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.config;
 
+import javax.annotation.PostConstruct;
+
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 @Configuration
 public class ThreadConfiguration {
-
-    static {
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-    }
 
     @Value("${task-executor.controller.core-pool-size}")
     private int controllerCorePoolSize;
@@ -41,5 +39,15 @@ public class ThreadConfiguration {
     @Bean
     public ExecutorDelegate executorDelegate() {
         return new ExecutorDelegate(controllerExecutor());
+    }
+
+    /**
+     * Forces the security context to be copied to child threads (e.g. jobs).
+     * Specifically, this allows jobs to have access to the credentials of the
+     * user who submitted the job.
+     */
+    @PostConstruct
+    public void setSecurityContextMode() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 }

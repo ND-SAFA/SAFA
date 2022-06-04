@@ -6,6 +6,7 @@ import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jobs.JobService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,8 @@ public class ServiceProvider {
     private final ProjectService projectService;
     private final FileUploadService fileUploadService;
     private final FlatFileService flatFileService;
+    private final EntityVersionService entityVersionService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
     // Common
     private final NotificationService notificationService;
     private final JobService jobService;

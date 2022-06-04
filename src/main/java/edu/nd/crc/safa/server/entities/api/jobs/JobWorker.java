@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
@@ -113,7 +112,6 @@ public abstract class JobWorker implements Job {
     }
 
     @Override
-    @NotNull
     public String getName() {
         return this.jobDbEntity.getName();
     }

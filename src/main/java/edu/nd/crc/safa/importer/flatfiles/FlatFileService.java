@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Service;
 @Scope("singleton")
 public class FlatFileService {
 
-    private static FlatFileService instance;
     private final CommitErrorRepository commitErrorRepository;
     private final EntityVersionService entityVersionService;
     private final ArtifactFileParser artifactFileParser;
@@ -52,15 +50,6 @@ public class FlatFileService {
         this.entityVersionService = entityVersionService;
         this.artifactFileParser = artifactFileParser;
         this.traceLinkGenerator = traceLinkGenerator;
-    }
-
-    public static FlatFileService getInstance() {
-        return instance;
-    }
-
-    @PostConstruct
-    public void init() {
-        instance = this;
     }
 
     /**

@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.AppConstraints;
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;

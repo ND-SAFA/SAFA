@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.common.AppConstraints;
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;

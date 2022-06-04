@@ -2,8 +2,8 @@ package unit.jobs;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.common.AppRoutes;
-import edu.nd.crc.safa.common.ProjectPaths;
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.jobs.JobService;

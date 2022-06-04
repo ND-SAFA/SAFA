@@ -13,8 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import edu.nd.crc.safa.common.AppConstraints;
-import edu.nd.crc.safa.common.ProjectVariables;
+import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
 import lombok.Data;

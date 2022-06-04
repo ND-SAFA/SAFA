@@ -2,8 +2,8 @@ package unit.flatfile;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.common.AppRoutes;
-import edu.nd.crc.safa.common.ProjectPaths;
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

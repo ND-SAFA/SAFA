@@ -9,11 +9,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.AppRoutes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.importer.flatfiles.ArtifactFile;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactTypeService;
 import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
@@ -48,23 +46,16 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class ParseDataFileController extends BaseController {
 
-    private final ArtifactFileParser artifactFileParser;
-    private final ArtifactTypeService artifactTypeService;
-
     private final ProjectRetriever artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     public ParseDataFileController(ResourceBuilder resourceBuilder,
                                    ProjectRetriever artifactRepository,
-                                   ArtifactVersionRepository artifactVersionRepository,
-                                   ArtifactFileParser artifactFileParser,
-                                   ArtifactTypeService artifactTypeService) {
+                                   ArtifactVersionRepository artifactVersionRepository) {
         super(resourceBuilder);
-        this.artifactFileParser = artifactFileParser;
         this.artifactRepository = artifactRepository;
         this.artifactVersionRepository = artifactVersionRepository;
-        this.artifactTypeService = artifactTypeService;
     }
 
     /**

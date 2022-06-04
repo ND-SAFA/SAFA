@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.common.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
 import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;

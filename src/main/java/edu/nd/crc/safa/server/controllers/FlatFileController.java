@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.AppRoutes;
-import edu.nd.crc.safa.common.ProjectPaths;
-import edu.nd.crc.safa.common.ProjectVariables;
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;

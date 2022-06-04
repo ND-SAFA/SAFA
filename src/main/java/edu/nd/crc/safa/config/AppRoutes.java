@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.common;
+package edu.nd.crc.safa.config;
 
 /**
  * The container centralizing all route names used within controllers and testing.

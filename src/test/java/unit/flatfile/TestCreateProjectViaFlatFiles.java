@@ -1,7 +1,7 @@
 package unit.flatfile;
 
-import edu.nd.crc.safa.common.AppRoutes;
-import edu.nd.crc.safa.common.ProjectPaths;
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Project;
 
 import org.json.JSONObject;

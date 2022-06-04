@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.common;
+package edu.nd.crc.safa.config;
 
 import org.springframework.dao.DataIntegrityViolationException;
 

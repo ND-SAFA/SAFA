@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.common.AppRoutes;
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;

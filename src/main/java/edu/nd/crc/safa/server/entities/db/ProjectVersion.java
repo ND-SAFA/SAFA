@@ -13,7 +13,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import edu.nd.crc.safa.common.AppConstraints;
+import edu.nd.crc.safa.config.AppConstraints;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;

@@ -64,6 +64,8 @@ export enum Endpoint {
   // Document Artifacts
   addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
   removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
+  setCurrentDocument = "projects/documents/current/:documentId",
+  clearCurrentDocument = "projects/documents/current",
 
   // Delta
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",

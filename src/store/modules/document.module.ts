@@ -4,7 +4,12 @@ import type { DocumentColumn, Project, ProjectDocument } from "@/types";
 import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, traceModule } from "@/store";
-import { handleResetGraph } from "@/api";
+import {
+  clearCurrentDocument,
+  handleResetGraph,
+  setCurrentDocument,
+} from "@/api";
+import doc = Mocha.reporters.doc;
 
 @Module({ namespaced: true, name: "document" })
 /**
@@ -99,6 +104,10 @@ export default class DocumentModule extends VuexModule {
     const currentArtifactIds = document.artifactIds;
 
     this.SET_CURRENT_DOCUMENT(document);
+
+    document.documentId === ""
+      ? await clearCurrentDocument()
+      : await setCurrentDocument(document.documentId);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
     await handleResetGraph();

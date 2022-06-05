@@ -24,7 +24,7 @@ public class AppRoutes {
 
     public static class Projects {
         private static final String projectPrefix = "/projects";
-        public static final String  retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
+        public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;

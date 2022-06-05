@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -21,6 +22,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "jira_project")
 @Data
+@NoArgsConstructor
 public class JiraProject {
     /**
      * Uniquely identifies the mapping

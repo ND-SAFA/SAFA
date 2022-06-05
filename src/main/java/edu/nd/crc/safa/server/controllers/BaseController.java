@@ -9,8 +9,8 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 
+import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -23,14 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestController
+@AllArgsConstructor
 public abstract class BaseController {
 
     protected final ResourceBuilder resourceBuilder;
-
-    @Autowired
-    public BaseController(ResourceBuilder resourceBuilder) {
-        this.resourceBuilder = resourceBuilder;
-    }
 
     protected Document getDocumentById(DocumentRepository documentRepository,
                                        UUID documentId) throws SafaError {

@@ -1,5 +1,5 @@
 import { Project } from "@/types";
-import { createProject } from "@/util";
+import { createProject, getSingleQueryResult } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
   appModule,
@@ -82,6 +82,7 @@ export async function handleClearProject(): Promise<void> {
 export async function handleSetProject(project: Project): Promise<void> {
   await handleProjectSubscription(project);
   errorModule.setArtifactWarnings(project.warnings);
+  await setCurrentDocument(project);
 }
 
 /**
@@ -92,4 +93,21 @@ export async function handleReloadProject(): Promise<void> {
 
   await handleLoadVersion(projectModule.versionId);
   await documentModule.switchDocuments(document);
+}
+
+/**
+ * Moves user to the document if one is set by currentDocumentId
+ * Otherwise default document would continue to be in view.
+ * @param project The project possibly containing a currentDocumentId
+ */
+async function setCurrentDocument(project: Project): Promise<void> {
+  if (project.currentDocumentId) {
+    const document = getSingleQueryResult(
+      project.documents.filter(
+        (d) => d.documentId === project.currentDocumentId
+      ),
+      "documents"
+    );
+    await documentModule.switchDocuments(document);
+  }
 }

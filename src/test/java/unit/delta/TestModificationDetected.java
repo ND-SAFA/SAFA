@@ -59,7 +59,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(artifactDelta.getJSONObject("removed").has(getId(projectName, "D7"))).isTrue();
         assertThat(artifactDelta.getJSONObject("added").has(getId(projectName, "D12"))).isTrue();
 
-        ProjectAppEntity beforeAppEntity = this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(beforeVersion);
+        ProjectAppEntity beforeAppEntity = getProjectAtVersion(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)
@@ -73,7 +73,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // Step - Collect list of artifact names in the after version.
-        ProjectAppEntity afterAppEntity = this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(afterVersion);
+        ProjectAppEntity afterAppEntity = getProjectAtVersion(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream()

@@ -18,7 +18,6 @@ import org.javatuples.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -168,7 +167,7 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
             .get();
-        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(deltaRouteName);
 
         // VP - Verify that change is detected
         JSONObject modifiedArtifacts = projectDelta.getJSONObject("artifacts").getJSONObject("modified");

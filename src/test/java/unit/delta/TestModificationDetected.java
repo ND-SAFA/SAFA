@@ -14,7 +14,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 import unit.SampleProjectConstants;
 
@@ -22,6 +21,7 @@ import unit.SampleProjectConstants;
  * Tests that changes to the content of artifacts are retrieved.
  */
 public class TestModificationDetected extends ApplicationBaseTest {
+
 
     /**
      * Tests that modifications to artifact bodies are detected in
@@ -50,7 +50,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(deltaRouteName);
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 

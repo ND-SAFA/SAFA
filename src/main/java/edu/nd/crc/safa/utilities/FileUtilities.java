@@ -12,6 +12,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
@@ -130,5 +131,17 @@ public class FileUtilities {
 
         }
         return result;
+    }
+
+    /**
+     * Returns the JSONObject parsed from path to JSON file.
+     *
+     * @param path The path to the JSON file.
+     * @return JSONObject
+     * @throws IOException If file is missing or not able to be read.
+     */
+    public static JSONObject readJSONFile(String path) throws IOException {
+        String fileContent = FileUtils.readFileToString(new File(path), "utf-8");
+        return new JSONObject(fileContent);
     }
 }

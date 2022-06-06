@@ -264,7 +264,6 @@ public abstract class GenericVersionRepository<
         List<AppEntity> appEntities) {
 
         List<String> processedAppEntities = new ArrayList<>();
-
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(a -> this.commitAppEntityToProjectVersion(projectVersion, a))
@@ -282,7 +281,6 @@ public abstract class GenericVersionRepository<
                 projectVersion,
                 baseEntity.getBaseEntityId()))
             .collect(Collectors.toList());
-
         response.addAll(removedVersionEntities);
 
         return response;
@@ -337,7 +335,7 @@ public abstract class GenericVersionRepository<
             errorDescription =
                 "Could not parse entity " + entityName + ": " + AppConstraints.getConstraintError(e);
         } catch (Exception e) {
-            //TODO e.printStackTrace();
+            e.printStackTrace();
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {

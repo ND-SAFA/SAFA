@@ -11,16 +11,20 @@ import edu.nd.crc.safa.server.entities.db.Project;
  * Contains common full paths used through app.
  */
 public class ProjectPaths {
+    // Flat files
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
     public static final String PATH_TO_BUILD = ProjectPaths.PATH_TO_ROOT + "/build";
     public static final String PATH_TO_STORAGE = ProjectPaths.PATH_TO_BUILD + "/storage";
     public static final String PATH_TO_RESOURCES = ProjectPaths.PATH_TO_ROOT + "/resources";
     public static final String PATH_TO_TEST_RESOURCES = ProjectPaths.PATH_TO_RESOURCES + "/tests";
-    public static final String PATH_TO_BEFORE_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/before";
+    public static final String PATH_TO_DEFAULT_PROJECT = ProjectPaths.PATH_TO_TEST_RESOURCES + "/before";
     public static final String PATH_TO_MINI_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/mini";
     public static final String PATH_TO_AFTER_FILES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/after";
     public static final String PATH_TO_TEST_2 = ProjectPaths.PATH_TO_TEST_RESOURCES + "/test2";
     public static final String PATH_TO_TEST_3 = ProjectPaths.PATH_TO_TEST_RESOURCES + "/test3";
+
+    // Jira
+    public static final String PATH_TO_DRONE_ISSUES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/jira/drone_response.json";
 
     private static String pathHelper(String... paths) {
         StringBuilder finalPath = new StringBuilder();
@@ -65,6 +69,6 @@ public class ProjectPaths {
     }
 
     public static String getPathToTestResources(String fileName) {
-        return pathHelper(PATH_TO_BEFORE_FILES, fileName);
+        return pathHelper(PATH_TO_DEFAULT_PROJECT, fileName);
     }
 }

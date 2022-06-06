@@ -17,6 +17,7 @@ import edu.nd.crc.safa.server.entities.app.JobStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -30,6 +31,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "job")
 @Getter
 @Setter
+@NoArgsConstructor
 public class JobDbEntity {
     /**
      * The name of job (e.g. project creation).
@@ -102,9 +104,6 @@ public class JobDbEntity {
      */
     @Column(name = "completed_entity_id")
     UUID completedEntityId;
-
-    public JobDbEntity() {
-    }
 
     public JobDbEntity(SafaUser user,
                        String name,

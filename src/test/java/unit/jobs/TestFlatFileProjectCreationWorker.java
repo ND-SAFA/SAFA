@@ -1,17 +1,13 @@
 package unit.jobs;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.util.Arrays;
 import java.util.UUID;
-
-import edu.nd.crc.safa.server.entities.app.JobStatus;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 
 import org.junit.jupiter.api.Test;
 
 public class TestFlatFileProjectCreationWorker extends JobBaseTest {
-    
+
+    int N_STEPS = 6;
+
     /*
      * Tests that uploading default project as job completes.
      *
@@ -28,28 +24,12 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
         UUID jobId = createJobFromDefaultProject();
 
         // Step - Get Job and subscribe for updates
-        createNewConnection(currentUsername)
-            .subscribeToJob(currentUsername, jobService.getJobById(jobId));
-
-        // Step - Allow job to run
-        Thread.sleep(5000);
+        createNewConnection(currentUsername).subscribeToJob(currentUsername, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
-        JobDbEntity jobDbEntity = jobService.getJobById(jobId);
-        assertThat(jobDbEntity.getCurrentStep()).isGreaterThanOrEqualTo(0);
-        assertThat(jobDbEntity.getCurrentProgress()).isGreaterThanOrEqualTo(0);
-        assertThat(jobDbEntity.getStatus()).isIn(Arrays.asList(JobStatus.IN_PROGRESS, JobStatus.COMPLETED));
-
-        // Step - Assert that start is before completed.
-        assert jobDbEntity.getCompletedAt() != null;
-        int comparison = jobDbEntity.getCompletedAt().compareTo(jobDbEntity.getStartedAt());
-        assertThat(comparison).isEqualTo(1);
-
-        // Step - Assert that lastUpdatedBy is after start.
-        comparison = jobDbEntity.getLastUpdatedAt().compareTo(jobDbEntity.getStartedAt());
-        assertThat(comparison).isEqualTo(1);
+        verifyJobWasCompleted(jobId, N_STEPS);
 
         // VP - Verify that all entities were created
-        verifyBeforeEntities(projectVersion.getProject());
+        verifyDefaultProjectEntities(projectVersion.getProject());
     }
 }

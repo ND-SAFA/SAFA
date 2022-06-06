@@ -17,13 +17,13 @@ public class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
         // Step 1 - Upload flat files
         String routeName = AppRoutes.Projects.FlatFiles.projectFlatFiles;
         MockMultipartHttpServletRequestBuilder request = createMultiPartRequest(routeName,
-            ProjectPaths.PATH_TO_BEFORE_FILES);
+            ProjectPaths.PATH_TO_DEFAULT_PROJECT);
         JSONObject responseBody = sendRequest(request, MockMvcResultMatchers.status().isCreated(), this.token);
 
         // VP - Verify response contains entities
         Project project = verifyBeforeResponse(responseBody);
 
         // VP - Verify that entities were actually created
-        verifyBeforeEntities(project);
+        verifyDefaultProjectEntities(project);
     }
 }

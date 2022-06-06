@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
@@ -52,7 +51,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AppEntityRetrievalService {
 
-    private static AppEntityRetrievalService instance;
     private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
@@ -65,13 +63,6 @@ public class AppEntityRetrievalService {
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     
-    public static AppEntityRetrievalService getInstance() {
-        return instance;
-    }
-
-    @PostConstruct
-    void init() {
-        instance = this;
     }
 
     /**

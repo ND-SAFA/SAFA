@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope("singleton")
 public class EntityVersionService {
 
-    public static EntityVersionService instance;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final CommitErrorRepository commitErrorRepository;
@@ -46,10 +44,6 @@ public class EntityVersionService {
         this.commitErrorRepository = commitErrorRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.appEntityRetrievalService = appEntityRetrievalService;
-    }
-
-    public static EntityVersionService getInstance() {
-        return instance;
     }
 
     /**
@@ -112,10 +106,4 @@ public class EntityVersionService {
             }
         }
     }
-
-    @PostConstruct
-    void init() {
-        instance = this;
-    }
-
 }

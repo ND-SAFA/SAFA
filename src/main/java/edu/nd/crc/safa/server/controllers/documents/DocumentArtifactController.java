@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
@@ -33,9 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides CRUD endpoints for document-artifact relations.
  */
 @RestController
-public class DocumentArtifactController extends BaseController {
+public class DocumentArtifactController extends BaseDocumentController {
 
-    private final DocumentRepository documentRepository;
     private final ProjectRetriever artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
@@ -46,8 +44,7 @@ public class DocumentArtifactController extends BaseController {
                                       DocumentArtifactRepository documentArtifactRepository,
                                       NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {
-        super(resourceBuilder);
-        this.documentRepository = documentRepository;
+        super(resourceBuilder, documentRepository);
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;
         this.notificationService = notificationService;

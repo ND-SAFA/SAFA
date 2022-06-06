@@ -126,7 +126,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, String jiraProjectId) {
+    public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES)
             + String.format("?jql=project=%s&fields", jiraProjectId);
 

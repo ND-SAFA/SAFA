@@ -56,7 +56,7 @@ public interface JiraConnectionService {
      * @param jiraProjectId The JIRA project id.
      * @return JIRA API Response
      */
-    JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, String jiraProjectId);
+    JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId);
 
     /**
      * Creates a mapping between the safa project and the jira project.

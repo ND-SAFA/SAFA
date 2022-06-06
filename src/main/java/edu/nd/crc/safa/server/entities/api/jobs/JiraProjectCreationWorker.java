@@ -56,6 +56,7 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
     /**
      * JIRA's response for downloading project
      */
+    @Setter
     JiraProjectResponseDTO jiraProjectResponse;
 
     public JiraProjectCreationWorker(
@@ -93,20 +94,13 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
 
         // Step - Retrieve project information including issues
-        //TODO: @Marcus Set project issues
         this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
             jiraProjectId);
+        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
     }
 
     public void createSafaProject() {
         ProjectService projectService = this.serviceProvider.getProjectService();
-
-        // Step - Setting up testing data
-        // TODO: Delete once issues are collected
-        JiraProjectResponseDTO mockJiraResponse = new JiraProjectResponseDTO();
-        mockJiraResponse.setKey("Mock Project Name");
-        mockJiraResponse.setDescription("sample project description");
-        this.jiraProjectResponse = mockJiraResponse;
 
         // Step - Save as SAFA project
         String projectName = this.jiraProjectResponse.getKey();

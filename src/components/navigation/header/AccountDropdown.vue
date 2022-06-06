@@ -1,5 +1,5 @@
 <template>
-  <v-menu rounded min-width="200px" bottom offset-y>
+  <v-menu rounded min-width="200px" bottom offset-y id="my-account">
     <template v-slot:activator="{ on: menuOn, attrs }">
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltipOn }">

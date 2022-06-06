@@ -4,14 +4,14 @@
 FullTest.js - Created by: Jeremy Arellano
     This automated test will test the capabilities of the SAFA
     web application in terms of creating a new account, logging in,
-    creating a project, manipulating the graph, and logging out. 
-    This test will also verify components of the UI are working properly 
-    and that no errors occur during the process. 
+    creating a project, manipulating the graph, and logging out.
+    This test will also verify components of the UI are working properly
+    and that no errors occur during the process.
 
     Some Notes:
         - Previous Tests (such as 01-03) will be used to test the functionality of individual parts of the
             web application. However, components of these tests will be seen in this test file.
-        - Currently, there is no way to delete an account, therefore the Create account section of the test 
+        - Currently, there is no way to delete an account, therefore the Create account section of the test
             will be skipped as to avoid creating too many spam accounts. In the later future, this section can
             be commented back into the test.
         - Some of the elements on the website currently could be renamed to have more distinction across from each other, this
@@ -32,7 +32,7 @@ module.exports = {
     const screenShotDestination = "/04FullTest/";
 
     /* Test Data Location + Names */
-    const TestDataLocation = "tests/e2e/nightwatch/TestData/";
+    const TestDataLocation = "tests/e2e/test-data/";
     const HazardsFileName = "Hazard.csv";
     const RequirementsFileName = "Requirement.csv";
     const DesignsFileName = "Design.csv";

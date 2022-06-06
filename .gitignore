@@ -32,10 +32,7 @@ pnpm-debug.log*
 /dist_electron
 
 # From Nightwatch Testing
-dir_to_ignore/node_modules
-dir_to_ignore/distrib
+distrib
 tests_output
 *.log
 *.png
-
-..env.development.un~

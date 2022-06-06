@@ -18,7 +18,7 @@ module.exports = {
     /* Our constants will go here */
     const projectCreatorButtonName = "Continue";
     const HazardsFileName = "Hazard.csv";
-    const TestDataLocation = "tests/e2e/nightwatch/TestData/";
+    const TestDataLocation = "tests/e2e/test-data/";
     const screenShotDestination = "/02CreateProject/";
 
     /* Our test will occur here */

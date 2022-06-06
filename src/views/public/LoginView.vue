@@ -1,5 +1,5 @@
 <template>
-  <card-page>
+  <card-page id="login-view">
     <template v-slot:form>
       <v-text-field
         filled

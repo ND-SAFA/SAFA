@@ -1,0 +1,10 @@
+"use strict";
+exports.__esModule = true;
+exports.LINE_GHOST_COLOR = exports.LINE_PREVIEW_COLOR = exports.TARGET_SELECTION_WIDTH = exports.TARGET_SELECTION_COLOR = exports.SOURCE_SELECTION_WIDTH = exports.SOURCE_SELECTION_COLOR = void 0;
+var util_1 = require("@/util");
+exports.SOURCE_SELECTION_COLOR = util_1.ThemeColors.secondary;
+exports.SOURCE_SELECTION_WIDTH = 2;
+exports.TARGET_SELECTION_COLOR = util_1.ThemeColors.secondary;
+exports.TARGET_SELECTION_WIDTH = 2;
+exports.LINE_PREVIEW_COLOR = util_1.ThemeColors.secondary;
+exports.LINE_GHOST_COLOR = "red";

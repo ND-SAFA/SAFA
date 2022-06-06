@@ -27,7 +27,7 @@ public class CurrentDocumentService {
      *
      * @param document The document that should be set as the user's preference.
      */
-    public void setAsCurrentDocument(Document document) {
+    public void setCurrentDocumentForCurrentUser(Document document) {
         SafaUser user = safaUserService.getCurrentUser();
         Optional<CurrentDocument> currentDocumentOptional = this.currentDocumentRepository.findByUser(user);
 
@@ -46,7 +46,7 @@ public class CurrentDocumentService {
     /**
      * Deletes the current document for the current user
      */
-    public void clearCurrentDocument() {
+    public void clearCurrentDocumentForCurrentUser() {
         SafaUser user = safaUserService.getCurrentUser();
         this.currentDocumentRepository
             .findByUser(user)

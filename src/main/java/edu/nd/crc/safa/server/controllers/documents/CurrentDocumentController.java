@@ -41,7 +41,7 @@ public class CurrentDocumentController extends BaseDocumentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCurrentDocument(@PathVariable UUID documentId) {
         Document document = getDocumentById(this.documentRepository, documentId);
-        this.currentDocumentService.setAsCurrentDocument(document);
+        this.currentDocumentService.setCurrentDocumentForCurrentUser(document);
     }
 
     /**
@@ -50,6 +50,6 @@ public class CurrentDocumentController extends BaseDocumentController {
     @DeleteMapping(AppRoutes.Projects.Documents.clearCurrentDocument)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCurrentDocument() {
-        this.currentDocumentService.clearCurrentDocument();
+        this.currentDocumentService.clearCurrentDocumentForCurrentUser();
     }
 }

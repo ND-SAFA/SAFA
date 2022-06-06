@@ -122,7 +122,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        setAuthorization();
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
         entityVersionService.setProjectEntitiesAtVersion(newVersion,
             Arrays.asList(artifactApp),
             new ArrayList<>());
@@ -160,7 +160,7 @@ public class TestArtifactService extends ApplicationBaseTest {
             new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        setAuthorization();
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
         this.entityVersionService.setProjectEntitiesAtVersion(projectVersion, List.of(appEntity), new ArrayList<>());
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,

@@ -30,7 +30,7 @@ public class JiraBaseTest extends JobBaseTest {
 
     @BeforeEach
     public void setJiraAuthorization() {
-        setAuthorization();
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();

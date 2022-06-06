@@ -8,7 +8,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -19,8 +18,6 @@ import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -117,26 +114,9 @@ public class JobController extends BaseController {
             projectVersion,
             files);
 
-        runJobWorker(jobDbEntity, jobCreationThread);
+        jobService.runJobWorker(jobDbEntity, jobCreationThread);
 
         // Step 4 - Create job response
         return JobAppEntity.createFromJob(jobDbEntity);
-    }
-
-    private void runJobWorker(JobDbEntity jobDbEntity,
-                              JobWorker jobCreationThread) throws
-        JobExecutionAlreadyRunningException, JobRestartException,
-        JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        JobParameters jobParameters =
-            new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis()).toJobParameters();
-
-        try {
-            jobCreationThread.initJobData();
-        } catch (Exception e) {
-            this.jobService.failJob(jobDbEntity);
-            throw new SafaError("Failed to start job.");
-        }
-        jobLauncher.run(jobCreationThread, jobParameters);
     }
 }

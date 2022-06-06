@@ -10,12 +10,20 @@ import javax.annotation.PostConstruct;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobDbRepository;
 
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -39,11 +47,18 @@ public class JobService {
      * Service used to add authenticated user to job.
      */
     SafaUserService safaUserService;
+    /**
+     * Runs jobs with pre-defined settings surrounding execution and security.
+     */
+    JobLauncher jobLauncher;
 
     @Autowired
-    public JobService(JobDbRepository jobDbRepository, SafaUserService safaUserService) {
+    public JobService(JobDbRepository jobDbRepository,
+                      SafaUserService safaUserService,
+                      JobLauncher jobLauncher) {
         this.jobDbRepository = jobDbRepository;
         this.safaUserService = safaUserService;
+        this.jobLauncher = jobLauncher;
     }
 
     public static JobService getInstance() {
@@ -162,5 +177,22 @@ public class JobService {
 
     private Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    public void runJobWorker(JobDbEntity jobDbEntity,
+                             JobWorker jobCreationThread) throws
+        JobExecutionAlreadyRunningException, JobRestartException,
+        JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        JobParameters jobParameters =
+            new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis()).toJobParameters();
+
+        try {
+            jobCreationThread.initJobData();
+        } catch (Exception e) {
+            this.failJob(jobDbEntity);
+            throw new SafaError("Failed to start job.");
+        }
+        jobLauncher.run(jobCreationThread, jobParameters);
     }
 }

@@ -22,12 +22,21 @@ public class AppRoutes {
         public static final String deleteJob = jobId;
     }
 
+
     public static class Projects {
         private static final String projectPrefix = "/projects";
         public static final String  retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;
+
+        public static class Layout {
+            public static final String createLayoutForProject = projectPrefix + "/versions/{versionId}/layout";
+            public static final String createLayoutForDocument = projectPrefix + "/versions/{versionId}/documents"
+                + "/{documentId}/layout";
+            public static final String saveLayoutForArtifact = projectPrefix + "/versions/{versionId}/artifacts"
+                + "/{artifactId}/position";
+        }
 
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";

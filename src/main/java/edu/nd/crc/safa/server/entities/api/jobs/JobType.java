@@ -9,5 +9,6 @@ public enum JobType {
     PROJECT_CREATION,
     PROJECT_SYNC,
     GENERATE_LINKS,
+    GENERATE_LAYOUT,
     TRAIN_MODEL
 }

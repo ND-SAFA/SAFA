@@ -32,7 +32,8 @@ import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.javatuples.Pair;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -61,27 +62,6 @@ public class AppEntityRetrievalService {
 
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-
-    @Autowired
-    public AppEntityRetrievalService(DocumentRepository documentRepository,
-                                     TraceLinkVersionRepository traceLinkVersionRepository,
-                                     DocumentArtifactRepository documentArtifactRepository,
-                                     ProjectMembershipRepository projectMembershipRepository,
-                                     ArtifactVersionRepository artifactVersionRepository,
-                                     ArtifactTypeRepository artifactTypeRepository,
-                                     DocumentColumnRepository documentColumnRepository,
-                                     WarningService warningService,
-                                     CommitErrorRetrievalService commitErrorRetrievalService) {
-        this.documentRepository = documentRepository;
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.projectMembershipRepository = projectMembershipRepository;
-        this.documentColumnRepository = documentColumnRepository;
-        this.warningService = warningService;
-        this.commitErrorRetrievalService = commitErrorRetrievalService;
-    }
 
     public static AppEntityRetrievalService getInstance() {
         return instance;
@@ -141,6 +121,20 @@ public class AppEntityRetrievalService {
             documents,
             artifactTypes,
             errors);
+    }
+
+    public Pair<List<ArtifactAppEntity>, List<TraceAppEntity>> getEntitiesInDocument(ProjectVersion projectVersion,
+                                                                                     Document document) {
+        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion)
+            .stream()
+            .filter(a -> a.documentIds.contains(document.getDocumentId().toString()))
+            .collect(Collectors.toList());
+        List<String> artifactIds = artifacts
+            .stream()
+            .map(ArtifactAppEntity::getBaseEntityId)
+            .collect(Collectors.toList());
+        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
+        return new Pair<>(artifacts, traces);
     }
 
     /**

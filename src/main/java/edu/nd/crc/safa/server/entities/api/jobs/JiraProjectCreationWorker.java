@@ -56,6 +56,7 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
     /**
      * JIRA's response for downloading project
      */
+    @Setter
     JiraProjectResponseDTO jiraProjectResponse;
 
     public JiraProjectCreationWorker(

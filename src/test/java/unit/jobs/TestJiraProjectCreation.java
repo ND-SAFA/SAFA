@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -39,6 +40,8 @@ public class TestJiraProjectCreation extends JiraBaseTest {
             jiraProjectId,
             cloudId
         );
+
+        job.setJiraProjectResponse(createMockJiraProject());
         job.setIssues(issues);
 
         // Step - Run job
@@ -55,5 +58,13 @@ public class TestJiraProjectCreation extends JiraBaseTest {
         verifyNumberOfItems("artifacts",
             () -> this.artifactVersionRepository.findByProjectVersion(projectVersion),
             nArtifacts);
+    }
+
+    private JiraProjectResponseDTO createMockJiraProject() {
+        JiraProjectResponseDTO mockJiraResponse = new JiraProjectResponseDTO();
+
+        mockJiraResponse.setKey("Mock Project Name");
+        mockJiraResponse.setDescription("sample project description");
+        return mockJiraResponse;
     }
 }

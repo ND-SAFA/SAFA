@@ -42,17 +42,6 @@ public class FlatFileService {
     private final ArtifactFileParser artifactFileParser;
     private final TraceLinkGenerator traceLinkGenerator;
 
-    @Autowired
-    public FlatFileService(CommitErrorRepository commitErrorRepository,
-                           EntityVersionService entityVersionService,
-                           ArtifactFileParser artifactFileParser,
-                           TraceLinkGenerator traceLinkGenerator) {
-        this.commitErrorRepository = commitErrorRepository;
-        this.entityVersionService = entityVersionService;
-        this.artifactFileParser = artifactFileParser;
-        this.traceLinkGenerator = traceLinkGenerator;
-    }
-
     /**
      * Constructs a project from the specification in TIM.json file.
      * Note, this route expects all files to be stored in local storage

@@ -62,8 +62,6 @@ public class AppEntityRetrievalService {
 
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-    
-    }
 
     /**
      * Finds project, artifact, traces, errors, and warnings related with given project version.

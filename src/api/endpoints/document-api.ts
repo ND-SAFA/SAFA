@@ -107,3 +107,27 @@ export async function deleteDocumentArtifact(
     }
   );
 }
+
+/**
+ * Sets the document to be the user's current document.
+ * @param documentId The document to save.
+ */
+export async function setCurrentDocument(documentId: string): Promise<void> {
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.setCurrentDocument, {
+      documentId,
+    }),
+    {
+      method: "POST",
+    }
+  );
+}
+
+/**
+ * Removes the current document affiliated with current user.
+ */
+export async function clearCurrentDocument(): Promise<void> {
+  return authHttpClient<void>(fillEndpoint(Endpoint.clearCurrentDocument, {}), {
+    method: "DELETE",
+  });
+}

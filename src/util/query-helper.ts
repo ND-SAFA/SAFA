@@ -1,5 +1,3 @@
-import { Artifact } from "@/types";
-
 /**
  * Returns the artifact in list if single item exists.
  *
@@ -8,10 +6,10 @@ import { Artifact } from "@/types";
  * @return The found artifact.
  * @throws Error if query contains multiple or no results.
  */
-export function getSingleQueryResult(
-  query: Artifact[],
+export function getSingleQueryResult<Entity>(
+  query: Entity[],
   queryName: string
-): Artifact {
+): Entity {
   switch (query.length) {
     case 1:
       return query[0];

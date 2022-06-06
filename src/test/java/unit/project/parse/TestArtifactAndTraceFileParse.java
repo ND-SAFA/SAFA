@@ -31,7 +31,7 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
 
         //VP - Verify that all artifacts were parsed
         assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
-        
+
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
             assertThat(artifact.getString("type")).isEqualTo(type);

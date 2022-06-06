@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 
@@ -49,6 +51,7 @@ public class JiraAccessCredentials {
     private String refreshToken;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
     private SafaUser user;
 

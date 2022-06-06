@@ -7,28 +7,19 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.api.jobs.ProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.app.JobSteps;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.services.EntityVersionService;
-import edu.nd.crc.safa.server.services.JobService;
-import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
 /**
- * Responsible for testing that the generic job worker is parsing
- * step correctly.
+ * Tests that the generic job worker is parsing step correctly.
  */
 public class TestJobDbEntityWorker extends ApplicationBaseTest {
 
     @Autowired
-    JobService jobService;
-
-    @Autowired
-    EntityVersionService entityVersionService;
-
-    @Autowired
-    NotificationService notificationService;
+    ServiceProvider serviceProvider;
 
     @Test
     public void testCreateProjectWorker() {
@@ -48,6 +39,7 @@ public class TestJobDbEntityWorker extends ApplicationBaseTest {
     private ProjectCreationWorker buildProjectCreationWorker() {
         return new ProjectCreationWorker(
             new JobDbEntity(),
+            serviceProvider,
             new ProjectCommit()
         );
     }

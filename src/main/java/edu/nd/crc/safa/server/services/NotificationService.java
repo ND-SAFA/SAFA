@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.server.services;
 
-import javax.annotation.PostConstruct;
-
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
@@ -14,6 +12,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Service;
  * Responsible for sending notifications to subscribers of certain topics.
  */
 @Service
+@Scope("singleton")
 public class NotificationService {
 
-    private static NotificationService instance;
     private final SimpMessagingTemplate messagingTemplate;
     private final SafaUserService safaUserService;
 
@@ -61,15 +60,6 @@ public class NotificationService {
      */
     public static String getJobTopic(JobDbEntity jobDbEntity) {
         return String.format("/topic/jobs/%s", jobDbEntity.getId());
-    }
-
-    public static NotificationService getInstance() {
-        return instance;
-    }
-
-    @PostConstruct
-    public void init() {
-        instance = this;
     }
 
     /**

@@ -32,7 +32,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
-        uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify that no artifacts associated with empty version
         List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
@@ -49,7 +49,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
-        uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - No new artifacts were created
         List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);

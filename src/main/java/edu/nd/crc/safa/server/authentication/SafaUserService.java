@@ -7,7 +7,9 @@ import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
  * and resetting users.
  */
 @Service
+@Scope("singleton")
 public class SafaUserService implements UserDetailsService {
 
     private final SafaUserRepository safaUserRepository;
@@ -53,7 +56,8 @@ public class SafaUserService implements UserDetailsService {
     }
 
     public SafaUser getCurrentUser() {
-        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication user = securityContext.getAuthentication();
         String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);
     }

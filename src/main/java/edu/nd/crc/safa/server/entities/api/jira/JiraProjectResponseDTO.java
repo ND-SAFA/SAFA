@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.entities.api.jira;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * JIRA api response for the endpoint /project/{id}
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JiraProjectResponseDTO {
 
     private static final String SMALL_AVATAR_KEY = "16x16";
@@ -26,7 +28,7 @@ public class JiraProjectResponseDTO {
     String mediumAvatarUrl;
 
     /**
-     *  Retrieve project avatar URLs
+     * Retrieve project avatar URLs
      *
      * @param avatarUrlsJson object child situated at .avatarUrls in the JSON object tree
      */

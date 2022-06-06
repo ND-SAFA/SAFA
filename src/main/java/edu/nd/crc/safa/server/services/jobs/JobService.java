@@ -1,21 +1,29 @@
-package edu.nd.crc.safa.server.services;
+package edu.nd.crc.safa.server.services.jobs;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobDbRepository;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -26,11 +34,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope("singleton")
 public class JobService {
-
-    /**
-     * Singleton enabling the static use of this service.
-     */
-    private static JobService instance;
     /**
      * Repository for creating job entities in the database.
      */
@@ -44,10 +47,6 @@ public class JobService {
     public JobService(JobDbRepository jobDbRepository, SafaUserService safaUserService) {
         this.jobDbRepository = jobDbRepository;
         this.safaUserService = safaUserService;
-    }
-
-    public static JobService getInstance() {
-        return instance;
     }
 
     public void deleteJob(UUID jobId) {
@@ -152,15 +151,31 @@ public class JobService {
         throw new SafaError("Could not find job with id:" + jobId);
     }
 
-    /**
-     * Sets static instance to be used in non-components.
-     */
-    @PostConstruct
-    public void init() {
-        instance = this;
+    public void setJobName(JobDbEntity jobDbEntity, String newName) {
+        jobDbEntity.setName(newName);
+        this.jobDbRepository.save(jobDbEntity);
     }
 
     private Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    public void runJobWorker(JobDbEntity jobDbEntity,
+                             ServiceProvider serviceProvider,
+                             JobWorker jobCreationThread) throws
+        JobExecutionAlreadyRunningException, JobRestartException,
+        JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        JobParameters jobParameters =
+            new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis()).toJobParameters();
+
+        try {
+            jobCreationThread.initJobData();
+        } catch (Exception e) {
+            serviceProvider.getJobService().failJob(jobDbEntity);
+            throw new SafaError("Failed to start job.");
+        }
+        JobLauncher jobLauncher = serviceProvider.getJobLauncher();
+        jobLauncher.run(jobCreationThread, jobParameters);
     }
 }

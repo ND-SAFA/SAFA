@@ -1,7 +1,6 @@
 import { IOHandlerCallback, Job } from "@/types";
 import {
   connect,
-  createFlatFileUploadJob,
   deleteJobById,
   Endpoint,
   fillEndpoint,
@@ -30,25 +29,13 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 }
 
 /**
- * Submits new job to upload flat files to project version with given id.
- * Then, subscribes to job updates via websocket messages which update the
- * store.
- *
- * @param versionId - The project version to commit entities from flat files to.
- * @param formData - The data containing the flat files.
- * @return The created job.
+ * Subscribes to job updates via websocket messages, updates the
+ * store, and selects the job.
  */
-export async function handleJobSubmission(
-  versionId: string,
-  formData: FormData
-): Promise<Job> {
-  const job = await createFlatFileUploadJob(versionId, formData);
-
+export async function handleJobSubmission(job: Job): Promise<void> {
   await connectAndSubscribeToJob(job.id);
   jobModule.addOrUpdateJob(job);
   jobModule.selectJob(job);
-
-  return job;
 }
 
 /**

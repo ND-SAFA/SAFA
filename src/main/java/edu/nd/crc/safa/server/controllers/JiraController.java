@@ -71,7 +71,7 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public JobAppEntity pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
+    public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
                                         @PathVariable("cloudId") String cloudId) throws Exception {
         JobService jobService = this.serviceProvider.getJobService();
         // Step - Create job identifier
@@ -133,7 +133,7 @@ public class JiraController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") @NotNull String cloudId) {
+    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {

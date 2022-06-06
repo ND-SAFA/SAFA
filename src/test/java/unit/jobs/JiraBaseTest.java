@@ -13,13 +13,9 @@ import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Sets up internal SAFA and JIRA authentication in order to skip
@@ -33,12 +29,8 @@ public class JiraBaseTest extends JobBaseTest {
     Long jiraProjectId = (long) 1;
 
     @BeforeEach
-    public void setAuthorization() {
-        Claims claims = Jwts.claims().setSubject(currentUsername);
-        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(claims,
-            null,
-            new ArrayList<>());
-        SecurityContextHolder.getContext().setAuthentication(authorization);
+    public void setJiraAuthorization() {
+        setAuthorization();
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();

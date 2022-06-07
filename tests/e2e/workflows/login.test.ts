@@ -1,9 +1,10 @@
-import { NightwatchTests, NightwatchBrowser } from "nightwatch";
+import { NightwatchBrowser } from "nightwatch";
 import { LoginPage } from "../types";
+import buildTests from "../buildTests";
 
-const loginTests: NightwatchTests = {
+export default buildTests<LoginPage>("LoginPage", (getPage) => ({
   "I cant log in with invalid credentials"(browser: NightwatchBrowser) {
-    const page: LoginPage = browser.page.LoginPage();
+    const page = getPage(browser);
 
     page
       .navigate()
@@ -14,6 +15,4 @@ const loginTests: NightwatchTests = {
 
     browser.end();
   },
-};
-
-export default loginTests;
+}));

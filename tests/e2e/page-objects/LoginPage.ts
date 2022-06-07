@@ -1,7 +1,16 @@
-import { PageObjectModel } from "nightwatch";
-import { LoginPage } from "../types";
+import {
+  LoginPage,
+  LoginPageCommands,
+  LoginPageModel,
+  LoginPageElements,
+} from "../types";
+import { buildPageModel } from "./BasePage";
 
-const loginPage: PageObjectModel = {
+export default buildPageModel<
+  LoginPageCommands,
+  LoginPageElements,
+  LoginPageModel
+>({
   url: "http://localhost:8080/",
   elements: {
     loginView: "#login-view",
@@ -9,46 +18,15 @@ const loginPage: PageObjectModel = {
     profileImage: "#my-account",
   },
   commands: {
-    setInputText(
-      this: LoginPage,
-      inputLabel: string,
-      inputValue: string
-    ): LoginPage {
-      const inputWrapperSelector = `//label[contains(text(),'${inputLabel}')]`;
-      const inputSelector = `${inputWrapperSelector}/following-sibling::*[1]`;
-
-      return this.useXpath()
-        .moveToElement(inputWrapperSelector, 0, 0)
-        .setValue(inputSelector, inputValue);
-    },
-    clickButton(this: LoginPage, buttonLabel: string): LoginPage {
-      const buttonSelector = `(//span[contains(text(),'${buttonLabel}')])[last()]`;
-
-      return this.useXpath()
-        .moveToElement(buttonSelector, 0, 0)
-        .click(buttonSelector);
-    },
-    isButtonClickable(
-      this: LoginPage,
-      buttonLabel: string,
-      testLabel: string
-    ): LoginPage {
-      const buttonSelector = `//*[contains(text(),'${buttonLabel}')]/parent::button`;
-
-      this.useXpath()
-        .expect.element(buttonSelector)
-        .to.have.attribute("disabled", testLabel)
-        .match(/true\b/);
-
-      return this;
-    },
     loginSession(this: LoginPage, email: string, password: string): LoginPage {
       this.setInputText("Email", email).isButtonClickable(
         "Login",
         "Login: Login button is disabled without a valid password entered"
       );
 
-      return this.setInputText("Password", password).clickButton("Login");
+      this.setInputText("Password", password).clickButton("Login");
+
+      return this;
     },
     checkLoginSuccess(this: LoginPage): LoginPage {
       this.waitForElementVisible(
@@ -70,6 +48,4 @@ const loginPage: PageObjectModel = {
       return this;
     },
   },
-};
-
-export default loginPage;
+});

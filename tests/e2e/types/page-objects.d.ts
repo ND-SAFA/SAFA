@@ -1,46 +1,49 @@
-import { EnhancedPageObject } from "nightwatch";
+import { EnhancedPageObject, PageElements, PageObjectModel } from "nightwatch";
 
-export type LoginPage = EnhancedPageObject<
-  {
-    /**
-     * Sets the value of an input field.
-     *
-     * @param inputLabel - The label of the input being set.
-     * @param inputValue - The value to set.
-     */
-    setInputText(inputLabel: string, inputValue: string): LoginPage;
-    /**
-     * Clicks a button.
-     *
-     * @param buttonLabel - The label of the button to click.
-     */
-    clickButton(buttonLabel: string): LoginPage;
-    /**
-     * Checks if a button can be clicked.
-     *
-     * @param buttonLabel - The label of the button to check.
-     * @param testLabel - The label of the test checking whether the button is clickable.
-     */
-    isButtonClickable(buttonLabel: string, testLabel: string): LoginPage;
-    /**
-     * Logs in to a session.
-     *
-     * @param email - The email to use.
-     * @param password - The password to use.
-     */
-    loginSession(email: string, password: string): LoginPage;
-    /**
-     * Checks that the login succeeded.
-     */
-    checkLoginSuccess(): LoginPage;
-    /**
-     * Checks that the login failed.
-     */
-    checkLoginFailure(): LoginPage;
-  },
-  {
-    loginView: string;
-    loginError: string;
-    profileImage: string;
-  }
+/**
+ * Represents a generic page model.
+ */
+export interface PageModel<Commands, Elements extends PageElements>
+  extends PageObjectModel {
+  commands: Commands;
+  elements: Elements;
+}
+
+/**
+ * Represents the commands on the base page object.
+ */
+interface BasePageCommands {
+  /**
+   * Sets the value of an input field.
+   *
+   * @param inputLabel - The label of the input being set.
+   * @param inputValue - The value to set.
+   */
+  setInputText(inputLabel: string, inputValue: string): BasePage;
+  /**
+   * Clicks a button.
+   *
+   * @param buttonLabel - The label of the button to click.
+   */
+  clickButton(buttonLabel: string): BasePage;
+  /**
+   * Checks if a button can be clicked.
+   *
+   * @param buttonLabel - The label of the button to check.
+   * @param testLabel - The label of the test checking whether the button is clickable.
+   */
+  isButtonClickable(buttonLabel: string, testLabel: string): BasePage;
+}
+
+/**
+ * Represents the login page model.
+ */
+export type BasePageModel = PageModel<BasePageCommands, Record<string, string>>;
+
+/**
+ * Represents the login page object.
+ */
+export type BasePage = EnhancedPageObject<
+  BasePageCommands,
+  Record<string, string>
 >;

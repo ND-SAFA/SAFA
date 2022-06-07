@@ -63,7 +63,7 @@ public class TestJiraProjectCreation extends JiraBaseTest {
     private JiraProjectResponseDTO createMockJiraProject() {
         JiraProjectResponseDTO mockJiraResponse = new JiraProjectResponseDTO();
 
-        mockJiraResponse.setKey("Mock Project Name");
+        mockJiraResponse.setName("Mock Project Name");
         mockJiraResponse.setDescription("sample project description");
         return mockJiraResponse;
     }

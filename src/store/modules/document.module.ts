@@ -9,7 +9,6 @@ import {
   handleResetGraph,
   setCurrentDocument,
 } from "@/api";
-import doc = Mocha.reporters.doc;
 
 @Module({ namespaced: true, name: "document" })
 /**

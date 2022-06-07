@@ -10,6 +10,7 @@
  */
 
 module.exports = {
+  '@disabled': true, // this will prevent this from being run as a test
   url: "/",
   commands: [],
 

@@ -2,7 +2,7 @@ import { PageObjectModel } from "nightwatch";
 import { LoginPage } from "../types";
 
 const loginPage: PageObjectModel = {
-  url: "http://localhost:8081/",
+  url: "http://localhost:8080/",
   elements: {
     loginView: "#login-view",
     loginError: ".v-messages__message",
@@ -42,12 +42,6 @@ const loginPage: PageObjectModel = {
 
       return this;
     },
-    /**
-     * Logs in to a session.
-     *
-     * @param email - The email to use.
-     * @param password - The password to use.
-     */
     loginSession(this: LoginPage, email: string, password: string): LoginPage {
       this.setInputText("Email", email).isButtonClickable(
         "Login",

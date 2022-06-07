@@ -11,7 +11,7 @@ export interface LoginPageCommands extends BasePageCommands {
    * @param email - The email to use.
    * @param password - The password to use.
    */
-  loginSession(email: string, password: string): LoginPage;
+  enterLogin(email: string, password: string): LoginPage;
   /**
    * Checks that the login succeeded.
    */
@@ -20,6 +20,10 @@ export interface LoginPageCommands extends BasePageCommands {
    * Checks that the login failed.
    */
   checkLoginFailure(): LoginPage;
+  /**
+   * Logs out of a session and verifies that the user is logged out.
+   */
+  checkLogout(): LoginPage;
 }
 
 /**
@@ -35,9 +39,9 @@ export interface LoginPageElements extends PageElements {
    */
   loginError: string;
   /**
-   * Selector for the profile image once logged in.
+   * Selector for the account dropdown once logged in.
    */
-  profileImage: string;
+  accountDropdown: string;
 }
 
 /**

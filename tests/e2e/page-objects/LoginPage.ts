@@ -15,10 +15,10 @@ export default buildPageModel<
   elements: {
     loginView: "#login-view",
     loginError: ".v-messages__message",
-    profileImage: "#my-account",
+    accountDropdown: "#account-dropdown",
   },
   commands: {
-    loginSession(this: LoginPage, email: string, password: string): LoginPage {
+    enterLogin(this: LoginPage, email: string, password: string): LoginPage {
       this.setInputText("Email", email).isButtonClickable(
         "Login",
         "Login: Login button is disabled without a valid password entered"
@@ -29,9 +29,9 @@ export default buildPageModel<
       return this;
     },
     checkLoginSuccess(this: LoginPage): LoginPage {
-      this.waitForElementVisible(
-        "@profileImage",
-        2000,
+      this.useCss().waitForElementVisible(
+        "@accountDropdown",
+        5000,
         undefined,
         true,
         undefined,
@@ -44,6 +44,21 @@ export default buildPageModel<
       this.useCss()
         .expect.element("@loginError")
         .text.to.contain("Invalid username or password");
+
+      return this;
+    },
+    checkLogout(this: LoginPage): LoginPage {
+      this.click("@accountDropdown")
+        .clickButton("Logout")
+        .useCss()
+        .waitForElementVisible(
+          "@loginView",
+          5000,
+          undefined,
+          true,
+          undefined,
+          "Login: The user is successfully logged out"
+        );
 
       return this;
     },

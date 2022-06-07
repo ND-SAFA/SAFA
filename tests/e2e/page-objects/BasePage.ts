@@ -3,11 +3,7 @@ import { PageElements } from "nightwatch";
 
 const basePage: BasePageModel = {
   url: "http://localhost:8080/",
-  elements: {
-    loginView: "#login-view",
-    loginError: ".v-messages__message",
-    profileImage: "#my-account",
-  },
+  elements: {},
   commands: {
     setInputText(
       this: BasePage,
@@ -42,6 +38,23 @@ const basePage: BasePageModel = {
 
       return this;
     },
+
+    waitForLoad(this: BasePage): BasePage {
+      this.navigate().useCss().waitForElementVisible("#login-view", 5000);
+
+      return this;
+    },
+    // TODO: find a safe way of injecting login credentials.
+    authenticate(this: BasePage): BasePage {
+      this.waitForLoad()
+        .setInputText("Email", "tjnewman111@gmail.com")
+        .setInputText("Password", "123")
+        .clickButton("Login")
+        .useCss()
+        .waitForElementVisible(".mdi-account-circle", 5000);
+
+      return this;
+    },
   },
 };
 
@@ -56,6 +69,10 @@ export function buildPageModel<
 >(page: PageModel<Omit<C, keyof BasePageCommands>, E>): T {
   return {
     ...page,
+    elements: {
+      ...basePage.elements,
+      ...page.elements,
+    },
     commands: {
       ...basePage.commands,
       ...page.commands,

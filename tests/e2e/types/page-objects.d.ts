@@ -33,15 +33,24 @@ interface BasePageCommands {
    * @param testLabel - The label of the test checking whether the button is clickable.
    */
   isButtonClickable(buttonLabel: string, testLabel: string): BasePage;
+
+  /**
+   * Waits for the login page to load.
+   */
+  waitForLoad(): BasePage;
+  /**
+   * Starts the app by waiting for load and logging in.
+   */
+  authenticate(): BasePage;
 }
 
 /**
- * Represents the login page model.
+ * Represents the base page model.
  */
 export type BasePageModel = PageModel<BasePageCommands, Record<string, string>>;
 
 /**
- * Represents the login page object.
+ * Represents the base page object.
  */
 export type BasePage = EnhancedPageObject<
   BasePageCommands,

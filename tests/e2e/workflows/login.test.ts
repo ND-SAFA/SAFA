@@ -32,4 +32,28 @@ export default buildTests<LoginPage>("LoginPage", (getPage) => ({
 
     browser.end();
   },
+  "When I log out, all stored project information is cleared"(
+    browser: NightwatchBrowser
+  ) {
+    const page = getPage(browser);
+
+    page.authenticate();
+    page.checkLogout();
+
+    browser.execute(
+      () => JSON.parse(localStorage.getItem("vuex") || ""),
+      [],
+      ({ value: store }) => {
+        page.assert.deepStrictEqual(
+          store,
+          {
+            session: { session: { token: "", versionId: "" } },
+          },
+          "Login: the session token has been cleared"
+        );
+      }
+    );
+
+    browser.end();
+  },
 }));

@@ -9,20 +9,16 @@ import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for collecting all parsing errors in a project version.
  */
 @Service
+@AllArgsConstructor
 public class CommitErrorRetrievalService {
     private final CommitErrorRepository commitErrorRepository;
-
-    @Autowired
-    public CommitErrorRetrievalService(CommitErrorRepository commitErrorRepository) {
-        this.commitErrorRepository = commitErrorRepository;
-    }
 
     /**
      * Retrieves, collections, and separates errors generated during given project version.

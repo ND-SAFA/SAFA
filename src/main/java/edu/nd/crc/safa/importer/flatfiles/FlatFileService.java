@@ -21,10 +21,10 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 
+import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -34,23 +34,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("singleton")
+@AllArgsConstructor
 public class FlatFileService {
 
     private final CommitErrorRepository commitErrorRepository;
     private final EntityVersionService entityVersionService;
     private final ArtifactFileParser artifactFileParser;
     private final TraceLinkGenerator traceLinkGenerator;
-
-    @Autowired
-    public FlatFileService(CommitErrorRepository commitErrorRepository,
-                           EntityVersionService entityVersionService,
-                           ArtifactFileParser artifactFileParser,
-                           TraceLinkGenerator traceLinkGenerator) {
-        this.commitErrorRepository = commitErrorRepository;
-        this.entityVersionService = entityVersionService;
-        this.artifactFileParser = artifactFileParser;
-        this.traceLinkGenerator = traceLinkGenerator;
-    }
 
     /**
      * Constructs a project from the specification in TIM.json file.

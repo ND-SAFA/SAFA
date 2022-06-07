@@ -20,6 +20,7 @@ import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,22 +28,13 @@ import org.springframework.stereotype.Service;
  * and its related fields.
  */
 @Service
+@AllArgsConstructor
 public class DocumentService {
 
     private final ProjectRetriever artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
-    NotificationService notificationService;
-
-    public DocumentService(ProjectRetriever artifactRepository,
-                           DocumentArtifactRepository documentArtifactRepository,
-                           DocumentColumnRepository documentColumnRepository,
-                           NotificationService notificationService) {
-        this.artifactRepository = artifactRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
-        this.documentColumnRepository = documentColumnRepository;
-        this.notificationService = notificationService;
-    }
+    private final NotificationService notificationService;
 
     /**
      * Compares the artifacts linked to document with the one's given and creates / deletes links as necessary.

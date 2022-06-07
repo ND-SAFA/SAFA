@@ -1,7 +1,6 @@
 package unit.warnings;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Hashtable;
 
@@ -27,7 +26,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
      * Uses atLeastOneRequirementOrDesignOrProcessForRequirement default rule to expect
      * 1. No warning retrieved on an empty project
      * 2. Single warning retrieved when a sole requirement exists
-     * 3. No warning exists with a second design artifact is connecte to requirement
+     * 3. No warning exists with a second design artifact is connected to requirement
      */
     @Test
     public void testRetrievingProjectWarnings() throws Exception {
@@ -128,6 +127,6 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Warnings.getWarningsInProjectVersion)
             .withVersion(projectVersion)
             .get();
-        return sendGet(endpoint, status().is2xxSuccessful());
+        return sendGet(endpoint);
     }
 }

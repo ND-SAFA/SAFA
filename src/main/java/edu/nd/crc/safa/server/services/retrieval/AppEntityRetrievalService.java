@@ -28,10 +28,11 @@ import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.services.CurrentDocumentService;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("singleton")
+@AllArgsConstructor
 public class AppEntityRetrievalService {
 
     private final DocumentRepository documentRepository;
@@ -56,30 +58,10 @@ public class AppEntityRetrievalService {
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final DocumentColumnRepository documentColumnRepository;
+    private final CurrentDocumentService currentDocumentService;
 
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-
-    @Autowired
-    public AppEntityRetrievalService(DocumentRepository documentRepository,
-                                     TraceLinkVersionRepository traceLinkVersionRepository,
-                                     DocumentArtifactRepository documentArtifactRepository,
-                                     ProjectMembershipRepository projectMembershipRepository,
-                                     ArtifactVersionRepository artifactVersionRepository,
-                                     ArtifactTypeRepository artifactTypeRepository,
-                                     DocumentColumnRepository documentColumnRepository,
-                                     WarningService warningService,
-                                     CommitErrorRetrievalService commitErrorRetrievalService) {
-        this.documentRepository = documentRepository;
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.projectMembershipRepository = projectMembershipRepository;
-        this.documentColumnRepository = documentColumnRepository;
-        this.warningService = warningService;
-        this.commitErrorRetrievalService = commitErrorRetrievalService;
-    }
 
     /**
      * Finds project, artifact, traces, errors, and warnings related with given project version.
@@ -115,7 +97,10 @@ public class AppEntityRetrievalService {
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
+
+        // Documents
         List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
+        String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
 
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
@@ -128,6 +113,7 @@ public class AppEntityRetrievalService {
             traces,
             projectMembers,
             documents,
+            currentDocumentId,
             artifactTypes,
             errors);
     }

@@ -8,7 +8,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,14 +22,10 @@ import org.springframework.stereotype.Component;
  * <p>Such that the keys are in lower case.
  */
 @Component
+@AllArgsConstructor
 public class ArtifactTypeService {
 
     private final ArtifactTypeRepository artifactTypeRepository;
-
-    @Autowired
-    public ArtifactTypeService(ArtifactTypeRepository artifactTypeRepository) {
-        this.artifactTypeRepository = artifactTypeRepository;
-    }
 
     public ArtifactType findArtifactType(Project project, String typeName)
         throws SafaError {

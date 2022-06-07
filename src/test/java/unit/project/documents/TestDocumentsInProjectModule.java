@@ -1,7 +1,6 @@
 package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -37,7 +36,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
             .withVersion(projectVersion)
             .get();
-        JSONObject projectJson = sendGet(route, status().isOk());
+        JSONObject projectJson = sendGet(route);
 
         // VP - Verify that documents has empty list
         assertThat(projectJson.getJSONArray("documents").length()).isEqualTo(0);
@@ -49,7 +48,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
         dbEntityBuilder.newDocument(projectName, docName, docDescription, docType);
 
         // VP - Verify that project meta data contains a single document
-        projectJson = sendGet(route, status().isOk());
+        projectJson = sendGet(route);
         JSONArray documentsJson = projectJson.getJSONArray("documents");
         assertThat(documentsJson.length()).isEqualTo(1);
 

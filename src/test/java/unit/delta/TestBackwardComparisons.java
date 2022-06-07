@@ -11,7 +11,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -33,7 +32,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .get();
-        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(backwardRouteName);
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
@@ -76,7 +75,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject projectDelta = sendGet(backwardRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(backwardRouteName);
 
 
         // VP - Verify that no changes are detected in artifacts

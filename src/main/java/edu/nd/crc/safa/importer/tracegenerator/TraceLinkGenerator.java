@@ -13,18 +13,15 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Responsible for generating trace links for given projects.
  */
 @Component
+@NoArgsConstructor
 public class TraceLinkGenerator {
-
-    @Autowired
-    public TraceLinkGenerator() {
-    }
 
     public List<TraceAppEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,
                                                                         List<ArtifactAppEntity> targetDocs) {

@@ -8,20 +8,16 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
 import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for finding, creating, and deleting trace matrices.
  */
 @Service
+@AllArgsConstructor
 public class TraceMatrixService {
     private final TraceMatrixRepository traceMatrixRepository;
-
-    @Autowired
-    public TraceMatrixService(TraceMatrixRepository traceMatrixRepository) {
-        this.traceMatrixRepository = traceMatrixRepository;
-    }
 
     public void assertOrCreateTraceMatrix(Project project,
                                           ArtifactType sourceArtifactType,

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.server.controllers.documents;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides CRUD endpoints for document-artifact relations.
  */
 @RestController
-public class DocumentArtifactController extends BaseController {
+public class DocumentArtifactController extends BaseDocumentController {
 
-    private final DocumentRepository documentRepository;
     private final ProjectRetriever artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
@@ -45,8 +44,7 @@ public class DocumentArtifactController extends BaseController {
                                       DocumentArtifactRepository documentArtifactRepository,
                                       NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {
-        super(resourceBuilder);
-        this.documentRepository = documentRepository;
+        super(resourceBuilder, documentRepository);
         this.artifactRepository = artifactRepository;
         this.documentArtifactRepository = documentArtifactRepository;
         this.notificationService = notificationService;

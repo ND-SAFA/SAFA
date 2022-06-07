@@ -1,7 +1,6 @@
 package unit.project.matrices;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -38,7 +37,7 @@ public class GetTraceMatrices extends TraceMatrixBaseTest {
             .withRoute(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
             .withProject(project)
             .get();
-        JSONObject projectMatrices = sendGet(route, status().isOk());
+        JSONObject projectMatrices = sendGet(route);
 
         // VP - Assert that no matrix exists for project.
         assertThat(projectMatrices.has(sourceArtifactTypeName)).isTrue();

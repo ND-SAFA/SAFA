@@ -2,7 +2,7 @@
 const headless = false;
 
 module.exports = {
-  src_folders: ["./distrib//workflows"],
+  src_folders: ["./distrib/workflows"],
   page_objects_path: ["./distrib/page-objects"],
   webdriver: {
     start_process: true,

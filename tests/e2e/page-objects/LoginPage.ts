@@ -1,31 +1,14 @@
-import { PageObjectModel, EnhancedPageObject } from "nightwatch";
-
-export type LoginPage = EnhancedPageObject<
-  {
-    setInputText(inputLabel: string, inputValue: string): LoginPage;
-    clickButton(buttonLabel: string): LoginPage;
-    isButtonClickable(buttonLabel: string, testLabel: string): LoginPage;
-    loginSession(email: string, password: string): LoginPage;
-  },
-  {
-    loginView: string;
-    profileImage: string;
-  }
->;
+import { PageObjectModel } from "nightwatch";
+import { LoginPage } from "../types";
 
 const loginPage: PageObjectModel = {
-  url: "http://localhost:8080/",
+  url: "http://localhost:8081/",
   elements: {
     loginView: "#login-view",
+    loginError: ".v-messages__message",
     profileImage: "#my-account",
   },
   commands: {
-    /**
-     * Sets the value of an input field.
-     *
-     * @param inputLabel - The label of the input being set.
-     * @param inputValue - The value to set.
-     */
     setInputText(
       this: LoginPage,
       inputLabel: string,
@@ -38,11 +21,6 @@ const loginPage: PageObjectModel = {
         .moveToElement(inputWrapperSelector, 0, 0)
         .setValue(inputSelector, inputValue);
     },
-    /**
-     * Clicks a button.
-     *
-     * @param buttonLabel - The label of the button to click.
-     */
     clickButton(this: LoginPage, buttonLabel: string): LoginPage {
       const buttonSelector = `(//span[contains(text(),'${buttonLabel}')])[last()]`;
 
@@ -50,12 +28,6 @@ const loginPage: PageObjectModel = {
         .moveToElement(buttonSelector, 0, 0)
         .click(buttonSelector);
     },
-    /**
-     * Checks if a button can be clicked
-     *
-     * @param buttonLabel - The label of the button to check.
-     * @param testLabel - The label of the test checking whether the button is clickable.
-     */
     isButtonClickable(
       this: LoginPage,
       buttonLabel: string,
@@ -82,16 +54,26 @@ const loginPage: PageObjectModel = {
         "Login: Login button is disabled without a valid password entered"
       );
 
-      return this.setInputText("Password", password)
-        .clickButton("Login")
-        .waitForElementVisible(
-          "@profileImage",
-          2000,
-          undefined,
-          true,
-          undefined,
-          "Login: The user is successfully logged in"
-        );
+      return this.setInputText("Password", password).clickButton("Login");
+    },
+    checkLoginSuccess(this: LoginPage): LoginPage {
+      this.waitForElementVisible(
+        "@profileImage",
+        2000,
+        undefined,
+        true,
+        undefined,
+        "Login: The user is successfully logged in"
+      );
+
+      return this;
+    },
+    checkLoginFailure(this: LoginPage): LoginPage {
+      this.useCss()
+        .expect.element("@loginError")
+        .text.to.contain("Invalid username or password");
+
+      return this;
     },
   },
 };

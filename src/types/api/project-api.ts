@@ -2,7 +2,6 @@ import {
   Artifact,
   ArtifactDeltaState,
   TraceLink,
-  Project,
   ProjectVersion,
 } from "@/types/domain";
 

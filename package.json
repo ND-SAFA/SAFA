@@ -13,7 +13,7 @@
     "serve:bend": "vue-cli-service serve --mode=bend",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "tsc tests/e2e/workflows/*.ts --outDir distrib && nightwatch",
+    "test:e2e": "tsc tests/e2e/**/*.ts --outDir distrib && nightwatch",
     "test:e2e:debug": "node --inspect-brk node_modules/nightwatch/bin/nightwatch",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",

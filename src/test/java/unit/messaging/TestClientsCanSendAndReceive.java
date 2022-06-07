@@ -36,7 +36,7 @@ public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
             .subscribeToVersion(clientTwo, projectVersion);
 
         // Step - Upload flat files
-        this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Artifact and traces received
         assertThat(getQueueSize(clientOne)).isEqualTo(1);

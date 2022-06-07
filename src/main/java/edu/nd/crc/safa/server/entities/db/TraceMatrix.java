@@ -51,7 +51,7 @@ public class TraceMatrix {
         nullable = false
     )
     ArtifactType sourceArtifactType;
-    
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(

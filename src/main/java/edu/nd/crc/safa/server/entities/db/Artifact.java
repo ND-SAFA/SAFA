@@ -15,10 +15,10 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 
+import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for storing the unique identifiers for artifacts
@@ -33,6 +33,7 @@ import org.json.JSONObject;
                 "name"
             }, name = AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT)
     })
+@Data
 public class Artifact implements Serializable, IBaseEntity, IArtifact {
 
     @Id
@@ -74,50 +75,8 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
         this.documentType = documentType;
     }
 
-    public DocumentType getDocumentType() {
-        return documentType;
-    }
-
-    public void setDocumentType(DocumentType documentType) {
-        this.documentType = documentType;
-    }
-
-    public Project getProject() {
-        return this.project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public ArtifactType getType() {
-        return this.type;
-    }
-
-    public void setType(ArtifactType artifactType) {
-        this.type = artifactType;
-    }
-
+    @Override
     public String getBaseEntityId() {
         return this.artifactId.toString();
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public UUID getArtifactId() {
-        return this.artifactId;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("name", this.name);
-        json.put("docType", this.documentType);
-        return json.toString();
     }
 }

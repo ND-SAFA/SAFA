@@ -33,6 +33,10 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     public static SafaUser currentUser;
     protected String token;
 
+    public void sendDelete(String routeName) throws Exception {
+        sendDelete(routeName, status().isNoContent());
+    }
+
     @BeforeEach
     public void createData() throws Exception {
         token = null;
@@ -47,6 +51,10 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         currentUser = safaUserService.getUserFromUsername(currentUsername);
     }
 
+    public JSONObject sendGet(String routeName) throws Exception {
+        return sendGet(routeName, status().isOk());
+    }
+
     public JSONObject sendGet(String routeName,
                               ResultMatcher test) throws Exception {
         assertTokenExists();
@@ -57,6 +65,10 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
                                               ResultMatcher test) throws Exception {
         assertTokenExists();
         return sendRequestWithCreator(get(routeName), test, this.token, EntityBaseTest::arrayCreator);
+    }
+
+    public JSONObject sendPost(String routeName, Object body) throws Exception {
+        return sendPost(routeName, body, status().is2xxSuccessful());
     }
 
     public JSONObject sendPost(String routeName,

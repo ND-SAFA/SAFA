@@ -25,7 +25,7 @@ public class AppRoutes {
 
     public static class Projects {
         private static final String projectPrefix = "/projects";
-        public static final String  retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
+        public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;
@@ -54,6 +54,8 @@ public class AppRoutes {
             public static final String createOrUpdateDocument = projectPrefix + "/versions/{versionId}/documents";
             public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";
             public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
+            public static final String setCurrentDocument = projectPrefix + "/documents/current/{documentId}";
+            public static final String clearCurrentDocument = projectPrefix + "/documents/current";
         }
 
         public static class DocumentArtifact {

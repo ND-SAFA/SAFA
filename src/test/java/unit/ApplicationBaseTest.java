@@ -15,16 +15,21 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.javatuples.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +41,19 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
+
+    public void setAuthorization() {
+        Claims claims = Jwts.claims().setSubject(currentUsername);
+        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(claims,
+            null,
+            new ArrayList<>());
+        SecurityContextHolder.getContext().setAuthentication(authorization);
+    }
+
+    public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+    }
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
                                          String pathToFileDir) throws Exception {
@@ -61,7 +79,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
-            ProjectPaths.PATH_TO_BEFORE_FILES,
+            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
         fileUploadService.uploadFilesToServer(project, files);
         return projectVersion;
@@ -101,7 +119,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
 
         if (uploadFiles) {
-            uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+            uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
             uploadFlatFilesToVersion(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
         }
 

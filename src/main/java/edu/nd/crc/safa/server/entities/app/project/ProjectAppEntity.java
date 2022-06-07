@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -15,16 +16,12 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 /**
  * Represents the front-end model of a project.
  */
-@Getter
-@Setter
-@ToString
+@Data
 public class ProjectAppEntity {
     @NotNull
     public String projectId;
@@ -40,6 +37,8 @@ public class ProjectAppEntity {
     public List<@Valid @NotNull TraceAppEntity> traces;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public List<ProjectMemberAppEntity> members;
+    @Nullable
+    public String currentDocumentId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public List<@Valid @NotNull DocumentAppEntity> documents;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -64,6 +63,7 @@ public class ProjectAppEntity {
                             List<TraceAppEntity> traces,
                             List<ProjectMemberAppEntity> members,
                             List<DocumentAppEntity> documents,
+                            @Nullable String currentDocumentId,
                             List<ArtifactType> artifactTypes,
                             ProjectParsingErrors errors) {
         this();
@@ -76,6 +76,7 @@ public class ProjectAppEntity {
         this.traces = traces;
         this.members = members;
         this.documents = documents;
+        this.currentDocumentId = currentDocumentId;
         this.artifactTypes = artifactTypes;
         this.errors = errors;
     }

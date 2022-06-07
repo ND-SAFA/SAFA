@@ -6,7 +6,7 @@ import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -22,17 +22,13 @@ import reactor.netty.http.client.HttpClient;
  * implementation for the application.
  */
 @Configuration
+@AllArgsConstructor
 public class JiraConfiguration {
 
     private static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
-
     private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
-    JiraProjectRepository jiraProjectRepository;
 
-    @Autowired
-    public JiraConfiguration(JiraProjectRepository jiraProjectRepository) {
-        this.jiraProjectRepository = jiraProjectRepository;
-    }
+    JiraProjectRepository jiraProjectRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {

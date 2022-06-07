@@ -12,7 +12,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -82,7 +81,7 @@ public class TestDeletedTraceLink extends ApplicationBaseTest {
             .get();
 
         // Step - Retrieve delta information
-        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(deltaRouteName);
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 

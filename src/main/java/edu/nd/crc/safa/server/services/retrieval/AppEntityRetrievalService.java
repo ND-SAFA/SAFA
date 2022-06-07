@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
@@ -29,11 +28,11 @@ import edu.nd.crc.safa.server.repositories.documents.DocumentColumnRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.server.services.CurrentDocumentService;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import lombok.AllArgsConstructor;
-import org.javatuples.Pair;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -49,9 +48,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("singleton")
+@AllArgsConstructor
 public class AppEntityRetrievalService {
 
-    private static AppEntityRetrievalService instance;
     private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
@@ -59,18 +58,10 @@ public class AppEntityRetrievalService {
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final DocumentColumnRepository documentColumnRepository;
+    private final CurrentDocumentService currentDocumentService;
 
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-
-    public static AppEntityRetrievalService getInstance() {
-        return instance;
-    }
-
-    @PostConstruct
-    void init() {
-        instance = this;
-    }
 
     /**
      * Finds project, artifact, traces, errors, and warnings related with given project version.
@@ -106,7 +97,10 @@ public class AppEntityRetrievalService {
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
+
+        // Documents
         List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
+        String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
 
         // Artifact types
         List<ArtifactType> artifactTypes = this.artifactTypeRepository.findByProject(project);
@@ -119,6 +113,7 @@ public class AppEntityRetrievalService {
             traces,
             projectMembers,
             documents,
+            currentDocumentId,
             artifactTypes,
             errors);
     }

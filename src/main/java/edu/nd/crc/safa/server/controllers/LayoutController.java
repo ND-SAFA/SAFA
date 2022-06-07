@@ -1,11 +1,13 @@
 package edu.nd.crc.safa.server.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.layout.CreateLayoutJob;
+import edu.nd.crc.safa.layout.KlayLayoutGenerator;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -55,7 +57,7 @@ public class LayoutController extends BaseController {
 
     //TODO: Add unit tests
     @PostMapping(AppRoutes.Projects.Layout.createLayoutForProject)
-    public JobAppEntity createLayoutForProject(@PathVariable UUID versionId) throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public Map<String, KlayLayoutGenerator.Position> createLayoutForProject(@PathVariable UUID versionId) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
         String name = createJobName("project", projectVersion);
@@ -63,12 +65,9 @@ public class LayoutController extends BaseController {
 
         ProjectAppEntity projectAppEntity =
             appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        CreateLayoutJob layoutGenerator = new CreateLayoutJob(jobDbEntity, projectAppEntity.artifacts,
-            projectAppEntity.traces);
 
-        jobService.runJobWorker(jobDbEntity, layoutGenerator);
-
-        return JobAppEntity.createFromJob(jobDbEntity);
+        KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(projectAppEntity);
+        return layoutGenerator.layout();
     }
 
     //TODO: Add unit tests

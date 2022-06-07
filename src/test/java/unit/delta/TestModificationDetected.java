@@ -14,7 +14,6 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 import unit.SampleProjectConstants;
 
@@ -22,6 +21,7 @@ import unit.SampleProjectConstants;
  * Tests that changes to the content of artifacts are retrieved.
  */
 public class TestModificationDetected extends ApplicationBaseTest {
+
 
     /**
      * Tests that modifications to artifact bodies are detected in
@@ -50,7 +50,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .get();
-        JSONObject projectDelta = sendGet(deltaRouteName, MockMvcResultMatchers.status().isOk());
+        JSONObject projectDelta = sendGet(deltaRouteName);
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 
@@ -59,7 +59,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(artifactDelta.getJSONObject("removed").has(getId(projectName, "D7"))).isTrue();
         assertThat(artifactDelta.getJSONObject("added").has(getId(projectName, "D12"))).isTrue();
 
-        ProjectAppEntity beforeAppEntity = this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(beforeVersion);
+        ProjectAppEntity beforeAppEntity = getProjectAtVersion(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity
             .getArtifacts()
             .stream().map(a -> a.name)
@@ -73,7 +73,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
 
         // Step - Collect list of artifact names in the after version.
-        ProjectAppEntity afterAppEntity = this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(afterVersion);
+        ProjectAppEntity afterAppEntity = getProjectAtVersion(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream()

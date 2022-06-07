@@ -1,7 +1,12 @@
 package edu.nd.crc.safa.layout;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
 import org.eclipse.elk.core.util.BasicProgressMonitor;
@@ -27,8 +32,28 @@ public class KlayLayoutGenerator {
      *
      * @return EkNode representing parent of all nodes (including islands).
      */
-    public ElkNode layout() {
+    public Map<String, Position> layout() {
         graphLayoutEngine.layout(graph, progressMonitor);
-        return graph;
+        Map<String, Position> positionMap = new Hashtable<>();
+        addPositionToMap(positionMap, graph);
+        return positionMap;
+    }
+
+    private void addPositionToMap(Map<String, Position> map, ElkNode graph) {
+        String id = graph.getIdentifier();
+        if (!map.containsKey(id)) {
+            Position graphPosition = new Position(graph.getX(), graph.getY());
+            map.put(id, graphPosition);
+            for (ElkNode child : graph.getChildren()) {
+                addPositionToMap(map, child);
+            }
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class Position {
+        double x;
+        double y;
     }
 }

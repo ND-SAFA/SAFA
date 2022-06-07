@@ -14,15 +14,16 @@ import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO.JiraResponseMessage;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
-import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
-import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
+import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.slf4j.Logger;
@@ -48,62 +49,48 @@ public class JiraController extends BaseController {
 
     private final JiraAccessCredentialsRepository accessCredentialsRepository;
 
-    private final AppEntityRetrievalService appEntityRetrievalService;
-    private final ProjectService projectService;
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
 
     private final ExecutorDelegate executorDelegate;
+    private final ServiceProvider serviceProvider;
 
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
-                          AppEntityRetrievalService appEntityRetrievalService,
-                          ProjectService projectService,
                           SafaUserService safaUserService,
                           JiraAccessCredentialsRepository accessCredentialsRepository,
                           JiraConnectionService jiraConnectionService,
-                          ExecutorDelegate executorDelegate) {
+                          ExecutorDelegate executorDelegate,
+                          ServiceProvider serviceProvider) {
         super(resourceBuilder);
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.projectService = projectService;
         this.safaUserService = safaUserService;
         this.accessCredentialsRepository = accessCredentialsRepository;
         this.jiraConnectionService = jiraConnectionService;
         this.executorDelegate = executorDelegate;
+        this.serviceProvider = serviceProvider;
     }
-    
+
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
-    public DeferredResult<ProjectAppEntity> pullJiraProject(@PathVariable("id") @NotNull Long jiraProjectId,
-                                                            @PathVariable("cloudId") String cloudId) {
-        DeferredResult<ProjectAppEntity> output = executorDelegate.createOutput(5000L);
+    public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
+                                        @PathVariable("cloudId") String cloudId) throws Exception {
+        JobService jobService = this.serviceProvider.getJobService();
+        // Step - Create job identifier
+        String jobName = JiraProjectCreationWorker.createJobName(jiraProjectId.toString());
+        JobDbEntity jobDbEntity = jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);
 
-        executorDelegate.submit(output, () -> {
-            // Step - Retrieve project
-            SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraProjectResponseDTO jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
-                jiraProjectId);
+        // Step - Create jira project creation job
+        JiraProjectCreationWorker job = new JiraProjectCreationWorker(
+            jobDbEntity,
+            serviceProvider,
+            jiraProjectId,
+            cloudId
+        );
 
-            // Step - Save project
-            String projectName = jiraProjectResponse.getKey();
-            String projectDescription = jiraProjectResponse.getDescription();
-            Project project = new Project(projectName, projectDescription);
-            this.projectService.saveProjectWithCurrentUserAsOwner(project);
+        // Step - Start job
+        jobService.runJobWorker(jobDbEntity, serviceProvider, job);
 
-            // Step - Map JIRA project to SAFA project
-            this.jiraConnectionService.createJiraProjectMapping(project, jiraProjectId);
-
-            // Step - Create initial version
-            ProjectVersion projectVersion = this.projectService.createInitialProjectVersion(project);
-
-            // Step - TODO: Save issues as artifacts and links
-
-            // Step - Respond with project
-            output.setResult(new ProjectAppEntity());
-        });
-
-        return output;
+        // Step - Respond with project
+        return JobAppEntity.createFromJob(jobDbEntity);
     }
 
     @PostMapping(AppRoutes.Accounts.jiraCredentials)
@@ -146,7 +133,7 @@ public class JiraController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") @NotNull String cloudId) {
+    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {

@@ -13,13 +13,13 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
-import edu.nd.crc.safa.server.services.JobService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.server.services.ServiceProvider;
+import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -48,7 +48,7 @@ public class JobController extends BaseController {
     AppEntityRetrievalService appEntityRetrievalService;
     NotificationService notificationService;
     TaskExecutor taskExecutor;
-    JobLauncher jobLauncher;
+    ServiceProvider serviceProvider;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -59,7 +59,7 @@ public class JobController extends BaseController {
                          AppEntityRetrievalService appEntityRetrievalService,
                          NotificationService notificationService,
                          TaskExecutor taskExecutor,
-                         JobLauncher jobLauncher) {
+                         ServiceProvider serviceProvider) {
         super(resourceBuilder);
         this.jobService = jobService;
         this.entityVersionService = entityVersionService;
@@ -68,7 +68,7 @@ public class JobController extends BaseController {
         this.appEntityRetrievalService = appEntityRetrievalService;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
-        this.jobLauncher = jobLauncher;
+        this.serviceProvider = serviceProvider;
     }
 
     @GetMapping(AppRoutes.Jobs.getJobs)
@@ -111,10 +111,11 @@ public class JobController extends BaseController {
 
         // Step 3 - Create job worker
         FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(jobDbEntity,
+            serviceProvider,
             projectVersion,
             files);
 
-        jobService.runJobWorker(jobDbEntity, jobCreationThread);
+        jobService.runJobWorker(jobDbEntity, serviceProvider, jobCreationThread);
 
         // Step 4 - Create job response
         return JobAppEntity.createFromJob(jobDbEntity);

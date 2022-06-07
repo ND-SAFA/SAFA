@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.server.controllers.documents;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides CRUD operations for Document entity.
  */
 @RestController
-public class DocumentController extends BaseController {
-
-    private final DocumentRepository documentRepository;
+public class DocumentController extends BaseDocumentController {
 
     private final DocumentService documentService;
     private final NotificationService notificationService;
@@ -45,8 +43,7 @@ public class DocumentController extends BaseController {
                               DocumentService documentService,
                               NotificationService notificationService,
                               AppEntityRetrievalService appEntityRetrievalService) {
-        super(resourceBuilder);
-        this.documentRepository = documentRepository;
+        super(resourceBuilder, documentRepository);
         this.documentService = documentService;
         this.notificationService = notificationService;
         this.appEntityRetrievalService = appEntityRetrievalService;

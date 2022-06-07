@@ -103,7 +103,7 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
         ProjectService projectService = this.serviceProvider.getProjectService();
 
         // Step - Save as SAFA project
-        String projectName = this.jiraProjectResponse.getKey();
+        String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
         Project project = new Project(projectName, projectDescription);
         projectService.saveProjectWithCurrentUserAsOwner(project);

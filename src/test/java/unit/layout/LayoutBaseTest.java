@@ -14,12 +14,11 @@ public class LayoutBaseTest extends ApplicationBaseTest {
     ProjectAppEntity project;
 
     @BeforeEach
-    //TODO: Merge this with other before each
     public void setupDefaultProject() throws Exception {
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
         this.project = getProjectAtVersion(projectVersion);
     }
 }

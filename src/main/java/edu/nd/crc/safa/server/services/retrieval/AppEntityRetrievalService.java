@@ -33,6 +33,7 @@ import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import lombok.AllArgsConstructor;
+import org.javatuples.Pair;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 

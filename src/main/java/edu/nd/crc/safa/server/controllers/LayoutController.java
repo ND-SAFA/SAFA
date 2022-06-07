@@ -17,7 +17,7 @@ import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.services.JobService;
+import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
@@ -96,7 +96,8 @@ public class LayoutController extends BaseController {
         JobDbEntity jobDbEntity = jobService.createNewJob(JobType.GENERATE_LAYOUT, jobName);
         CreateLayoutJob layoutGenerator = new CreateLayoutJob(jobDbEntity, artifacts, traces);
 
-        jobService.runJobWorker(jobDbEntity, layoutGenerator);
+        //TODO: Include our own service provider
+        jobService.runJobWorker(jobDbEntity, layoutGenerator.getServiceProvider(), layoutGenerator);
 
         return JobAppEntity.createFromJob(jobDbEntity);
     }

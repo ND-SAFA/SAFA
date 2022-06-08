@@ -19,9 +19,10 @@ export default class JobModule extends VuexModule {
   @Action
   /**
    * Adds job to list of jobs if new job, otherwise updates previous one.
+   * New or updated job will be first element of the list of jobs.
    */
   addOrUpdateJob(job: Job): void {
-    const newJobs = this.jobs.filter((j) => j.id !== job.id).concat([job]);
+    const newJobs = [job].concat(this.jobs.filter((j) => j.id !== job.id));
     this.SET_JOBS(newJobs);
   }
 

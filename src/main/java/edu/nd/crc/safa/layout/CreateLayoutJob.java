@@ -6,6 +6,7 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 
 /**
  * TODO: Define steps
@@ -16,9 +17,10 @@ public class CreateLayoutJob extends JobWorker {
     List<TraceAppEntity> traces;
 
     public CreateLayoutJob(JobDbEntity jobDbEntity,
+                           ServiceProvider serviceProvider,
                            List<ArtifactAppEntity> artifacts,
                            List<TraceAppEntity> traces) {
-        super(jobDbEntity);
+        super(jobDbEntity, serviceProvider);
         this.artifacts = artifacts;
         this.traces = traces;
     }

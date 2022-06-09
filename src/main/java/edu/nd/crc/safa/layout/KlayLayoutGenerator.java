@@ -35,7 +35,7 @@ public class KlayLayoutGenerator {
     public Map<String, Position> layout() {
         graphLayoutEngine.layout(graph, progressMonitor);
         Map<String, Position> positionMap = new Hashtable<>();
-        addPositionToMap(positionMap, graph);
+        addChildrenToMap(positionMap, graph);
         return positionMap;
     }
 
@@ -44,9 +44,13 @@ public class KlayLayoutGenerator {
         if (!map.containsKey(id)) {
             Position graphPosition = new Position(graph.getX(), graph.getY());
             map.put(id, graphPosition);
-            for (ElkNode child : graph.getChildren()) {
-                addPositionToMap(map, child);
-            }
+            addChildrenToMap(map, graph);
+        }
+    }
+
+    private void addChildrenToMap(Map<String, Position> map, ElkNode graph) {
+        for (ElkNode child : graph.getChildren()) {
+            addPositionToMap(map, child);
         }
     }
 

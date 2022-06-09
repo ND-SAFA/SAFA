@@ -17,6 +17,7 @@ import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
+import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
@@ -43,16 +44,19 @@ public class LayoutController extends BaseController {
 
     JobService jobService;
     AppEntityRetrievalService appEntityRetrievalService;
+    ServiceProvider serviceProvider;
 
     @Autowired
     public LayoutController(ResourceBuilder resourceBuilder,
                             DocumentRepository documentRepository,
                             JobService jobService,
-                            AppEntityRetrievalService appEntityRetrievalService) {
+                            AppEntityRetrievalService appEntityRetrievalService,
+                            ServiceProvider serviceProvider) {
         super(resourceBuilder);
         this.documentRepository = documentRepository;
         this.jobService = jobService;
         this.appEntityRetrievalService = appEntityRetrievalService;
+        this.serviceProvider = serviceProvider;
     }
 
     //TODO: Add unit tests
@@ -94,7 +98,7 @@ public class LayoutController extends BaseController {
                                       List<TraceAppEntity> traces) throws JobInstanceAlreadyCompleteException,
         JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobDbEntity jobDbEntity = jobService.createNewJob(JobType.GENERATE_LAYOUT, jobName);
-        CreateLayoutJob layoutGenerator = new CreateLayoutJob(jobDbEntity, artifacts, traces);
+        CreateLayoutJob layoutGenerator = new CreateLayoutJob(jobDbEntity, serviceProvider, artifacts, traces);
 
         //TODO: Include our own service provider
         jobService.runJobWorker(jobDbEntity, layoutGenerator.getServiceProvider(), layoutGenerator);

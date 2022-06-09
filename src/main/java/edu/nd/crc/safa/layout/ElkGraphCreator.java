@@ -39,14 +39,14 @@ public class ElkGraphCreator {
     public static Hashtable<String, ElkNode> createName2ElkNode(List<ArtifactAppEntity> artifacts) {
         Hashtable<String, ElkNode> nodes = new Hashtable<>();
         for (ArtifactAppEntity artifact : artifacts) {
-            nodes.put(artifact.name, createElkNodeFromArtifact(artifact));
+            nodes.put(artifact.id, createElkNodeFromArtifact(artifact));
         }
         return nodes;
     }
 
     private static ElkNode createElkNodeFromArtifact(ArtifactAppEntity artifact) {
         ElkNode elkNode = createNode();
-        elkNode.setIdentifier(artifact.name);
+        elkNode.setIdentifier(artifact.id);
         return elkNode;
     }
 
@@ -56,8 +56,8 @@ public class ElkGraphCreator {
             .stream()
             .filter(t -> t.getApprovalStatus() == ApprovalStatus.APPROVED)
             .forEach(t -> {
-                ElkNode sourceNode = name2node.get(t.sourceName);
-                ElkNode targetNode = name2node.get(t.targetName);
+                ElkNode sourceNode = name2node.get(t.sourceId);
+                ElkNode targetNode = name2node.get(t.targetId);
                 sourceNode.setParent(targetNode);
             });
     }

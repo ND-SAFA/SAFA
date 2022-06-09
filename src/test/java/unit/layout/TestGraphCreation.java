@@ -54,7 +54,7 @@ public class TestGraphCreation extends LayoutBaseTest {
 
         ElkNode artifact = getArtifact(artifactName);
         List<ElkNode> artifactChildren = artifact.getChildren();
-        assertThat(artifact.getParent().getIdentifier()).isEqualTo(parentId);
+        assertThat(artifact.getParent().getIdentifier()).isEqualTo(getArtifactId(parentId));
         assertThat(artifactChildren.size()).isEqualTo(nChildren);
     }
 
@@ -62,7 +62,7 @@ public class TestGraphCreation extends LayoutBaseTest {
     public void testName2Node() {
         assertThat(name2nodes.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
         for (ArtifactAppEntity artifact : project.getArtifacts()) {
-            assertThat(name2nodes.containsKey(artifact.name)).isTrue();
+            assertThat(name2nodes.containsKey(artifact.id)).isTrue();
         }
     }
 
@@ -75,13 +75,24 @@ public class TestGraphCreation extends LayoutBaseTest {
             .collect(Collectors.toList());
 
 
-        assertThat(rootNodeNames.contains("F1")).isTrue();
-        assertThat(rootNodeNames.contains("D10")).isTrue();
-        assertThat(rootNodeNames.contains("D11")).isTrue();
+        assertThat(rootNodeNames.contains(getArtifactId("F1"))).isTrue();
+        assertThat(rootNodeNames.contains(getArtifactId("D10"))).isTrue();
+        assertThat(rootNodeNames.contains(getArtifactId("D11"))).isTrue();
         assertThat(rootNodeNames.size()).isEqualTo(3);
     }
 
-    private ElkNode getArtifact(String name) {
-        return name2nodes.get(name);
+    private ElkNode getArtifact(String artifactName) {
+        String artifactId = getArtifactId(artifactName);
+        return name2nodes.get(artifactId);
+    }
+
+    private String getArtifactId(String name) {
+        return this.project
+            .getArtifacts()
+            .stream()
+            .filter(a -> a.name.equals(name))
+            .collect(Collectors.toList())
+            .get(0)
+            .id;
     }
 }

@@ -53,6 +53,9 @@ public class SafaUserService implements UserDetailsService {
     public SafaUser getCurrentUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication user = securityContext.getAuthentication();
+        System.out.println("Claims Package:" + Claims.class.getName());
+        System.out.println("User:" + user);
+        System.out.println("Principal:" + user.getPrincipal());
         String userName = ((Claims) user.getPrincipal()).getSubject();
         return this.getUserFromUsername(userName);
     }

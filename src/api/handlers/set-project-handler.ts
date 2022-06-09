@@ -102,12 +102,12 @@ export async function handleReloadProject(): Promise<void> {
  */
 async function setCurrentDocument(project: Project): Promise<void> {
   if (project.currentDocumentId) {
-    const document = getSingleQueryResult(
-      project.documents.filter(
-        (d) => d.documentId === project.currentDocumentId
-      ),
-      "documents"
+    const documents = project.documents.filter(
+      (d) => d.documentId === project.currentDocumentId
     );
-    await documentModule.switchDocuments(document);
+    if (documents.length === 1) {
+      const document = documents[0];
+      await documentModule.switchDocuments(document);
+    }
   }
 }

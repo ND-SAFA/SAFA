@@ -79,6 +79,9 @@ export enum Endpoint {
 
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
+
+  // Layout
+  getProjectLayout = "projects/versions/:versionId/layout",
 }
 
 /**

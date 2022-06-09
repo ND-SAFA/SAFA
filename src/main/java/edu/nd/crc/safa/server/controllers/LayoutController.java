@@ -61,7 +61,7 @@ public class LayoutController extends BaseController {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
         String name = createJobName("project", projectVersion);
-        JobDbEntity jobDbEntity = jobService.createNewJob(JobType.GENERATE_LAYOUT, name);
+        // TODO : JobDbEntity jobDbEntity = jobService.createNewJob(JobType.GENERATE_LAYOUT, name);
 
         ProjectAppEntity projectAppEntity =
             appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);

@@ -4,12 +4,12 @@ describe("Canvas", () => {
   });
 
   it("can interact with the canvas", () => {
-    const validTestUser = {
+    const user = {
       email: "tjnewman111@gmail.com",
       password: "123",
     };
 
-    cy.login(validTestUser.email, validTestUser.password);
+    cy.login(user.email, user.password);
 
     // Validates that artifacts appear on the graph.
     cy.get(".artifact-container").should("be.visible");

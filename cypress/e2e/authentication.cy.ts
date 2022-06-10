@@ -1,16 +1,31 @@
 const validTestUser = {
-  email: "tjnewman111@gmail.com",
+  email: "test@test.com",
   password: "123",
 };
 
 const invalidTestUser = {
-  email: "tjnewman111@gmail.com",
+  email: "test@test.com",
   password: "321",
 };
 
 describe("Authentication", () => {
   beforeEach(() => {
     cy.visit("http://localhost:8080");
+  });
+
+  describe("I can create an account", () => {
+    it("displays successful account creation", () => {
+      cy.clickButton("Sign Up").wait(500);
+
+      cy.inputText("Email", validTestUser.email)
+        .inputText("Password", validTestUser.password)
+        .clickButton("Create Account");
+
+      cy.contains(
+        "p",
+        "Your account has been successfully created. Please check your email to complete the sign up process."
+      );
+    });
   });
 
   describe("I can log in", () => {

@@ -1,9 +1,11 @@
 package edu.nd.crc.safa.layout;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,8 +23,11 @@ public class KlayLayoutGenerator {
     private final RecursiveGraphLayoutEngine graphLayoutEngine;
     private final BasicProgressMonitor progressMonitor;
 
-    public KlayLayoutGenerator(ProjectAppEntity projectAppEntity) {
-        this.graph = ElkGraphCreator.createGraphFromProject(projectAppEntity).getValue0();
+    public KlayLayoutGenerator(
+        List<ArtifactAppEntity> artifacts,
+        List<TraceAppEntity> traces
+    ) {
+        this.graph = ElkGraphCreator.createGraphFromProject(artifacts, traces).getValue0();
         this.graphLayoutEngine = new RecursiveGraphLayoutEngine();
         this.progressMonitor = new BasicProgressMonitor();
     }

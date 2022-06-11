@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 
@@ -22,9 +21,12 @@ public class ElkGraphCreator {
 
     static ElkGraphFactory factory = ElkGraphFactory.eINSTANCE;
 
-    public static Pair<ElkNode, Hashtable<String, ElkNode>> createGraphFromProject(ProjectAppEntity projectAppEntity) {
-        Hashtable<String, ElkNode> name2node = createName2ElkNode(projectAppEntity.artifacts);
-        connectNodesWithTraces(name2node, projectAppEntity.traces);
+    public static Pair<ElkNode, Hashtable<String, ElkNode>> createGraphFromProject(
+        List<ArtifactAppEntity> artifacts,
+        List<TraceAppEntity> traces
+    ) {
+        Hashtable<String, ElkNode> name2node = createName2ElkNode(artifacts);
+        connectNodesWithTraces(name2node, traces);
 
         ElkNode graph = createNode();
         List<ElkNode> nodes = new ArrayList<>(name2node.values());

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.layout;
 
+import static edu.nd.crc.safa.layout.LayoutSettings.LAYOUT_ALGORITHM;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -8,8 +10,10 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 
+import org.eclipse.elk.core.math.ElkPadding;
 import org.eclipse.elk.core.math.KVector;
 import org.eclipse.elk.core.options.CoreOptions;
+import org.eclipse.elk.core.options.HierarchyHandling;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
@@ -27,15 +31,18 @@ public class ElkGraphCreator {
     ) {
         Hashtable<String, ElkNode> name2node = createName2ElkNode(artifacts);
         connectNodesWithTraces(name2node, traces);
-
-        ElkNode graph = createNode();
-        List<ElkNode> nodes = new ArrayList<>(name2node.values());
-        List<ElkNode> rootNodes = getRootNodes(nodes);
-
-        for (ElkNode rootNode : rootNodes) {
-            rootNode.setParent(graph);
-        }
+        ElkNode graph = connectToRootNode(getNodes(name2node));
         return new Pair<>(graph, name2node);
+    }
+
+    private static ElkNode connectToRootNode(List<ElkNode> nodes) {
+        ElkNode graph = createNode();
+        getRootNodes(nodes).forEach((rootNode) -> rootNode.setParent(graph));
+        return graph;
+    }
+
+    private static List<ElkNode> getNodes(Hashtable<String, ElkNode> name2node) {
+        return new ArrayList<>(name2node.values());
     }
 
     public static Hashtable<String, ElkNode> createName2ElkNode(List<ArtifactAppEntity> artifacts) {
@@ -88,11 +95,12 @@ public class ElkGraphCreator {
         ElkNode elkNode = factory.createElkNode();
 
         elkNode.setDimensions(LayoutSettings.ARTIFACT_WIDTH, LayoutSettings.ARTIFACT_HEIGHT);
-        elkNode.setProperty(CoreOptions.ALGORITHM, LayoutSettings.LAYOUT_ALGORITHM);
-        //.setProperty(CoreOptions.HIERARCHY_HANDLING, INCLUDE_CHILDREN)
+        elkNode.setProperty(CoreOptions.ALGORITHM, LAYOUT_ALGORITHM);
         elkNode.setProperty(CoreOptions.NODE_SIZE_MINIMUM, new KVector(
             LayoutSettings.ARTIFACT_WIDTH,
             LayoutSettings.ARTIFACT_HEIGHT));
+        elkNode.setProperty(CoreOptions.NODE_LABELS_PADDING, new ElkPadding(0));
+        elkNode.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN);
 
         return elkNode;
     }

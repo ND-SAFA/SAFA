@@ -7,10 +7,10 @@ import java.util.Map;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
+import org.eclipse.elk.alg.mrtree.options.MrTreeMetaDataProvider;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
+import org.eclipse.elk.core.data.LayoutMetaDataService;
 import org.eclipse.elk.core.util.BasicProgressMonitor;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
@@ -18,6 +18,11 @@ import org.eclipse.elk.graph.ElkNode;
 @Getter
 public class KlayLayoutGenerator {
     public static final ElkGraphFactory factory = ElkGraphFactory.eINSTANCE;
+    private static final LayoutMetaDataService SERVICE = LayoutMetaDataService.getInstance();
+
+    static {
+        SERVICE.registerLayoutMetaDataProviders(new MrTreeMetaDataProvider());
+    }
 
     private final ElkNode graph;
     private final RecursiveGraphLayoutEngine graphLayoutEngine;
@@ -27,6 +32,7 @@ public class KlayLayoutGenerator {
         List<ArtifactAppEntity> artifacts,
         List<TraceAppEntity> traces
     ) {
+
         this.graph = ElkGraphCreator.createGraphFromProject(artifacts, traces).getValue0();
         this.graphLayoutEngine = new RecursiveGraphLayoutEngine();
         this.progressMonitor = new BasicProgressMonitor();
@@ -37,32 +43,30 @@ public class KlayLayoutGenerator {
      *
      * @return EkNode representing parent of all nodes (including islands).
      */
-    public Map<String, Position> layout() {
+    public Map<String, LayoutPosition> layout() {
+        progressMonitor.logGraph(graph, "start");
         graphLayoutEngine.layout(graph, progressMonitor);
-        Map<String, Position> positionMap = new Hashtable<>();
+        return createPositionMap();
+    }
+
+    private Map<String, LayoutPosition> createPositionMap() {
+        Map<String, LayoutPosition> positionMap = new Hashtable<>();
         addChildrenToMap(positionMap, graph);
         return positionMap;
     }
 
-    private void addPositionToMap(Map<String, Position> map, ElkNode graph) {
+    private void addPositionToMap(Map<String, LayoutPosition> map, ElkNode graph) {
         String id = graph.getIdentifier();
         if (!map.containsKey(id)) {
-            Position graphPosition = new Position(graph.getX(), graph.getY());
+            LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
             map.put(id, graphPosition);
             addChildrenToMap(map, graph);
         }
     }
 
-    private void addChildrenToMap(Map<String, Position> map, ElkNode graph) {
+    private void addChildrenToMap(Map<String, LayoutPosition> map, ElkNode graph) {
         for (ElkNode child : graph.getChildren()) {
             addPositionToMap(map, child);
         }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class Position {
-        double x;
-        double y;
     }
 }

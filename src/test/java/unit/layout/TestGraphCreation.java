@@ -2,17 +2,13 @@ package unit.layout;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.layout.ElkGraphCreator;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
 import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;
-import org.javatuples.Pair;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import unit.SampleProjectConstants;
 
@@ -24,16 +20,6 @@ import unit.SampleProjectConstants;
  * 4. Artifact positions are calculated
  */
 public class TestGraphCreation extends LayoutBaseTest {
-    ElkNode graph;
-    Hashtable<String, ElkNode> name2nodes;
-
-    @BeforeEach
-    public void createGraph() {
-        Pair<ElkNode, Hashtable<String, ElkNode>> response =
-            ElkGraphCreator.createGraphFromProject(project);
-        graph = response.getValue0();
-        name2nodes = response.getValue1();
-    }
 
     @Test
     public void testRootNode() {
@@ -79,20 +65,5 @@ public class TestGraphCreation extends LayoutBaseTest {
         assertThat(rootNodeNames.contains(getArtifactId("D10"))).isTrue();
         assertThat(rootNodeNames.contains(getArtifactId("D11"))).isTrue();
         assertThat(rootNodeNames.size()).isEqualTo(3);
-    }
-
-    private ElkNode getArtifact(String artifactName) {
-        String artifactId = getArtifactId(artifactName);
-        return name2nodes.get(artifactId);
-    }
-
-    private String getArtifactId(String name) {
-        return this.project
-            .getArtifacts()
-            .stream()
-            .filter(a -> a.name.equals(name))
-            .collect(Collectors.toList())
-            .get(0)
-            .id;
     }
 }

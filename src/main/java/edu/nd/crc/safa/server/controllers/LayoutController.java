@@ -8,6 +8,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.layout.CreateLayoutJob;
 import edu.nd.crc.safa.layout.KlayLayoutGenerator;
+import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -61,7 +62,7 @@ public class LayoutController extends BaseController {
 
     //TODO: Add unit tests
     @PostMapping(AppRoutes.Projects.Layout.createLayoutForProject)
-    public Map<String, KlayLayoutGenerator.Position> createLayoutForProject(@PathVariable UUID versionId) {
+    public Map<String, LayoutPosition> createLayoutForProject(@PathVariable UUID versionId) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
 
         String name = createJobName("project", projectVersion);
@@ -70,7 +71,8 @@ public class LayoutController extends BaseController {
         ProjectAppEntity projectAppEntity =
             appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
 
-        KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(projectAppEntity);
+        KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(projectAppEntity.artifacts,
+            projectAppEntity.traces);
         return layoutGenerator.layout();
     }
 

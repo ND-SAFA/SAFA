@@ -1,4 +1,5 @@
 import {
+  ArtifactPositions,
   ArtifactType,
   ArtifactWarning,
   ProjectMembership,
@@ -139,6 +140,10 @@ export interface Project extends ProjectIdentifier {
    * A collection of warnings on project artifacts.
    */
   warnings: Record<string, ArtifactWarning[]>;
+  /**
+   * Map of artifact ids to their position in the default graph.
+   */
+  layout: ArtifactPositions;
 }
 
 export interface ProjectSummary {

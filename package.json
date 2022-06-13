@@ -13,7 +13,9 @@
     "serve:prod": "vue-cli-service serve --mode=production",
     "serve:bend": "vue-cli-service serve --mode=bend",
 
-    "test": "npx cypress open",
+    "test": "npm run test:e2e && npm run test:unit",
+    "test:e2e": "npx cypress open",
+    "test:unit": "vue-cli-service test",
 
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",

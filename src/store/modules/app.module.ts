@@ -134,10 +134,13 @@ export default class ProjectModule extends VuexModule {
    * @param isNewArtifact - Whether the artifact creator should
    * create a new artifact.
    */
-  openArtifactCreatorTo(
-    type?: SafetyCaseType | FTANodeType,
-    isNewArtifact?: boolean
-  ): void {
+  openArtifactCreatorTo({
+    type,
+    isNewArtifact,
+  }: {
+    type?: SafetyCaseType | FTANodeType;
+    isNewArtifact?: boolean;
+  }): void {
     if (isNewArtifact) {
       artifactSelectionModule.clearSelections();
     }

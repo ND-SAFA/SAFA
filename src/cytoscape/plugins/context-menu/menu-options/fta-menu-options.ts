@@ -9,7 +9,10 @@ export const ftaMenuItem: MenuItem = {
   content: "Add FTA Node",
   tooltipText: "Create a logical node (e.g. AND / OR)",
   onClickFunction(): void {
-    appModule.openArtifactCreatorTo(FTANodeType.AND, true);
+    appModule.openArtifactCreatorTo({
+      type: FTANodeType.AND,
+      isNewArtifact: true,
+    });
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
@@ -23,7 +26,10 @@ export const ftaMenuItem: MenuItem = {
       content: "AND",
       tooltipText: "Asserts all conditions must be met.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(FTANodeType.AND, true);
+        appModule.openArtifactCreatorTo({
+          type: FTANodeType.AND,
+          isNewArtifact: true,
+        });
       },
     },
     {
@@ -31,7 +37,10 @@ export const ftaMenuItem: MenuItem = {
       content: "OR",
       tooltipText: "Asserts at least one condition must be met.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(FTANodeType.OR, true);
+        appModule.openArtifactCreatorTo({
+          type: FTANodeType.OR,
+          isNewArtifact: true,
+        });
       },
     },
   ],

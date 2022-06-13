@@ -44,13 +44,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  appModule,
-  artifactSelectionModule,
-  documentModule,
-  logModule,
-  projectModule,
-} from "@/store";
+import { appModule, documentModule, logModule, projectModule } from "@/store";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 

@@ -33,7 +33,6 @@ RUN npm run build
 RUN npm install -g serve
 
 RUN npm run lint
-RUN npm run test:unit
 
 EXPOSE 80
 

@@ -26,9 +26,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
-    public AuthenticationFilter(
-        AuthenticationManager authenticationManager,
-        TokenService tokenService) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                TokenService tokenService) {
         super(authenticationManager);
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
@@ -66,14 +65,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException {
-        String username = ((User) auth.getPrincipal()).getUsername();
-        String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
 
-        // Create response
+        String username = ((SafaUserDetails)auth.getPrincipal()).getUsername();
+        String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
+        JSONObject responseJson = new JSONObject();
+
+        responseJson.put(SecurityConstants.TOKEN_NAME, token);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(SecurityConstants.TOKEN_NAME, token);
         res.getWriter().write(responseJson.toString());
     }
 }

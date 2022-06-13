@@ -22,14 +22,14 @@ import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import org.javatuples.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,13 +40,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
+    UserDetailsService userDetailsService;
+
+    @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
 
     public void setAuthorization() {
-        Claims claims = Jwts.claims().setSubject(currentUsername);
-        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(claims,
+        UserDetails userDetails = userDetailsService.loadUserByUsername(currentUsername);
+        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
+            userDetails,
             null,
-            new ArrayList<>());
+            userDetails.getAuthorities());
+
         SecurityContextHolder.getContext().setAuthentication(authorization);
     }
 

@@ -48,6 +48,7 @@ public class ThreadConfiguration {
      */
     @PostConstruct
     public void setSecurityContextMode() {
+        // Only call this method once, otherwise the strategy will reset to default
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 }

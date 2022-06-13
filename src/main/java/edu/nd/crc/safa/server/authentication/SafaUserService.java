@@ -1,17 +1,13 @@
 package edu.nd.crc.safa.server.authentication;
 
-import java.util.Optional;
-
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
-import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,29 +30,20 @@ public class SafaUserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final SafaUser customer = getUserFromUsername(username);
-        return User
-            .withUsername(customer.getEmail())
-            .password(customer.getPassword())
-            .authorities("USER") // TODO: Replace with custom roles here
-            .build();
+        return new SafaUserDetails(this.getUserFromUsername(username));
     }
 
-    public SafaUser getUserFromUsername(String userName) {
-        final Optional<SafaUser> userQuery = safaUserRepository.findByEmail(userName);
-        if (userQuery.isEmpty()) {
-            throw new UsernameNotFoundException(userName);
-        }
-        return userQuery.get();
+    public SafaUser getUserFromUsername(String username) {
+        return safaUserRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
+    /**
+     * @return the current {@link SafaUser} logged in
+     */
     public SafaUser getCurrentUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication user = securityContext.getAuthentication();
-        System.out.println("Claims Package:" + Claims.class.getName());
-        System.out.println("User:" + user);
-        System.out.println("Principal:" + user.getPrincipal());
-        String userName = ((Claims) user.getPrincipal()).getSubject();
-        return this.getUserFromUsername(userName);
+        Authentication authentication = securityContext.getAuthentication();
+
+        return ((SafaUserDetails) authentication.getPrincipal()).getUser();
     }
 }

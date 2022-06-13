@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,7 +41,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     private final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
     @Resource
-    private SafaUserService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Resource
     private TokenService tokenService;
@@ -73,7 +74,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Authentication Filters
             .and()
             .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

@@ -1,6 +1,7 @@
 import { NodeSingular } from "cytoscape";
 import { ArtifactData, SafetyCaseType } from "@/types";
 import { traceModule, typeOptionsModule } from "@/store";
+
 /**
  * Return whether any two nodes can be traced. Criteria includes:
  * - source != target.
@@ -53,7 +54,7 @@ export function canConnect(
 }
 
 const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> = {
-  [SafetyCaseType.GOAL]: [SafetyCaseType.GOAL],
+  [SafetyCaseType.GOAL]: [SafetyCaseType.GOAL, SafetyCaseType.STRATEGY],
   [SafetyCaseType.SOLUTION]: [SafetyCaseType.GOAL],
   [SafetyCaseType.CONTEXT]: [SafetyCaseType.GOAL],
   [SafetyCaseType.STRATEGY]: [SafetyCaseType.GOAL],

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1 class="text-h6">Custom Fields</h1>
+    <v-divider class="mb-2" />
     <single-custom-field-input
       v-for="column in columns"
       :column="column"

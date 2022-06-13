@@ -3,12 +3,14 @@
     :title="title"
     :isOpen="!!isOpen"
     :isLoading="isLoading"
+    size="l"
     @close="$emit('close')"
   >
     <template v-slot:body>
       <artifact-creator-inputs
         :artifact="editedArtifact"
         :current-artifact-name="currentArtifactName"
+        :is-edit-mode="!!artifact"
         @change:parent="parentId = $event"
         @change:valid="isNameValid = $event"
       />

@@ -110,7 +110,7 @@ export default Vue.extend({
      * @return The parent artifact of a logic node.
      */
     parentArtifact(): Artifact | undefined {
-      return this.isFTA && this.parentId
+      return this.parentId
         ? artifactModule.getArtifactById(this.parentId)
         : undefined;
     },

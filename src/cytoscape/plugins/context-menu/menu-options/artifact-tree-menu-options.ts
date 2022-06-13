@@ -25,8 +25,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     onClickFunction(): void {
       if (projectModule.isProjectDefined) {
-        artifactSelectionModule.clearSelections();
-        appModule.openArtifactCreatorTo();
+        appModule.openArtifactCreatorTo(undefined, true);
       } else {
         logModule.onWarning("Please select a project to create artifacts.");
       }

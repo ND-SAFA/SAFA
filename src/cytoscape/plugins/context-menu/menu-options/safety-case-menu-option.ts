@@ -1,5 +1,5 @@
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { appModule, documentModule } from "@/store";
+import { appModule, artifactSelectionModule, documentModule } from "@/store";
 import { ArtifactData, DocumentType, SafetyCaseType } from "@/types";
 
 /**
@@ -24,7 +24,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Goal Node",
       tooltipText: "Define an expected system property.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.GOAL);
+        appModule.openArtifactCreatorTo(SafetyCaseType.GOAL, true);
       },
     },
     {
@@ -32,7 +32,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Strategy Node",
       tooltipText: "Define the safety strategy of an argument.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.STRATEGY);
+        appModule.openArtifactCreatorTo(SafetyCaseType.STRATEGY, true);
       },
     },
     {
@@ -40,7 +40,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Context Node",
       tooltipText: "Define the expected system environment assumptions.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.CONTEXT);
+        appModule.openArtifactCreatorTo(SafetyCaseType.CONTEXT, true);
       },
     },
     {
@@ -48,7 +48,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Evidence Node",
       tooltipText: "Define a container for ground-truth resources.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION);
+        appModule.openArtifactCreatorTo(SafetyCaseType.SOLUTION, true);
       },
     },
   ],

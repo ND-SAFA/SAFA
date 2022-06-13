@@ -1,2 +1,3 @@
 export * from "./options";
-export * from "./edgeHandlesCore";
+export * from "./edge-handles-core";
+export * from "./can-connect";

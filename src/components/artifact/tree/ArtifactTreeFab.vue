@@ -85,8 +85,7 @@ export default Vue.extend({
      */
     handleAddArtifact(): void {
       if (projectModule.isProjectDefined) {
-        artifactSelectionModule.clearSelections();
-        appModule.openArtifactCreatorTo();
+        appModule.openArtifactCreatorTo({ isNewArtifact: true });
       } else {
         logModule.onWarning("Please select a project to create artifacts.");
       }

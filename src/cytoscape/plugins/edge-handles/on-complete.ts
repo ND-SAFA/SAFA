@@ -8,7 +8,7 @@ import {
   TraceType,
 } from "@/types";
 import { handleCreateLink } from "@/api";
-import { disableDrawMode } from "./edgeHandlesCore";
+import { disableDrawMode } from "./edge-handles-core";
 
 /**
  * Creates the finalized trace link when an edge creation draw is completed.

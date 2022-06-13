@@ -1,6 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { PanelState } from "@/types";
 import { FTANodeType, PanelType, SafetyCaseType } from "@/types";
+import { artifactSelectionModule } from "@/store";
 
 @Module({ namespaced: true, name: "app" })
 /**
@@ -130,8 +131,19 @@ export default class ProjectModule extends VuexModule {
    * Opens the artifact creator to a specific node type.
    *
    * @param type - The type of panel.
+   * @param isNewArtifact - Whether the artifact creator should
+   * create a new artifact.
    */
-  openArtifactCreatorTo(type?: SafetyCaseType | FTANodeType): void {
+  openArtifactCreatorTo({
+    type,
+    isNewArtifact,
+  }: {
+    type?: SafetyCaseType | FTANodeType;
+    isNewArtifact?: boolean;
+  }): void {
+    if (isNewArtifact) {
+      artifactSelectionModule.clearSelections();
+    }
     this.SET_ARTIFACT_CREATOR(type || true);
   }
 

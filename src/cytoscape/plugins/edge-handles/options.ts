@@ -1,53 +1,11 @@
-import { typeOptionsModule, traceModule } from "@/store";
-import { ArtifactData, EdgeHandlersOptions, SafetyCaseType } from "@/types";
+import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
 import { NodeSingular, EdgeDataDefinition } from "cytoscape";
+import { canConnect } from "@/cytoscape/plugins/edge-handles/can-connect";
 
 // the default values of each option are outlined below:
 export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
-  /**
-   * Return whether any two nodes can be traced. Criteria includes:
-   * - source != target.
-   * - trace link between source and target doesn't already exist.
-   *
-   * @param sourceNode - The source node on the graph.
-   * @param targetNode - The target node on the graph.
-   * @returns Whether the two nodes can be traced.
-   */
-  canConnect(sourceNode: NodeSingular, targetNode: NodeSingular): boolean {
-    if (sourceNode.data() === undefined || targetNode.data() === undefined) {
-      // If either link doesn't have any data, the link cannot be created.
-      return false;
-    }
-
-    const sourceData: ArtifactData = sourceNode.data();
-    const targetData: ArtifactData = targetNode.data();
-
-    // If this link already exists, the link cannot be created.
-    const linkDoesNotExist = !traceModule.doesLinkExist(
-      sourceData.id,
-      targetData.id
-    );
-
-    // If this link in opposite direct exists, the link cannot be created.
-    const oppositeLinkDoesNotExist = !traceModule.doesLinkExist(
-      targetData.id,
-      sourceData.id
-    );
-
-    // If this link is to itself, the link cannot be created.
-    const isNotSameNode = !sourceNode.same(targetNode);
-
-    // If the link is not between allowed artifact directions, thee link cannot be created.
-    const linkIsAllowedByType = artifactTypesAreValid(sourceData, targetData);
-
-    return (
-      linkDoesNotExist &&
-      isNotSameNode &&
-      oppositeLinkDoesNotExist &&
-      linkIsAllowedByType
-    );
-  },
+  canConnect,
 
   /**
    * Handler that determines the data to be added to cytoscape upon the edge snap
@@ -80,39 +38,3 @@ export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
   // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom.
   disableBrowserGestures: true,
 };
-
-/**
- * Returns whether given artifact can traced regarding their artifact types
- * rules.
- * @param sourceData The artifact data of the source artifact.
- * @param targetData The artifact data of the target artifact.
- */
-function artifactTypesAreValid(
-  sourceData: ArtifactData,
-  targetData: ArtifactData
-): boolean {
-  const isSourceDefaultArtifact =
-    !sourceData.safetyCaseType && !sourceData.logicType;
-  const isTargetDefaultArtifact =
-    !targetData.safetyCaseType && !targetData.logicType;
-
-  if (isSourceDefaultArtifact) {
-    return typeOptionsModule.isLinkAllowedByType(
-      sourceData.artifactType,
-      targetData.artifactType
-    );
-  } else if (sourceData.safetyCaseType) {
-    switch (sourceData.safetyCaseType) {
-      case SafetyCaseType.STRATEGY:
-        return SafetyCaseType.STRATEGY !== targetData.safetyCaseType;
-      case SafetyCaseType.SOLUTION:
-        return SafetyCaseType.SOLUTION !== targetData.safetyCaseType;
-      default:
-        return isTargetDefaultArtifact;
-    }
-  } else if (sourceData.logicType) {
-    return isTargetDefaultArtifact;
-  }
-
-  throw Error("Undefined trace link logic for:" + sourceData.type);
-}

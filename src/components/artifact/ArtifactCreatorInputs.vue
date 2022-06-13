@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="px-10">
     <v-select
       filled
       label="Document Type"

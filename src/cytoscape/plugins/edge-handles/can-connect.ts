@@ -40,11 +40,7 @@ export function canConnect(
 
   // If the link is not between allowed artifact directions, thee link cannot be created.
   const linkIsAllowedByType = artifactTypesAreValid(sourceData, targetData);
-  console.log(sourceData.artifactName, "->", targetData.artifactName);
-  console.log("link does not exists:", linkDoesNotExist);
-  console.log("opposite link does not exists:", oppositeLinkDoesNotExist);
-  console.log("is not same node:", isNotSameNode);
-  console.log("Is link allowed:", linkIsAllowedByType);
+
   return (
     linkDoesNotExist &&
     isNotSameNode &&
@@ -74,21 +70,16 @@ export function artifactTypesAreValid(
   sourceData: ArtifactIdentifierInformation,
   targetData: ArtifactIdentifierInformation
 ): boolean {
-  console.log("Source Data:", sourceData);
-  console.log("Target Data:", targetData);
   const isSourceDefaultArtifact =
     !sourceData.safetyCaseType && !sourceData.logicType;
   const isTargetDefaultArtifact =
     !targetData.safetyCaseType && !targetData.logicType;
 
   if (isSourceDefaultArtifact) {
-    console.log("source is artifact!");
-    const result = typeOptionsModule.isLinkAllowedByType(
+    return typeOptionsModule.isLinkAllowedByType(
       sourceData.artifactType,
       targetData.artifactType
     );
-    console.log("Result:", result);
-    return result;
   } else if (sourceData.safetyCaseType) {
     if (isTargetDefaultArtifact) return true;
     if (targetData.logicType) return false;

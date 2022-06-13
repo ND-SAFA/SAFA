@@ -1,6 +1,6 @@
 <template>
   <v-autocomplete
-    filled
+    :filled="filled"
     chips
     :multiple="multiple"
     deletable-chips
@@ -55,6 +55,10 @@ export default Vue.extend({
     onlyDocumentArtifacts: {
       type: Boolean,
       default: false,
+    },
+    filled: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

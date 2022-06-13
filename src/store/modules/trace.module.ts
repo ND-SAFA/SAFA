@@ -143,13 +143,11 @@ export default class TraceModule extends VuexModule {
    */
   get doesLinkExist(): LinkValidator {
     return (sourceId, targetId) => {
-      const traceLinkQuery = this.traces
-        .filter(
-          (trace) =>
-            (trace.sourceId === sourceId && trace.targetId === targetId) ||
-            (trace.targetId === sourceId && trace.sourceId === targetId)
-        )
-        .filter((t) => t.approvalStatus === TraceApproval.APPROVED);
+      const traceLinkQuery = this.traces.filter(
+        (trace) =>
+          (trace.sourceId === sourceId && trace.targetId === targetId) ||
+          (trace.targetId === sourceId && trace.sourceId === targetId)
+      );
 
       return traceLinkQuery.length > 0;
     };

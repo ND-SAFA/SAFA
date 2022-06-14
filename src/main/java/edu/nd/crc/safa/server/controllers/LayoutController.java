@@ -79,7 +79,7 @@ public class LayoutController extends BaseController {
     //TODO: Add unit tests
     @PostMapping(AppRoutes.Projects.Layout.createLayoutForDocument)
     public JobAppEntity createLayoutForDocument(@PathVariable UUID versionId,
-                                                @PathVariable UUID documentId) throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+                                                @PathVariable UUID documentId) throws Exception {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(documentRepository, documentId);
 

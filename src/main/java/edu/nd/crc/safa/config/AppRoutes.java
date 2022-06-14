@@ -21,8 +21,7 @@ public class AppRoutes {
         private static final String jobId = jobRoot + "/{jobId}";
         public static final String deleteJob = jobId;
     }
-
-
+    
     public static class Projects {
         private static final String projectPrefix = "/projects";
         public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";

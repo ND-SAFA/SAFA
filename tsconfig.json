@@ -19,14 +19,15 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "outDir": "./distrib",
+    "allowJs": true,
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/cypress/**/*.ts",
   ],
   "exclude": ["node_modules"]
 }

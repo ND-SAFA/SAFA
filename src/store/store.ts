@@ -19,6 +19,7 @@ import {
   ArtifactModule,
   TraceModule,
   JobModule,
+  LayoutModule,
 } from "./modules";
 
 Vue.use(Vuex);
@@ -43,6 +44,7 @@ const store = new Vuex.Store({
     subtree: SubtreeModule,
     snackbar: SnackbarModule,
     job: JobModule,
+    layout: LayoutModule,
   },
   plugins: [vuexLocal.plugin],
 });
@@ -65,5 +67,6 @@ export const commitModule = getModule(CommitModule, store);
 export const subtreeModule = getModule(SubtreeModule, store);
 export const typeOptionsModule = getModule(TypeOptionsModule, store);
 export const jobModule = getModule(JobModule, store);
+export const layoutModule = getModule(LayoutModule, store);
 
 export default store;

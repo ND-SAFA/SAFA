@@ -4,6 +4,7 @@ import {
   JiraCloudSite,
   JiraProject,
   JiraProjectList,
+  Job,
 } from "@/types";
 import { sessionModule } from "@/store";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
@@ -189,8 +190,8 @@ export async function saveJiraCredentials(
 export async function createJiraProject(
   cloudId: string,
   projectId: string
-): Promise<void> {
-  return authHttpClient<void>(
+): Promise<Job> {
+  return authHttpClient<Job>(
     fillEndpoint(Endpoint.jiraProject, { cloudId, projectId }),
     {
       method: "POST",

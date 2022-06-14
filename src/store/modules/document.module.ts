@@ -4,7 +4,11 @@ import type { DocumentColumn, Project, ProjectDocument } from "@/types";
 import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, traceModule } from "@/store";
-import { handleResetGraph } from "@/api";
+import {
+  clearCurrentDocument,
+  handleResetGraph,
+  setCurrentDocument,
+} from "@/api";
 
 @Module({ namespaced: true, name: "document" })
 /**
@@ -99,6 +103,10 @@ export default class DocumentModule extends VuexModule {
     const currentArtifactIds = document.artifactIds;
 
     this.SET_CURRENT_DOCUMENT(document);
+
+    document.documentId === ""
+      ? await clearCurrentDocument()
+      : await setCurrentDocument(document.documentId);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
     await handleResetGraph();
@@ -208,10 +216,17 @@ export default class DocumentModule extends VuexModule {
   }
 
   /**
+   * Returns whether the current document type is for editing a table.
+   */
+  get isEditableTableDocument(): boolean {
+    return isTableDocument(this.currentDocument.type);
+  }
+
+  /**
    * Returns whether the current document type is for rendering a table.
    */
   get isTableDocument(): boolean {
-    return this.isTableView || isTableDocument(this.currentDocument.type);
+    return this.isTableView || this.isEditableTableDocument;
   }
 
   /**

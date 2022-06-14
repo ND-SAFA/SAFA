@@ -1,9 +1,14 @@
 <template>
-  <v-menu rounded min-width="200px" bottom offset-y>
+  <v-menu rounded min-width="200px" bottom offset-y id="my-account">
     <template v-slot:activator="{ on: menuOn, attrs }">
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltipOn }">
-          <v-btn icon v-on="{ ...tooltipOn, ...menuOn }" v-bind="attrs">
+          <v-btn
+            icon
+            v-on="{ ...tooltipOn, ...menuOn }"
+            v-bind="attrs"
+            id="account-dropdown"
+          >
             <v-avatar>
               <v-icon color="secondary" style="font-size: 48px">
                 mdi-account-circle
@@ -28,7 +33,14 @@
           <v-divider class="my-3"></v-divider>
           <v-btn text rounded @click="handleEditAccount">Edit Account</v-btn>
           <v-divider class="my-3"></v-divider>
-          <v-btn text rounded color="error" @click="handleLogout">Logout</v-btn>
+          <v-btn
+            text
+            rounded
+            color="error"
+            @click="handleLogout"
+            id="logout-button"
+            >Logout</v-btn
+          >
         </div>
       </v-list-item-content>
     </v-card>

@@ -44,13 +44,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  appModule,
-  artifactSelectionModule,
-  documentModule,
-  logModule,
-  projectModule,
-} from "@/store";
+import { appModule, documentModule, logModule, projectModule } from "@/store";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
@@ -85,8 +79,7 @@ export default Vue.extend({
      */
     handleAddArtifact(): void {
       if (projectModule.isProjectDefined) {
-        artifactSelectionModule.clearSelections();
-        appModule.openArtifactCreatorTo();
+        appModule.openArtifactCreatorTo({ isNewArtifact: true });
       } else {
         logModule.onWarning("Please select a project to create artifacts.");
       }

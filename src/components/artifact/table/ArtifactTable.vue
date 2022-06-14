@@ -22,29 +22,10 @@
       </template>
 
       <template
-        v-for="{ id, dataType, required } in columns"
-        v-slot:[`item.${id}`]="{ item }"
+        v-for="column in columns"
+        v-slot:[`item.${column.id}`]="{ item }"
       >
-        <v-icon v-if="required && !item[id]" :key="id" :color="errorColor">
-          mdi-information-outline
-        </v-icon>
-        <span v-if="isFreeText(dataType)" class="text-body-1" :key="id">
-          {{ item[id] || "" }}
-        </span>
-        <div v-if="isRelation(dataType)" :key="id">
-          <artifact-table-chip
-            v-for="artifactId in getArrayValue(item[id])"
-            :key="artifactId"
-            :text="getArtifactName(artifactId)"
-          />
-        </div>
-        <div v-if="isSelect(dataType)" :key="id">
-          <artifact-table-chip
-            v-for="val in getArrayValue(item[id])"
-            :key="val"
-            :text="val"
-          />
-        </div>
+        <artifact-table-cell :column="column" :item="item" :key="column.id" />
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -92,11 +73,9 @@ import Vue from "vue";
 import {
   Artifact,
   ArtifactDeltaState,
-  ColumnDataType,
   DocumentType,
   FlatArtifact,
 } from "@/types";
-import { ThemeColors } from "@/util";
 import {
   appModule,
   artifactModule,
@@ -109,6 +88,7 @@ import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactCreatorModal from "../ArtifactCreatorModal.vue";
+import ArtifactTableCell from "./ArtifactTableCell.vue";
 
 /**
  * Represents a table of artifacts.
@@ -120,6 +100,7 @@ export default Vue.extend({
     ArtifactTableChip,
     GenericIconButton,
     ArtifactCreatorModal,
+    ArtifactTableCell,
   },
   data() {
     return {
@@ -127,7 +108,6 @@ export default Vue.extend({
       createDialogueOpen: false as boolean | DocumentType.FMEA,
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
-      errorColor: ThemeColors.error,
     };
   },
   computed: {
@@ -158,14 +138,17 @@ export default Vue.extend({
         {
           text: "Name",
           value: "name",
+          width: "200px",
         },
         {
           text: "Type",
           value: "type",
+          width: "200px",
         },
         ...documentModule.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,
+          width: "300px",
         })),
         {
           text: "Actions",
@@ -238,44 +221,6 @@ export default Vue.extend({
       this.createDialogueOpen = false;
       this.selectedArtifact = undefined;
     },
-    /**
-     * @param dataType - The data type to check.
-     * @return Whether the data type is free text.
-     */
-    isFreeText(dataType: ColumnDataType): boolean {
-      return dataType === ColumnDataType.FREE_TEXT;
-    },
-    /**
-     * @param dataType - The data type to check.
-     * @return Whether the data type is a relation.
-     */
-    isRelation(dataType: ColumnDataType): boolean {
-      return dataType === ColumnDataType.RELATION;
-    },
-    /**
-     * @param dataType - The data type to check.
-     * @return Whether the data type is a select.
-     */
-    isSelect(dataType: ColumnDataType): boolean {
-      return dataType === ColumnDataType.SELECT;
-    },
-    /**
-     * Returns the artifact name of the given artifact id.
-     * @param id - The artifact to find.
-     * @return The artifact name.
-     */
-    getArtifactName(id: string): string {
-      return artifactModule.getArtifactById(id).name;
-    },
-    /**
-     * Returns the value of an array custom field.
-     * @param itemValue - The stored array value.
-     * @return The stored value as an array.
-     */
-    getArrayValue(itemValue?: string): string[] {
-      return itemValue?.split("||") || [];
-    },
-
     /**
      * Returns the background class name of an artifact row.
      * @param item - The artifact to display.

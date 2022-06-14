@@ -215,7 +215,7 @@ function htmlSafetyCaseDetails(data: ArtifactData): string {
 
   return `
     <div class="artifact-sc-details">
-      <span class="text-body-1 flex-grow-1">
+      <span class="text-body-1 flex-grow-1 text-center">
         ${data.artifactName}
       </span>
       ${displayChildren ? hiddenChildren : ""}

@@ -4,12 +4,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  Artifact,
-  ArtifactCytoCoreElement,
-  ArtifactDeltaState,
-  ArtifactWarning,
-} from "@/types";
+import { Artifact, ArtifactCytoCoreElement, ArtifactDeltaState } from "@/types";
 import {
   artifactSelectionModule,
   deltaModule,
@@ -37,12 +32,6 @@ export default Vue.extend({
       );
     },
     /**
-     * @return Any artifact warnings.
-     */
-    localWarnings(): ArtifactWarning[] | undefined {
-      return errorModule.getArtifactWarnings[this.artifactDefinition.id];
-    },
-    /**
      * @return The delta state of this artifact.
      */
     artifactDeltaState(): ArtifactDeltaState {
@@ -61,6 +50,8 @@ export default Vue.extend({
     definition(): ArtifactCytoCoreElement {
       const { id, body, type, name, safetyCaseType, logicType } =
         this.artifactDefinition;
+      const warnings =
+        errorModule.getArtifactWarnings[this.artifactDefinition.id];
       const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
       const hiddenChildWarnings =
         errorModule.getWarningsByArtifactNames(hiddenChildren);
@@ -73,7 +64,7 @@ export default Vue.extend({
           body,
           artifactName: name,
           type: "node",
-          warnings: this.localWarnings,
+          warnings,
           artifactType: type,
           artifactDeltaState: this.artifactDeltaState,
           isSelected: this.isSelected,

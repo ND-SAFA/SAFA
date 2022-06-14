@@ -104,7 +104,7 @@ export default Vue.extend({
      * Opens the artifact creator.
      */
     handleEditArtifact(): void {
-      appModule.openArtifactCreatorTo();
+      appModule.openArtifactCreatorTo({});
     },
   },
 });

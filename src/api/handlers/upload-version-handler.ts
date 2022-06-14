@@ -2,6 +2,7 @@ import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/job-handler";
+import { createFlatFileUploadJob } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.
@@ -33,7 +34,8 @@ export async function handleUploadProjectVersion(
     }
 
     const uploadFlatFiles = async () => {
-      const job = await handleJobSubmission(versionId, formData);
+      const job = await createFlatFileUploadJob(versionId, formData);
+      await handleJobSubmission(job);
       logModule.onSuccess(`Project upload has been submitted.`);
       return job;
     };

@@ -6,7 +6,11 @@
     @mouseover="showEditButton = true"
     @mouseout="showEditButton = false"
   >
-    <v-icon v-if="column.required && !item[id]" :key="id" :color="errorColor">
+    <v-icon
+      v-if="column.required && !item[column.id]"
+      :key="artifact.id"
+      :color="errorColor"
+    >
       mdi-information-outline
     </v-icon>
     <div v-if="isFreeText(column.dataType)">

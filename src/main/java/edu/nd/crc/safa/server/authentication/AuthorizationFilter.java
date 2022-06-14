@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.authentication;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
@@ -23,10 +26,14 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
     private final TokenService tokenService;
 
+    private final UserDetailsService userDetailsService;
+
     public AuthorizationFilter(AuthenticationManager authManager,
-                               TokenService tokenService) {
+                               TokenService tokenService,
+                               UserDetailsService userDetailsService) {
         super(authManager);
         this.tokenService = tokenService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -47,7 +54,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             e.printStackTrace();
             return;
         }
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }
@@ -60,10 +67,15 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
      */
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws SafaError {
         String token = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
-        if (token != null) {
-            Claims userClaims = this.tokenService.getTokenClaims(token);
-            return new UsernamePasswordAuthenticationToken(userClaims, null, new ArrayList<>());
+
+        if (Objects.isNull(token)) {
+            throw new SafaError("No token found.");
         }
-        throw new SafaError("No token found.");
+
+        Claims userClaims = this.tokenService.getTokenClaims(token);
+        String username = userClaims.getSubject();
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }

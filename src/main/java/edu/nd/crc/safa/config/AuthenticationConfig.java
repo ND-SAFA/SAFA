@@ -6,7 +6,6 @@ import javax.annotation.Resource;
 
 import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.authentication.TokenService;
 
 import org.springframework.context.annotation.Bean;
@@ -70,6 +69,12 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                 AppRoutes.Accounts.loginLink,
                 AppRoutes.Accounts.createNewUser,
                 "/websocket/**").permitAll()
+            // API Generation
+            .antMatchers(
+                "/swagger-ui/**", // Needed to get configu
+                "/v3/api-docs/**",
+                "/docs").permitAll()
+            // Close authentication settings
             .anyRequest().authenticated()
             // Authentication Filters
             .and()

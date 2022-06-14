@@ -13,10 +13,11 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Identifies a series of versioned trace links between a source
@@ -30,6 +31,8 @@ import org.json.JSONObject;
         }, name = AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET)
     }
 )
+@Data
+@NoArgsConstructor
 public class TraceLink implements Serializable, IBaseEntity {
 
     @Id
@@ -55,22 +58,11 @@ public class TraceLink implements Serializable, IBaseEntity {
         nullable = false
     )
     Artifact targetArtifact;
-
-    public TraceLink() {
-    }
-
+    
     public TraceLink(Artifact sourceArtifact,
                      Artifact targetArtifact) {
         this.sourceArtifact = sourceArtifact;
         this.targetArtifact = targetArtifact;
-    }
-
-    public UUID getTraceLinkId() {
-        return this.traceLinkId;
-    }
-
-    public void setTraceLinkId(UUID traceLinkId) {
-        this.traceLinkId = traceLinkId;
     }
 
     public String getSourceName() {
@@ -89,36 +81,12 @@ public class TraceLink implements Serializable, IBaseEntity {
         return this.targetArtifact.getType();
     }
 
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("link", String.format("%s -> %s", sourceArtifact, targetArtifact));
-        json.put("ids", String.format("%s -> %s", sourceArtifact.artifactId, targetArtifact.artifactId));
-
-        return json + "\n";
-    }
-
     public boolean isSourceName(String sourceName) {
         return this.sourceArtifact.getName().equals(sourceName);
     }
 
     public boolean isTargetName(String targetName) {
         return this.targetArtifact.getName().equals(targetName);
-    }
-
-    public Artifact getSourceArtifact() {
-        return this.sourceArtifact;
-    }
-
-    public void setSourceArtifact(Artifact sourceArtifact) {
-        this.sourceArtifact = sourceArtifact;
-    }
-
-    public Artifact getTargetArtifact() {
-        return this.targetArtifact;
-    }
-
-    public void setTargetArtifact(Artifact targetArtifact) {
-        this.targetArtifact = targetArtifact;
     }
 
     @Override
@@ -129,9 +97,5 @@ public class TraceLink implements Serializable, IBaseEntity {
     public boolean equals(TraceLink other) {
         return this.sourceArtifact.getArtifactId().equals(other.sourceArtifact.getArtifactId())
             && this.targetArtifact.getArtifactId().equals(other.targetArtifact.getArtifactId());
-    }
-
-    public String getTraceName() {
-        return this.getSourceName() + "-" + this.getTargetName();
     }
 }

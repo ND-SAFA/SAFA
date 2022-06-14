@@ -177,8 +177,10 @@ public class AppEntityRetrievalService {
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
             .filter(t -> existingArtifactIds.contains(t.sourceId)
-                && existingArtifactIds.contains(t.targetId))
+                && existingArtifactIds.contains(t.targetId)
+                && t.approvalStatus != ApprovalStatus.DECLINED)
             .collect(Collectors.toList());
+        //TODO: Look at absorbing filter method into the retrieval method by default.
     }
 
     /**

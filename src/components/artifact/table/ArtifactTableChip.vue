@@ -6,7 +6,7 @@
         v-bind="attrs"
         small
         class="text-body-1 mr-1"
-        style="max-width: 80px"
+        style="max-width: 200px"
       >
         <span class="text-ellipsis">{{ text }}</span>
       </v-chip>

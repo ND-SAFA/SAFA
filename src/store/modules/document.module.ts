@@ -216,10 +216,17 @@ export default class DocumentModule extends VuexModule {
   }
 
   /**
+   * Returns whether the current document type is for editing a table.
+   */
+  get isEditableTableDocument(): boolean {
+    return isTableDocument(this.currentDocument.type);
+  }
+
+  /**
    * Returns whether the current document type is for rendering a table.
    */
   get isTableDocument(): boolean {
-    return this.isTableView || isTableDocument(this.currentDocument.type);
+    return this.isTableView || this.isEditableTableDocument;
   }
 
   /**

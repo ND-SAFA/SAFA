@@ -9,6 +9,7 @@
         :fab="fab"
         :class="disabled ? 'disable-events' : ''"
         :small="small"
+        :hidden="isHidden"
         @click="$emit('click')"
       >
         <v-icon :style="iconStyle">{{ iconId }}</v-icon>
@@ -42,6 +43,7 @@ export default Vue.extend({
     fab: Boolean,
     small: Boolean,
     isDisabled: Boolean,
+    isHidden: Boolean,
   },
   computed: {
     /**

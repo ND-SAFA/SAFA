@@ -35,7 +35,7 @@ export default Vue.extend({
         try {
           plugin.initialize(cy);
         } catch (e) {
-          console.warn(`Plugin installation error: ${e}`);
+          logModule.onDevError(`Plugin installation error: ${e}`);
         }
       });
     },

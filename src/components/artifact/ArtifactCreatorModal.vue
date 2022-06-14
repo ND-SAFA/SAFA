@@ -3,12 +3,14 @@
     :title="title"
     :isOpen="!!isOpen"
     :isLoading="isLoading"
+    size="l"
     @close="$emit('close')"
   >
     <template v-slot:body>
       <artifact-creator-inputs
         :artifact="editedArtifact"
         :current-artifact-name="currentArtifactName"
+        :is-edit-mode="!!artifact"
         @change:parent="parentId = $event"
         @change:valid="isNameValid = $event"
       />
@@ -108,7 +110,7 @@ export default Vue.extend({
      * @return The parent artifact of a logic node.
      */
     parentArtifact(): Artifact | undefined {
-      return this.isFTA && this.parentId
+      return this.parentId
         ? artifactModule.getArtifactById(this.parentId)
         : undefined;
     },

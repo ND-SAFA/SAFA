@@ -1,68 +1,78 @@
 <template>
   <v-container class="px-10">
-    <v-select
-      filled
-      label="Document Type"
-      v-model="artifact.documentType"
-      :items="documentTypes"
-      item-text="name"
-      item-value="id"
-    />
-    <v-text-field
-      filled
-      v-if="!isFTA"
-      v-model="artifact.name"
-      label="Artifact Name"
-      hint="Please select an identifier for the artifact"
-      :error-messages="nameError"
-      :loading="nameCheckIsLoading"
-    />
-    <v-combobox
-      filled
-      v-if="!isFTA && !isSafetyCase && !isFMEA"
-      v-model="artifact.type"
-      :items="artifactTypes"
-      label="Artifact Type"
-    />
-    <v-select
-      filled
-      v-if="isFTA"
-      label="Logic Type"
-      v-model="artifact.logicType"
-      :items="logicTypes"
-      item-text="name"
-      item-value="id"
-    />
-    <artifact-input
-      only-document-artifacts
-      v-if="isFTA"
-      v-model="parentId"
-      :multiple="false"
-      label="Parent Artifact"
-    />
-    <v-select
-      filled
-      v-if="isSafetyCase"
-      label="Safety Case Type"
-      v-model="artifact.safetyCaseType"
-      :items="safetyCaseTypes"
-      item-text="name"
-      item-value="id"
-    />
-    <v-textarea
-      filled
-      v-if="!isFTA"
-      label="Artifact Summary"
-      v-model="artifact.summary"
-      rows="3"
-    />
-    <v-textarea
-      filled
-      v-if="!isFTA"
-      label="Artifact Body"
-      v-model="artifact.body"
-      rows="3"
-    />
+    <v-row>
+      <v-col cols="5">
+        <h1 class="text-h6">Artifact</h1>
+        <v-divider class="mb-2" />
+        <v-text-field
+          filled
+          v-if="!isFTA"
+          v-model="artifact.name"
+          label="Artifact Name"
+          hint="Please select an identifier for the artifact"
+          :error-messages="nameError"
+          :loading="nameCheckIsLoading"
+        />
+        <v-select
+          filled
+          label="Document Type"
+          v-model="artifact.documentType"
+          :items="documentTypes"
+          item-text="name"
+          item-value="id"
+        />
+        <v-combobox
+          filled
+          v-if="!isFTA && !isSafetyCase && !isFMEA"
+          v-model="artifact.type"
+          :items="artifactTypes"
+          label="Artifact Type"
+        />
+        <v-select
+          filled
+          v-if="isSafetyCase"
+          label="Safety Case Type"
+          v-model="artifact.safetyCaseType"
+          :items="safetyCaseTypes"
+          item-text="name"
+          item-value="id"
+        />
+        <v-select
+          filled
+          v-if="isFTA"
+          label="Logic Type"
+          v-model="artifact.logicType"
+          :items="logicTypes"
+          item-text="name"
+          item-value="id"
+        />
+        <artifact-input
+          only-document-artifacts
+          v-if="!isEditMode"
+          v-model="parentId"
+          :multiple="false"
+          label="Parent Artifact"
+        />
+      </v-col>
+      <v-col cols="7">
+        <h1 class="text-h6">Description</h1>
+        <v-divider class="mb-2" />
+        <v-textarea
+          filled
+          v-if="!isFTA"
+          label="Artifact Summary"
+          v-model="artifact.summary"
+          rows="3"
+        />
+        <v-textarea
+          filled
+          v-if="!isFTA"
+          label="Artifact Body"
+          v-model="artifact.body"
+          rows="3"
+        />
+      </v-col>
+    </v-row>
     <custom-field-input v-if="isFMEA" v-model="artifact" />
   </v-container>
 </template>
@@ -91,6 +101,10 @@ export default Vue.extend({
       required: true,
     },
     currentArtifactName: String,
+    isEditMode: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

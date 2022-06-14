@@ -8,6 +8,7 @@
     dense
     hide-details
     style="width: 200px"
+    :disabled="isFixedTable"
     @focus="handleLoadItems"
   >
     <template v-slot:selection> {{ selectDisplay }} </template>
@@ -91,6 +92,12 @@ export default Vue.extend({
         if (!column) return;
         this.handleEditOpen(column);
       },
+    },
+    /**
+     * Returns whether the table columns can be edited.
+     */
+    isFixedTable(): boolean {
+      return !documentModule.isEditableTableDocument;
     },
   },
   methods: {

@@ -65,8 +65,8 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactOptional.isPresent()).isTrue();
 
         // Step - Subscribe to version updates
-        createNewConnection(currentUsername)
-            .subscribeToVersion(currentUsername, projectVersion);
+        createNewConnection(currentUserEmail)
+            .subscribeToVersion(currentUserEmail, projectVersion);
 
         // Step - Request artifact is removed from document
         String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.removeArtifactFromDocument)
@@ -81,7 +81,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactList.size()).isEqualTo(0);
 
         // VP - Verify that websocket message to update artifacts.
-        VersionMessage message = getNextMessage(currentUsername, VersionMessage.class);
+        VersionMessage message = getNextMessage(currentUserEmail, VersionMessage.class);
         assertThat(message.getType()).isEqualTo(VersionEntityTypes.ARTIFACTS);
     }
 }

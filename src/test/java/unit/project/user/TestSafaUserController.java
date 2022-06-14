@@ -35,18 +35,18 @@ public class TestSafaUserController extends ApplicationBaseTest {
 
     @Test
     public void createAccount() throws Exception {
-        createUser(currentUsername, localPassword);
-        Optional<SafaUser> userQuery = safaUserRepository.findByEmail(currentUsername);
+        createUser(currentUserEmail, currentUserPassword);
+        Optional<SafaUser> userQuery = safaUserRepository.findByEmail(currentUserEmail);
         assertThat(userQuery.isPresent()).isTrue();
 
         SafaUser user = userQuery.get();
-        assertThat(user.getEmail()).isEqualTo(currentUsername);
+        assertThat(user.getEmail()).isEqualTo(currentUserEmail);
     }
 
     @Test
     public void correctLoginAttempt() throws Exception {
-        createUser(currentUsername, localPassword);
-        loginUser(currentUsername, localPassword, status().isOk());
+        createUser(currentUserEmail, currentUserPassword);
+        loginUser(currentUserEmail, currentUserPassword, status().isOk());
         assertThat(this.token).isNotNull();
     }
 
@@ -67,7 +67,7 @@ public class TestSafaUserController extends ApplicationBaseTest {
     @Test
     public void wrongLoginAttempt() {
         assertThrows(JSONException.class, () -> {
-            loginUser(currentUsername, localPassword, status().is4xxClientError());
+            loginUser(currentUserEmail, currentUserPassword, status().is4xxClientError());
         });
     }
 }

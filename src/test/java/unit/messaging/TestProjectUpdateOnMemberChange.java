@@ -32,21 +32,21 @@ public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
         loginUser(projectMemberUsername, projectMemberPassword, false);
 
         // Step - Create two client and subscript to version
-        createNewConnection(currentUsername)
-            .subscribeToProject(currentUsername, project);
+        createNewConnection(currentUserEmail)
+            .subscribeToProject(currentUserEmail, project);
 
         // Step - Add member to project
         shareProject(project, projectMemberUsername, ProjectRole.VIEWER, status().isOk());
 
         // VP - New member notification is received.
-        ProjectMessage message = getNextMessage(currentUsername, ProjectMessage.class);
+        ProjectMessage message = getNextMessage(currentUserEmail, ProjectMessage.class);
         assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
 
         // Step - Remove member from project
         removeMemberFromProject(project, projectMemberUsername);
 
         // VP - Verify that message is sent to update members after deletion
-        message = getNextMessage(currentUsername, ProjectMessage.class);
+        message = getNextMessage(currentUserEmail, ProjectMessage.class);
         assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
     }
 }

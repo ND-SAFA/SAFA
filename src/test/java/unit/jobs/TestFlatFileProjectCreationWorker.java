@@ -24,7 +24,7 @@ public class TestFlatFileProjectCreationWorker extends JobBaseTest {
         UUID jobId = createJobFromDefaultProject();
 
         // Step - Get Job and subscribe for updates
-        createNewConnection(currentUsername).subscribeToJob(currentUsername, jobService.getJobById(jobId));
+        createNewConnection(currentUserEmail).subscribeToJob(currentUserEmail, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
         verifyJobWasCompleted(jobId, N_STEPS);

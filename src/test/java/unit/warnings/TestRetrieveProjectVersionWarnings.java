@@ -65,8 +65,8 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        createNewConnection(currentUsername)
-            .subscribeToVersion(currentUsername, projectVersion);
+        createNewConnection(currentUserEmail)
+            .subscribeToVersion(currentUserEmail, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =
@@ -86,9 +86,9 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
         // VP - Receive expected messages
         Hashtable<VersionEntityTypes, VersionMessage> messages = new Hashtable<>();
-        int nExpectedMessages = getQueueSize(currentUsername);
+        int nExpectedMessages = getQueueSize(currentUserEmail);
         for (int i = 0; i < nExpectedMessages; i++) {
-            VersionMessage message = getNextMessage(currentUsername, VersionMessage.class);
+            VersionMessage message = getNextMessage(currentUserEmail, VersionMessage.class);
             messages.put(message.getType(), message);
         }
         assertThat(messages.containsKey(VersionEntityTypes.ARTIFACTS)).isTrue();

@@ -40,13 +40,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
+    protected AppEntityRetrievalService appEntityRetrievalService;
+    @Autowired
     UserDetailsService userDetailsService;
 
-    @Autowired
-    protected AppEntityRetrievalService appEntityRetrievalService;
-
     public void setAuthorization() {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(currentUsername);
+        setAuthorization(currentUserEmail);
+    }
+
+    public void setAuthorization(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,

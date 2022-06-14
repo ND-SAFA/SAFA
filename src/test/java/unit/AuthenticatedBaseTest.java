@@ -28,27 +28,86 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  */
 public class AuthenticatedBaseTest extends EntityBaseTest {
 
-    public static final String currentUsername = "root-test-user@gmail.com";
-    public static final String localPassword = "r{QjR3<Ec2eZV@?";
+    public static final String currentUserEmail = "current-user@gmail.com";
+    public static final String currentUserPassword = "r{QjR3<Ec2eZV@?";
     public static SafaUser currentUser;
     protected String token;
-
-    public void sendDelete(String routeName) throws Exception {
-        sendDelete(routeName, status().isNoContent());
-    }
 
     @BeforeEach
     public void createData() throws Exception {
         token = null;
         this.safaUserRepository.deleteAll();
-        this.defaultLogin();
+        currentUser = createUser(currentUserEmail, currentUserPassword);
+        loginUser(currentUserEmail, currentUserPassword);
         this.dbEntityBuilder.setCurrentUser(currentUser);
     }
 
-    public void defaultLogin() throws Exception {
-        createUser(currentUsername, localPassword);
-        loginUser(currentUsername, localPassword);
-        currentUser = safaUserService.getUserFromUsername(currentUsername);
+    public SafaUser createUser(String email, String password) throws Exception {
+        SafaUser user = new SafaUser(email, password);
+        sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(),
+            false);
+        return safaUserService.getUserFromUsername(email);
+    }
+
+    public void loginUser(String username, String password) throws Exception {
+        this.loginUser(username, password, true);
+    }
+
+    public void loginUser(String email, String password, boolean setToken) throws Exception {
+        loginUser(email, password, status().is2xxSuccessful(), setToken);
+    }
+
+    public void loginUser(String email, String password, ResultMatcher test) throws Exception {
+        this.loginUser(email, password, test, true);
+    }
+
+    public void loginUser(String email, String password,
+                          ResultMatcher test,
+                          boolean setTokenIfSuccess) throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("email", email);
+        user.put("password", password);
+        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user),
+            test);
+        if (setTokenIfSuccess) {
+            this.token = response.getString("token");
+        }
+    }
+
+    public void removeMemberFromProject(Project project, String username) throws Exception {
+        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(username);
+        if (safaUserOptional.isEmpty()) {
+            throw new SafaError("Could not find user with name: " + username);
+        }
+        Optional<ProjectMembership> projectMembershipOptional = this.projectMembershipRepository.findByProjectAndMember(
+            project,
+            safaUserOptional.get());
+        if (projectMembershipOptional.isEmpty()) {
+            String errorMessage = String.format("Could not find membership between {%s} and {%s}.",
+                username,
+                project.getName());
+            throw new SafaError(errorMessage);
+
+        }
+        String url = RouteBuilder
+            .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
+            .withProjectMembership(projectMembershipOptional.get())
+            .get();
+        sendDelete(url, status().isNoContent());
+    }
+
+    public void assertTokenExists() throws SafaError {
+        if (this.token == null || this.token.equals("")) {
+            throw new SafaError("Authorization token not set.");
+        }
+    }
+
+    /**
+     * HTTP Routes
+     */
+
+    public void sendDelete(String routeName) throws Exception {
+        sendDelete(routeName, status().isNoContent());
     }
 
     public JSONObject sendGet(String routeName) throws Exception {
@@ -111,68 +170,5 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
                            ResultMatcher test) throws Exception {
         assertTokenExists();
         sendRequest(delete(routeName), test, this.token);
-    }
-
-    public void assertTokenExists() throws SafaError {
-        if (this.token == null || this.token.equals("")) {
-            throw new SafaError("Authorization token not set.");
-        }
-    }
-
-    /**
-     * Sends a Http request to the create account endpoint with given username and password.
-     *
-     * @param email    The id for the account.
-     * @param password The password associated with account created.
-     * @throws Exception Throws exception if problems occurs with Http request.
-     */
-    public void createUser(String email, String password) throws Exception {
-        SafaUser user = new SafaUser(email, password);
-        sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(), false);
-    }
-
-    public void loginUser(String email, String password) throws Exception {
-        this.loginUser(email, password, true);
-    }
-
-    public void loginUser(String email, String password, boolean setToken) throws Exception {
-        loginUser(email, password, status().is2xxSuccessful(), setToken);
-    }
-
-    public void loginUser(String email, String password, ResultMatcher test) throws Exception {
-        this.loginUser(email, password, test, true);
-    }
-
-    public void loginUser(String email, String password, ResultMatcher test, boolean setToken) throws Exception {
-        JSONObject user = new JSONObject();
-        user.put("email", email);
-        user.put("password", password);
-        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user),
-            test);
-        if (setToken) {
-            this.token = response.getString("token");
-        }
-    }
-
-    public void removeMemberFromProject(Project project, String username) throws Exception {
-        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(username);
-        if (safaUserOptional.isEmpty()) {
-            throw new SafaError("Could not find user with name: " + username);
-        }
-        Optional<ProjectMembership> projectMembershipOptional = this.projectMembershipRepository.findByProjectAndMember(
-            project,
-            safaUserOptional.get());
-        if (projectMembershipOptional.isEmpty()) {
-            String errorMessage = String.format("Could not find membership between {%s} and {%s}.",
-                username,
-                project.getName());
-            throw new SafaError(errorMessage);
-
-        }
-        String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
-            .withProjectMembership(projectMembershipOptional.get())
-            .get();
-        sendDelete(url, status().isNoContent());
     }
 }

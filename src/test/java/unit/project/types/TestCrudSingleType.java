@@ -32,7 +32,7 @@ public class TestCrudSingleType extends ApplicationBaseTest {
             .newProjectWithReturn(projectName);
 
         // Step - Subscribe to project
-        createNewConnection(currentUsername).subscribeToProject(currentUsername, project);
+        createNewConnection(currentUserEmail).subscribeToProject(currentUserEmail, project);
 
         // Step - Create artifact type
         String endpoint = RouteBuilder
@@ -54,8 +54,8 @@ public class TestCrudSingleType extends ApplicationBaseTest {
         assertThat(createdArtifactType.getIcon()).isEqualTo(icon);
 
         // VP - Verify that notification received
-        ProjectMessage projectMessage = getNextMessage(currentUsername, ProjectMessage.class);
-        assertThat(projectMessage.getUser()).isEqualTo(currentUsername);
+        ProjectMessage projectMessage = getNextMessage(currentUserEmail, ProjectMessage.class);
+        assertThat(projectMessage.getUser()).isEqualTo(currentUserEmail);
         assertThat(projectMessage.getType()).isEqualTo(ProjectEntityTypes.TYPES);
 
         // Step - Edit artifact type
@@ -71,8 +71,8 @@ public class TestCrudSingleType extends ApplicationBaseTest {
         assertThat(updatedArtifactType.getIcon()).isEqualTo(newIconName);
 
         // VP - Verify that notification of update is received
-        projectMessage = getNextMessage(currentUsername, ProjectMessage.class);
-        assertThat(projectMessage.getUser()).isEqualTo(currentUsername);
+        projectMessage = getNextMessage(currentUserEmail, ProjectMessage.class);
+        assertThat(projectMessage.getUser()).isEqualTo(currentUserEmail);
         assertThat(projectMessage.getType()).isEqualTo(ProjectEntityTypes.TYPES);
 
         // Step - Retrieve artifact type
@@ -100,8 +100,8 @@ public class TestCrudSingleType extends ApplicationBaseTest {
         assertThat(projectTypes.length()).isEqualTo(0);
 
         // VP - Verify that notification of deletion is received
-        projectMessage = getNextMessage(currentUsername, ProjectMessage.class);
-        assertThat(projectMessage.getUser()).isEqualTo(currentUsername);
+        projectMessage = getNextMessage(currentUserEmail, ProjectMessage.class);
+        assertThat(projectMessage.getUser()).isEqualTo(currentUserEmail);
         assertThat(projectMessage.getType()).isEqualTo(ProjectEntityTypes.TYPES);
     }
 }

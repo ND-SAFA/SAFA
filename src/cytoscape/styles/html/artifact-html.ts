@@ -1,6 +1,6 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
-import { getBackgroundColor } from "@/util";
+import { getBackgroundColor, ThemeColors } from "@/util";
 import {
   htmlBody,
   htmlContainer,
@@ -154,7 +154,10 @@ function htmlStoplight(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function htmlSafetyCase(data: ArtifactData): string {
-  const attrs = { opacity: data.opacity };
+  const attrs = {
+    opacity: data.opacity,
+    color: ThemeColors.artifactDefault,
+  };
   const header = [
     htmlHeader(data.safetyCaseType?.toLowerCase() || ""),
     htmlStoplight(data),
@@ -163,9 +166,13 @@ function htmlSafetyCase(data: ArtifactData): string {
 
   switch (data.safetyCaseType) {
     case "GOAL":
+      return htmlContainer(
+        [...header, htmlBody(data.body, 100, 200, 95)],
+        attrs
+      );
     case "CONTEXT":
       return htmlContainer(
-        [...header, htmlBody(data.body, 100, 200, 70)],
+        [...header, htmlBody(data.body, 100, 200, 100)],
         attrs
       );
     case "SOLUTION":
@@ -175,7 +182,7 @@ function htmlSafetyCase(data: ArtifactData): string {
       });
     case "STRATEGY":
       return htmlContainer(
-        [...header, htmlBody(data.body, 80, 170, 70)],
+        [...header, htmlBody(data.body, 80, 175, 90)],
         attrs
       );
     default:

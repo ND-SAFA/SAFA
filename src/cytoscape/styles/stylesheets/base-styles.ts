@@ -159,23 +159,26 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       shape: "polygon",
       "shape-polygon-points": "-1 -0.8, 1 -0.8, 1 0.8, -1 0.8",
       "border-width": "1",
+      width: ARTIFACT_WIDTH,
+      height: ARTIFACT_HEIGHT * 1.5,
     },
   },
   {
     selector: `node[safetyCaseType='${SafetyCaseType.SOLUTION}']`,
     style: {
-      height: 50,
-      width: 50,
       shape: "ellipse",
       "border-width": "1",
+      width: ARTIFACT_HEIGHT * 1.4,
+      height: ARTIFACT_HEIGHT * 1.4,
     },
   },
   {
     selector: `node[safetyCaseType='${SafetyCaseType.CONTEXT}']`,
     style: {
-      height: 30,
       shape: "roundrectangle",
       "border-width": "1",
+      width: ARTIFACT_WIDTH,
+      height: ARTIFACT_HEIGHT,
     },
   },
   {
@@ -184,6 +187,8 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       shape: "polygon",
       "shape-polygon-points": "-0.8 -0.8, 1 -0.8, 0.8 0.8, -1 0.8",
       "border-width": "1",
+      width: ARTIFACT_WIDTH * 1.2,
+      height: ARTIFACT_HEIGHT * 1.4,
     },
   },
   // Misc

@@ -14,8 +14,8 @@ import unit.ApplicationBaseTest;
  */
 public class BaseSharingTest extends ApplicationBaseTest {
 
-    protected final String otherUserEmail = "doesNotExist@gmail.com";
-    protected final String otherUserPassword = "somePassword";
+    protected final String otherUserEmail = "otherUser@gmail.com";
+    protected final String otherUserPassword = "otherUserPassword";
     protected SafaUser otherUser = null;
 
     @BeforeEach
@@ -24,6 +24,12 @@ public class BaseSharingTest extends ApplicationBaseTest {
     }
 
     protected Project createAndShareProject(String projectName) throws Exception {
+        return createAndShareProject(projectName, ProjectRole.VIEWER, true);
+    }
+
+    protected Project createAndShareProject(String projectName,
+                                            ProjectRole projectRole,
+                                            boolean currentUserAsOwner) throws Exception {
         // Step - Create other user to share project with.
         SafaUser otherUser = new SafaUser();
         otherUser.setEmail(this.otherUserEmail);
@@ -32,11 +38,13 @@ public class BaseSharingTest extends ApplicationBaseTest {
         this.safaUserRepository.save(otherUser);
 
         // Step - Create project to share
+        SafaUser owner = currentUserAsOwner ? currentUser : otherUser;
         Project project = dbEntityBuilder
-            .newProjectWithReturn(projectName);
+            .newProject(projectName, owner)
+            .getProject(projectName);
 
         // Step - Share project
-        shareProject(project, otherUser.getEmail(), ProjectRole.VIEWER, status().is2xxSuccessful());
+        shareProject(project, owner.getEmail(), projectRole, status().is2xxSuccessful());
 
         return project;
     }

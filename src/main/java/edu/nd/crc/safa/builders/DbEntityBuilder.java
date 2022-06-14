@@ -113,11 +113,7 @@ public class DbEntityBuilder extends BaseBuilder {
     }
 
     public DbEntityBuilder newProject(String name) {
-        return newProjectWithUser(name, currentUser);
-    }
-
-    public DbEntityBuilder newProjectWithUser(String name, SafaUser username) {
-        return newProject(name, username);
+        return newProject(name, currentUser);
     }
 
     public DbEntityBuilder newProject(String name, SafaUser owner) {

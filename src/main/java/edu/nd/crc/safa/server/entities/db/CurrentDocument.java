@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import edu.nd.crc.safa.config.AppConstraints;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -20,7 +23,13 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Data
-@Table(name = "current_document")
+@Table(name = "current_document",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "user_id"
+        }, name = AppConstraints.SINGLE_DEFAULT_DOCUMENT_PER_USER)
+    }
+)
 public class CurrentDocument {
 
     @Id
@@ -31,11 +40,11 @@ public class CurrentDocument {
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id ", nullable = false, unique = true)
+    @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
     SafaUser user;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "document_id", nullable = false, unique = true)
+    @JoinColumn(name = "document_id", nullable = false)
     Document document;
 }

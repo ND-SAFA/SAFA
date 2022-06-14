@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -22,6 +24,8 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "document")
+@Data
+@NoArgsConstructor
 public class Document implements Serializable {
 
     @Id
@@ -49,9 +53,6 @@ public class Document implements Serializable {
     @Column(name = "description")
     String description;
 
-    public Document() {
-    }
-
     public Document(Document document) {
         this(document.project,
             document.name,
@@ -65,45 +66,5 @@ public class Document implements Serializable {
         this.name = name;
         this.description = description;
         this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public UUID getDocumentId() {
-        return documentId;
-    }
-
-    public void setDocumentId(UUID documentId) {
-        this.documentId = documentId;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public DocumentType getType() {
-        return type;
-    }
-
-    public void setType(DocumentType type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

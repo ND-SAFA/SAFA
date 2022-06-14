@@ -19,9 +19,10 @@ public class AppConstraints {
     public static final String UNIQUE_ARTIFACT_PER_DOCUMENT = "UNIQUE_ARTIFACT_PER_DOCUMENT";
     //Permissions
     public static final String SINGLE_ROLE_PER_PROJECT = "SINGLE_ROLE_PER_PROJECT";
-
     //Generic
     public static final String NULL_VALUE = "NULL not allowed for column";
+    //Documents
+    public static final String SINGLE_DEFAULT_DOCUMENT_PER_USER = "SINGLE_DEFAULT_DOCUMENT_PER_USER";
 
     public static final String[] registeredConstraints = new String[]{
         AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT,

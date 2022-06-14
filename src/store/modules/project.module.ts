@@ -11,6 +11,7 @@ import { createProject } from "@/util";
 import {
   artifactModule,
   documentModule,
+  layoutModule,
   logModule,
   subtreeModule,
   traceModule,
@@ -38,6 +39,7 @@ export default class ProjectModule extends VuexModule {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
     typeOptionsModule.initializeTypeIcons(project.artifactTypes);
+    layoutModule.SET_ARTIFACT_POSITIONS(project.layout);
 
     await setTimeout(async () => {
       // Not sure why this needs any wait, but it doesnt work without it.

@@ -1,5 +1,5 @@
 import { Project } from "@/types";
-import { createProject, getSingleQueryResult } from "@/util";
+import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
   appModule,
@@ -19,7 +19,7 @@ import {
   handleSelectVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
-import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
+import { getProjectArtifactTypes, getProjectLayout } from "@/api/endpoints";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -55,6 +55,7 @@ export async function handleProjectSubscription(
   const isDifferentProject = projectModule.versionId !== versionId;
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
+  project.layout = await getProjectLayout(versionId);
 
   await handleSelectVersion(projectId, versionId);
   await projectModule.initializeProject(project);

@@ -29,7 +29,7 @@ public class PermissionService {
         this.safaUserService = safaUserService;
     }
 
-    public void requireOwnerPermission(Project project) throws SafaError {
+    public void requireOwnerPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasOwnerPermission(project, currentUser)) {
             throw new SafaError("User does not have edit permissions on project.");

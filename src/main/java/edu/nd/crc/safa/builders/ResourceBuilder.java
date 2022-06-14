@@ -67,17 +67,17 @@ public class ResourceBuilder {
         return this.project;
     }
 
-    public Project withEditProject() throws SafaError {
+    public Project withEditProject() {
         this.permissionService.requireEditPermission(project);
         return this.project;
     }
 
-    public ProjectVersion withViewVersion() throws SafaError {
+    public ProjectVersion withViewVersion() {
         this.permissionService.requireViewPermission(projectVersion.getProject());
         return projectVersion;
     }
 
-    public ProjectVersion withEditVersion() throws SafaError {
+    public ProjectVersion withEditVersion() {
         this.permissionService.requireEditPermission(projectVersion.getProject());
         return projectVersion;
     }

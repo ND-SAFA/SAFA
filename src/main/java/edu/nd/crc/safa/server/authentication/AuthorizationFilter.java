@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.authentication;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

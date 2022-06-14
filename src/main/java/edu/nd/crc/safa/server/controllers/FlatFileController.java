@@ -68,7 +68,7 @@ public class FlatFileController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
-        @RequestParam MultipartFile[] files) throws SafaError {
+        @RequestParam MultipartFile[] files) {
         if (files.length == 0) {
             throw new SafaError("Could not create project because no files were received.");
         }

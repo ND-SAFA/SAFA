@@ -41,7 +41,7 @@ public class CommitController extends BaseController {
      */
     @PostMapping(AppRoutes.Projects.Commits.commitChange)
     public ProjectCommit commitChange(@PathVariable UUID versionId,
-                                      @RequestBody ProjectCommit projectCommit) throws SafaError {
+                                      @RequestBody ProjectCommit projectCommit) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         projectCommit.setCommitVersion(projectVersion);
         projectCommit.setFailOnError(true);

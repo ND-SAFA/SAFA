@@ -64,7 +64,7 @@ public class DocumentArtifactController extends BaseDocumentController {
     public List<ArtifactAppEntity> addArtifactToDocuments(@PathVariable UUID versionId,
                                                           @PathVariable UUID documentId,
                                                           @RequestBody List<ArtifactAppEntity> artifacts
-    ) throws SafaError {
+    ) {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
         for (ArtifactAppEntity a : artifacts) {
@@ -81,7 +81,7 @@ public class DocumentArtifactController extends BaseDocumentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeArtifactFromDocument(@PathVariable UUID versionId,
                                            @PathVariable UUID documentId,
-                                           @PathVariable UUID artifactId) throws SafaError {
+                                           @PathVariable UUID artifactId) {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
         Artifact artifact = getArtifactById(artifactId);

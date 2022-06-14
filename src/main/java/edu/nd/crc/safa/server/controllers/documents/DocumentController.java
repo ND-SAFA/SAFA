@@ -61,8 +61,7 @@ public class DocumentController extends BaseDocumentController {
     @PostMapping(AppRoutes.Projects.Documents.createOrUpdateDocument)
     @ResponseStatus(HttpStatus.CREATED)
     public DocumentAppEntity createOrUpdateDocument(@PathVariable UUID versionId,
-                                                    @RequestBody @Valid DocumentAppEntity documentAppEntity)
-        throws SafaError {
+                                                    @RequestBody @Valid DocumentAppEntity documentAppEntity) {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
         documentAppEntity.setProject(project); // Manually set to verify authenticity

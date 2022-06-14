@@ -99,7 +99,7 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.flatFileProjectUpdateJob)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws SafaError,
+                                                 @RequestParam MultipartFile[] files) throws
         JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
         JobParametersInvalidException, JobRestartException {
         // Step 1 - Fetch version and assert permissions

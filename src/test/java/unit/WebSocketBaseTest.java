@@ -44,7 +44,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     private static HashMap<String, BlockingQueue<String>> idToQueue;
     private static HashMap<String, StompSession> idToSession;
 
-    final int TIME_TO_POLL_SECONDS = 5; // seconds
+    final int TIME_TO_POLL_SECONDS = 10; // # of seconds to wait for a message until failing
     final int TIME_TO_POLL_MS = TIME_TO_POLL_SECONDS * 1000;
 
     @LocalServerPort

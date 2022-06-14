@@ -61,7 +61,7 @@ public class JobService {
     public List<JobAppEntity> retrieveCurrentUserJobs() {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         return this.jobDbRepository
-            .findByUser(currentUser)
+            .findByUserOrderByLastUpdatedAtDesc(currentUser)
             .stream()
             .map(JobAppEntity::createFromJob)
             .collect(Collectors.toList());

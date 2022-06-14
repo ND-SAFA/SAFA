@@ -3,6 +3,7 @@ import {
   ArtifactWarning,
   CytoCoreElementData,
   CytoCoreElementDefinition,
+  LayoutPosition,
   TraceLink,
 } from "@/types";
 
@@ -69,6 +70,10 @@ export interface ArtifactCytoCoreElement extends CytoCoreElementDefinition {
    * The element's stored data.
    */
   data: ArtifactData;
+  /**
+   * The artifact's position in the graph
+   */
+  position?: LayoutPosition;
   /**
    * The element's cytoscape classes
    */

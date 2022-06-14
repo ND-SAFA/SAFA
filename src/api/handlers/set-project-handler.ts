@@ -7,6 +7,7 @@ import {
   deltaModule,
   documentModule,
   errorModule,
+  layoutModule,
   projectModule,
   subtreeModule,
   typeOptionsModule,
@@ -80,6 +81,7 @@ export async function handleClearProject(): Promise<void> {
  * @param project - Project created containing entities.
  */
 export async function handleSetProject(project: Project): Promise<void> {
+  layoutModule.SET_ARTIFACT_POSITIONS(project.layout);
   await handleProjectSubscription(project);
   errorModule.setArtifactWarnings(project.warnings);
   await setCurrentDocument(project);
@@ -99,15 +101,16 @@ export async function handleReloadProject(): Promise<void> {
  * Moves user to the document if one is set by currentDocumentId
  * Otherwise default document would continue to be in view.
  * @param project The project possibly containing a currentDocumentId
+ * TODO: Clear currentDocument whenever project is cleared.
  */
 async function setCurrentDocument(project: Project): Promise<void> {
   if (project.currentDocumentId) {
-    const document = getSingleQueryResult(
-      project.documents.filter(
-        (d) => d.documentId === project.currentDocumentId
-      ),
-      "documents"
+    const documents = project.documents.filter(
+      (d) => d.documentId === project.currentDocumentId
     );
-    await documentModule.switchDocuments(document);
+    if (documents.length === 1) {
+      const document = documents[0];
+      await documentModule.switchDocuments(document);
+    }
   }
 }

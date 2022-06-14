@@ -170,7 +170,6 @@ public class AppEntityRetrievalService {
      * @param projectVersion      The project version whose traces are returned if existing in it.
      * @param existingArtifactIds List of artifact ids for those existing in given version.
      * @return List of trace links existing in given version at the time of calling this.
-     * TODO: Look at absorbing filter method into the retrieval method by default.
      */
     public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion,
                                                                List<String> existingArtifactIds) {
@@ -181,6 +180,7 @@ public class AppEntityRetrievalService {
                 && existingArtifactIds.contains(t.targetId)
                 && t.approvalStatus != ApprovalStatus.DECLINED)
             .collect(Collectors.toList());
+        //TODO: Look at absorbing filter method into the retrieval method by default.
     }
 
     /**

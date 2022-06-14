@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.services;
 import java.util.Optional;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
@@ -11,6 +10,7 @@ import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,21 +32,21 @@ public class PermissionService {
     public void requireOwnerPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasOwnerPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new AccessDeniedException("User does not have edit permissions on project.");
         }
     }
 
-    public void requireViewPermission(Project project) throws SafaError {
+    public void requireViewPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasViewingPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new AccessDeniedException("User does not have edit permissions on project.");
         }
     }
 
-    public void requireEditPermission(Project project) throws SafaError {
+    public void requireEditPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasEditPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new AccessDeniedException("User does not have edit permissions on project.");
         }
     }
 

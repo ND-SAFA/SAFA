@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,13 +54,6 @@ public abstract class BaseController {
         return new SafaError(errorMessage, exception);
     }
 
-    @ExceptionHandler(SafaError.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public SafaError handleServerError(SafaError safaError) {
-        safaError.printError();
-        return safaError;
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleValidationError(MethodArgumentNotValidException exception) {
@@ -81,6 +75,21 @@ public abstract class BaseController {
         SafaError error = new SafaError(errorMessage, exception);
         error.setDetails(exception.getMessage());
         return error;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public AccessDeniedException handlePermissionError(AccessDeniedException e) {
+        //Exists to not get handled in generic handler below
+        System.out.println("PERMISSION ERROR");
+        return e;
+    }
+
+    @ExceptionHandler(SafaError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleServerError(SafaError safaError) {
+        safaError.printError();
+        return safaError;
     }
 
     @ExceptionHandler(Exception.class)

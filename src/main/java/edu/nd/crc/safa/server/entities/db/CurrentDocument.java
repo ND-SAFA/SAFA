@@ -40,7 +40,7 @@ public class CurrentDocument {
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
     SafaUser user;
 
     @ManyToOne

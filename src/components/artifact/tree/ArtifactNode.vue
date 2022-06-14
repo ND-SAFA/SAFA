@@ -57,18 +57,19 @@ export default Vue.extend({
         errorModule.getWarningsByArtifactNames(hiddenChildren);
       const hiddenChildDeltaStates =
         deltaModule.getDeltaStatesByArtifactNames(hiddenChildren);
+      const opacity = this.hidden ? 0 : this.faded ? 0.1 : 1;
 
       return {
         data: {
+          type: "node",
           id,
           body,
           artifactName: name,
-          type: "node",
           warnings,
           artifactType: type,
           artifactDeltaState: this.artifactDeltaState,
           isSelected: this.isSelected,
-          opacity: this.hidden ? 0 : this.faded ? 0.1 : 1,
+          opacity,
           hiddenChildren: hiddenChildren.length,
           childWarnings: hiddenChildWarnings,
           childDeltaStates: hiddenChildDeltaStates,

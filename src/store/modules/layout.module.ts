@@ -24,6 +24,7 @@ export default class LayoutModule extends VuexModule {
    * Returns the position of an artifact.
    */
   get getArtifactPosition(): (artifactId: string) => LayoutPosition {
-    return (artifactId: string) => this.artifactPositions[artifactId];
+    return (artifactId: string) =>
+      this.artifactPositions[artifactId] || { x: 0, y: 0 };
   }
 }

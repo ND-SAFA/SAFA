@@ -4,7 +4,6 @@ import {
   DefaultPreLayoutHooks,
   DefaultPostLayoutHooks,
 } from "@/cytoscape/hooks";
-import { ArtifactKlaySettings } from "./artifact-klay-settings";
 import GraphLayout from "./graph-layout";
 
 /**
@@ -15,7 +14,7 @@ export default class ArtifactGraphLayout extends GraphLayout {
     super(
       ArtifactTreeAutoMoveHandlers,
       ArtifactTreeCytoEvents,
-      ArtifactKlaySettings,
+      undefined,
       DefaultPreLayoutHooks,
       DefaultPostLayoutHooks
     );

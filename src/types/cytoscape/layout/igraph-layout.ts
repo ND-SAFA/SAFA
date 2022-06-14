@@ -9,7 +9,7 @@ import { CytoCore, CytoEventHandlers } from "@/types/cytoscape/core";
  * Defines the layout and event handlers of a graph.
  */
 export interface IGraphLayout {
-  klaySettings: KlayLayoutSettings;
+  klaySettings: KlayLayoutSettings | undefined;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];
   autoMoveHandlers: AutoMoveEventHandlers;

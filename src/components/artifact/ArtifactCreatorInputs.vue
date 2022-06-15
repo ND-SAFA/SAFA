@@ -1,7 +1,7 @@
 <template>
   <v-container class="px-10">
     <v-row>
-      <v-col cols="5">
+      <v-col :cols="isFTA ? 12 : 5">
         <h1 class="text-h6">Artifact</h1>
         <v-divider class="mb-2" />
         <v-text-field
@@ -54,7 +54,7 @@
           label="Parent Artifact"
         />
       </v-col>
-      <v-col cols="7">
+      <v-col cols="7" v-if="!isFTA">
         <h1 class="text-h6">Description</h1>
         <v-divider class="mb-2" />
         <v-textarea

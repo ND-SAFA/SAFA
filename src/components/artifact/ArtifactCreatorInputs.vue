@@ -79,7 +79,6 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { setTimeout } from "timers";
 import { Artifact, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { documentModule, projectModule, typeOptionsModule } from "@/store";

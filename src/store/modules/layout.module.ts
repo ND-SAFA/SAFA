@@ -1,5 +1,5 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ArtifactPositions, LayoutPosition } from "@/types";
+import type { ArtifactPositions, LayoutPosition } from "@/types";
 
 @Module({ namespaced: true, name: "layout" })
 /**

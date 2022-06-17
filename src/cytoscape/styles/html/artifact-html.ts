@@ -1,6 +1,6 @@
 import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
-import { getBackgroundColor, ThemeColors } from "@/util";
+import { capitalize, getBackgroundColor, ThemeColors } from "@/util";
 import {
   htmlBody,
   htmlContainer,
@@ -154,12 +154,13 @@ function htmlStoplight(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function htmlSafetyCase(data: ArtifactData): string {
+  const type = capitalize(data.safetyCaseType?.toLowerCase() || "");
   const attrs = {
     opacity: data.opacity,
     color: ThemeColors.artifactDefault,
   };
   const header = [
-    htmlHeader(data.safetyCaseType?.toLowerCase() || ""),
+    htmlHeader(type),
     htmlStoplight(data),
     htmlSafetyCaseDetails(data),
   ];
@@ -176,6 +177,7 @@ function htmlSafetyCase(data: ArtifactData): string {
         attrs
       );
     case "SOLUTION":
+      // return htmlSafetyCaseSolution(data);
       return htmlContainer([...header, htmlBody(data.body, 40, 140, 60)], {
         ...attrs,
         width: 140,
@@ -227,6 +229,40 @@ function htmlSafetyCaseDetails(data: ArtifactData): string {
       </span>
       ${displayChildren ? hiddenChildren : ""}
       ${displayWarning ? warning : ""}
+    </div>
+  `;
+}
+
+/**
+ * Creates the HTML safety case solution.
+ *
+ * @param data - The artifact data to render.
+ *
+ * @return stringified HTML for the node.
+ */
+function htmlSafetyCaseSolution(data: ArtifactData): string {
+  return `
+    <div>
+      <svg 
+        width="200" 
+        height="200" 
+        style="margin-top: 7px"
+      >
+        <circle 
+          cx="100" cy="100" r="92"
+          fill="${ThemeColors.artifactBorder}"
+        />
+        <circle 
+          cx="100" cy="100" r="91"
+          fill="${ThemeColors.artifactDefault}"
+        />
+        <text x="72" y="35" fill="#36405a" >Solution</text>
+        <line 
+          x1="40" y1="42" x2="160" y2="42" 
+          stroke="rgb(136, 136, 136)" 
+          shape-rendering="crispEdges"
+        />
+      </svg>
     </div>
   `;
 }

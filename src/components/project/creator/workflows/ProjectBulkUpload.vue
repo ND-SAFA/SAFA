@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined elevation="1">
+  <v-card outlined elevation="1" data-cy="tab-bulk-upload">
     <project-identifier-input
       v-bind:name.sync="name"
       v-bind:description.sync="description"

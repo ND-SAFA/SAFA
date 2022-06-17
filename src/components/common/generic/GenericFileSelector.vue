@@ -8,6 +8,7 @@
     truncate-length="30"
     class="mt-3"
     v-model="model"
+    data-cy="input-files"
     @click:clear="$emit('clear')"
   />
 </template>

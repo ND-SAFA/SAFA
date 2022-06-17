@@ -7,11 +7,11 @@ describe("Authentication", () => {
 
   describe("I can create an account", () => {
     it("displays successful account creation", () => {
-      cy.clickButton("Sign Up").wait(500);
+      cy.clickButton("button-create-account-redirect").wait(500);
 
-      cy.inputText("Email", validUser.email)
-        .inputText("Password", validUser.password)
-        .clickButton("Create Account");
+      cy.inputText("input-email", validUser.email)
+        .inputText("input-password", validUser.password)
+        .clickButton("button-create-account");
 
       cy.contains(
         "p",
@@ -24,19 +24,19 @@ describe("Authentication", () => {
     it("logs in successfully with validUser credentials", () => {
       cy.login(validUser.email, validUser.password);
 
-      cy.get("#account-dropdown").should("exist");
+      cy.get("[data-cy='account-dropdown']").should("exist");
     });
 
     it("fails to log in with invalidUser credentials", () => {
       cy.login(invalidUser.email, invalidUser.password);
 
-      cy.get("#account-dropdown").should("not.exist");
+      cy.get("[data-cy='account-dropdown']").should("not.exist");
     });
 
     it("wont let you log in without both an email and password", () => {
-      cy.inputText("Email", validUser.email);
+      cy.inputText("input-email", validUser.email);
 
-      cy.getButton("Login").should("be.disabled");
+      cy.getCy("button-login").should("be.disabled");
     });
   });
 
@@ -44,7 +44,7 @@ describe("Authentication", () => {
     it("logs out successfully", () => {
       cy.login(validUser.email, validUser.password);
       cy.logout();
-      cy.getButton("Login").should("exist");
+      cy.getCy("button-login").should("exist");
     });
 
     it("clears my session on logout", () => {

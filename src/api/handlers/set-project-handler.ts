@@ -82,7 +82,6 @@ export async function handleClearProject(): Promise<void> {
  * @param project - Project created containing entities.
  */
 export async function handleSetProject(project: Project): Promise<void> {
-  layoutModule.SET_ARTIFACT_POSITIONS(project.layout);
   await handleProjectSubscription(project);
   errorModule.setArtifactWarnings(project.warnings);
   await setCurrentDocument(project);

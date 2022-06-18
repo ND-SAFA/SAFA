@@ -7,7 +7,7 @@ import {
   CytoEventHandlers,
 } from "@/types";
 import { layoutModule } from "@/store";
-import { NodePositionFunction, NodeSingular, Position } from "cytoscape";
+import { NodeSingular } from "cytoscape";
 
 /**
  * Defines a graph layout.

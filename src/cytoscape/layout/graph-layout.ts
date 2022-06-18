@@ -51,10 +51,11 @@ export default class GraphLayout implements IGraphLayout {
         name: "preset",
         fit: true,
         padding: 30,
-        positions: ((node: NodeSingular) =>
-          layoutModule.getArtifactPosition(
-            node.data().id
-          ) as Position) as unknown as NodePositionFunction,
+        positions: (node: NodeSingular | string) => {
+          const id = typeof node === "string" ? node : node.data().id;
+
+          return layoutModule.getArtifactPosition(id);
+        },
       }).run();
     }
 

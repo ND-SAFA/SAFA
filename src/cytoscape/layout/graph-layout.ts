@@ -7,6 +7,7 @@ import {
   CytoEventHandlers,
 } from "@/types";
 import { layoutModule } from "@/store";
+import { NodePositionFunction, NodeSingular, Position } from "cytoscape";
 
 /**
  * Defines a graph layout.
@@ -50,7 +51,10 @@ export default class GraphLayout implements IGraphLayout {
         name: "preset",
         fit: true,
         padding: 30,
-        positions: (id: string) => layoutModule.getArtifactPosition(id),
+        positions: ((node: NodeSingular) =>
+          layoutModule.getArtifactPosition(
+            node.data().id
+          ) as Position) as unknown as NodePositionFunction,
       }).run();
     }
 

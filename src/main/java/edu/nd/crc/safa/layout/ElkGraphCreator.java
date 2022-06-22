@@ -16,6 +16,7 @@ import org.eclipse.elk.core.options.CoreOptions;
 import org.eclipse.elk.core.options.HierarchyHandling;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
+import org.eclipse.elk.graph.util.ElkGraphUtil;
 import org.javatuples.Pair;
 
 /**
@@ -63,7 +64,7 @@ public class ElkGraphCreator {
                                               List<TraceAppEntity> traces) {
         traces
             .stream()
-            .filter(t -> t.getApprovalStatus() == ApprovalStatus.APPROVED)
+            .filter(t -> t.getApprovalStatus() != ApprovalStatus.DECLINED)
             .forEach(t -> {
                 ElkNode sourceNode = name2node.get(t.sourceId);
                 ElkNode targetNode = name2node.get(t.targetId);

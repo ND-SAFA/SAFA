@@ -180,6 +180,7 @@ public class JsonBuilder extends BaseBuilder {
         JSONObject trace = new JSONObject();
         trace.put("sourceName", sourceName);
         trace.put("targetName", targetName);
+        trace.put("score", 1);
         return trace;
     }
 

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.services.jira;
 
+import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
@@ -54,7 +55,7 @@ public interface JiraConnectionService {
      *
      * @param credentials   The credentials of the user accessing JIRA.
      * @param jiraProjectId The JIRA project id.
-     * @return JIRA API Response
+     * @return JIRA issues for the given project
      */
     JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId);
 
@@ -65,4 +66,13 @@ public interface JiraConnectionService {
      * @param jiraProjectId The id of the JIRA project.
      */
     void createJiraProjectMapping(Project project, Long jiraProjectId);
+
+    /**
+     * Retrieve updated issues associated with a JIRA project after a certain timestamp
+     *
+     * @param credentials   The credentials of the user accessing JIRA.
+     * @param jiraProjectId The JIRA project id.
+     * @return JIRA the updated issues for the given project
+     */
+    JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId, Date timestamp);
 }

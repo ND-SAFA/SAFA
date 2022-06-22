@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.server.controllers.JiraController;
 import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
@@ -7,6 +8,8 @@ import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 /**
@@ -27,12 +32,28 @@ public class JiraConfiguration {
 
     private static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
     private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
+    private final Logger log = LoggerFactory.getLogger(JiraConfiguration.class);
 
     JiraProjectRepository jiraProjectRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
-        return new JiraConnectionServiceImpl(jiraProjectRepository);
+        return new JiraConnectionServiceImpl(jiraProjectRepository, webClient());
+    }
+
+
+    private ExchangeFilterFunction logRequest() {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
+
+            clientRequest.headers().forEach((name, values) -> {
+                values.forEach(value -> {
+                    log.info("{}={}", name, value);
+                });
+            });
+
+            return Mono.just(clientRequest);
+        });
     }
 
     @Bean
@@ -53,6 +74,7 @@ public class JiraConfiguration {
             .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADER_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, "*/*")
+            .filter(logRequest())
             .build();
     }
 

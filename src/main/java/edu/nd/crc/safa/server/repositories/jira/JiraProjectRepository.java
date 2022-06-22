@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.repositories.jira;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.JiraProject;
@@ -9,5 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JiraProjectRepository extends CrudRepository<JiraProject, UUID> {
+
+    Optional<JiraProject> findByJiraProjectId(Long id);
 
 }

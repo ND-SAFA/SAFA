@@ -1,15 +1,17 @@
 package edu.nd.crc.safa.server.controllers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
+import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
@@ -18,9 +20,11 @@ import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.server.entities.db.JiraProject;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
+import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jobs.JobService;
@@ -55,19 +59,23 @@ public class JiraController extends BaseController {
     private final ExecutorDelegate executorDelegate;
     private final ServiceProvider serviceProvider;
 
+    private final JiraProjectRepository jiraProjectRepository;
+
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
                           SafaUserService safaUserService,
                           JiraAccessCredentialsRepository accessCredentialsRepository,
                           JiraConnectionService jiraConnectionService,
                           ExecutorDelegate executorDelegate,
-                          ServiceProvider serviceProvider) {
+                          ServiceProvider serviceProvider,
+                          JiraProjectRepository jiraProjectRepository) {
         super(resourceBuilder);
         this.safaUserService = safaUserService;
         this.accessCredentialsRepository = accessCredentialsRepository;
         this.jiraConnectionService = jiraConnectionService;
         this.executorDelegate = executorDelegate;
         this.serviceProvider = serviceProvider;
+        this.jiraProjectRepository = jiraProjectRepository;
     }
 
     @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
@@ -191,6 +199,30 @@ public class JiraController extends BaseController {
             } catch (Exception ex) {
                 output.setResult(new JiraResponseDTO<>(false, JiraResponseMessage.ERROR));
             }
+        });
+
+        return output;
+    }
+
+    @PutMapping(AppRoutes.Projects.updateJIRAProject)
+    // TODO: Modify the output of the endpoint. Currently it retrieves the updated issues for testing purposes
+    public DeferredResult<JiraIssuesResponseDTO> updateJiraProject(@PathVariable("id") Long jiraProjectId,
+                                                                   @PathVariable("cloudId") String cloudId) throws Exception {
+        DeferredResult<JiraIssuesResponseDTO> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            // TODO: @Alberto, please update the artifacts given the changed issues
+            JiraProject jiraProject = jiraProjectRepository.findByJiraProjectId(jiraProjectId)
+                .orElseThrow(() -> new SafaError("JIRA project not imported"));
+            SafaUser principal = safaUserService.getCurrentUser();
+            JiraAccessCredentials credentials = accessCredentialsRepository
+                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+            JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(credentials, jiraProjectId,
+                jiraProject.getLastUpdate());
+
+            jiraProject.setLastUpdate(new Date());
+            jiraProject = jiraProjectRepository.save(jiraProject);
+            output.setResult(dto);
         });
 
         return output;

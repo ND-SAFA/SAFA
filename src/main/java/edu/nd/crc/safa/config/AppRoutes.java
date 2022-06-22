@@ -28,6 +28,8 @@ public class AppRoutes {
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;
+        public static final String updateJIRAProject = projectPrefix + "/jira/{cloudId}/{id}";
+
 
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";

@@ -67,7 +67,7 @@ public class ElkGraphCreator {
             .forEach(t -> {
                 ElkNode sourceNode = name2node.get(t.sourceId);
                 ElkNode targetNode = name2node.get(t.targetId);
-                sourceNode.setParent(targetNode);
+                ElkGraphUtil.createSimpleEdge(targetNode, sourceNode);
             });
     }
 

@@ -30,7 +30,6 @@ public class AppRoutes {
         public static final String getProjects = projectPrefix;
         public static final String updateJIRAProject = projectPrefix + "/jira/{cloudId}/{id}";
 
-
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";
             public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";

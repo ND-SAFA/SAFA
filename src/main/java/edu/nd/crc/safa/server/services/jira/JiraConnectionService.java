@@ -72,7 +72,10 @@ public interface JiraConnectionService {
      *
      * @param credentials   The credentials of the user accessing JIRA.
      * @param jiraProjectId The JIRA project id.
+     * @param timestamp     Timestamp after which issues were updated
      * @return JIRA the updated issues for the given project
      */
-    JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId, Date timestamp);
+    JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                    Long jiraProjectId,
+                                                    Date timestamp);
 }

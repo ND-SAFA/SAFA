@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.server.controllers.JiraController;
 import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
@@ -40,7 +39,6 @@ public class JiraConfiguration {
     public JiraConnectionService jiraConnectionService() {
         return new JiraConnectionServiceImpl(jiraProjectRepository, webClient());
     }
-
 
     private ExchangeFilterFunction logRequest() {
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {

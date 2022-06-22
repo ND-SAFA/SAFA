@@ -207,7 +207,7 @@ public class JiraController extends BaseController {
     @PutMapping(AppRoutes.Projects.updateJIRAProject)
     // TODO: Modify the output of the endpoint. Currently it retrieves the updated issues for testing purposes
     public DeferredResult<JiraIssuesResponseDTO> updateJiraProject(@PathVariable("id") Long jiraProjectId,
-                                                                   @PathVariable("cloudId") String cloudId) throws Exception {
+                                                                   @PathVariable("cloudId") String cloudId)  {
         DeferredResult<JiraIssuesResponseDTO> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {

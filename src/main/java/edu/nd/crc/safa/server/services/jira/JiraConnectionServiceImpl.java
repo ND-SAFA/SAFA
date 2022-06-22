@@ -139,8 +139,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                                                            Date timestamp) {
         String updateDate = new SimpleDateFormat(JIRA_ISSUE_UPDATE_DATE_FORMAT).format(timestamp);
         String jqlQuery = String.format(
-            "project=%s AND " +
-            "(updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
+            "project=%s AND (updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
 
         return this.getJIRAIssues(credentials, jqlQuery);
     }

@@ -11,8 +11,6 @@ import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 
 import org.eclipse.elk.core.options.CoreOptions;
-import org.eclipse.elk.graph.ElkConnectableShape;
-import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
@@ -70,26 +68,6 @@ public class ElkGraphCreator {
 
                 ElkGraphUtil.createSimpleEdge(targetNode, sourceNode);
             });
-    }
-
-    public static List<ElkNode> getRootNodes(List<ElkNode> nodes) {
-        Hashtable<String, ElkNode> rootNodes = new Hashtable<>();
-        for (ElkNode node : nodes) {
-            ElkNode rootNode = getRootNode(node);
-            String rootNodeId = rootNode.getIdentifier();
-            if (!rootNodes.containsKey(rootNodeId)) {
-                rootNodes.put(rootNodeId, rootNode);
-            }
-        }
-        return new ArrayList<>(rootNodes.values());
-    }
-
-    public static ElkNode getRootNode(ElkNode elkNode) {
-        if (elkNode.getParent() == null) {
-            return elkNode;
-        } else {
-            return getRootNode(elkNode.getParent());
-        }
     }
 
     private static ElkNode createNode() {

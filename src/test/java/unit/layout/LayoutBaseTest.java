@@ -1,6 +1,8 @@
 package unit.layout;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -8,6 +10,8 @@ import edu.nd.crc.safa.layout.ElkGraphCreator;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import org.eclipse.elk.graph.ElkConnectableShape;
+import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +28,28 @@ public class LayoutBaseTest extends ApplicationBaseTest {
     String projectName = "test-project";
     ProjectVersion projectVersion;
     ProjectAppEntity project;
-    ElkNode graph;
+    ElkNode rootGraphNode;
     Hashtable<String, ElkNode> name2nodes;
+
+    public static List<ElkNode> getChildren(ElkNode elkNode) {
+        List<ElkNode> children = new ArrayList<>();
+        for (ElkEdge edge : elkNode.getOutgoingEdges()) {
+            List<ElkConnectableShape> targets = edge.getTargets();
+            targets.forEach(t -> children.add((ElkNode) t));
+        }
+        return children;
+    }
+
+    public static ElkNode getParent(ElkNode elkNode) {
+        //TODO : Guarantee certain parent is more than one
+        for (ElkEdge edge : elkNode.getIncomingEdges()) {
+            List<ElkConnectableShape> targets = edge.getSources();
+            if (targets.size() > 0) {
+                return (ElkNode) targets.get(0);
+            }
+        }
+        return null;
+    }
 
     @BeforeEach
     public void setupDefaultProject() throws Exception {
@@ -36,7 +60,7 @@ public class LayoutBaseTest extends ApplicationBaseTest {
         this.project = getProjectAtVersion(projectVersion);
         Pair<ElkNode, Hashtable<String, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(project.artifacts, project.traces);
-        graph = response.getValue0();
+        rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();
     }
 

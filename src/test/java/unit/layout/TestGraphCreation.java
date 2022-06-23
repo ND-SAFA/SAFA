@@ -2,13 +2,17 @@ package unit.layout;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.layout.ElkGraphCreator;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import unit.SampleProjectConstants;
 
@@ -22,25 +26,28 @@ import unit.SampleProjectConstants;
 public class TestGraphCreation extends LayoutBaseTest {
 
     @Test
-    public void testRootNode() {
+    public void testF1() {
         String artifactName = "F1";
         int nChildren = 4; // EA1, F2, F3, F4
-        ElkNode artifact = getArtifact(artifactName);
+        ElkNode f1 = getArtifact(artifactName);
 
-        List<ElkNode> artifactChildren = artifact.getChildren();
-        assertThat(artifact.getParent()).isEqualTo(graph);
-        assertThat(artifactChildren.size()).isEqualTo(nChildren);
+        // VP - Verify F1 is a child of root graph node.
+        assertThat(getParent(f1)).isEqualTo(null);
+        List<ElkNode> f1Children = getChildren(f1);
+        assertThat(f1Children.size()).isEqualTo(nChildren);
     }
 
     @Test
     public void testLeafNode() {
-        String artifactName = "D1";
+        String d1Name = "D1";
         String parentId = "F5";
         int nChildren = 0;
 
-        ElkNode artifact = getArtifact(artifactName);
-        List<ElkNode> artifactChildren = artifact.getChildren();
-        assertThat(artifact.getParent().getIdentifier()).isEqualTo(getArtifactId(parentId));
+        ElkNode d1Node = getArtifact(d1Name);
+        List<ElkNode> artifactChildren = getChildren(d1Node);
+        ElkNode d1Parent = getParent(d1Node);
+        assert d1Parent != null;
+        assertThat(d1Parent.getIdentifier()).isEqualTo(getArtifactId(parentId));
         assertThat(artifactChildren.size()).isEqualTo(nChildren);
     }
 
@@ -53,17 +60,64 @@ public class TestGraphCreation extends LayoutBaseTest {
     }
 
     @Test
-    public void rootNode() {
-        List<String> rootNodeNames = this.graph
+    public void testGraphRootChildren() {
+        List<String> graphNodesNames = this.rootGraphNode
             .getChildren()
             .stream()
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
 
-
-        assertThat(rootNodeNames.contains(getArtifactId("F1"))).isTrue();
-        assertThat(rootNodeNames.contains(getArtifactId("D10"))).isTrue();
-        assertThat(rootNodeNames.contains(getArtifactId("D11"))).isTrue();
-        assertThat(rootNodeNames.size()).isEqualTo(3);
+        assertThat(graphNodesNames.contains(getArtifactId("F1"))).isTrue();
+        assertThat(graphNodesNames.contains(getArtifactId("D11"))).isTrue();
+        assertThat(graphNodesNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
     }
+
+    @Test
+    public void getChildren() {
+        String rootId = "Root";
+        List<String> artifactIds = List.of("R1", "R2");
+        List<ArtifactAppEntity> artifacts = artifactIds
+            .stream()
+            .map(this::createArtifact)
+            .collect(Collectors.toList());
+        List<TraceAppEntity> traces = List.of(createTrace(artifactIds.get(0), artifactIds.get(1)));
+
+        // Create Graph
+        Pair<ElkNode, Hashtable<String, ElkNode>> result = ElkGraphCreator
+            .createGraphFromProject(artifacts, traces);
+
+        // Extract information
+        ElkNode graph = result.getValue0();
+        graph.setIdentifier(rootId);
+        Hashtable<String, ElkNode> name2Node = result.getValue1();
+
+        // VP - Verify that root node has correct children
+        List<ElkNode> children = graph.getChildren();
+        List<String> childrenNames = children
+            .stream()
+            .map(ElkGraphElement::getIdentifier)
+            .collect(Collectors.toList());
+        assertThat(children.size()).isEqualTo(2);
+        assertThat(childrenNames.contains("R2")).isTrue();
+        assertThat(childrenNames.contains("R1")).isTrue();
+
+        // VP - Verify that R1 is a child of R2.
+        ElkNode parent = getParent(name2Node.get("R1"));
+        assert parent != null;
+        assertThat(parent.getIdentifier()).isEqualTo("R2");
+    }
+
+    private ArtifactAppEntity createArtifact(String artifactName) {
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
+        artifactAppEntity.setId(artifactName);
+        return artifactAppEntity;
+    }
+
+    private TraceAppEntity createTrace(String sourceName, String targetName) {
+        TraceAppEntity traceAppEntity = new TraceAppEntity();
+        traceAppEntity.setSourceId(sourceName);
+        traceAppEntity.setTargetId(targetName);
+        return traceAppEntity;
+    }
+
 }

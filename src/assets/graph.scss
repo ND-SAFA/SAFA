@@ -120,29 +120,6 @@ $graph-border-radius: 8px;
   border-top: 1px solid $color-border;
 }
 
-.artifact-sc-stoplight {
-  height: 4px;
-  margin: 2px;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.artifact-sc-details {
-  height: 25px;
-  padding: 0 4px;
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  & > * {
-    justify-content: center;
-  }
-
-  .warning-text {
-    color: $color-warning;
-  }
-}
-
 .cy-container,
 #cytoscape-div {
   height: 100% !important;

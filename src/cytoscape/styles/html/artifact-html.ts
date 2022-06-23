@@ -7,6 +7,7 @@ import {
   htmlHeader,
   htmlSubheader,
 } from "./core-html";
+import { _htmlSafetyCase } from "./safety-case-html";
 
 /**
  * Renders artifact html.
@@ -21,6 +22,7 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
     if (!data?.artifactType) return "";
 
     if (data.safetyCaseType) {
+      // return _htmlSafetyCase(data);
       return htmlSafetyCase(data);
     } else if (data.logicType) {
       return htmlFTA(data);
@@ -177,7 +179,6 @@ function htmlSafetyCase(data: ArtifactData): string {
         attrs
       );
     case "SOLUTION":
-      // return htmlSafetyCaseSolution(data);
       return htmlContainer([...header, htmlBody(data.body, 40, 140, 60)], {
         ...attrs,
         width: 140,

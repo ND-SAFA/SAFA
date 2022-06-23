@@ -10,10 +10,9 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 
-import org.eclipse.elk.core.math.ElkPadding;
-import org.eclipse.elk.core.math.KVector;
 import org.eclipse.elk.core.options.CoreOptions;
-import org.eclipse.elk.core.options.HierarchyHandling;
+import org.eclipse.elk.graph.ElkConnectableShape;
+import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
@@ -42,7 +41,7 @@ public class ElkGraphCreator {
         return graph;
     }
 
-    private static List<ElkNode> getNodes(Hashtable<String, ElkNode> name2node) {
+    public static List<ElkNode> getNodes(Hashtable<String, ElkNode> name2node) {
         return new ArrayList<>(name2node.values());
     }
 
@@ -68,6 +67,7 @@ public class ElkGraphCreator {
             .forEach(t -> {
                 ElkNode sourceNode = name2node.get(t.sourceId);
                 ElkNode targetNode = name2node.get(t.targetId);
+
                 ElkGraphUtil.createSimpleEdge(targetNode, sourceNode);
             });
     }
@@ -97,11 +97,6 @@ public class ElkGraphCreator {
 
         elkNode.setDimensions(LayoutSettings.ARTIFACT_WIDTH, LayoutSettings.ARTIFACT_HEIGHT);
         elkNode.setProperty(CoreOptions.ALGORITHM, LAYOUT_ALGORITHM);
-        elkNode.setProperty(CoreOptions.NODE_SIZE_MINIMUM, new KVector(
-            LayoutSettings.ARTIFACT_WIDTH,
-            LayoutSettings.ARTIFACT_HEIGHT));
-        elkNode.setProperty(CoreOptions.NODE_LABELS_PADDING, new ElkPadding(0));
-        elkNode.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN);
 
         return elkNode;
     }

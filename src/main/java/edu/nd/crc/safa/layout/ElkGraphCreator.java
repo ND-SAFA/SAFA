@@ -37,7 +37,7 @@ public class ElkGraphCreator {
 
     private static ElkNode connectToRootNode(List<ElkNode> nodes) {
         ElkNode graph = createNode();
-        getRootNodes(nodes).forEach((rootNode) -> rootNode.setParent(graph));
+        nodes.forEach((n) -> n.setParent(graph));
         return graph;
     }
 

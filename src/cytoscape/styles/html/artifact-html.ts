@@ -1,4 +1,4 @@
-import { ArtifactData, ArtifactDeltaState, HtmlDefinition } from "@/types";
+import { ArtifactData, HtmlDefinition } from "@/types";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
 import { getBackgroundColor } from "@/util";
 import {
@@ -8,6 +8,8 @@ import {
   htmlSubheader,
 } from "./core-html";
 import { htmlSafetyCase } from "./safety-case-html";
+import { htmlStoplight } from "./artifact-stoplight";
+import { getWarningMessage, getWarnings } from "./artifact-helper";
 
 /**
  * Renders artifact html.
@@ -82,72 +84,27 @@ function htmlArtifact(data: ArtifactData): string {
  * @return stringified HTML for the node.
  */
 function htmlFooter(data: ArtifactData): string {
-  const displayChildren = !!data.hiddenChildren;
-  let displayWarning = !!data.warnings?.length;
-  let message = data.warnings?.[0]?.ruleName || "Warning";
-  let warningCount = data.warnings?.length || 0;
+  const message = getWarningMessage(data);
+  const warningCount = getWarnings(data);
+  const warning =
+    warningCount > 0
+      ? `
+        <div class="d-flex flex-grow-1 px-1 warning-text text-body-1">
+          <span class="material-icons md-18 pr-1">warning</span>
+          <span class="artifact-footer-text">(${warningCount}) ${message}</span>
+        </div>
+      `
+      : "";
+  const hiddenChildren = data.hiddenChildren
+    ? `
+      <div class="d-flex flex-grow-1 pr-1 text-body-1">
+        <span class="material-icons md-18">expand_more</span>
+        <span>
+          ${data.hiddenChildren} ${warning ? "" : "Hidden"}
+        </span>
+      </div>
+    `
+    : "";
 
-  if (displayChildren) {
-    displayWarning ||= !!data.childWarnings?.length;
-    message = data.childWarnings?.[0]?.ruleName || message;
-    warningCount += data.childWarnings?.length || 0;
-  }
-
-  const warning = `
-    <div class="d-flex flex-grow-1 px-1 warning-text text-body-1">
-      <span class="material-icons md-18 pr-1">warning</span>
-      <span class="artifact-footer-text">(${warningCount}) ${message}</span>
-    </div>
-  `;
-
-  const hiddenChildren = `
-    <div class="d-flex flex-grow-1 pr-1 text-body-1">
-      <span class="material-icons md-18">expand_more</span>
-      <span>
-        ${data.hiddenChildren} ${displayWarning ? "" : "Hidden"}
-      </span>
-    </div>
-  `;
-
-  return `
-    <div class="artifact-footer">
-      ${displayChildren ? hiddenChildren : ""}
-      ${displayWarning ? warning : ""}
-    </div>
-  `;
-}
-
-/**
- * Creates the HTML for representing an artifact node's child delta states.
- *
- * @param data - The artifact data to render.
- *
- * @return stringified HTML for the node.
- */
-function htmlStoplight(data: ArtifactData): string {
-  const { childDeltaStates = [] } = data;
-
-  if (!childDeltaStates.length) return "";
-
-  const toRender = [
-    {
-      doRender: childDeltaStates.includes(ArtifactDeltaState.ADDED),
-      node: "<div class='artifact-added flex-grow-1'/>",
-    },
-    {
-      doRender: childDeltaStates.includes(ArtifactDeltaState.MODIFIED),
-      node: "<div class='artifact-modified flex-grow-1'/>",
-    },
-    {
-      doRender: childDeltaStates.includes(ArtifactDeltaState.REMOVED),
-      node: "<div class='artifact-removed flex-grow-1'/>",
-    },
-  ];
-
-  const stoplight = toRender
-    .filter(({ doRender }) => doRender)
-    .map(({ node }) => node)
-    .join("");
-
-  return `<div class="artifact-stoplight">${stoplight}</div>`;
+  return `<div class="artifact-footer">${hiddenChildren}${warning}</div>`;
 }

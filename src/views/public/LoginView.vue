@@ -6,6 +6,7 @@
         label="Email"
         v-model="email"
         :error-messages="isError ? ['Invalid username or password'] : []"
+        data-cy="input-email"
         @keydown.enter="handleLogin"
       />
       <password-field v-model="password" @enter="handleLogin" />
@@ -15,9 +16,10 @@
       <v-btn
         color="primary"
         width="8em"
-        @click="handleLogin"
         :disabled="password.length === 0"
         :loading="isLoading"
+        data-cy="button-login"
+        @click="handleLogin"
       >
         Login
       </v-btn>
@@ -26,7 +28,14 @@
         <span class="text-body-1">
           Dont have an account yet?
 
-          <v-btn text small class="px-1" color="primary" @click="handleSignUp">
+          <v-btn
+            text
+            small
+            class="px-1"
+            color="primary"
+            data-cy="button-create-account-redirect"
+            @click="handleSignUp"
+          >
             Sign Up
           </v-btn>
         </span>

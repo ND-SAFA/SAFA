@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel>
+  <v-expansion-panel data-cy="job-panel">
     <v-expansion-panel-header disable-icon-rotate>
       <v-row no-gutters>
         <v-col cols="4">
@@ -27,7 +27,7 @@
       </v-row>
       <template v-slot:actions>
         <div style="width: 120px" class="d-flex justify-end">
-          <v-chip :color="getStatusColor(job.status)">
+          <v-chip :color="getStatusColor(job.status)" data-cy="job-status">
             <span class="mr-1">
               {{ formatStatus(job.status) }}
             </span>
@@ -63,7 +63,12 @@
       </v-stepper>
 
       <div class="d-flex">
-        <v-btn color="error" class="mr-1" @click="deleteJob(job)">
+        <v-btn
+          color="error"
+          class="mr-1"
+          data-cy="button-delete-job"
+          @click="deleteJob(job)"
+        >
           Delete Upload
         </v-btn>
         <v-btn

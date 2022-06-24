@@ -5,6 +5,7 @@
     v-model="model"
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
+    data-cy="input-password"
     @click:append="showPassword = !showPassword"
     @keydown.enter="$emit('enter')"
   />

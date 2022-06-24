@@ -17,7 +17,7 @@
         />
       </template>
 
-      <template v-slot:item.type="{ item }">
+      <template v-slot:[`item.type`]="{ item }">
         <artifact-table-chip :text="item.type" />
       </template>
 
@@ -28,7 +28,7 @@
         <artifact-table-cell :column="column" :item="item" :key="column.id" />
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template v-slot:[`item.actions`]="{ item }">
         <generic-icon-button
           icon-id="mdi-view-split-vertical"
           :tooltip="`View '${item.name}'`"

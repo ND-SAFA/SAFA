@@ -66,15 +66,10 @@ export function handleLoadJiraProjects(
 ): void {
   localStorage.setItem(LocalStorageKeys.JIRA_CLOUD_ID, credentials.cloudId);
 
-  saveJiraCredentials(credentials)
-    .then(async () => {
-      const projects = await getJiraProjects(
-        credentials.bearerAccessToken,
-        credentials.cloudId
-      );
+  saveJiraCredentials(credentials).catch(onError);
 
-      onSuccess?.(projects);
-    })
+  getJiraProjects(credentials.bearerAccessToken, credentials.cloudId)
+    .then(onSuccess)
     .catch((e) => {
       onError?.(e);
       logModule.onError(e);

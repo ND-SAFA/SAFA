@@ -1,0 +1,13 @@
+[
+  "simpleProject/tim.json",
+  "simpleProject/Design.csv",
+  "simpleProject/Design2Design.csv",
+  "simpleProject/Design2Requirement.csv",
+  "simpleProject/EnvironmentalAssumption.csv",
+  "simpleProject/EnvironmentalAssumption2Hazard.csv",
+  "simpleProject/Hazard.csv",
+  "simpleProject/Hazard2Hazard.csv",
+  "simpleProject/Requirement.csv",
+  "simpleProject/Requirement2Hazard.csv",
+  "simpleProject/Requirement2Requirement.csv"
+]

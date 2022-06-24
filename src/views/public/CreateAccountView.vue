@@ -14,6 +14,7 @@
           label="Email"
           v-model="email"
           :error-messages="isError ? ['Unable to create an account'] : []"
+          data-cy="input-email"
         />
         <password-field v-model="password" />
       </div>
@@ -28,8 +29,9 @@
       <v-btn
         v-if="!isCreated"
         color="primary"
-        @click="handleCreateAccount"
         :disabled="password.length === 0"
+        data-cy="button-create-account"
+        @click="handleCreateAccount"
       >
         Create Account
       </v-btn>

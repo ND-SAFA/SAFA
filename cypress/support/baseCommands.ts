@@ -1,14 +1,24 @@
-Cypress.Commands.add("inputText", (inputLabel: string, inputValue: string) => {
-  cy.contains("label", inputLabel)
-    .invoke("attr", "for")
-    .then((id) => cy.get(`#${id}`))
-    .type(inputValue);
+import "cypress-file-upload";
+
+Cypress.Commands.add("getCy", (dataCy: string, timeout?: number) => {
+  return cy.get(`[data-cy="${dataCy}"]`, { timeout });
 });
 
-Cypress.Commands.add("clickButton", (buttonLabel: string) => {
-  cy.contains("span", buttonLabel).parent().click();
+Cypress.Commands.add("inputText", (dataCy: string, inputValue: string) => {
+  cy.getCy(dataCy).first().type(inputValue);
 });
 
-Cypress.Commands.add("getButton", (buttonLabel: string) => {
-  return cy.contains("span", buttonLabel).parent();
+Cypress.Commands.add("clickButton", (dataCy: string) => {
+  cy.getCy(dataCy).first().click();
+});
+
+Cypress.Commands.add(
+  "uploadFiles",
+  (dataCy: string, ...filePaths: string[]) => {
+    cy.getCy(dataCy).first().attachFile(filePaths);
+  }
+);
+
+Cypress.Commands.add("switchTab", (tabLabel: string) => {
+  cy.contains("div", tabLabel).click();
 });

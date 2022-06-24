@@ -7,7 +7,7 @@
             icon
             v-on="{ ...tooltipOn, ...menuOn }"
             v-bind="attrs"
-            id="account-dropdown"
+            data-cy="account-dropdown"
           >
             <v-avatar>
               <v-icon color="secondary" style="font-size: 48px">
@@ -38,9 +38,10 @@
             rounded
             color="error"
             @click="handleLogout"
-            id="logout-button"
-            >Logout</v-btn
+            data-cy="button-logout"
           >
+            Logout
+          </v-btn>
         </div>
       </v-list-item-content>
     </v-card>

@@ -1,9 +1,9 @@
 Cypress.Commands.add("login", (email, password) => {
-  cy.inputText("Email", email)
-    .inputText("Password", password)
-    .clickButton("Login");
+  cy.inputText("input-email", email)
+    .inputText("input-password", password)
+    .clickButton("button-login");
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.get("#account-dropdown").click().clickButton("Logout");
+  cy.getCy("account-dropdown").click().clickButton("button-logout");
 });

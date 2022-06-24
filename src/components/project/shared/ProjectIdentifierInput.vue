@@ -1,7 +1,15 @@
 <template>
   <v-container style="max-width: 30em">
-    <v-text-field v-model="currentName" label="Project Name" />
-    <v-text-field v-model="currentDescription" label="Project description" />
+    <v-text-field
+      v-model="currentName"
+      label="Project Name"
+      data-cy="input-project-name"
+    />
+    <v-text-field
+      v-model="currentDescription"
+      label="Project Description"
+      data-cy="input-project-description"
+    />
   </v-container>
 </template>
 

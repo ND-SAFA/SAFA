@@ -7,6 +7,7 @@
       :disabled="isDisabled"
       @click="handleCreate"
       :loading="isLoading"
+      data-cy="button-create-project"
     >
       Create Project From Files
     </v-btn>

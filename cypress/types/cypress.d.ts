@@ -3,24 +3,39 @@ declare namespace Cypress {
     // Base Commands
 
     /**
+     * Gets an element based on the `data-cy` selector.
+     *
+     * @param dataCy - The testing selector to find.
+     * @param timeout - The timeout to optionally wait for.
+     */
+    getCy(dataCy: string, timeout?: number): Chainable<JQuery<HTMLElement>>;
+
+    /**
      * Sets the value of an input field.
      *
-     * @param inputLabel - The label of the input being set.
+     * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
      */
-    inputText(inputLabel: string, inputValue: string): Chainable<void>;
-    /**
-     * Returns the button with the given label.
-     *
-     * @param buttonLabel - The label of the button to find.
-     */
-    getButton(buttonLabel: string): Chainable<JQuery<HTMLElement>>;
+    inputText(dataCy: string, inputValue: string): Chainable<void>;
     /**
      * Clicks a button.
      *
-     * @param buttonLabel - The label of the button to click.
+     * @param dataCy - The testing selector of the button to click.
      */
-    clickButton(buttonLabel: string): Chainable<void>;
+    clickButton(dataCy: string): Chainable<void>;
+    /**
+     * Uploads files.
+     *
+     * @param dataCy - The testing selector of the file upload input.
+     * @param filePaths - The paths to the files to upload.
+     */
+    uploadFiles(dataCy: string, ...filePaths: string[]): Chainable<void>;
+    /**
+     * Clicks to switch to a different tab.
+     *
+     * @param tabLabel - The label of the tab to click.
+     */
+    switchTab(tabLabel: string): Chainable<void>;
 
     // Authentication Commands
 

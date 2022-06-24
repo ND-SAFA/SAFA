@@ -1,5 +1,5 @@
 import { Project } from "@/types";
-import { createProject, getSingleQueryResult } from "@/util";
+import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
   appModule,
@@ -7,7 +7,6 @@ import {
   deltaModule,
   documentModule,
   errorModule,
-  layoutModule,
   projectModule,
   subtreeModule,
   typeOptionsModule,
@@ -19,7 +18,7 @@ import {
   handleSelectVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
-import { getProjectArtifactTypes } from "@/api/endpoints/artifact-type-api";
+import { getProjectArtifactTypes } from "@/api/endpoints";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -81,7 +80,6 @@ export async function handleClearProject(): Promise<void> {
  * @param project - Project created containing entities.
  */
 export async function handleSetProject(project: Project): Promise<void> {
-  layoutModule.SET_ARTIFACT_POSITIONS(project.layout);
   await handleProjectSubscription(project);
   errorModule.setArtifactWarnings(project.warnings);
   await setCurrentDocument(project);

@@ -17,6 +17,9 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
         artifactSelectionModule.clearSelections();
         disableDrawMode();
       }
+      console.log(event.target.data().artifactName);
+      console.log(event.target.data().id);
+      console.log(event.target.position());
     },
   },
   selectAll: {

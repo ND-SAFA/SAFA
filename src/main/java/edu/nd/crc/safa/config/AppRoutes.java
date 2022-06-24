@@ -29,10 +29,6 @@ public class AppRoutes {
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;
 
-        public static class Layout {
-            public static final String createLayoutForProject = projectPrefix + "/versions/{versionId}/layout";
-        }
-
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";
             public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";

@@ -1,5 +1,5 @@
 import { ArtifactData, SvgStyle } from "@/types";
-import { getBackgroundColor, ThemeColors } from "@/util";
+import { capitalize, getBackgroundColor, ThemeColors } from "@/util";
 import { svgStoplight } from "./artifact-stoplight";
 import { getBody, getWarnings } from "./artifact-helper";
 
@@ -33,40 +33,24 @@ export function htmlSafetyCase(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgGoal(data: ArtifactData): string {
-  const color = getBackgroundColor(data.artifactDeltaState);
-  const x = 10;
-  const y = 20;
   const outerHeight = 160;
   const outerWidth = 206;
-  const width = 180;
 
-  return `
-    <div>
-      <svg 
-        width="${outerWidth}" height="${outerHeight}" 
-        style="margin-top: 6px"
-      >
-        <rect 
-          width="${outerWidth}" height="${outerHeight}"
-          fill="${ThemeColors.artifactBorder}"
-        />
-        <rect
-          x="1" y="1" fill="${color}"
-          width="${outerWidth - 2}" height="${outerHeight - 2}"
-        />
-        ${svgTitle("Goal", y)}
-        ${svgDiv({ x, y: y + 7, width })}
-        ${svgStoplight(data, { x, y: y + 9, width })}
-        ${svgDetails(data, y + 27)}
-        ${svgBody(data, 90, {
-          x,
-          y: y + 30,
-          width,
-          height: 100,
-        })}
-      </svg>
-    </div>
-  `;
+  return svgNode(
+    data,
+    { width: outerWidth, height: outerHeight, marginTop: 6 },
+    { x: 10, y: 20, width: 180, height: 100, truncateLength: 90 },
+    `
+      <rect 
+        width="${outerWidth}" height="${outerHeight}"
+        fill="${ThemeColors.artifactBorder}"
+      />
+      <rect
+        x="1" y="1" width="${outerWidth - 2}" height="${outerHeight - 2}"
+        fill="${getBackgroundColor(data.artifactDeltaState)}"
+      />
+    `
+  );
 }
 
 /**
@@ -77,40 +61,24 @@ function svgGoal(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgContext(data: ArtifactData): string {
-  const color = getBackgroundColor(data.artifactDeltaState);
-  const x = 10;
-  const y = 20;
   const outerHeight = 160;
   const outerWidth = 206;
-  const width = 180;
 
-  return `
-    <div>
-      <svg 
-        width="${outerWidth}" height="${outerHeight}" 
-        style="margin-top: 6px"
-      >
-        <rect 
-          rx="8" fill="${ThemeColors.artifactBorder}"
-          width="${outerWidth}" height="${outerHeight}"
-        />
-        <rect
-          x="1" y="1" rx="7" fill="${color}"
-          width="${outerWidth - 2}" height="${outerHeight - 2}"
-        />
-        ${svgTitle("Context", y)}
-        ${svgDiv({ x, y: y + 7, width })}
-        ${svgStoplight(data, { x, y: y + 9, width })}
-        ${svgDetails(data, y + 27)}
-        ${svgBody(data, 90, {
-          x,
-          y: y + 30,
-          width,
-          height: 100,
-        })}
-      </svg>
-    </div>
-  `;
+  return svgNode(
+    data,
+    { width: outerWidth, height: outerHeight, marginTop: 6 },
+    { x: 10, y: 20, width: 180, height: 100, truncateLength: 90 },
+    `
+      <rect 
+        rx="8" width="${outerWidth}" height="${outerHeight}"
+        fill="${ThemeColors.artifactBorder}"
+      />
+      <rect
+        x="1" y="1" rx="7" width="${outerWidth - 2}" height="${outerHeight - 2}"
+        fill="${getBackgroundColor(data.artifactDeltaState)}"
+      />
+    `
+  );
 }
 
 /**
@@ -121,38 +89,28 @@ function svgContext(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgSolution(data: ArtifactData): string {
-  const color = getBackgroundColor(data.artifactDeltaState);
-  const x = 40;
-  const y = 35;
-  const width = 120;
-
-  return `
-    <div>
-      <svg 
-        width="200" height="200" 
-        style="margin-top: 7px"
-      >
-        <circle 
-          cx="100" cy="100" r="92"
-          fill="${ThemeColors.artifactBorder}"
-        />
-        <circle 
-          cx="100" cy="100" r="91"
-          fill="${color}"
-        />
-        ${svgTitle("Solution", y)}
-        ${svgDiv({ x, y: y + 7, width })}
-        ${svgStoplight(data, { x, y: y + 9, width })}
-        ${svgDetails(data, y + 25)}
-        ${svgBody(data, 65, {
-          x,
-          y: y + 30,
-          width: 160,
-          height: 70,
-        })}
-      </svg>
-    </div>
-  `;
+  return svgNode(
+    data,
+    { width: 200, height: 200, marginTop: 7 },
+    {
+      x: 40,
+      y: 35,
+      width: 120,
+      height: 70,
+      bodyWidth: 160,
+      truncateLength: 65,
+    },
+    `
+      <circle 
+        cx="100" cy="100" r="92"
+        fill="${ThemeColors.artifactBorder}"
+      />
+      <circle 
+        cx="100" cy="100" r="91"
+        fill="${getBackgroundColor(data.artifactDeltaState)}"
+      />
+    `
+  );
 }
 
 /**
@@ -163,45 +121,70 @@ function svgSolution(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgStrategy(data: ArtifactData): string {
-  const color = getBackgroundColor(data.artifactDeltaState);
-  const x = 30;
-  const y = 20;
   const outerHeight = 160;
   const outerWidth = 206;
-  const width = 180;
   const xOffset = 20;
+
+  return svgNode(
+    data,
+    { width: outerWidth + xOffset, height: outerHeight, marginTop: 6 },
+    { x: 30, y: 20, width: 180, height: 100, truncateLength: 90 },
+    `
+      <polygon 
+        points="
+          ${xOffset},0 
+          ${outerWidth + xOffset},0 
+          ${outerWidth},${outerHeight} 
+          0,${outerHeight}"
+        fill="${ThemeColors.artifactBorder}"
+      />
+      <polygon
+        points="
+          ${xOffset + 1},1 
+          ${outerWidth + xOffset - 1},1 
+          ${outerWidth - 1},${outerHeight - 1} 
+          1,${outerHeight - 1}"
+        fill="${getBackgroundColor(data.artifactDeltaState)}"
+      />
+    `
+  );
+}
+
+/**
+ * Creates the SVG safety case node.
+ *
+ * @param data - The artifact data to render.
+ * @param outerStyle - The styles to render the SVG with.
+ * @param innerStyle - The styles to render the inner content with.
+ * @param svgShape - The SVG for rendering the node's shape.
+ *
+ * @return stringified SVG for the node.
+ */
+function svgNode(
+  data: ArtifactData,
+  outerStyle: Pick<SvgStyle, "width" | "height"> & { marginTop: number },
+  innerStyle: SvgStyle & { truncateLength: number; bodyWidth?: number },
+  svgShape: string
+): string {
+  const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
 
   return `
     <div>
       <svg 
-        width="${outerWidth + xOffset}" height="${outerHeight}" 
-        style="margin-top: 6px"
+        width="${outerStyle.width}" height="${outerStyle.height}" 
+        style="margin-top: ${outerStyle.marginTop}px"
       >
-        <polygon 
-          points="
-            ${xOffset},0 
-            ${outerWidth + xOffset},0 
-            ${outerWidth},${outerHeight} 
-            0,${outerHeight}"
-          fill="${ThemeColors.artifactBorder}"
-        />
-        <polygon
-          points="
-            ${xOffset + 1},1 
-            ${outerWidth + xOffset - 1},1 
-            ${outerWidth - 1},${outerHeight - 1} 
-            1,${outerHeight - 1}"
-          fill="${color}"
-        />
-        ${svgTitle("Strategy", y)}
+        ${svgShape}
+        ${svgTitle(capitalize(data.safetyCaseType || ""), y)}
         ${svgDiv({ x, y: y + 7, width })}
         ${svgStoplight(data, { x, y: y + 9, width })}
         ${svgDetails(data, y + 27)}
-        ${svgBody(data, 90, {
+        ${svgBody(data, {
           x,
           y: y + 30,
-          width,
-          height: 100,
+          width: bodyWidth || width,
+          height,
+          truncateLength,
         })}
       </svg>
     </div>
@@ -283,22 +266,22 @@ function svgDetails(data: ArtifactData, yPos: number): string {
  * Creates the SVG for representing a safety case node's body.
  *
  * @param data - The artifact data to render.
- * @param truncateLength - The number of characters to print before truncating.
  * @param style - The position style to draw with.
  *
  * @return stringified SVG for the node.
  */
 function svgBody(
   data: ArtifactData,
-  truncateLength: number,
-  style: SvgStyle
+  style: SvgStyle & { truncateLength: number }
 ): string {
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
       width="${style.width}" height="${style.height}"
     >
-      <span class="text-body-2">${getBody(data.body, truncateLength)}</span>
+      <span class="text-body-2">
+        ${getBody(data.body, style.truncateLength)}
+      </span>
     </foreignObject>
   `;
 }

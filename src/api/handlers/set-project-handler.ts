@@ -19,7 +19,7 @@ import {
   handleSelectVersion,
 } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
-import { getProjectArtifactTypes, getProjectLayout } from "@/api/endpoints";
+import { getProjectArtifactTypes } from "@/api/endpoints";
 
 /**
  * Resets graph state when some or all of a project gets reloaded.
@@ -55,7 +55,6 @@ export async function handleProjectSubscription(
   const isDifferentProject = projectModule.versionId !== versionId;
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
-  project.layout = await getProjectLayout(versionId);
 
   await handleSelectVersion(projectId, versionId);
   await projectModule.initializeProject(project);

@@ -50,7 +50,7 @@ export default class GraphLayout implements IGraphLayout {
       cy.layout({
         name: "preset",
         fit: true,
-        padding: 30,
+        padding: 0,
         positions: (node: NodeSingular | string) => {
           const id = typeof node === "string" ? node : node.data().id;
 

@@ -11,10 +11,13 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
 import org.junit.jupiter.api.Test;
 
-public class TestLayoutInProjectRetrieval extends LayoutBaseTest {
+/**
+ * Tests that the layout is being returned when retrieving a project.
+ */
+public class TestLayoutRetrieved extends LayoutBaseTest {
 
     @Test
-    public void generateMrTreeLayout() throws Exception {
+    public void testValidLayoutExistsInDefaultProject() throws Exception {
         Map<String, LayoutPosition> layout = project.getLayout();
 
         // VP - Verify position created for every artifact
@@ -31,9 +34,6 @@ public class TestLayoutInProjectRetrieval extends LayoutBaseTest {
         // VP - F1 is at least one node height above F4
         LayoutPosition f1 = layout.get(getArtifactId("F1"));
         LayoutPosition f4 = layout.get(getArtifactId("F4"));
-
-        System.out.println("F1:" + f1);
-        System.out.println("F1:" + f4);
 
         double deltaY = f4.getY() - f1.getY();
         assertThat(deltaY).isGreaterThan(LayoutSettings.ARTIFACT_HEIGHT);

@@ -14,13 +14,16 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
+/**
+ * Tests that nodes are formatted in a hierarchical structure.
+ */
 public class TestLayoutCorrectness extends ApplicationBaseTest {
     String projectName = "project name";
     String artifactType = "Requirement";
     String artifactBody = "This is body";
 
     @Test
-    public void simpleLayout() throws Exception {
+    public void testParentWithTwoChildren() throws Exception {
         String a1Name = "R1";
         String a2Name = "R2";
         String a3Name = "R3";

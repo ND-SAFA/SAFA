@@ -26,19 +26,7 @@ import unit.SampleProjectConstants;
 public class TestGraphCreation extends LayoutBaseTest {
 
     @Test
-    public void testF1() {
-        String artifactName = "F1";
-        int nChildren = 4; // EA1, F2, F3, F4
-        ElkNode f1 = getArtifact(artifactName);
-
-        // VP - Verify F1 is a child of root graph node.
-        assertThat(getParent(f1)).isEqualTo(null);
-        List<ElkNode> f1Children = getChildren(f1);
-        assertThat(f1Children.size()).isEqualTo(nChildren);
-    }
-
-    @Test
-    public void testLeafNode() {
+    public void testInternalMethods() {
         String d1Name = "D1";
         String parentId = "F5";
         int nChildren = 0;
@@ -60,20 +48,18 @@ public class TestGraphCreation extends LayoutBaseTest {
     }
 
     @Test
-    public void testGraphRootChildren() {
+    public void testNodeAreChildrenOnGraph() {
         List<String> graphNodesNames = this.rootGraphNode
             .getChildren()
             .stream()
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
 
-        assertThat(graphNodesNames.contains(getArtifactId("F1"))).isTrue();
-        assertThat(graphNodesNames.contains(getArtifactId("D11"))).isTrue();
         assertThat(graphNodesNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
     }
 
     @Test
-    public void getChildren() {
+    public void testChildrenOfTwoArtifactProject() {
         String rootId = "Root";
         List<String> artifactIds = List.of("R1", "R2");
         List<ArtifactAppEntity> artifacts = artifactIds

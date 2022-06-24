@@ -21,7 +21,7 @@ public class AppRoutes {
         private static final String jobId = jobRoot + "/{jobId}";
         public static final String deleteJob = jobId;
     }
-    
+
     public static class Projects {
         private static final String projectPrefix = "/projects";
         public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
@@ -31,10 +31,6 @@ public class AppRoutes {
 
         public static class Layout {
             public static final String createLayoutForProject = projectPrefix + "/versions/{versionId}/layout";
-            public static final String createLayoutForDocument = projectPrefix + "/versions/{versionId}/documents"
-                + "/{documentId}/layout";
-            public static final String saveLayoutForArtifact = projectPrefix + "/versions/{versionId}/artifacts"
-                + "/{artifactId}/position";
         }
 
         public static class Import {

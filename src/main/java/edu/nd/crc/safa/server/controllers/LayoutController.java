@@ -14,7 +14,6 @@ import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
@@ -22,7 +21,6 @@ import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
-import org.javatuples.Pair;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -30,7 +28,6 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -74,25 +71,6 @@ public class LayoutController extends BaseController {
         KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(projectAppEntity.artifacts,
             projectAppEntity.traces);
         return layoutGenerator.layout();
-    }
-
-    //TODO: Add unit tests
-    @PostMapping(AppRoutes.Projects.Layout.createLayoutForDocument)
-    public JobAppEntity createLayoutForDocument(@PathVariable UUID versionId,
-                                                @PathVariable UUID documentId) throws Exception {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
-        Document document = getDocumentById(documentRepository, documentId);
-
-        String name = createJobName("document", projectVersion);
-        Pair<List<ArtifactAppEntity>, List<TraceAppEntity>> response =
-            appEntityRetrievalService.getEntitiesInDocument(projectVersion,
-                document);
-        return runLayoutJob(name, response.getValue0(), response.getValue1());
-    }
-
-    @PostMapping(AppRoutes.Projects.Layout.saveLayoutForArtifact)
-    public void saveArtifactPosition(@RequestBody ArtifactAppEntity artifactAppEntity) {
-        //TODO: Plan out database entities (can we re-use existing ones?)
     }
 
     private JobAppEntity runLayoutJob(String jobName,

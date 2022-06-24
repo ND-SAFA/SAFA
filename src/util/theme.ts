@@ -13,9 +13,11 @@ export enum ThemeColors {
 
   artifactDefault = "#fafafa",
   artifactBorder = "#888888",
+  artifactText = "#36405a",
   artifactAdded = "#81c784",
   artifactRemoved = "#e57373",
   artifactModified = "#64b5f6",
+  artifactWarning = "#EEBC3D",
 }
 
 /**

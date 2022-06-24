@@ -1,4 +1,5 @@
 import { capitalize } from "@/util";
+import { getBody } from "./artifact-helper";
 
 /**
  * Creates the HTML for representing a node's header.
@@ -49,12 +50,9 @@ export function htmlBody(
   const nodeWidth = width ? `width: ${width}px;` : "";
   const nodeHeight = width ? `height: ${height}px;` : "";
 
-  body =
-    body.length > truncateLength ? body.slice(0, truncateLength) + "..." : body;
-
   return `
     <span class="text-body-2 artifact-body" style="${nodeWidth}${nodeHeight}">
-      ${body}
+      ${getBody(body, truncateLength)}
     </span>
   `;
 }

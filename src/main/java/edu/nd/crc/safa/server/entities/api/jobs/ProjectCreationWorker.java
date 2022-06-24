@@ -47,7 +47,7 @@ public class ProjectCreationWorker extends JobWorker {
     }
 
     public void generatingLayout() {
-        //TODO: Use Klayout Layout package to generate layout
+        //TODO: Store generated layout
     }
 
     @Override

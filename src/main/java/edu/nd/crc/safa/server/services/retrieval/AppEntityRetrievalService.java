@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.layout.KlayLayoutGenerator;
+import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
@@ -108,6 +110,9 @@ public class AppEntityRetrievalService {
         // Version errors
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
 
+        // Layout
+        Map<String, LayoutPosition> layout = retrieveProjectLayout(artifacts, traces);
+
         return new ProjectAppEntity(projectVersion,
             artifacts,
             traces,
@@ -115,7 +120,8 @@ public class AppEntityRetrievalService {
             documents,
             currentDocumentId,
             artifactTypes,
-            errors);
+            errors,
+            layout);
     }
 
     /**
@@ -251,5 +257,13 @@ public class AppEntityRetrievalService {
                 .map(TraceLinkVersion::getTraceLink)
                 .collect(Collectors.toList());
         return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);
+    }
+
+    public Map<String, LayoutPosition> retrieveProjectLayout(
+        List<ArtifactAppEntity> artifacts,
+        List<TraceAppEntity> traces
+    ) {
+        KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(artifacts, traces);
+        return layoutGenerator.layout();
     }
 }

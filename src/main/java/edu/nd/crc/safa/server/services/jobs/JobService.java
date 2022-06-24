@@ -44,7 +44,8 @@ public class JobService {
     SafaUserService safaUserService;
 
     @Autowired
-    public JobService(JobDbRepository jobDbRepository, SafaUserService safaUserService) {
+    public JobService(JobDbRepository jobDbRepository,
+                      SafaUserService safaUserService) {
         this.jobDbRepository = jobDbRepository;
         this.safaUserService = safaUserService;
     }

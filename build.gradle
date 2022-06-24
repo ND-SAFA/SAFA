@@ -80,6 +80,10 @@ dependencies {
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0' // Parses javadoc
     implementation 'org.springdoc:springdoc-openapi-javadoc:1.6.9' // Adds javadoc to swagger docs
 
+    // layout generation
+    implementation 'org.eclipse.elk:org.eclipse.elk.core:0.8.1'
+    implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
+
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
     testImplementation 'com.h2database:h2:1.4.200'

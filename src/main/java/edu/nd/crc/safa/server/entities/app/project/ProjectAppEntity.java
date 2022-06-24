@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -47,6 +48,8 @@ public class ProjectAppEntity {
     Map<String, List<@Valid @NotNull RuleName>> warnings;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ProjectParsingErrors errors;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    Map<String, LayoutPosition> layout;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -65,7 +68,8 @@ public class ProjectAppEntity {
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
                             List<ArtifactType> artifactTypes,
-                            ProjectParsingErrors errors) {
+                            ProjectParsingErrors errors,
+                            Map<String, LayoutPosition> layout) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
@@ -79,5 +83,6 @@ public class ProjectAppEntity {
         this.currentDocumentId = currentDocumentId;
         this.artifactTypes = artifactTypes;
         this.errors = errors;
+        this.layout = layout;
     }
 }

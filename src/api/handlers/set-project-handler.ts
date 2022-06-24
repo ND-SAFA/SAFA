@@ -7,7 +7,6 @@ import {
   deltaModule,
   documentModule,
   errorModule,
-  layoutModule,
   projectModule,
   subtreeModule,
   typeOptionsModule,

@@ -9,5 +9,4 @@ export * from "./jira-api";
 export * from "./warning-api";
 export * from "./job-api";
 export * from "./github-api";
-export * from "./layout-api";
 export * from "./artifact-type-api";

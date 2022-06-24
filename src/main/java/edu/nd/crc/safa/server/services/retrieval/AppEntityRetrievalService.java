@@ -35,7 +35,6 @@ import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import lombok.AllArgsConstructor;
-import org.javatuples.Pair;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -123,20 +122,6 @@ public class AppEntityRetrievalService {
             artifactTypes,
             errors,
             layout);
-    }
-
-    public Pair<List<ArtifactAppEntity>, List<TraceAppEntity>> getEntitiesInDocument(ProjectVersion projectVersion,
-                                                                                     Document document) {
-        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion)
-            .stream()
-            .filter(a -> a.documentIds.contains(document.getDocumentId().toString()))
-            .collect(Collectors.toList());
-        List<String> artifactIds = artifacts
-            .stream()
-            .map(ArtifactAppEntity::getBaseEntityId)
-            .collect(Collectors.toList());
-        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
-        return new Pair<>(artifacts, traces);
     }
 
     /**

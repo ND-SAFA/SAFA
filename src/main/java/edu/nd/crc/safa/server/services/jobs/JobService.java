@@ -42,18 +42,12 @@ public class JobService {
      * Service used to add authenticated user to job.
      */
     SafaUserService safaUserService;
-    /**
-     * Runs jobs with pre-defined settings surrounding execution and security.
-     */
-    JobLauncher jobLauncher;
 
     @Autowired
     public JobService(JobDbRepository jobDbRepository,
-                      SafaUserService safaUserService,
-                      JobLauncher jobLauncher) {
+                      SafaUserService safaUserService) {
         this.jobDbRepository = jobDbRepository;
         this.safaUserService = safaUserService;
-        this.jobLauncher = jobLauncher;
     }
 
     public void deleteJob(UUID jobId) {

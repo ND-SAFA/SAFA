@@ -169,7 +169,7 @@ function svgNode(
   const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
 
   return `
-    <div>
+    <div style="opacity: ${data.opacity}">
       <svg 
         width="${outerStyle.width}" height="${outerStyle.height}" 
         style="margin-top: ${outerStyle.marginTop}px"

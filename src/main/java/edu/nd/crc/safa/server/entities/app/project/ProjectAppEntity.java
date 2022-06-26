@@ -50,6 +50,8 @@ public class ProjectAppEntity {
     ProjectParsingErrors errors;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, LayoutPosition> layout;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    Map<String, Map<String, LayoutPosition>> documentLayouts;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -59,6 +61,8 @@ public class ProjectAppEntity {
         this.artifactTypes = new ArrayList<>();
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
+        this.layout = new Hashtable<>();
+        this.documentLayouts = new Hashtable<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -69,7 +73,8 @@ public class ProjectAppEntity {
                             @Nullable String currentDocumentId,
                             List<ArtifactType> artifactTypes,
                             ProjectParsingErrors errors,
-                            Map<String, LayoutPosition> layout) {
+                            Map<String, LayoutPosition> layout,
+                            Map<String, Map<String, LayoutPosition>> documentLayouts) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();
@@ -84,5 +89,6 @@ public class ProjectAppEntity {
         this.artifactTypes = artifactTypes;
         this.errors = errors;
         this.layout = layout;
+        this.documentLayouts = documentLayouts;
     }
 }

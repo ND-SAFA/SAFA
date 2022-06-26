@@ -78,9 +78,8 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
     }
 
     public JSONArray sendPostWithArrayResponse(String routeName,
-                                               Object body,
-                                               ResultMatcher test) throws Exception {
-        return sendPost(routeName, body, test, true, EntityBaseTest::arrayCreator);
+                                               Object body) throws Exception {
+        return sendPost(routeName, body, status().is2xxSuccessful(), true, EntityBaseTest::arrayCreator);
     }
 
     public void sendPost(String routeName,

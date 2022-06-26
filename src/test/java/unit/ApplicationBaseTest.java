@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
@@ -15,8 +16,10 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
+import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectRole;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -40,10 +43,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
-    UserDetailsService userDetailsService;
-
-    @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
+    @Autowired
+    UserDetailsService userDetailsService;
 
     public void setAuthorization() {
         UserDetails userDetails = userDetailsService.loadUserByUsername(currentUsername);
@@ -198,6 +200,27 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
                 .withVersion(projectVersion)
                 .get();
         return sendPost(route, docJson, status().isCreated());
+    }
+
+    protected JSONArray addArtifactToDocument(ProjectVersion projectVersion,
+                                              Document document,
+                                              JSONArray artifactsJson) throws Exception {
+        String route = RouteBuilder
+            .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
+            .withVersion(projectVersion)
+            .withDocument(document)
+            .get();
+        return sendPostWithArrayResponse(route, artifactsJson);
+    }
+
+    protected String getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {
+        ArtifactAppEntity artifact =
+            artifacts
+                .stream()
+                .filter(a -> a.name.equals(artifactName))
+                .collect(Collectors.toList())
+                .get(0);
+        return artifact.getId();
     }
 
     private void assertArraysMatch(JSONArray expected, JSONArray actual) {

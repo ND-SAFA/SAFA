@@ -73,8 +73,7 @@ public class ProjectAppEntity {
                             @Nullable String currentDocumentId,
                             List<ArtifactType> artifactTypes,
                             ProjectParsingErrors errors,
-                            Map<String, LayoutPosition> layout,
-                            Map<String, Map<String, LayoutPosition>> documentLayouts) {
+                            Map<String, LayoutPosition> layout) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId().toString();

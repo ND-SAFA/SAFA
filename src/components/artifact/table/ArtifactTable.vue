@@ -22,10 +22,14 @@
       </template>
 
       <template v-slot:[`item.name`]="{ item }">
-        <div class="d-flex flex-row">
-          <v-icon v-if="getHasWarnings(item)" color="secondary">
-            mdi-hazard-lights
-          </v-icon>
+        <div class="d-flex flex-row align-center">
+          <generic-icon-button
+            v-if="getHasWarnings(item)"
+            icon-id="mdi-hazard-lights"
+            tooltip="View warnings"
+            color="secondary"
+            @click="handleView(item)"
+          />
           <span class="text-body-1 ml-1">{{ item.name }}</span>
         </div>
       </template>

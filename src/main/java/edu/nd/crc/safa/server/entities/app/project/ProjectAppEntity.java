@@ -50,8 +50,6 @@ public class ProjectAppEntity {
     ProjectParsingErrors errors;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, LayoutPosition> layout;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Map<String, Map<String, LayoutPosition>> documentLayouts;
 
     public ProjectAppEntity() {
         this.artifacts = new ArrayList<>();
@@ -62,7 +60,6 @@ public class ProjectAppEntity {
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
         this.layout = new Hashtable<>();
-        this.documentLayouts = new Hashtable<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -88,6 +85,5 @@ public class ProjectAppEntity {
         this.artifactTypes = artifactTypes;
         this.errors = errors;
         this.layout = layout;
-        this.documentLayouts = documentLayouts;
     }
 }

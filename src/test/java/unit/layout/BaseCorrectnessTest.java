@@ -66,9 +66,14 @@ public class BaseCorrectnessTest extends ApplicationBaseTest {
     protected LayoutPosition getPositionInDocument(ProjectAppEntity project,
                                                    String documentId,
                                                    String artifactName) {
+        String artifactId = getArtifactId(project.artifacts, artifactName);
         return project
-            .getDocumentLayouts()
-            .get(documentId)
-            .get(getArtifactId(project.artifacts, artifactName));
+            .getDocuments()
+            .stream()
+            .filter(d -> d.getDocumentId().toString().equals(documentId))
+            .findFirst()
+            .get()
+            .getLayout()
+            .get(artifactId);
     }
 }

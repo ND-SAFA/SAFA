@@ -132,9 +132,10 @@ public class AppEntityRetrievalService {
     public void setDocumentLayouts(List<ArtifactAppEntity> projectArtifacts,
                                    List<TraceAppEntity> projectTraces,
                                    List<DocumentAppEntity> documents) {
+        //TODO: Replace with layout retrieval
         Map<String, Map<String, LayoutPosition>> documentLayouts = this
             .layoutService
-            .retrieveDocumentLayouts(projectArtifacts, projectTraces, documents);
+            .generateDocumentLayouts(projectArtifacts, projectTraces, documents);
         for (DocumentAppEntity documentAppEntity : documents) {
             documentAppEntity.setLayout(documentLayouts.get(documentAppEntity.getDocumentId().toString()));
         }

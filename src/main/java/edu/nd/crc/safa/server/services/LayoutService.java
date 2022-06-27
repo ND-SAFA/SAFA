@@ -39,7 +39,7 @@ public class LayoutService {
      * @param documents        The documents in the project.
      * @return Map of documentId to the layout associated with the document.
      */
-    public Map<String, Map<String, LayoutPosition>> retrieveDocumentLayouts(
+    public Map<String, Map<String, LayoutPosition>> generateDocumentLayouts(
         List<ArtifactAppEntity> projectArtifacts,
         List<TraceAppEntity> projectTraces,
         List<DocumentAppEntity> documents

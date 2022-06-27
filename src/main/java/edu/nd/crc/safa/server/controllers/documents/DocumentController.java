@@ -94,7 +94,7 @@ public class DocumentController extends BaseDocumentController {
         // Generate layout
         Map<String, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
         documentAppEntity.setLayout(documentLayout);
-        
+
         return documentAppEntity;
     }
 
@@ -102,8 +102,9 @@ public class DocumentController extends BaseDocumentController {
                                                             DocumentAppEntity documentAppEntity) {
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        //TODO: Replace with layout retrieval.
         Map<String, Map<String, LayoutPosition>> documentLayoutMap =
-            this.layoutService.retrieveDocumentLayouts(projectAppEntity.artifacts,
+            this.layoutService.generateDocumentLayouts(projectAppEntity.artifacts,
                 projectAppEntity.traces,
                 List.of(documentAppEntity));
         return documentLayoutMap.get(documentAppEntity.getDocumentId().toString());

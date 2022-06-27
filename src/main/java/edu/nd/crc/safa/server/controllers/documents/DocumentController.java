@@ -1,19 +1,23 @@
 package edu.nd.crc.safa.server.controllers.documents;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.services.DocumentService;
+import edu.nd.crc.safa.server.services.LayoutService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
@@ -36,17 +40,20 @@ public class DocumentController extends BaseDocumentController {
     private final DocumentService documentService;
     private final NotificationService notificationService;
     private final AppEntityRetrievalService appEntityRetrievalService;
+    private final LayoutService layoutService;
 
     @Autowired
     public DocumentController(ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
                               DocumentService documentService,
                               NotificationService notificationService,
-                              AppEntityRetrievalService appEntityRetrievalService) {
+                              AppEntityRetrievalService appEntityRetrievalService,
+                              LayoutService layoutService) {
         super(resourceBuilder, documentRepository);
         this.documentService = documentService;
         this.notificationService = notificationService;
         this.appEntityRetrievalService = appEntityRetrievalService;
+        this.layoutService = layoutService;
     }
 
     /**
@@ -83,7 +90,23 @@ public class DocumentController extends BaseDocumentController {
 
         // Update version subscribers
         documentService.notifyDocumentChanges(projectVersion, nArtifactUpdated > 0);
+
+        // Generate layout
+        Map<String, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
+        documentAppEntity.setLayout(documentLayout);
+        
         return documentAppEntity;
+    }
+
+    public Map<String, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
+                                                            DocumentAppEntity documentAppEntity) {
+        ProjectAppEntity projectAppEntity =
+            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        Map<String, Map<String, LayoutPosition>> documentLayoutMap =
+            this.layoutService.retrieveDocumentLayouts(projectAppEntity.artifacts,
+                projectAppEntity.traces,
+                List.of(documentAppEntity));
+        return documentLayoutMap.get(documentAppEntity.getDocumentId().toString());
     }
 
 

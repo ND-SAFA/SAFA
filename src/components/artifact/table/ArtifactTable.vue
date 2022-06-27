@@ -21,6 +21,15 @@
         <artifact-table-chip :text="item.type" />
       </template>
 
+      <template v-slot:[`item.name`]="{ item }">
+        <div class="d-flex flex-row">
+          <v-icon v-if="getHasWarnings(item)" color="secondary">
+            mdi-hazard-lights
+          </v-icon>
+          <span class="text-body-1 ml-1">{{ item.name }}</span>
+        </div>
+      </template>
+
       <template
         v-for="column in columns"
         v-slot:[`item.${column.id}`]="{ item }"
@@ -82,6 +91,7 @@ import {
   artifactSelectionModule,
   deltaModule,
   documentModule,
+  errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
@@ -234,6 +244,14 @@ export default Vue.extend({
 
         return `artifact-${deltaState.toLowerCase()}`;
       }
+    },
+    /**
+     * Returns whether the artifact has any warnings.
+     * @param item - The artifact to search for
+     * @return Whether the artifact has warnings.
+     */
+    getHasWarnings(item: Artifact): boolean {
+      return errorModule.getWarningsByIds([item.id]).length > 0;
     },
   },
 });

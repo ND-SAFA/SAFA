@@ -40,12 +40,12 @@ export default class WarningModule extends VuexModule {
   }
 
   /**
-   * @return Warnings associated with artifacts of given names.
+   * @return Warnings associated with artifacts of given ids.
    */
-  get getWarningsByArtifactNames(): (names: string[]) => ArtifactWarning[] {
-    return (names) => {
-      return names
-        .map((name) => this.artifactWarnings[name] || [])
+  get getWarningsByIds(): (ids: string[]) => ArtifactWarning[] {
+    return (ids) => {
+      return ids
+        .map((id) => this.artifactWarnings[id] || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
     };
   }

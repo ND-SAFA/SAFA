@@ -1,9 +1,14 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type { DocumentColumn, Project, ProjectDocument } from "@/types";
-import { DocumentType } from "@/types";
+import { ArtifactPositions, DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
-import { artifactModule, traceModule } from "@/store";
+import {
+  artifactModule,
+  layoutModule,
+  projectModule,
+  traceModule,
+} from "@/store";
 import {
   clearCurrentDocument,
   handleResetGraph,
@@ -109,6 +114,14 @@ export default class DocumentModule extends VuexModule {
       : await setCurrentDocument(document.documentId);
     artifactModule.initializeArtifacts({ currentArtifactIds });
     traceModule.initializeTraces({ currentArtifactIds });
+    if (document.documentId !== "") {
+      await layoutModule.SET_ARTIFACT_POSITIONS(document.layout);
+    } else {
+      await layoutModule.SET_ARTIFACT_POSITIONS(
+        projectModule.getProject.layout
+      );
+    }
+
     await handleResetGraph();
   }
 

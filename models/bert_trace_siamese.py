@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
 from transformers import AutoModel, BertPreTrainedModel
+from models.base_model_identifier import BaseModelIdentifier
 
 
 class AvgPooler(nn.Module):
@@ -80,3 +81,14 @@ class BertTraceSiamese(BertPreTrainedModel):
         logits = self.classifier(t_hidden=s_hidden, s_hidden=t_hidden)
         sim_scores = torch.softmax(logits, 1).data.tolist()
         return [x[1] for x in sim_scores]
+
+
+class BertTraceSiameseIdentifier(BaseModelIdentifier):
+
+    @property
+    def model_class(self):
+        return BertTraceSiamese
+
+    @property
+    def model_path(self):
+        pass

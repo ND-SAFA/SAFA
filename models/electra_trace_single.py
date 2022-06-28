@@ -1,6 +1,7 @@
 from transformers import ElectraPreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
 
+from models.base_model_identifier import BaseModelIdentifier
 from models.single_lm_forward import single_lm_forward
 
 
@@ -22,3 +23,14 @@ class ElectraTraceSingle(ElectraPreTrainedModel):
             labels=labels,
             kwargs=kwargs,
         )
+
+
+class ElectraTraceSingleIdentifier(BaseModelIdentifier):
+
+    @property
+    def model_class(self):
+        return ElectraTraceSingle
+
+    @property
+    def model_path(self):
+        pass

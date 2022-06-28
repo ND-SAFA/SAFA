@@ -3,6 +3,7 @@ from transformers.models.electra.modeling_electra import (
     ElectraClassificationHead,
 )
 
+from models.base_model_identifier import BaseModelIdentifier
 from models.single_lm_forward import single_lm_forward
 
 
@@ -24,3 +25,14 @@ class BertTraceSingle(BertPreTrainedModel):
             labels=labels,
             kwargs=kwargs,
         )
+
+
+class BertTraceSingleIdentifier(BaseModelIdentifier):
+
+    @property
+    def model_class(self):
+        return BertTraceSingle
+
+    @property
+    def model_path(self):
+        pass

@@ -1,5 +1,4 @@
 from jobs.base_job import BaseJob
-from train.trainer import LMTrainer
 
 
 class TrainJob(BaseJob):
@@ -7,7 +6,8 @@ class TrainJob(BaseJob):
     def _get_checkpoint(self) -> str:
         pass
 
-    def _start(self, trainer: LMTrainer):
+    def _start(self):
         checkpoint = self._get_checkpoint()
+        trainer = self._get_trainer()
         results = trainer.train(checkpoint=checkpoint)
-        trainer.save(results)
+        results.save()

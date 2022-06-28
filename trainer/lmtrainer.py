@@ -1,5 +1,7 @@
 from transformers import Trainer
 
+from results.base_results import BaseResults
+
 
 # TODO
 class LMTrainer(Trainer):
@@ -7,11 +9,8 @@ class LMTrainer(Trainer):
     def __init__(self, args, model, dataset):
         pass
 
-    def train(self, **kwargs):
+    def train(self, **kwargs) -> BaseResults:
         pass
 
-    def save(self, results):
-        pass
-
-    def predict(self):
+    def predict(self) -> BaseResults:
         pass

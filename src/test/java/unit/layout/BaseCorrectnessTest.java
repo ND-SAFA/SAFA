@@ -2,14 +2,21 @@ package unit.layout;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.layout.LayoutPosition;
+import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import unit.ApplicationBaseTest;
 
@@ -38,11 +45,21 @@ public class BaseCorrectnessTest extends ApplicationBaseTest {
             .withAddedTrace(jsonBuilder.createTrace(a3Name, a1Name)));
     }
 
-    protected void assertLayoutCorrectness(LayoutPosition a1Pos,
-                                           LayoutPosition a2Pos,
-                                           LayoutPosition a3Pos) {
-        assertThat(a1Pos.getY()).isLessThan(a2Pos.getY());
-        assertThat(a1Pos.getY()).isLessThan(a3Pos.getY());
+    /**
+     * Makes the following assertions about the following structure:
+     * - Root node is above both children
+     * - Children have the same height
+     *
+     * @param rootPos        The position of the root node.
+     * @param firstChildPos  The position of one of the children.
+     * @param secondChildPos The position of the other child.
+     */
+    protected void assertLayoutCorrectness(LayoutPosition rootPos,
+                                           LayoutPosition firstChildPos,
+                                           LayoutPosition secondChildPos) {
+        assertThat(rootPos.getY()).isLessThan(firstChildPos.getY());
+        assertThat(rootPos.getY()).isLessThan(secondChildPos.getY());
+        assertThat(firstChildPos.getY()).isEqualTo(secondChildPos.getY());
     }
 
     protected JSONObject createArtifact(String artifactName) {
@@ -63,9 +80,9 @@ public class BaseCorrectnessTest extends ApplicationBaseTest {
         return project.getLayout().get(id);
     }
 
-    protected LayoutPosition getPositionInDocument(ProjectAppEntity project,
-                                                   String documentId,
-                                                   String artifactName) {
+    protected LayoutPosition getArtifactPositionInProjectLayout(ProjectAppEntity project,
+                                                                String documentId,
+                                                                String artifactName) {
         String artifactId = getArtifactId(project.artifacts, artifactName);
         return project
             .getDocuments()
@@ -75,5 +92,38 @@ public class BaseCorrectnessTest extends ApplicationBaseTest {
             .get()
             .getLayout()
             .get(artifactId);
+    }
+
+    protected List<String> getArtifactIds(JSONObject projectCommit) {
+        return new ArrayList<>(getArtifactNameToIdMap(projectCommit).values());
+    }
+
+    protected String getArtifactIdFromProjectCommit(JSONObject projectCommit, String artifactName) {
+        return getArtifactNameToIdMap(projectCommit).get(artifactName);
+    }
+
+    protected List<LayoutPosition> getArtifactPositionsInDocument(
+        JSONObject projectCommit,
+        JSONObject documentJson,
+        List<String> artifactNames) throws JsonProcessingException {
+        DocumentAppEntity document = toClass(documentJson.toString(), DocumentAppEntity.class);
+        return artifactNames.stream()
+            .map(artifactName -> {
+                String artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);
+                return document.getLayout().get(artifactId);
+            })
+            .collect(Collectors.toList());
+    }
+
+    private Map<String, String> getArtifactNameToIdMap(JSONObject projectCommit) {
+        Map<String, String> name2id = new Hashtable<>();
+        JSONArray artifactsJson = projectCommit.getJSONObject("artifacts").getJSONArray("added");
+        for (int i = 0; i < artifactsJson.length(); i++) {
+            JSONObject artifactAdded = artifactsJson.getJSONObject(i);
+            String artifactId = artifactAdded.getString("id");
+            String artifactName = artifactAdded.getString("name");
+            name2id.put(artifactName, artifactId);
+        }
+        return name2id;
     }
 }

@@ -1,5 +1,8 @@
 package unit.layout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.Document;
@@ -15,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class TestDocumentLayout extends BaseCorrectnessTest {
 
     @Test
-    public void testSimpleDocumentLayout() throws Exception {
+    public void testDocumentLayoutInProjectRetrieval() throws Exception {
         String documentName = "test-document";
 
         // Step - Create project
@@ -28,16 +31,52 @@ public class TestDocumentLayout extends BaseCorrectnessTest {
         JSONArray artifactsJson = commitResponse.getJSONObject("artifacts").getJSONArray("added");
         addArtifactToDocument(projectVersion, document, artifactsJson);
 
-        // Step - Create layout
+        // Step - Retrieve project (including layout)
         ProjectAppEntity project = getProjectAtVersion(projectVersion);
 
-        // Step - Extract positions
+        // Step - Extract artifact positions
         String documentId = document.getDocumentId().toString();
-        LayoutPosition a1Pos = getPositionInDocument(project, documentId, a1Name);
-        LayoutPosition a2Pos = getPositionInDocument(project, documentId, a2Name);
-        LayoutPosition a3Pos = getPositionInDocument(project, documentId, a3Name);
+        LayoutPosition a1Pos = getArtifactPositionInProjectLayout(project, documentId, a1Name);
+        LayoutPosition a2Pos = getArtifactPositionInProjectLayout(project, documentId, a2Name);
+        LayoutPosition a3Pos = getArtifactPositionInProjectLayout(project, documentId, a3Name);
 
         // VP - Verify that root has greatest y
+        assertLayoutCorrectness(a1Pos, a2Pos, a3Pos);
+    }
+
+    @Test
+    public void testDocumentLayoutOnCreation() throws Exception {
+        String docName = "doc-name";
+        DocumentType docType = DocumentType.ARTIFACT_TREE;
+        String docDescription = "";
+
+        // Step - Create project
+        JSONObject projectCommit = createProject();
+        List<String> artifactIds = getArtifactIds(projectCommit);
+
+        // Step - Create new document payload
+        JSONObject documentJson = jsonBuilder.createDocument(
+            docName,
+            docDescription,
+            docType,
+            artifactIds,
+            new ArrayList<>());
+
+        // Step - Create project with document
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
+
+        // Step - Get list of artifact positions
+        List<LayoutPosition> artifactPositions = getArtifactPositionsInDocument(
+            projectCommit,
+            docCreated,
+            List.of(a1Name, a2Name, a3Name));
+
+        // Step - Extract individual positions
+        LayoutPosition a1Pos = artifactPositions.get(0);
+        LayoutPosition a2Pos = artifactPositions.get(1);
+        LayoutPosition a3Pos = artifactPositions.get(2);
+
+        // VP - Verify that layout is correct
         assertLayoutCorrectness(a1Pos, a2Pos, a3Pos);
     }
 }

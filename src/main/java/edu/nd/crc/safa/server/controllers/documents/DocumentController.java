@@ -82,7 +82,9 @@ public class DocumentController extends BaseDocumentController {
         }
 
         // Create or update: artifact links
-        int nArtifactUpdated = documentService.createOrUpdateArtifactIds(projectVersion, document,
+        int nArtifactUpdated = documentService.createOrUpdateArtifactIds(
+            projectVersion,
+            document,
             documentAppEntity.getArtifactIds());
 
         // Create or update: columns

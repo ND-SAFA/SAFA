@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnAppEntity;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
@@ -187,10 +188,24 @@ public class JsonBuilder extends BaseBuilder {
     public JSONObject createDocument(String docName,
                                      String description,
                                      DocumentType documentType) {
+        return createDocument(docName,
+            description,
+            documentType,
+            new ArrayList<>(),
+            new ArrayList<>());
+    }
+
+    public JSONObject createDocument(String docName,
+                                     String description,
+                                     DocumentType documentType,
+                                     List<String> artifactIds,
+                                     List<DocumentColumnAppEntity> columns) {
         JSONObject docJson = new JSONObject();
         docJson.put("name", docName);
         docJson.put("description", description);
         docJson.put("type", documentType.toString());
+        docJson.put("artifactIds", artifactIds);
+
         return docJson;
     }
 

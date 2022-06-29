@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -21,6 +23,8 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "safety_case_artifact")
+@Data
+@NoArgsConstructor
 public class SafetyCaseArtifact implements IArtifact {
 
     @Id
@@ -35,27 +39,8 @@ public class SafetyCaseArtifact implements IArtifact {
     @Column(name = "safety_case_type")
     SafetyCaseType safetyCaseType;
 
-    public SafetyCaseArtifact() {
-    }
-
     public SafetyCaseArtifact(Artifact artifact, SafetyCaseType safetyCaseType) {
         this.artifact = artifact;
-        this.safetyCaseType = safetyCaseType;
-    }
-
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    public void setArtifact(Artifact artifact) {
-        this.artifact = artifact;
-    }
-
-    public SafetyCaseType getSafetyCaseType() {
-        return safetyCaseType;
-    }
-
-    public void setSafetyCaseType(SafetyCaseType safetyCaseType) {
         this.safetyCaseType = safetyCaseType;
     }
 

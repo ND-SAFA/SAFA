@@ -193,7 +193,8 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         }
     }
 
-    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion, JSONObject docJson) throws Exception {
+    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion,
+                                                    JSONObject docJson) throws Exception {
         String route =
             RouteBuilder
                 .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
@@ -230,5 +231,19 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             Object actualValue = actual.get(i);
             assertMatch(expectedValue, actualValue);
         }
+    }
+
+    protected Pair<ProjectVersion, JSONObject> createProjectWithDocument(
+        String projectName,
+        JSONObject documentJson) throws Exception {
+        // Step - Create empty project
+        ProjectVersion projectVersion = dbEntityBuilder
+            .newProject(projectName)
+            .newVersionWithReturn(projectName);
+
+        // Step - Send creation request.
+        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
+
+        return new Pair<>(projectVersion, docCreated);
     }
 }

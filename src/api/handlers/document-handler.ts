@@ -13,7 +13,13 @@ import {
   projectModule,
   subtreeModule,
 } from "@/store";
-import { saveDocument, deleteDocument, getDocuments } from "@/api";
+import {
+  saveDocument,
+  deleteDocument,
+  getDocuments,
+  setCurrentDocument,
+  clearCurrentDocument,
+} from "@/api";
 
 /**
  * Creates a new document and updates app state.
@@ -264,4 +270,19 @@ export function handleColumnDelete(
       logModule.onDevError(e);
       onError?.(e);
     });
+}
+
+/**
+ * Updates the currently saved document.
+ *
+ * @param document - The current document.
+ */
+export async function handleUpdateCurrentDocument(
+  document: ProjectDocument
+): Promise<void> {
+  if (document.documentId) {
+    await setCurrentDocument(document.documentId);
+  } else {
+    await clearCurrentDocument();
+  }
 }

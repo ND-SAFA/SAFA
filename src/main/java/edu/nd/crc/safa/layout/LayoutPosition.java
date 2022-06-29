@@ -2,6 +2,7 @@ package edu.nd.crc.safa.layout;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Responsible for defining a position in a graph from the top left corner
@@ -9,6 +10,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class LayoutPosition {
     /**
      * # of pixels right from the top left corner.

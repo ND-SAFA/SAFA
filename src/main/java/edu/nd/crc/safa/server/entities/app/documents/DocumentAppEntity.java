@@ -8,7 +8,6 @@ import java.util.Map;
 import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.db.Document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +17,6 @@ public class DocumentAppEntity extends Document {
 
     List<String> artifactIds = new ArrayList<>();
     List<DocumentColumnAppEntity> columns = new ArrayList<>();
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, LayoutPosition> layout = new Hashtable<>();
 
     public DocumentAppEntity(Document document,

@@ -32,7 +32,7 @@ export default class LayoutModule extends VuexModule {
    * Sets the stored positions of artifacts.
    * @param artifactPositions - The artifact positions.
    */
-  SET_ARTIFACT_POSITIONS(artifactPositions: ArtifactPositions): void {
+  SET_ARTIFACT_POSITIONS(artifactPositions: ArtifactPositions = {}): void {
     this.artifactPositions = artifactPositions;
   }
 

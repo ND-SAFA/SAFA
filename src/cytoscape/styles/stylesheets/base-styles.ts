@@ -11,6 +11,7 @@ import {
 } from "@/types";
 
 export const GENERATED_LINK_SELECTOR = `edge[traceType='${TraceType.GENERATED}']`;
+export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${TraceApproval.APPROVED}']`;
 
 export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   // Edges
@@ -45,7 +46,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `edge[traceType='${TraceType.GENERATED}'][approvalStatus='${TraceApproval.APPROVED}']`,
+    selector: GENERATED_APPROVED_LINK_SELECTOR,
     style: {
       "line-style": "solid",
     },
@@ -65,6 +66,14 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       "target-arrow-color": ThemeColors.artifactModified,
       "source-arrow-color": ThemeColors.artifactModified,
       "line-color": ThemeColors.artifactModified,
+    },
+  },
+  {
+    selector: `${GENERATED_APPROVED_LINK_SELECTOR}[deltaType='${ArtifactDeltaState.MODIFIED}']`,
+    style: {
+      "target-arrow-color": ThemeColors.artifactAdded,
+      "source-arrow-color": ThemeColors.artifactAdded,
+      "line-color": ThemeColors.artifactAdded,
     },
   },
   {

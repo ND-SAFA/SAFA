@@ -7,7 +7,7 @@ import {
 } from "@/types";
 
 /**
- * The formatted scopes of jira permissions being requested.
+ * The formatted scopes of GitHub permissions being requested.
  */
 const scopes = encodeURI(["repo"].join(","));
 

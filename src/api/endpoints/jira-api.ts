@@ -10,7 +10,7 @@ import { sessionModule } from "@/store";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
- * The formatted scopes of jira permissions being requested.
+ * The formatted scopes of Jira permissions being requested.
  */
 const scopes = encodeURI(
   [

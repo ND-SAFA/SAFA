@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RuleName {
-    public String name;
-    public String description;
+    public String ruleName;
+    public String ruleMessage;
 }

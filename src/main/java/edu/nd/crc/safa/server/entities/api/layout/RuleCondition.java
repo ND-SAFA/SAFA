@@ -38,5 +38,9 @@ public enum RuleCondition {
         public String toString() {
             return "||";
         }
+    };
+
+    public static boolean containsVariable(RuleCondition ruleCondition) {
+        return ruleCondition.toString().contains("-n");
     }
 }

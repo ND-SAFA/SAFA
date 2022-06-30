@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 import edu.nd.crc.safa.server.entities.db.Warning;
 
 /**
  * Defines the client-facing entity for defining a new rule that generates project warnings.
  */
-public class Rule {
+public class ParserRule {
     private final RuleName mRuleName;
     public List<Token> mTokens;
     List<String> ImplementedFunctions = Arrays.asList(
@@ -22,19 +23,25 @@ public class Rule {
     );
     String mText;
 
-    public Rule(Rule that) {
+    public ParserRule(ParserRule that) {
         mRuleName = that.mRuleName;
         mText = that.mText;
         mTokens = new ArrayList<>(that.mTokens);
     }
 
-    public Rule(final String name, final String longname, final String rule) {
+    public ParserRule(RuleAppEntity rule) {
+        mRuleName = new RuleName(rule.getName(), rule.getDescription());
+        mText = rule.toString();
+        mTokens = Tokenizer.lex(mText);
+    }
+
+    public ParserRule(final String name, final String longname, final String rule) {
         mRuleName = new RuleName(name, longname);
         mText = rule;
         mTokens = Tokenizer.lex(mText);
     }
 
-    public Rule(Warning warning) {
+    public ParserRule(Warning warning) {
         this(warning.getNShort(), warning.getNLong(), warning.getRule());
     }
 

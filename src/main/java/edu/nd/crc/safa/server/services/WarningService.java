@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.Warning;
 import edu.nd.crc.safa.server.repositories.WarningRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
-import edu.nd.crc.safa.warnings.Rule;
+import edu.nd.crc.safa.warnings.ParserRule;
 import edu.nd.crc.safa.warnings.RuleName;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
@@ -42,7 +42,7 @@ public class WarningService {
                                                                   List<ArtifactVersion> artifacts,
                                                                   List<TraceLink> traceLinks) {
         TreeVerifier verifier = new TreeVerifier();
-        List<Rule> rulesToApply = new ArrayList<>();
+        List<ParserRule> rulesToApply = new ArrayList<>();
         rulesToApply.addAll(DefaultTreeRules.getDefaultRules());
         rulesToApply.addAll(this.getProjectRules(project));
         return verifier.findRuleViolations(artifacts, traceLinks, rulesToApply);
@@ -54,12 +54,12 @@ public class WarningService {
      * @param project The project whose rule are returned.
      * @return The project rules.
      */
-    public List<Rule> getProjectRules(Project project) {
+    public List<ParserRule> getProjectRules(Project project) {
         List<Warning> projectWarnings = this.warningRepository.findAllByProject(project);
-        List<Rule> projectRules = new ArrayList<Rule>();
+        List<ParserRule> projectRules = new ArrayList<ParserRule>();
 
         for (Warning warning : projectWarnings) {
-            projectRules.add(new Rule(warning));
+            projectRules.add(new ParserRule(warning));
         }
         return projectRules;
     }

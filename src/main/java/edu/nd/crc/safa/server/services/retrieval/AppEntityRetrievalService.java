@@ -104,7 +104,7 @@ public class AppEntityRetrievalService {
 
         // Documents
         List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
-        setDocumentLayouts(artifacts, traces, documents);
+        generatedAndSetDocumentLayouts(artifacts, traces, documents);
 
         // Current document
         String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
@@ -129,9 +129,9 @@ public class AppEntityRetrievalService {
             layout);
     }
 
-    public void setDocumentLayouts(List<ArtifactAppEntity> projectArtifacts,
-                                   List<TraceAppEntity> projectTraces,
-                                   List<DocumentAppEntity> documents) {
+    public void generatedAndSetDocumentLayouts(List<ArtifactAppEntity> projectArtifacts,
+                                               List<TraceAppEntity> projectTraces,
+                                               List<DocumentAppEntity> documents) {
         //TODO: Replace with layout retrieval
         Map<String, Map<String, LayoutPosition>> documentLayouts = this
             .layoutService

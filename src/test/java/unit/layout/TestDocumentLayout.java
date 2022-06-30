@@ -1,6 +1,5 @@
 package unit.layout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.layout.LayoutPosition;
@@ -59,8 +58,7 @@ public class TestDocumentLayout extends BaseCorrectnessTest {
             docName,
             docDescription,
             docType,
-            artifactIds,
-            new ArrayList<>());
+            artifactIds);
 
         // Step - Create project with document
         JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);

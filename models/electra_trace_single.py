@@ -1,7 +1,10 @@
+from typing import Type
+
 from transformers import ElectraPreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
 
-from models.base_model_identifier import BaseModelIdentifier
+from models.model_generator import BaseModelGenerator, ArchitectureType
+from transformers.modeling_utils import PreTrainedModel
 from models.single_lm_forward import single_lm_forward
 
 
@@ -25,12 +28,16 @@ class ElectraTraceSingle(ElectraPreTrainedModel):
         )
 
 
-class ElectraTraceSingleIdentifier(BaseModelIdentifier):
+class ElectraTraceSingleModelGenerator(BaseModelGenerator):
 
     @property
-    def model_class(self):
+    def base_model_class(self) -> Type[PreTrainedModel]:
         return ElectraTraceSingle
 
     @property
-    def model_path(self):
+    def model_path(self) -> str:
         pass
+
+    @property
+    def arch_type(self) -> ArchitectureType:
+        return ArchitectureType.SINGLE

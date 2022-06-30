@@ -1,7 +1,7 @@
 import enum
-from bert_trace_single import BertTraceSingleIdentifier
-from models.bert_trace_siamese import BertTraceSiameseIdentifier
-from models.electra_trace_single import ElectraTraceSingleIdentifier
+from bert_trace_single import BertTraceSingleModelGenerator
+from models.bert_trace_siamese import BertTraceSiameseModelGenerator
+from models.electra_trace_single import ElectraTraceSingleModelGenerator
 
 
 class SupportedModels(enum):
@@ -10,6 +10,6 @@ class SupportedModels(enum):
     ELECTRA_TRACE_SINGLE = 'electra_trace_single'
 
 
-MODEL_IDENTIFIERS = {SupportedModels.BERT_TRACE_SINGLE: BertTraceSingleIdentifier,
-                     SupportedModels.BERT_TRACE_SIAMESE: BertTraceSiameseIdentifier,
-                     SupportedModels.ELECTRA_TRACE_SINGLE: ElectraTraceSingleIdentifier}
+MODEL_GENERATORS = {SupportedModels.BERT_TRACE_SINGLE: BertTraceSingleModelGenerator,
+                    SupportedModels.BERT_TRACE_SIAMESE: BertTraceSiameseModelGenerator,
+                    SupportedModels.ELECTRA_TRACE_SINGLE: ElectraTraceSingleModelGenerator}

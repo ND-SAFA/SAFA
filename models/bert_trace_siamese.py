@@ -1,8 +1,12 @@
+from typing import Type
+
 import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
 from transformers import AutoModel, BertPreTrainedModel
-from models.base_model_identifier import BaseModelIdentifier
+from transformers.modeling_utils import PreTrainedModel
+
+from models.model_generator import BaseModelGenerator, ArchitectureType
 
 
 class AvgPooler(nn.Module):
@@ -83,12 +87,16 @@ class BertTraceSiamese(BertPreTrainedModel):
         return [x[1] for x in sim_scores]
 
 
-class BertTraceSiameseIdentifier(BaseModelIdentifier):
+class BertTraceSiameseModelGenerator(BaseModelGenerator):
 
     @property
-    def model_class(self):
+    def base_model_class(self) -> Type[PreTrainedModel]:
         return BertTraceSiamese
 
     @property
-    def model_path(self):
+    def arch_type(self) -> ArchitectureType:
+        return ArchitectureType.SIAMESE
+
+    @property
+    def model_path(self) -> str:
         pass

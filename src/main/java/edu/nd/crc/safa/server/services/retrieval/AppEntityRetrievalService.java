@@ -31,7 +31,7 @@ import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.CurrentDocumentService;
-import edu.nd.crc.safa.server.services.WarningService;
+import edu.nd.crc.safa.server.services.RuleService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import lombok.AllArgsConstructor;
@@ -62,7 +62,7 @@ public class AppEntityRetrievalService {
     private final DocumentColumnRepository documentColumnRepository;
     private final CurrentDocumentService currentDocumentService;
 
-    private final WarningService warningService;
+    private final RuleService ruleService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
 
     /**
@@ -256,7 +256,7 @@ public class AppEntityRetrievalService {
                 .filter(t -> t.getApprovalStatus() == ApprovalStatus.APPROVED)
                 .map(TraceLinkVersion::getTraceLink)
                 .collect(Collectors.toList());
-        return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);
+        return this.ruleService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);
     }
 
     public Map<String, LayoutPosition> retrieveProjectLayout(

@@ -61,7 +61,10 @@ public class RuleController extends BaseController {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
 
         // Step - Parse rule
-        ParserRule parserRule = new ParserRule(ruleAppEntity);
+        ParserRule parserRule = new ParserRule(
+            ruleAppEntity.getName(),
+            ruleAppEntity.getDescription(),
+            ruleAppEntity.toString());
         assert parserRule.isValid();
 
         // Step - Create and save persistent rule

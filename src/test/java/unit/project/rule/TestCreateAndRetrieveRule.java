@@ -10,7 +10,9 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 import edu.nd.crc.safa.server.entities.api.layout.RuleCondition;
 import edu.nd.crc.safa.server.entities.api.layout.RuleRelation;
+import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,12 @@ public class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
 
     @Test
-    public void createDefaultRule() throws Exception {
+    public void createAtLeastOneRule() throws Exception {
         String projectName = "test";
         String ruleName = "test-rule";
         String ruleDescription = "test-description";
-        String sourceType = "Requirements";
-        String targetType = "Designs";
+        String sourceType = "MadeUpSource";
+        String targetType = "MadeUpTarget";
 
         Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
         String route =
@@ -51,6 +53,27 @@ public class TestCreateAndRetrieveRule extends ApplicationBaseTest {
         assertThat(ruleCreated).isNotNull();
         assertObjectsMatch(toJson(rule), ruleCreated, List.of("id"));
 
-        // VP - Able to retrieve rule
+        // Step - Create version and violating artifact
+        String artifactName = "RE-20";
+        ProjectVersion projectVersion = this.dbEntityBuilder
+            .newVersion(projectName)
+            .newType(projectName, sourceType)
+            .newArtifactAndBody(projectName, sourceType, artifactName, "", "")
+            .getProjectVersion(projectName, 0);
+        ArtifactVersion artifactVersion = this.dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
+
+        // Step - Retrieve project warning
+        String getProjectWarningEndpoint =
+            RouteBuilder
+                .withRoute(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
+                .withVersion(projectVersion).get();
+        JSONObject projectWarnings = sendGet(getProjectWarningEndpoint);
+
+        // VP - Assert that warnings are generated
+        String artifactId = artifactVersion.getArtifact().getArtifactId().toString();
+        assertThat(artifactId).isNotNull();
+        assertThat(projectWarnings.has(artifactId)).isTrue();
+        String violatedRuleName = projectWarnings.getJSONObject(artifactId).getString("name");
+        assertThat(violatedRuleName).isEqualTo(ruleName);
     }
 }

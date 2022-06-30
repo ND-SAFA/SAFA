@@ -6,29 +6,25 @@ import java.util.Map;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.server.entities.db.Rule;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.entities.db.Warning;
-import edu.nd.crc.safa.server.repositories.WarningRepository;
+import edu.nd.crc.safa.server.repositories.RuleRepository;
 import edu.nd.crc.safa.warnings.DefaultTreeRules;
 import edu.nd.crc.safa.warnings.ParserRule;
 import edu.nd.crc.safa.warnings.RuleName;
 import edu.nd.crc.safa.warnings.TreeVerifier;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for generating project warnings for a given project version.
  */
 @Service
-public class WarningService {
+@AllArgsConstructor
+public class RuleService {
 
-    private final WarningRepository warningRepository;
-
-    @Autowired
-    public WarningService(WarningRepository warningRepository) {
-        this.warningRepository = warningRepository;
-    }
+    private final RuleRepository ruleRepository;
 
     /**
      * Returns the warnings of given artifacts using default and project rules.
@@ -55,11 +51,14 @@ public class WarningService {
      * @return The project rules.
      */
     public List<ParserRule> getProjectRules(Project project) {
-        List<Warning> projectWarnings = this.warningRepository.findAllByProject(project);
+        List<Rule> databaseRules = this.ruleRepository.findByProject(project);
         List<ParserRule> projectRules = new ArrayList<ParserRule>();
 
-        for (Warning warning : projectWarnings) {
-            projectRules.add(new ParserRule(warning));
+        for (Rule rule : databaseRules) {
+            projectRules.add(new ParserRule(
+                rule.getName(),
+                rule.getDescription(),
+                rule.getRule()));
         }
         return projectRules;
     }

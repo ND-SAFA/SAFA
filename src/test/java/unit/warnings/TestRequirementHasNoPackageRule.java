@@ -10,7 +10,7 @@ import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.services.WarningService;
+import edu.nd.crc.safa.server.services.RuleService;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import unit.ApplicationBaseTest;
 public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
     @Autowired
-    WarningService warningService;
+    RuleService ruleService;
 
     @Test
     public void testRequirementHasNoPackageLink() {
@@ -48,7 +48,7 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
             .stream()
             .map(TraceLinkVersion::getTraceLink)
             .collect(Collectors.toList());
-        Map<String, List<RuleName>> violations = warningService.generateWarningsOnEntities(project,
+        Map<String, List<RuleName>> violations = ruleService.generateWarningsOnEntities(project,
             projectBodies,
             traceLinks);
 

@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -19,6 +20,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "project_rule")
 @Data
+@NoArgsConstructor
 public class Rule {
     /**
      * Unique id for each rule.

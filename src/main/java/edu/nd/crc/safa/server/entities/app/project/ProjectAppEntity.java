@@ -59,6 +59,7 @@ public class ProjectAppEntity {
         this.artifactTypes = new ArrayList<>();
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
+        this.layout = new Hashtable<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,

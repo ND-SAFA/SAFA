@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.server.services.retrieval;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.layout.KlayLayoutGenerator;
 import edu.nd.crc.safa.layout.LayoutPosition;
 import edu.nd.crc.safa.server.entities.api.ProjectParsingErrors;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
@@ -31,6 +31,7 @@ import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
 import edu.nd.crc.safa.server.services.CurrentDocumentService;
+import edu.nd.crc.safa.server.services.LayoutService;
 import edu.nd.crc.safa.server.services.WarningService;
 import edu.nd.crc.safa.warnings.RuleName;
 
@@ -64,6 +65,7 @@ public class AppEntityRetrievalService {
 
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
+    private final LayoutService layoutService;
 
     /**
      * Finds project, artifact, traces, errors, and warnings related with given project version.
@@ -102,6 +104,9 @@ public class AppEntityRetrievalService {
 
         // Documents
         List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
+        generatedAndSetDocumentLayouts(artifacts, traces, documents);
+
+        // Current document
         String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
 
         // Artifact types
@@ -111,7 +116,7 @@ public class AppEntityRetrievalService {
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
 
         // Layout
-        Map<String, LayoutPosition> layout = retrieveProjectLayout(artifacts, traces);
+        Map<String, LayoutPosition> layout = this.layoutService.generateLayoutForArtifactTree(artifacts, traces);
 
         return new ProjectAppEntity(projectVersion,
             artifacts,
@@ -122,6 +127,18 @@ public class AppEntityRetrievalService {
             artifactTypes,
             errors,
             layout);
+    }
+
+    public void generatedAndSetDocumentLayouts(List<ArtifactAppEntity> projectArtifacts,
+                                               List<TraceAppEntity> projectTraces,
+                                               List<DocumentAppEntity> documents) {
+        //TODO: Replace with layout retrieval
+        Map<String, Map<String, LayoutPosition>> documentLayouts = this
+            .layoutService
+            .generateDocumentLayouts(projectArtifacts, projectTraces, documents);
+        for (DocumentAppEntity documentAppEntity : documents) {
+            documentAppEntity.setLayout(documentLayouts.get(documentAppEntity.getDocumentId().toString()));
+        }
     }
 
     /**
@@ -223,7 +240,8 @@ public class AppEntityRetrievalService {
                 .stream()
                 .map(da -> da.getArtifact().getArtifactId().toString())
                 .collect(Collectors.toList());
-            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds);
+            //TODO: Retrieve artifact positions
+            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, new Hashtable<>());
 
             // Retrieve FMEA columns
             if (document.getType() == DocumentType.FMEA) {
@@ -257,13 +275,5 @@ public class AppEntityRetrievalService {
                 .map(TraceLinkVersion::getTraceLink)
                 .collect(Collectors.toList());
         return this.warningService.generateWarningsOnEntities(projectVersion.getProject(), artifacts, traceLinks);
-    }
-
-    public Map<String, LayoutPosition> retrieveProjectLayout(
-        List<ArtifactAppEntity> artifacts,
-        List<TraceAppEntity> traces
-    ) {
-        KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(artifacts, traces);
-        return layoutGenerator.layout();
     }
 }

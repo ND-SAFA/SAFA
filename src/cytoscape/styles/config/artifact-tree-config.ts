@@ -10,6 +10,7 @@ import {
  */
 export const ARTIFACT_WIDTH = 105;
 export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
+export const ARTIFACT_CHILDREN_HEIGHT = 35;
 
 /**
  * Graph specific values.

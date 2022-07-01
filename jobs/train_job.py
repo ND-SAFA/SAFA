@@ -11,7 +11,7 @@ class TrainJob(BaseJob):
 
     def _start(self):
         checkpoint = self._get_checkpoint()
-        trainer = self.__get_trainer()
+        trainer = self._get_trainer()
         results = trainer.train(checkpoint=checkpoint)
         results.save()
 
@@ -24,9 +24,5 @@ class TrainJob(BaseJob):
             )
         )
         return data_collator
-
-    def __get_trainer(self) -> LMTrainer:
-        model = self.args.model_generator.load_model()
-        data = self.args.dataset.get_training_data(self.args.resample_rate, self.args.max_seq_length)
-        return LMTrainer(args=self.args, model=model, dataset=data)
+    
 

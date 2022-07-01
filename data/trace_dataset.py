@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from data.trace_link import TraceLink, Artifact
 from data.data_key import DataKey
-from constants import MAX_SEQ_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT
+from constants import MAX_SEQ_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT
 from models.model_generator import BaseModelGenerator, ArchitectureType
 
 
@@ -24,7 +24,7 @@ class TraceDataset:
         dataset.extend(self.__get_feature_entries(reduced_neg_link_ids, 1, max_seq_length))
         return dataset
 
-    def get_validation_data(self, dataset_size: int = math.inf, max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT) -> List:
+    def get_validation_data(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT, max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT) -> List:
         new_length = min(dataset_size, len(self.links))
         reduced_link_ids = self.__reduce_data_size(list(self.links.keys()), new_length, duplicates=False)
         return self.__get_feature_entries(reduced_link_ids, max_seq_length=max_seq_length)
@@ -37,7 +37,8 @@ class TraceDataset:
         linked_target_ids = {t_id for _, t_id in true_links}
         return {t_id: token for t_id, token in t_arts.items() if t_id in linked_target_ids}
 
-    def __get_feature_entries(self, link_ids, resample_rate: int = RESAMPLE_RATE_DEFAULT, max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT):
+    def __get_feature_entries(self, link_ids, resample_rate: int = RESAMPLE_RATE_DEFAULT,
+                              max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT):
         dataset = []
         for link_id in link_ids:
             feature_entry = self.__get_feature_entry(self.links[link_id], max_seq_length)

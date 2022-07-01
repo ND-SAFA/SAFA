@@ -38,7 +38,11 @@ function svgGoal(data: ArtifactData): string {
 
   return svgNode(
     data,
-    { width: outerWidth, height: outerHeight, marginTop: 6 },
+    {
+      width: outerWidth,
+      height: outerHeight,
+      marginTop: 6,
+    },
     { x: 10, y: 20, width: 180, height: 100, truncateLength: 90 },
     `
       <rect 
@@ -167,12 +171,14 @@ function svgNode(
   svgShape: string
 ): string {
   const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
+  const childrenHeight = 30;
 
   return `
     <div style="opacity: ${data.opacity}">
       <svg 
-        width="${outerStyle.width}" height="${outerStyle.height}" 
-        style="margin-top: ${outerStyle.marginTop}px"
+        width="${outerStyle.width}" 
+        height="${outerStyle.height + childrenHeight + 6}" 
+        style="margin-top: ${outerStyle.marginTop + childrenHeight}px"
       >
         ${svgShape}
         ${svgTitle(capitalize(data.safetyCaseType || ""), y)}
@@ -186,6 +192,17 @@ function svgNode(
           height,
           truncateLength,
         })}
+        
+        <rect 
+          x="0" y="${outerStyle.height + 4}" rx="8" 
+          width="${outerStyle.width}" height="${childrenHeight}"
+          fill="${ThemeColors.artifactBorder}"
+        />
+        <rect
+          x="1" y="${outerStyle.height + 5}" rx="7" 
+          width="${outerStyle.width - 2}" height="${childrenHeight - 2}"
+          fill="${getBackgroundColor(data.artifactDeltaState)}"
+        />
       </svg>
     </div>
   `;

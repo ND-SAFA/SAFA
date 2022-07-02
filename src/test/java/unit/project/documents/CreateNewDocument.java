@@ -7,6 +7,7 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
+import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -20,22 +21,24 @@ public class CreateNewDocument extends DocumentBaseTest {
      */
     @Test
     public void testCreateNewDocument() throws Exception {
+
         DocumentType docType = DocumentType.ARTIFACT_TREE;
 
-        // Step - Create empty project
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
         // Step - Create new document payload
-        JSONObject docJson = jsonBuilder.createDocument(docName, docDescription, docType);
+        JSONObject documentJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
-        // Step - Send creation request.
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, docJson);
+        // Step - Create new document
+        Pair<ProjectVersion, JSONObject> response = createProjectWithDocument(
+            projectName,
+            documentJson);
+
+        // Step - Retrieve project version, json sent for creation, response
+        ProjectVersion projectVersion = response.getValue0();
+        JSONObject documentCreated = response.getValue1();
 
         // VP - Assert all properties were returned as inputted.
-        assertObjectsMatch(docJson, docCreated, List.of("documentId"));
-        assertThat(docCreated.getString("documentId")).isNotEmpty();
+        assertObjectsMatch(documentJson, documentCreated, List.of("documentId"));
+        assertThat(documentCreated.getString("documentId")).isNotEmpty();
 
         // VP - Verify that contents was persisted.
         assertDocumentInProjectExists(projectVersion.getProject(), docName, docDescription, docType);

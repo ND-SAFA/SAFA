@@ -168,8 +168,7 @@ public class TestLinkApproval extends TraceBaseTest {
         generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
         generateTraceLinkBody.put("targetArtifacts", targetArtifacts);
 
-        JSONArray generatedLinks = sendPostWithArrayResponse(generateRoute, generateTraceLinkBody,
-            status().is2xxSuccessful());
+        JSONArray generatedLinks = sendPostWithArrayResponse(generateRoute, generateTraceLinkBody);
 
         // VP - Verify that same number of links were generated.
         assertThat(generatedLinks.length()).isEqualTo(numberOfLinks);

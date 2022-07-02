@@ -1,12 +1,9 @@
 package unit.project.documentArtifact;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
@@ -62,16 +59,12 @@ public class AddArtifactsToDocument extends ApplicationBaseTest {
             .withArtifactAndReturn(projectName, artifact.getArtifactId().toString(),
                 artifactName, artifactType,
                 artifactContent);
-        JSONArray requestPayload = new JSONArray();
-        requestPayload.put(artifactJson);
+        JSONArray artifactsJson = new JSONArray();
+        artifactsJson.put(artifactJson);
 
         // Step - Request artifact is added to document
-        String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
-            .withVersion(projectVersion)
-            .withDocument(document)
-            .get();
-        JSONArray artifactsAdded = sendPostWithArrayResponse(route, requestPayload, status().isOk());
+
+        JSONArray artifactsAdded = addArtifactToDocument(projectVersion, document, artifactsJson);
 
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {

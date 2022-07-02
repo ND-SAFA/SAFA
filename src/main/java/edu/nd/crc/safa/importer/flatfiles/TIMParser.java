@@ -13,26 +13,22 @@ import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 
 /**
  * Responsible for parsing a project from a TIM definition.
  */
+@NoArgsConstructor
 public class TIMParser {
 
     public static final String FILE_PARAM = "file";
-    private final List<TraceFileParser> traceFileParsers;
-    private final List<ArtifactFile> artifactTypeDefinitions;
-    private boolean parsed;
+    private final List<TraceFileParser> traceFileParsers = new ArrayList<>();
+    private final List<ArtifactFile> artifactTypeDefinitions = new ArrayList<>();
+    private boolean parsed = false;
     private JSONObject timFileJson;
-
-    public TIMParser() {
-        this.artifactTypeDefinitions = new ArrayList<>();
-        this.traceFileParsers = new ArrayList<>();
-        this.parsed = false;
-    }
-
+    
     public TIMParser(JSONObject timFileJson) {
         this();
         this.timFileJson = FileUtilities.toLowerCase(timFileJson);

@@ -32,11 +32,6 @@ public class JsonBuilder extends BaseBuilder {
         projectVersions = new Hashtable<>();
     }
 
-    public JSONObject withProjectAndReturn(String id, String name, String description) {
-        withProject(id, name, description, new ArrayList<>(), new ArrayList<>());
-        return this.projects.get(id);
-    }
-
     public JsonBuilder withProject(String id, String name, String description) {
         return withProject(id, name, description, new ArrayList<>(), new ArrayList<>());
     }
@@ -187,10 +182,22 @@ public class JsonBuilder extends BaseBuilder {
     public JSONObject createDocument(String docName,
                                      String description,
                                      DocumentType documentType) {
+        return createDocument(docName,
+            description,
+            documentType,
+            new ArrayList<>());
+    }
+
+    public JSONObject createDocument(String docName,
+                                     String description,
+                                     DocumentType documentType,
+                                     List<String> artifactIds) {
         JSONObject docJson = new JSONObject();
         docJson.put("name", docName);
         docJson.put("description", description);
         docJson.put("type", documentType.toString());
+        docJson.put("artifactIds", artifactIds);
+
         return docJson;
     }
 

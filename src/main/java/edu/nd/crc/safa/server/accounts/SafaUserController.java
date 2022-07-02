@@ -8,16 +8,12 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.authentication.TokenService;
-import edu.nd.crc.safa.server.entities.accounts.PasswordResetToken;
-import edu.nd.crc.safa.server.entities.accounts.ResetPasswordAppEntity;
-import edu.nd.crc.safa.server.entities.accounts.SafaUser;
-import edu.nd.crc.safa.server.entities.accounts.UserAppEntity;
+import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,19 +34,16 @@ public class SafaUserController extends BaseController {
     private final SafaUserRepository safaUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final UserDetailsService userDetailsService;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
                               SafaUserRepository safaUserRepository,
                               PasswordEncoder passwordEncoder,
-                              TokenService tokenService,
-                              UserDetailsService userDetailsService) {
+                              TokenService tokenService) {
         super(resourceBuilder);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
-        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping(AppRoutes.Accounts.createNewUser)

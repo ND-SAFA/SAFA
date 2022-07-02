@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobDbRepository;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 

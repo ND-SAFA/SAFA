@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

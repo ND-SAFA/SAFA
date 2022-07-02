@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.authentication;
 
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
 import lombok.AllArgsConstructor;

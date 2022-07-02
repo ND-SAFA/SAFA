@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;

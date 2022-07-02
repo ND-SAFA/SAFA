@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -19,7 +18,7 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;

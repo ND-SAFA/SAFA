@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;

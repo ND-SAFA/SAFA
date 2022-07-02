@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.config.SecurityConstants;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -15,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -66,7 +65,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication auth) throws IOException {
 
-        String username = ((SafaUserDetails)auth.getPrincipal()).getUsername();
+        String username = ((SafaUserDetails) auth.getPrincipal()).getUsername();
         String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
         JSONObject responseJson = new JSONObject();
 

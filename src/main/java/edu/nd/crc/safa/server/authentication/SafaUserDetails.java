@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.authentication;
 import java.util.Collection;
 import java.util.Collections;
 
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

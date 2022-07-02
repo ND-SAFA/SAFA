@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.db;
+package edu.nd.crc.safa.server.accounts;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -8,14 +8,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * The model for our users.
  */
 @Entity
 @Table(name = "safa_user")
+@Data
+@NoArgsConstructor
 public class SafaUser implements Serializable {
 
     public static final String ID_COLUMN = "user_id";
@@ -32,38 +35,8 @@ public class SafaUser implements Serializable {
     @Column(name = "password", nullable = false)
     String password;
 
-    public SafaUser() {
-    }
-
     public SafaUser(String email, String password) {
         this.email = email;
         this.password = password;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("email", this.email);
-        json.put("password:", this.password);
-        return json.toString();
     }
 }

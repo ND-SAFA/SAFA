@@ -30,7 +30,7 @@ public class FileUtilities {
                 throw new SafaError("CSV file does not exist: " + pathToFile);
             }
 
-            CSVFormat fileFormat = getFormat();
+            CSVFormat fileFormat = getCSVFormat();
             return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
         } catch (IOException e) {
             String error = String.format("Could not read CSV file at path: %s", pathToFile);
@@ -45,7 +45,7 @@ public class FileUtilities {
             throw new SafaError("Expected a CSV file with columns: " + requiredColumnsLabel);
         }
         try {
-            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
+            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getCSVFormat());
             assertHasColumns(parsedFile, requiredColumns);
             return parsedFile;
         } catch (IOException e) {
@@ -54,7 +54,7 @@ public class FileUtilities {
         }
     }
 
-    private static CSVFormat getFormat() {
+    public static CSVFormat getCSVFormat() {
         return CSVFormat.DEFAULT
             .withHeader() // only way to read headers without defining them.
             .builder()

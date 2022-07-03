@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.server.flatFiles;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,7 +16,6 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.flatFiles.services.FileService;
 import edu.nd.crc.safa.server.flatFiles.services.FlatFileService;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
@@ -39,21 +39,18 @@ public class FlatFileController extends BaseController {
     private final NotificationService notificationService;
     private final FlatFileService flatFileService;
     private final FileService fileService;
-    private final ProjectVersionRepository projectVersionRepository;
 
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
                               ProjectService projectService,
                               NotificationService notificationService,
                               FlatFileService flatFileService,
-                              FileService fileService,
-                              ProjectVersionRepository projectVersionRepository) {
+                              FileService fileService) {
         super(resourceBuilder);
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.flatFileService = flatFileService;
         this.fileService = fileService;
-        this.projectVersionRepository = projectVersionRepository;
     }
 
 
@@ -116,6 +113,7 @@ public class FlatFileController extends BaseController {
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        fileService.sendFilesAsZipResponse(response, fileName, new ArrayList<>());
+        List<File> projectFiles = flatFileService.createProjectFiles(projectVersion);
+        fileService.sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

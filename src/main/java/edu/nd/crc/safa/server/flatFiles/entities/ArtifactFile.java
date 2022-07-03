@@ -31,7 +31,7 @@ public class ArtifactFile {
     private static final String NAME_PARAM = "id";
     private static final String SUMMARY_PARAM = "summary";
     private static final String CONTENT_PARAM = "content";
-    private static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
+    public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
     String name;
     String file;
 

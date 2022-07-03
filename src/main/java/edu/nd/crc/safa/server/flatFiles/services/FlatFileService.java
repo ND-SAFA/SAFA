@@ -1,11 +1,14 @@
 package edu.nd.crc.safa.server.flatFiles.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.EntityCreation;
@@ -52,6 +55,7 @@ public class FlatFileService {
     private final TraceLinkGenerator traceLinkGenerator;
     private final FileService fileService;
     private final AppEntityRetrievalService appEntityRetrievalService;
+    private final FileCreatorService fileCreatorService;
 
     /**
      * Responsible for creating a project from given flat files. This includes
@@ -192,5 +196,36 @@ public class FlatFileService {
         projectCommit.getErrors().addAll(commitErrors);
 
         return new Pair<>(projectCommit, traceResponse.getValue1());
+    }
+
+    public List<File> createProjectFiles(ProjectVersion projectVersion) throws IOException {
+        Project project = projectVersion.getProject();
+        ProjectAppEntity projectAppEntity =
+            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        Map<String, List<ArtifactAppEntity>> type2Artifacts = new Hashtable<>();
+        List<File> projectFiles = new ArrayList<>();
+
+        for (ArtifactAppEntity artifact : projectAppEntity.artifacts) {
+            String artifactType = artifact.type;
+            if (type2Artifacts.containsKey(artifactType)) {
+                type2Artifacts.get(artifactType).add(artifact);
+            } else {
+                List<ArtifactAppEntity> artifacts = new ArrayList<>();
+                artifacts.add(artifact);
+                type2Artifacts.put(artifactType, artifacts);
+            }
+        }
+
+        for (String artifactType : type2Artifacts.keySet()) {
+            String fileName = String.format("%s.csv", artifactType);
+            String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
+            System.out.println("Creating file:" + pathToFile);
+            File artifactFile = new File(pathToFile);
+            List<ArtifactAppEntity> artifacts = type2Artifacts.get(artifactType);
+            fileCreatorService.writeArtifactsToFile(pathToFile, artifacts);
+            projectFiles.add(artifactFile);
+        }
+
+        return projectFiles;
     }
 }

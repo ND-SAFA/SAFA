@@ -11,6 +11,7 @@ import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.StringCreator;
+import edu.nd.crc.safa.server.flatFiles.FileService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
@@ -23,7 +24,6 @@ import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.FileUploadService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -66,7 +66,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
-    protected FileUploadService fileUploadService;
+    protected FileService fileService;
 
     @Autowired
     protected CommitErrorRepository commitErrorRepository;

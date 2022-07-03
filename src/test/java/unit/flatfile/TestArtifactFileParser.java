@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.TIMParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.flatFiles.ArtifactFileParser;
+import edu.nd.crc.safa.server.flatFiles.TIMParser;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

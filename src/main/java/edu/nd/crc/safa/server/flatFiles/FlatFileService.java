@@ -1,25 +1,31 @@
-package edu.nd.crc.safa.importer.flatfiles;
+package edu.nd.crc.safa.server.flatFiles;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.importer.tracegenerator.TraceLinkGenerator;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.CommitError;
+import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
+import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
+import edu.nd.crc.safa.tgen.TraceLinkGenerator;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
@@ -27,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for parsing flat files including reading,
@@ -41,6 +48,31 @@ public class FlatFileService {
     private final EntityVersionService entityVersionService;
     private final ArtifactFileParser artifactFileParser;
     private final TraceLinkGenerator traceLinkGenerator;
+    private final FileService fileService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
+
+    /**
+     * Responsible for creating a project from given flat files. This includes
+     * parsing tim.json, creating artifacts, and their trace links.
+     *
+     * @param project        The project whose artifacts and trace links should be associated with
+     * @param projectVersion The version that the artifacts and errors will be associated with.
+     * @param files          the flat files defining the project
+     * @return FlatFileResponse containing uploaded, parsed, and generated files.
+     * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
+     */
+    public ProjectAppEntity uploadAndCreateProjectFromFlatFiles(Project project,
+                                                                ProjectVersion projectVersion,
+                                                                MultipartFile[] files)
+        throws SafaError {
+        this.fileService.uploadFilesToServer(project, Arrays.asList(files));
+        String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        if (!Files.exists(Paths.get(pathToFile))) {
+            throw new SafaError("TIM.json file was not uploaded for this project");
+        }
+        this.constructProjectFromFlatFiles(projectVersion, pathToFile);
+        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+    }
 
     /**
      * Constructs a project from the specification in TIM.json file.

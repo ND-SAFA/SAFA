@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.tracegenerator;
+package edu.nd.crc.safa.tgen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.importer.tracegenerator.vsm.Controller;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.tgen.vsm.Controller;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -88,7 +88,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
-        fileUploadService.uploadFilesToServer(project, files);
+        fileService.uploadFilesToServer(project, files);
         return projectVersion;
     }
 

@@ -1,8 +1,9 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
+import edu.nd.crc.safa.server.flatFiles.ArtifactFileParser;
+import edu.nd.crc.safa.server.flatFiles.FileService;
+import edu.nd.crc.safa.server.flatFiles.FlatFileService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class ServiceProvider {
     // Flat Files
     private final ProjectService projectService;
-    private final FileUploadService fileUploadService;
+    private final FileService fileService;
     private final FlatFileService flatFileService;
     private final EntityVersionService entityVersionService;
     private final AppEntityRetrievalService appEntityRetrievalService;

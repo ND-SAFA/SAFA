@@ -16,6 +16,8 @@ import javax.validation.constraints.Positive;
 import edu.nd.crc.safa.config.AppConstraints;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -31,6 +33,8 @@ import org.hibernate.annotations.Type;
         }, name = AppConstraints.UNIQUE_VERSION_ID_PER_PROJECT)
     }
 )
+@Data
+@NoArgsConstructor
 public class ProjectVersion implements Serializable {
 
     @Id
@@ -60,9 +64,6 @@ public class ProjectVersion implements Serializable {
     @Positive
     @Column(name = "revision", nullable = false)
     int revision;
-
-    public ProjectVersion() {
-    }
 
     public ProjectVersion(Project project,
                           int majorVersion,
@@ -102,54 +103,6 @@ public class ProjectVersion implements Serializable {
 
     public boolean isGreaterThan(ProjectVersion other) {
         return !this.isLessThanOrEqualTo(other);
-    }
-
-    public Project getProject() {
-        return this.project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public UUID getVersionId() {
-        return this.versionId;
-    }
-
-    public void setVersionId(UUID versionId) {
-        this.versionId = versionId;
-    }
-
-    public int getMajorVersion() {
-        return this.majorVersion;
-    }
-
-    public void setMajorVersion(int majorVersion) {
-        this.majorVersion = majorVersion;
-    }
-
-    public int getMinorVersion() {
-        return this.minorVersion;
-    }
-
-    public void setMinorVersion(int minorVersion) {
-        this.minorVersion = minorVersion;
-    }
-
-    public int getRevision() {
-        return this.revision;
-    }
-
-    public void setRevision(int revision) {
-        this.revision = revision;
-    }
-
-    public boolean hasValidId() {
-        return this.versionId != null && !this.versionId.toString().equals("");
-    }
-
-    public boolean hasValidVersion() {
-        return this.majorVersion > 0 && this.minorVersion > 0 && this.revision > 0;
     }
 
     public String toString() {

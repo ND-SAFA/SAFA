@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.tracegenerator;
+package edu.nd.crc.safa.tgen;
 
 /**
  * Defines an interface for a generic class able to create trace links.

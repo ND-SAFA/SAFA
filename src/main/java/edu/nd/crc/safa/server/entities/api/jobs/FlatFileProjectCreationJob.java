@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
-import edu.nd.crc.safa.importer.flatfiles.TIMParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
@@ -21,7 +19,9 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.FileUploadService;
+import edu.nd.crc.safa.server.flatFiles.FileService;
+import edu.nd.crc.safa.server.flatFiles.FlatFileService;
+import edu.nd.crc.safa.server.flatFiles.TIMParser;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 
 import org.javatuples.Pair;
@@ -76,8 +76,8 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
     }
 
     private void uploadFlatFiles(Project project) {
-        FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
-        fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
+        FileService fileService = this.serviceProvider.getFileService();
+        fileService.uploadFilesToServer(project, Arrays.asList(files));
         this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
     }
 

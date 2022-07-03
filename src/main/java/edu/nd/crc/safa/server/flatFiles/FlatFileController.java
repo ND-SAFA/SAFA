@@ -1,27 +1,25 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.server.flatFiles;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
+import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
+import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.FileUploadService;
+import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,25 +34,26 @@ import org.springframework.web.multipart.MultipartFile;
 public class FlatFileController extends BaseController {
 
     private final ProjectService projectService;
-    private final FileUploadService fileUploadService;
     private final NotificationService notificationService;
     private final FlatFileService flatFileService;
-    private final AppEntityRetrievalService appEntityRetrievalService;
+    private final FileService fileService;
+    private final ProjectVersionRepository projectVersionRepository;
 
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
                               ProjectService projectService,
-                              FileUploadService fileUploadService,
                               NotificationService notificationService,
-                              FlatFileService flatFileParser,
-                              AppEntityRetrievalService appEntityRetrievalService) {
+                              FlatFileService flatFileService,
+                              FileService fileService,
+                              ProjectVersionRepository projectVersionRepository) {
         super(resourceBuilder);
         this.projectService = projectService;
         this.notificationService = notificationService;
-        this.fileUploadService = fileUploadService;
-        this.flatFileService = flatFileParser;
-        this.appEntityRetrievalService = appEntityRetrievalService;
+        this.flatFileService = flatFileService;
+        this.fileService = fileService;
+        this.projectVersionRepository = projectVersionRepository;
     }
+
 
     /**
      * Uploads and parses given flat files to the specified version.
@@ -74,7 +73,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity response = this.uploadAndCreateProjectFromFlatFiles(
+        ProjectAppEntity response = this.flatFileService.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,
             files);
@@ -100,33 +99,21 @@ public class FlatFileController extends BaseController {
         this.projectService.saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
 
-        ProjectAppEntity response = this.uploadAndCreateProjectFromFlatFiles(project,
+        ProjectAppEntity response = this.flatFileService.uploadAndCreateProjectFromFlatFiles(project,
             projectVersion,
             files);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
         return response;
     }
 
-    /**
-     * Responsible for creating a project from given flat files. This includes
-     * parsing tim.json, creating artifacts, and their trace links.
-     *
-     * @param project        The project whose artifacts and trace links should be associated with
-     * @param projectVersion The version that the artifacts and errors will be associated with.
-     * @param files          the flat files defining the project
-     * @return FlatFileResponse containing uploaded, parsed, and generated files.
-     * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
-     */
-    private ProjectAppEntity uploadAndCreateProjectFromFlatFiles(Project project,
-                                                                 ProjectVersion projectVersion,
-                                                                 MultipartFile[] files)
-        throws SafaError {
-        this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
-        if (!Files.exists(Paths.get(pathToFile))) {
-            throw new SafaError("TIM.json file was not uploaded for this project");
-        }
-        this.flatFileService.constructProjectFromFlatFiles(projectVersion, pathToFile);
-        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+    @GetMapping(AppRoutes.Projects.FlatFiles.downloadFlatFiles)
+    public void downloadFlatFiles(@PathVariable UUID versionId,
+                                  HttpServletResponse response) throws IOException {
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
+        String projectName = projectVersion.getProject().getName();
+        String versionName = projectVersion.toString();
+        String fileName = String.format("%s-%s.zip", projectName, versionName);
+
+        fileService.sendFilesAsZipResponse(response, fileName, new ArrayList<>());
     }
 }

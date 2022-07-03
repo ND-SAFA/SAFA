@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfiles;
+package edu.nd.crc.safa.server.flatFiles;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

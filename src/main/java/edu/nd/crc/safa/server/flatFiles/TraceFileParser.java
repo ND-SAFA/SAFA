@@ -1,6 +1,6 @@
-package edu.nd.crc.safa.importer.flatfiles;
+package edu.nd.crc.safa.server.flatFiles;
 
-import static edu.nd.crc.safa.importer.flatfiles.TIMParser.FILE_PARAM;
+import static edu.nd.crc.safa.server.flatFiles.TIMParser.FILE_PARAM;
 
 import java.io.IOException;
 import java.util.ArrayList;

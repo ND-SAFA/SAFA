@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.importer.flatfiles;
+package edu.nd.crc.safa.server.flatFiles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class TIMParser {
     private final List<ArtifactFile> artifactTypeDefinitions = new ArrayList<>();
     private boolean parsed = false;
     private JSONObject timFileJson;
-    
+
     public TIMParser(JSONObject timFileJson) {
         this();
         this.timFileJson = FileUtilities.toLowerCase(timFileJson);

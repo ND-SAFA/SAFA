@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFile;
-import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
 import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
 import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
@@ -24,6 +22,8 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.flatFiles.ArtifactFile;
+import edu.nd.crc.safa.server.flatFiles.TraceFileParser;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles;
+package edu.nd.crc.safa.server.flatFiles.services;
 
 import java.util.List;
 import java.util.Optional;

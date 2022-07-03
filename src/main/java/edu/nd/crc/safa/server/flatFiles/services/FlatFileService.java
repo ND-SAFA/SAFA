@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles;
+package edu.nd.crc.safa.server.flatFiles.services;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,6 +22,8 @@ import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.flatFiles.entities.ArtifactFileParser;
+import edu.nd.crc.safa.server.flatFiles.entities.TIMParser;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;

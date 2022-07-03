@@ -11,7 +11,7 @@ import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.StringCreator;
-import edu.nd.crc.safa.server.flatFiles.FileService;
+import edu.nd.crc.safa.server.flatFiles.services.FileService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;

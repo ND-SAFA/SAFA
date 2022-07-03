@@ -22,8 +22,8 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.ArtifactFile;
-import edu.nd.crc.safa.server.flatFiles.TraceFileParser;
+import edu.nd.crc.safa.server.flatFiles.entities.ArtifactFile;
+import edu.nd.crc.safa.server.flatFiles.entities.TraceFileParser;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 

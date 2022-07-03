@@ -19,9 +19,9 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.FileService;
-import edu.nd.crc.safa.server.flatFiles.FlatFileService;
-import edu.nd.crc.safa.server.flatFiles.TIMParser;
+import edu.nd.crc.safa.server.flatFiles.entities.TIMParser;
+import edu.nd.crc.safa.server.flatFiles.services.FileService;
+import edu.nd.crc.safa.server.flatFiles.services.FlatFileService;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 
 import org.javatuples.Pair;

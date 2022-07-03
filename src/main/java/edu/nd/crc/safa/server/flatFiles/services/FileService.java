@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles;
+package edu.nd.crc.safa.server.flatFiles.services;
 
 import java.io.File;
 import java.io.FileInputStream;

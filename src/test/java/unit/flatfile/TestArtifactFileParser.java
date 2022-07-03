@@ -7,8 +7,8 @@ import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.ArtifactFileParser;
-import edu.nd.crc.safa.server.flatFiles.TIMParser;
+import edu.nd.crc.safa.server.flatFiles.entities.ArtifactFileParser;
+import edu.nd.crc.safa.server.flatFiles.entities.TIMParser;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

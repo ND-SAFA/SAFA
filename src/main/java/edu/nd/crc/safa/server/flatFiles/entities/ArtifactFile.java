@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles;
+package edu.nd.crc.safa.server.flatFiles.entities;
 
 import java.io.IOException;
 import java.util.ArrayList;

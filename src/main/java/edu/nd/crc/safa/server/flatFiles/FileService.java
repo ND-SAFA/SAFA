@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.services;
+package edu.nd.crc.safa.server.flatFiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 @Scope("singleton")
+@AllArgsConstructor
 public class FileUploadService {
 
     /**

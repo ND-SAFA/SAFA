@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Dict, Type
 
 from transformers.modeling_utils import PreTrainedModel
-from transformers import AutoConfig, AutoTokenizer, default_data_collator, DataCollatorWithPadding
+from transformers import AutoConfig, AutoTokenizer
 from enum import IntEnum
 
 

@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from data.trace_link import TraceLink, Artifact
 from data.data_key import DataKey
-from constants import MAX_SEQ_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT
+from constants import MAX_SEQ_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT
 from models.model_generator import BaseModelGenerator, ArchitectureType
 
 
@@ -13,7 +13,8 @@ class TraceDataset:
     pos_link_ids = set()
     neg_link_ids = set()
 
-    def __init__(self, s_arts: Dict, t_arts: Dict, true_links: List, model_generator: BaseModelGenerator, linked_targets_only=False):
+    def __init__(self, s_arts: Dict, t_arts: Dict, true_links: List, model_generator: BaseModelGenerator,
+                 linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT):
         self.model_generator = model_generator
         t_arts = self.__get_linked_targets(t_arts, true_links) if linked_targets_only else t_arts
         self.__create_links(s_arts, t_arts, true_links)

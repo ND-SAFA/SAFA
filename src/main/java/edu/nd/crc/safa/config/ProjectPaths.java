@@ -60,6 +60,10 @@ public class ProjectPaths {
         return pathHelper(getPathToStorage(project), "uploaded");
     }
 
+    public static String getPathToProjectFile(Project project, String fileName) {
+        return pathHelper(getPathToStorage(project), fileName);
+    }
+
     public static String getPathToFlatFile(Project project, String fileName) {
         return pathHelper(getPathToUploadedFiles(project), fileName);
     }

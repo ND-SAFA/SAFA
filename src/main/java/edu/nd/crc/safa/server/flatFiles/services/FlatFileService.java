@@ -202,7 +202,9 @@ public class FlatFileService {
         Project project = projectVersion.getProject();
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        Map<String, ArtifactAppEntity> name2artifact = new Hashtable<>();
         Map<String, List<ArtifactAppEntity>> type2Artifacts = new Hashtable<>();
+        Map<String, Map<String, List<TraceAppEntity>>> type2Traces = new Hashtable<>();
         List<File> projectFiles = new ArrayList<>();
 
         for (ArtifactAppEntity artifact : projectAppEntity.artifacts) {
@@ -214,18 +216,51 @@ public class FlatFileService {
                 artifacts.add(artifact);
                 type2Artifacts.put(artifactType, artifacts);
             }
+            name2artifact.put(artifact.name, artifact);
         }
 
         for (String artifactType : type2Artifacts.keySet()) {
             String fileName = String.format("%s.csv", artifactType);
-            String pathToFile = ProjectPaths.getPathToFlatFile(project, fileName);
-            System.out.println("Creating file:" + pathToFile);
+            String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
+
             File artifactFile = new File(pathToFile);
             List<ArtifactAppEntity> artifacts = type2Artifacts.get(artifactType);
             fileCreatorService.writeArtifactsToFile(pathToFile, artifacts);
+
             projectFiles.add(artifactFile);
         }
 
+        for (TraceAppEntity trace : projectAppEntity.traces) {
+            String sourceType = name2artifact.get(trace.sourceName).type;
+            String targetType = name2artifact.get(trace.targetName).type;
+
+            if (type2Traces.containsKey(sourceType)) {
+                if (type2Traces.containsKey(targetType)) {
+                    type2Traces.get(sourceType).get(targetType).add(trace);
+                } else {
+                    Map<String, List<TraceAppEntity>> sourceTypeTraces = type2Traces.get(sourceType);
+                    sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
+                }
+            } else {
+                Map<String, List<TraceAppEntity>> sourceTypeTraces = new Hashtable<>();
+                sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
+                type2Traces.put(sourceType, sourceTypeTraces);
+            }
+        }
+
+        for (String sourceType : type2Traces.keySet()) {
+            for (String targetType : type2Traces.get(sourceType).keySet()) {
+                String fileName = String.format("%s2%s.csv", sourceType, targetType);
+                String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
+                File traceFile = new File(pathToFile);
+                List<TraceAppEntity> traces = type2Traces.get(sourceType).get(targetType);
+                fileCreatorService.writeTracesToFile(pathToFile, traces);
+
+                projectFiles.add(traceFile);
+            }
+        }
+
+        // TODO: Write tim.json
         return projectFiles;
     }
 }

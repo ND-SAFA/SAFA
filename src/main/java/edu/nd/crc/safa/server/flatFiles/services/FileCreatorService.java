@@ -32,7 +32,12 @@ public class FileCreatorService {
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT
             .withHeader(ArtifactFile.REQUIRED_COLUMNS))) {
             for (ArtifactAppEntity artifact : artifacts) {
-                printer.printRecord(artifact.name, artifact.summary, artifact.body);
+                printer.printRecord(artifact.name,
+                    artifact.documentType,
+                    artifact.logicType,
+                    artifact.safetyCaseType,
+                    artifact.summary,
+                    artifact.body);
             }
         }
         out.close();

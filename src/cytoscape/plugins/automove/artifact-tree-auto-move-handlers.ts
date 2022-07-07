@@ -16,8 +16,8 @@ export const ArtifactTreeAutoMoveHandlers: AutoMoveEventHandlers = {
       document.body.style.cursor = CSSCursor.GRAB;
       const nodePosition = event.target.renderedPosition();
       event.target.renderedPosition({
-        x: nodePosition.x + event.originalEvent.movementX,
-        y: nodePosition.y + event.originalEvent.movementY,
+        x: nodePosition.x + event.originalEvent.movementX / 2,
+        y: nodePosition.y + event.originalEvent.movementY / 2,
       });
     },
   },

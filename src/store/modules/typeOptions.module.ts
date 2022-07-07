@@ -8,6 +8,7 @@ import type {
   ArtifactTypeIcons,
 } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
+import { SafetyCaseType } from "@/types";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
@@ -110,7 +111,11 @@ export default class TypeOptionsModule extends VuexModule {
    * @returns all types of artifacts.
    */
   get artifactTypes(): string[] {
-    return Object.keys(this.linkDirections);
+    const safetyCaseTypes = Object.values(SafetyCaseType) as string[];
+
+    return Object.keys(this.linkDirections).filter(
+      (type) => !safetyCaseTypes.includes(type)
+    );
   }
 
   /**

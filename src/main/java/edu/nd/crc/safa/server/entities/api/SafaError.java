@@ -24,18 +24,14 @@ public class SafaError extends RuntimeException {
         this.errors = new ArrayList<>();
     }
 
-    public SafaError(Exception e) {
+    public SafaError(String message, Exception e) {
         this.exception = e;
+        this.message = message;
         this.errors =
             Arrays
                 .stream(e.getStackTrace())
                 .map(StackTraceElement::toString)
                 .collect(Collectors.toList());
-    }
-
-    public SafaError(String message, Exception e) {
-        this(e);
-        this.message = message;
         this.errors.add(0, e.getLocalizedMessage());
         this.details = e.getMessage();
     }

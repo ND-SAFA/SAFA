@@ -103,7 +103,7 @@ public class DocumentController extends BaseDocumentController {
     public Map<String, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
                                                             DocumentAppEntity documentAppEntity) {
         ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+            this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
         //TODO: Replace with layout retrieval.
         Map<String, Map<String, LayoutPosition>> documentLayoutMap =
             this.layoutService.generateDocumentLayouts(projectAppEntity.artifacts,

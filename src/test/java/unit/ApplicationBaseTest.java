@@ -59,7 +59,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
     public void uploadFlatFilesToVersion(ProjectVersion projectVersion,

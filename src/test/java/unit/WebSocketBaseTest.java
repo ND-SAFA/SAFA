@@ -140,6 +140,10 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
         return mapper.readValue(response, targetClass);
     }
 
+    public ObjectMapper getMapper() {
+        return objectMapper;
+    }
+
     /**
      * Returns the next message in the queue associated with given client id.
      *

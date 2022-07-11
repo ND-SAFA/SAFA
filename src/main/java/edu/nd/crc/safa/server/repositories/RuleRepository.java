@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.Warning;
+import edu.nd.crc.safa.server.entities.db.Rule;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WarningRepository extends CrudRepository<Warning, UUID> {
+public interface RuleRepository extends CrudRepository<Rule, UUID> {
 
-    List<Warning> findAllByProject(Project project);
+    List<Rule> findByProject(Project project);
 }

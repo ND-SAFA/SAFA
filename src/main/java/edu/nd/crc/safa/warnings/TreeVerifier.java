@@ -26,14 +26,14 @@ public class TreeVerifier {
      */
     public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
                                                                 List<TraceLink> traceLinks,
-                                                                List<Rule> rulesToApply) {
+                                                                List<ParserRule> rulesToApply) {
         Map<String, List<RuleName>> results = new HashMap<>();
 
         artifactBodies.forEach((artifactBody) -> {
 
             List<RuleName> artifactWarnings = new ArrayList<>();
-            for (Rule rule : rulesToApply) {
-                rule = new Rule(rule);
+            for (ParserRule rule : rulesToApply) {
+                rule = new ParserRule(rule);
                 while (true) {
                     Optional<Function> ruleFunctionQuery = rule.parseFunction();
                     if (ruleFunctionQuery.isPresent()) {

@@ -110,7 +110,8 @@ public class AppRoutes {
             public static final String deleteArtifactType = projectPrefix + "/artifactTypes/{typeId}";
         }
 
-        public static class Warnings {
+        public static class Rules {
+            public static final String createWarningInProject = "/project/{projectId}/rules";
             public static final String getWarningsInProjectVersion = projectPrefix + "/versions/{versionId}/warnings";
         }
     }

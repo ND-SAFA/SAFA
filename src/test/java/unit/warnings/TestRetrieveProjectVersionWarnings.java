@@ -124,7 +124,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
     private JSONObject getProjectRules(ProjectVersion projectVersion) throws Exception {
         String endpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.Warnings.getWarningsInProjectVersion)
+            .withRoute(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
             .withVersion(projectVersion)
             .get();
         return sendGet(endpoint);

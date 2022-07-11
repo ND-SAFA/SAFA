@@ -68,15 +68,14 @@ public class RuleAppEntity {
                     sourceType,
                     relation,
                     targetType);
-            } else {
-                String format = "%s(" + createFormattedArguments(4) + ")";
-                return String.format(
-                    format,
-                    condition.toString(),
-                    sourceType,
-                    relation,
-                    targetType);
             }
+            String format = "%s(" + createFormattedArguments(4) + ")";
+            return String.format(
+                format,
+                condition.toString(),
+                sourceType,
+                relation,
+                targetType);
         }
     }
 

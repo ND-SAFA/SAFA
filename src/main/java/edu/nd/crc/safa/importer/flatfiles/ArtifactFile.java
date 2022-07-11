@@ -14,6 +14,8 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Responsible for reading and parsing artifact files.
  */
+@Data
+@AllArgsConstructor
 public class ArtifactFile {
 
     public static final String[] REQUIRED_KEYS = {TIMParser.FILE_PARAM};
@@ -30,11 +34,6 @@ public class ArtifactFile {
     private static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
     String name;
     String file;
-
-    public ArtifactFile(String name, String file) {
-        this.name = name;
-        this.file = file;
-    }
 
     public static EntityCreation<ArtifactAppEntity, String> parseArtifactFileIntoApplicationEntities(
         String artifactType,
@@ -84,21 +83,5 @@ public class ArtifactFile {
         String pathToFile = ProjectPaths.getPathToFlatFile(project, this.file);
         CSVParser fileParser = FileUtilities.readCSVFile(pathToFile);
         return parseArtifactFileIntoApplicationEntities(this.name, this.file, fileParser);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
     }
 }

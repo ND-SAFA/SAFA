@@ -31,7 +31,7 @@ import lombok.Setter;
  * 3. Saving issues as artifacts
  * 4. Returning project created
  */
-public class JiraProjectCreationWorker extends ProjectCreationWorker {
+public class JiraProjectCreationJob extends ProjectCreationJob {
     /**
      * The project version to upload entities to.
      */
@@ -59,7 +59,7 @@ public class JiraProjectCreationWorker extends ProjectCreationWorker {
     @Setter
     JiraProjectResponseDTO jiraProjectResponse;
 
-    public JiraProjectCreationWorker(
+    public JiraProjectCreationJob(
         JobDbEntity jobDbEntity,
         ServiceProvider serviceProvider,
         Long jiraProjectId,

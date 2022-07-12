@@ -27,7 +27,7 @@ import org.springframework.batch.core.JobParametersValidator;
  */
 @Getter
 @Setter
-public abstract class JobWorker implements Job {
+public abstract class AbstractJob implements Job {
 
     /**
      * The job identifying information that is being performed.
@@ -38,7 +38,7 @@ public abstract class JobWorker implements Job {
      */
     ServiceProvider serviceProvider;
 
-    public JobWorker(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
+    public AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
         this.serviceProvider = serviceProvider;
     }

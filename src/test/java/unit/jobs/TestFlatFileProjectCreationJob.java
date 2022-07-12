@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-public class TestFlatFileProjectCreationWorker extends JobBaseTest {
+class TestFlatFileProjectCreationJob extends JobBaseTest {
 
     int N_STEPS = 6;
 

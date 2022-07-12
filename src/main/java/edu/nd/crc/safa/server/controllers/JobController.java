@@ -6,7 +6,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
@@ -110,12 +110,12 @@ public class JobController extends BaseController {
         JobDbEntity jobDbEntity = this.jobService.createNewJob(JobType.FLAT_FILE_PROJECT_CREATION, name);
 
         // Step 3 - Create job worker
-        FlatFileProjectCreationWorker jobCreationThread = new FlatFileProjectCreationWorker(jobDbEntity,
+        FlatFileProjectCreationJob jobCreationThread = new FlatFileProjectCreationJob(jobDbEntity,
             serviceProvider,
             projectVersion,
             files);
 
-        jobService.runJobWorker(jobDbEntity, serviceProvider, jobCreationThread);
+        jobService.executeJob(jobDbEntity, serviceProvider, jobCreationThread);
 
         // Step 4 - Create job response
         return JobAppEntity.createFromJob(jobDbEntity);

@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * to use the project creation worker.
  * TODO: Implement default spring steps.
  */
-public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
+public class FlatFileProjectCreationJob extends ProjectCreationJob {
 
     /**
      * The initial project version
@@ -56,10 +56,10 @@ public class FlatFileProjectCreationWorker extends ProjectCreationWorker {
      */
     List<TraceGenerationRequest> traceGenerationRequests;
 
-    public FlatFileProjectCreationWorker(JobDbEntity jobDbEntity,
-                                         ServiceProvider serviceProvider,
-                                         ProjectVersion projectVersion,
-                                         MultipartFile[] files) {
+    public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
+                                      ServiceProvider serviceProvider,
+                                      ProjectVersion projectVersion,
+                                      MultipartFile[] files) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;

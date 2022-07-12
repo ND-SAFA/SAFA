@@ -6,7 +6,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
-import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationJob;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -34,7 +34,7 @@ public class TestJiraProjectCreation extends JiraBaseTest {
         int nArtifacts = issues.size();
 
         // Step - Create job and worker
-        JiraProjectCreationWorker job = new JiraProjectCreationWorker(
+        JiraProjectCreationJob job = new JiraProjectCreationJob(
             jobDbEntity,
             serviceProvider,
             jiraProjectId,
@@ -47,7 +47,7 @@ public class TestJiraProjectCreation extends JiraBaseTest {
         // Step - Run job
         serviceProvider
             .getJobService()
-            .runJobWorker(jobDbEntity, serviceProvider, job);
+            .executeJob(jobDbEntity, serviceProvider, job);
 
         // VP - Verify that project completed
         JobDbEntity completedJob = verifyJIRAJobWasCompleted(jobDbEntity.getId());

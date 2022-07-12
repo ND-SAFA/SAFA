@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
  * The worker responsible for providing method implementations for
  * the steps to create projects.
  */
-public class ProjectCreationWorker extends JobWorker {
+public class ProjectCreationJob extends AbstractJob {
     /**
      * The project version of the
      */
@@ -26,9 +26,9 @@ public class ProjectCreationWorker extends JobWorker {
      */
     EntityVersionService entityVersionService;
 
-    public ProjectCreationWorker(JobDbEntity jobDbEntity,
-                                 ServiceProvider serviceProvider,
-                                 ProjectCommit projectCommit) {
+    public ProjectCreationJob(JobDbEntity jobDbEntity,
+                              ServiceProvider serviceProvider,
+                              ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
         this.projectCommit = projectCommit;
         this.entityVersionService = serviceProvider.getEntityVersionService();

@@ -68,26 +68,13 @@ public class AppEntityRetrievalService {
     private final LayoutService layoutService;
 
     /**
-     * Finds project, artifact, traces, errors, and warnings related with given project version.
-     *
-     * @param projectVersion Version whose artifacts are used to generate warnings and error
-     * @return ProjectCreationResponse containing all relevant project entities
-     */
-    public ProjectAppEntity retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
-        ProjectAppEntity projectAppEntity = this.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        Map<String, List<RuleName>> warnings = this.retrieveWarningsInProjectVersion(projectVersion);
-        projectAppEntity.setWarnings(warnings);
-        return projectAppEntity;
-    }
-
-    /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
      * the given version. Further, gathers the list of project members at the time of being called.
      *
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity retrieveProjectAppEntityAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
 
         Project project = projectVersion.getProject();
 
@@ -115,6 +102,9 @@ public class AppEntityRetrievalService {
         // Version errors
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
 
+        // Artifact warnings
+        Map<String, List<RuleName>> warnings = this.retrieveWarningsInProjectVersion(projectVersion);
+
         // Layout
         Map<String, LayoutPosition> layout = this.layoutService.generateLayoutForArtifactTree(artifacts, traces);
 
@@ -125,6 +115,7 @@ public class AppEntityRetrievalService {
             documents,
             currentDocumentId,
             artifactTypes,
+            warnings,
             errors,
             layout);
     }

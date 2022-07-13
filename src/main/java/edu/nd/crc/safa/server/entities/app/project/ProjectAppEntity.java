@@ -69,6 +69,7 @@ public class ProjectAppEntity {
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
                             List<ArtifactType> artifactTypes,
+                            Map<String, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
                             Map<String, LayoutPosition> layout) {
         this();
@@ -83,6 +84,7 @@ public class ProjectAppEntity {
         this.documents = documents;
         this.currentDocumentId = currentDocumentId;
         this.artifactTypes = artifactTypes;
+        this.warnings = warnings;
         this.errors = errors;
         this.layout = layout;
     }

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.api.jobs.AbstractJob;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
@@ -161,9 +161,9 @@ public class JobService {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    public void runJobWorker(JobDbEntity jobDbEntity,
-                             ServiceProvider serviceProvider,
-                             JobWorker jobCreationThread) throws
+    public void executeJob(JobDbEntity jobDbEntity,
+                           ServiceProvider serviceProvider,
+                           AbstractJob jobCreationThread) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         JobParameters jobParameters =

@@ -3,7 +3,6 @@ package edu.nd.crc.safa.server.controllers;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -14,7 +13,7 @@ import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO.JiraResponseMessage;
-import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationWorker;
+import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationJob;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
@@ -75,11 +74,11 @@ public class JiraController extends BaseController {
                                         @PathVariable("cloudId") String cloudId) throws Exception {
         JobService jobService = this.serviceProvider.getJobService();
         // Step - Create job identifier
-        String jobName = JiraProjectCreationWorker.createJobName(jiraProjectId.toString());
+        String jobName = JiraProjectCreationJob.createJobName(jiraProjectId.toString());
         JobDbEntity jobDbEntity = jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);
 
         // Step - Create jira project creation job
-        JiraProjectCreationWorker job = new JiraProjectCreationWorker(
+        JiraProjectCreationJob job = new JiraProjectCreationJob(
             jobDbEntity,
             serviceProvider,
             jiraProjectId,
@@ -87,7 +86,7 @@ public class JiraController extends BaseController {
         );
 
         // Step - Start job
-        jobService.runJobWorker(jobDbEntity, serviceProvider, job);
+        jobService.executeJob(jobDbEntity, serviceProvider, job);
 
         // Step - Respond with project
         return JobAppEntity.createFromJob(jobDbEntity);

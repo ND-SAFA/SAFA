@@ -15,17 +15,6 @@ export const artifactHtml: HtmlDefinition<ArtifactData> = {
   tpl(data?: ArtifactData) {
     if (!data?.artifactType) return "";
 
-    // data.hiddenChildren = 3;
-    // data.warnings = [
-    //   { ruleMessage: "Warning", ruleName: "Warning" },
-    //   { ruleMessage: "Warning", ruleName: "Warning" },
-    // ];
-    // data.childDeltaStates = [
-    //   ArtifactDeltaState.ADDED,
-    //   ArtifactDeltaState.MODIFIED,
-    //   ArtifactDeltaState.REMOVED,
-    // ];
-
     if (data.logicType) {
       return htmlFTA(data);
     } else if (data.safetyCaseType) {

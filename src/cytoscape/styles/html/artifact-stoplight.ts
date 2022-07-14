@@ -51,17 +51,14 @@ function getChildDeltaStates(data: ArtifactData): NodeChildDelta[] {
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.ADDED),
       color: ThemeColors.artifactAdded,
-      node: "<div class='artifact-added flex-grow-1'></div>",
     },
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.MODIFIED),
       color: ThemeColors.artifactModified,
-      node: "<div class='artifact-modified flex-grow-1'></div>",
     },
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.REMOVED),
       color: ThemeColors.artifactRemoved,
-      node: "<div class='artifact-removed flex-grow-1'></div>",
     },
   ];
 

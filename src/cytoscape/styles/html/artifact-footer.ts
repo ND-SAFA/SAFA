@@ -17,7 +17,7 @@ export function svgFooter(
   outerStyle: Pick<SvgStyle, "width" | "height">
 ): string {
   const textY = data.childDeltaStates?.length
-    ? outerStyle.height + 22
+    ? outerStyle.height + 20
     : outerStyle.height + 26;
   const iconY = textY - 16;
   const warningCount = getWarnings(data);
@@ -81,13 +81,12 @@ export function svgFooter(
       x="1" y="${outerStyle.height + 5}" rx="7" 
       width="${outerStyle.width - 2}" height="${ARTIFACT_CHILDREN_HEIGHT - 2}"
       fill="${ThemeColors.artifactDefault}"
-      opacity="0.8"
     />
     ${children}
     ${warnings}
     ${svgStoplight(data, {
       x: 4,
-      y: textY + 4,
+      y: textY + 6,
       width: outerStyle.width - 8,
     })}
   `;

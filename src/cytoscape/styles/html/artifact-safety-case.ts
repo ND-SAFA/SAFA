@@ -47,6 +47,7 @@ export function svgDefault(data: ArtifactData): string {
       <rect
         x="1" y="1" rx="7" width="${outerWidth - 2}" height="${outerHeight - 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
+        class="artifact-svg"
       />
     `
   );
@@ -79,6 +80,7 @@ function svgGoal(data: ArtifactData): string {
       <rect
         x="1" y="1" width="${outerWidth - 2}" height="${outerHeight - 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
+        class="artifact-svg"
       />
     `
   );
@@ -111,6 +113,7 @@ function svgSolution(data: ArtifactData): string {
       <circle 
         cx="100" cy="100" r="91"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
+        class="artifact-svg"
       />
     `
   );
@@ -148,6 +151,7 @@ function svgStrategy(data: ArtifactData): string {
           ${outerWidth - 1},${outerHeight - 1} 
           1,${outerHeight - 1}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
+        class="artifact-svg"
       />
     `
   );

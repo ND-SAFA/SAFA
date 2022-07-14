@@ -33,6 +33,7 @@ export function svgNode(
         style="margin-top: ${
           outerStyle.marginTop + ARTIFACT_CHILDREN_HEIGHT + 6
         }px"
+        class="artifact-svg-wrapper"
       >
         ${svgShape}
         ${svgTitle(title, y)}

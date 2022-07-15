@@ -120,8 +120,8 @@ export function handleDeleteArtifact(
 
         deleteArtifact(artifact)
           .then(async () => {
-            await projectModule.deleteArtifacts([artifact]);
             await artifactSelectionModule.UNSELECT_ARTIFACT();
+            await projectModule.deleteArtifacts([artifact]);
             onSuccess?.();
             resolve();
           })

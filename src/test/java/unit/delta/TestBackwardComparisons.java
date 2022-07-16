@@ -31,7 +31,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
-            .get();
+            .buildEndpoint();
         JSONObject projectDelta = sendGet(backwardRouteName);
 
         // VP - Verify that artifact changes are flipped
@@ -74,7 +74,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .get();
+            .buildEndpoint();
         JSONObject projectDelta = sendGet(backwardRouteName);
 
 

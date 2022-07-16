@@ -26,7 +26,7 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
         String type = "Design";
 
         //Step - Upload file, parse artifacts, and collect them
-        String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).get();
+        String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).buildEndpoint();
         JSONArray artifacts = uploadArtifactFileAndGetArtifacts(routeName, SampleProjectConstants.DESIGN_FILE);
 
         //VP - Verify that all artifacts were parsed

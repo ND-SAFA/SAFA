@@ -31,7 +31,7 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
      */
     @Test
     public void parseDesignArtifacts() throws Exception {
-        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
+        ProjectVersion projectVersion = createDefaultProject("testProject");
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
@@ -49,7 +49,7 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
 
     @Test
     public void missingFileKey() throws Exception {
-        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles("testProject");
+        ProjectVersion projectVersion = createDefaultProject("testProject");
 
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
 

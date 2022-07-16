@@ -26,7 +26,7 @@ public class TestUploadFiles extends ApplicationBaseTest {
     @Test
     public void uploadTestResources() throws IOException, SafaError {
         String testProjectName = "testProject";
-        ProjectVersion projectVersion = createProjectAndUploadBeforeFiles(testProjectName);
+        ProjectVersion projectVersion = createDefaultProject(testProjectName);
         Project project = projectVersion.getProject();
 
         //Cleanup

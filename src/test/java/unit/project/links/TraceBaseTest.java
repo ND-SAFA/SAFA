@@ -38,6 +38,6 @@ public class TraceBaseTest extends ApplicationBaseTest {
         return RouteBuilder
             .withRoute(AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
             .withVersion(projectVersion)
-            .get();
+            .buildEndpoint();
     }
 }

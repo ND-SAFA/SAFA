@@ -40,7 +40,7 @@ public class DeleteDocument extends ApplicationBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Documents.deleteDocument)
             .withDocument(document)
-            .get();
+            .buildEndpoint();
         sendDelete(route, status().isNoContent());
 
         // VP - Verify that no documents are associated with project

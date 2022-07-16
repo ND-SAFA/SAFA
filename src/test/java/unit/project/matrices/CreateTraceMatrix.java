@@ -37,7 +37,7 @@ public class CreateTraceMatrix extends TraceMatrixBaseTest {
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
-            .get();
+            .buildEndpoint();
         sendPost(route, new JSONObject(), status().isOk());
 
         // VP - Assert that single matrix exists for project.

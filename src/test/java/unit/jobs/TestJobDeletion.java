@@ -22,7 +22,7 @@ public class TestJobDeletion extends JobBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Jobs.deleteJob)
             .withJob(job)
-            .get();
+            .buildEndpoint();
 
         // Send deletion request
         sendDelete(route, status().isOk());

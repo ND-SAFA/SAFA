@@ -49,7 +49,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .get();
+            .buildEndpoint();
         JSONObject projectDelta = sendGet(deltaRouteName);
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -26,7 +27,7 @@ public class ProjectPaths {
     // Jira
     public static final String PATH_TO_DRONE_ISSUES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/jira/drone_response.json";
 
-    private static String pathHelper(String... paths) {
+    public static String joinPaths(String... paths) {
         StringBuilder finalPath = new StringBuilder();
         for (int i = 0; i < paths.length; i++) {
             String p = paths[i];
@@ -45,7 +46,7 @@ public class ProjectPaths {
 
     public static String getPathToStorage(Project project, boolean createIfEmpty) {
 
-        String pathToLocalStorage = pathHelper(ProjectPaths.PATH_TO_STORAGE, project.getProjectId().toString());
+        String pathToLocalStorage = joinPaths(ProjectPaths.PATH_TO_STORAGE, project.getProjectId().toString());
         if (!Files.exists(Paths.get(pathToLocalStorage)) && createIfEmpty) {
             try {
                 Files.createDirectories(Paths.get(pathToLocalStorage));
@@ -56,23 +57,34 @@ public class ProjectPaths {
         return pathToLocalStorage;
     }
 
+    public static String getTemporaryPath() throws IOException {
+        String randomId = UUID.randomUUID().toString();
+        String pathToTemporary = joinPaths(ProjectPaths.PATH_TO_STORAGE, randomId);
+        Files.createDirectories(Paths.get(pathToTemporary));
+        return pathToTemporary;
+    }
+
     public static String getPathToUploadedFiles(Project project) {
-        return pathHelper(getPathToStorage(project), "uploaded");
+        return joinPaths(getPathToStorage(project), "uploaded");
     }
 
     public static String getPathToProjectFile(Project project, String fileName) {
-        return pathHelper(getPathToStorage(project), fileName);
+        return joinPaths(getPathToStorage(project), fileName);
     }
 
     public static String getPathToFlatFile(Project project, String fileName) {
-        return pathHelper(getPathToUploadedFiles(project), fileName);
+        return joinPaths(getPathToUploadedFiles(project), fileName);
     }
 
     public static String getPathToGeneratedFiles(Project project) {
-        return pathHelper(getPathToStorage(project), "generated");
+        return joinPaths(getPathToStorage(project), "generated");
+    }
+
+    public static String getPathToTemporaryFile(String fileName) throws IOException {
+        return joinPaths(getTemporaryPath(), fileName);
     }
 
     public static String getPathToTestResources(String fileName) {
-        return pathHelper(PATH_TO_DEFAULT_PROJECT, fileName);
+        return joinPaths(PATH_TO_DEFAULT_PROJECT, fileName);
     }
 }

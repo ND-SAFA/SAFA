@@ -36,7 +36,7 @@ public class GetTraceMatrices extends TraceMatrixBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
             .withProject(project)
-            .get();
+            .buildEndpoint();
         JSONObject projectMatrices = sendGet(route);
 
         // VP - Assert that no matrix exists for project.

@@ -76,13 +76,13 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         String path = RouteBuilder
             .withRoute(baseRoute)
             .withVersion(projectVersion)
-            .get();
+            .buildEndpoint();
         MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
             pathToFileDir);
         return sendRequest(beforeRequest, status().isCreated(), this.token);
     }
 
-    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws SafaError, IOException {
+    public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
@@ -108,7 +108,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Commits.commitChange)
             .withVersion(commitVersion)
-            .get();
+            .buildEndpoint();
         return sendPost(route, commitBuilder.asJson(), expectedStatus);
     }
 
@@ -147,7 +147,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
                                       ProjectRole role,
                                       ResultMatcher httpResult) throws Exception {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        String url = RouteBuilder.withRoute(AppRoutes.Projects.Membership.addProjectMember).withProject(project).get();
+        String url = RouteBuilder.withRoute(AppRoutes.Projects.Membership.addProjectMember).withProject(project).buildEndpoint();
         return sendPost(url, toJson(request), httpResult);
     }
 
@@ -155,7 +155,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         String url = RouteBuilder
             .withRoute(AppRoutes.Projects.Membership.getProjectMembers)
             .withProject(project)
-            .get();
+            .buildEndpoint();
         return sendGetWithArrayResponse(url, status().is2xxSuccessful());
     }
 
@@ -199,7 +199,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             RouteBuilder
                 .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
                 .withVersion(projectVersion)
-                .get();
+                .buildEndpoint();
         return sendPost(route, docJson, status().isCreated());
     }
 
@@ -210,7 +210,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
             .withVersion(projectVersion)
             .withDocument(document)
-            .get();
+            .buildEndpoint();
         return sendPostWithArrayResponse(route, artifactsJson);
     }
 

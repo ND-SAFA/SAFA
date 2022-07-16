@@ -73,7 +73,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withDocument(document)
             .withArtifactId(artifact)
-            .get();
+            .buildEndpoint();
         sendDelete(route, status().isNoContent());
 
         // VP - Verify that artifact is no longer linked

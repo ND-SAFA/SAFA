@@ -27,7 +27,7 @@ public class TestSafaErrorMessage extends ApplicationBaseTest {
         String routeName = RouteBuilder
             .withRoute(AppRoutes.Projects.Versions.getVersions)
             .withProject(project)
-            .get();
+            .buildEndpoint();
 
         JSONObject obj = sendGet(routeName, status().isBadRequest());
 

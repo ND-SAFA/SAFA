@@ -78,7 +78,7 @@ public class TestDeletedTraceLink extends ApplicationBaseTest {
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .get();
+            .buildEndpoint();
 
         // Step - Retrieve delta information
         JSONObject projectDelta = sendGet(deltaRouteName);

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.builders;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 
 import edu.nd.crc.safa.server.entities.api.StringCreator;
 
@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class TestUtil {
     public <T> T apiResponseAsJsonObject(
         MvcResult apiResponse,
-        StringCreator<T> stringCreator) throws UnsupportedEncodingException,
+        StringCreator<T> stringCreator) throws IOException,
         JSONException {
         MockHttpServletResponse response = apiResponse.getResponse();
         String content = response.getContentAsString();

@@ -35,7 +35,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
             .withVersion(projectVersion)
-            .get();
+            .buildEndpoint();
         JSONObject projectJson = sendGet(route);
 
         // VP - Verify that documents has empty list

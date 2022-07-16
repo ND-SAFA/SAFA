@@ -11,7 +11,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 /**
  * Given a route template, allows the users to specify the needed parameters and validates the final path.
  */
-public class RouteBuilder {
+public class RouteBuilder<T extends RouteBuilder<T>> {
     String path;
 
     public RouteBuilder(String path) {
@@ -22,9 +22,9 @@ public class RouteBuilder {
         return new RouteBuilder(routeTemplate);
     }
 
-    public RouteBuilder withVersion(ProjectVersion version) {
+    public T withVersion(ProjectVersion version) {
         this.path = this.path.replace("{versionId}", version.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
     public RouteBuilder withProject(Project project) {
@@ -82,7 +82,7 @@ public class RouteBuilder {
         return this;
     }
 
-    public String get() {
+    public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new RuntimeException("Path is not fully configured:" + this.path);
         }

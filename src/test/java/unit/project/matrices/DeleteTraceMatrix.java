@@ -37,7 +37,7 @@ public class DeleteTraceMatrix extends TraceMatrixBaseTest {
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
-            .get();
+            .buildEndpoint();
         sendDelete(route, status().isOk());
 
         // VP - Assert that no matrix exists for project.

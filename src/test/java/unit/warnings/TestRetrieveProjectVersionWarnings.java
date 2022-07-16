@@ -126,7 +126,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         String endpoint = RouteBuilder
             .withRoute(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
             .withVersion(projectVersion)
-            .get();
+            .buildEndpoint();
         return sendGet(endpoint);
     }
 }

@@ -166,7 +166,7 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
-            .get();
+            .buildEndpoint();
         JSONObject projectDelta = sendGet(deltaRouteName);
 
         // VP - Verify that change is detected

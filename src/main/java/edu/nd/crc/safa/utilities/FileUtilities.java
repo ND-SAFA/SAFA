@@ -1,13 +1,19 @@
 package edu.nd.crc.safa.utilities;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import org.apache.commons.csv.CSVFormat;
@@ -143,5 +149,25 @@ public class FileUtilities {
     public static JSONObject readJSONFile(String path) throws IOException {
         String fileContent = FileUtils.readFileToString(new File(path), "utf-8");
         return new JSONObject(fileContent);
+    }
+
+    public static List<File> getZipFiles(String content) throws IOException {
+        ZipEntry entry;
+        final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        String temporaryFolder = ProjectPaths.getTemporaryPath();
+        List<File> filesCreated = new ArrayList<>();
+        while ((entry = zin.getNextEntry()) != null) {
+            String name = entry.getName();
+            String pathToFile = ProjectPaths.joinPaths(temporaryFolder, name);
+            try (FileOutputStream outputStream = new FileOutputStream(pathToFile)) {
+                for (var c = zin.read(); c != -1; c = zin.read()) {
+                    outputStream.write(c);
+                }
+                outputStream.flush();
+                zin.closeEntry();
+                filesCreated.add(new File(pathToFile));
+            }
+        }
+        return filesCreated;
     }
 }

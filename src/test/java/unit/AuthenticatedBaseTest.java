@@ -5,15 +5,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +47,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         this.safaUserRepository.deleteAll();
         this.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
+        SafaRequest.setMockMvc(mockMvc);
     }
 
     public void defaultLogin() throws Exception {
@@ -53,6 +58,13 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
 
     public JSONObject sendGet(String routeName) throws Exception {
         return sendGet(routeName, status().isOk());
+    }
+
+    public List<File> getFilesInZip(String routeName) throws Exception {
+        return sendRequestWithCreator(get(routeName),
+            status().isOk(),
+            this.token,
+            (FileUtilities::getZipFiles));
     }
 
     public JSONObject sendGet(String routeName,
@@ -150,6 +162,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
             test);
         if (setToken) {
             this.token = response.getString("token");
+            SafaRequest.setAuthorizationToken(this.token);
         }
     }
 
@@ -171,7 +184,7 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         String url = RouteBuilder
             .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
             .withProjectMembership(projectMembershipOptional.get())
-            .get();
+            .buildEndpoint();
         sendDelete(url, status().isNoContent());
     }
 }

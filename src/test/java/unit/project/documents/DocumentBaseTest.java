@@ -67,7 +67,7 @@ public class DocumentBaseTest extends ApplicationBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
             .withProject(project)
-            .get();
+            .buildEndpoint();
         return sendGetWithArrayResponse(route, status().isOk());
     }
 }

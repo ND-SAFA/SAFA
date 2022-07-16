@@ -38,14 +38,14 @@ public class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Documents.setCurrentDocument)
             .withDocument(document)
-            .get();
+            .buildEndpoint();
         sendPost(route, new JSONObject());
 
         // VP - Verify the currentDocumentId is set to document created
         assertThat(getCurrentDocumentId(projectVersion)).isEqualTo(document.getDocumentId().toString());
 
         // Step - Delete currentDocumentId
-        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.clearCurrentDocument).get();
+        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.clearCurrentDocument).buildEndpoint();
         sendDelete(deleteRoute);
 
         // VP - Verify that currentDocumentId is back to null

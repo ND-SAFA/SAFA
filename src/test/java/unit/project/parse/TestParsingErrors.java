@@ -12,7 +12,7 @@ public class TestParsingErrors extends ParseBaseTest {
 
     @Test
     public void errorForWrongColumnsInArtifactFile() throws Exception {
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.FlatFiles.parseArtifactFile).withArtifactType("Designs").get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.FlatFiles.parseArtifactFile).withArtifactType("Designs").buildEndpoint();
         String fileName = "Design2Requirement.csv";
 
         // VP - Verify error message informs that columns are wrong
@@ -31,7 +31,7 @@ public class TestParsingErrors extends ParseBaseTest {
 
     @Test
     public void errorForWrongFileToArtifactParser() throws Exception {
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.FlatFiles.parseArtifactFile).withArtifactType("Designs").get();
+        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.FlatFiles.parseArtifactFile).withArtifactType("Designs").buildEndpoint();
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong

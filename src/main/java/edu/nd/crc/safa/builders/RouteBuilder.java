@@ -27,29 +27,29 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
-    public RouteBuilder withProject(Project project) {
+    public T withProject(Project project) {
         this.path = this.path.replace("{projectId}", project.getProjectId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withType(ArtifactType artifactType) {
+    public T withType(ArtifactType artifactType) {
         this.path = this.path.replace("{typeId}", artifactType.getTypeId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withDocument(Document document) {
+    public T withDocument(Document document) {
         this.path = this.path.replace("{documentId}", document.getDocumentId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withBaselineVersion(ProjectVersion baselineVersion) {
+    public T withBaselineVersion(ProjectVersion baselineVersion) {
         this.path = this.path.replace("{baselineVersionId}", baselineVersion.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withTargetVersion(ProjectVersion targetVersion) {
+    public T withTargetVersion(ProjectVersion targetVersion) {
         this.path = this.path.replace("{targetVersionId}", targetVersion.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
     public RouteBuilder withArtifactType(String artifactType) {

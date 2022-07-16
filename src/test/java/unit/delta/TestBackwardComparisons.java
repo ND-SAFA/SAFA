@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -17,22 +17,20 @@ import unit.ApplicationBaseTest;
  * Tests that the delta between two project versions can be calculated in the opposite direction
  * (e.g. from present version to past versions).
  */
-public class TestBackwardComparisons extends ApplicationBaseTest {
+class TestBackwardComparisons extends ApplicationBaseTest {
 
     @Test
-    public void backwardsVersioning() throws Exception {
+    void backwardsVersioning() throws Exception {
         String projectName = "backward-versioning";
         Pair<ProjectVersion, ProjectVersion> versionPair = setupDualVersions(projectName);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();
 
         // Step - Calculate Delta in Backwards direction
-        String backwardRouteName = RouteBuilder
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
-            .buildEndpoint();
-        JSONObject projectDelta = sendGet(backwardRouteName);
+            .getJSONResponse();
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
@@ -52,7 +50,7 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
     }
 
     @Test
-    public void testComparisonAgainstSameVersion() throws Exception {
+    void testComparisonAgainstSameVersion() throws Exception {
         String projectName = "testThatTrivialArtifactNotCalculated";
 
         // Step - Create empty before and after versions
@@ -70,13 +68,10 @@ public class TestBackwardComparisons extends ApplicationBaseTest {
         dbEntityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
-        String backwardRouteName = RouteBuilder
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .buildEndpoint();
-        JSONObject projectDelta = sendGet(backwardRouteName);
-
+            .getJSONResponse();
 
         // VP - Verify that no changes are detected in artifacts
         for (String entityName : List.of("artifacts", "traces")) {

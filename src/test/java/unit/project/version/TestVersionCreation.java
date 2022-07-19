@@ -3,7 +3,7 @@ package unit.project.version;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -14,29 +14,33 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that users are able to create new versions.
  */
-public class TestVersionCreation extends ApplicationBaseTest {
+class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
-    public void attemptNewRevisionWithoutVersions() throws Exception {
+    void attemptNewRevisionWithoutVersions() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProjectWithReturn(projectName);
-        String routeName =
-            RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion).withProject(project).buildEndpoint();
-        JSONObject response = sendPost(routeName, new JSONObject(), status().is4xxClientError());
+        JSONObject response =
+            SafaRequest
+                .withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion)
+                .withProject(project)
+                .postWithJsonObject(new JSONObject(), status().is4xxClientError());
         assertThat(response.getString("message")).contains("initial version");
     }
 
     @Test
-    public void createFirstVersionThroughRevision() throws Exception {
+    void createFirstVersionThroughRevision() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName =
-            RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion).withProject(project).buildEndpoint();
-        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
+        JSONObject projectVersionJson =
+            SafaRequest
+                .withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion)
+                .withProject(project)
+                .postWithJsonObject(new JSONObject());
 
         // VP - Verify that the correct version numbers appear
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
@@ -48,15 +52,16 @@ public class TestVersionCreation extends ApplicationBaseTest {
     }
 
     @Test
-    public void createNewMinorVersion() throws Exception {
+    void createNewMinorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewMinorVersion).withProject(project).buildEndpoint();
-
-        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
+        JSONObject projectVersionJson = SafaRequest
+            .withRoute(AppRoutes.Projects.Versions.createNewMinorVersion)
+            .withProject(project)
+            .postWithJsonObject(new JSONObject());
 
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
         assertThat(projectVersionJson.get("minorVersion")).isEqualTo(2);
@@ -67,15 +72,16 @@ public class TestVersionCreation extends ApplicationBaseTest {
     }
 
     @Test
-    public void createNewMajorVersion() throws Exception {
+    void createNewMajorVersion() throws Exception {
         String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.Versions.createNewMajorVersion).withProject(project).buildEndpoint();
-
-        JSONObject projectVersionJson = sendPost(routeName, new JSONObject(), status().isCreated());
+        JSONObject projectVersionJson = SafaRequest
+            .withRoute(AppRoutes.Projects.Versions.createNewMajorVersion)
+            .withProject(project)
+            .postWithJsonObject(new JSONObject());
 
         assertThat(projectVersionJson.get("majorVersion")).isEqualTo(2);
         assertThat(projectVersionJson.get("minorVersion")).isEqualTo(1);

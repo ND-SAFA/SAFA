@@ -1,17 +1,16 @@
 package unit.project.user;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,51 +22,56 @@ import unit.ApplicationBaseTest;
  * 2. Log into an existing account
  * 3. User is not allowed without credentials.
  */
-public class TestSafaUserController extends ApplicationBaseTest {
+class TestSafaUserController extends ApplicationBaseTest {
+    String testEmail = "abc123@gmail.com";
+    String testPassword = "r{QjR3<Ec2eZV@?";
 
     @Autowired
     SafaUserRepository safaUserRepository;
 
     @BeforeEach
     public void clearUsers() {
-        this.safaUserRepository.deleteAll();
+        // Base controller (AuthenticatedBaseTest) clears all accounts before each test.
+        SafaRequest.clearAuthorizationToken();
     }
 
     @Test
-    public void createAccount() throws Exception {
-        createUser(currentUsername, localPassword);
-        Optional<SafaUser> userQuery = safaUserRepository.findByEmail(currentUsername);
-        assertThat(userQuery.isPresent()).isTrue();
+    void testCanCreateAccount() throws Exception {
+        createUser(testEmail, testPassword);
+        Optional<SafaUser> userQuery = safaUserRepository.findByEmail(testEmail);
+        assertThat(userQuery).isPresent();
 
         SafaUser user = userQuery.get();
-        assertThat(user.getEmail()).isEqualTo(currentUsername);
+        assertThat(user.getEmail()).isEqualTo(testEmail);
     }
 
     @Test
-    public void correctLoginAttempt() throws Exception {
-        createUser(currentUsername, localPassword);
-        loginUser(currentUsername, localPassword, status().isOk());
-        assertThat(this.token).isNotNull();
+    void testTokenIsSet() throws Exception {
+        createUser(testEmail, testPassword);
+        loginUser(testEmail, testPassword, status().isOk());
+        assertThat(SafaRequest.getAuthorizationToken()).isNotNull();
     }
 
     @Test
-    public void validResourceRequest() throws Exception {
-        String email = "abc123@gmail.com";
-        String password = "r{QjR3<Ec2eZV@?";
-        createUser(email, password);
-        loginUser(email, password, status().isOk());
-        sendGetWithArrayResponse(AppRoutes.Projects.getProjects, status().is2xxSuccessful());
+    void testThatUserWasCreated() throws Exception {
+        createUser(testEmail, testPassword);
+        loginUser(testEmail, testPassword, status().isOk());
+
+        // VP - Verify that user is able to be authenticated and no projects are assigned to it.
+        JSONArray response = new SafaRequest(AppRoutes.Projects.getProjects).getWithJsonArray();
+        assertThat(response.length()).isZero();
     }
 
     @Test
-    public void invalidResourceRequest() throws Exception {
-        sendRequest(get(AppRoutes.Projects.getProjects), status().is4xxClientError());
+    void testInvalidRequestMissingCredentials() throws Exception {
+        SafaRequest.clearAuthorizationToken();
+        SafaRequest
+            .withRoute(AppRoutes.Projects.getProjects)
+            .getWithJsonObject(status().isForbidden());
     }
 
     @Test
-    public void wrongLoginAttempt() {
-        assertThrows(JSONException.class, () -> {
-            loginUser(currentUsername, localPassword, status().is4xxClientError());
-        });
+    void testForbiddenIsUserNotAuthorized() throws Exception {
+        loginUser(testEmail, testPassword, status().is4xxClientError(), false);
     }
 }

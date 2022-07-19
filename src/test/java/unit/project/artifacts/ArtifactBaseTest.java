@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.IArtifact;
@@ -162,12 +162,11 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
             .withModifiedArtifact(artifactJson));
 
         // Step - Get project delta
-        String deltaRouteName = RouteBuilder
+        JSONObject projectDelta = SafaRequest
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
-            .buildEndpoint();
-        JSONObject projectDelta = sendGet(deltaRouteName);
+            .getWithJsonObject();
 
         // VP - Verify that change is detected
         JSONObject modifiedArtifacts = projectDelta.getJSONObject("artifacts").getJSONObject("modified");

@@ -1,16 +1,10 @@
 package unit;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-
-import java.io.IOException;
-import java.util.List;
-
 import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.flatFiles.services.FileService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
@@ -32,12 +26,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
 /**
  * Provides layer of access to entities in database.
@@ -117,72 +105,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
         dbEntityBuilder.createEmptyData();
         appBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
-    }
-
-    protected MockHttpServletRequestBuilder addJsonBody(MockHttpServletRequestBuilder request,
-                                                        Object body) {
-        return request
-            .content(body.toString())
-            .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
-                                  ResultMatcher test) throws Exception {
-        return sendRequestWithCreator(request, test, "", EntityBaseTest::jsonCreator);
-    }
-
-    public JSONObject sendRequest(MockHttpServletRequestBuilder request,
-                                  ResultMatcher test,
-                                  String authorizationToken) throws Exception {
-        return sendRequestWithCreator(request, test, authorizationToken, EntityBaseTest::jsonCreator);
-    }
-
-    public <T> T sendRequestWithCreator(MockHttpServletRequestBuilder request,
-                                        ResultMatcher test,
-                                        String authorizationToken,
-                                        StringCreator<T> stringCreator) throws Exception {
-        if (!authorizationToken.equals("")) {
-            request = request.header("Authorization", authorizationToken);
-        }
-        return sendRequestWithResponse(request, test, stringCreator);
-    }
-
-    public <T> T sendRequestWithResponse(MockHttpServletRequestBuilder request,
-                                         ResultMatcher test,
-                                         StringCreator<T> stringCreator) throws Exception {
-
-        MvcResult response = mockMvc
-            .perform(request)
-            .andExpect(test)
-            .andReturn();
-
-        return testUtil.apiResponseAsJsonObject(response, stringCreator);
-    }
-
-    public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)
-        throws IOException {
-        String attributeName = "files";
-
-        List<MockMultipartFile> files =
-            MultipartHelper.createMockMultipartFilesFromDirectory(pathToFiles, attributeName);
-        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
-
-        for (MockMultipartFile file : files) {
-            request.file(file);
-        }
-
-        return request;
-    }
-
-    public MockMultipartHttpServletRequestBuilder createSingleFileRequest(String routeName, String pathToFile)
-        throws IOException {
-        String attributeName = "file";
-
-        MockMultipartFile file = MultipartHelper.createFile(pathToFile, attributeName);
-        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
-        request.file(file);
-
-        return request;
     }
 
     public JSONObject toJson(Object object) throws JsonProcessingException {

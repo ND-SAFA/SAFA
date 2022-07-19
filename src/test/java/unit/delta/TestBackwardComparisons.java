@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.SafaRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -30,7 +30,7 @@ class TestBackwardComparisons extends ApplicationBaseTest {
         JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
-            .getJSONResponse();
+            .getWithJsonObject();
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
@@ -44,8 +44,8 @@ class TestBackwardComparisons extends ApplicationBaseTest {
         int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
         int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
 
-        assertThat(nTracesAdded).isEqualTo(0);
-        assertThat(nTracesModified).isEqualTo(0);
+        assertThat(nTracesAdded).isZero();
+        assertThat(nTracesModified).isZero();
         assertThat(nTracesRemoved).isEqualTo(1);
     }
 
@@ -71,14 +71,14 @@ class TestBackwardComparisons extends ApplicationBaseTest {
         JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .getJSONResponse();
+            .getWithJsonObject();
 
         // VP - Verify that no changes are detected in artifacts
         for (String entityName : List.of("artifacts", "traces")) {
             JSONObject entityDelta = projectDelta.getJSONObject(entityName);
-            assertThat(entityDelta.getJSONObject("added").keySet().size()).isEqualTo(0);
-            assertThat(entityDelta.getJSONObject("removed").keySet().size()).isEqualTo(0);
-            assertThat(entityDelta.getJSONObject("modified").keySet().size()).isEqualTo(0);
+            assertThat(entityDelta.getJSONObject("added").keySet().size()).isZero();
+            assertThat(entityDelta.getJSONObject("removed").keySet().size()).isZero();
+            assertThat(entityDelta.getJSONObject("modified").keySet().size()).isZero();
         }
     }
 }

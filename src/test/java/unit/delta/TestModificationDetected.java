@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
@@ -20,7 +20,7 @@ import unit.SampleProjectConstants;
 /**
  * Tests that changes to the content of artifacts are retrieved.
  */
-public class TestModificationDetected extends ApplicationBaseTest {
+class TestModificationDetected extends ApplicationBaseTest {
 
 
     /**
@@ -30,7 +30,7 @@ public class TestModificationDetected extends ApplicationBaseTest {
      * @throws Exception Throws error if http request fails.
      */
     @Test
-    public void testModificationDetected() throws Exception {
+    void testModificationDetected() throws Exception {
         String projectName = "test-project";
 
         // Step - Create before and after version
@@ -45,12 +45,11 @@ public class TestModificationDetected extends ApplicationBaseTest {
         assertThat(changedBodies.size()).isEqualTo(3);
 
         // Step - Calculate delta
-        String deltaRouteName = RouteBuilder
+        JSONObject projectDelta = SafaRequest
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .buildEndpoint();
-        JSONObject projectDelta = sendGet(deltaRouteName);
+            .getWithJsonObject();
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 

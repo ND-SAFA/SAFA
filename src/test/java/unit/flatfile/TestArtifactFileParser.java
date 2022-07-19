@@ -19,7 +19,7 @@ import unit.SampleProjectConstants;
 /**
  * Provides smoke tests for testing the ArtifactFileParser
  */
-public class TestArtifactFileParser extends ApplicationBaseTest {
+class TestArtifactFileParser extends ApplicationBaseTest {
 
     @Autowired
     ArtifactFileParser artifactFileParser;
@@ -30,7 +30,7 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
      * @throws Exception If any http requests fails.
      */
     @Test
-    public void parseDesignArtifacts() throws Exception {
+    void parseDesignArtifacts() throws Exception {
         ProjectVersion projectVersion = createDefaultProject("testProject");
 
         // Step - parse Design artifact definition specification
@@ -48,7 +48,7 @@ public class TestArtifactFileParser extends ApplicationBaseTest {
     }
 
     @Test
-    public void missingFileKey() throws Exception {
+    void missingFileKey() throws Exception {
         ProjectVersion projectVersion = createDefaultProject("testProject");
 
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");

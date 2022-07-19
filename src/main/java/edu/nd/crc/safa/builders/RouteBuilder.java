@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
  * Given a route template, allows the users to specify the needed parameters and validates the final path.
  */
 public class RouteBuilder<T extends RouteBuilder<T>> {
-    String path;
+    protected String path;
 
     public RouteBuilder(String path) {
         this.path = path;
@@ -52,34 +52,34 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
-    public RouteBuilder withArtifactType(String artifactType) {
+    public T withArtifactType(String artifactType) {
         this.path = this.path.replace("{artifactType}", artifactType);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withArtifactId(Artifact artifact) {
+    public T withArtifactId(Artifact artifact) {
         this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withProjectMembership(ProjectMembership projectMembership) {
+    public T withProjectMembership(ProjectMembership projectMembership) {
         this.path = this.path.replace("{projectMembershipId}", projectMembership.getMembershipId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withSourceArtifactTypeName(String sourceArtifactTypeName) {
+    public T withSourceArtifactTypeName(String sourceArtifactTypeName) {
         this.path = this.path.replace("{sourceArtifactTypeName}", sourceArtifactTypeName);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withTargetArtifactTypeName(String targetArtifactTypeName) {
+    public T withTargetArtifactTypeName(String targetArtifactTypeName) {
         this.path = this.path.replace("{targetArtifactTypeName}", targetArtifactTypeName);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withJob(JobDbEntity job) {
+    public T withJob(JobDbEntity job) {
         this.path = this.path.replace("{jobId}", job.getId().toString());
-        return this;
+        return (T) this;
     }
 
     public String buildEndpoint() {

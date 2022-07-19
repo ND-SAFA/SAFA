@@ -2,13 +2,12 @@ package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -64,10 +63,9 @@ public class DocumentBaseTest extends ApplicationBaseTest {
 
 
     protected JSONArray getProjectDocuments(Project project) throws Exception {
-        String route = RouteBuilder
+        return SafaRequest
             .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
             .withProject(project)
-            .buildEndpoint();
-        return sendGetWithArrayResponse(route, status().isOk());
+            .getWithJsonArray();
     }
 }

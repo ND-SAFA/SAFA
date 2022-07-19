@@ -1,12 +1,12 @@
 package unit.project.documentArtifact;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
@@ -25,7 +25,7 @@ import unit.ApplicationBaseTest;
  * Tests that the client is able to add multiple artifact to some
  * specified document.
  */
-public class DeleteArtifactFromDocument extends ApplicationBaseTest {
+class DeleteArtifactFromDocument extends ApplicationBaseTest {
 
     @Autowired
     DocumentArtifactRepository documentArtifactRepository;
@@ -34,7 +34,7 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
      * Verifies that the response object contains
      */
     @Test
-    public void testRemoveArtifactFromDocument() throws Exception {
+    void testRemoveArtifactFromDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
@@ -65,8 +65,8 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactOptional.isPresent()).isTrue();
 
         // Step - Subscribe to version updates
-        createNewConnection(currentUsername)
-            .subscribeToVersion(currentUsername, projectVersion);
+        createNewConnection(defaultUser)
+            .subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Request artifact is removed from document
         String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.removeArtifactFromDocument)
@@ -74,14 +74,14 @@ public class DeleteArtifactFromDocument extends ApplicationBaseTest {
             .withDocument(document)
             .withArtifactId(artifact)
             .buildEndpoint();
-        sendDelete(route, status().isNoContent());
+        SafaRequest.withRoute(route).deleteWithJsonObject();
 
         // VP - Verify that artifact is no longer linked
         List<DocumentArtifact> documentArtifactList = this.documentArtifactRepository.findByDocument(document);
         assertThat(documentArtifactList.size()).isEqualTo(0);
 
         // VP - Verify that websocket message to update artifacts.
-        VersionMessage message = getNextMessage(currentUsername, VersionMessage.class);
+        VersionMessage message = getNextMessage(defaultUser, VersionMessage.class);
         assertThat(message.getType()).isEqualTo(VersionEntityTypes.ARTIFACTS);
     }
 }

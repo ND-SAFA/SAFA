@@ -2,7 +2,7 @@ package unit.project.matrices;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -17,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class GetTraceMatrices extends TraceMatrixBaseTest {
+class TestTraceMatricesCanBeCreated extends TraceMatrixBaseTest {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
 
     @Test
-    public void getTraceMatrices() throws Exception {
+    void testCreateDeleteRetrieveTraceMatrices() throws Exception {
         Project project = this.createEmptyProject();
         ArtifactType sourceArtifactType = this.dbEntityBuilder.getType(projectName, sourceArtifactTypeName);
         ArtifactType targetArtifactType = this.dbEntityBuilder.getType(projectName, targetArtifactTypeName);
@@ -32,12 +32,10 @@ public class GetTraceMatrices extends TraceMatrixBaseTest {
         TraceMatrix traceMatrix = new TraceMatrix(project, sourceArtifactType, targetArtifactType);
         this.traceMatrixRepository.save(traceMatrix);
 
-        // Step - Send request to delete matrix.
-        String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
+        // Step - Send request to retrieve matrix.
+        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
             .withProject(project)
-            .buildEndpoint();
-        JSONObject projectMatrices = sendGet(route);
+            .getWithJsonObject();
 
         // VP - Assert that no matrix exists for project.
         assertThat(projectMatrices.has(sourceArtifactTypeName)).isTrue();

@@ -1,9 +1,9 @@
 package unit.project.matrices;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -38,7 +38,7 @@ public class DeleteTraceMatrix extends TraceMatrixBaseTest {
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
             .buildEndpoint();
-        sendDelete(route, status().isOk());
+        SafaRequest.withRoute(route).deleteWithJsonObject();
 
         // VP - Assert that no matrix exists for project.
         int nMatrices = traceMatrixRepository.findByProject(project).size();

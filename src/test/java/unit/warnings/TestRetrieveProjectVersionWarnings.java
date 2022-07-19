@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.Hashtable;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
@@ -65,8 +65,8 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        createNewConnection(currentUsername)
-            .subscribeToVersion(currentUsername, projectVersion);
+        createNewConnection(defaultUser)
+            .subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =
@@ -86,9 +86,9 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
         // VP - Receive expected messages
         Hashtable<VersionEntityTypes, VersionMessage> messages = new Hashtable<>();
-        int nExpectedMessages = getQueueSize(currentUsername);
+        int nExpectedMessages = getQueueSize(defaultUser);
         for (int i = 0; i < nExpectedMessages; i++) {
-            VersionMessage message = getNextMessage(currentUsername, VersionMessage.class);
+            VersionMessage message = getNextMessage(defaultUser, VersionMessage.class);
             messages.put(message.getType(), message);
         }
         assertThat(messages.containsKey(VersionEntityTypes.ARTIFACTS)).isTrue();
@@ -123,10 +123,8 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
     }
 
     private JSONObject getProjectRules(ProjectVersion projectVersion) throws Exception {
-        String endpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
+        return new SafaRequest(AppRoutes.Projects.Warnings.getWarningsInProjectVersion)
             .withVersion(projectVersion)
-            .buildEndpoint();
-        return sendGet(endpoint);
+            .getWithJsonObject();
     }
 }

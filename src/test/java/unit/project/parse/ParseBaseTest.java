@@ -2,12 +2,11 @@ package unit.project.parse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -55,9 +54,9 @@ public class ParseBaseTest extends ApplicationBaseTest {
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
         String pathToFile = ProjectPaths.PATH_TO_DEFAULT_PROJECT + "/" + fileName;
-        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToFile);
-
-        // Step - Extract artifact and errors from body
-        return sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
+        return SafaRequest
+            .withRoute(routeName)
+            .getFlatFileHelper()
+            .uploadSingleFile(pathToFile);
     }
 }

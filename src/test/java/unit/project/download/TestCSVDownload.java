@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.io.File;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.SafaRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -20,7 +20,7 @@ class TestCSVDownload extends ApplicationBaseTest {
         ProjectVersion projectVersion = createDefaultProject(projectName);
         List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.downloadFlatFiles)
             .withVersion(projectVersion)
-            .getFilesInZipResponse();
+            .getWithFilesInZip();
 
         assertThat(projectFiles.size()).isPositive();
     }

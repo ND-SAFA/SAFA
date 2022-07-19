@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
@@ -44,9 +45,11 @@ public class JobBaseTest extends FlatFileBaseTest {
     }
 
     public UUID createJobFromDefaultProject() throws Exception {
-        JSONObject jobSubmissionResponse = uploadFlatFilesToVersion(projectVersion,
-            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
-            AppRoutes.Jobs.flatFileProjectUpdateJob);
+        JSONObject jobSubmissionResponse = FlatFileRequest
+            .withRoute(AppRoutes.Jobs.flatFileProjectUpdateJob)
+            .withVersion(projectVersion)
+            .getFlatFileHelper()
+            .uploadFlatFilesToVersion(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         return UUID.fromString(jobSubmissionResponse.getString("id"));
     }

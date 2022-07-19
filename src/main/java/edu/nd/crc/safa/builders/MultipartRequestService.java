@@ -1,4 +1,4 @@
-package unit;
+package edu.nd.crc.safa.builders;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Creates a test layer for sending multi-part file http requests.
  */
-public class MultipartHelper {
-
+@NoArgsConstructor
+public class MultipartRequestService {
 
     public static List<MockMultipartFile> createMockMultipartFilesFromDirectory(String pathToDirectory,
                                                                                 String attributeName)

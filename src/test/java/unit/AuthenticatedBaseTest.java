@@ -1,29 +1,20 @@
 package unit;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.SafaRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.StringCreator;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectMembership;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.utilities.FileUtilities;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * Wraps each test with a test harness for creating a user account and logging in before each test.
@@ -32,114 +23,36 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  */
 public class AuthenticatedBaseTest extends EntityBaseTest {
 
-    public static final String currentUsername = "root-test-user@gmail.com";
-    public static final String localPassword = "r{QjR3<Ec2eZV@?";
+    public static final String defaultUser = "root-test-user@gmail.com";
+    public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";
     public static SafaUser currentUser;
     protected String token;
-
-    public void sendDelete(String routeName) throws Exception {
-        sendDelete(routeName, status().isNoContent());
-    }
 
     @BeforeEach
     public void createData() throws Exception {
         token = null;
         this.safaUserRepository.deleteAll();
+        SafaRequest.setMockMvc(mockMvc);
         this.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
-        SafaRequest.setMockMvc(mockMvc);
+    }
+
+    @AfterEach
+    public void clearAuthentication() {
+        SafaRequest.clearAuthorizationToken();
     }
 
     public void defaultLogin() throws Exception {
-        createUser(currentUsername, localPassword);
-        loginUser(currentUsername, localPassword);
-        currentUser = safaUserService.getUserFromUsername(currentUsername);
+        createUser(defaultUser, defaultUserPassword);
+        loginUser(defaultUser, defaultUserPassword);
+        currentUser = safaUserService.getUserFromUsername(defaultUser);
     }
 
-    public JSONObject sendGet(String routeName) throws Exception {
-        return sendGet(routeName, status().isOk());
-    }
-
-    public List<File> getFilesInZip(String routeName) throws Exception {
-        return sendRequestWithCreator(get(routeName),
-            status().isOk(),
-            this.token,
-            (FileUtilities::getZipFiles));
-    }
-
-    public JSONObject sendGet(String routeName,
-                              ResultMatcher test) throws Exception {
-        assertTokenExists();
-        return sendRequest(get(routeName), test, this.token);
-    }
-
-    public JSONArray sendGetWithArrayResponse(String routeName,
-                                              ResultMatcher test) throws Exception {
-        assertTokenExists();
-        return sendRequestWithCreator(get(routeName), test, this.token, EntityBaseTest::arrayCreator);
-    }
-
-    public JSONObject sendPost(String routeName, Object body) throws Exception {
-        return sendPost(routeName, body, status().is2xxSuccessful());
-    }
-
-    public JSONObject sendPost(String routeName,
-                               Object body,
-                               ResultMatcher test) throws Exception {
-        return sendPost(routeName, body, test, true, EntityBaseTest::jsonCreator);
-    }
-
-    public JSONArray sendPostWithArrayResponse(String routeName,
-                                               Object body) throws Exception {
-        return sendPost(routeName, body, status().is2xxSuccessful(), true, EntityBaseTest::arrayCreator);
-    }
-
-    public void sendPost(String routeName,
-                         Object body,
-                         ResultMatcher test,
-                         boolean assertToken) throws Exception {
-        sendPost(routeName, body, test, assertToken, JSONObject::new);
-    }
-
-    public <T> T sendPost(String routeName,
-                          Object body,
-                          ResultMatcher test,
-                          boolean assertToken,
-                          StringCreator<T> stringCreator) throws Exception {
-        MockHttpServletRequestBuilder request;
-        if (assertToken) {
-            assertTokenExists();
-            request = addJsonBody(post(routeName), body);
-            return sendRequestWithCreator(request, test, this.token, stringCreator);
-        } else {
-            //TODO: Create better way to omit authentication token
-            request = addJsonBody(post(routeName), body);
-            return sendRequestWithCreator(request, test, "", stringCreator);
-        }
-    }
-
-    public void sendDelete(String routeName,
-                           ResultMatcher test) throws Exception {
-        assertTokenExists();
-        sendRequest(delete(routeName), test, this.token);
-    }
-
-    public void assertTokenExists() throws SafaError {
-        if (this.token == null || this.token.equals("")) {
-            throw new SafaError("Authorization token not set.");
-        }
-    }
-
-    /**
-     * Sends a Http request to the create account endpoint with given username and password.
-     *
-     * @param email    The id for the account.
-     * @param password The password associated with account created.
-     * @throws Exception Throws exception if problems occurs with Http request.
-     */
     public void createUser(String email, String password) throws Exception {
         SafaUser user = new SafaUser(email, password);
-        sendPost(AppRoutes.Accounts.createNewUser, toJson(user), status().is2xxSuccessful(), false);
+        SafaRequest
+            .withRoute(AppRoutes.Accounts.createNewUser)
+            .postWithJsonObject(toJson(user));
     }
 
     public void loginUser(String email, String password) throws Exception {
@@ -158,8 +71,9 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         JSONObject user = new JSONObject();
         user.put("email", email);
         user.put("password", password);
-        JSONObject response = sendRequest(addJsonBody(post(AppRoutes.Accounts.loginLink), user),
-            test);
+        JSONObject response = SafaRequest
+            .withRoute(AppRoutes.Accounts.loginLink)
+            .postWithJsonObject(user, test);
         if (setToken) {
             this.token = response.getString("token");
             SafaRequest.setAuthorizationToken(this.token);
@@ -181,10 +95,9 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
             throw new SafaError(errorMessage);
 
         }
-        String url = RouteBuilder
+        SafaRequest
             .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
             .withProjectMembership(projectMembershipOptional.get())
-            .buildEndpoint();
-        sendDelete(url, status().isNoContent());
+            .deleteWithJsonObject();
     }
 }

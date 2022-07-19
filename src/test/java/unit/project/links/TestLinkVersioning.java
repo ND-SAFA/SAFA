@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
@@ -43,7 +44,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
 
         // Step - Create base trace link
         String flatFilesPath = ProjectPaths.PATH_TO_MINI_FILES;
-        uploadFlatFilesToVersion(v1, flatFilesPath);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
         ProjectAppEntity baseEntities = getProjectAtVersion(v1);
@@ -51,7 +52,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
         assertThat(baseTraces.size()).isEqualTo(1);
 
         // Step - Save same link to latter version
-        uploadFlatFilesToVersion(v2, flatFilesPath);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
 
         // VP - Verify that no change is stored by system
         assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);

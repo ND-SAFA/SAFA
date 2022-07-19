@@ -3,6 +3,7 @@ package unit.project.currentDocument;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -35,18 +36,17 @@ public class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest
         assertThat(getCurrentDocumentId(projectVersion)).isNull();
 
         // Step - Set current document
-        String route = RouteBuilder
+        SafaRequest
             .withRoute(AppRoutes.Projects.Documents.setCurrentDocument)
             .withDocument(document)
-            .buildEndpoint();
-        sendPost(route, new JSONObject());
+            .postWithJsonObject(new JSONObject());
 
         // VP - Verify the currentDocumentId is set to document created
         assertThat(getCurrentDocumentId(projectVersion)).isEqualTo(document.getDocumentId().toString());
 
         // Step - Delete currentDocumentId
         String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.clearCurrentDocument).buildEndpoint();
-        sendDelete(deleteRoute);
+        SafaRequest.withRoute(deleteRoute).deleteWithJsonObject();
 
         // VP - Verify that currentDocumentId is back to null
         assertThat(getCurrentDocumentId(projectVersion)).isNull();

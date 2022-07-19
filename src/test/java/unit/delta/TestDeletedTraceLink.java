@@ -3,7 +3,7 @@ package unit.delta;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -17,7 +17,7 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that changes to the content of artifacts are retrieved.
  */
-public class TestDeletedTraceLink extends ApplicationBaseTest {
+class TestDeletedTraceLink extends ApplicationBaseTest {
 
     String projectName = "test-project";
     String artifactOneName = "RE-10";
@@ -32,7 +32,7 @@ public class TestDeletedTraceLink extends ApplicationBaseTest {
      * @throws Exception Throws error if http request fails.
      */
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         // Step - Create before and after version
         Pair<ProjectVersion, ProjectVersion> versionPair = setupDualVersions(projectName, false);
         ProjectVersion beforeVersion = versionPair.getValue0();
@@ -54,7 +54,7 @@ public class TestDeletedTraceLink extends ApplicationBaseTest {
             .withAddedTrace(traceJson));
         ProjectCommit projectCommit = toClass(projectCommitJson.toString(), ProjectCommit.class);
         ArtifactAppEntity firstArtifact = projectCommit.getArtifacts().filterAdded(a -> a.name.equals(artifactOneName));
-        ArtifactAppEntity secondArtifact =
+        ArtifactAppEntity secondArtifact = // TODO: Remove or add test cases
             projectCommit.getArtifacts().filterAdded(a -> a.name.equals(artifactTwoName));
 
         // Step - Commit deleted artifactOne
@@ -74,14 +74,13 @@ public class TestDeletedTraceLink extends ApplicationBaseTest {
                              ProjectVersion afterVersion,
                              String expectedChange) throws Exception {
         // Step - Reverse delta
-        String deltaRouteName = RouteBuilder
+        JSONObject projectDelta = SafaRequest
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
-            .buildEndpoint();
+            .getWithJsonObject();
 
         // Step - Retrieve delta information
-        JSONObject projectDelta = sendGet(deltaRouteName);
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
 

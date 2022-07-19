@@ -87,7 +87,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.projectFlatFiles)
+    @PostMapping(value = AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError {
         if (files.length == 0) {

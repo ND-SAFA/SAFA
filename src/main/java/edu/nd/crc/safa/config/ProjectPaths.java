@@ -27,6 +27,9 @@ public class ProjectPaths {
     // Jira
     public static final String PATH_TO_DRONE_ISSUES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/jira/drone_response.json";
 
+    private ProjectPaths() {
+    }
+
     public static String joinPaths(String... paths) {
         StringBuilder finalPath = new StringBuilder();
         for (int i = 0; i < paths.length; i++) {

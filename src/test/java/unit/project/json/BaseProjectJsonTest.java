@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -36,7 +37,9 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
 
     protected JSONObject postProjectJson(JSONObject projectJson,
                                          ResultMatcher expectedStatus) throws Exception {
-        return sendPost(AppRoutes.Projects.createOrUpdateProjectMeta, projectJson, expectedStatus);
+        return SafaRequest
+            .withRoute(AppRoutes.Projects.createOrUpdateProjectMeta)
+            .postWithJsonObject(projectJson, expectedStatus);
     }
 
     /**

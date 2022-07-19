@@ -7,6 +7,7 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector to find.
      * @param timeout - The timeout to optionally wait for.
+     * @return The elements that match the given selector.
      */
     getCy(dataCy: string, timeout?: number): Chainable<JQuery<HTMLElement>>;
 
@@ -44,7 +45,6 @@ declare namespace Cypress {
      *
      * @param email - The email to log in with.
      * @param password - The password to log in with.
-     * @return Whether the login was successful.
      */
     login(email: string, password: string): Chainable<void>;
     /**

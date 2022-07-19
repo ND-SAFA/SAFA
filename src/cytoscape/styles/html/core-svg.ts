@@ -120,7 +120,8 @@ function svgBody(
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
-      width="${style.width}" height="${style.height}"
+      width="${style.width - style.x}" 
+      height="${style.height}"
     >
       <span class="text-body-2">
         ${getBody(data.body, style.truncateLength)}

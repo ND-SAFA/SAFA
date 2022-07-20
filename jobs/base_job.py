@@ -9,11 +9,11 @@ class BaseJob:
         self.args = args
 
     @abstractmethod
-    def _start(self):
+    def __start(self):
         pass
 
     def _get_trainer(self) -> LMTrainer:
         return LMTrainer(args=self.args, model_generator=self.args.model_generator, dataset=self.args.dataset)
 
     def start(self):
-        self._start()
+        self.__start()

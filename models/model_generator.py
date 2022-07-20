@@ -5,6 +5,8 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers import AutoConfig, AutoTokenizer
 from enum import IntEnum
 
+from constants import MAX_SEQ_LENGTH_DEFAULT
+
 
 class ArchitectureType(IntEnum):
     SINGLE = 1
@@ -12,8 +14,9 @@ class ArchitectureType(IntEnum):
 
 
 class BaseModelGenerator:
-    _tokenizer = None
-    _model = None
+    __tokenizer = None
+    __model = None
+    _max_seq_length = MAX_SEQ_LENGTH_DEFAULT
 
     @abstractmethod
     @property
@@ -30,20 +33,24 @@ class BaseModelGenerator:
     def arch_type(self) -> ArchitectureType:
         pass
 
-    def _load_model(self) -> PreTrainedModel:
+    def __load_model(self) -> PreTrainedModel:
         config = AutoConfig.from_pretrained(self.model_path)
         config.num_labels = 2
         return self.base_model_class.from_pretrained(self.model_path, config=config)
 
     def get_model(self) -> PreTrainedModel:
-        if self._model is None:
-            self._model = self._load_model()
-        return self._model
+        if self.__model is None:
+            self.__model = self.__load_model()
+        return self.__model
 
     def get_tokenizer(self) -> AutoTokenizer:
-        if self._tokenizer is None:
-            self._tokenizer = AutoTokenizer.from_pretrained(self.model_path)
-        return self._tokenizer
+        if self.__tokenizer is None:
+            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        return self.__tokenizer
 
-    def get_feature(self, **kwargs) -> Dict:
-        return self.get_tokenizer()(**kwargs)
+    def set_max_seq_length(self, max_seq_length):
+        self._max_seq_length = max_seq_length
+
+    def get_feature(self, return_token_type_ids=False, **kwargs) -> Dict:
+        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True, max_length=self._max_seq_length,
+                                    padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

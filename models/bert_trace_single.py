@@ -36,6 +36,7 @@ class BertTraceSingleModelGenerator(BaseModelGenerator):
     def base_model_class(self) -> Type[PreTrainedModel]:
         return BertTraceSingle
 
+    # TODO
     @property
     def model_path(self) -> str:
         pass
@@ -43,4 +44,3 @@ class BertTraceSingleModelGenerator(BaseModelGenerator):
     @property
     def arch_type(self) -> ArchitectureType:
         return ArchitectureType.SINGLE
-

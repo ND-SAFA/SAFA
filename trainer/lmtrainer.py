@@ -15,6 +15,7 @@ class LMTrainer(Trainer):
         tokenizer = model_generator.get_tokenizer()
         self.args = args
         self.model_generator = model_generator
+        self.model_generator.set_max_seq_length(self.args.max_seq_length)
         self.dataset = dataset
         super().__init__(model=model, args=args, tokenizer=tokenizer)
 
@@ -25,18 +26,18 @@ class LMTrainer(Trainer):
 
     # TODO
     def perform_prediction(self) -> BaseResults:
-        self.eval_dataset = self.dataset.get_validation_data(self.args.dataset_size, self.args.max_seq_length)
+        self.eval_dataset = self.dataset.get_validation_data(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
         return BaseResults()
 
     def get_train_dataloader(self):
-        self.train_dataset = self.dataset.get_training_data(self.args.resample_rate, self.args.max_seq_length)
+        self.train_dataset = self.dataset.get_training_data(self.args.resample_rate)
 
         if is_torch_tpu_available():
-            train_sampler = get_tpu_sampler(self.train_dataset , self.args.train_batch_size)
+            train_sampler = get_tpu_sampler(self.train_dataset, self.args.train_batch_size)
         else:
             train_sampler = (
-                RandomSampler(self.train_dataset )
+                RandomSampler(self.train_dataset)
                 if self.args.local_rank == -1
                 else DistributedSampler(self.train_dataset)
             )

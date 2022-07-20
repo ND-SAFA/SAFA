@@ -15,11 +15,11 @@ class JobArgs(TrainingArguments):
     dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
 
     def __init__(self, model_name: str, s_arts: Dict, t_arts: Dict, links: List, **kwargs):
-        self.set_args(**kwargs)
+        self.__set_args(**kwargs)
         self.model_generator = MODEL_GENERATORS[model_name]()
         self.dataset = TraceDataset(s_arts, t_arts, links, self.model_generator, self.linked_targets_only)
 
-    def set_args(self, **kwargs):
+    def __set_args(self, **kwargs):
         for arg_name, arg_value in kwargs.items():
             if hasattr(self, arg_name):
                 self.__setattr__(arg_name, arg_value)

@@ -34,6 +34,7 @@ class ElectraTraceSingleModelGenerator(BaseModelGenerator):
     def base_model_class(self) -> Type[PreTrainedModel]:
         return ElectraTraceSingle
 
+    # TODO
     @property
     def model_path(self) -> str:
         pass

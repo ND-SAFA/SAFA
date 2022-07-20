@@ -4,3 +4,4 @@ export { default as ErrorPageView } from "./ErrorPageView.vue";
 export { default as ProjectCreatorView } from "./ProjectCreatorView.vue";
 export { default as ProjectSettingsView } from "./ProjectSettingsView.vue";
 export { default as UploadStatusView } from "./UploadStatusView.vue";
+export { default as HomeView } from "./HomeView.vue";

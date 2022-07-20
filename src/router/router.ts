@@ -12,6 +12,7 @@ import {
   ProjectSettingsView,
   ResetPasswordView,
   UploadStatusView,
+  HomeView,
 } from "@/views";
 import { routerChecks } from "@/router/checks";
 import { NextPayload } from "@/types";
@@ -45,7 +46,7 @@ const routes: Array<RouteConfig> = [
   {
     path: Routes.HOME,
     name: "Home",
-    component: ProjectCreatorView,
+    component: HomeView,
   },
   {
     path: Routes.ARTIFACT,

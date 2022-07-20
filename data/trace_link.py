@@ -13,6 +13,7 @@ class Artifact:
         self.token = token
         self.__feature_func = feature_func  # delay execution in case not needed
         self.__feature = None
+        self.embd = None
 
     def get_feature(self):
         if self.__feature is None:

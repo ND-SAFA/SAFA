@@ -1,11 +1,14 @@
 import math
 import random
+from copy import deepcopy
 from typing import Dict, List
 
 from data.trace_link import TraceLink, Artifact
 from data.data_key import DataKey
-from constants import MAX_SEQ_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT
+from constants import RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT
 from models.model_generator import BaseModelGenerator, ArchitectureType
+
+import torch
 
 
 class TraceDataset:
@@ -29,6 +32,49 @@ class TraceDataset:
         new_length = min(dataset_size, len(self.links))
         reduced_link_ids = self._reduce_data_size(list(self.links.keys()), new_length, include_duplicates=False)
         return self._get_feature_entries(reduced_link_ids)
+
+    # TODO is this needed? incorporate into training/validation?
+    # TODO clean this up
+    def split_links(self, weights):
+        total_w = sum(weights.values())
+        links_by_splice = {slice_name: [] for slice_name in weights.keys()}
+        link_ids_lists = [list(self.neg_link_ids), list(self.pos_link_ids)]
+        n_link_ids = [len(self.neg_link_ids), len(self.pos_link_ids)]
+        start = [0, 0]
+        end = [0, 0]
+        for slice_name, weight in weights.items():
+            for i, link_ids_list in enumerate(link_ids_lists):
+                end[i] = end[i] + min(math.ceil(weight * n_link_ids[i] / total_w), n_link_ids[i])
+                subset = link_ids_list[start[i]:end[i]]
+                links_by_splice[slice_name].extend([self.links[link_id] for link_id in subset])
+                start[i] = end[i]
+        return links_by_splice
+
+    # TODO is this needed?
+    def update_embeddings(self):
+        artifact_types = ["source", "target"]
+        updated_ids = {"source": set(), "target": set()}
+        with torch.no_grad():
+            self.model_generator.get_model().eval()
+            for link in self.links.values():
+                for artifact_type in artifact_types:
+                    artifact = getattr(link, artifact_type)
+                    if artifact.id_ not in updated_ids[artifact_type]:
+                        self._updated_embd(artifact)
+                        updated_ids[artifact_type].add(link.source.id_)
+
+    def _updated_embd(self, artifact: Artifact):
+        feature = artifact.get_feature()
+        model = self.model_generator.get_model()
+        input_tensor = (
+            torch.tensor(feature[DataKey.INPUT_IDS]).view(1, -1).to(model.device)
+        )
+        mask_tensor = (
+            torch.tensor(feature[DataKey.ATTEN_MASK]).view(1, -1).to(model.device)
+        )
+        embd = model.get_LM(input_tensor, mask_tensor)[0]
+        embd_cpu = embd.to("cpu")
+        artifact.embd = embd_cpu
 
     def _get_feature_entry(self, link: TraceLink) -> Dict:
         if self.model_generator.arch_type == ArchitectureType.SIAMESE:
@@ -81,5 +127,3 @@ class TraceDataset:
     def _get_linked_targets_only(t_arts: Dict, true_links: List) -> Dict:
         linked_target_ids = {t_id for _, t_id in true_links}
         return {t_id: token for t_id, token in t_arts.items() if t_id in linked_target_ids}
-
-

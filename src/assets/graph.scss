@@ -2,8 +2,9 @@ $color-warning: #EEBC3D;
 $color-added: #81c784;
 $color-removed: #e57373;
 $color-modified: #64b5f6;
-$color-selected: #CCCCCC;
+$color-selected: #EEEEEE;
 $color-border: #888888;
+$color-text: #888888;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
@@ -56,72 +57,27 @@ $graph-border-radius: 8px;
   line-height: 1 !important;
 }
 
-.artifact-footer {
-  height: 25px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  & > * {
-    justify-content: center;
-  }
-
-  & > :nth-child(2) {
-    border-top-left-radius: $graph-border-radius;
-  }
-
-  & > div > span {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .warning-text {
-    overflow: hidden;
-    background-color: $color-warning;
-    height: 110%;
-  }
-}
-
-.artifact-added {
-  background: $color-added !important;
-
-  &:hover {
-    background: darken($color-added, 10) !important;
-  }
-}
-
-.artifact-removed {
-  background: $color-removed !important;
-
-  &:hover {
-    background: darken($color-removed, 10) !important;
-  }
-}
-
-.artifact-modified {
-  background: $color-modified !important;
-
-  &:hover {
-    background: darken($color-modified, 10) !important;
-  }
-}
-
-.artifact-selected {
-  background: $color-selected !important;
-
-  &:hover {
-    background: darken($color-selected, 10) !important;
-  }
-}
-
-.artifact-stoplight {
-  height: 10px;
-  border-top: 1px solid $color-border;
-}
-
 .cy-container,
 #cytoscape-div {
   height: 100% !important;
   max-height: 100vh !important;
+}
+
+.artifact-svg-wrapper:hover > .artifact-svg {
+  fill: #FFFFFF;
+  filter: drop-shadow(0px 4px 2px rgb(0 0 0 / 0.3));
+}
+
+.cy-context-menus-cxt-menu {
+  border-radius: $graph-border-radius;
+  border-color: $color-border;
+
+  > button {
+    border-radius: $graph-border-radius;
+
+    &:hover {
+      color: black;
+      background-color: $color-selected;
+    }
+  }
 }

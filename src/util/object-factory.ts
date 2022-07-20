@@ -219,5 +219,6 @@ export function createDocument(
     type: document?.type || DocumentType.ARTIFACT_TREE,
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",
+    layout: document?.layout || {},
   };
 }

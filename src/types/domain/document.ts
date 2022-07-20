@@ -1,4 +1,5 @@
 import { ProjectIdentifier } from "@/types/domain/project";
+import { ArtifactPositions } from "@/types";
 
 /**
  * Enumerates the type of documents supported by SAFA.
@@ -70,6 +71,10 @@ export interface ProjectDocument {
    * The ids of artifacts displayed within this document.
    */
   artifactIds: string[];
+  /**
+   * Map of document ids to their artifact positions.
+   */
+  layout: ArtifactPositions;
   /**
    * Defines the columns of a table-like document.
    */

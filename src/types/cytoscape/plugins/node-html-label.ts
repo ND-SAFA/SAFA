@@ -78,8 +78,4 @@ export interface NodeChildDelta {
    * The color of delta to render.
    */
   color: string;
-  /**
-   * The HTML node to render.
-   */
-  node: string;
 }

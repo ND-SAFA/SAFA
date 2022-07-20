@@ -49,7 +49,7 @@ class BaseModelGenerator:
         return self.__tokenizer
 
     def set_max_seq_length(self, max_seq_length):
-        self._max_seq_length = max_seq_length
+        self._max_seq_length = min(max_seq_length, self.get_tokenizer().model_max_length)
 
     def get_feature(self, return_token_type_ids=False, **kwargs) -> Dict:
         return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True, max_length=self._max_seq_length,

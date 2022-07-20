@@ -22,13 +22,14 @@ class LMTrainer(Trainer):
     # TODO
     def perform_training(self, checkpoint: str = None) -> BaseResults:
         output = self.train(resume_from_checkpoint=checkpoint)
-        return BaseResults()
+        self.save_model()
+        return BaseResults(output)
 
     # TODO
     def perform_prediction(self) -> BaseResults:
         self.eval_dataset = self.dataset.get_validation_data(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
-        return BaseResults()
+        return BaseResults(output)
 
     def get_train_dataloader(self):
         self.train_dataset = self.dataset.get_training_data(self.args.resample_rate)

@@ -16,6 +16,7 @@ import java.util.zip.ZipInputStream;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
+import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.io.FileUtils;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for reading CSV files and validating them
  * while mindful that casing does not matter.
  */
+@NoArgsConstructor
 public class FileUtilities {
 
     public static CSVParser readCSVFile(String pathToFile) throws SafaError {
@@ -58,6 +60,10 @@ public class FileUtilities {
             String error = "Unable to read csv file: " + file.getOriginalFilename();
             throw new SafaError(error, e);
         }
+    }
+
+    public static JSONObject readMultiPartJSONFile(MultipartFile file) throws IOException {
+        return new JSONObject(new String(file.getBytes()));
     }
 
     public static CSVFormat getCSVFormat() {
@@ -170,4 +176,6 @@ public class FileUtilities {
         }
         return filesCreated;
     }
+
+
 }

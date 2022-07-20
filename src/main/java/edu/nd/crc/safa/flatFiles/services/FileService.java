@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles.services;
+package edu.nd.crc.safa.flatFiles.services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ public class FileService {
      * @throws SafaError Throws error if error occurs while creating necessary directory structure or writing to disk.
      */
     public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError {
-        String pathToStorage = ProjectPaths.getPathToStorage(project);
+        String pathToStorage = ProjectPaths.getPathToUploadedFiles(project);
         OSHelper.clearOrCreateDirectory(pathToStorage);
 
         for (MultipartFile requestFile : requestFiles) {

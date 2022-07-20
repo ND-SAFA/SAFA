@@ -1,36 +1,23 @@
 package edu.nd.crc.safa.common;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Contains a set of entities along with a series of errors associated with them.
  *
- * @param <EntityType> The type of entity contained.
- * @param <ErrorType>  The errors associated with entities.
+ * @param <Entity> The type of entity contained.
+ * @param <Error>  The errors associated with entities.
  */
-public class EntityCreation<EntityType, ErrorType> {
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class EntityCreation<Entity, Error> {
 
-    List<EntityType> entities;
-    List<ErrorType> errors;
-
-    public EntityCreation(List<EntityType> entities, List<ErrorType> errors) {
-        this.entities = entities;
-        this.errors = errors;
-    }
-
-    public List<EntityType> getEntities() {
-        return entities;
-    }
-
-    public void setEntities(List<EntityType> entities) {
-        this.entities = entities;
-    }
-
-    public List<ErrorType> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<ErrorType> errors) {
-        this.errors = errors;
-    }
+    List<Entity> entities = new ArrayList<>();
+    List<Error> errors = new ArrayList<>();
 }

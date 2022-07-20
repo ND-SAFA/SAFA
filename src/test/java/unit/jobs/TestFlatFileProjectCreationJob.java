@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-class TestFlatFileProjectCreationJob extends JobBaseTest {
+class TestFlatFileProjectCreationWorker extends JobBaseTest {
 
     int N_STEPS = 6;
 
@@ -18,7 +18,7 @@ class TestFlatFileProjectCreationJob extends JobBaseTest {
      *                   4. Sleeping thread to wait for job to finish fails.
      */
     @Test
-    public void testDefaultProjectCompletes() throws Exception {
+    void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
         UUID jobId = createJobFromDefaultProject();

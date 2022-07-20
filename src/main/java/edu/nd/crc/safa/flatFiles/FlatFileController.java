@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles;
+package edu.nd.crc.safa.flatFiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,14 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.flatFiles.services.FileService;
+import edu.nd.crc.safa.flatFiles.services.FlatFileService;
 import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.services.FileService;
-import edu.nd.crc.safa.server.flatFiles.services.FlatFileService;
 import edu.nd.crc.safa.server.services.NotificationService;
 import edu.nd.crc.safa.server.services.ProjectService;
 
@@ -113,7 +113,7 @@ public class FlatFileController extends BaseController {
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = flatFileService.createProjectFiles(projectVersion);
+        List<File> projectFiles = flatFileService.downloadProjectFiles(projectVersion);
         fileService.sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

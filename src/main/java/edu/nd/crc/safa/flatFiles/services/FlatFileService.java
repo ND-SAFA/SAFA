@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.flatFiles.services;
+package edu.nd.crc.safa.flatFiles.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.flatFiles.entities.TimParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
@@ -25,8 +26,6 @@ import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.entities.ArtifactFileParser;
-import edu.nd.crc.safa.server.flatFiles.entities.TIMParser;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -51,7 +50,6 @@ public class FlatFileService {
 
     private final CommitErrorRepository commitErrorRepository;
     private final EntityVersionService entityVersionService;
-    private final ArtifactFileParser artifactFileParser;
     private final TraceLinkGenerator traceLinkGenerator;
     private final FileService fileService;
     private final AppEntityRetrievalService appEntityRetrievalService;
@@ -93,13 +91,15 @@ public class FlatFileService {
                                               String pathToTIMFile) throws SafaError {
         try {
             // Parse TIM.json
-            String TIMFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
-            JSONObject timFileJson = new JSONObject(TIMFileContent);
+            String timFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
+            JSONObject timFileJson = new JSONObject(timFileContent);
 
             // Step - Parse artifacts, traces, and trace generation requests
             Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMResponse = parseTIMIntoCommit(
                 projectVersion,
                 timFileJson);
+
+            System.out.println("Tim Response:" + parseTIMResponse);
 
             // Step - Attempt to perform commit, saving errors on fail.
             ProjectCommit projectCommit = parseTIMResponse.getValue0();
@@ -129,6 +129,8 @@ public class FlatFileService {
     public List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
                                                    List<TraceGenerationRequest> traceGenerationRequests) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
+
+        System.out.println("Trace generation requests:" + traceGenerationRequests);
 
         for (TraceGenerationRequest request : traceGenerationRequests) {
             String sourceArtifactType = request.getSource();
@@ -169,23 +171,19 @@ public class FlatFileService {
 
     public Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMIntoCommit(ProjectVersion projectVersion,
                                                                                 JSONObject timFileJson
-    ) throws SafaError {
+    ) throws SafaError, IOException {
         // Step - Create project parser
-        TIMParser TIMParser = new TIMParser(timFileJson);
-        TIMParser.parse();
+        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject());
+        TimParser timParser = new TimParser(timFileJson, pathToFiles);
 
         // Step - parse artifacts then traces
-        EntityCreation<ArtifactAppEntity, String> artifactCreationResponse =
-            artifactFileParser.parseArtifactFiles(projectVersion,
-                TIMParser);
-        Pair<List<TraceAppEntity>, List<TraceGenerationRequest>> traceResponse =
-            TIMParser.parseTraces(projectVersion);
-        List<TraceAppEntity> traces = traceResponse.getValue0();
+        EntityCreation<ArtifactAppEntity, String> artifactCreationResponse = timParser.parseArtifacts();
+        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces();
 
         // Step - Create project commit with parsed artifacts and traces
         ProjectCommit projectCommit = new ProjectCommit(projectVersion, false);
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
-        projectCommit.getTraces().setAdded(traces);
+        projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
 
         List<CommitError> commitErrors =
             artifactCreationResponse
@@ -195,10 +193,10 @@ public class FlatFileService {
                 .collect(Collectors.toList());
         projectCommit.getErrors().addAll(commitErrors);
 
-        return new Pair<>(projectCommit, traceResponse.getValue1());
+        return new Pair<>(projectCommit, timParser.getTraceGenerationRequests());
     }
 
-    public List<File> createProjectFiles(ProjectVersion projectVersion) throws IOException {
+    public List<File> downloadProjectFiles(ProjectVersion projectVersion) throws IOException {
         Project project = projectVersion.getProject();
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);

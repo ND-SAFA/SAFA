@@ -1,13 +1,13 @@
-package edu.nd.crc.safa.server.flatFiles.services;
+package edu.nd.crc.safa.flatFiles.services;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.flatFiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.flatFiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
-import edu.nd.crc.safa.server.flatFiles.entities.ArtifactFile;
-import edu.nd.crc.safa.server.flatFiles.entities.TraceFileParser;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -30,7 +30,7 @@ public class FileCreatorService {
                                      List<ArtifactAppEntity> artifacts) throws IOException {
         FileWriter out = new FileWriter(pathToFile);
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT
-            .withHeader(ArtifactFile.REQUIRED_COLUMNS))) {
+            .withHeader(AbstractArtifactFile.Constants.REQUIRED_COLUMNS))) {
             for (ArtifactAppEntity artifact : artifacts) {
                 printer.printRecord(artifact.name,
                     artifact.documentType,
@@ -54,7 +54,7 @@ public class FileCreatorService {
                                   List<TraceAppEntity> traces) throws IOException {
         FileWriter out = new FileWriter(pathToFile);
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT
-            .withHeader(TraceFileParser.FILE_REQUIRED_COLUMNS))) {
+            .withHeader(AbstractTraceFile.Constants.REQUIRED_COLUMNS))) {
             for (TraceAppEntity trace : traces) {
                 printer.printRecord(trace.sourceName, trace.targetName);
             }

@@ -87,7 +87,7 @@ public class ProjectPaths {
         return joinPaths(getTemporaryPath(), fileName);
     }
 
-    public static String getPathToTestResources(String fileName) {
+    public static String getPathToDefaultProjectFile(String fileName) {
         return joinPaths(PATH_TO_DEFAULT_PROJECT, fileName);
     }
 }

@@ -6,10 +6,10 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.flatFiles.services.FileService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.flatFiles.services.FileService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

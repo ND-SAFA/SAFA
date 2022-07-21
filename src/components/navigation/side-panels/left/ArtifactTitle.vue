@@ -24,7 +24,7 @@
         <h1
           v-on="on"
           v-bind="attrs"
-          class="text-h6 text-ellipsis artifact-title"
+          class="text-h5 text-ellipsis artifact-title"
         >
           {{ selectedArtifactName }}
         </h1>
@@ -40,9 +40,10 @@
       @close="isArtifactBodyOpen = false"
     >
       <template v-slot:body>
-        <pre class="text-body-1 mt-2 overflow-auto">
+        <pre v-if="isCodeDisplay" class="text-body-1 mt-2 overflow-y-auto">
           {{ selectedArtifactBody }}
         </pre>
+        <p class="text-body-1 mt-6">{{ selectedArtifactBody }}</p>
       </template>
     </generic-modal>
   </div>
@@ -87,6 +88,14 @@ export default Vue.extend({
      */
     selectedArtifactBody(): string {
       return this.selectedArtifact?.body.trim() || "";
+    },
+    /**
+     * An incredibly crude and temporary way to distinguish code nodes.
+     *
+     * @return Whether to display this body as code.
+     */
+    isCodeDisplay(): boolean {
+      return this.selectedArtifact?.type.includes("code") || false;
     },
   },
   methods: {

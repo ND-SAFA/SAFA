@@ -1,0 +1,51 @@
+<template>
+  <v-tooltip bottom :disabled="tooltip.length < 20">
+    <template v-slot:activator="{ on, attrs }">
+      <v-list-item v-on="on" v-bind="attrs" @click="handleClick">
+        <v-list-item-title>
+          <span class="text-h6 text--primary">
+            {{ item.title }}
+          </span>
+        </v-list-item-title>
+        <v-list-item-subtitle v-if="!!item.subtitle">
+          {{ item.subtitle }}
+        </v-list-item-subtitle>
+      </v-list-item>
+    </template>
+    <span>
+      {{ tooltip }}
+    </span>
+  </v-tooltip>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import { ListItem } from "@/types";
+
+/**
+ * Displays a generic list item.
+ *
+ * @emits `click` - On click.
+ */
+export default Vue.extend({
+  name: "GenericListItem",
+  props: {
+    item: Object as PropType<ListItem>,
+  },
+  computed: {
+    tooltip(): string {
+      return this.item.subtitle
+        ? `${this.item.title} - ${this.item.subtitle}`
+        : this.item.title;
+    },
+  },
+  methods: {
+    /**
+     * Handles button clicks by emitting them.
+     */
+    handleClick() {
+      this.$emit("click");
+    },
+  },
+});
+</script>

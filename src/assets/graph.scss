@@ -69,6 +69,10 @@ $graph-border-radius: 8px;
     filter: drop-shadow(0px 4px 2px rgb(0 0 0 / 0.3));
   }
 
+  &:hover > .artifact-border {
+    fill: darken($color-border, 20)
+  }
+
   &.artifact-svg-delta-ADDED:hover > .artifact-svg {
     fill: lighten($color-added, 10);
   }

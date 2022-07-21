@@ -14,28 +14,15 @@
         <v-expansion-panel-header class="text-body-1">
           {{ parentTitle }}
         </v-expansion-panel-header>
-        <v-expansion-panel-content class="text-body-1">
+        <v-expansion-panel-content>
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(parentName, idx) in parents">
-              <v-divider :key="parentName + '-div'" v-if="idx !== 0" />
-              <v-tooltip
-                bottom
-                :key="parentName"
-                :disabled="parentName.length < 30"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item
-                    v-on="on"
-                    v-bind="attrs"
-                    @click="handleArtifactClick(parentName)"
-                  >
-                    <v-list-item-title>
-                      {{ parentName }}
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <span> {{ parentName }}</span>
-              </v-tooltip>
+            <template v-for="(parent, idx) in parents">
+              <v-divider :key="parent.title + '-div'" v-if="idx !== 0" />
+              <generic-list-item
+                :key="parent.title"
+                :item="parent"
+                @click="handleArtifactClick(parent.title)"
+              />
             </template>
           </v-list>
         </v-expansion-panel-content>
@@ -45,28 +32,15 @@
         <v-expansion-panel-header class="text-body-1">
           {{ childTitle }}
         </v-expansion-panel-header>
-        <v-expansion-panel-content class="text-body-1">
+        <v-expansion-panel-content>
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(childName, idx) in children">
-              <v-divider :key="childName + '-div'" v-if="idx !== 0" />
-              <v-tooltip
-                bottom
-                :key="childName"
-                :disabled="childName.length < 30"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item
-                    v-on="on"
-                    v-bind="attrs"
-                    @click="handleArtifactClick(childName)"
-                  >
-                    <v-list-item-title>
-                      {{ childName }}
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <span> {{ childName }}</span>
-              </v-tooltip>
+            <template v-for="(child, idx) in children">
+              <v-divider :key="child.title + '-div'" v-if="idx !== 0" />
+              <generic-list-item
+                :key="child.title"
+                :item="child"
+                @click="handleArtifactClick(child.title)"
+              />
             </template>
           </v-list>
         </v-expansion-panel-content>
@@ -78,12 +52,15 @@
 <script lang="ts">
 import Vue from "vue";
 import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
+import { ListItem } from "@/types";
+import GenericListItem from "@/components/common/generic/GenericListItem.vue";
 
 /**
  * Displays the selected node's parents and children.
  */
 export default Vue.extend({
   name: "ArtifactTraces",
+  components: { GenericListItem },
   computed: {
     /**
      * @return The selected artifact.
@@ -94,22 +71,28 @@ export default Vue.extend({
     /**
      * @return The selected artifact's parents.
      */
-    parents(): string[] {
+    parents(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
       return traceModule.traces
         .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
-        .map(({ targetName }) => targetName);
+        .map(({ targetName, targetId }) => ({
+          title: targetName,
+          subtitle: artifactModule.getArtifactById(targetId).type,
+        }));
     },
     /**
      * @return The selected artifact's children.
      */
-    children(): string[] {
+    children(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
       return traceModule.traces
         .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
-        .map(({ sourceName }) => sourceName);
+        .map(({ sourceName, sourceId }) => ({
+          title: sourceName,
+          subtitle: artifactModule.getArtifactById(sourceId).type,
+        }));
     },
     /**
      * Determines the width of trace link buttons.

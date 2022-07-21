@@ -7,6 +7,7 @@
     :items="displayedVersions"
     :is-open="isOpen"
     :is-loading="isLoading"
+    :minimal="minimal"
     :has-edit="false"
     :can-delete-last-item="false"
     @item:select="handleSelectVersion"
@@ -73,30 +74,40 @@ export default Vue.extend({
       type: Boolean,
       required: false,
     },
+    minimal: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
+    const baseHeaders = [
+      {
+        text: "Major",
+        value: "majorVersion",
+        sortable: true,
+        isSelectable: true,
+      },
+      {
+        text: "Minor",
+        value: "minorVersion",
+        sortable: true,
+        isSelectable: true,
+      },
+      {
+        text: "Revision",
+        value: "revision",
+        sortable: true,
+        isSelectable: true,
+      },
+    ];
+
     return {
-      headers: [
-        {
-          text: "Major",
-          value: "majorVersion",
-          sortable: true,
-          isSelectable: true,
-        },
-        {
-          text: "Minor",
-          value: "minorVersion",
-          sortable: true,
-          isSelectable: true,
-        },
-        {
-          text: "Revision",
-          value: "revision",
-          sortable: true,
-          isSelectable: true,
-        },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
+      headers: this.minimal
+        ? baseHeaders
+        : [
+            ...baseHeaders,
+            { text: "Actions", value: "actions", sortable: false },
+          ],
       versions: [] as ProjectVersion[],
       versionToDelete: undefined as ProjectVersion | undefined,
       deleteVersionDialogue: false,

@@ -1,9 +1,14 @@
 <template>
   <v-container>
-    <v-card outlined elevation="1">
+    <v-card :outlined="!minimal" :style="minimal ? 'box-shadow: none' : ''">
       <v-row>
-        <v-stepper v-model="currentStep" class="full-width" alt-labels>
-          <v-stepper-header>
+        <v-stepper
+          v-model="currentStep"
+          class="full-width"
+          :alt-labels="!minimal"
+          :elevation="minimal ? 0 : 1"
+        >
+          <v-stepper-header :style="minimal ? 'box-shadow: none' : ''">
             <template v-for="(stepName, stepIndex) in stepNames">
               <v-stepper-step
                 :complete="currentStep > stepIndex + 1"
@@ -72,6 +77,10 @@ export default Vue.extend({
     submitText: {
       type: String,
       default: "Submit",
+    },
+    minimal: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {

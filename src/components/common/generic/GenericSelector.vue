@@ -18,7 +18,7 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <v-row class="ma-1">
+      <v-row class="ma-1" v-if="!minimal">
         <v-col cols="11" class="ma-0 pa-0">
           <v-text-field
             v-model="search"
@@ -55,7 +55,7 @@
       />
     </template>
     <template v-slot:footer>
-      <v-row justify="end" class="mr-2 mt-1">
+      <v-row justify="end" class="mr-2 mt-1" v-if="!minimal">
         <generic-icon-button
           fab
           color="primary"
@@ -135,6 +135,10 @@ export default Vue.extend({
     isOpen: {
       type: Boolean,
       required: true,
+    },
+    minimal: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

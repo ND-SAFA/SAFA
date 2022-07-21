@@ -48,3 +48,10 @@ export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
  * Defines a panel for parsing artifact files.
  */
 export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
+
+export enum CreatorTypes {
+  standard = "standard",
+  bulk = "bulk",
+  jira = "jira",
+  github = "github",
+}

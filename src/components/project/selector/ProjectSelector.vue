@@ -3,6 +3,7 @@
     :headers="headers"
     :items="projects"
     :is-open="isOpen"
+    :minimal="minimal"
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
@@ -76,26 +77,32 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    minimal: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       selected: undefined as ProjectIdentifier | undefined,
       projects: [] as ProjectIdentifier[],
       deletableProjects: [] as number[],
-      headers: [
-        { text: "Name", value: "name", sortable: true, isSelectable: true },
-        {
-          text: "Description",
-          sortable: false,
-          value: "description",
-        },
-        {
-          text: "Owner",
-          sortable: false,
-          value: "owner",
-        },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
+      headers: this.minimal
+        ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
+        : [
+            { text: "Name", value: "name", sortable: true, isSelectable: true },
+            {
+              text: "Description",
+              sortable: false,
+              value: "description",
+            },
+            {
+              text: "Owner",
+              sortable: false,
+              value: "owner",
+            },
+            { text: "Actions", value: "actions", sortable: false },
+          ],
       editProjectDialogue: false,
       deleteProjectDialogue: false,
       addProjectDialogue: false,

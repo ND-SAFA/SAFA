@@ -30,7 +30,7 @@ export default Vue.extend({
      * Navigates to the project creator when the logo is clicked.
      */
     onAvatarClick() {
-      navigateTo(Routes.PROJECT_CREATOR);
+      navigateTo(Routes.HOME);
     },
   },
 });

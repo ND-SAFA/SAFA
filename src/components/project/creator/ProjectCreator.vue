@@ -24,13 +24,14 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { CreatorTypes } from "@/types";
 import { getParam, QueryParams, updateParam } from "@/router";
 import {
   ProjectCreatorStepper,
   JiraCreatorStepper,
+  GitHubCreatorStepper,
   ProjectBulkUpload,
 } from "./workflows";
-import GitHubCreatorStepper from "@/components/project/creator/workflows/GitHubCreatorStepper.vue";
 
 /**
  * Allows for creating a project.
@@ -47,10 +48,10 @@ export default Vue.extend({
     return {
       tab: 0,
       tabs: [
-        { id: "standard", name: "Standard Upload" },
-        { id: "bulk", name: "Bulk Upload" },
-        { id: "jira", name: "Jira Upload" },
-        { id: "github", name: "GitHub Upload" },
+        { id: CreatorTypes.standard, name: "Standard Upload" },
+        { id: CreatorTypes.bulk, name: "Bulk Upload" },
+        { id: CreatorTypes.jira, name: "Jira Upload" },
+        { id: CreatorTypes.github, name: "GitHub Upload" },
       ],
     };
   },
@@ -58,12 +59,20 @@ export default Vue.extend({
    * When the page loads, switch to any set tab in the query.
    */
   mounted() {
-    const tabId = getParam(QueryParams.TAB);
-    const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
+    this.openCurrentTab();
+  },
+  methods: {
+    /**
+     * Switch to any set tab in the query.
+     */
+    openCurrentTab() {
+      const tabId = getParam(QueryParams.TAB);
+      const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
 
-    if (!tabId || tabIndex === -1) return;
+      if (!tabId || tabIndex === -1 || this.tab === tabIndex) return;
 
-    this.tab = tabIndex;
+      this.tab = tabIndex;
+    },
   },
   watch: {
     /**
@@ -76,6 +85,9 @@ export default Vue.extend({
       if (currentTabId !== routeTabId) {
         updateParam(QueryParams.TAB, currentTabId);
       }
+    },
+    $route() {
+      this.openCurrentTab();
     },
   },
 });

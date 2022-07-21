@@ -24,6 +24,7 @@ export function svgNode(
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : capitalize(data.artifactType);
+  const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
 
   return `
     <div style="opacity: ${data.opacity}">
@@ -33,7 +34,7 @@ export function svgNode(
         style="margin-top: ${
           outerStyle.marginTop + ARTIFACT_CHILDREN_HEIGHT + 6
         }px"
-        class="artifact-svg-wrapper"
+        class="artifact-svg-wrapper ${deltaClass}"
       >
         ${svgShape}
         ${svgTitle(title, y)}

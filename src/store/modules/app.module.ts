@@ -34,6 +34,10 @@ export default class ProjectModule extends VuexModule {
    * artifact creator will open to that type set.
    */
   private isArtifactCreatorOpen: boolean | string = false;
+  /**
+   * Whether the artifact body modal is open.
+   */
+  private isArtifactBodyOpen = false;
 
   @Action
   /**
@@ -179,6 +183,16 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * Sets whether the artifact body modal is open.
+   *
+   * @param isOpen - Whether to open the modal.
+   */
+  SET_ARTIFACT_BODY(isOpen: boolean): void {
+    this.isArtifactBodyOpen = isOpen;
+  }
+
+  @Mutation
+  /**
    * Sets whether a panel is open or closed.
    *
    * @param panelState - The panel type and whether it should be open.
@@ -249,6 +263,13 @@ export default class ProjectModule extends VuexModule {
    */
   get getIsArtifactCreatorOpen(): boolean | string {
     return this.isArtifactCreatorOpen;
+  }
+
+  /**
+   * @return Whether the artifact body is open.
+   */
+  get getIsArtifactBodyOpen(): boolean {
+    return this.isArtifactBodyOpen;
   }
 
   /**

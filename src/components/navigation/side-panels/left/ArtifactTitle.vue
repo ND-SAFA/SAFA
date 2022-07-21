@@ -4,7 +4,7 @@
       <generic-icon-button
         tooltip="View Artifact Body"
         icon-id="mdi-code-tags"
-        @click="isArtifactBodyOpen = true"
+        @click="handleViewBody"
       />
       <generic-icon-button
         v-if="!selectedArtifact.logicType"
@@ -31,21 +31,6 @@
       </template>
       {{ selectedArtifactName }}
     </v-tooltip>
-
-    <generic-modal
-      :is-open="isArtifactBodyOpen"
-      :title="selectedArtifactName"
-      :actionsHeight="0"
-      size="l"
-      @close="isArtifactBodyOpen = false"
-    >
-      <template v-slot:body>
-        <pre v-if="isCodeDisplay" class="text-body-1 mt-2 overflow-y-auto">
-          {{ selectedArtifactBody }}
-        </pre>
-        <p class="text-body-1 mt-6">{{ selectedArtifactBody }}</p>
-      </template>
-    </generic-modal>
   </div>
 </template>
 
@@ -54,7 +39,7 @@ import Vue from "vue";
 import { PanelType } from "@/types";
 import { appModule, artifactSelectionModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton, GenericModal } from "@/components/common";
+import { GenericIconButton } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -62,13 +47,7 @@ import { GenericIconButton, GenericModal } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
-    GenericModal,
     GenericIconButton,
-  },
-  data() {
-    return {
-      isArtifactBodyOpen: false,
-    };
   },
   computed: {
     /**
@@ -114,6 +93,12 @@ export default Vue.extend({
      */
     handleEditArtifact(): void {
       appModule.openArtifactCreatorTo({});
+    },
+    /**
+     * Opens the artifact body display.
+     */
+    handleViewBody(): void {
+      appModule.SET_ARTIFACT_BODY(true);
     },
   },
 });

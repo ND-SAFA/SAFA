@@ -21,7 +21,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "add-artifact",
     content: "Add Artifact",
-    tooltipText: "Create new artifact",
+    tooltipText: "Create a new artifact",
     coreAsWell: true,
     onClickFunction(): void {
       if (projectModule.isProjectDefined) {
@@ -35,7 +35,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "add-link",
     content: "Add Link",
-    tooltipText: "Create new trace link",
+    tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
       if (projectModule.isProjectDefined) {
@@ -48,7 +48,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "view-artifact",
     content: "View Artifact",
-    tooltipText: "View Artifact",
+    tooltipText: "View details about this artifact",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
@@ -61,9 +61,25 @@ export const artifactTreeMenuItems: MenuItem[] = [
     },
   },
   {
+    id: "view-body",
+    content: "View Body",
+    tooltipText: "View this artifact's body text",
+    selector: "node",
+    coreAsWell: false,
+    onClickFunction(event: EventObject): void {
+      handleOnClick(event, (artifact: Artifact) => {
+        artifactSelectionModule.selectArtifact(artifact.id);
+        appModule.SET_ARTIFACT_BODY(true);
+      });
+    },
+    isVisible(artifactData: ArtifactData | undefined): boolean {
+      return artifactData !== undefined;
+    },
+  },
+  {
     id: "edit-artifact",
     content: "Edit Artifact",
-    tooltipText: "Edit Artifact",
+    tooltipText: "Edit this artifact",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
@@ -79,7 +95,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "delete-artifact",
     content: "Delete Artifact",
-    tooltipText: "Delete Artifact",
+    tooltipText: "Delete this artifact",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
@@ -94,7 +110,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "duplicate-artifact",
     content: "Duplicate Artifact",
-    tooltipText: "Duplicate Artifact",
+    tooltipText: "Create an identical version of this artifact",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
@@ -109,7 +125,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "highlight-artifact-subtree",
     content: "Highlight Subtree",
-    tooltipText: "Highlight Subtree",
+    tooltipText: "Highlight this artifact's subtree nodes",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
@@ -120,7 +136,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "hide-artifact-subtree",
     content: "Hide Subtree",
-    tooltipText: "Hide all children.",
+    tooltipText: "Hide all child nodes of this artifact",
     selector: "node",
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
@@ -132,7 +148,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
   {
     id: "show-artifact-subtree",
     content: "Show Subtree",
-    tooltipText: "Show all hidden children.",
+    tooltipText: "Display all child nodes of this artifact",
     selector: "node",
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;

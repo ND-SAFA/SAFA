@@ -42,7 +42,7 @@ export function svgNode(
         ${svgDetails(data, y + 27)}
         ${svgBody(data, {
           x,
-          y: y + 30,
+          y: y + 35,
           width: bodyWidth || width,
           height,
           truncateLength,
@@ -66,6 +66,7 @@ function svgTitle(title: string, yPos: number): string {
    <text 
       x="50%" y="${yPos}" text-anchor="middle"
       fill="${ThemeColors.artifactText}" 
+      font-weight="600"
     >
       ${title}
     </text>
@@ -100,8 +101,14 @@ function svgDiv(style: Omit<SvgStyle, "height">): string {
  */
 function svgDetails(data: ArtifactData, yPos: number): string {
   return `
-    <text x="50%" y="${yPos}" text-anchor="middle" shape-rendering="crispEdges">
-      <tspan fill="${ThemeColors.artifactText}">${data.artifactName}</tspan>
+    <text 
+      x="50%" y="${yPos}" 
+      text-anchor="middle" 
+      shape-rendering="crispEdges"
+      font-weight="600"
+      fill="${ThemeColors.artifactText}"
+    >
+      ${data.artifactName}
     </text>
   `;
 }
@@ -121,12 +128,26 @@ function svgBody(
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
-      width="${style.width - style.x}" 
+      width="${style.width}" 
       height="${style.height}"
     >
-      <span class="text-body-2">
-        ${getBody(data.body, style.truncateLength)}
-      </span>
+     <span
+       class="text-body-1" 
+       style="
+         display: block;
+         width: ${style.width}px;
+         height: ${style.height}px;
+         line-height: 1rem;
+         text-align: center;"
+     >
+       ${getBody(data.body, style.truncateLength)}
+     </span>
     </foreignObject>
   `;
 }
+
+// <div style="display: inline-block">
+// <span class="text-body-2">
+//   ${getBody(data.body, style.truncateLength)}
+//   </span>
+//   </div>

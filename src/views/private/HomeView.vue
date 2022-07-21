@@ -1,23 +1,23 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <h1 class="text-h3 text-center mt-10">Welcome to SAFA!</h1>
-      <p class="text-body-1 text-center mb-10">
-        You can either open an existing project, or create a new one.
-      </p>
+      <h1 class="text-h3 text-center my-10">Welcome to SAFA!</h1>
       <v-row>
         <v-col cols="6">
-          <v-card elevation="1">
-            <div class="mx-auto width-fit pt-6">
-              <v-icon style="font-size: 80px" :color="iconColor">
+          <v-card outlined>
+            <v-card-title>
+              <v-icon style="font-size: 40px" :color="iconColor">
                 mdi-folder-plus-outline
               </v-icon>
-            </div>
-            <v-card-title>
-              <h2 class="text-h5">Create New Project</h2>
+              <h2 class="text-h5 ml-1">Create New Project</h2>
             </v-card-title>
-            <v-card-text>
+            <v-card-subtitle>
               <v-divider class="mb-2" />
+              <p class="text-subtitle-2">
+                Chose which data source you would like to create a project from.
+              </p>
+            </v-card-subtitle>
+            <v-card-text>
               <div class="mx-auto width-min">
                 <v-btn text @click="handleOpenStandard">
                   <v-icon>mdi-plus</v-icon>
@@ -29,28 +29,31 @@
                 </v-btn>
                 <v-btn text @click="handleOpenGitHub">
                   <v-icon>mdi-transit-connection-variant</v-icon>
-                  Create GitHub Project
+                  Import GitHub Project
                 </v-btn>
                 <v-btn text @click="handleOpenJira">
                   <v-icon>mdi-transit-connection-variant</v-icon>
-                  Create Jira Project
+                  Import Jira Project
                 </v-btn>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="6">
-          <v-card elevation="1">
-            <div class="mx-auto width-fit pt-6">
-              <v-icon style="font-size: 80px" :color="iconColor">
+          <v-card outlined>
+            <v-card-title>
+              <v-icon style="font-size: 40px" :color="iconColor">
                 mdi-view-list
               </v-icon>
-            </div>
-            <v-card-title>
-              <h2 class="text-h5">Load Existing Project</h2>
+              <h2 class="text-h5 ml-1">Load Existing Project</h2>
             </v-card-title>
-            <v-card-text>
+            <v-card-subtitle>
               <v-divider class="mb-2" />
+              <p class="text-subtitle-2">
+                Select an existing project and version to load.
+              </p>
+            </v-card-subtitle>
+            <v-card-text>
               <project-version-list />
             </v-card-text>
           </v-card>

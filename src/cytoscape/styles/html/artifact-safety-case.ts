@@ -103,9 +103,9 @@ function svgSolution(data: ArtifactData): string {
       x: 40,
       y: 35,
       width: 120,
-      height: 70,
-      bodyWidth: 160,
-      truncateLength: 65,
+      height: 82,
+      bodyWidth: 120,
+      truncateLength: 60,
     },
     `
       <circle 

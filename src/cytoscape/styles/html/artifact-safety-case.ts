@@ -43,6 +43,7 @@ export function svgDefault(data: ArtifactData): string {
       <rect 
         rx="8" width="${outerWidth}" height="${outerHeight}"
         fill="${ThemeColors.artifactBorder}"
+        class="artifact-border"
       />
       <rect
         x="1" y="1" rx="7" width="${outerWidth - 2}" height="${outerHeight - 2}"
@@ -76,6 +77,7 @@ function svgGoal(data: ArtifactData): string {
       <rect 
         width="${outerWidth}" height="${outerHeight}"
         fill="${ThemeColors.artifactBorder}"
+        class="artifact-border"
       />
       <rect
         x="1" y="1" width="${outerWidth - 2}" height="${outerHeight - 2}"
@@ -109,6 +111,7 @@ function svgSolution(data: ArtifactData): string {
       <circle 
         cx="100" cy="100" r="92"
         fill="${ThemeColors.artifactBorder}"
+        class="artifact-border"
       />
       <circle 
         cx="100" cy="100" r="91"
@@ -143,6 +146,7 @@ function svgStrategy(data: ArtifactData): string {
           ${outerWidth},${outerHeight} 
           0,${outerHeight}"
         fill="${ThemeColors.artifactBorder}"
+        class="artifact-border"
       />
       <polygon
         points="

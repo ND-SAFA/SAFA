@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatFiles.entities;
+package edu.nd.crc.safa.flatfiles.entities;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.flatFiles.IDataFile;
-import edu.nd.crc.safa.flatFiles.services.DataFileBuilder;
+import edu.nd.crc.safa.flatfiles.IDataFile;
+import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -60,47 +60,65 @@ public class TimParser {
     private void parse() throws SafaError, IOException {
         JSONObject dataFiles = this.getDataFiles();
         List<String> artifactTypes = this.getArtifactTypes();
+        parseArtifactDefinitions(dataFiles, artifactTypes);
+        parseTraceDefinitions(artifactTypes);
+    }
 
-        // Step - Create artifact files
-        for (String artifactType : artifactTypes) {
-            JSONObject artifactDefinition = dataFiles.getJSONObject(artifactType);
-            FileUtilities.assertHasKeys(artifactDefinition, AbstractArtifactFile.Constants.REQUIRED_KEYS);
-            String fileName = artifactDefinition.getString(TimParser.Constants.FILE_PARAM);
-            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
-            IDataFile<ArtifactAppEntity> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile);
-            this.artifactFiles.add(artifactFile);
-        }
-
-        // Step - Parse trace files
+    private void parseTraceDefinitions(List<String> artifactTypes) throws IOException {
         for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next();
-
             if (traceMatrixKey.equalsIgnoreCase(ProjectVariables.DATAFILES_PARAM)) {
                 continue;
             }
+
+            // Step - Parse and validate trace definition
             JSONObject traceFileDefinition = timFileJson.getJSONObject(traceMatrixKey);
-            String fileName = traceFileDefinition.getString(TimParser.Constants.FILE_PARAM);
-            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+            AbstractTraceFile.validateTraceDefinition(traceFileDefinition);
 
-            boolean isGenerated =
-                traceFileDefinition.has(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM)
-                    && traceFileDefinition.getBoolean(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM);
-
+            // Step - Get required params
             String source = traceFileDefinition.getString(AbstractTraceFile.Constants.SOURCE_PARAM);
             String target = traceFileDefinition.getString(AbstractTraceFile.Constants.TARGET_PARAM);
+
+            // Step - Validate trace definition
             for (String artifactType : List.of(source, target)) {
                 if (!artifactTypes.contains(artifactType.toLowerCase())) {
                     throw new SafaError(String.format("Unknown artifact type: %s", artifactType));
                 }
             }
 
-            IDataFile<TraceAppEntity> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
+            // Step - If generation is set, create generation request.
+            boolean isGenerated =
+                traceFileDefinition.has(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM)
+                    && traceFileDefinition.getBoolean(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM);
             if (isGenerated) {
                 TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest(source, target);
                 traceGenerationRequests.add(traceGenerationRequest);
-            } else {
+            }
+
+            // Step - If file is defined, create trace file parser
+            if (traceFileDefinition.has(Constants.FILE_PARAM)) {
+                String fileName = traceFileDefinition.getString(Constants.FILE_PARAM);
+                String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+                IDataFile<TraceAppEntity> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
                 this.traceFiles.add(traceFile);
             }
+        }
+    }
+
+    private void parseArtifactDefinitions(JSONObject dataFiles, List<String> artifactTypes) throws IOException {
+        // Step - Create artifact files
+        for (String artifactType : artifactTypes) {
+            // Step - Parse and validate artifact definition
+            JSONObject artifactDefinition = dataFiles.getJSONObject(artifactType);
+            AbstractArtifactFile.validateArtifactDefinition(artifactDefinition);
+
+            // Step - Get required params
+            String fileName = artifactDefinition.getString(Constants.FILE_PARAM);
+
+            // Step - Create artifact file parser
+            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+            IDataFile<ArtifactAppEntity> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile);
+            this.artifactFiles.add(artifactFile);
         }
     }
 
@@ -113,14 +131,14 @@ public class TimParser {
     }
 
     private <D> EntityCreation<D, String> parseDataFiles(List<IDataFile<D>> dataFiles) {
-        List<D> traces = new ArrayList<>();
+        List<D> entities = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-        for (IDataFile<D> traceFile : dataFiles) {
-            EntityCreation<D, String> traceAppEntities = traceFile.parseEntities();
-            traces.addAll(traceAppEntities.getEntities());
-            errors.addAll(traceAppEntities.getErrors());
+        for (IDataFile<D> dataFile : dataFiles) {
+            EntityCreation<D, String> entitiesInDataFile = dataFile.parseEntities();
+            entities.addAll(entitiesInDataFile.getEntities());
+            errors.addAll(entitiesInDataFile.getErrors());
         }
-        return new EntityCreation<>(traces, errors);
+        return new EntityCreation<>(entities, errors);
     }
 
     public JSONObject getDataFiles() {

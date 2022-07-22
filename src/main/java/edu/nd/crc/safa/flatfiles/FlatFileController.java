@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatFiles;
+package edu.nd.crc.safa.flatfiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.flatFiles.services.FileService;
-import edu.nd.crc.safa.flatFiles.services.FlatFileService;
+import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
@@ -72,12 +72,12 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity response = this.flatFileService.uploadAndCreateProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.flatFileService.uploadAndCreateProjectFromFlatFiles(
             project,
             projectVersion,
             files);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
-        return response;
+        return projectCreated;
     }
 
     /**

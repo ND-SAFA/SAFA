@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatFiles.services;
+package edu.nd.crc.safa.flatfiles.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.flatFiles.entities.TimParser;
+import edu.nd.crc.safa.flatfiles.entities.TimParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
@@ -70,11 +70,11 @@ public class FlatFileService {
                                                                 MultipartFile[] files)
         throws SafaError {
         this.fileService.uploadFilesToServer(project, Arrays.asList(files));
-        String pathToFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
-        if (!Files.exists(Paths.get(pathToFile))) {
+        String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        if (!Files.exists(Paths.get(pathToTimFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
-        this.constructProjectFromFlatFiles(projectVersion, pathToFile);
+        this.constructProjectFromFlatFiles(projectVersion, pathToTimFile);
         return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
     }
 
@@ -98,8 +98,6 @@ public class FlatFileService {
             Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMResponse = parseTIMIntoCommit(
                 projectVersion,
                 timFileJson);
-
-            System.out.println("Tim Response:" + parseTIMResponse);
 
             // Step - Attempt to perform commit, saving errors on fail.
             ProjectCommit projectCommit = parseTIMResponse.getValue0();
@@ -129,8 +127,6 @@ public class FlatFileService {
     public List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
                                                    List<TraceGenerationRequest> traceGenerationRequests) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
-
-        System.out.println("Trace generation requests:" + traceGenerationRequests);
 
         for (TraceGenerationRequest request : traceGenerationRequests) {
             String sourceArtifactType = request.getSource();
@@ -169,11 +165,21 @@ public class FlatFileService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Creates commit with all parsed artifacts, traces, and trace generation requests in specified tim.json.
+     *
+     * @param projectVersion The version where the commit will be made.
+     * @param timFileJson    The project specification file.
+     * @return Pair of ProjectCommit containing entities and list of trace generation requests.
+     * @throws SafaError   Throws error is a critical error has occurred. Current reasons are:
+     *                     - syntax error or unknown reference in the tim.json.
+     * @throws IOException Throws IOException if an errors occurs while reading files in tim.json.
+     */
     public Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMIntoCommit(ProjectVersion projectVersion,
                                                                                 JSONObject timFileJson
     ) throws SafaError, IOException {
         // Step - Create project parser
-        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject());
+        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
         TimParser timParser = new TimParser(timFileJson, pathToFiles);
 
         // Step - parse artifacts then traces

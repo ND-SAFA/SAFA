@@ -1,12 +1,13 @@
-package edu.nd.crc.safa.flatFiles.services;
+package edu.nd.crc.safa.flatfiles.services;
 
 import java.io.IOException;
+import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.flatFiles.IDataFile;
-import edu.nd.crc.safa.flatFiles.entities.csv.CsvArtifactFile;
-import edu.nd.crc.safa.flatFiles.entities.csv.CsvTraceFile;
-import edu.nd.crc.safa.flatFiles.entities.json.JsonArtifactFile;
-import edu.nd.crc.safa.flatFiles.entities.json.JsonTraceFile;
+import edu.nd.crc.safa.flatfiles.IDataFile;
+import edu.nd.crc.safa.flatfiles.entities.csv.CsvArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.csv.CsvTraceFile;
+import edu.nd.crc.safa.flatfiles.entities.json.JsonArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.json.JsonTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
@@ -64,6 +65,7 @@ public class DataFileBuilder {
         }
     }
 
+    @NotNull
     public static AcceptedFileTypes getFileType(String fileName) {
         for (AcceptedFileTypes acceptedFileTypes : AcceptedFileTypes.values()) {
             if (fileName.contains(acceptedFileTypes.key)) {

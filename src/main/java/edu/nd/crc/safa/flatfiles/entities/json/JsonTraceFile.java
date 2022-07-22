@@ -1,18 +1,23 @@
-package edu.nd.crc.safa.flatFiles.entities.json;
+package edu.nd.crc.safa.flatfiles.entities.json;
 
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.flatFiles.entities.AbstractTraceFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * JSON file defining a set of trace links.
+ */
 public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
     public JsonTraceFile(String pathToFile) throws IOException {
         super(pathToFile);
@@ -26,13 +31,13 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
     @Override
     public List<JSONObject> readFileRecords(String pathToFile) throws IOException {
         JSONObject fileContent = FileUtilities.readJSONFile(pathToFile);
-        return JsonReader.parseFileContent(fileContent, JsonTraceFile.JsonTraceConstants.JSON_TRACE_KEY);
+        return JsonDataFileReader.getArrayAsRecords(fileContent, JsonTraceFile.JsonTraceConstants.JSON_TRACE_KEY);
     }
 
     @Override
     public List<JSONObject> readFileRecords(MultipartFile file) throws IOException {
         JSONObject fileContent = FileUtilities.readMultiPartJSONFile(file);
-        return JsonReader.parseFileContent(fileContent, JsonTraceFile.JsonTraceConstants.JSON_TRACE_KEY);
+        return JsonDataFileReader.getArrayAsRecords(fileContent, JsonTraceFile.JsonTraceConstants.JSON_TRACE_KEY);
     }
 
     @Override
@@ -46,6 +51,7 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
         }
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class JsonTraceConstants {
         public static final String JSON_TRACE_KEY = "traces";
     }

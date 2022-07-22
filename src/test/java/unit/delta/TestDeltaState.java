@@ -20,17 +20,18 @@ import unit.SampleProjectConstants;
 /**
  * Tests that changes to the content of artifacts are retrieved.
  */
-class TestModificationDetected extends ApplicationBaseTest {
+class TestDeltaState extends ApplicationBaseTest {
 
 
     /**
-     * Tests that modifications to artifact bodies are detected in
-     * delta calculations
+     * Tests that the following modifications are detected to the delta calculations:
+     * <p>
+     * - Artifact was added, modified, and removed
      *
      * @throws Exception Throws error if http request fails.
      */
     @Test
-    void testModificationDetected() throws Exception {
+    void testDeltaStateInDefaultProject() throws Exception {
         String projectName = "test-project";
 
         // Step - Create before and after version

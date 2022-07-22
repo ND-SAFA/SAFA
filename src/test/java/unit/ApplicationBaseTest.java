@@ -66,7 +66,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
     public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
-        List<MultipartFile> files = MultipartRequestService.createMultipartFilesFromDirectory(
+        List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
         fileService.uploadFilesToServer(project, files);

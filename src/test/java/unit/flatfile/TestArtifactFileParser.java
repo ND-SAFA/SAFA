@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.flatFiles.entities.TimParser;
+import edu.nd.crc.safa.flatfiles.entities.TimParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -31,7 +31,7 @@ class TestArtifactFileParser extends ApplicationBaseTest {
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
-        String pathToFiles = ProjectPaths.getPathToStorage(projectVersion.getProject());
+        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
         TimParser timParser = new TimParser(jsonSpec, pathToFiles);
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse = timParser.parseArtifacts();
 
@@ -46,7 +46,7 @@ class TestArtifactFileParser extends ApplicationBaseTest {
         ProjectVersion projectVersion = createDefaultProject("testProject");
 
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
-        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject());
+        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
         Exception exception = assertThrows(SafaError.class, () -> new TimParser(jsonSpec, pathToFiles));
         assertThat(exception.getMessage()).contains("file");
         projectService.deleteProject(projectVersion.getProject());

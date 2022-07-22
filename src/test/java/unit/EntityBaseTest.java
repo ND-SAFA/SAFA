@@ -4,7 +4,7 @@ import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.TestUtil;
-import edu.nd.crc.safa.flatFiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;

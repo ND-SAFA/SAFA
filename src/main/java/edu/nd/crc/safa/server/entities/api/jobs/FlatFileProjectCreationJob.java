@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.flatFiles.entities.TimParser;
-import edu.nd.crc.safa.flatFiles.services.FileService;
-import edu.nd.crc.safa.flatFiles.services.FlatFileService;
+import edu.nd.crc.safa.flatfiles.entities.TimParser;
+import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -68,7 +68,7 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
         super.initJobData();
         Project project = this.projectVersion.getProject();
         uploadFlatFiles(project);
-        this.pathToFiles = ProjectPaths.getPathToUploadedFiles(project);
+        this.pathToFiles = ProjectPaths.getPathToUploadedFiles(project, false);
         parseTimFile();
     }
 

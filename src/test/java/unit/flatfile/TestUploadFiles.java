@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.flatFiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -32,7 +32,7 @@ public class TestUploadFiles extends ApplicationBaseTest {
         //Cleanup
         this.projectVersionRepository.delete(projectVersion);
         projectService.deleteProject(project);
-        File oldStorage = new File(ProjectPaths.getPathToStorage(project, false));
+        File oldStorage = new File(ProjectPaths.getPathToUploadedFiles(project, false));
         assertThat(oldStorage.exists()).as("delete project storage").isFalse();
     }
 }

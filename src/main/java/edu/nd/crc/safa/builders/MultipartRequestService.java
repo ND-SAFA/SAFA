@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;
@@ -15,39 +16,74 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Creates a test layer for sending multi-part file http requests.
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MultipartRequestService {
 
-    public static List<MockMultipartFile> createMockMultipartFilesFromDirectory(String pathToDirectory,
-                                                                                String attributeName)
+    /**
+     * Reads files in directory and converts them to MultipartFiles.
+     *
+     * @param pathToDirectory Path to directory whose files are read.
+     * @param attributeName   Name of the attribute in the request body to group files under. See readAsMockMultipartFile
+     *                        for more information
+     * @return MultipartFiles read from directory.
+     * @throws IOException Throws errors if any errors occur while reading mock files.
+     */
+    public static List<MultipartFile> readDirectoryAsMultipartFiles(String pathToDirectory, String attributeName)
         throws IOException {
-        File directory = new File(pathToDirectory);
-        List<MockMultipartFile> files = new ArrayList<>();
-        File[] subFiles = directory.listFiles();
-
-        if (subFiles == null) {
-            throw new RuntimeException("Could not list files inside directory: " + pathToDirectory);
-        }
-
-        for (File subFile : subFiles) {
-            files.add(createFile(subFile.getAbsolutePath(), attributeName));
-        }
-        return files;
+        List<MockMultipartFile> mocks = readDirectoryAsMockMultipartFiles(pathToDirectory, attributeName);
+        return new ArrayList<>(mocks);
     }
 
-    public static MockMultipartFile createFile(String pathToFile, String attributeName) throws IOException {
+    /**
+     * Reads files in directory and converts them to MockMultipartFiles.
+     *
+     * @param pathToDirectory Path the directory whose files are read.
+     * @param attributeName   Name of the attribute in the request body to group files under. See readAsMockMultipartFile
+     *                        *                        for more information
+     * @return MockMultipartFile read from directory.
+     * @throws IOException Throws errors if any errors occur while reading mock files.
+     */
+    public static List<MockMultipartFile> readDirectoryAsMockMultipartFiles(String pathToDirectory,
+                                                                            String attributeName)
+        throws IOException {
+        File directory = new File(pathToDirectory);
+
+
+        List<MockMultipartFile> mockMultipartFiles = new ArrayList<>();
+        for (File subFile : getFilesInDirectory(directory)) {
+            mockMultipartFiles.add(readAsMockMultipartFile(subFile.getAbsolutePath(), attributeName));
+        }
+        return mockMultipartFiles;
+    }
+
+    /**
+     * Reads file and converts it to a mock multi-part file.
+     *
+     * @param pathToFile         Path to file to read
+     * @param paramNameInRequest Name of the parameter containing this file. Note, this is useful for sending
+     *                           multiple files in a single parameter. Parameter groupings are defined using
+     *                           this given name.
+     *                           object use the filename to group them together as a parameter.
+     * @return File as a MockMultipartField
+     * @throws IOException If file cannot be read.
+     */
+    public static MockMultipartFile readAsMockMultipartFile(String pathToFile, String paramNameInRequest)
+        throws IOException {
         File file = new File(pathToFile);
         byte[] fileContent = FileUtils.readFileToByteArray(file);
         return new MockMultipartFile(
-            attributeName,
+            paramNameInRequest,
             file.getName(),
             Files.probeContentType(Paths.get(pathToFile)),
             fileContent);
     }
 
-    public static List<MultipartFile> createMultipartFilesFromDirectory(String pathToDirectory, String attributeName)
-        throws IOException {
-        List<MockMultipartFile> mocks = createMockMultipartFilesFromDirectory(pathToDirectory, attributeName);
-        return new ArrayList<>(mocks);
+    private static File[] getFilesInDirectory(File directory) {
+        File[] directoryFiles = directory.listFiles();
+
+        if (directoryFiles == null) {
+            throw new RuntimeException("Could not list files inside directory: " + directory.getPath());
+        }
+        return directoryFiles;
     }
 }

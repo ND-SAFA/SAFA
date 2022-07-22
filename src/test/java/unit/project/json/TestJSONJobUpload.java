@@ -20,15 +20,15 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that user is able to submit a project creation job via JSON.
  */
-public class TestJSONJobUpload extends BaseProjectJsonTest {
+class TestJSONJobUpload extends BaseProjectJsonTest {
 
     /**
      * Test that user is able to update project with checks for:
      * TODO: Update this test to use the job module in a subsequent PR
      */
     @Test
-    @Disabled
-    public void updateEntities() throws Exception {
+    @Disabled("Not implemented yet")
+    void updateEntities() throws Exception {
         // Step - Create Project JSON
         JSONObject projectJson = createBaseProjectJson();
 

@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.flatFiles.services.FileService;
-import edu.nd.crc.safa.flatFiles.services.FlatFileService;
+import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;

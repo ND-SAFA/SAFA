@@ -41,7 +41,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         throws Exception {
         String attributeName = "file";
 
-        MockMultipartFile file = MultipartRequestService.createFile(pathToFile, attributeName);
+        MockMultipartFile file = MultipartRequestService.readAsMockMultipartFile(pathToFile, attributeName);
         return uploadFlatFilesToVersion(List.of(file), status().is2xxSuccessful());
     }
 
@@ -51,7 +51,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         String attributeName = "files";
 
         List<MockMultipartFile> files =
-            MultipartRequestService.createMockMultipartFilesFromDirectory(pathToFileDir, attributeName);
+            MultipartRequestService.readDirectoryAsMockMultipartFiles(pathToFileDir, attributeName);
         return uploadFlatFilesToVersion(files, resultMatcher);
     }
 

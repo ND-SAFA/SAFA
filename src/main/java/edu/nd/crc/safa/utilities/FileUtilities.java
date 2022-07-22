@@ -16,6 +16,7 @@ import java.util.zip.ZipInputStream;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -28,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for reading CSV files and validating them
  * while mindful that casing does not matter.
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
 
     public static CSVParser readCSVFile(String pathToFile) throws SafaError {
@@ -90,33 +91,12 @@ public class FileUtilities {
         }
     }
 
-    public static void assertHasKeys(JSONObject obj, String[] keys) throws SafaError {
+    public static void assertHasKeys(JSONObject obj, List<String> keys) throws SafaError {
         for (String key : keys) {
             if (!obj.has(key)) {
                 String error = String.format("Expected %s to have key: %s", obj, key);
                 throw new SafaError(error);
             }
-        }
-    }
-
-    public static String toString(Object[] a) {
-        if (a == null) {
-            return "null";
-        }
-
-        int iMax = a.length - 1;
-        if (iMax == -1) {
-            return "[]";
-        }
-
-        StringBuilder b = new StringBuilder();
-        b.append('[');
-        for (int i = 0; ; i++) {
-            b.append(a[i]);
-            if (i == iMax) {
-                return b.append(']').toString();
-            }
-            b.append(", ");
         }
     }
 
@@ -157,7 +137,14 @@ public class FileUtilities {
         return new JSONObject(fileContent);
     }
 
-    public static List<File> getZipFiles(String content) throws IOException {
+    /**
+     * Extracts files in given zip bytearray as a string.
+     *
+     * @param content The content of the zip as a string representing an array of bytes.
+     * @return List of files found in the zip content.
+     * @throws IOException Throws error if error occurred while saving file.
+     */
+    public static List<File> extractFilesFromZipContent(String content) throws IOException {
         ZipEntry entry;
         final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
         String temporaryFolder = ProjectPaths.getTemporaryPath();
@@ -177,5 +164,12 @@ public class FileUtilities {
         return filesCreated;
     }
 
-
+    public void hasRequiredFields(JSONObject json, Iterator<String> fields) {
+        for (Iterator<String> it = fields; it.hasNext(); ) {
+            String field = it.next();
+            if (!json.has(field)) {
+                throw new SafaError("Expected object:\n" + json + "\n to contain field:" + field);
+            }
+        }
+    }
 }

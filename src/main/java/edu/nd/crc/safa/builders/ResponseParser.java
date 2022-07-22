@@ -20,7 +20,7 @@ public class ResponseParser {
 
     public static List<File> zipFileParser(String content) {
         try {
-            return FileUtilities.getZipFiles(content);
+            return FileUtilities.extractFilesFromZipContent(content);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

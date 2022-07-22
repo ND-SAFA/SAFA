@@ -8,9 +8,13 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.server.entities.db.Project;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
- * Contains common full paths used through app.
+ * Contains common paths used through app.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProjectPaths {
     // Flat files
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
@@ -27,7 +31,20 @@ public class ProjectPaths {
     // Jira
     public static final String PATH_TO_DRONE_ISSUES = ProjectPaths.PATH_TO_TEST_RESOURCES + "/jira/drone_response.json";
 
-    private ProjectPaths() {
+    private static void createDirectoryIfEmpty(String pathToLocalStorage, boolean createIfEmpty) {
+        if (createIfEmpty) {
+            createDirectoryIfEmpty(pathToLocalStorage);
+        }
+    }
+
+    private static void createDirectoryIfEmpty(String pathToLocalStorage) {
+        if (!Files.exists(Paths.get(pathToLocalStorage))) {
+            try {
+                Files.createDirectories(Paths.get(pathToLocalStorage));
+            } catch (IOException e) {
+                throw new RuntimeException("Could not create local storage for project. \n Error: " + e.getMessage());
+            }
+        }
     }
 
     public static String joinPaths(String... paths) {
@@ -43,20 +60,9 @@ public class ProjectPaths {
         return finalPath.toString();
     }
 
-    public static String getPathToStorage(Project project) {
-        return getPathToStorage(project, true);
-    }
-
     public static String getPathToStorage(Project project, boolean createIfEmpty) {
-
         String pathToLocalStorage = joinPaths(ProjectPaths.PATH_TO_STORAGE, project.getProjectId().toString());
-        if (!Files.exists(Paths.get(pathToLocalStorage)) && createIfEmpty) {
-            try {
-                Files.createDirectories(Paths.get(pathToLocalStorage));
-            } catch (IOException e) {
-                throw new RuntimeException("Could not create local storage for project: " + project.getProjectId());
-            }
-        }
+        createDirectoryIfEmpty(pathToLocalStorage, createIfEmpty);
         return pathToLocalStorage;
     }
 
@@ -67,24 +73,18 @@ public class ProjectPaths {
         return pathToTemporary;
     }
 
-    public static String getPathToUploadedFiles(Project project) {
-        return joinPaths(getPathToStorage(project), "uploaded");
+    public static String getPathToUploadedFiles(Project project, boolean createIfEmpty) {
+        String path = joinPaths(getPathToStorage(project, createIfEmpty), "uploaded");
+        createDirectoryIfEmpty(path, createIfEmpty);
+        return path;
     }
 
     public static String getPathToProjectFile(Project project, String fileName) {
-        return joinPaths(getPathToStorage(project), fileName);
+        return joinPaths(getPathToStorage(project, true), fileName);
     }
 
     public static String getPathToFlatFile(Project project, String fileName) {
-        return joinPaths(getPathToUploadedFiles(project), fileName);
-    }
-
-    public static String getPathToGeneratedFiles(Project project) {
-        return joinPaths(getPathToStorage(project), "generated");
-    }
-
-    public static String getPathToTemporaryFile(String fileName) throws IOException {
-        return joinPaths(getTemporaryPath(), fileName);
+        return joinPaths(getPathToUploadedFiles(project, true), fileName);
     }
 
     public static String getPathToDefaultProjectFile(String fileName) {

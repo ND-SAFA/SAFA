@@ -21,7 +21,7 @@ public class SafaMultiPartRequest extends SafaRequest {
         String attributeName = "files";
 
         List<MockMultipartFile> files =
-            MultipartRequestService.createMockMultipartFilesFromDirectory(pathToFiles, attributeName);
+            MultipartRequestService.readDirectoryAsMockMultipartFiles(pathToFiles, attributeName);
         MockMultipartHttpServletRequestBuilder request = multipart(routeName);
 
         for (MockMultipartFile file : files) {

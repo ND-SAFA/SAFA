@@ -1,11 +1,9 @@
 package edu.nd.crc.safa.flatfiles.entities.csv;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 import lombok.AccessLevel;
@@ -25,12 +23,6 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     public CsvTraceFile(MultipartFile file) throws IOException {
         super(file);
     }
-
-    @Override
-    public List<String> validate(List<TraceAppEntity> entities, ProjectCommit projectCommit) {
-        return new ArrayList<>();
-    }
-
 
     @Override
     public List<CSVRecord> readFileRecords(String pathToFile) throws IOException {

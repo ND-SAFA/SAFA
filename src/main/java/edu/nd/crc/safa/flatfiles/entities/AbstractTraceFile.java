@@ -1,10 +1,11 @@
 package edu.nd.crc.safa.flatfiles.entities;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -41,8 +42,27 @@ public abstract class AbstractTraceFile<T> extends AbstractDataFile<TraceAppEnti
     }
 
     @Override
-    public List<String> validate(List<TraceAppEntity> entities, ProjectCommit projectCommit) {
-        return null;
+    public List<String> validate(List<TraceAppEntity> entities, ProjectAppEntity projectAppEntity) {
+        // Step - Create map of artifact names
+        List<String> artifactNames = projectAppEntity.getArtifactNames();
+        List<String> errors = new ArrayList<>();
+        for (TraceAppEntity traceAppEntity : entities) {
+            if (!artifactNames.contains(traceAppEntity.sourceName)) {
+                errors.addAll(assertTraceContainsPointers(traceAppEntity, artifactNames));
+            }
+        }
+        return errors;
+    }
+
+    private List<String> assertTraceContainsPointers(TraceAppEntity traceAppEntity, List<String> artifactNames) {
+        List<String> errors = new ArrayList<>();
+        if (!artifactNames.contains(traceAppEntity.sourceName)) {
+            errors.add("Link contains unknown source artifact:" + traceAppEntity.sourceName);
+        }
+        if (!artifactNames.contains(traceAppEntity.targetName)) {
+            errors.add("Link contains unknown target artifact:" + traceAppEntity.sourceName);
+        }
+        return errors;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

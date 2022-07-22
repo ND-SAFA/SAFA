@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -87,5 +88,12 @@ public class ProjectAppEntity {
         this.warnings = warnings;
         this.errors = errors;
         this.layout = layout;
+    }
+
+    public List<String> getArtifactNames() {
+        return this.artifacts
+            .stream()
+            .map(ArtifactAppEntity::getName)
+            .collect(Collectors.toList());
     }
 }

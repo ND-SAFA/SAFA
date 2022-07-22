@@ -6,7 +6,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.flatfiles.IDataFile;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,10 +36,10 @@ public abstract class AbstractDataFile<E, R> implements IDataFile<E> {
     }
 
     @Override
-    public EntityCreation<E, String> parseAndValidateEntities(ProjectCommit projectCommit) {
+    public EntityCreation<E, String> parseAndValidateEntities(ProjectAppEntity projectAppEntity) {
         EntityCreation<E, String> entityCreation = this.parseEntities();
         List<E> entities = entityCreation.getEntities();
-        List<String> errors = this.validate(entities, projectCommit);
+        List<String> errors = this.validate(entities, projectAppEntity);
         return new EntityCreation<>(entities, errors);
     }
 

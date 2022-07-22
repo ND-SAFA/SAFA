@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -181,14 +182,17 @@ public class FlatFileService {
         // Step - Create project parser
         String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
         TimParser timParser = new TimParser(timFileJson, pathToFiles);
+        ProjectCommit projectCommit = new ProjectCommit(projectVersion, false);
 
-        // Step - parse artifacts then traces
+
+        // Step - parse artifacts
         EntityCreation<ArtifactAppEntity, String> artifactCreationResponse = timParser.parseArtifacts();
-        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces();
+        projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
+
+        // Step - parse traces
+        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces(projectCommit);
 
         // Step - Create project commit with parsed artifacts and traces
-        ProjectCommit projectCommit = new ProjectCommit(projectVersion, false);
-        projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
         projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
 
         List<CommitError> commitErrors =
@@ -206,9 +210,9 @@ public class FlatFileService {
         Project project = projectVersion.getProject();
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        Map<String, ArtifactAppEntity> name2artifact = new Hashtable<>();
-        Map<String, List<ArtifactAppEntity>> type2Artifacts = new Hashtable<>();
-        Map<String, Map<String, List<TraceAppEntity>>> type2Traces = new Hashtable<>();
+        Map<String, ArtifactAppEntity> name2artifact = new HashMap<>();
+        Map<String, List<ArtifactAppEntity>> type2Artifacts = new HashMap<>();
+        Map<String, Map<String, List<TraceAppEntity>>> type2Traces = new HashMap<>();
         List<File> projectFiles = new ArrayList<>();
 
         for (ArtifactAppEntity artifact : projectAppEntity.artifacts) {

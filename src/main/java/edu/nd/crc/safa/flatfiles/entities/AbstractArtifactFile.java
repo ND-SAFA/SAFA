@@ -2,11 +2,11 @@ package edu.nd.crc.safa.flatfiles.entities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AccessLevel;
@@ -36,14 +36,15 @@ public abstract class AbstractArtifactFile<T> extends AbstractDataFile<ArtifactA
     }
 
     @Override
-    public List<String> validate(List<ArtifactAppEntity> newEntities, ProjectCommit projectCommit) {
-        List<ArtifactAppEntity> existingEntities = projectCommit.getArtifacts().getAdded();
-        List<String> existingEntityNames = existingEntities.stream().map(ArtifactAppEntity::getName).collect(Collectors.toList());
+    public List<String> validate(List<ArtifactAppEntity> newEntities, ProjectAppEntity projectAppEntity) {
+        HashMap<String, ArtifactAppEntity> name2artifact = new HashMap<>();
         List<String> errors = new ArrayList<>();
 
-        for (ArtifactAppEntity artifact : existingEntities) {
-            if (existingEntityNames.contains(artifact.name)) {
-                errors.add("Duplicate artifact found:" + artifact.name);
+        for (ArtifactAppEntity artifact : newEntities) {
+            if (name2artifact.containsKey(artifact.name)) {
+                errors.add("Duplicate artifact artifact found:" + artifact.name);
+            } else {
+                name2artifact.put(artifact.name, artifact);
             }
         }
         return errors;

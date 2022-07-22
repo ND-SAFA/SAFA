@@ -15,6 +15,7 @@ import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
@@ -100,7 +101,9 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
     }
 
     public void parsingTraceFiles() throws SafaError {
-        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces();
+        ProjectAppEntity projectAppEntity = new ProjectAppEntity();
+        projectAppEntity.getArtifacts().addAll(projectCommit.getArtifacts().getAdded());
+        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces(projectAppEntity);
         projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
         List<CommitError> errors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
         projectCommit.getErrors().addAll(errors);

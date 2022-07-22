@@ -1,12 +1,10 @@
 package edu.nd.crc.safa.flatfiles.entities.csv;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
@@ -41,11 +39,6 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     public CsvArtifactFile(String artifactType, MultipartFile file) throws IOException {
         super(file);
         this.artifactType = artifactType;
-    }
-
-    @Override
-    public List<String> validate(List newEntities, ProjectCommit projectCommit) {
-        return new ArrayList<>();
     }
 
     @Override

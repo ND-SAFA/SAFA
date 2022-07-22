@@ -3,7 +3,7 @@ package edu.nd.crc.safa.flatfiles;
 import java.util.List;
 
 import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
 /**
  * Defines interface for parsing flat files of a certain format
@@ -20,17 +20,17 @@ public interface IDataFile<E> {
     /**
      * Validates given entities and returns any errors found.
      *
-     * @param entities      The entities to validate.
-     * @param projectCommit The entities existing in the system.
+     * @param entities         The entities to validate.
+     * @param projectAppEntity The entities existing in the system.
      * @return List of errors
      */
-    List<String> validate(List<E> entities, ProjectCommit projectCommit);
+    List<String> validate(List<E> entities, ProjectAppEntity projectAppEntity);
 
     /**
      * Parses entities in file and validates them based on the given existing entities.
      *
-     * @param projectCommit Entities in the existing project.
+     * @param projectAppEntity Entities in the existing project.
      * @return Entities created and errors encountered.
      */
-    EntityCreation<E, String> parseAndValidateEntities(ProjectCommit projectCommit);
+    EntityCreation<E, String> parseAndValidateEntities(ProjectAppEntity projectAppEntity);
 }

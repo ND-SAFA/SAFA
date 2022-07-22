@@ -12,12 +12,15 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.flatfiles.IDataFile;
 import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
@@ -122,19 +125,30 @@ public class TimParser {
         }
     }
 
-    public EntityCreation<TraceAppEntity, String> parseTraces() throws SafaError {
-        return this.parseDataFiles(this.traceFiles);
+    public EntityCreation<TraceAppEntity, String> parseTraces(ProjectCommit projectCommit) throws SafaError {
+        ProjectAppEntity projectAppEntity = new ProjectAppEntity();
+        projectAppEntity.getArtifacts().addAll(projectCommit.getArtifacts().getAdded());
+        return this.parseDataFiles(this.traceFiles, projectAppEntity);
     }
 
-    public EntityCreation<ArtifactAppEntity, String> parseArtifacts() throws SafaError {
-        return this.parseDataFiles(this.artifactFiles);
+    public EntityCreation<TraceAppEntity, String> parseTraces(ProjectAppEntity projectAppEntity) throws SafaError {
+        return this.parseDataFiles(this.traceFiles, projectAppEntity);
     }
 
-    private <D> EntityCreation<D, String> parseDataFiles(List<IDataFile<D>> dataFiles) {
+    public EntityCreation<ArtifactAppEntity, String> parseArtifacts() {
+        return parseArtifacts(new ProjectAppEntity());
+    }
+
+    public EntityCreation<ArtifactAppEntity, String> parseArtifacts(ProjectAppEntity projectAppEntity) throws SafaError {
+        return this.parseDataFiles(this.artifactFiles, projectAppEntity);
+    }
+
+    private <D> EntityCreation<D, String> parseDataFiles(List<IDataFile<D>> dataFiles,
+                                                         ProjectAppEntity projectAppEntity) {
         List<D> entities = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         for (IDataFile<D> dataFile : dataFiles) {
-            EntityCreation<D, String> entitiesInDataFile = dataFile.parseEntities();
+            EntityCreation<D, String> entitiesInDataFile = dataFile.parseAndValidateEntities(projectAppEntity);
             entities.addAll(entitiesInDataFile.getEntities());
             errors.addAll(entitiesInDataFile.getErrors());
         }
@@ -153,10 +167,8 @@ public class TimParser {
             .collect(Collectors.toList());
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Constants {
         public static final String FILE_PARAM = "file";
-
-        private Constants() {
-        }
     }
 }

@@ -13,6 +13,7 @@ class JobArgs(TrainingArguments):
     resample_rate: int = RESAMPLE_RATE_DEFAULT
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
     dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
+    metrics: List[str] = None
 
     def __init__(self, model_name: str, s_arts: Dict, t_arts: Dict, links: List, **kwargs):
         self.__set_args(**kwargs)
@@ -23,3 +24,5 @@ class JobArgs(TrainingArguments):
         for arg_name, arg_value in kwargs.items():
             if hasattr(self, arg_name):
                 self.__setattr__(arg_name, arg_value)
+
+

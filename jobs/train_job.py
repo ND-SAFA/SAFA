@@ -10,6 +10,5 @@ class TrainJob(BaseJob):
         checkpoint = self._get_checkpoint()
         trainer = self._get_trainer()
         results = trainer.perform_training(checkpoint=checkpoint)
-        results.save()
     
 

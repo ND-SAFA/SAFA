@@ -1,9 +1,10 @@
 from jobs.base_job import BaseJob
 
 
-class EvaluateJob(BaseJob):
+class PredictJob(BaseJob):
     def __start(self):
         trainer = self._get_trainer()
         results = trainer.perform_prediction()
-        results.save()
+        if self.args.metrics:
+            results.evaluate(self.args.metrics)
 

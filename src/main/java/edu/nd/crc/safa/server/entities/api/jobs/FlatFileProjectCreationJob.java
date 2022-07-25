@@ -6,23 +6,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.flatfiles.entities.TimParser;
+import edu.nd.crc.safa.flatfiles.entities.FlatFileParser;
 import edu.nd.crc.safa.flatfiles.services.FileService;
 import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.CommitError;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.ServiceProvider;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +50,7 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
     /**
      * The parser used to parse time file.
      */
-    TimParser timParser;
+    FlatFileParser flatFileParser;
     /**
      * Path to uploaded files.
      */
@@ -85,36 +86,36 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
         }
 
         try {
-            String timFileContent = new String(Files.readAllBytes(Paths.get(this.pathToTIMFile)));
-            JSONObject timFileJson = new JSONObject(timFileContent);
-            this.timParser = new TimParser(timFileJson, this.pathToFiles);
+            JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
+            this.flatFileParser = new FlatFileParser(timFileJson, this.pathToFiles);
         } catch (Exception e) {
             throw new SafaError("Could not parse");
         }
     }
 
     public void parsingArtifactFiles() throws SafaError {
-        EntityCreation<ArtifactAppEntity, String> artifactCreationResponse = timParser.parseArtifacts();
+        EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
-        List<CommitError> errors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
-        projectCommit.getErrors().addAll(errors);
+        List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
+        projectCommit.getErrors().addAll(artifactErrors);
     }
 
     public void parsingTraceFiles() throws SafaError {
-        ProjectAppEntity projectAppEntity = new ProjectAppEntity();
-        projectAppEntity.getArtifacts().addAll(projectCommit.getArtifacts().getAdded());
-        EntityCreation<TraceAppEntity, String> traceCreationResponse = timParser.parseTraces(projectAppEntity);
+        List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
+        EntityParsingResult<TraceAppEntity, String> traceCreationResponse = flatFileParser.parseTraces(artifactsCreated);
         projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
-        List<CommitError> errors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
-        projectCommit.getErrors().addAll(errors);
+        List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
+        projectCommit.getErrors().addAll(traceErrors);
     }
 
     private List<CommitError> createErrors(List<String> errorMessages,
                                            ProjectEntity projectEntity) {
+        CommitErrorRepository commitErrorRepository = this.serviceProvider.getCommitErrorRepository();
         return
             errorMessages
                 .stream()
                 .map(e -> new CommitError(projectVersion, e, projectEntity))
+                .map(commitErrorRepository::save)
                 .collect(Collectors.toList());
     }
 
@@ -122,7 +123,7 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
         FlatFileService flatFileService = this.getServiceProvider().getFlatFileService();
         List<TraceAppEntity> generatedLinks = flatFileService.generateTraceLinks(
             projectCommit.getArtifacts().getAdded(),
-            timParser.getTraceGenerationRequests());
+            flatFileParser.getTraceGenerationRequests());
         generatedLinks = flatFileService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
             generatedLinks);
         projectCommit.getTraces().getAdded().addAll(generatedLinks);

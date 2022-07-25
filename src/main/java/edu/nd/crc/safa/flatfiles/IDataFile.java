@@ -1,36 +1,32 @@
 package edu.nd.crc.safa.flatfiles;
 
+import java.io.File;
 import java.util.List;
 
-import edu.nd.crc.safa.common.EntityCreation;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-
 /**
- * Defines interface for parsing flat files of a certain format
+ * Defines interface for retrieving entities in artifact file.
  */
 public interface IDataFile<E> {
 
-    /**
-     * Parses entities in file along and stores any errors.
-     *
-     * @return Entities created and errors encountered.
-     */
-    EntityCreation<E, String> parseEntities();
 
     /**
-     * Validates given entities and returns any errors found.
+     * Returns entities and errors created while creating the artifact file.
      *
-     * @param entities         The entities to validate.
-     * @param projectAppEntity The entities existing in the system.
+     * @return Entities in data file alongside any parsing errors.
+     */
+    List<E> getEntities();
+
+    /**
+     * Returns list of parsing errors occurring when creating this data file.
+     *
      * @return List of errors
      */
-    List<String> validate(List<E> entities, ProjectAppEntity projectAppEntity);
+    List<String> getErrors();
 
     /**
-     * Parses entities in file and validates them based on the given existing entities.
+     * Exports artifact file to give file.
      *
-     * @param projectAppEntity Entities in the existing project.
-     * @return Entities created and errors encountered.
+     * @param file The file to export entities to.
      */
-    EntityCreation<E, String> parseAndValidateEntities(ProjectAppEntity projectAppEntity);
+    void export(File file) throws Exception;
 }

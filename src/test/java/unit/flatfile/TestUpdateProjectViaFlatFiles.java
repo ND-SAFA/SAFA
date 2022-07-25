@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
@@ -45,9 +45,9 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
         assertThat(updateBodies.size())
             .as("bodies created in later version")
-            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+            .isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
         List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
+        assertThat(updateTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
         FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
@@ -60,6 +60,6 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
         // VP - No new trace links were created
         List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
+        assertThat(noChangeTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
     }
 }

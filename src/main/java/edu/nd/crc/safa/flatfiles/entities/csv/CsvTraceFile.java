@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.flatfiles.entities.csv;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
 
     public CsvTraceFile(MultipartFile file) throws IOException {
         super(file);
+    }
+
+    @Override
+    protected void exportAsFileContent(File file) throws Exception {
+        //TODO:
     }
 
     @Override

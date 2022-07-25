@@ -1,15 +1,14 @@
 package edu.nd.crc.safa.flatfiles.entities;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.common.EntityCreation;
 import edu.nd.crc.safa.flatfiles.IDataFile;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,57 +16,113 @@ import org.springframework.web.multipart.MultipartFile;
  * Baseline functionality for parsing and validating artifacts.
  *
  * @param <E> The type of entities in data file (e.g. artifacts or traces)
- * @param <R> The type of record this file is handling.
+ * @param <I> The type of record this file is handling.
  */
 @Data
-@NoArgsConstructor
-public abstract class AbstractDataFile<E, R> implements IDataFile<E> {
+public abstract class AbstractDataFile<E, I> implements IDataFile<E>,
+    IFlatFileParser<E> {
     /**
      * Rows in csv file representing artifacts.
      */
-    List<R> artifactRecords;
+    protected List<I> artifactRecords;
+    /**
+     * Entities parsed from file.
+     */
+    protected List<E> entities;
+    /**
+     * List of errors created while parsing entities.
+     */
+    protected List<String> errors;
+
+    protected AbstractDataFile() {
+        this.artifactRecords = new ArrayList<>();
+        this.entities = new ArrayList<>();
+        this.errors = new ArrayList<>();
+    }
+
+    protected AbstractDataFile(List<E> entities) {
+        this();
+        this.entities = entities;
+    }
 
     protected AbstractDataFile(String pathToFile) throws IOException {
+        this(pathToFile, true);
+    }
+
+    protected AbstractDataFile(String pathToFile, boolean parseOnConstructor) throws IOException {
+        this();
         this.artifactRecords = readFileRecords(pathToFile);
+        if (parseOnConstructor) {
+            this.parseEntities();
+        }
     }
 
-    protected AbstractDataFile(MultipartFile file) throws IOException {
+    protected AbstractDataFile(MultipartFile file, boolean parseOnConstructor) throws IOException {
+        this();
         this.artifactRecords = readFileRecords(file);
+        if (parseOnConstructor) {
+            this.parseEntities();
+        }
     }
 
     @Override
-    public EntityCreation<E, String> parseAndValidateEntities(ProjectAppEntity projectAppEntity) {
-        EntityCreation<E, String> entityCreation = this.parseEntities();
-        List<E> entities = entityCreation.getEntities();
-        List<String> errors = this.validate(entities, projectAppEntity);
-        return new EntityCreation<>(entities, errors);
-    }
-
-    @Override
-    public EntityCreation<E, String> parseEntities() {
-        List<E> artifactAppEntities = new ArrayList<>();
-        List<String> errors = new ArrayList<>();
-        for (R artifactRecord : artifactRecords) {
+    public void parseEntities() {
+        this.entities = new ArrayList<>();
+        this.errors = new ArrayList<>();
+        for (I artifactRecord : artifactRecords) {
             Pair<E, String> response = this.parseRecord(artifactRecord);
-            if (response.getValue1() == null) {
-                artifactAppEntities.add(response.getValue0());
+            E entity = response.getValue0();
+            String error = response.getValue1();
+            if (error == null) {
+                this.entities.add(entity);
             } else {
-                errors.add(response.getValue1());
+                this.errors.add(error);
             }
         }
 
-        return new EntityCreation<>(artifactAppEntities, errors);
+        // Filters out invalid artifacts
+        Pair<List<E>, List<String>> validationResponse = this.validateEntitiesCreated();
+        this.entities = validationResponse.getValue0();
+        this.errors = validationResponse.getValue1();
     }
+
+    @Override
+    public void export(File file) throws Exception {
+        exportAsFileContent(file);
+    }
+
+    /**
+     * Exports artifacts to given file.
+     *
+     * @param file The file to write entities to
+     * @throws Exception If trouble reading objects, reading file, or writing to file.
+     */
+    protected abstract void exportAsFileContent(File file) throws Exception;
+
+    /**
+     * Validates given entities and returns any errors found.
+     *
+     * @param projectAppEntity The entities existing in the system.
+     * @return List of errors
+     */
+    abstract Pair<List<E>, List<String>> validateInProject(ProjectAppEntity projectAppEntity);
+
+    /**
+     * Keeps on valid entities and returns those with errors.
+     *
+     * @return List of erroneous entities and their errors
+     */
+    abstract Pair<List<E>, List<String>> validateEntitiesCreated();
 
     /**
      * Reads file in implemented format from path.
      */
-    protected abstract List<R> readFileRecords(String pathToFile) throws IOException;
+    protected abstract List<I> readFileRecords(String pathToFile) throws IOException;
 
     /**
      * Reads MultipartFile in format.
      */
-    protected abstract List<R> readFileRecords(MultipartFile file) throws IOException;
+    protected abstract List<I> readFileRecords(MultipartFile file) throws IOException;
 
     /**
      * Parses record in file into an artifact
@@ -75,5 +130,5 @@ public abstract class AbstractDataFile<E, R> implements IDataFile<E> {
      * @param entityRecord The artifact entry in the file.
      * @return The parsed artifact.
      */
-    protected abstract Pair<E, String> parseRecord(R entityRecord);
+    protected abstract Pair<E, String> parseRecord(I entityRecord);
 }

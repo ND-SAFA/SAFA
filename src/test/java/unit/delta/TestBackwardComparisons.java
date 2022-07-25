@@ -12,6 +12,7 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
+import unit.DefaultProjectConstants;
 
 /**
  * Tests that the delta between two project versions can be calculated in the opposite direction
@@ -44,9 +45,9 @@ class TestBackwardComparisons extends ApplicationBaseTest {
         int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
         int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
 
-        assertThat(nTracesAdded).isZero();
+        assertThat(nTracesAdded).isEqualTo(DefaultProjectConstants.Delta.N_LINKS_REMOVED);
         assertThat(nTracesModified).isZero();
-        assertThat(nTracesRemoved).isEqualTo(1);
+        assertThat(nTracesRemoved).isEqualTo(DefaultProjectConstants.Delta.N_LINKS_ADDED);
     }
 
     @Test

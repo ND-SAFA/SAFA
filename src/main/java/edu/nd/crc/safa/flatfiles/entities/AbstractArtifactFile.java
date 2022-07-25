@@ -10,25 +10,30 @@ import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Contains artifact file constants and validation.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class AbstractArtifactFile<T> extends AbstractDataFile<ArtifactAppEntity, T> {
+public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactAppEntity, I> {
+
     protected AbstractArtifactFile(String pathToFile) throws IOException {
         super(pathToFile);
     }
 
+    protected AbstractArtifactFile(String pathToFile, boolean parseOnConstruct) throws IOException {
+        super(pathToFile, parseOnConstruct);
+    }
+
     protected AbstractArtifactFile(MultipartFile file) throws IOException {
-        super(file);
+        super(file, true);
+    }
+
+    protected AbstractArtifactFile(MultipartFile file, boolean parseOnConstruct) throws IOException {
+        super(file, parseOnConstruct);
     }
 
     public static void validateArtifactDefinition(JSONObject artifactDefinition) {
@@ -36,22 +41,37 @@ public abstract class AbstractArtifactFile<T> extends AbstractDataFile<ArtifactA
     }
 
     @Override
-    public List<String> validate(List<ArtifactAppEntity> newEntities, ProjectAppEntity projectAppEntity) {
+    public Pair<List<ArtifactAppEntity>, List<String>> validateInProject(ProjectAppEntity projectAppEntity) {
         HashMap<String, ArtifactAppEntity> name2artifact = new HashMap<>();
-        List<String> errors = new ArrayList<>();
+        for (ArtifactAppEntity artifact : projectAppEntity.getArtifacts()) {
+            name2artifact.put(artifact.name, artifact);
+        }
+        return checkForDuplicates(name2artifact);
+    }
 
-        for (ArtifactAppEntity artifact : newEntities) {
-            if (name2artifact.containsKey(artifact.name)) {
-                errors.add("Duplicate artifact artifact found:" + artifact.name);
+    @Override
+    public Pair<List<ArtifactAppEntity>, List<String>> validateEntitiesCreated() {
+        HashMap<String, ArtifactAppEntity> name2artifact = new HashMap<>();
+        return checkForDuplicates(name2artifact);
+    }
+
+    private Pair<List<ArtifactAppEntity>, List<String>> checkForDuplicates(HashMap<String, ArtifactAppEntity> artifactsProcessed) {
+        List<String> errors = new ArrayList<>();
+        List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
+        for (ArtifactAppEntity artifact : entities) {
+            if (artifactsProcessed.containsKey(artifact.name)) {
+                String errorMessage = String.format("Duplicate artifact artifact found: %s", artifact.name);
+                errors.add(errorMessage);
             } else {
-                name2artifact.put(artifact.name, artifact);
+                artifactsProcessed.put(artifact.name, artifact);
+                validArtifacts.add(artifact);
             }
         }
-        return errors;
+        return new Pair<>(validArtifacts, errors);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Constants {
-        public static final List<String> REQUIRED_KEYS = List.of(TimParser.Constants.FILE_PARAM);
+        public static final List<String> REQUIRED_KEYS = List.of(FlatFileParser.Constants.FILE_PARAM);
     }
 }

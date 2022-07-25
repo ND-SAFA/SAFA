@@ -3,6 +3,7 @@ package edu.nd.crc.safa.utilities;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -162,6 +163,12 @@ public class FileUtilities {
             }
         }
         return filesCreated;
+    }
+
+    public static void writeToFile(File file, String fileContent) throws IOException {
+        FileWriter myWriter = new FileWriter(file);
+        myWriter.write(fileContent);
+        myWriter.close();
     }
 
     public void hasRequiredFields(JSONObject json, Iterator<String> fields) {

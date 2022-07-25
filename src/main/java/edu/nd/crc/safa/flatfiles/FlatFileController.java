@@ -72,7 +72,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity projectCreated = this.flatFileService.uploadAndCreateProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.flatFileService.createProjectFromFlatFiles(
             project,
             projectVersion,
             files);
@@ -98,7 +98,7 @@ public class FlatFileController extends BaseController {
         this.projectService.saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
 
-        ProjectAppEntity response = this.flatFileService.uploadAndCreateProjectFromFlatFiles(project,
+        ProjectAppEntity response = this.flatFileService.createProjectFromFlatFiles(project,
             projectVersion,
             files);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);

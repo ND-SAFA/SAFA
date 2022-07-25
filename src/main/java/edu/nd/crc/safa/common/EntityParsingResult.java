@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EntityCreation<Entity, Error> {
+public class EntityParsingResult<Entity, Error> {
 
     List<Entity> entities = new ArrayList<>();
     List<Error> errors = new ArrayList<>();

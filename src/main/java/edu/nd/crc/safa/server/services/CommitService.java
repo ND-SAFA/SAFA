@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.server.entities.api.AppEntityCreator;
 import edu.nd.crc.safa.server.entities.api.CommitAction;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
@@ -152,7 +152,7 @@ public class CommitService {
                 appEntity.getBaseEntityId());
 
         // Commit added entities
-        EntityCreation<AppEntity, CommitError> addedResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> addedResponse = commitActionOnAppEntities(
             projectChange.getAdded(),
             saveOrModifyAction,
             appEntityCreator,
@@ -163,7 +163,7 @@ public class CommitService {
         commitErrors = new ArrayList<>(addedResponse.getErrors());
 
         // Commit modified entities
-        EntityCreation<AppEntity, CommitError> modifiedResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> modifiedResponse = commitActionOnAppEntities(
             projectChange.getModified(),
             saveOrModifyAction,
             appEntityCreator,
@@ -173,7 +173,7 @@ public class CommitService {
         change.getModified().addAll(entitiesModified);
 
         // Commit removed entities
-        EntityCreation<AppEntity, CommitError> removeResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
             removeAction,
             appEntityCreator,
@@ -196,7 +196,7 @@ public class CommitService {
      * @return List of processed app entities.
      * @throws SafaError Throws error is anything goes wrong during commit.
      */
-    private <AppEntity, VersionEntity> EntityCreation<AppEntity, CommitError> commitActionOnAppEntities(
+    private <AppEntity, VersionEntity> EntityParsingResult<AppEntity, CommitError> commitActionOnAppEntities(
         List<AppEntity> appEntities,
         CommitAction<AppEntity, VersionEntity> commitAction,
         AppEntityCreator<AppEntity, VersionEntity> appEntityCreator,
@@ -220,6 +220,6 @@ public class CommitService {
                 updatedEntities.add(traceAppEntity);
             }
         }
-        return new EntityCreation<>(updatedEntities, commitErrors);
+        return new EntityParsingResult<>(updatedEntities, commitErrors);
     }
 }

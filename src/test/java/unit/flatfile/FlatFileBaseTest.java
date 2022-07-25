@@ -18,11 +18,11 @@ import edu.nd.crc.safa.server.entities.db.TraceType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import unit.ApplicationBaseTest;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 public class FlatFileBaseTest extends ApplicationBaseTest {
 
-    public Project verifyBeforeResponse(JSONObject projectJson) throws Exception {
+    public Project verifyDefaultProjectCreationResponse(JSONObject projectJson) throws Exception {
 
         // VP - Project id is not null
         assertThat(projectJson).as("uploadedFiles non-null").isNotNull();
@@ -35,13 +35,13 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
         // VP - Artifacts present in response
         assertThat(projectJson.getJSONArray("artifacts").length())
             .as("all artifacts confirmed")
-            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+            .isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Traces present in response
         JSONArray traces = projectJson.getJSONArray("traces");
         assertThat(traces.length())
-            .as("all traces confirmed")
-            .isGreaterThanOrEqualTo(SampleProjectConstants.N_LINKS);
+            .as("all traces parsed")
+            .isGreaterThanOrEqualTo(DefaultProjectConstants.Entities.N_LINKS);
 
         int nManual = (int) traces
             .toList()
@@ -51,28 +51,29 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
             ).count();
         assertThat(nManual)
             .as("manual traced confirmed")
-            .isEqualTo(SampleProjectConstants.N_LINKS);
+            .isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
 
         // VP - Errors are present in response
         JSONObject errors = projectJson.getJSONObject("errors");
         assertThat(errors.getJSONArray("tim").length())
             .as("tim file error")
-            .isEqualTo(0);
+            .isZero();
         assertThat(errors.getJSONArray("artifacts").length())
             .as("artifact parsing errors")
-            .isEqualTo(0);
+            .isZero();
         assertThat(errors.getJSONArray("traces").length())
             .as("trace link errors")
             .isEqualTo(1);
 
+        // VP - Verify invalid trace link detected
         JSONObject traceError = errors.getJSONArray("traces").getJSONObject(0);
         assertThat(traceError.get("errorId")).isNotNull();
-        assertThat(traceError.get("message")).isNotNull();
+        assertThat(traceError.getString("message")).contains("FX1");
         assertThat(traceError.get("activity")).isNotNull();
 
         // VP - Project warnings present in response
         JSONObject projectWarnings = projectJson.getJSONObject("warnings");
-        assertThat(projectWarnings.keySet().size()).isGreaterThanOrEqualTo(1);
+        assertThat(projectWarnings.keySet().size()).isPositive();
 
         return project;
     }
@@ -85,23 +86,23 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
 
         // VP - Project types
         verifyNumberOfItems("Artifact Types",
-            () -> artifactTypeRepository.findByProject(project), SampleProjectConstants.N_TYPES);
+            () -> artifactTypeRepository.findByProject(project), DefaultProjectConstants.Entities.N_TYPES);
 
         // VP - requirements created
-        verifyArtifactType(project, "requirement", SampleProjectConstants.N_REQUIREMENTS);
-        verifyArtifactType(project, "design", SampleProjectConstants.N_DESIGNS);
-        verifyArtifactType(project, "hazard", SampleProjectConstants.N_HAZARDS);
-        verifyArtifactType(project, "environmentalassumption", SampleProjectConstants.N_ENV_ASSUMPTIONS);
+        verifyArtifactType(project, "requirement", DefaultProjectConstants.Entities.N_REQUIREMENTS);
+        verifyArtifactType(project, "design", DefaultProjectConstants.Entities.N_DESIGNS);
+        verifyArtifactType(project, "hazard", DefaultProjectConstants.Entities.N_HAZARDS);
+        verifyArtifactType(project, "environmentalassumption", DefaultProjectConstants.Entities.N_ENV_ASSUMPTIONS);
 
         // VP - Verify that total number of artifacts is as expected.
         verifyNumberOfItems("Artifacts",
             () -> artifactRepository.getProjectArtifacts(project),
-            SampleProjectConstants.N_ARTIFACTS);
+            DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that artifact body created for each artifact
         verifyNumberOfItems("Artifact Version Entity",
             () -> artifactVersionRepository.findByProjectVersion(projectVersion),
-            SampleProjectConstants.N_ARTIFACTS);
+            DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that link referencing unknown artifact FX1 in R2R
         CommitError error = verifyNumberOfItems("Trace Errors",
@@ -113,7 +114,7 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
         // VP - Verify that remaining links were created.
         verifyNumberOfItems("Trace Links",
             () -> traceLinkVersionRepository.getApprovedLinksInVersion(projectVersion),
-            SampleProjectConstants.N_LINKS);
+            DefaultProjectConstants.Entities.N_LINKS);
     }
 
     private void verifyArtifactType(Project project, String typeName, int nArtifacts) {

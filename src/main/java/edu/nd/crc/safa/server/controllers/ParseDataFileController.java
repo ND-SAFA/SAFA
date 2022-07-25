@@ -8,9 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.flatfiles.IDataFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.server.entities.api.FileParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -62,14 +63,15 @@ public class ParseDataFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
-    public EntityCreation<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
-                                                                       @RequestParam MultipartFile file) {
-        EntityCreation<ArtifactAppEntity, String> response = new EntityCreation<>();
+    public EntityParsingResult<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
+                                                                            @RequestParam MultipartFile file) {
+        EntityParsingResult<ArtifactAppEntity, String> response = new EntityParsingResult<>();
         tryParseFile(response, () -> {
-            IDataFile<ArtifactAppEntity> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, file);
-            EntityCreation<ArtifactAppEntity, String> entityCreationResponse = artifactFile.parseEntities();
-            response.setEntities(entityCreationResponse.getEntities());
-            response.setErrors(entityCreationResponse.getErrors());
+            AbstractArtifactFile<? extends Object> artifactFile =
+                DataFileBuilder.createArtifactFileParser(artifactType,
+                    file);
+            response.setEntities(artifactFile.getEntities());
+            response.setErrors(artifactFile.getErrors());
         });
         return response;
     }
@@ -82,13 +84,12 @@ public class ParseDataFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.parseTraceFile)
     @ResponseStatus(HttpStatus.OK)
-    public EntityCreation<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
-        EntityCreation<TraceAppEntity, String> response = new EntityCreation<>();
+    public EntityParsingResult<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
+        EntityParsingResult<TraceAppEntity, String> response = new EntityParsingResult<>();
         tryParseFile(response, () -> {
-            IDataFile<TraceAppEntity> traceFile = DataFileBuilder.createTraceFileParser(file);
-            EntityCreation<TraceAppEntity, String> parseResponse = traceFile.parseEntities();
-            response.setEntities(parseResponse.getEntities());
-            response.setErrors(parseResponse.getErrors());
+            AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(file);
+            response.setEntities(traceFile.getEntities());
+            response.setErrors(traceFile.getErrors());
         });
         return response;
     }
@@ -122,7 +123,7 @@ public class ParseDataFileController extends BaseController {
         return response;
     }
 
-    private <T> void tryParseFile(EntityCreation<T, String> response, FileParser fileParser) {
+    private <T> void tryParseFile(EntityParsingResult<T, String> response, FileParser fileParser) {
         try {
             fileParser.parseFile();
         } catch (Exception e) {

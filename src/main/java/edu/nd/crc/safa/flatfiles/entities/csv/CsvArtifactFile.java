@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.flatfiles.entities.csv;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
@@ -8,9 +9,8 @@ import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVRecord;
 import org.javatuples.Pair;
@@ -21,9 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
  * <p>
  * File is expected to contain a name, summary, and body
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     /**
@@ -32,13 +29,21 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     String artifactType;
 
     public CsvArtifactFile(String artifactType, String pathToFile) throws IOException {
-        super(pathToFile);
-        this.artifactType = artifactType;
+        super(pathToFile, false);
+        setArtifactType(artifactType);
+        this.parseEntities();
     }
 
     public CsvArtifactFile(String artifactType, MultipartFile file) throws IOException {
-        super(file);
-        this.artifactType = artifactType;
+        super(file, false);
+        setArtifactType(artifactType);
+        this.parseEntities();
+    }
+
+    @Override
+    protected void exportAsFileContent(File file) throws JsonProcessingException {
+        // TODO: Convert entities into CSV rows
+        // TODO: Write rows to file
     }
 
     @Override
@@ -53,6 +58,9 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     @Override
     public Pair<ArtifactAppEntity, String> parseRecord(CSVRecord entityRecord) {
+        if (artifactType == null) {
+            throw new IllegalArgumentException("Cannot parse record without artifact type");
+        }
         try {
             String artifactName = entityRecord.get(Constants.NAME_PARAM);
             String artifactSummary = entityRecord.get(Constants.SUMMARY_PARAM);
@@ -73,6 +81,13 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }
+    }
+
+    public void setArtifactType(String artifactType) {
+        if (artifactType == null) {
+            throw new IllegalArgumentException("Artifact type cannot be null.");
+        }
+        this.artifactType = artifactType;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

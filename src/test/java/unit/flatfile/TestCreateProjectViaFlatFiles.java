@@ -20,7 +20,7 @@ class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
             .uploadFlatFilesToVersion(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify response contains entities
-        Project project = verifyBeforeResponse(responseBody);
+        Project project = verifyDefaultProjectCreationResponse(responseBody);
 
         // VP - Verify that entities were actually created
         verifyDefaultProjectEntities(project);

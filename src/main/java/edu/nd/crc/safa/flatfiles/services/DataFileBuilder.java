@@ -3,14 +3,13 @@ package edu.nd.crc.safa.flatfiles.services;
 import java.io.IOException;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.flatfiles.IDataFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.flatfiles.entities.csv.CsvArtifactFile;
 import edu.nd.crc.safa.flatfiles.entities.csv.CsvTraceFile;
 import edu.nd.crc.safa.flatfiles.entities.json.JsonArtifactFile;
 import edu.nd.crc.safa.flatfiles.entities.json.JsonTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DataFileBuilder {
     private static final String UNSUPPORTED_FILE_TYPE = "File type is not supported: ";
 
-    public static IDataFile<ArtifactAppEntity> createArtifactFileParser(String artifactType, String pathToFile) throws IOException {
+    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType, String pathToFile) throws IOException {
         switch (getFileType(pathToFile)) {
             case CSV:
                 return new CsvArtifactFile(artifactType, pathToFile);
@@ -32,7 +31,7 @@ public class DataFileBuilder {
         }
     }
 
-    public static IDataFile<ArtifactAppEntity> createArtifactFileParser(String artifactType, MultipartFile file) throws IOException {
+    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType, MultipartFile file) throws IOException {
         switch (getFileType(file.getOriginalFilename())) {
             case CSV:
                 return new CsvArtifactFile(artifactType, file);
@@ -43,7 +42,7 @@ public class DataFileBuilder {
         }
     }
 
-    public static IDataFile<TraceAppEntity> createTraceFileParser(String pathToFile) throws IOException {
+    public static AbstractTraceFile<?> createTraceFileParser(String pathToFile) throws IOException {
         switch (getFileType(pathToFile)) {
             case CSV:
                 return new CsvTraceFile(pathToFile);
@@ -54,7 +53,7 @@ public class DataFileBuilder {
         }
     }
 
-    public static IDataFile<TraceAppEntity> createTraceFileParser(MultipartFile file) throws IOException {
+    public static AbstractTraceFile<?> createTraceFileParser(MultipartFile file) throws IOException {
         switch (getFileType(file.getOriginalFilename())) {
             case CSV:
                 return new CsvTraceFile(file);

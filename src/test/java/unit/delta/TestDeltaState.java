@@ -15,7 +15,7 @@ import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.
@@ -42,7 +42,7 @@ class TestDeltaState extends ApplicationBaseTest {
         // VP - Verify that number of changes is detected
         List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
         List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
-        assertThat(originalBodies.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        assertThat(originalBodies.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
         assertThat(changedBodies.size()).isEqualTo(3);
 
         // Step - Calculate delta
@@ -70,7 +70,7 @@ class TestDeltaState extends ApplicationBaseTest {
         assertThat(beforeArtifactNames.contains("D7")).isTrue();
 
         // VP - Verify that no artifacts were added to before version.
-        assertThat(beforeArtifactNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        assertThat(beforeArtifactNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // Step - Collect list of artifact names in the after version.
         ProjectAppEntity afterAppEntity = getProjectAtVersion(afterVersion);
@@ -87,15 +87,15 @@ class TestDeltaState extends ApplicationBaseTest {
         assertThat(afterArtifactNames.contains("D12")).isTrue();
 
         // VP - Verify that no extra artifacts where created.
-        assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that trace link changes are detected
         int nTracesAdded = traceDelta.getJSONObject("added").keySet().toArray().length;
         int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
         int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
 
-        assertThat(nTracesAdded).isEqualTo(1);
-        assertThat(nTracesModified).isEqualTo(0);
-        assertThat(nTracesRemoved).isEqualTo(0);
+        assertThat(nTracesAdded).as("# traces added").isEqualTo(1);
+        assertThat(nTracesModified).as("# traces modified").isZero();
+        assertThat(nTracesRemoved).as("# traces removed").isOne();
     }
 }

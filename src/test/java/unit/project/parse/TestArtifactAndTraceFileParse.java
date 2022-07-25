@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 /**
  * Tests that system is able to parse artifact and trace files containing no errors.
@@ -27,10 +27,10 @@ class TestArtifactAndTraceFileParse extends ParseBaseTest {
 
         //Step - Upload file, parse artifacts, and collect them
         String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).buildEndpoint();
-        JSONArray artifacts = uploadFileAndGetEntities(routeName, SampleProjectConstants.DESIGN_FILE);
+        JSONArray artifacts = uploadFileAndGetEntities(routeName, DefaultProjectConstants.File.DESIGN_FILE);
 
         //VP - Verify that all artifacts were parsed
-        assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
+        assertThat(artifacts.length()).isEqualTo(DefaultProjectConstants.Entities.N_DESIGNS);
 
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);

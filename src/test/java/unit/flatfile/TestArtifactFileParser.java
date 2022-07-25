@@ -3,9 +3,9 @@ package unit.flatfile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.flatfiles.entities.TimParser;
+import edu.nd.crc.safa.flatfiles.entities.FlatFileParser;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -13,7 +13,7 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 /**
  * Provides smoke tests for testing the ArtifactFileParser
@@ -32,13 +32,13 @@ class TestArtifactFileParser extends ApplicationBaseTest {
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
         String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
-        TimParser timParser = new TimParser(jsonSpec, pathToFiles);
-        EntityCreation<ArtifactAppEntity, String> artifactCreationResponse = timParser.parseArtifacts();
+        FlatFileParser flatFileParser = new FlatFileParser(jsonSpec, pathToFiles);
+        EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
 
         // VP - Verify that all design artifacts are created
         assertThat(artifactCreationResponse.getEntities().size())
             .as("artifacts created")
-            .isEqualTo(SampleProjectConstants.N_DESIGNS);
+            .isEqualTo(DefaultProjectConstants.Entities.N_DESIGNS);
     }
 
     @Test
@@ -47,7 +47,7 @@ class TestArtifactFileParser extends ApplicationBaseTest {
 
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
         String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
-        Exception exception = assertThrows(SafaError.class, () -> new TimParser(jsonSpec, pathToFiles));
+        Exception exception = assertThrows(SafaError.class, () -> new FlatFileParser(jsonSpec, pathToFiles));
         assertThat(exception.getMessage()).contains("file");
         projectService.deleteProject(projectVersion.getProject());
     }

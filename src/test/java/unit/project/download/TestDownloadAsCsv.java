@@ -9,14 +9,12 @@ import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
-class TestCSVDownload extends ApplicationBaseTest {
+class TestDownloadAsCsv extends ApplicationBaseTest {
 
     @Test
-    @Disabled("Current under development")
     void downloadDefaultProject() throws Exception {
         String projectName = "default-project";
         ProjectVersion projectVersion = createDefaultProject(projectName);

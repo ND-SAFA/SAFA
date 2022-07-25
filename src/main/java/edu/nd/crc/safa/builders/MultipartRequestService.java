@@ -23,8 +23,8 @@ public class MultipartRequestService {
      * Reads files in directory and converts them to MultipartFiles.
      *
      * @param pathToDirectory Path to directory whose files are read.
-     * @param attributeName   Name of the attribute in the request body to group files under. See readAsMockMultipartFile
-     *                        for more information
+     * @param attributeName   Name of the attribute in the request body to group files under. \See
+     *                        readAsMockMultipartFile for more information
      * @return MultipartFiles read from directory.
      * @throws IOException Throws errors if any errors occur while reading mock files.
      */
@@ -38,8 +38,8 @@ public class MultipartRequestService {
      * Reads files in directory and converts them to MockMultipartFiles.
      *
      * @param pathToDirectory Path the directory whose files are read.
-     * @param attributeName   Name of the attribute in the request body to group files under. See readAsMockMultipartFile
-     *                        *                        for more information
+     * @param attributeName   Name of the attribute in the request body to group files under.
+     *                        See readAsMockMultipartFile for more information
      * @return MockMultipartFile read from directory.
      * @throws IOException Throws errors if any errors occur while reading mock files.
      */

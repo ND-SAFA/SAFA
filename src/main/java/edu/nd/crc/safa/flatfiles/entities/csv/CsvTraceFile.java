@@ -17,6 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
  * Reads trace links from a CSV file.
  */
 public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
+
+    public CsvTraceFile(List<TraceAppEntity> traces) {
+        super(traces);
+    }
+
     public CsvTraceFile(String pathToFile) throws IOException {
         super(pathToFile);
     }

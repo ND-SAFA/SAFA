@@ -102,7 +102,8 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
 
     public void parsingTraceFiles() throws SafaError {
         List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
-        EntityParsingResult<TraceAppEntity, String> traceCreationResponse = flatFileParser.parseTraces(artifactsCreated);
+        EntityParsingResult<TraceAppEntity, String> traceCreationResponse =
+            flatFileParser.parseTraces(artifactsCreated);
         projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
         List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
         projectCommit.getErrors().addAll(traceErrors);

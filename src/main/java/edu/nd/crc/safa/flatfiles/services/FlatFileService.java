@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.flatfiles.entities.FlatFileParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -216,7 +218,7 @@ public class FlatFileService {
         projectCommit.getErrors().addAll(commitErrors);
     }
 
-    public List<File> downloadProjectFiles(ProjectVersion projectVersion) throws IOException {
+    public List<File> downloadProjectFiles(ProjectVersion projectVersion, String fileType) throws Exception {
         Project project = projectVersion.getProject();
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
@@ -238,14 +240,15 @@ public class FlatFileService {
         }
 
         for (String artifactType : type2Artifacts.keySet()) {
-            String fileName = String.format("%s.csv", artifactType);
+            String fileName = String.format("%s.%s", artifactType, fileType);
             String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
 
-            File artifactFile = new File(pathToFile);
+            File artifactFileOutput = new File(pathToFile);
             List<ArtifactAppEntity> artifacts = type2Artifacts.get(artifactType);
-            fileCreatorService.writeArtifactsToFile(pathToFile, artifacts);
-
-            projectFiles.add(artifactFile);
+            AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile,
+                artifacts);
+            artifactFile.export(artifactFileOutput);
+            projectFiles.add(artifactFileOutput);
         }
 
         for (TraceAppEntity trace : projectAppEntity.traces) {
@@ -268,13 +271,18 @@ public class FlatFileService {
 
         for (String sourceType : type2Traces.keySet()) {
             for (String targetType : type2Traces.get(sourceType).keySet()) {
-                String fileName = String.format("%s2%s.csv", sourceType, targetType);
+                // Step - Create file
+                String fileName = String.format("%s2%s.%s", sourceType, targetType, fileType);
                 String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
-                File traceFile = new File(pathToFile);
-                List<TraceAppEntity> traces = type2Traces.get(sourceType).get(targetType);
-                fileCreatorService.writeTracesToFile(pathToFile, traces);
+                File traceFileOutput = new File(pathToFile);
 
-                projectFiles.add(traceFile);
+                // Step - Create trace file
+                List<TraceAppEntity> traces = type2Traces.get(sourceType).get(targetType);
+                AbstractTraceFile<?> traceFileParser = DataFileBuilder.createTraceFileParser(pathToFile, traces);
+                System.out.println("Exporting trace file:" + traceFileOutput);
+                traceFileParser.export(traceFileOutput);
+
+                projectFiles.add(traceFileOutput);
             }
         }
 

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
  * JSON file defining a set of trace links.
  */
 public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
+
+    public JsonTraceFile(List<TraceAppEntity> traces) {
+        super(traces);
+    }
+
     public JsonTraceFile(String pathToFile) throws IOException {
         super(pathToFile);
         throw new SafaError("JSON Not implemented yet");
@@ -32,17 +36,10 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        JSONObject fileContent = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        for (TraceAppEntity traceAppEntity : this.entities) {
-            String objectString = objectMapper.writeValueAsString(traceAppEntity);
-            JSONObject jsonObject = new JSONObject(objectString);
-            jsonArray.put(jsonObject);
-        }
-        fileContent.put(Constants.JSON_TRACE_KEY, jsonArray);
+        JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
+            Constants.JSON_TRACE_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());
+        System.out.println("Wrote file:" + file.getPath());
     }
 
     @Override

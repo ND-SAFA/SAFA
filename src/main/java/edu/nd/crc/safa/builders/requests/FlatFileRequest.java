@@ -33,16 +33,16 @@ public class FlatFileRequest extends SafaMultiPartRequest {
             .uploadFlatFilesToVersion(pathToFileDir);
     }
 
-    public JSONObject uploadFlatFilesToVersion(String pathToFileDir) throws Exception {
-        return uploadFlatFilesToVersion(pathToFileDir, status().is2xxSuccessful());
-    }
-
     public JSONObject uploadSingleFile(String pathToFile)
         throws Exception {
         String attributeName = "file";
 
         MockMultipartFile file = MultipartRequestService.readAsMockMultipartFile(pathToFile, attributeName);
         return uploadFlatFilesToVersion(List.of(file), status().is2xxSuccessful());
+    }
+
+    public JSONObject uploadFlatFilesToVersion(String pathToFileDir) throws Exception {
+        return uploadFlatFilesToVersion(pathToFileDir, status().is2xxSuccessful());
     }
 
     public JSONObject uploadFlatFilesToVersion(String pathToFileDir, ResultMatcher resultMatcher) throws Exception {

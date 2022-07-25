@@ -34,6 +34,4 @@ public class SafaMultiPartRequest extends SafaRequest {
     protected MockMultipartHttpServletRequestBuilder buildRequest() {
         return MockMvcRequestBuilders.multipart(this.buildEndpoint());
     }
-
-
 }

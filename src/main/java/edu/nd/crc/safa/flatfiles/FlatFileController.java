@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.flatfiles;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
@@ -107,13 +106,14 @@ public class FlatFileController extends BaseController {
 
     @GetMapping(AppRoutes.Projects.FlatFiles.downloadFlatFiles)
     public void downloadFlatFiles(@PathVariable UUID versionId,
-                                  HttpServletResponse response) throws IOException {
+                                  @PathVariable String fileType,
+                                  HttpServletResponse response) throws Exception {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
         String projectName = projectVersion.getProject().getName();
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = flatFileService.downloadProjectFiles(projectVersion);
+        List<File> projectFiles = flatFileService.downloadProjectFiles(projectVersion, fileType);
         fileService.sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

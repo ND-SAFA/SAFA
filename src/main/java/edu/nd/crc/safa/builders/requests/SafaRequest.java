@@ -40,9 +40,6 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         SafaRequest.mockMvc = mockMvc;
     }
 
-    /**
-     * Authorization Token
-     */
     public static String getAuthorizationToken() {
         return authorizationToken;
     }
@@ -59,16 +56,9 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         SafaRequest.authorizationToken = "";
     }
 
-    /**
-     * Constructors
-     */
     public FlatFileRequest getFlatFileHelper() {
         return new FlatFileRequest(this.path);
     }
-
-    /**
-     * GET Requests
-     */
 
     public List<File> getWithFilesInZip() throws Exception {
         return sendGet(ResponseParser::zipFileParser);
@@ -95,10 +85,6 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             authorizationToken,
             responseParser);
     }
-
-    /**
-     * POST Requests
-     */
 
     public JSONArray postWithJsonArray(Object body) throws Exception {
         return postWithResponseParser(body, ResponseParser::arrayCreator);
@@ -145,10 +131,6 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
-    /**
-     * DELETE Requests
-     */
-
     public void deleteWithJsonObject() throws Exception {
         sendAuthenticatedRequest(MockMvcRequestBuilders.delete(this.buildEndpoint()),
             status().is2xxSuccessful(),
@@ -156,9 +138,6 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             ResponseParser::jsonCreator);
     }
 
-    /**
-     * Base Request
-     */
     protected <T> T sendAuthenticatedRequest(MockHttpServletRequestBuilder request,
                                              ResultMatcher test,
                                              String authorizationToken,

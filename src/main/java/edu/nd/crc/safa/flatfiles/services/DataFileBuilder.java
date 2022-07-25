@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.flatfiles.services;
 
 import java.io.IOException;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
@@ -10,6 +11,8 @@ import edu.nd.crc.safa.flatfiles.entities.csv.CsvTraceFile;
 import edu.nd.crc.safa.flatfiles.entities.json.JsonArtifactFile;
 import edu.nd.crc.safa.flatfiles.entities.json.JsonTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class DataFileBuilder {
     private static final String UNSUPPORTED_FILE_TYPE = "File type is not supported: ";
 
-    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType, String pathToFile) throws IOException {
+    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
+                                                                   String pathToFile) throws IOException {
         switch (getFileType(pathToFile)) {
             case CSV:
                 return new CsvArtifactFile(artifactType, pathToFile);
@@ -31,7 +35,8 @@ public class DataFileBuilder {
         }
     }
 
-    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType, MultipartFile file) throws IOException {
+    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
+                                                                   MultipartFile file) throws IOException {
         switch (getFileType(file.getOriginalFilename())) {
             case CSV:
                 return new CsvArtifactFile(artifactType, file);
@@ -39,6 +44,19 @@ public class DataFileBuilder {
                 return new JsonArtifactFile(file);
             default:
                 throw new SafaError(UNSUPPORTED_FILE_TYPE + file.getOriginalFilename());
+        }
+    }
+
+    public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
+                                                                   String fileName,
+                                                                   List<ArtifactAppEntity> artifacts) {
+        switch (getFileType(fileName)) {
+            case CSV:
+                return new CsvArtifactFile(artifactType, artifacts);
+            case JSON:
+                return new JsonArtifactFile(artifacts);
+            default:
+                throw new SafaError(UNSUPPORTED_FILE_TYPE + fileName);
         }
     }
 
@@ -64,6 +82,17 @@ public class DataFileBuilder {
         }
     }
 
+    public static AbstractTraceFile<?> createTraceFileParser(String fileName, List<TraceAppEntity> traces) {
+        switch (getFileType(fileName)) {
+            case CSV:
+                return new CsvTraceFile(traces);
+            case JSON:
+                return new JsonTraceFile(traces);
+            default:
+                throw new SafaError(UNSUPPORTED_FILE_TYPE + fileName);
+        }
+    }
+
     @NotNull
     public static AcceptedFileTypes getFileType(String fileName) {
         for (AcceptedFileTypes acceptedFileTypes : AcceptedFileTypes.values()) {
@@ -75,7 +104,7 @@ public class DataFileBuilder {
     }
 
     @AllArgsConstructor
-    private enum AcceptedFileTypes {
+    public enum AcceptedFileTypes {
         CSV(".csv"),
         JSON(".json");
         private final String key;

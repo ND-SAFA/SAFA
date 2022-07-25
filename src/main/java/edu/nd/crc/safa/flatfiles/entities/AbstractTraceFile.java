@@ -22,6 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEntity, I> {
 
+    protected AbstractTraceFile(List<TraceAppEntity> entities) {
+        super(entities);
+    }
+
     protected AbstractTraceFile(String pathToFile) throws IOException {
         super(pathToFile);
     }

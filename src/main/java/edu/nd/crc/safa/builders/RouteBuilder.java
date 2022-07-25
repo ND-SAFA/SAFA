@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.builders;
 
+import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Document;
@@ -79,6 +80,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public T withJob(JobDbEntity job) {
         this.path = this.path.replace("{jobId}", job.getId().toString());
+        return (T) this;
+    }
+
+    public T withFileType(DataFileBuilder.AcceptedFileTypes fileType) {
+        this.path = this.path.replace("{fileType}", fileType.name());
         return (T) this;
     }
 

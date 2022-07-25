@@ -20,6 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactAppEntity, I> {
 
+    protected AbstractArtifactFile(List<ArtifactAppEntity> artifacts) {
+        super(artifacts);
+    }
+
     protected AbstractArtifactFile(String pathToFile) throws IOException {
         super(pathToFile);
     }
@@ -55,7 +59,8 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
         return checkForDuplicates(name2artifact);
     }
 
-    private Pair<List<ArtifactAppEntity>, List<String>> checkForDuplicates(HashMap<String, ArtifactAppEntity> artifactsProcessed) {
+    private Pair<List<ArtifactAppEntity>, List<String>> checkForDuplicates(
+        HashMap<String, ArtifactAppEntity> artifactsProcessed) {
         List<String> errors = new ArrayList<>();
         List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
         for (ArtifactAppEntity artifact : entities) {

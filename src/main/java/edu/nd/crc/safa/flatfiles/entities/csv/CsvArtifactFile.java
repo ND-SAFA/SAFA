@@ -18,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * A CSV file defining a set of artifacts on each row.
- * <p>
- * File is expected to contain a name, summary, and body
+ *
+ * <p>File is expected to contain a name, summary, and body
  */
 public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
@@ -27,6 +27,11 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      * The artifact type to be associated with all artifacts.
      */
     String artifactType;
+
+    public CsvArtifactFile(String artifactType, List<ArtifactAppEntity> artifacts) {
+        super(artifacts);
+        setArtifactType(artifactType);
+    }
 
     public CsvArtifactFile(String artifactType, String pathToFile) throws IOException {
         super(pathToFile, false);

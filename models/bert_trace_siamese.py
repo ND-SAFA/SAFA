@@ -98,6 +98,5 @@ class BertTraceSiameseModelGenerator(BaseModelGenerator):
         return ArchitectureType.SIAMESE
 
     # TODO
-    @property
-    def model_path(self) -> str:
+    def get_model_path(self) -> str:
         pass

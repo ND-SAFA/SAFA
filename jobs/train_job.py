@@ -1,14 +1,13 @@
-from jobs.base_job import BaseJob
+from jobs.base_job import BaseLMJob
 
 
-class TrainJob(BaseJob):
+class TrainJob(BaseLMJob):
 
     def _get_checkpoint(self) -> str:
         pass
 
     def __start(self):
         checkpoint = self._get_checkpoint()
-        trainer = self._get_trainer()
-        results = trainer.perform_training(checkpoint=checkpoint)
-    
+        results = self.trainer.perform_training(checkpoint=checkpoint)
+
 

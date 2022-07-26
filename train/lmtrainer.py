@@ -1,16 +1,16 @@
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer import Trainer
 from data.trace_dataset import TraceDataset
-from jobs.job_args import JobArgs
+from jobs.job_args import LMArgs
 from models.model_generator import BaseModelGenerator
-from results.base_results import BaseResults
+from results.base_result import BaseResult
 from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
 
 
 class LMTrainer(Trainer):
 
-    def __init__(self, args: JobArgs, model_generator: BaseModelGenerator, dataset: TraceDataset):
+    def __init__(self, args: LMArgs, model_generator: BaseModelGenerator, dataset: TraceDataset):
         model = model_generator.get_model()
         tokenizer = model_generator.get_tokenizer()
         self.args = args
@@ -20,16 +20,16 @@ class LMTrainer(Trainer):
         super().__init__(model=model, args=args, tokenizer=tokenizer)
 
     # TODO
-    def perform_training(self, checkpoint: str = None) -> BaseResults:
+    def perform_training(self, checkpoint: str = None) -> BaseResult:
         output = self.train(resume_from_checkpoint=checkpoint)
         self.save_model()
-        return BaseResults(output)
+        return BaseResult(output)
 
     # TODO
-    def perform_prediction(self) -> BaseResults:
+    def perform_prediction(self) -> BaseResult:
         self.eval_dataset = self.dataset.get_validation_data(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
-        return BaseResults(output)
+        return BaseResult(output)
 
     def get_train_dataloader(self):
         self.train_dataset = self.dataset.get_training_data(self.args.resample_rate)

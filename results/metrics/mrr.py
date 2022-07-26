@@ -1,4 +1,4 @@
-from metrics.lmmetric import LMMetric
+from results.metrics.lmmetric import LMMetric
 
 
 class MRR(LMMetric):

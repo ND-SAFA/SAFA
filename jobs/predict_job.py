@@ -1,10 +1,8 @@
-from jobs.base_job import BaseJob
+from jobs.base_job import BaseLMJob
 
 
-class PredictJob(BaseJob):
+class PredictJob(BaseLMJob):
     def __start(self):
-        trainer = self._get_trainer()
-        results = trainer.perform_prediction()
+        results = self.trainer.perform_prediction()
         if self.args.metrics:
             results.evaluate(self.args.metrics)
-

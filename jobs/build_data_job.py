@@ -1,12 +1,11 @@
 from jobs.job_args import PretrainArgs
 from jobs.base_job import BasePretrainJob
-from pretrain.pretrainer import Pretrainer
 
 
-class PretrainJob(BasePretrainJob):
+class BuildDataJob(BasePretrainJob):
 
     def __init__(self, args: PretrainArgs):
         super().__init__(args)
 
     def __start(self):
-        self.pretrain.train()
+        self.pretrain.build_pretraining_data()

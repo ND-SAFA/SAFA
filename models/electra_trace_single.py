@@ -3,7 +3,7 @@ from typing import Type
 from transformers import ElectraPreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
 
-from models.model_generator import BaseModelGenerator, ArchitectureType
+from models.model_generator import BaseModelGenerator, ArchitectureType, ModelSize
 from transformers.modeling_utils import PreTrainedModel
 from models.single_lm_forward import single_lm_forward
 
@@ -34,11 +34,13 @@ class ElectraTraceSingleModelGenerator(BaseModelGenerator):
     def base_model_class(self) -> Type[PreTrainedModel]:
         return ElectraTraceSingle
 
-    # TODO
-    @property
-    def model_path(self) -> str:
-        pass
-
     @property
     def arch_type(self) -> ArchitectureType:
         return ArchitectureType.SINGLE
+
+    def get_model_name(self) -> str:
+        return f"electra_{self.model_size}"
+
+    # TODO
+    def get_model_path(self) -> str:
+        return f"google/electra-{self.model_size}-discriminator"

@@ -1,7 +1,7 @@
 from datasets import list_metrics
-from metrics.map_at_k import MAPatK
-from metrics.mrr import MRR
-from metrics.precision_at_k import PrecisionAtK
+from results.metrics.map_at_k import MAPatK
+from results.metrics.mrr import MRR
+from results.metrics.precision_at_k import PrecisionAtK
 from constants import PROJ_PATH
 import os
 

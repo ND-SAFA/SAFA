@@ -7,7 +7,7 @@ from metrics.supported_metrics import get_metric_path
 
 
 # TODO
-class BaseResults:
+class BaseResult:
 
     def __init__(self, output: Union[PredictionOutput, TrainOutput]):
         self.output = output

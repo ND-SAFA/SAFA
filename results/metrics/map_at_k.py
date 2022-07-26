@@ -1,12 +1,12 @@
-from metrics.lmmetric import LMMetric
+from results.metrics.lmmetric import LMMetric
 from constants import K_METRIC_DEFAULT
 
 
-class PrecisionAtK(LMMetric):
+class MAPatK(LMMetric):
 
     @property
     def name(self) -> str:
-        return "precision_at_k"
+        return "map_at_k"
 
     # TODO
     def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:

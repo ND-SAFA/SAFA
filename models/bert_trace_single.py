@@ -36,11 +36,10 @@ class BertTraceSingleModelGenerator(BaseModelGenerator):
     def base_model_class(self) -> Type[PreTrainedModel]:
         return BertTraceSingle
 
-    # TODO
-    @property
-    def model_path(self) -> str:
-        pass
-
     @property
     def arch_type(self) -> ArchitectureType:
         return ArchitectureType.SINGLE
+
+    # TODO
+    def get_model_path(self) -> str:
+        pass

@@ -38,7 +38,6 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
         JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
             Constants.JSON_ARTIFACTS_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());
-        System.out.println("Wrote file:" + file.getPath());
     }
 
     @Override

@@ -40,7 +40,6 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
         JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
             Constants.JSON_TRACE_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());
-        System.out.println("Wrote file:" + file.getPath());
     }
 
     @Override

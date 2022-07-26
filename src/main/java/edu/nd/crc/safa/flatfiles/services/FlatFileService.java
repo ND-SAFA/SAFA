@@ -204,8 +204,7 @@ public class FlatFileService {
                 .collect(Collectors.toList());
         projectCommit.getErrors().addAll(commitErrors);
     }
-
-
+    
     private JSONObject getTimFileContent(Project project) throws IOException {
         String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
         if (!Files.exists(Paths.get(pathToTimFile))) {

@@ -93,7 +93,8 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files) throws SafaError, IOException {
+    public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files)
+        throws SafaError, IOException {
         if (files.length == 0) {
             throw new SafaError("Could not create project because no files were received.");
         }

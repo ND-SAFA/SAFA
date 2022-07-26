@@ -76,8 +76,8 @@ public class FlatFileParser {
 
             // Step - Get required params
             String fileName = artifactDefinition.getString(Constants.FILE_PARAM);
-            DocumentType documentType = artifactDefinition.has(Constants.TYPE_PARAM) ?
-                DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
+            DocumentType documentType = artifactDefinition.has(Constants.TYPE_PARAM)
+                ? DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
 
             // Step - Create artifact file parser
             String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);

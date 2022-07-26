@@ -1,37 +1,55 @@
 package edu.nd.crc.safa.builders.requests;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-
-import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.MultipartRequestService;
+import edu.nd.crc.safa.builders.ResponseParser;
 
+import org.json.JSONObject;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-public class SafaMultiPartRequest extends SafaRequest {
-    public SafaMultiPartRequest(String path) {
+/**
+ * Defines generic multi-part request containing a series of files.
+ */
+public abstract class SafaMultiPartRequest extends SafaRequest {
+    protected SafaMultiPartRequest(String path) {
         super(path);
     }
 
-    public MockMultipartHttpServletRequestBuilder createMultiPartRequest(String routeName, String pathToFiles)
-        throws IOException {
-        String attributeName = "files";
-
-        List<MockMultipartFile> files =
-            MultipartRequestService.readDirectoryAsMockMultipartFiles(pathToFiles, attributeName);
-        MockMultipartHttpServletRequestBuilder request = multipart(routeName);
+    /**
+     * Creates the multi-part request with given files attached.
+     *
+     * @param files         The files attached to multipart request.
+     * @param resultMatcher The expected status of the HTTP request.
+     * @return Response to HTTP request.
+     * @throws Exception Throws exception if server fails to send HTTP request.
+     */
+    protected JSONObject sendRequestWithFiles(List<MockMultipartFile> files,
+                                              ResultMatcher resultMatcher
+    ) throws Exception {
+        SafaRequest.assertTokenExists();
+        MockMultipartHttpServletRequestBuilder request = this.buildMultiPartRequest();
 
         for (MockMultipartFile file : files) {
             request.file(file);
         }
 
-        return request;
+        return sendAuthenticatedRequest(
+            request,
+            resultMatcher,
+            SafaRequest.getAuthorizationToken(),
+            ResponseParser::jsonCreator
+        );
     }
 
-    protected MockMultipartHttpServletRequestBuilder buildRequest() {
+    /**
+     * Creates MultiPart request with current set endpoint.
+     *
+     * @return MultiPart request
+     */
+    protected MockMultipartHttpServletRequestBuilder buildMultiPartRequest() {
         return MockMvcRequestBuilders.multipart(this.buildEndpoint());
     }
 }

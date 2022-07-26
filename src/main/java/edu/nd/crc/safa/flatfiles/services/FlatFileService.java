@@ -78,7 +78,7 @@ public class FlatFileService {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
         this.parseFlatFilesAndCommitEntities(projectVersion, pathToTimFile);
-        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
     /**

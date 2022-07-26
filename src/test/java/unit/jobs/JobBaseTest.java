@@ -49,7 +49,7 @@ public class JobBaseTest extends FlatFileBaseTest {
             .withRoute(AppRoutes.Jobs.flatFileProjectUpdateJob)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .uploadFlatFilesToVersion(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         return UUID.fromString(jobSubmissionResponse.getString("id"));
     }

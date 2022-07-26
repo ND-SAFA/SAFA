@@ -17,7 +17,7 @@ class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
             .getFlatFileHelper()
-            .uploadFlatFilesToVersion(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify response contains entities
         Project project = verifyDefaultProjectCreationResponse(responseBody);

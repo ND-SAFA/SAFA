@@ -49,6 +49,6 @@ public class ParseBaseTest extends ApplicationBaseTest {
         return SafaRequest
             .withRoute(routeName)
             .getFlatFileHelper()
-            .uploadSingleFile(pathToFile);
+            .sendRequestWithFile(pathToFile);
     }
 }

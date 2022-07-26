@@ -24,13 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation
  */
-public class ApproveLinkInFutureVersion extends TraceBaseTest {
+class ApproveLinkInFutureVersion extends TraceBaseTest {
 
     @Autowired
     AppEntityRetrievalService appEntityRetrievalService;
 
     @Test
-    public void ableToEditGeneratedLinksInFutureVersions() throws Exception {
+    void ableToEditGeneratedLinksInFutureVersions() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
@@ -72,7 +72,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
     }
 
     @Test
-    public void testApproveDeclineLinks() throws Exception {
+    void testApproveDeclineLinks() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";

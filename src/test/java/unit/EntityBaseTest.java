@@ -3,7 +3,6 @@ package unit;
 import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
-import edu.nd.crc.safa.builders.TestUtil;
 import edu.nd.crc.safa.flatfiles.services.FileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
@@ -22,7 +21,6 @@ import edu.nd.crc.safa.server.services.ProjectService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,19 +84,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected JsonBuilder jsonBuilder;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    TestUtil testUtil;
-
-    public static JSONObject jsonCreator(String content) {
-        return content.length() == 0 ? new JSONObject() : new JSONObject(content);
-    }
-
-    public static JSONArray arrayCreator(String content) {
-        return content.length() == 0 ? new JSONArray() : new JSONArray(content);
-    }
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void createNewBuilders() {

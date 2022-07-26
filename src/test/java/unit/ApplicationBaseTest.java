@@ -60,7 +60,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
     public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {

@@ -53,7 +53,7 @@ public class ProjectCreationJob extends AbstractJob {
     @Override
     public void done() {
         AppEntityRetrievalService appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
-        this.projectAppEntity = appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(
+        this.projectAppEntity = appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(
             projectCommit.getCommitVersion()
         );
         this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());

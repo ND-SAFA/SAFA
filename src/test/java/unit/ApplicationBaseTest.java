@@ -130,7 +130,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
         return SafaRequest
             .withRoute(AppRoutes.Projects.Membership.addProjectMember)
             .withProject(project)
-            .postWithJsonObject(toJson(request), resultMatcher);
+            .postWithJsonObject(request, resultMatcher);
     }
 
     protected JSONArray getProjectMembers(Project project) throws Exception {

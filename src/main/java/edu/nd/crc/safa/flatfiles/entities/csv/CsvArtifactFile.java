@@ -11,9 +11,11 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
+import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.csv.CSVRecord;
 import org.javatuples.Pair;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * <p>File is expected to contain a name, summary, and body
  */
+@Setter
 public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     /**
@@ -30,26 +33,37 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      */
     String artifactType;
 
-    public CsvArtifactFile(String artifactType, List<ArtifactAppEntity> artifacts) {
+    DocumentType documentType;
+
+    public CsvArtifactFile(String artifactType,
+                           DocumentType documentType,
+                           List<ArtifactAppEntity> artifacts) {
         super(artifacts);
-        setArtifactType(artifactType);
+        setPossibleNullArgument(this::setArtifactType, artifactType);
+        setPossibleNullArgument(this::setDocumentType, documentType);
     }
 
-    public CsvArtifactFile(String artifactType, String pathToFile) throws IOException {
+    public CsvArtifactFile(String artifactType,
+                           DocumentType documentType,
+                           String pathToFile) throws IOException {
         super(pathToFile, false);
-        setArtifactType(artifactType);
+        setPossibleNullArgument(this::setArtifactType, artifactType);
+        setPossibleNullArgument(this::setDocumentType, documentType);
         this.parseEntities();
     }
 
-    public CsvArtifactFile(String artifactType, MultipartFile file) throws IOException {
+    public CsvArtifactFile(String artifactType,
+                           DocumentType documentType,
+                           MultipartFile file) throws IOException {
         super(file, false);
-        setArtifactType(artifactType);
+        setPossibleNullArgument(this::setArtifactType, artifactType);
+        setPossibleNullArgument(this::setDocumentType, documentType);
         this.parseEntities();
     }
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        CsvDataFileParser.writeEntitiesAsCsvFile(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
+        CsvFileUtilities.writeEntitiesAsCsvFile(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
     }
 
     private String[] getArtifactRow(ArtifactAppEntity artifact) {
@@ -61,12 +75,12 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     @Override
     public List<CSVRecord> readFileRecords(String pathToFile) throws IOException {
-        return CsvDataFileParser.readArtifactFile(pathToFile);
+        return CsvFileUtilities.readArtifactFile(pathToFile);
     }
 
     @Override
     public List<CSVRecord> readFileRecords(MultipartFile file) throws IOException {
-        return CsvDataFileParser.readArtifactFile(file);
+        return CsvFileUtilities.readArtifactFile(file);
     }
 
     @Override
@@ -91,17 +105,22 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 new Hashtable<>()
             );
 
-            // Read optional FTA logic type
-            readAndSetOptionalProperty(
-                SafetyCaseType.class,
-                entityRecord.get(Constants.LOGIC_TYPE_PARAM),
-                artifactAppEntity::setSafetyCaseType);
+            if (this.documentType == DocumentType.SAFETY_CASE) {
+                // Read optional FTA logic type
+                readAndSetOptionalProperty(
+                    SafetyCaseType.class,
+                    entityRecord.get(Constants.SAFETY_CASE_TYPE_PARAM),
+                    artifactAppEntity::setSafetyCaseType);
+            }
 
-            // Read optional safety case type
-            readAndSetOptionalProperty(
-                FTANodeType.class,
-                entityRecord.get(Constants.SAFETY_CASE_TYPE_PARAM),
-                artifactAppEntity::setLogicType);
+            if (this.documentType == DocumentType.FTA) {
+                // Read optional safety case type
+                readAndSetOptionalProperty(
+                    FTANodeType.class,
+                    entityRecord.get(Constants.LOGIC_TYPE_PARAM),
+                    artifactAppEntity::setLogicType);
+            }
+
             return new Pair(artifactAppEntity, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
@@ -117,11 +136,11 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         }
     }
 
-    public void setArtifactType(String artifactType) {
-        if (artifactType == null) {
-            throw new IllegalArgumentException("Artifact type cannot be null.");
+    public <T> void setPossibleNullArgument(Consumer<T> argumentSetter, T argument) {
+        if (argument == null) {
+            throw new IllegalArgumentException(argument + "cannot be null.");
         }
-        this.artifactType = artifactType;
+        argumentSetter.accept(argument);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

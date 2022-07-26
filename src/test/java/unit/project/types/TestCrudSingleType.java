@@ -43,7 +43,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
         ArtifactType initialArtifactType = new ArtifactType(project, typeName);
         JSONObject createdType = SafaRequest
             .withRoute(endpoint)
-            .postWithJsonObject(toJson(initialArtifactType),
+            .postWithJsonObject(initialArtifactType,
                 status().is2xxSuccessful());
 
         // VP - Verify that id is returned and icon is established.
@@ -67,7 +67,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
         createdArtifactType.setIcon(newIconName);
         JSONObject updatedType = SafaRequest
             .withRoute(endpoint)
-            .postWithJsonObject(toJson(createdArtifactType),
+            .postWithJsonObject(createdArtifactType,
                 status().is2xxSuccessful());
 
         // VP - Verify that change is made

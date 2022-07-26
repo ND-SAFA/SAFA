@@ -10,6 +10,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 import edu.nd.crc.safa.warnings.RuleName;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,12 +18,12 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
-public class TestCreateAndRetrieveRule extends ApplicationBaseTest {
+class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
     List<IRuleTest> ruleTests = List.of(new AtLeastOneRuleTest());
 
     @Test
-    public void createAtLeastOneRule() throws Exception {
+    void createAtLeastOneRule() throws Exception {
 
         for (IRuleTest ruleTest : ruleTests) {
             String projectName = ruleTest.getProjectName();
@@ -40,7 +41,7 @@ public class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
             // VP - Verify that ID is returned
             assertThat(ruleCreated).isNotNull();
-            assertObjectsMatch(toJson(rule), ruleCreated, List.of("id"));
+            assertObjectsMatch(JsonFileUtilities.toJson(rule), ruleCreated, List.of("id"));
 
             // Step - Create violating rule entities
             ruleTest.createViolatingRuleEntities(projectVersion, this.dbEntityBuilder);
@@ -54,7 +55,7 @@ public class TestCreateAndRetrieveRule extends ApplicationBaseTest {
             // Step - Parse warnings
             TypeReference<Map<String, List<RuleName>>> typeRef = new TypeReference<>() {
             };
-            Map<String, List<RuleName>> warnings = getMapper().readValue(projectWarnings.toString(), typeRef);
+            Map<String, List<RuleName>> warnings = JsonFileUtilities.parse(projectWarnings.toString(), typeRef);
 
             // Verify - Verify that warnings are as expected
             ruleTest.assertWarnings(warnings);

@@ -13,6 +13,7 @@ import edu.nd.crc.safa.flatfiles.entities.json.JsonTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,10 +25,11 @@ public class DataFileBuilder {
     private static final String UNSUPPORTED_FILE_TYPE = "File type is not supported: ";
 
     public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
+                                                                   DocumentType documentType,
                                                                    String pathToFile) throws IOException {
         switch (getFileType(pathToFile)) {
             case CSV:
-                return new CsvArtifactFile(artifactType, pathToFile);
+                return new CsvArtifactFile(artifactType, documentType, pathToFile);
             case JSON:
                 return new JsonArtifactFile(pathToFile);
             default:
@@ -36,10 +38,11 @@ public class DataFileBuilder {
     }
 
     public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
+                                                                   DocumentType documentType,
                                                                    MultipartFile file) throws IOException {
         switch (getFileType(file.getOriginalFilename())) {
             case CSV:
-                return new CsvArtifactFile(artifactType, file);
+                return new CsvArtifactFile(artifactType, documentType, file);
             case JSON:
                 return new JsonArtifactFile(file);
             default:
@@ -49,10 +52,11 @@ public class DataFileBuilder {
 
     public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
                                                                    String fileName,
+                                                                   DocumentType documentType,
                                                                    List<ArtifactAppEntity> artifacts) {
         switch (getFileType(fileName)) {
             case CSV:
-                return new CsvArtifactFile(artifactType, artifacts);
+                return new CsvArtifactFile(artifactType, documentType, artifacts);
             case JSON:
                 return new JsonArtifactFile(artifacts);
             default:

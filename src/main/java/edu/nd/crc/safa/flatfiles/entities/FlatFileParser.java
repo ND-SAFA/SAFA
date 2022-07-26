@@ -16,6 +16,7 @@ import edu.nd.crc.safa.server.entities.api.TraceGenerationRequest;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AccessLevel;
@@ -66,6 +67,27 @@ public class FlatFileParser {
         parseTraceDefinitions(artifactTypes);
     }
 
+    private void parseArtifactDefinitions(JSONObject dataFiles, List<String> artifactTypes) throws IOException {
+        // Step - Create artifact files
+        for (String artifactType : artifactTypes) {
+            // Step - Parse and validate artifact definition
+            JSONObject artifactDefinition = dataFiles.getJSONObject(artifactType);
+            AbstractArtifactFile.validateArtifactDefinition(artifactDefinition);
+
+            // Step - Get required params
+            String fileName = artifactDefinition.getString(Constants.FILE_PARAM);
+            DocumentType documentType = artifactDefinition.has(Constants.TYPE_PARAM) ?
+                DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
+
+            // Step - Create artifact file parser
+            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+            AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
+                documentType,
+                pathToFile);
+            this.artifactFiles.add(artifactFile);
+        }
+    }
+
     private void parseTraceDefinitions(List<String> artifactTypes) throws IOException {
         for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next();
@@ -104,23 +126,6 @@ public class FlatFileParser {
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
                 this.traceFiles.add(traceFile);
             }
-        }
-    }
-
-    private void parseArtifactDefinitions(JSONObject dataFiles, List<String> artifactTypes) throws IOException {
-        // Step - Create artifact files
-        for (String artifactType : artifactTypes) {
-            // Step - Parse and validate artifact definition
-            JSONObject artifactDefinition = dataFiles.getJSONObject(artifactType);
-            AbstractArtifactFile.validateArtifactDefinition(artifactDefinition);
-
-            // Step - Get required params
-            String fileName = artifactDefinition.getString(Constants.FILE_PARAM);
-
-            // Step - Create artifact file parser
-            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
-            AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile);
-            this.artifactFiles.add(artifactFile);
         }
     }
 
@@ -171,5 +176,6 @@ public class FlatFileParser {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Constants {
         public static final String FILE_PARAM = "file";
+        public static final String TYPE_PARAM = "type";
     }
 }

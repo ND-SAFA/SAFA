@@ -67,7 +67,8 @@ public class FlatFileService {
                                                        MultipartFile[] files)
         throws SafaError, IOException {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        this.parseFlatFilesAndCommitEntities(projectVersion, getTimFileContent(project));
+        JSONObject timFileContent = getTimFileContent(project);
+        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent);
         return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
@@ -77,15 +78,12 @@ public class FlatFileService {
      * before processing.
      *
      * @param projectVersion the project version to be associated with the files specified.
-     * @param timFileContent JSON definition of project extracted from tim.json file.
+     * @param timFileJson    JSON definition of project extracted from tim.json file.
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
-                                                JSONObject timFileContent) throws SafaError {
+                                                JSONObject timFileJson) throws SafaError {
         try {
-            // Parse TIM.json
-            JSONObject timFileJson = new JSONObject(timFileContent);
-
             // Step - Parse artifacts, traces, and trace generation requests
             Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMResponse = parseTIMIntoCommit(
                 projectVersion,

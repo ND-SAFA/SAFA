@@ -8,6 +8,7 @@ import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;

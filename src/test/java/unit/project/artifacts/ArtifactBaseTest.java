@@ -28,7 +28,7 @@ import unit.ApplicationBaseTest;
  * 4. Deletion of artifacts
  * 5. Recreation of artifacts
  */
-public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest {
+abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest {
     String projectName = "test-project";
     String projectDescription = "project-description";
     String artifactName = "RE-10";
@@ -55,7 +55,7 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
     }
 
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         // Step - Create project with artifact type
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)

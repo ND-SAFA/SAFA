@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import edu.nd.crc.safa.builders.ResponseParser;
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -121,9 +122,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                          ResultMatcher resultMatcher,
                                          String localAuthorizationToken
     ) throws Exception {
+        String content = body instanceof JSONObject || body instanceof JSONArray
+            ? body.toString() : JsonFileUtilities.toJson(body).toString();
         return sendAuthenticatedRequest(
             post(this.buildEndpoint())
-                .content(body.toString())
+                .content(content)
                 .contentType(MediaType.APPLICATION_JSON),
             resultMatcher,
             localAuthorizationToken,

@@ -1,27 +1,21 @@
 package edu.nd.crc.safa.server.entities.app.project;
 
+import lombok.AllArgsConstructor;
+
 /**
  * Enumerates the types of nodes used in a safety case
  */
+@AllArgsConstructor
 public enum SafetyCaseType {
-    SOLUTION {
-        public String toString() {
-            return "SOLUTION";
-        }
-    },
-    CONTEXT {
-        public String toString() {
-            return "CONTEXT";
-        }
-    },
-    GOAL {
-        public String toString() {
-            return "GOAL";
-        }
-    },
-    STRATEGY {
-        public String toString() {
-            return "STRATEGY";
-        }
+    SOLUTION("SOLUTION"),
+    CONTEXT("CONTEXT"),
+    GOAL("GOAL"),
+    STRATEGY("STRATEGY");
+
+    private String value;
+
+    @Override
+    public String toString() {
+        return this.value;
     }
 }

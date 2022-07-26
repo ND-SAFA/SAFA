@@ -19,6 +19,7 @@ import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
@@ -69,6 +70,7 @@ public class ParseDataFileController extends BaseController {
         tryParseFile(response, () -> {
             AbstractArtifactFile<? extends Object> artifactFile =
                 DataFileBuilder.createArtifactFileParser(artifactType,
+                    DocumentType.ARTIFACT_TREE,
                     file);
             response.setEntities(artifactFile.getEntities());
             response.setErrors(artifactFile.getErrors());

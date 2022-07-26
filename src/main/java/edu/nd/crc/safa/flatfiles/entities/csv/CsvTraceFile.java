@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
+import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
 
     @Override
     protected void exportAsFileContent(File file) throws Exception {
-        CsvDataFileParser.writeEntitiesAsCsvFile(file,
+        CsvFileUtilities.writeEntitiesAsCsvFile(file,
             CsvArtifactFile.Constants.REQUIRED_COLUMNS,
             this.entities,
             this::getTraceRow);
@@ -47,12 +48,12 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
 
     @Override
     public List<CSVRecord> readFileRecords(String pathToFile) throws IOException {
-        return CsvDataFileParser.readTraceFile(pathToFile);
+        return CsvFileUtilities.readTraceFile(pathToFile);
     }
 
     @Override
     public List<CSVRecord> readFileRecords(MultipartFile file) throws IOException {
-        return CsvDataFileParser.readTraceFile(file);
+        return CsvFileUtilities.readTraceFile(file);
     }
 
     @Override

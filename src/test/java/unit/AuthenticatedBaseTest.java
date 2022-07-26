@@ -52,7 +52,7 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
         SafaUser user = new SafaUser(email, password);
         SafaRequest
             .withRoute(AppRoutes.Accounts.createNewUser)
-            .postWithJsonObject(toJson(user));
+            .postWithJsonObject(user);
     }
 
     public void loginUser(String email, String password) throws Exception {

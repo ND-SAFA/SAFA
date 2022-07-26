@@ -7,6 +7,7 @@ import java.util.List;
 import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;

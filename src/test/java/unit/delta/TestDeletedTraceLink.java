@@ -8,6 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;
@@ -60,7 +61,7 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
         // Step - Commit deleted artifactOne
         JSONObject commitJson = commit(CommitBuilder
             .withVersion(afterVersion)
-            .withRemovedArtifact(toJson(firstArtifact)));
+            .withRemovedArtifact(JsonFileUtilities.toJson(firstArtifact)));
         ProjectCommit commit = toClass(commitJson.toString(), ProjectCommit.class);
 
         // Step - Calculate delta

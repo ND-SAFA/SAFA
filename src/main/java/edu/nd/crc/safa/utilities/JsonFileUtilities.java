@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatfiles.entities.json;
+package edu.nd.crc.safa.utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -55,5 +56,59 @@ public interface JsonFileUtilities {
         }
         jsonObject.put(paramName, jsonArray);
         return jsonObject;
+    }
+
+    /**
+     * Converts object to JSONObject using Jackson ObjectMapper.
+     *
+     * @param object The object to convert to JSON
+     * @return JSON representation of object
+     */
+    static JSONObject toJson(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> {
+            String objectJsonString = objectMapper.writeValueAsString(object);
+            return new JSONObject(objectJsonString);
+        });
+    }
+
+    /**
+     * Converts JSON string to instance of java class.
+     *
+     * @param jsonString  Object json as string.
+     * @param exportClass Class to convert object to
+     * @param <T>         The type that gets parsed
+     * @return Instance of specified class.
+     */
+    static <T> T parse(String jsonString, Class<T> exportClass) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> objectMapper.readValue(jsonString, exportClass));
+    }
+
+    /**
+     * Converts JSON string to instance of java class.
+     *
+     * @param jsonString  Object json as string.
+     * @param exportClass Class to convert object to
+     * @param <T>         The type that gets parsed
+     * @return Instance of specified class.
+     */
+    static <T> T parse(String jsonString, TypeReference<T> exportClass) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JSONObject jsonObject = jsonString.length() == 0 ? new JSONObject() : new JSONObject(jsonString);
+        return wrapReturnValue(() -> objectMapper.readValue(jsonObject.toString(), exportClass));
+    }
+
+    private static <T> T wrapReturnValue(ThrowingSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @FunctionalInterface
+    interface ThrowingSupplier<T> {
+        T get() throws JsonProcessingException;
     }
 }

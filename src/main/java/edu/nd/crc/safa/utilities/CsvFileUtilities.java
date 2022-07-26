@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.flatfiles.entities.csv;
+package edu.nd.crc.safa.utilities;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.flatfiles.entities.csv.CsvArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.csv.CsvTraceFile;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Builds readers for data files for a specified file format.
  */
-public interface CsvDataFileParser {
+public interface CsvFileUtilities {
     static List<CSVRecord> readArtifactFile(String pathToFile) throws IOException {
         CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile);
         FileUtilities.assertHasColumns(parsedFile, CsvArtifactFile.Constants.REQUIRED_COLUMNS);

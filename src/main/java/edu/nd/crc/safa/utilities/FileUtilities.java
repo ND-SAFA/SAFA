@@ -148,7 +148,7 @@ public class FileUtilities {
     public static List<File> extractFilesFromZipContent(String content) throws IOException {
         ZipEntry entry;
         final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
-        String temporaryFolder = ProjectPaths.getTemporaryPath();
+        String temporaryFolder = ProjectPaths.createTemporaryDirectory();
         List<File> filesCreated = new ArrayList<>();
         while ((entry = zin.getNextEntry()) != null) {
             String name = entry.getName();

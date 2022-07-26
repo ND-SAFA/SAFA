@@ -84,7 +84,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
     }
 
     public T withFileType(DataFileBuilder.AcceptedFileTypes fileType) {
-        this.path = this.path.replace("{fileType}", fileType.name());
+        this.path = this.path.replace("{fileType}", fileType.toString());
         return (T) this;
     }
 

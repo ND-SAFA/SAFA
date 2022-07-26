@@ -18,13 +18,13 @@ import unit.ApplicationBaseTest;
 /**
  * Provides a smoke test for verifying that files can be uploaded and stored.
  */
-public class TestUploadFiles extends ApplicationBaseTest {
+class TestUploadFiles extends ApplicationBaseTest {
 
     @Autowired
     FileUploadService fileUploadService;
 
     @Test
-    public void uploadTestResources() throws IOException, SafaError {
+    void uploadTestResources() throws IOException, SafaError {
         String testProjectName = "testProject";
         ProjectVersion projectVersion = createDefaultProject(testProjectName);
         Project project = projectVersion.getProject();

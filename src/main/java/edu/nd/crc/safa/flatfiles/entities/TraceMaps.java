@@ -30,10 +30,10 @@ public class TraceMaps {
             String targetType = artifactMaps.getArtifactByName(trace.targetName).type;
 
             if (type2traces.containsKey(sourceType)) {
-                if (type2traces.containsKey(targetType)) {
+                Map<String, List<TraceAppEntity>> sourceTypeTraces = type2traces.get(sourceType);
+                if (sourceTypeTraces.containsKey(targetType)) {
                     type2traces.get(sourceType).get(targetType).add(trace);
                 } else {
-                    Map<String, List<TraceAppEntity>> sourceTypeTraces = type2traces.get(sourceType);
                     sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
                 }
             } else {

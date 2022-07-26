@@ -100,7 +100,8 @@ public class DataFileBuilder {
     @NotNull
     public static AcceptedFileTypes getFileType(String fileName) {
         for (AcceptedFileTypes acceptedFileTypes : AcceptedFileTypes.values()) {
-            if (fileName.contains(acceptedFileTypes.key)) {
+            String fileTypeExtension = "." + acceptedFileTypes.key;
+            if (fileName.contains(fileTypeExtension)) {
                 return acceptedFileTypes;
             }
         }
@@ -109,8 +110,13 @@ public class DataFileBuilder {
 
     @AllArgsConstructor
     public enum AcceptedFileTypes {
-        CSV(".csv"),
-        JSON(".json");
+        CSV("csv"),
+        JSON("json");
         private final String key;
+
+        @Override
+        public String toString() {
+            return this.key;
+        }
     }
 }

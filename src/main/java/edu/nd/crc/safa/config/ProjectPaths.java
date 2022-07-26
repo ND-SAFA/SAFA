@@ -66,7 +66,7 @@ public class ProjectPaths {
         return pathToLocalStorage;
     }
 
-    public static String getTemporaryPath() throws IOException {
+    public static String createTemporaryDirectory() throws IOException {
         String randomId = UUID.randomUUID().toString();
         String pathToTemporary = joinPaths(ProjectPaths.PATH_TO_STORAGE, randomId);
         Files.createDirectories(Paths.get(pathToTemporary));

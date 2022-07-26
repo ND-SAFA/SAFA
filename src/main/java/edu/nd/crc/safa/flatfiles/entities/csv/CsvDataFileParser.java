@@ -1,18 +1,23 @@
 package edu.nd.crc.safa.flatfiles.entities.csv;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Builds readers for data files for a specified file format.
  */
-public interface CsvDataFileReader {
+public interface CsvDataFileParser {
     static List<CSVRecord> readArtifactFile(String pathToFile) throws IOException {
         CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile);
         FileUtilities.assertHasColumns(parsedFile, CsvArtifactFile.Constants.REQUIRED_COLUMNS);
@@ -34,5 +39,29 @@ public interface CsvDataFileReader {
         return FileUtilities
             .readMultiPartCSVFile(file, CsvTraceFile.Constants.REQUIRED_COLUMNS)
             .getRecords();
+    }
+
+    static <T> void writeEntitiesAsCsvEntires(File file,
+                                              String[] headers,
+                                              List<T> entities,
+                                              Function<T, String[]> entity2values) throws IOException {
+        FileWriter reader = new FileWriter(file);
+        CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers));
+        printer.printRecord(headers);
+        for (T entity : entities) {
+            printer.printRecord(entity2values.apply(entity));
+        }
+        printer.flush();
+        printer.close();
+    }
+
+    private static CSVFormat createCsvFormat(String[] headers) {
+        return CSVFormat
+            .Builder
+            .create()
+            .setHeader(headers)
+            .setSkipHeaderRecord(false)
+            .setAllowMissingColumnNames(true)
+            .build();
     }
 }

@@ -10,7 +10,7 @@ import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.flatfiles.entities.FlatFileParser;
-import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -75,8 +75,8 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
     }
 
     private void uploadFlatFiles(Project project) {
-        FileService fileService = this.serviceProvider.getFileService();
-        fileService.uploadFilesToServer(project, Arrays.asList(files));
+        FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
+        fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
     }
 

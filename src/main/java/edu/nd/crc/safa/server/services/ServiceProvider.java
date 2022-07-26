@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class ServiceProvider {
     // Flat Files
     private final ProjectService projectService;
-    private final FileService fileService;
+    private final FileUploadService fileUploadService;
     private final FlatFileService flatFileService;
     private final EntityVersionService entityVersionService;
     private final AppEntityRetrievalService appEntityRetrievalService;

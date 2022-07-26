@@ -36,7 +36,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
             .withRoute(AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .sendRequestWithFilesInDirectory(pathToFileDir);
+            .postWithFilesInDirectory(pathToFileDir);
     }
 
     /**
@@ -44,7 +44,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
      * @return Response to HTTP request.
      * @throws Exception Throws exception if server fails to send request.
      */
-    public JSONObject sendRequestWithFile(String pathToFile) throws Exception {
+    public JSONObject postWithFile(String pathToFile) throws Exception {
         String attributeName = "file";
         MockMultipartFile file = MultipartRequestService.readAsMockMultipartFile(pathToFile, attributeName);
         return sendRequestWithFiles(List.of(file), status().is2xxSuccessful());
@@ -57,8 +57,8 @@ public class FlatFileRequest extends SafaMultiPartRequest {
      * @return Response to HTTP request.
      * @throws Exception Throws exception if error occurred during reading files or sending request.
      */
-    public JSONObject sendRequestWithFilesInDirectory(String pathToFileDir) throws Exception {
-        return sendRequestWithFilesInDirectory(pathToFileDir, status().is2xxSuccessful());
+    public JSONObject postWithFilesInDirectory(String pathToFileDir) throws Exception {
+        return postWithFilesInDirectory(pathToFileDir, status().is2xxSuccessful());
     }
 
     /**
@@ -69,8 +69,8 @@ public class FlatFileRequest extends SafaMultiPartRequest {
      * @return Response to HTTP request.
      * @throws Exception Throws exception if error occurred during reading files or sending request.
      */
-    public JSONObject sendRequestWithFilesInDirectory(String pathToFileDir,
-                                                      ResultMatcher resultMatcher) throws Exception {
+    public JSONObject postWithFilesInDirectory(String pathToFileDir,
+                                               ResultMatcher resultMatcher) throws Exception {
         SafaRequest.assertTokenExists();
 
         String attributeName = "files";

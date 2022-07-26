@@ -1,22 +1,16 @@
 package edu.nd.crc.safa.flatfiles.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
-import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.flatfiles.entities.FlatFileParser;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -33,6 +27,7 @@ import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.services.EntityVersionService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 import edu.nd.crc.safa.tgen.TraceLinkGenerator;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
@@ -54,9 +49,8 @@ public class FlatFileService {
     private final CommitErrorRepository commitErrorRepository;
     private final EntityVersionService entityVersionService;
     private final TraceLinkGenerator traceLinkGenerator;
-    private final FileService fileService;
+    private final FileUploadService fileUploadService;
     private final AppEntityRetrievalService appEntityRetrievalService;
-    private final FileCreatorService fileCreatorService;
 
     /**
      * Responsible for creating a project from given flat files. This includes
@@ -71,13 +65,9 @@ public class FlatFileService {
     public ProjectAppEntity createProjectFromFlatFiles(Project project,
                                                        ProjectVersion projectVersion,
                                                        MultipartFile[] files)
-        throws SafaError {
-        this.fileService.uploadFilesToServer(project, Arrays.asList(files));
-        String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
-        if (!Files.exists(Paths.get(pathToTimFile))) {
-            throw new SafaError("TIM.json file was not uploaded for this project");
-        }
-        this.parseFlatFilesAndCommitEntities(projectVersion, pathToTimFile);
+        throws SafaError, IOException {
+        this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
+        this.parseFlatFilesAndCommitEntities(projectVersion, getTimFileContent(project));
         return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
@@ -87,14 +77,13 @@ public class FlatFileService {
      * before processing.
      *
      * @param projectVersion the project version to be associated with the files specified.
-     * @param pathToTIMFile  path to the TIM.json file in local storage (see ProjectPaths.java)
-     * @throws SafaError any error occurring while parsing TIM.json or associated files.
+     * @param timFileContent JSON definition of project extracted from tim.json file.
+     * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
-                                                String pathToTIMFile) throws SafaError {
+                                                JSONObject timFileContent) throws SafaError {
         try {
             // Parse TIM.json
-            String timFileContent = new String(Files.readAllBytes(Paths.get(pathToTIMFile)));
             JSONObject timFileJson = new JSONObject(timFileContent);
 
             // Step - Parse artifacts, traces, and trace generation requests
@@ -218,75 +207,12 @@ public class FlatFileService {
         projectCommit.getErrors().addAll(commitErrors);
     }
 
-    public List<File> downloadProjectFiles(ProjectVersion projectVersion, String fileType) throws Exception {
-        Project project = projectVersion.getProject();
-        ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        Map<String, ArtifactAppEntity> name2artifact = new HashMap<>();
-        Map<String, List<ArtifactAppEntity>> type2Artifacts = new HashMap<>();
-        Map<String, Map<String, List<TraceAppEntity>>> type2Traces = new HashMap<>();
-        List<File> projectFiles = new ArrayList<>();
 
-        for (ArtifactAppEntity artifact : projectAppEntity.artifacts) {
-            String artifactType = artifact.type;
-            if (type2Artifacts.containsKey(artifactType)) {
-                type2Artifacts.get(artifactType).add(artifact);
-            } else {
-                List<ArtifactAppEntity> artifacts = new ArrayList<>();
-                artifacts.add(artifact);
-                type2Artifacts.put(artifactType, artifacts);
-            }
-            name2artifact.put(artifact.name, artifact);
+    private JSONObject getTimFileContent(Project project) throws IOException {
+        String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        if (!Files.exists(Paths.get(pathToTimFile))) {
+            throw new SafaError("TIM.json file was not uploaded for this project");
         }
-
-        for (String artifactType : type2Artifacts.keySet()) {
-            String fileName = String.format("%s.%s", artifactType, fileType);
-            String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
-
-            File artifactFileOutput = new File(pathToFile);
-            List<ArtifactAppEntity> artifacts = type2Artifacts.get(artifactType);
-            AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile,
-                artifacts);
-            artifactFile.export(artifactFileOutput);
-            projectFiles.add(artifactFileOutput);
-        }
-
-        for (TraceAppEntity trace : projectAppEntity.traces) {
-            String sourceType = name2artifact.get(trace.sourceName).type;
-            String targetType = name2artifact.get(trace.targetName).type;
-
-            if (type2Traces.containsKey(sourceType)) {
-                if (type2Traces.containsKey(targetType)) {
-                    type2Traces.get(sourceType).get(targetType).add(trace);
-                } else {
-                    Map<String, List<TraceAppEntity>> sourceTypeTraces = type2Traces.get(sourceType);
-                    sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
-                }
-            } else {
-                Map<String, List<TraceAppEntity>> sourceTypeTraces = new Hashtable<>();
-                sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
-                type2Traces.put(sourceType, sourceTypeTraces);
-            }
-        }
-
-        for (String sourceType : type2Traces.keySet()) {
-            for (String targetType : type2Traces.get(sourceType).keySet()) {
-                // Step - Create file
-                String fileName = String.format("%s2%s.%s", sourceType, targetType, fileType);
-                String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
-                File traceFileOutput = new File(pathToFile);
-
-                // Step - Create trace file
-                List<TraceAppEntity> traces = type2Traces.get(sourceType).get(targetType);
-                AbstractTraceFile<?> traceFileParser = DataFileBuilder.createTraceFileParser(pathToFile, traces);
-                System.out.println("Exporting trace file:" + traceFileOutput);
-                traceFileParser.export(traceFileOutput);
-
-                projectFiles.add(traceFileOutput);
-            }
-        }
-
-        // TODO: Write tim.json
-        return projectFiles;
+        return FileUtilities.readJSONFile(pathToTimFile);
     }
 }

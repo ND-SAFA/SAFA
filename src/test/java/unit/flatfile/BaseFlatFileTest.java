@@ -20,25 +20,25 @@ import org.json.JSONObject;
 import unit.ApplicationBaseTest;
 import unit.DefaultProjectConstants;
 
-public class FlatFileBaseTest extends ApplicationBaseTest {
+public abstract class BaseFlatFileTest extends ApplicationBaseTest {
 
-    public Project verifyDefaultProjectCreationResponse(JSONObject projectJson) throws Exception {
+    public Project verifyDefaultProjectCreationResponse(JSONObject creationResponse) {
 
         // VP - Project id is not null
-        assertThat(projectJson).as("uploadedFiles non-null").isNotNull();
-        String projectId = projectJson.getString("projectId");
+        assertThat(creationResponse).as("uploadedFiles non-null").isNotNull();
+        String projectId = creationResponse.getString("projectId");
 
         // VP - Project with id was created
         Project project = projectRepository.findByProjectId(UUID.fromString(projectId));
         assertThat(project).as("project was created").isNotNull();
 
         // VP - Artifacts present in response
-        assertThat(projectJson.getJSONArray("artifacts").length())
+        assertThat(creationResponse.getJSONArray("artifacts").length())
             .as("all artifacts confirmed")
             .isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Traces present in response
-        JSONArray traces = projectJson.getJSONArray("traces");
+        JSONArray traces = creationResponse.getJSONArray("traces");
         assertThat(traces.length())
             .as("all traces parsed")
             .isGreaterThanOrEqualTo(DefaultProjectConstants.Entities.N_LINKS);
@@ -54,7 +54,7 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
             .isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
 
         // VP - Errors are present in response
-        JSONObject errors = projectJson.getJSONObject("errors");
+        JSONObject errors = creationResponse.getJSONObject("errors");
         assertThat(errors.getJSONArray("tim").length())
             .as("tim file error")
             .isZero();
@@ -72,7 +72,7 @@ public class FlatFileBaseTest extends ApplicationBaseTest {
         assertThat(traceError.get("activity")).isNotNull();
 
         // VP - Project warnings present in response
-        JSONObject projectWarnings = projectJson.getJSONObject("warnings");
+        JSONObject projectWarnings = creationResponse.getJSONObject("warnings");
         assertThat(projectWarnings.keySet().size()).isPositive();
 
         return project;

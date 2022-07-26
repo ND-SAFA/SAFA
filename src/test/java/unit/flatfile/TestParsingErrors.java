@@ -25,7 +25,7 @@ class TestParsingErrors extends ApplicationBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
             .getFlatFileHelper()
-            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_TEST_2, MockMvcResultMatchers.status().isBadRequest());
+            .postWithFilesInDirectory(ProjectPaths.PATH_TO_TEST_2, MockMvcResultMatchers.status().isBadRequest());
 
         // VP - Verify that message contains constraint
         String message = responseBody.getString("message").toLowerCase();
@@ -38,7 +38,7 @@ class TestParsingErrors extends ApplicationBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
             .getFlatFileHelper()
-            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_TEST_3);
+            .postWithFilesInDirectory(ProjectPaths.PATH_TO_TEST_3);
         // VP - Verify that message contains artifact that failed constraint
         JSONObject errors = responseBody.getJSONObject("errors");
         JSONArray artifactErrors = errors.getJSONArray("artifacts");

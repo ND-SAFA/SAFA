@@ -32,7 +32,7 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
 
     @Override
     protected void exportAsFileContent(File file) throws Exception {
-        CsvDataFileParser.writeEntitiesAsCsvEntires(file,
+        CsvDataFileParser.writeEntitiesAsCsvFile(file,
             CsvArtifactFile.Constants.REQUIRED_COLUMNS,
             this.entities,
             this::getTraceRow);

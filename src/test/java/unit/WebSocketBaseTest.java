@@ -36,7 +36,7 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * <p>
  * TODO: Do I need to clear subscriptions?
  */
-public class WebSocketBaseTest extends AuthenticatedBaseTest {
+public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
 
     static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
     private static ObjectMapper mapper;

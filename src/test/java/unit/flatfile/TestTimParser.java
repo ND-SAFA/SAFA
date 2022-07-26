@@ -31,7 +31,7 @@ class TestTimParser extends ApplicationBaseTest {
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
-        this.fileService.uploadFilesToServer(project, files);
+        this.fileUploadService.uploadFilesToServer(project, files);
 
         // Step - Start processing for
         String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
@@ -49,7 +49,7 @@ class TestTimParser extends ApplicationBaseTest {
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
-        this.fileService.uploadFilesToServer(project, files);
+        this.fileUploadService.uploadFilesToServer(project, files);
         MultipartFile file =
             files
                 .stream()

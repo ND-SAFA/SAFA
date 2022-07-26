@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  * Tests that JIRA issues and links can be parsed from JSON
  * and created in the form of artifacts and trace links.
  */
-public class TestJiraProjectCreation extends JiraBaseTest {
+public class FlatFileTestJiraProjectCreation extends JiraBaseFlatFileTest {
 
     /**
      * Tests that the sample DroneResponse JSON file is able

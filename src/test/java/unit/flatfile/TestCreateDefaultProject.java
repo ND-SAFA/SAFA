@@ -8,7 +8,12 @@ import edu.nd.crc.safa.server.entities.db.Project;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
+/**
+ * Creates default project via flat files and verifies:
+ * - all entities were created
+ * - parsing errors were returned
+ */
+class TestCreateDefaultProject extends BaseFlatFileTest {
 
     @Test
     void testUseCase() throws Exception {
@@ -17,7 +22,7 @@ class TestCreateProjectViaFlatFiles extends FlatFileBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
             .getFlatFileHelper()
-            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify response contains entities
         Project project = verifyDefaultProjectCreationResponse(responseBody);

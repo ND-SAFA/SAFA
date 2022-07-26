@@ -3,7 +3,7 @@ package unit;
 import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
-import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
@@ -52,7 +52,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
-    protected FileService fileService;
+    protected FileUploadService fileUploadService;
 
     @Autowired
     protected CommitErrorRepository commitErrorRepository;

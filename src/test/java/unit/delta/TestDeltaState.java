@@ -9,18 +9,15 @@ import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
-import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.ApplicationBaseTest;
 import unit.DefaultProjectConstants;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.
  */
-class TestDeltaState extends ApplicationBaseTest {
+class TestDeltaState extends BaseDeltaTest {
 
 
     /**
@@ -32,42 +29,34 @@ class TestDeltaState extends ApplicationBaseTest {
      */
     @Test
     void testDeltaStateInDefaultProject() throws Exception {
-        String projectName = "test-project";
 
-        // Step - Create before and after version
-        Pair<ProjectVersion, ProjectVersion> versionPair = setupDualVersions(projectName);
-        ProjectVersion beforeVersion = versionPair.getValue0();
-        ProjectVersion afterVersion = versionPair.getValue1();
-
-        // VP - Verify that number of changes is detected
+        // VP - Verify that # of entities in before version
         List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
-        List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
         assertThat(originalBodies.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
-        assertThat(changedBodies.size()).isEqualTo(3);
 
-        // Step - Calculate delta
+        // VP - Verify that # of entities in after version coincides with # of changes.
+        List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
+        assertThat(changedBodies.size()).isEqualTo(Constants.N_CHANGES);
+
+        // Step - Calculate delta between versions
         JSONObject projectDelta = SafaRequest
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
-        JSONObject traceDelta = projectDelta.getJSONObject("traces");
 
         // VP - Verify that artifact changes are detected
-        assertThat(artifactDelta.getJSONObject("modified").has(getId(projectName, "F3"))).isTrue();
-        assertThat(artifactDelta.getJSONObject("removed").has(getId(projectName, "D7"))).isTrue();
-        assertThat(artifactDelta.getJSONObject("added").has(getId(projectName, "D12"))).isTrue();
+        verifyArtifactInDelta(artifactDelta, "modified", Constants.ARTIFACT_MODIFIED);
+        verifyArtifactInDelta(artifactDelta, "added", Constants.ARTIFACT_ADDED);
+        verifyArtifactInDelta(artifactDelta, "removed", Constants.ARTIFACT_REMOVED);
 
         ProjectAppEntity beforeAppEntity = getProjectAtVersion(beforeVersion);
-        List<String> beforeArtifactNames = beforeAppEntity
-            .getArtifacts()
-            .stream().map(a -> a.name)
-            .collect(Collectors.toList());
+        List<String> beforeArtifactNames = beforeAppEntity.getArtifactNames();
 
         // VP - Verify added artifact does not exist in before version.
-        assertThat(beforeArtifactNames.contains("D12")).isFalse();
-        assertThat(beforeArtifactNames.contains("D7")).isTrue();
+        assertThat(beforeArtifactNames.contains(Constants.ARTIFACT_ADDED)).isFalse();
+        assertThat(beforeArtifactNames.contains(Constants.ARTIFACT_REMOVED)).isTrue();
 
         // VP - Verify that no artifacts were added to before version.
         assertThat(beforeArtifactNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
@@ -80,7 +69,7 @@ class TestDeltaState extends ApplicationBaseTest {
             .map(a -> a.name)
             .collect(Collectors.toList());
 
-        // VP - Verify that artifact removed in after version is not returned.
+        // VP - Verify that removed artifact not included
         assertThat(afterArtifactNames.contains("D7")).isFalse();
 
         // VP - Verify that artifact added in after version is retrieved.
@@ -90,12 +79,9 @@ class TestDeltaState extends ApplicationBaseTest {
         assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that trace link changes are detected
-        int nTracesAdded = traceDelta.getJSONObject("added").keySet().toArray().length;
-        int nTracesModified = traceDelta.getJSONObject("modified").keySet().toArray().length;
-        int nTracesRemoved = traceDelta.getJSONObject("removed").keySet().toArray().length;
-
-        assertThat(nTracesAdded).as("# traces added").isEqualTo(1);
-        assertThat(nTracesModified).as("# traces modified").isZero();
-        assertThat(nTracesRemoved).as("# traces removed").isOne();
+        JSONObject traceDelta = projectDelta.getJSONObject("traces");
+        verifyNumOfChangesInDelta(traceDelta, "added", Constants.N_TRACES_ADDED);
+        verifyNumOfChangesInDelta(traceDelta, "removed", Constants.N_TRACES_REMOVED);
+        verifyNumOfChangesInDelta(traceDelta, "modified", Constants.N_TRACES_MODIFIED);
     }
 }

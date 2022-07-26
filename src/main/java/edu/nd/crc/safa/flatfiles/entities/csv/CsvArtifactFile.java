@@ -14,7 +14,6 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.javatuples.Pair;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +49,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        CsvDataFileParser.writeEntitiesAsCsvEntires(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
+        CsvDataFileParser.writeEntitiesAsCsvFile(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
     }
 
     private String[] getArtifactRow(ArtifactAppEntity artifact) {
@@ -58,16 +57,6 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
             artifact.body,
             artifact.logicType.toString(),
             artifact.safetyCaseType.toString()};
-    }
-
-    private CSVFormat createCsvFormat(String[] headers) {
-        return CSVFormat
-            .Builder
-            .create()
-            .setHeader(headers)
-            .setSkipHeaderRecord(false)
-            .setAllowMissingColumnNames(true)
-            .build();
     }
 
     @Override

@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Testing layer for encapsulating application logic.
  */
-public class ApplicationBaseTest extends WebSocketBaseTest {
+public abstract class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
@@ -69,7 +69,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
-        fileService.uploadFilesToServer(project, files);
+        fileUploadService.uploadFilesToServer(project, files);
         return projectVersion;
     }
 
@@ -92,11 +92,11 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
             .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
     }
 
-    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName) throws Exception {
-        return setupDualVersions(projectName, true);
+    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName) throws Exception {
+        return createDualVersions(projectName, true);
     }
 
-    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName, boolean uploadFiles) throws Exception {
+    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName, boolean uploadFiles) throws Exception {
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)

@@ -41,10 +41,10 @@ public interface CsvDataFileParser {
             .getRecords();
     }
 
-    static <T> void writeEntitiesAsCsvEntires(File file,
-                                              String[] headers,
-                                              List<T> entities,
-                                              Function<T, String[]> entity2values) throws IOException {
+    static <T> void writeEntitiesAsCsvFile(File file,
+                                           String[] headers,
+                                           List<T> entities,
+                                           Function<T, String[]> entity2values) throws IOException {
         FileWriter reader = new FileWriter(file);
         CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers));
         printer.printRecord(headers);

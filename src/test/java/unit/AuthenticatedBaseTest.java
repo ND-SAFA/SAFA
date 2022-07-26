@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
  * If a certain test needs to exclude this harness one needs to create a test rule that excludes the
  * pre-test setup.
  */
-public class AuthenticatedBaseTest extends EntityBaseTest {
+public abstract class AuthenticatedBaseTest extends EntityBaseTest {
 
     public static final String defaultUser = "root-test-user@gmail.com";
     public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";

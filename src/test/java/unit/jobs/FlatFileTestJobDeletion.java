@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 
 import org.junit.jupiter.api.Test;
 
-class TestJobDeletion extends JobBaseTest {
+class FlatFileTestJobDeletion extends JobBaseFlatFileTest {
 
     @Test
     void testDeleteJob() throws Exception {

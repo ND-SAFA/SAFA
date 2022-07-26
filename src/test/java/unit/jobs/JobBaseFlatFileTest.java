@@ -18,9 +18,9 @@ import edu.nd.crc.safa.server.services.jobs.JobService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import unit.flatfile.FlatFileBaseTest;
+import unit.flatfile.BaseFlatFileTest;
 
-public class JobBaseTest extends FlatFileBaseTest {
+public class JobBaseFlatFileTest extends BaseFlatFileTest {
 
     @Autowired
     public JobService jobService;
@@ -49,7 +49,7 @@ public class JobBaseTest extends FlatFileBaseTest {
             .withRoute(AppRoutes.Jobs.flatFileProjectUpdateJob)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .sendRequestWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         return UUID.fromString(jobSubmissionResponse.getString("id"));
     }

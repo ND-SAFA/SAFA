@@ -17,10 +17,4 @@ public class DefaultProjectConstants {
     public static class File {
         public static final String DESIGN_FILE = "Design.csv";
     }
-
-    public class Delta {
-        public static final int N_LINKS_REMOVED = 1;
-        public static final int N_LINKS_ADDED = 1;
-    }
-
 }

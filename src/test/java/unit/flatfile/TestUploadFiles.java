@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.flatfiles.services.FileService;
+import edu.nd.crc.safa.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -21,7 +21,7 @@ import unit.ApplicationBaseTest;
 public class TestUploadFiles extends ApplicationBaseTest {
 
     @Autowired
-    FileService fileService;
+    FileUploadService fileUploadService;
 
     @Test
     public void uploadTestResources() throws IOException, SafaError {

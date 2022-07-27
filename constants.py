@@ -10,6 +10,7 @@ LINKED_TARGETS_ONLY_DEFAULT = False
 
 # -------------- METRICS --------------
 K_METRIC_DEFAULT = 10  # TODO
+EVAL_RESULTS_KEY = "metrics"
 
 # -------------- PRETRAIN --------------
 PRETRAIN_NUM_TRAINING_SIZE_DEFAULT = 5000

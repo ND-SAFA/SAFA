@@ -1,39 +1,76 @@
+from typing import List, Dict
+
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer import Trainer
-from data.trace_dataset import TraceDataset
+from data.trace_dataset import TraceDatasetCreator
 from jobs.job_args import LMArgs
 from models.model_generator import BaseModelGenerator
-from results.base_result import BaseResult
 from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
+from transformers.trainer_utils import PredictionOutput
+from datasets import load_metric
+import numpy as np
+from train.metrics.supported_metrics import get_metric_path
 
 
 class LMTrainer(Trainer):
 
-    def __init__(self, args: LMArgs, model_generator: BaseModelGenerator, dataset: TraceDataset):
+    def __init__(self, args: LMArgs, model_generator: BaseModelGenerator, dataset_creator: TraceDatasetCreator):
+        """
+        Handles the training and evaluation of learning models
+        :param args: the learning model arguments
+        :param model_generator: the ModelGenerator
+        :param dataset_creator: the TraceDatasetCreator
+        """
         model = model_generator.get_model()
         tokenizer = model_generator.get_tokenizer()
         self.args = args
         self.model_generator = model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
-        self.dataset = dataset
+        self.dataset = dataset_creator
         super().__init__(model=model, args=args, tokenizer=tokenizer)
 
     # TODO
-    def perform_training(self, checkpoint: str = None) -> BaseResult:
+    def perform_training(self, checkpoint: str = None) -> Dict:
+        """
+        Performs the model training
+        :param checkpoint: path to checkpoint
+        :return: a dictionary containing the results
+        """
+        self.train_dataset = self.dataset.get_training_dataset(self.args.resample_rate)
         output = self.train(resume_from_checkpoint=checkpoint)
         self.save_model()
-        return BaseResult(output)
+        return dict(output)
 
     # TODO
-    def perform_prediction(self) -> BaseResult:
-        self.eval_dataset = self.dataset.get_validation_data(self.args.dataset_size)
+    def perform_prediction(self) -> Dict:
+        """
+        Performs the prediction and (optionally) evaluation for the model
+        :return: a dictionary containing the results
+        """
+        self.eval_dataset = self.dataset.get_prediction_dataset(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
-        return BaseResult(output)
+        if self.args.metrics:
+            output.metrics = self._eval(output, self.args.metrics)
+        return dict(output)
 
-    def get_train_dataloader(self):
-        self.train_dataset = self.dataset.get_training_data(self.args.resample_rate)
+    def _eval(self, output: PredictionOutput, metric_names: List) -> Dict:
+        """
+        Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from datasets)
+        :param output: the output from predictions
+        :param metric_names: name of metrics desired for evaluation
+        :return: metric name, result mappings
+        """
+        metric_paths = [get_metric_path(name) for name in metric_names]
+        metric = load_metric(*metric_paths)
+        preds = np.argmax(output.predictions, axis=-1)
+        return metric.compute(predictions=preds, references=output.predictions.label_ids)
 
+    def get_train_dataloader(self) -> DataLoader:
+        """
+        Gets the dataloader for training
+        :return: the DataLoader
+        """
         if is_torch_tpu_available():
             train_sampler = get_tpu_sampler(self.train_dataset, self.args.train_batch_size)
         else:

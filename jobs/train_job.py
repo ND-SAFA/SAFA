@@ -1,13 +1,22 @@
 from jobs.base_job import BaseLMJob
+from jobs.job_result import JobResult
 
 
 class TrainJob(BaseLMJob):
 
+    # TODO
     def _get_checkpoint(self) -> str:
+        """
+        Gets the current checkpoint file path
+        :return: the checkpoint file path
+        """
         pass
 
-    def __start(self):
+    def __start(self) -> JobResult:
+        """
+        Runs the training and obtains results
+        :return: the results of the training
+        """
         checkpoint = self._get_checkpoint()
-        results = self.trainer.perform_training(checkpoint=checkpoint)
-
-
+        output = self.trainer.perform_training(checkpoint=checkpoint)
+        return JobResult(output)

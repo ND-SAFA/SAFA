@@ -1,12 +1,13 @@
-from jobs.job_args import PretrainArgs
 from jobs.base_job import BasePretrainJob
-from pretrain.pretrainer import Pretrainer
+from jobs.job_result import JobResult
 
 
 class PretrainJob(BasePretrainJob):
 
-    def __init__(self, args: PretrainArgs):
-        super().__init__(args)
-
-    def __start(self):
+    def __start(self) -> JobResult:
+        """
+        Runs the pretraining
+        :return: the results of the pretraining
+        """
         self.pretrain.train()
+        return JobResult()

@@ -1,4 +1,4 @@
-from results.metrics.lmmetric import LMMetric
+from train.metrics.lmmetric import LMMetric
 from constants import K_METRIC_DEFAULT
 
 

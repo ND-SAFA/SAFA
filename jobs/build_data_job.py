@@ -1,11 +1,13 @@
-from jobs.job_args import PretrainArgs
 from jobs.base_job import BasePretrainJob
+from jobs.job_result import JobResult
 
 
-class BuildDataJob(BasePretrainJob):
+class BuildPretrainDataJob(BasePretrainJob):
 
-    def __init__(self, args: PretrainArgs):
-        super().__init__(args)
-
-    def __start(self):
+    def __start(self) -> JobResult:
+        """
+        Runs the dataset building for pretraining
+        :return: the results of the data build
+        """
         self.pretrain.build_pretraining_data()
+        return JobResult()

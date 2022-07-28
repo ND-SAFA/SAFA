@@ -1,8 +1,5 @@
 package edu.nd.crc.safa.server.services.jira;
 
-import java.util.List;
-import java.util.Optional;
-
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
@@ -11,32 +8,31 @@ import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.JiraProject;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
-
+import edu.nd.crc.safa.utilities.WebApiUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
-import reactor.core.publisher.Mono;
 
+import java.util.List;
+
+@AllArgsConstructor
 public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private static final String ATLASSIAN_API_URL = "https://api.atlassian.com";
     private static final String ATLASSIAN_AUTH_URL = "https://auth.atlassian.com";
     private static final int API_VERSION = 3;
     private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
-    private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
 
     private final JiraProjectRepository jiraProjectRepository;
 
-    @Autowired
     private WebClient webClient;
 
     public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository) {
@@ -63,7 +59,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long jiraProjectId) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECT);
 
-        return this.blockOptional(
+        return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.PROJECT.getMethod())
                 .uri(uri, jiraProjectId)
@@ -77,7 +73,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     public boolean checkCredentials(JiraAccessCredentials credentials) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.MYSELF);
 
-        HttpStatus code = this.blockOptional(
+        HttpStatus code = WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.MYSELF.getMethod())
                 .uri(uri)
@@ -99,7 +95,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
         log.info("Initialising jira auth web client");
 
-        return this.blockOptional(
+        return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.REFRESH_TOKEN.getMethod())
                 .uri(uri)
@@ -113,7 +109,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     public List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECTS_PREVIEW);
 
-        return this.blockOptional(
+        return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.PROJECTS_PREVIEW.getMethod())
                 .uri(uri)
@@ -130,7 +126,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES)
             + String.format("?jql=project=%s&fields", jiraProjectId);
 
-        return this.blockOptional(
+        return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.ISSUES.getMethod())
                 .uri(uri)
@@ -141,14 +137,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         ).orElseThrow(() -> new SafaError("Error while trying to refresh JIRA credentials"));
     }
 
-    private <T> Optional<T> blockOptional(Mono<T> mono) {
-        try {
-            return mono.blockOptional();
-        } catch (WebClientException ex) {
-            log.error("Exception thrown while executing blocking call", ex);
-            throw new SafaError("Exception thrown while executing blocking call", ex);
-        }
-    }
 
     @Override
     public void createJiraProjectMapping(Project project, Long jiraProjectId) {

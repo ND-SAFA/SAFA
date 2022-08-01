@@ -13,6 +13,15 @@
           :error-messages="nameError"
           :loading="nameCheckIsLoading"
         />
+        <v-combobox
+          filled
+          persistent-hint
+          v-if="!isFTA && !isSafetyCase && !isFMEA"
+          v-model="artifact.type"
+          :items="artifactTypes"
+          label="Artifact Type"
+          hint="Required"
+        />
         <v-select
           filled
           label="Document Type"
@@ -20,13 +29,7 @@
           :items="documentTypes"
           item-text="name"
           item-value="id"
-        />
-        <v-combobox
-          filled
-          v-if="!isFTA && !isSafetyCase && !isFMEA"
-          v-model="artifact.type"
-          :items="artifactTypes"
-          label="Artifact Type"
+          hint="Which type of document this artifact belongs to"
         />
         <v-select
           filled
@@ -59,17 +62,20 @@
         <v-divider class="mb-2" />
         <v-textarea
           filled
-          v-if="!isFTA"
-          label="Artifact Summary"
-          v-model="artifact.summary"
-          rows="3"
-        />
-        <v-textarea
-          filled
+          persistent-hint
           v-if="!isFTA"
           label="Artifact Body"
           v-model="artifact.body"
           rows="3"
+          hint="Required"
+        />
+        <v-textarea
+          filled
+          v-if="!isFTA"
+          label="Artifact Summary"
+          v-model="artifact.summary"
+          rows="3"
+          hint="A brief summary of the artifact content"
         />
       </v-col>
     </v-row>

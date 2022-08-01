@@ -8,7 +8,7 @@ import type {
   ArtifactTypeIcons,
 } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
-import { SafetyCaseType } from "@/types";
+import { Artifact, SafetyCaseType } from "@/types";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
@@ -67,6 +67,25 @@ export default class TypeOptionsModule extends VuexModule {
     this.SET_TYPE_ICONS({
       ...this.artifactTypeIcons,
       [type]: icon,
+    });
+  }
+
+  @Action
+  /**
+   * Adds a new artifact type if it does not yet exist.
+   */
+  addArtifactTypes(newArtifacts: Artifact[]): void {
+    newArtifacts.forEach(({ type }) => {
+      if (this.artifactTypeDirections[type]) return;
+
+      this.SET_TYPE_ICONS({
+        ...this.artifactTypeIcons,
+        [type]: "mdi-help",
+      });
+      this.SET_LINK_DIRECTIONS({
+        ...this.artifactTypeDirections,
+        [type]: [],
+      });
     });
   }
 

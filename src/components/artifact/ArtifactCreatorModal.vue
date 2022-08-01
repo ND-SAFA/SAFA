@@ -12,6 +12,7 @@
         :current-artifact-name="currentArtifactName"
         :is-edit-mode="!!artifact"
         @change:parent="parentId = $event"
+        @change:documentType="handleDocumentTypeChange"
         @change:valid="isNameValid = $event"
         data-cy="create-new-artifact-button"
       />
@@ -121,10 +122,6 @@ export default Vue.extend({
     computedArtifactType(): string {
       if (this.isFTA) {
         return this.parentArtifact?.type || this.editedArtifact.type;
-      } else if (this.isSafetyCase) {
-        return this.editedArtifact.safetyCaseType || "";
-      } else if (this.isFMEA) {
-        return "FMEA";
       } else {
         return this.editedArtifact.type;
       }
@@ -175,6 +172,15 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Updates artifact fields when the document type changes.
+     */
+    handleDocumentTypeChange(): void {
+      this.editedArtifact = createArtifactOfType(
+        this.artifact,
+        this.artifact?.type
+      );
+    },
     /**
      * Attempts to save the artifact.
      */

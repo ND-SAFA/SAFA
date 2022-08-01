@@ -63,6 +63,7 @@ export default class ProjectModule extends VuexModule {
     this.SET_ARTIFACTS(updatedArtifacts);
     await handleDocumentReload();
     await artifactModule.addOrUpdateArtifacts(updatedArtifacts);
+    await typeOptionsModule.addArtifactTypes(newArtifacts);
     await subtreeModule.updateSubtreeMap();
   }
 

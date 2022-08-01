@@ -13,6 +13,7 @@ import {
   ResetPasswordView,
   UploadStatusView,
   HomeView,
+  MyAccountView,
 } from "@/views";
 import { routerChecks } from "@/router/checks";
 import { NextPayload } from "@/types";
@@ -47,6 +48,11 @@ const routes: Array<RouteConfig> = [
     path: Routes.HOME,
     name: "Home",
     component: HomeView,
+  },
+  {
+    path: Routes.ACCOUNT,
+    name: "My Account",
+    component: MyAccountView,
   },
   {
     path: Routes.ARTIFACT,

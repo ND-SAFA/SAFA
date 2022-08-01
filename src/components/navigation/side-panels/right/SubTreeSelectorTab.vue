@@ -7,25 +7,39 @@
       label="Search Artifacts"
       solo
       rounded
-      prepend-inner-icon="mdi-magnify"
+      dense
+      append-icon="mdi-magnify"
       v-model="searchText"
     />
+
+    <div class="full-width text-right text-subtitle-1 text--secondary">
+      {{ searchHint }}
+    </div>
 
     <v-list class="search-container full-width">
       <v-list-group
         v-for="type in artifactTypes"
         :key="type"
         :prepend-icon="getIconName(type)"
+        value="true"
       >
         <template v-slot:activator>
           <v-list-item-title>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <span v-on="on" v-bind="attrs">
-                  {{ getTypePrintName(type) }}
-                </span>
+                <div v-on="on" v-bind="attrs">
+                  <span class="text-body-1">
+                    {{ getTypePrintName(type) }}
+                  </span>
+                  <span class="text-subtitle-1 text--secondary ml-1">
+                    ({{ artifactTypeHashTable[type].length }})
+                  </span>
+                </div>
               </template>
-              <span>{{ getTypePrintName(type) }}</span>
+              <span>
+                {{ getTypePrintName(type) }}
+                ({{ artifactTypeHashTable[type].length }})
+              </span>
             </v-tooltip>
           </v-list-item-title>
         </template>
@@ -64,29 +78,60 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
+      artifacts: [] as Artifact[],
+      artifactTypes: [] as string[],
+      artifactTypeHashTable: {} as Record<string, Artifact[]>,
     };
+  },
+  mounted() {
+    this.updateArtifacts();
   },
   computed: {
     /**
-     * @return Artifacts that match the search text.
+     * Returns how many results match.
      */
-    artifacts(): Artifact[] {
+    searchHint(): string {
+      return this.artifacts.length === 1
+        ? "1 Match"
+        : `${this.artifacts.length} Matches`;
+    },
+    /**
+     * Returns all visible artifacts.
+     */
+    allArtifacts(): Artifact[] {
+      return artifactModule.artifacts;
+    },
+  },
+  watch: {
+    /**
+     * Updates the currently displayed artifacts when the search changes.
+     */
+    searchText() {
+      this.updateArtifacts();
+    },
+    /**
+     * Updates the currently displayed artifacts when the artifacts change.
+     */
+    allArtifacts() {
+      this.updateArtifacts();
+    },
+  },
+  methods: {
+    /**
+     * Updates the saved list of artifacts to match the current search.
+     */
+    updateArtifacts(): void {
       const artifacts = artifactModule.artifacts;
       const lowercaseSearch = this.searchText.toLowerCase();
+      const hashTable: Record<string, Artifact[]> = {};
 
-      return lowercaseSearch
+      this.artifacts = lowercaseSearch
         ? artifacts.filter(
             ({ name, body }) =>
               name.toLowerCase().includes(lowercaseSearch) ||
               body.toLowerCase().includes(lowercaseSearch)
           )
         : artifacts;
-    },
-    /**
-     * @return All artifacts grouped by their type.
-     */
-    artifactTypeHashTable(): Record<string, Artifact[]> {
-      const hashTable: Record<string, Artifact[]> = {};
 
       this.artifacts.forEach((a) => {
         if (a.type in hashTable) {
@@ -96,16 +141,9 @@ export default Vue.extend({
         }
       });
 
-      return hashTable;
+      this.artifactTypeHashTable = hashTable;
+      this.artifactTypes = Object.keys(hashTable);
     },
-    /**
-     * @return All artifact types.
-     */
-    artifactTypes(): string[] {
-      return Object.keys(this.artifactTypeHashTable);
-    },
-  },
-  methods: {
     /**
      * Converts an artifact type into a title case name.
      * @param type - The artifact type.

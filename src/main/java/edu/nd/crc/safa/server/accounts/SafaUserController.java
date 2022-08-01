@@ -54,20 +54,18 @@ public class SafaUserController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.forgotPassword)
+    // TODO: usually it's not a idea to use entities as DTOs
     public void forgotPassword(@RequestBody SafaUser user) {
         String username = user.getEmail();
-        Optional<SafaUser> retrievedUserOptional = this.safaUserRepository.findByEmail(username);
-        if (retrievedUserOptional.isPresent()) {
-            SafaUser retrievedUser = retrievedUserOptional.get();
-            String token = this.tokenService.createTokenForUsername(username,
-                SecurityConstants.FORGOT_PASSWORD_EXPIRATION_TIME);
-            PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser,
-                token);
+        SafaUser retrievedUser = this.safaUserRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
 
-            //TODO: Send email with reset token
-        } else {
-            throw new UsernameNotFoundException("Username does not exist:" + username);
-        }
+        Date expirationDate = new Date(System.currentTimeMillis() + SecurityConstants.FORGOT_PASSWORD_EXPIRATION_TIME);
+        String token = this.tokenService.createTokenForUsername(username, expirationDate);
+        PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
+
+        //TODO: Send email with reset token
+
     }
 
     @PutMapping(AppRoutes.Accounts.resetPassword)
@@ -79,22 +77,15 @@ public class SafaUserController extends BaseController {
         // Step - Decode token and extract user
         Claims userClaims = this.tokenService.getTokenClaims(resetToken);
         String username = userClaims.getSubject();
-        Optional<SafaUser> retrievedUserOptional = this.safaUserRepository.findByEmail(username);
+        SafaUser retrievedUser = this.safaUserRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username does not exist:" + username));
 
-        // TODO: Refactor this comparison to user non-deprecated methods
-        int dateComparison = userClaims.getExpiration().compareTo(new Date(LocalDateTime.now().toString()));
-        if (dateComparison < 1) {
+        if (userClaims.getExpiration().before(new Date())) {
             throw new SafaError("Reset password token has expired.");
         }
 
-        // Step - Save new password
-        if (retrievedUserOptional.isPresent()) {
-            SafaUser retrievedUser = retrievedUserOptional.get();
-            retrievedUser.setPassword(passwordEncoder.encode(newPassword));
-            this.safaUserRepository.save(retrievedUser);
-            return new UserAppEntity(retrievedUser);
-        } else {
-            throw new UsernameNotFoundException("Username does not exist:" + username);
-        }
+        retrievedUser.setPassword(passwordEncoder.encode(newPassword));
+        this.safaUserRepository.save(retrievedUser);
+        return new UserAppEntity(retrievedUser);
     }
 }

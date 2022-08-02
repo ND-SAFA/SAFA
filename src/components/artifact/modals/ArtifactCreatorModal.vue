@@ -14,6 +14,7 @@
         @change:parent="parentId = $event"
         @change:documentType="handleDocumentTypeChange"
         @change:valid="isNameValid = $event"
+        data-cy="create-new-artifact-button"
       />
     </template>
     <template v-slot:actions>

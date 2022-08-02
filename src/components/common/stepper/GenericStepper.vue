@@ -33,6 +33,7 @@
                 :outlined="currentStep !== numberOfSteps"
                 :disabled="!isStepDone"
                 @click="onStepForward"
+                data-cy="generic-stepper-continue"
               >
                 {{ currentStep === numberOfSteps ? submitText : "Continue" }}
               </v-btn>

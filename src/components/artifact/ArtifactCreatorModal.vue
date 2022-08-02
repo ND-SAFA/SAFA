@@ -13,6 +13,7 @@
         :is-edit-mode="!!artifact"
         @change:parent="parentId = $event"
         @change:valid="isNameValid = $event"
+        data-cy="create-new-artifact-button"
       />
     </template>
     <template v-slot:actions>

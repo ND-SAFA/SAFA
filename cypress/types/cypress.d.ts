@@ -53,6 +53,14 @@ declare namespace Cypress {
     logout(): Chainable<void>;
 
     // projectCreatorCommands
-    setProjectInformationInCreator (name:string,description:string): Chainable<void>;
+    /**
+     * Setting the project name and description within the standard project creator.
+     * @param name - Project name.
+     * @param description - Project description.
+     */
+    setProjectInformationInCreator(
+      name: string,
+      description: string
+    ): Chainable<void>;
   }
 }

@@ -1,8 +1,8 @@
-from jobs.base_job import BaseLMJob
-from jobs.job_result import JobResult
+from jobs.abstract.abstract_model_job import AbstractModelJob
+from jobs.abstract.job_result import JobResult
 
 
-class PredictJob(BaseLMJob):
+class PredictJob(AbstractModelJob):
 
     def __start(self) -> JobResult:
         """

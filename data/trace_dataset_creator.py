@@ -1,35 +1,41 @@
 import math
 import random
-from typing import Dict, List, Tuple, Iterable
-
-from data.trace_link import TraceLink, Artifact
-from data.data_key import DataKey
-from constants import RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT
-from models.model_generator import BaseModelGenerator, ArchitectureType
+from typing import Dict, Iterable, List, Tuple
 
 import torch
 
+from constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
+from data.artifact import Artifact
+from data.data_key import DataKey
+from data.trace_link import TraceLink
+from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+
 
 class TraceDatasetCreator:
+    """
+    Responsible for creating dataset in format for defined models.
+    """
     links: Dict = {}
     pos_link_ids: set = set()
     neg_link_ids: set = set()
     __training_dataset: List[Dict] = None
     __prediction_dataset: List[Dict] = None
 
-    def __init__(self, s_arts: Dict[str, str], t_arts: Dict[str, str], true_links: List[Tuple[str, str]],
-                 model_generator: BaseModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
+    def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str],
+                 true_links: List[Tuple[str, str]],
+                 model_generator: AbstractModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs datasets for trace link training and validation
-        :param s_arts: source artifacts represented as id, token mappings
-        :param t_arts: target artifacts represented as id, token mappings
+        :param source_artifacts: source artifacts represented as mapping between id and token
+        :param target_artifacts: target artifacts represented as mapping between id and token
         :param true_links: list of tuples containing linked source and target ids
         :param model_generator: the ModelGenerator
         :param linked_targets_only: if True, uses only targets that have at least one true link to a source
         """
         self.model_generator = model_generator
-        t_arts = self._get_linked_targets_only(t_arts, true_links) if linked_targets_only else t_arts
-        self._create_links(s_arts, t_arts, true_links)
+        target_artifacts = self._get_linked_targets_only(target_artifacts,
+                                                         true_links) if linked_targets_only else target_artifacts
+        self._create_links(source_artifacts, target_artifacts, true_links)
 
     def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> List[Dict]:
         """
@@ -39,7 +45,8 @@ class TraceDatasetCreator:
         """
         if self.__training_dataset is None:
             self.__training_dataset = self._get_feature_entries(self.pos_link_ids, resample_rate)
-            reduced_neg_link_ids = self._reduce_data_size(list(self.neg_link_ids), len(self.pos_link_ids) * resample_rate)
+            reduced_neg_link_ids = self._reduce_data_size(list(self.neg_link_ids),
+                                                          len(self.pos_link_ids) * resample_rate)
             self.__training_dataset.extend(self._get_feature_entries(reduced_neg_link_ids, 1))
         return self.__training_dataset
 
@@ -91,10 +98,10 @@ class TraceDatasetCreator:
                 for artifact_type in artifact_types:
                     artifact = getattr(link, artifact_type)
                     if artifact.id_ not in updated_ids[artifact_type]:
-                        self._updated_embd(artifact)
+                        self._update_artifact_embedding(artifact)
                         updated_ids[artifact_type].add(link.source.id_)
 
-    def _updated_embd(self, artifact: Artifact) -> None:
+    def _update_artifact_embedding(self, artifact: Artifact) -> None:
         """
         Helper method to update an artifact embedding
         :param artifact: artifact to update
@@ -108,9 +115,9 @@ class TraceDatasetCreator:
         mask_tensor = (
             torch.tensor(feature[DataKey.ATTEN_MASK]).view(1, -1).to(model.device)
         )
-        embd = model.get_LM(input_tensor, mask_tensor)[0]
-        embd_cpu = embd.to("cpu")
-        artifact.embd = embd_cpu
+        artifact_embedding = model.get_LM(input_tensor, mask_tensor)[0]
+        artifact_embedding_cpu = artifact_embedding.to("cpu")
+        artifact.embedding = artifact_embedding_cpu
 
     def _get_feature_entry(self, link: TraceLink) -> Dict[str, any]:
         """

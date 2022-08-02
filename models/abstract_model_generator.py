@@ -1,9 +1,9 @@
 from abc import abstractmethod
+from enum import Enum, IntEnum
 from typing import Dict, Type
 
-from transformers.modeling_utils import PreTrainedModel
 from transformers import AutoConfig, AutoTokenizer
-from enum import IntEnum, Enum
+from transformers.modeling_utils import PreTrainedModel
 
 from constants import MAX_SEQ_LENGTH_DEFAULT
 
@@ -19,7 +19,10 @@ class ModelSize(Enum):
     LARGE = "large"
 
 
-class BaseModelGenerator:
+class AbstractModelGenerator:
+    """
+    Represents a learning model
+    """
     __tokenizer: AutoTokenizer = None
     __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
@@ -107,5 +110,6 @@ class BaseModelGenerator:
         :param kwargs: other arguments for tokenizer
         :return: feature name, value mappings
         """
-        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True, max_length=self._max_seq_length,
+        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True,
+                                    max_length=self._max_seq_length,
                                     padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

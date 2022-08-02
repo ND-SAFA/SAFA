@@ -6,13 +6,19 @@ import {
   GENERATED_TRACE_MAX_WIDTH,
 } from "@/cytoscape/styles";
 
+let nodeHtmlApplied = false;
+
 /**
  * Applies HTML overlays to the graph nodes.
  *
  * @param cy - The cy instance.
  */
 export const applyNodeHtml: LayoutHook = (cy: CytoCore): void => {
+  if (nodeHtmlApplied) return;
+
   cy.nodeHtmlLabel([nodeHTML]);
+
+  nodeHtmlApplied = true;
 };
 
 /**

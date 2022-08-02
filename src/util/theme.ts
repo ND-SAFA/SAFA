@@ -11,7 +11,7 @@ export enum ThemeColors {
 
   menuHighlight = "#f0f0f0",
 
-  artifactDefault = "#fafafa",
+  artifactDefault = "#F5F5F5",
   artifactBorder = "#888888",
   artifactText = "#36405a",
   artifactAdded = "#81c784",

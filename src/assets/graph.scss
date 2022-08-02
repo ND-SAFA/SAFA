@@ -70,7 +70,11 @@ $graph-border-radius: 8px;
   }
 
   &:hover > .artifact-border {
-    fill: darken($color-border, 20)
+    fill: darken($color-border, 20);
+  }
+
+  &:hover > .artifact-svg-div {
+    fill: darken($color-border, 20);
   }
 
   &.artifact-svg-delta-ADDED:hover > .artifact-svg {

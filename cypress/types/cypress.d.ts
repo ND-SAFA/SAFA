@@ -51,5 +51,8 @@ declare namespace Cypress {
      * Logs out of the app.
      */
     logout(): Chainable<void>;
+
+    // projectCreatorCommands
+    setProjectInformationInCreator (name:string,description:string): Chainable<void>;
   }
 }

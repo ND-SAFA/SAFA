@@ -45,7 +45,7 @@ import {
   ProjectVersion,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appModule, logModule, projectModule } from "@/store";
+import { logModule, projectModule } from "@/store";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon } from "@/components/common";
 import {

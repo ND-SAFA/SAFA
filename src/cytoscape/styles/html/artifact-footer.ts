@@ -76,11 +76,13 @@ export function svgFooter(
       x="0" y="${outerStyle.height + 4}" rx="8" 
       width="${outerStyle.width}" height="${ARTIFACT_CHILDREN_HEIGHT}"
       fill="${ThemeColors.artifactBorder}"
+      class="artifact-border"
     />
     <rect
       x="2" y="${outerStyle.height + 6}" rx="7" 
       width="${outerStyle.width - 4}" height="${ARTIFACT_CHILDREN_HEIGHT - 4}"
       fill="${ThemeColors.artifactDefault}"
+      class="artifact-svg"
     />
     ${children}
     ${warnings}

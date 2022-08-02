@@ -42,9 +42,9 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
 
-        cy.clickButton("create-new-artifact-button");
-        cy.getCy("input-artifact-name").last().type("Hazards");
-        cy.clickButton("create-artifact-button");
+        cy.clickButton("button-artifact-type");
+        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.clickButton("button-artifact-type");
       });
 
       //it("cant upload artifacts",() => {

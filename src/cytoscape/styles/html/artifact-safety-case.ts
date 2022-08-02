@@ -46,7 +46,7 @@ export function svgDefault(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-        x="1" y="1" rx="7" width="${outerWidth - 2}" height="${outerHeight - 2}"
+        x="2" y="2" rx="7" width="${outerWidth - 4}" height="${outerHeight - 4}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -80,7 +80,7 @@ function svgGoal(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-        x="1" y="1" width="${outerWidth - 2}" height="${outerHeight - 2}"
+        x="2" y="2" width="${outerWidth - 4}" height="${outerHeight - 4}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -114,7 +114,7 @@ function svgSolution(data: ArtifactData): string {
         class="artifact-border"
       />
       <circle 
-        cx="100" cy="100" r="91"
+        cx="100" cy="100" r="90"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -150,10 +150,10 @@ function svgStrategy(data: ArtifactData): string {
       />
       <polygon
         points="
-          ${xOffset + 1},1 
-          ${outerWidth + xOffset - 1},1 
-          ${outerWidth - 1},${outerHeight - 1} 
-          1,${outerHeight - 1}"
+          ${xOffset + 2},2 
+          ${outerWidth + xOffset - 2},2
+          ${outerWidth - 2},${outerHeight - 2} 
+          2,${outerHeight - 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />

@@ -78,8 +78,8 @@ export function svgFooter(
       fill="${ThemeColors.artifactBorder}"
     />
     <rect
-      x="1" y="${outerStyle.height + 5}" rx="7" 
-      width="${outerStyle.width - 2}" height="${ARTIFACT_CHILDREN_HEIGHT - 2}"
+      x="2" y="${outerStyle.height + 6}" rx="7" 
+      width="${outerStyle.width - 4}" height="${ARTIFACT_CHILDREN_HEIGHT - 4}"
       fill="${ThemeColors.artifactDefault}"
     />
     ${children}

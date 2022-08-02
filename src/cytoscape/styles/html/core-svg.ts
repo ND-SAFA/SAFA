@@ -86,7 +86,7 @@ function svgDiv(style: Omit<SvgStyle, "height">): string {
         x1="${style.x}" y1="${style.y}" 
         x2="${style.x + style.width}" y2="${style.y}" 
         stroke="rgb(136, 136, 136)" 
-        shape-rendering="crispEdges"
+        stroke-width="2"
       />
   `;
 }
@@ -145,9 +145,3 @@ function svgBody(
     </foreignObject>
   `;
 }
-
-// <div style="display: inline-block">
-// <span class="text-body-2">
-//   ${getBody(data.body, style.truncateLength)}
-//   </span>
-//   </div>

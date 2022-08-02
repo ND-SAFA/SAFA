@@ -10,15 +10,26 @@
 
     <snackbar :timeout="5000" />
     <app-confirm-modal :message="confirmationMessage" />
-    <artifact-body-modal />
+
+    <artifact-body-modal v-if="isLoggedIn" />
+    <app-bar v-if="isLoggedIn" />
+    <left-nav-drawer v-if="isLoggedIn" />
+    <right-nav-drawer v-if="isLoggedIn" />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { logModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 import { handleAuthentication } from "@/api";
-import { AppConfirmModal, ArtifactBodyModal, Snackbar } from "@/components";
+import {
+  AppConfirmModal,
+  ArtifactBodyModal,
+  Snackbar,
+  AppBar,
+  LeftNavDrawer,
+  RightNavDrawer,
+} from "@/components";
 
 /**
  * Renders the SAFA app.
@@ -29,6 +40,9 @@ export default Vue.extend({
     Snackbar,
     AppConfirmModal,
     ArtifactBodyModal,
+    AppBar,
+    LeftNavDrawer,
+    RightNavDrawer,
   },
   async mounted() {
     await handleAuthentication();
@@ -39,6 +53,12 @@ export default Vue.extend({
      */
     confirmationMessage() {
       return logModule.getConfirmationMessage;
+    },
+    /**
+     * Returns whether a user is currently logged in.
+     */
+    isLoggedIn() {
+      return sessionModule.getDoesSessionExist;
     },
   },
 });

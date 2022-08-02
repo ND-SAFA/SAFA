@@ -87,6 +87,7 @@ function svgDiv(style: Omit<SvgStyle, "height">): string {
         x2="${style.x + style.width}" y2="${style.y}" 
         stroke="rgb(136, 136, 136)" 
         stroke-width="2"
+        class="artifact-svg-div"
       />
   `;
 }

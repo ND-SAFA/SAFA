@@ -43,6 +43,7 @@
             </v-tooltip>
           </v-list-item-title>
         </template>
+        <v-divider />
         <v-list-item
           v-for="artifact in artifactTypeHashTable[type]"
           :key="artifact.name"

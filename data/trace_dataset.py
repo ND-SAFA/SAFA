@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Iterable
 from data.trace_link import TraceLink, Artifact
 from data.data_key import DataKey
 from constants import RESAMPLE_RATE_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT
-from models.model_generator import BaseModelGenerator, ArchitectureType
+from models.model_generator import ModelGenerator, ArchitectureType
 
 import torch
 
@@ -18,7 +18,7 @@ class TraceDatasetCreator:
     __prediction_dataset: List[Dict] = None
 
     def __init__(self, s_arts: Dict[str, str], t_arts: Dict[str, str], true_links: List[Tuple[str, str]],
-                 model_generator: BaseModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
+                 model_generator: ModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs datasets for trace link training and validation
         :param s_arts: source artifacts represented as id, token mappings

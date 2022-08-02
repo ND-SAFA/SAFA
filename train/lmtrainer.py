@@ -4,7 +4,7 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 from transformers.trainer import Trainer
 from data.trace_dataset import TraceDatasetCreator
 from jobs.job_args import LMArgs
-from models.model_generator import BaseModelGenerator
+from models.model_generator import ModelGenerator
 from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
 from transformers.trainer_utils import PredictionOutput
@@ -15,7 +15,7 @@ from train.metrics.supported_metrics import get_metric_path
 
 class LMTrainer(Trainer):
 
-    def __init__(self, args: LMArgs, model_generator: BaseModelGenerator, dataset_creator: TraceDatasetCreator):
+    def __init__(self, args: LMArgs, model_generator: ModelGenerator, dataset_creator: TraceDatasetCreator):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments

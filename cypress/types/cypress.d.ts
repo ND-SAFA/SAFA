@@ -63,7 +63,7 @@ declare namespace Cypress {
      * @param name - Project name.
      * @param description - Project description.
      */
-    setProjectInformationInCreator(
+    setProjectInformationInStandardUpload(
       name: string,
       description: string
     ): Chainable<void>;

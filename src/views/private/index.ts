@@ -5,3 +5,4 @@ export { default as ProjectCreatorView } from "./ProjectCreatorView.vue";
 export { default as ProjectSettingsView } from "./ProjectSettingsView.vue";
 export { default as UploadStatusView } from "./UploadStatusView.vue";
 export { default as HomeView } from "./HomeView.vue";
+export { default as MyAccountView } from "./MyAccountView.vue";

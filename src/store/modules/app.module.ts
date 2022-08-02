@@ -13,6 +13,10 @@ export default class ProjectModule extends VuexModule {
    */
   private isLoading = false;
   /**
+   * Whether the app is currently saving.
+   */
+  private isSaving = false;
+  /**
    * Whether the left panel is open.
    */
   private isLeftOpen = false;
@@ -173,6 +177,16 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
+   * Sets the current saving state.
+   *
+   * @param isSaving - Whether the app is saving.
+   */
+  SET_IS_SAVING(isSaving: boolean): void {
+    this.isSaving = isSaving;
+  }
+
+  @Mutation
+  /**
    * Sets the artifact creator state.
    *
    * @param isOpenOrType - The state of the artifact creator.
@@ -284,5 +298,11 @@ export default class ProjectModule extends VuexModule {
    */
   get getIsCreateLinkEnabled(): boolean {
     return this.isCreateLinkEnabled;
+  }
+  /**
+   * @return Whether the app is currently saving.
+   */
+  get getIsSaving(): boolean {
+    return this.isSaving;
   }
 }

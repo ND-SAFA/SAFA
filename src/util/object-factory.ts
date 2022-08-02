@@ -135,22 +135,30 @@ export function createArtifactOfType(
   type: true | string
 ): Artifact {
   if (typeof type === "string") {
-    if (type in FTANodeType) {
+    const isFTA = type in FTANodeType;
+    const isSC = type in SafetyCaseType;
+
+    if (isFTA || type === DocumentType.FTA) {
       return createArtifact({
         ...artifact,
         documentType: DocumentType.FTA,
-        logicType: type as FTANodeType,
+        logicType: isFTA ? (type as FTANodeType) : FTANodeType.AND,
+        type: DocumentType.FTA,
       });
-    } else if (type in SafetyCaseType) {
+    } else if (isSC) {
       return createArtifact({
         ...artifact,
         documentType: DocumentType.SAFETY_CASE,
-        safetyCaseType: type as SafetyCaseType,
+        safetyCaseType: isSC
+          ? (type as SafetyCaseType)
+          : SafetyCaseType.CONTEXT,
+        type: DocumentType.SAFETY_CASE,
       });
     } else if (type === DocumentType.FMEA) {
       return createArtifact({
         ...artifact,
         documentType: DocumentType.FMEA,
+        type: DocumentType.FMEA,
       });
     }
   }

@@ -13,6 +13,7 @@ export enum Routes {
   ERROR = "/error",
   PROJECT_CREATOR = "/create",
   UPLOAD_STATUS = "/uploads",
+  ACCOUNT = "/account",
 }
 
 /**

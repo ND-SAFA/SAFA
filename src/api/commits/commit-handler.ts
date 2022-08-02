@@ -1,5 +1,5 @@
 import { Commit } from "@/types";
-import { projectModule, commitModule } from "@/store";
+import { projectModule, commitModule, appModule } from "@/store";
 import { persistCommit } from "@/api";
 
 /**
@@ -9,9 +9,12 @@ import { persistCommit } from "@/api";
  * @return The saved commit.
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
-  const commitResponse = await persistCommit(commit);
+  appModule.SET_IS_SAVING(true);
 
+  const commitResponse = await persistCommit(commit);
   await commitModule.saveCommit(commitResponse);
+
+  appModule.SET_IS_SAVING(false);
 
   return commitResponse;
 }
@@ -20,20 +23,28 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
  * Undoes the last commit.
  */
 export async function undoCommit(): Promise<void> {
+  appModule.SET_IS_SAVING(true);
+
   const commit = await commitModule.undoLastCommit();
   const commitResponse = await persistCommit(commit);
 
   await applyArtifactChanges(commitResponse);
+
+  appModule.SET_IS_SAVING(false);
 }
 
 /**
  * Reattempts the last undone commit.
  */
 export async function redoCommit(): Promise<void> {
+  appModule.SET_IS_SAVING(true);
+
   const commit = await commitModule.redoLastUndoneCommit();
   const commitResponse = await persistCommit(commit);
 
   await applyArtifactChanges(commitResponse);
+
+  appModule.SET_IS_SAVING(false);
 }
 
 /**

@@ -15,6 +15,9 @@ export default class CommitModule extends VuexModule {
    * during the current session.
    */
   private commits: CommitHistory[] = [];
+  /**
+   * The list of recently reverted commits.
+   */
   private revertedCommits: CommitHistory[] = [];
 
   @Action({ rawError: true })
@@ -84,7 +87,7 @@ export default class CommitModule extends VuexModule {
 
   @Mutation
   /**
-   * Sets given list as reverted commits
+   * Sets given list as reverted commits.
    */
   SET_REVERTED_COMMITS(revertedCommits: CommitHistory[]): void {
     this.revertedCommits = revertedCommits;
@@ -92,7 +95,7 @@ export default class CommitModule extends VuexModule {
 
   @Mutation
   /**
-   * Adds a commit to the commit history
+   * Adds a commit to the commit history.
    */
   ADD_COMMIT(commitHistory: CommitHistory): void {
     this.commits = [...this.commits, commitHistory];
@@ -100,7 +103,7 @@ export default class CommitModule extends VuexModule {
 
   @Mutation
   /**
-   * Adds a commit to the commit history
+   * Adds a commit to the commit history.
    */
   ADD_REVERTED_COMMIT(commitHistory: CommitHistory): void {
     this.revertedCommits = [...this.revertedCommits, commitHistory];

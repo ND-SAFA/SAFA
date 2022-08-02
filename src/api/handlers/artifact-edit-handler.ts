@@ -45,7 +45,7 @@ export async function handleSaveArtifact(
       const createdArtifacts = await createArtifact(versionId, artifact);
 
       await projectModule.addOrUpdateArtifacts(createdArtifacts);
-      await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
       await viewportModule.setArtifactTreeLayout();
 
       if (!parentArtifact) {

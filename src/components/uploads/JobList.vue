@@ -68,7 +68,7 @@ export default Vue.extend({
       }
 
       jobModule.SET_JOBS(jobs);
-      jobModule.selectJob(jobs[jobs.length - 1]);
+      jobModule.selectJob(jobs[0]);
     },
   },
 });

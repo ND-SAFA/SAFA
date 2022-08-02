@@ -26,7 +26,7 @@ describe("Project Creation", () => {
       });
 
       it("can create a valid project", () => {
-        cy.setProjectInformationInCreator(
+        cy.setProjectInformationInStandardUpload(
           "SAFA",
           "Safety Artifact Forest Analysis"
         );
@@ -35,7 +35,7 @@ describe("Project Creation", () => {
       });
 
       it("can create artifacts", () => {
-        cy.setProjectInformationInCreator(
+        cy.setProjectInformationInStandardUpload(
           "SAFA",
           "Safety Artifact Forest Analysis"
         );

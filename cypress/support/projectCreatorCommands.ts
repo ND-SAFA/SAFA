@@ -1,5 +1,5 @@
 Cypress.Commands.add(
-  "setProjectInformationInCreator",
+  "setProjectInformationInStandardUpload",
   (name: string, description: string) => {
     cy.getCy("input-project-name").first().type(name);
     cy.getCy("input-project-description").first().type(description);

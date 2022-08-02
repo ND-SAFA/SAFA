@@ -101,7 +101,7 @@ import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactCreatorModal from "../ArtifactCreatorModal.vue";
+import ArtifactCreatorModal from "../modals/ArtifactCreatorModal.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 
 /**

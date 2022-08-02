@@ -10,6 +10,7 @@
 
     <snackbar :timeout="5000" />
     <app-confirm-modal :message="confirmationMessage" />
+    <artifact-body-modal />
   </v-app>
 </template>
 
@@ -17,7 +18,7 @@
 import Vue from "vue";
 import { logModule } from "@/store";
 import { handleAuthentication } from "@/api";
-import { AppConfirmModal, Snackbar } from "@/components";
+import { AppConfirmModal, ArtifactBodyModal, Snackbar } from "@/components";
 
 /**
  * Renders the SAFA app.
@@ -27,6 +28,7 @@ export default Vue.extend({
   components: {
     Snackbar,
     AppConfirmModal,
+    ArtifactBodyModal,
   },
   async mounted() {
     await handleAuthentication();

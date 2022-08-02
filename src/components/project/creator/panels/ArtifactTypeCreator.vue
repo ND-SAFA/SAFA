@@ -6,8 +6,14 @@
       required
       :error-messages="errors"
       @keydown.enter="handleEnterPress"
+      data-cy="input-artifact-type"
     />
-    <v-btn @click="handleSubmit" color="primary" class="ml-1">
+    <v-btn
+      @click="handleSubmit"
+      color="primary"
+      class="ml-1"
+      data-cy="button-artifact-type"
+    >
       Create Artifact
     </v-btn>
   </v-row>

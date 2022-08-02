@@ -10,7 +10,10 @@ import { getBody } from "./artifact-helper";
  */
 export function htmlHeader(title: string): string {
   return `
-    <strong class="artifact-header text-body-1" style="height: 28px">
+    <strong 
+      class="artifact-header text-body-1" 
+      style="height: 28px; font-weight: 600"
+    >
       ${capitalize(title)}
     </strong>
   `;
@@ -25,9 +28,12 @@ export function htmlHeader(title: string): string {
  */
 export function htmlSubheader(subtitle: string): string {
   return `
-    <span class="artifact-sub-header text-body-1" style="height: 28px">
+    <strong 
+      class="artifact-sub-header text-body-1" 
+      style="height: 28px; font-weight: 600"
+    >
       ${subtitle}
-    </span>
+    </strong>
   `;
 }
 

@@ -63,7 +63,7 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
         HashMap<String, ArtifactAppEntity> artifactsProcessed) {
         List<String> errors = new ArrayList<>();
         List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
-        for (ArtifactAppEntity artifact : entities) {
+        entities.forEach(artifact -> {
             if (artifactsProcessed.containsKey(artifact.name)) {
                 String errorMessage = String.format("Duplicate artifact artifact found: %s", artifact.name);
                 errors.add(errorMessage);
@@ -71,7 +71,7 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
                 artifactsProcessed.put(artifact.name, artifact);
                 validArtifacts.add(artifact);
             }
-        }
+        });
         return new Pair<>(validArtifacts, errors);
     }
 

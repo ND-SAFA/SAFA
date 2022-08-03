@@ -101,11 +101,11 @@ public class FlatFileController extends BaseController {
         Project project = new Project("", "");
         this.projectService.saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
-        ProjectAppEntity response = this.flatFileService.createProjectFromFlatFiles(project,
+        ProjectAppEntity projectAppEntity = this.flatFileService.createProjectFromFlatFiles(project,
             projectVersion,
             files);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
-        return response;
+        return projectAppEntity;
     }
 
     @GetMapping(AppRoutes.Projects.FlatFiles.downloadFlatFiles)

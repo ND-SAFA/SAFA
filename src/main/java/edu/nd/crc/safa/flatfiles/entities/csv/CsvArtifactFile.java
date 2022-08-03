@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.FTAType;
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
@@ -116,7 +116,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
             if (this.documentType == DocumentType.FTA) {
                 // Read optional safety case type
                 readAndSetOptionalProperty(
-                    FTANodeType.class,
+                    FTAType.class,
                     entityRecord.get(Constants.LOGIC_TYPE_PARAM),
                     artifactAppEntity::setLogicType);
             }

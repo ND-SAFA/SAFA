@@ -46,14 +46,15 @@ public interface CsvFileUtilities {
                                            String[] headers,
                                            List<T> entities,
                                            Function<T, String[]> entity2values) throws IOException {
-        FileWriter reader = new FileWriter(file);
-        CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers));
-        printer.printRecord(headers);
-        for (T entity : entities) {
-            printer.printRecord(entity2values.apply(entity));
+        try (FileWriter reader = new FileWriter(file)) {
+            try (CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers))) {
+                printer.printRecord((Object[]) headers);
+                for (T entity : entities) {
+                    printer.printRecord((Object[]) entity2values.apply(entity));
+                }
+                printer.flush();
+            }
         }
-        printer.flush();
-        printer.close();
     }
 
     private static CSVFormat createCsvFormat(String[] headers) {

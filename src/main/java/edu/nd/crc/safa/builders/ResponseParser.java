@@ -8,6 +8,7 @@ import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.util.StringUtils;
 
 /**
  * Defines series of types that HTTP responses can be parsed into.
@@ -20,7 +21,7 @@ public interface ResponseParser {
      * @return JSONObject
      */
     static JSONObject jsonCreator(String content) {
-        return content.length() == 0 ? new JSONObject() : new JSONObject(content);
+        return StringUtils.hasLength(content) ? new JSONObject(content) : new JSONObject();
     }
 
     /**
@@ -30,7 +31,7 @@ public interface ResponseParser {
      * @return JSONArray
      */
     static JSONArray arrayCreator(String content) {
-        return content.length() == 0 ? new JSONArray() : new JSONArray(content);
+        return StringUtils.hasLength(content) ? new JSONArray(content) : new JSONArray();
     }
 
     /**

@@ -1,9 +1,14 @@
-package edu.nd.crc.safa.builders;
+package edu.nd.crc.safa.builders.entities;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.builders.BaseBuilder;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.server.entities.app.project.FTAType;
+import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
@@ -21,6 +26,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
@@ -39,9 +45,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DbEntityBuilder extends BaseBuilder {
 
+    static DbEntityBuilder instance;
     final int majorVersion = 1;
     final int minorVersion = 1;
-
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final DocumentRepository documentRepository;
@@ -52,16 +58,14 @@ public class DbEntityBuilder extends BaseBuilder {
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
-
+    private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     Hashtable<String, Project> projects;
     Hashtable<String, Hashtable<Integer, ProjectVersion>> versions;
     Hashtable<String, Hashtable<String, Document>> documents;
     Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
     Hashtable<String, Hashtable<String, Artifact>> artifacts;
     Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactVersion>>> bodies;
-
     int revisionNumber;
-
     SafaUser currentUser;
 
     @Autowired
@@ -74,7 +78,8 @@ public class DbEntityBuilder extends BaseBuilder {
                            ProjectRetriever artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
-                           TraceLinkVersionRepository traceLinkVersionRepository) {
+                           TraceLinkVersionRepository traceLinkVersionRepository,
+                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.documentRepository = documentRepository;
@@ -85,6 +90,16 @@ public class DbEntityBuilder extends BaseBuilder {
         this.traceLinkRepository = traceLinkRepository;
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
+        this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
+    }
+
+    public static DbEntityBuilder getInstance() {
+        return DbEntityBuilder.instance;
+    }
+
+    @PostConstruct
+    public void setInstance() {
+        DbEntityBuilder.instance = this;
     }
 
     public void createEmptyData() {
@@ -195,10 +210,19 @@ public class DbEntityBuilder extends BaseBuilder {
         return this.newArtifact(projectName, typeName, artifactName).getArtifact(projectName, artifactName);
     }
 
-    public DbEntityBuilder newArtifact(String projectName, String typeName, String artifactName) {
+    public DbEntityBuilder newArtifact(String projectName,
+                                       String typeName,
+                                       String artifactName) {
+        return newArtifact(projectName, typeName, artifactName, DocumentType.ARTIFACT_TREE);
+    }
+
+    public DbEntityBuilder newArtifact(String projectName,
+                                       String typeName,
+                                       String artifactName,
+                                       DocumentType documentType) {
         Project project = getProject(projectName);
         ArtifactType artifactType = getType(projectName, typeName);
-        Artifact artifact = new Artifact(project, artifactType, artifactName, DocumentType.ARTIFACT_TREE);
+        Artifact artifact = new Artifact(project, artifactType, artifactName, documentType);
         this.artifactRepository.save(artifact);
         this.addEntry(this.artifacts, projectName, artifactName, artifact);
         return this;
@@ -306,24 +330,31 @@ public class DbEntityBuilder extends BaseBuilder {
         return this;
     }
 
-    public DbEntityBuilder updateProjectName(String currentName, String newName) {
-        Project project = getProject(currentName);
-        project.setName(newName);
-        this.projectRepository.save(project);
+    public DbEntityBuilder newFtaArtifact(Artifact artifact,
+                                          DocumentType documentType,
+                                          FTAType ftaType
+    ) {
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
+        artifactAppEntity.setDocumentType(documentType);
+        artifactAppEntity.setLogicType(ftaType);
+        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
+            artifactAppEntity,
+            artifact
+        );
         return this;
     }
 
-    public DbEntityBuilder updateTypeName(String projectName, String currentName, String newName) {
-        ArtifactType artifactType = getType(projectName, currentName);
-        artifactType.setName(newName);
-        this.artifactTypeRepository.save(artifactType);
-        return this;
-    }
-
-    public DbEntityBuilder updateArtifactName(String projectName, String artifactName, String newName) {
-        Artifact artifact = getArtifact(projectName, artifactName);
-        artifact.setName(newName);
-        this.artifactRepository.save(artifact);
+    public DbEntityBuilder newSafetyArtifact(Artifact artifact,
+                                             DocumentType documentType,
+                                             SafetyCaseType safetyCaseType
+    ) {
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
+        artifactAppEntity.setDocumentType(documentType);
+        artifactAppEntity.setSafetyCaseType(safetyCaseType);
+        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
+            artifactAppEntity,
+            artifact
+        );
         return this;
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
-import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.FTAType;
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
@@ -130,12 +130,12 @@ public class JsonBuilder extends BaseBuilder {
                                        String artifactName,
                                        String artifactType,
                                        String body,
-                                       FTANodeType ftaNodeType
+                                       FTAType ftaType
     ) {
 
         this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
-        artifact.put("logicType", ftaNodeType.toString());
+        artifact.put("logicType", ftaType.toString());
         artifact.put("documentType", DocumentType.FTA.toString());
         return this;
     }

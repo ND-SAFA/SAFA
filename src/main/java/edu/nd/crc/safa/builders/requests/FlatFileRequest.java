@@ -2,6 +2,7 @@ package edu.nd.crc.safa.builders.requests;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.util.List;
 
 import edu.nd.crc.safa.builders.MultipartRequestService;
@@ -48,6 +49,12 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         String attributeName = "file";
         MockMultipartFile file = MultipartRequestService.readAsMockMultipartFile(pathToFile, attributeName);
         return sendRequestWithFiles(List.of(file), status().is2xxSuccessful());
+    }
+
+    public JSONObject postWithFiles(List<File> files) throws Exception {
+        List<MockMultipartFile> mockMultipartFiles = MultipartRequestService.convertToMockMultipartFiles(files,
+            "files");
+        return this.sendRequestWithFiles(mockMultipartFiles, status().is2xxSuccessful());
     }
 
     /**

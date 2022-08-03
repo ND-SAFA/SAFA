@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.DbEntityBuilder;
+import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 import edu.nd.crc.safa.server.entities.api.layout.RuleCondition;
 import edu.nd.crc.safa.server.entities.api.layout.RuleRelation;

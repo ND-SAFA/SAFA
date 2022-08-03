@@ -57,6 +57,7 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
     @Override
     public Pair<TraceAppEntity, String> parseRecord(JSONObject entityRecord) {
         try {
+            //TODO : make this the default logic for parsing json records with specified generic class
             ObjectMapper mapper = new ObjectMapper();
             TraceAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), TraceAppEntity.class);
             return new Pair<>(artifactAppEntity, null);

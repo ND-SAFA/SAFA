@@ -3,7 +3,7 @@ package unit.project.artifacts;
 import java.util.Hashtable;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.FTAType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.FTAArtifact;
 import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TestFTAArtifacts extends ArtifactBaseTest<FTAArtifact> {
 
-    FTANodeType ftaNodeType = FTANodeType.AND;
-    String ftaType = ftaNodeType.toString();
+    FTAType ftaType = FTAType.AND;
 
     @Autowired
     FTAArtifactRepository ftaArtifactRepository;
@@ -28,13 +27,13 @@ public class TestFTAArtifacts extends ArtifactBaseTest<FTAArtifact> {
     public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {
         return jsonBuilder
             .withProject(projectName, projectName, "")
-            .withFTAArtifact(projectName, artifactName, ftaType, artifactBody, ftaNodeType)
+            .withFTAArtifact(projectName, artifactName, ftaType.name(), artifactBody, ftaType)
             .getArtifact(projectName, artifactName);
     }
 
     @Override
     public String getArtifactType() {
-        return ftaType;
+        return ftaType.name();
     }
 
     @Override
@@ -45,7 +44,7 @@ public class TestFTAArtifacts extends ArtifactBaseTest<FTAArtifact> {
     @Override
     public Map<String, Object> getJsonExpectedProperties() {
         Hashtable<String, Object> expectedProperties = new Hashtable<>();
-        expectedProperties.put("logicType", ftaNodeType);
+        expectedProperties.put("logicType", ftaType);
         return expectedProperties;
     }
 

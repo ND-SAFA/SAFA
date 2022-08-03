@@ -7,15 +7,13 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum SafetyCaseType {
-    SOLUTION("SOLUTION"),
-    CONTEXT("CONTEXT"),
-    GOAL("GOAL"),
-    STRATEGY("STRATEGY");
-
-    private String value;
+    SOLUTION,
+    CONTEXT,
+    GOAL,
+    STRATEGY;
 
     @Override
     public String toString() {
-        return this.value;
+        return this.name();
     }
 }

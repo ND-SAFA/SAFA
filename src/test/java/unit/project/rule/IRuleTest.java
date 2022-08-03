@@ -3,7 +3,7 @@ package unit.project.rule;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.DbEntityBuilder;
+import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;

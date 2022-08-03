@@ -198,7 +198,7 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    private void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
+    public void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
         switch (artifactAppEntity.getDocumentType()) {
             case FTA:
                 FTAArtifact ftaArtifact;

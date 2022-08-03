@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Creates a test layer for sending multi-part file http requests.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MultipartRequestService {
+public interface MultipartRequestService {
 
     /**
      * Reads files in directory and converts them to MultipartFiles.
@@ -28,7 +26,7 @@ public class MultipartRequestService {
      * @return MultipartFiles read from directory.
      * @throws IOException Throws errors if any errors occur while reading mock files.
      */
-    public static List<MultipartFile> readDirectoryAsMultipartFiles(String pathToDirectory, String attributeName)
+    static List<MultipartFile> readDirectoryAsMultipartFiles(String pathToDirectory, String attributeName)
         throws IOException {
         List<MockMultipartFile> mocks = readDirectoryAsMockMultipartFiles(pathToDirectory, attributeName);
         return new ArrayList<>(mocks);
@@ -43,14 +41,21 @@ public class MultipartRequestService {
      * @return MockMultipartFile read from directory.
      * @throws IOException Throws errors if any errors occur while reading mock files.
      */
-    public static List<MockMultipartFile> readDirectoryAsMockMultipartFiles(String pathToDirectory,
-                                                                            String attributeName)
+    static List<MockMultipartFile> readDirectoryAsMockMultipartFiles(String pathToDirectory,
+                                                                     String attributeName)
         throws IOException {
         File directory = new File(pathToDirectory);
+        return convertToMockMultipartFiles(getFilesInDirectory(directory), attributeName);
+    }
 
+    static List<MockMultipartFile> convertToMockMultipartFiles(File[] files, String attributeName) throws IOException {
+        return convertToMockMultipartFiles(Arrays.asList(files), attributeName);
+    }
 
+    static List<MockMultipartFile> convertToMockMultipartFiles(Iterable<File> files,
+                                                               String attributeName) throws IOException {
         List<MockMultipartFile> mockMultipartFiles = new ArrayList<>();
-        for (File subFile : getFilesInDirectory(directory)) {
+        for (File subFile : files) {
             mockMultipartFiles.add(readAsMockMultipartFile(subFile.getAbsolutePath(), attributeName));
         }
         return mockMultipartFiles;
@@ -67,7 +72,7 @@ public class MultipartRequestService {
      * @return File as a MockMultipartField
      * @throws IOException If file cannot be read.
      */
-    public static MockMultipartFile readAsMockMultipartFile(String pathToFile, String paramNameInRequest)
+    static MockMultipartFile readAsMockMultipartFile(String pathToFile, String paramNameInRequest)
         throws IOException {
         File file = new File(pathToFile);
         byte[] fileContent = FileUtils.readFileToByteArray(file);

@@ -1,14 +1,16 @@
 package unit;
 
 import edu.nd.crc.safa.builders.AppEntityBuilder;
-import edu.nd.crc.safa.builders.DbEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
+import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
+import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
@@ -82,6 +84,12 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected JsonBuilder jsonBuilder;
 
+    @Autowired
+    protected SafetyCaseArtifactRepository safetyCaseArtifactRepository;
+
+    @Autowired
+    protected FTAArtifactRepository ftaArtifactRepository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -90,6 +98,4 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
         appBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
     }
-
-
 }

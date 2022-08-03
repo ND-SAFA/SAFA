@@ -35,6 +35,17 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Link",
     tooltipText: "Create a new trace link",
     coreAsWell: true,
+    onClickFunction(): void {
+      projectModule.ifProjectDefined(() => {
+        appModule.toggleTraceLinkCreator();
+      });
+    },
+  },
+  {
+    id: "draw-link",
+    content: "Draw Link",
+    tooltipText: "Draw a new trace link between artifacts",
+    coreAsWell: true,
     hasTrailingDivider: true,
     onClickFunction(): void {
       projectModule.ifProjectDefined(() => {

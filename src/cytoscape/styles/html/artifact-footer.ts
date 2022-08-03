@@ -2,7 +2,7 @@ import { ArtifactData, SvgStyle } from "@/types";
 import { ThemeColors } from "@/util";
 import { svgStoplight } from "./artifact-stoplight";
 import { getWarnings } from "./artifact-helper";
-import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
 
 /**
  * Creates the SVG for representing a safety case node's footer.
@@ -16,6 +16,7 @@ export function svgFooter(
   data: ArtifactData,
   outerStyle: Pick<SvgStyle, "width" | "height">
 ): string {
+  const baseY = outerStyle.height + 4;
   const textY = data.childDeltaStates?.length
     ? outerStyle.height + 20
     : outerStyle.height + 26;
@@ -73,23 +74,29 @@ export function svgFooter(
 
   return `
     <rect 
-      x="0" y="${outerStyle.height + 4}" rx="8" 
-      width="${outerStyle.width}" height="${ARTIFACT_CHILDREN_HEIGHT}"
+      x="0" 
+      y="${baseY}" 
+      rx="8" 
+      width="${outerStyle.width}" 
+      height="${ARTIFACT_CHILDREN_HEIGHT}"
       fill="${ThemeColors.artifactBorder}"
       class="artifact-border"
     />
     <rect
-      x="2" y="${outerStyle.height + 6}" rx="7" 
-      width="${outerStyle.width - 4}" height="${ARTIFACT_CHILDREN_HEIGHT - 4}"
+      x="${ARTIFACT_BORDER_WIDTH}" 
+      y="${baseY + ARTIFACT_BORDER_WIDTH}"
+      rx="7" 
+      width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
+      height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
       fill="${ThemeColors.artifactDefault}"
       class="artifact-svg"
     />
     ${children}
     ${warnings}
     ${svgStoplight(data, {
-      x: 4,
-      y: textY + 6,
-      width: outerStyle.width - 8,
+      x: 6,
+      y: textY + 4,
+      width: outerStyle.width - 12,
     })}
   `;
 }

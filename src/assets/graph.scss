@@ -99,4 +99,8 @@ $graph-border-radius: 8px;
     color: black;
     background-color: $color-selected;
   }
+
+  > .cy-context-menus-divider {
+    border-bottom: 1px solid lighten($color-border, 30);
+  }
 }

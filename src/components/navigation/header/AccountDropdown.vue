@@ -50,8 +50,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logModule, sessionModule } from "@/store";
+import { sessionModule } from "@/store";
 import { handleLogout } from "@/api";
+import { navigateTo, Routes } from "@/router";
 
 export default Vue.extend({
   name: "AccountDropdown",
@@ -80,7 +81,7 @@ export default Vue.extend({
      * Navigates to the account editing page.
      */
     handleEditAccount(): void {
-      logModule.onInfo("Account editing is not yet available.");
+      navigateTo(Routes.ACCOUNT);
     },
   },
 });

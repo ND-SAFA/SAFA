@@ -6,8 +6,8 @@ import type {
   LinkValidator,
   TraceLink,
 } from "@/types";
-import { TraceApproval } from "@/types";
-import { documentModule } from "@/store";
+import { CreateLinkValidator, TraceApproval } from "@/types";
+import { documentModule, traceModule, typeOptionsModule } from "@/store";
 import { getTraceId } from "@/util";
 
 @Module({ namespaced: true, name: "trace" })
@@ -150,6 +150,38 @@ export default class TraceModule extends VuexModule {
       );
 
       return traceLinkQuery.length > 0;
+    };
+  }
+
+  /**
+   * @retuyrn Whether a link between these artifacts is allowed.
+   */
+  get isLinkAllowed(): CreateLinkValidator {
+    return (source, target) => {
+      // If this link already exists, the link cannot be created.
+      const linkDoesNotExist = !traceModule.doesLinkExist(source.id, target.id);
+
+      // If this link in opposite direct exists, the link cannot be created.
+      const oppositeLinkDoesNotExist = !traceModule.doesLinkExist(
+        source.id,
+        target.id
+      );
+
+      // If this link is to itself, the link cannot be created.
+      const isNotSameNode = source.id !== target.id;
+
+      // If the link is not between allowed artifact directions, thee link cannot be created.
+      const linkIsAllowedByType = typeOptionsModule.isLinkAllowedByType(
+        source,
+        target
+      );
+
+      return (
+        linkDoesNotExist &&
+        isNotSameNode &&
+        oppositeLinkDoesNotExist &&
+        linkIsAllowedByType
+      );
     };
   }
 }

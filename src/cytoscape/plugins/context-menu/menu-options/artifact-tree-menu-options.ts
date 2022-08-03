@@ -4,7 +4,6 @@ import {
   appModule,
   artifactModule,
   artifactSelectionModule,
-  logModule,
   projectModule,
   subtreeModule,
   viewportModule,

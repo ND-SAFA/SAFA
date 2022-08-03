@@ -13,10 +13,7 @@
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:item="{ item }">
-      <generic-artifact-body-display
-        :body="item.body"
-        :title="getTitle(item)"
-      />
+      <generic-artifact-body-display display-title :artifact="item" />
     </template>
   </v-autocomplete>
 </template>
@@ -25,7 +22,6 @@
 import Vue from "vue";
 import { Artifact } from "@/types";
 import { artifactModule } from "@/store";
-import { getArtifactTypePrintName } from "@/util";
 import { GenericArtifactBodyDisplay } from "@/components/common/generic";
 
 /**
@@ -69,12 +65,6 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Converts the type name to title case.
-     * @param type - The type to convert.
-     * @return The title case type name.
-     */
-    getTypePrintName: getArtifactTypePrintName,
-    /**
      * Decides whether to filter an artifact out of view.
      * @param artifact - The artifact to check.
      * @param queryText - The current query text.
@@ -84,21 +74,13 @@ export default Vue.extend({
       const lowercaseQuery = queryText.toLowerCase();
       const { name, type } = artifact;
 
-      if (this.value.includes(artifact.id)) return false;
+      if (this.value?.includes(artifact.id)) return false;
 
       return (
         name.toLowerCase().includes(lowercaseQuery) ||
         type.toLowerCase().includes(lowercaseQuery) ||
-        this.getTypePrintName(type).toLowerCase().includes(lowercaseQuery)
+        type.toLowerCase().includes(lowercaseQuery)
       );
-    },
-    /**
-     * Returns whether the artifact has its display expanded.
-     * @param artifact - The artifact to check.
-     * @return Whether its display is expanded.
-     */
-    getTitle(artifact: Artifact): string {
-      return `${this.getTypePrintName(artifact.type)} - ${artifact.name}`;
     },
   },
   computed: {

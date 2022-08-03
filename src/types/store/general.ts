@@ -1,4 +1,11 @@
-import { DocumentType, FTANodeType, SafetyCaseType, TraceLink } from "@/types";
+import {
+  Artifact,
+  ArtifactData,
+  DocumentType,
+  FTANodeType,
+  SafetyCaseType,
+  TraceLink,
+} from "@/types";
 
 /**
  * Enumerates the allowed trace link directions between artifact types.
@@ -60,6 +67,14 @@ export interface ChannelSubscriptionId {
  * Returns whether a link exists from the given source to the given target ID.
  */
 export type LinkValidator = (sourceId: string, targetId: string) => boolean;
+
+/**
+ * Returns whether a link can be created between artifacts.
+ */
+export type CreateLinkValidator = (
+  source: Artifact | ArtifactData,
+  target: Artifact | ArtifactData
+) => boolean;
 
 /**
  * Returns the trace link between the given artifact ids.

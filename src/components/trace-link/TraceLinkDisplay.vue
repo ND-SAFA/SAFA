@@ -1,32 +1,24 @@
 <template>
-  <v-container>
-    <v-row>
+  <div>
+    <v-row class="my-4">
       <v-col cols="6">
-        <div class="d-flex justify-space-between align-end">
-          <h1 class="text-h5">{{ link.sourceName }}</h1>
-          <span class="text-caption text--secondary">
-            {{ sourceArtifact.type }}
-          </span>
-        </div>
-        <v-divider />
-        <generic-artifact-body-display :body="sourceArtifact.body" />
+        <generic-artifact-body-display
+          :artifact="sourceArtifact"
+          display-title
+        />
       </v-col>
 
       <v-divider vertical inset />
 
       <v-col cols="6">
-        <div class="d-flex justify-space-between align-end">
-          <h1 class="text-h5">{{ link.targetName }}</h1>
-          <span class="text-caption text--secondary">
-            {{ targetArtifact.type }}
-          </span>
-        </div>
-        <v-divider />
-        <generic-artifact-body-display :body="targetArtifact.body" />
+        <generic-artifact-body-display
+          :artifact="targetArtifact"
+          display-title
+        />
       </v-col>
     </v-row>
 
-    <div class="d-flex flex-row justify-end pt-5">
+    <div class="d-flex flex-row justify-end mt-1">
       <v-btn
         outlined
         v-if="showApprove"
@@ -64,7 +56,7 @@
         Cancel
       </v-btn>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">

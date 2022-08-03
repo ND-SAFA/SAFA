@@ -1,10 +1,4 @@
-import {
-  Artifact,
-  ConfirmationType,
-  IOHandlerCallback,
-  TraceApproval,
-  TraceType,
-} from "@/types";
+import { Artifact, ConfirmationType, IOHandlerCallback } from "@/types";
 import {
   artifactSelectionModule,
   logModule,
@@ -54,16 +48,7 @@ export async function handleSaveArtifact(
       }
 
       for (const createdArtifact of createdArtifacts) {
-        await handleCreateLink({
-          traceLinkId: "",
-          sourceName: createdArtifact.name,
-          sourceId: createdArtifact.id,
-          targetName: parentArtifact.name,
-          targetId: parentArtifact.id,
-          approvalStatus: TraceApproval.APPROVED,
-          score: 1,
-          traceType: TraceType.MANUAL,
-        });
+        await handleCreateLink(createdArtifact, parentArtifact);
       }
     }
 

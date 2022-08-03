@@ -9,6 +9,7 @@
       :items="items"
       :search="searchText"
       :item-class="getItemBackground"
+      sort-by="name"
     >
       <template v-slot:top>
         <artifact-table-header

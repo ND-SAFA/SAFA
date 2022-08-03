@@ -3,7 +3,6 @@
     app
     clipped
     hide-overlay
-    light
     right
     stateless
     :value="isRightOpen"

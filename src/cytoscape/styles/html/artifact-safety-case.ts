@@ -2,6 +2,8 @@ import { ArtifactData } from "@/types";
 import { getBackgroundColor, ThemeColors } from "@/util";
 import { svgNode } from "./core-svg";
 
+const borderWidth = 3;
+
 /**
  * Creates the HTML for representing a safety case node in a graph.
  *
@@ -46,7 +48,9 @@ export function svgDefault(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-        x="2" y="2" rx="7" width="${outerWidth - 4}" height="${outerHeight - 4}"
+        x="${borderWidth}" y="${borderWidth}" rx="7" 
+        width="${outerWidth - borderWidth * 2}" 
+        height="${outerHeight - borderWidth * 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -80,7 +84,9 @@ function svgGoal(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-        x="2" y="2" width="${outerWidth - 4}" height="${outerHeight - 4}"
+          x="${borderWidth}" y="${borderWidth}"
+        width="${outerWidth - borderWidth * 2}" 
+        height="${outerHeight - borderWidth * 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -96,6 +102,8 @@ function svgGoal(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgSolution(data: ArtifactData): string {
+  const radius = 92;
+
   return svgNode(
     data,
     { width: 200, height: 200, marginTop: 7 },
@@ -109,12 +117,12 @@ function svgSolution(data: ArtifactData): string {
     },
     `
       <circle 
-        cx="100" cy="100" r="92"
+        cx="100" cy="100" r="${radius}"
         fill="${ThemeColors.artifactBorder}"
         class="artifact-border"
       />
       <circle 
-        cx="100" cy="100" r="90"
+        cx="100" cy="100" r="${radius - borderWidth}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -150,10 +158,10 @@ function svgStrategy(data: ArtifactData): string {
       />
       <polygon
         points="
-          ${xOffset + 2},2 
-          ${outerWidth + xOffset - 2},2
-          ${outerWidth - 2},${outerHeight - 2} 
-          2,${outerHeight - 2}"
+          ${xOffset + borderWidth},${borderWidth}
+          ${outerWidth + xOffset - borderWidth},${borderWidth}
+          ${outerWidth - borderWidth},${outerHeight - borderWidth} 
+          ${borderWidth},${outerHeight - borderWidth}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />

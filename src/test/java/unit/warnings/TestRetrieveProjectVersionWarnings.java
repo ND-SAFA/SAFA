@@ -7,9 +7,9 @@ import java.util.Hashtable;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.notifications.VersionMessage;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

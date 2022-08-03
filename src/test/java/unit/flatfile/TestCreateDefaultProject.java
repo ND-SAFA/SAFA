@@ -3,7 +3,7 @@ package unit.flatfile;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

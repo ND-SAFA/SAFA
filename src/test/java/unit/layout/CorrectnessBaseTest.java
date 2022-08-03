@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.layout.LayoutPosition;
-import edu.nd.crc.safa.server.entities.app.documents.DocumentAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONArray;

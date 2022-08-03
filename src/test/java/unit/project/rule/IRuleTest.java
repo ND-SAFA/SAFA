@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.warnings.RuleName;
+import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.rules.parser.RuleName;
 
 /**
  * Responsible for creating interface for testing a rule.

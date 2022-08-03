@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;

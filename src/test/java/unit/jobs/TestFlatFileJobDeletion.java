@@ -7,8 +7,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 
 import org.junit.jupiter.api.Test;
 

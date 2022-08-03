@@ -3,7 +3,7 @@ package edu.nd.crc.safa.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

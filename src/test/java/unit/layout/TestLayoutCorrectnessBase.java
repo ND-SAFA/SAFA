@@ -1,7 +1,7 @@
 package unit.layout;
 
-import edu.nd.crc.safa.layout.LayoutPosition;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import org.junit.jupiter.api.Test;
 

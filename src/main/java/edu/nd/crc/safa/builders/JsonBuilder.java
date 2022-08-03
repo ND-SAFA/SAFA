@@ -5,11 +5,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
-import edu.nd.crc.safa.server.entities.app.project.FTAType;
-import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
+import edu.nd.crc.safa.features.artifacts.entities.FTAType;
+import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;

@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
-import edu.nd.crc.safa.server.entities.api.layout.RuleCondition;
-import edu.nd.crc.safa.server.entities.api.layout.RuleRelation;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.warnings.RuleName;
+import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
+import edu.nd.crc.safa.features.rules.entities.app.RuleCondition;
+import edu.nd.crc.safa.features.rules.entities.app.RuleRelation;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.rules.parser.RuleName;
 
 /**
  * Defines a rule test consisting of creating a rule constraining

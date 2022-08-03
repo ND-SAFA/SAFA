@@ -2,10 +2,10 @@ package unit.layout;
 
 import java.util.List;
 
-import edu.nd.crc.safa.layout.LayoutPosition;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

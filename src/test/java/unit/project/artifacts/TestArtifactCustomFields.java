@@ -6,11 +6,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
-import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
+import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -2,9 +2,9 @@ package unit.project.sharing;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.junit.jupiter.api.BeforeEach;
 import unit.ApplicationBaseTest;

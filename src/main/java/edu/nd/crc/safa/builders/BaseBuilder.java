@@ -3,7 +3,7 @@ package edu.nd.crc.safa.builders;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 
 public abstract class BaseBuilder {
 

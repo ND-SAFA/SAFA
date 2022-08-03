@@ -2,7 +2,7 @@ package unit.delta;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;

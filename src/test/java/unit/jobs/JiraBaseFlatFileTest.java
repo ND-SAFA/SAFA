@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
-import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.app.JobSteps;
-import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
+import edu.nd.crc.safa.features.jobs.entities.app.JobType;
+import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
+import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONArray;

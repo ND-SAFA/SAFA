@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.jira.JiraIssueDTO;
-import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
-import edu.nd.crc.safa.server.entities.api.jobs.JiraProjectCreationJob;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
+import edu.nd.crc.safa.features.jobs.entities.app.JiraProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 

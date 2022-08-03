@@ -4,8 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 
 import edu.nd.crc.safa.MainApplication;
-import edu.nd.crc.safa.server.controllers.ProjectController;
-import edu.nd.crc.safa.server.services.ServiceProvider;
+import edu.nd.crc.safa.features.projects.controllers.ProjectController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.MultipartRequestService;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 import org.springframework.mock.web.MockMultipartFile;

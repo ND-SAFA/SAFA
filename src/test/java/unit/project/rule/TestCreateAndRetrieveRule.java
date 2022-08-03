@@ -7,11 +7,11 @@ import java.util.Map;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.layout.RuleAppEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
-import edu.nd.crc.safa.warnings.RuleName;
+import edu.nd.crc.safa.features.rules.parser.RuleName;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.json.JSONObject;

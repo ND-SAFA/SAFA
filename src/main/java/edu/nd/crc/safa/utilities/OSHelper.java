@@ -3,7 +3,7 @@ package edu.nd.crc.safa.utilities;
 import java.io.File;
 import java.io.IOException;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

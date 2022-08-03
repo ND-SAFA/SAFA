@@ -10,6 +10,7 @@
           label="Search"
           style="max-width: 600px"
           v-model="searchText"
+          hint="Search by artifact name or type"
         />
       </v-col>
       <v-col class="flex-grow-0">

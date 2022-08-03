@@ -1,11 +1,11 @@
 from typing import Type
 
 from transformers import ElectraPreTrainedModel
+from transformers.modeling_utils import PreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
 
-from models.model_generator import BaseModelGenerator, ArchitectureType
-from transformers.modeling_utils import PreTrainedModel
-from models.single_lm_forward import single_lm_forward
+from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+from models.single_model_forward_pass import single_model_forward_pass
 
 
 class ElectraTraceSingle(ElectraPreTrainedModel):
@@ -16,7 +16,7 @@ class ElectraTraceSingle(ElectraPreTrainedModel):
         self.init_weights()
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None, **kwargs):
-        return single_lm_forward(
+        return single_model_forward_pass(
             model=self.electra,
             cls_header=self.cls,
             num_labels=self.config.num_labels,
@@ -28,7 +28,7 @@ class ElectraTraceSingle(ElectraPreTrainedModel):
         )
 
 
-class ElectraTraceSingleModelGenerator(BaseModelGenerator):
+class ElectraTraceSingleModelGenerator(AbstractModelGenerator):
 
     @property
     def base_model_class(self) -> Type[PreTrainedModel]:

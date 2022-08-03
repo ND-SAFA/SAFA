@@ -6,8 +6,8 @@ from transformers.models.electra.modeling_electra import (
     ElectraClassificationHead,
 )
 
-from models.model_generator import BaseModelGenerator, ArchitectureType
-from models.single_lm_forward import single_lm_forward
+from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+from models.single_model_forward_pass import single_model_forward_pass
 
 
 class BertTraceSingle(BertPreTrainedModel):
@@ -18,7 +18,7 @@ class BertTraceSingle(BertPreTrainedModel):
         self.init_weights()
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None, **kwargs):
-        return single_lm_forward(
+        return single_model_forward_pass(
             model=self.bert,
             cls_header=self.cls,
             num_labels=self.config.num_labels,
@@ -30,7 +30,7 @@ class BertTraceSingle(BertPreTrainedModel):
         )
 
 
-class BertTraceSingleModelGenerator(BaseModelGenerator):
+class BertTraceSingleModelGenerator(AbstractModelGenerator):
 
     @property
     def base_model_class(self) -> Type[PreTrainedModel]:

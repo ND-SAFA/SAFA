@@ -1,8 +1,8 @@
-from jobs.base_job import BasePretrainJob
-from jobs.job_result import JobResult
+from jobs.abstract.job_result import JobResult
+from jobs.pretrain.abstract_pretrain_job import AbstractPreTrainJob
 
 
-class PretrainJob(BasePretrainJob):
+class PretrainJob(AbstractPreTrainJob):
 
     def __start(self) -> JobResult:
         """

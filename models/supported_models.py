@@ -1,6 +1,7 @@
 from enum import Enum
-from bert_trace_single import BertTraceSingleModelGenerator
+
 from models.bert_trace_siamese import BertTraceSiameseModelGenerator
+from models.bert_trace_single import BertTraceSingleModelGenerator
 from models.electra_trace_single import ElectraTraceSingleModelGenerator
 
 

@@ -2,11 +2,11 @@ from typing import Type
 
 import torch
 from torch import nn
-from torch.nn import CrossEntropyLoss
 from transformers import AutoModel, BertPreTrainedModel
 from transformers.modeling_utils import PreTrainedModel
 
-from models.model_generator import BaseModelGenerator, ArchitectureType
+from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+from models.single_model_forward_pass import calculate_softmax_from_logits
 
 
 class AvgPooler(nn.Module):
@@ -73,13 +73,7 @@ class BertTraceSiamese(BertPreTrainedModel):
         ).last_hidden_state
 
         logits = self.cls(s_hidden=s_hidden, t_hidden=t_hidden)
-        output_dict = {}
-        if labels is not None:
-            loss_fct = CrossEntropyLoss()
-            rel_loss = loss_fct(logits.view(-1, 2), labels.view(-1))
-            output_dict["loss"] = rel_loss
-        output_dict["logits"] = torch.softmax(logits, 1)
-        return output_dict  # (rel_loss), rel_score
+        return calculate_softmax_from_logits(logits, 2, labels)  # (rel_loss), rel_score
 
     def get_sim_score(self, s_hidden, t_hidden):
         logits = self.classifier(t_hidden=s_hidden, s_hidden=t_hidden)
@@ -87,7 +81,7 @@ class BertTraceSiamese(BertPreTrainedModel):
         return [x[1] for x in sim_scores]
 
 
-class BertTraceSiameseModelGenerator(BaseModelGenerator):
+class BertTraceSiameseModelGenerator(AbstractModelGenerator):
 
     @property
     def base_model_class(self) -> Type[PreTrainedModel]:

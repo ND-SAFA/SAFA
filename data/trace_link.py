@@ -1,33 +1,13 @@
-from typing import Dict
 from collections.abc import Callable
+from typing import Dict
 
-
-class Artifact:
-
-    def __init__(self, id_: str, token: str, feature_func: Callable):
-        """
-        Represents an artifact (i.e. source and target)
-        :param id_: artifact id
-        :param token: artifact token
-        :param feature_func: function from which the artifact features can be generated
-        """
-        self.id_ = id_
-        self.token = token
-        self.__feature_func = feature_func  # delay execution in case not needed
-        self.__feature = None
-        self.embd = None
-
-    def get_feature(self) -> Dict:
-        """
-        Calls the feature function to get the artifact feature
-        :return: feature name, value mappings
-        """
-        if self.__feature is None:
-            self.__feature = self.__feature_func(text=self.token)
-        return self.__feature
+from data.artifact import Artifact
 
 
 class TraceLink:
+    """
+    Data structure representing link between source and target artifact.
+    """
 
     def __init__(self, source: Artifact, target: Artifact, feature_func: Callable, is_true_link: bool = False):
         """
@@ -50,7 +30,9 @@ class TraceLink:
          :return: a dictionary of features
          """
         if self.__feature is None:
-            self.__feature = self.__feature_func(text=self.source.token, text_pair=self.target.token, return_token_type_ids=True,
+            self.__feature = self.__feature_func(text=self.source.token,
+                                                 text_pair=self.target.token,
+                                                 return_token_type_ids=True,
                                                  add_special_tokens=True)
         return self.__feature
 

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-class TestFlatFileProjectCreationJob extends JobBaseTest {
+class TestProjectCreationWorkerFlatFile extends JobBaseFlatFileTest {
 
     int N_STEPS = 6;
 
@@ -18,13 +18,13 @@ class TestFlatFileProjectCreationJob extends JobBaseTest {
      *                   4. Sleeping thread to wait for job to finish fails.
      */
     @Test
-    public void testDefaultProjectCompletes() throws Exception {
+    void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
         UUID jobId = createJobFromDefaultProject();
 
         // Step - Get Job and subscribe for updates
-        createNewConnection(currentUsername).subscribeToJob(currentUsername, jobService.getJobById(jobId));
+        createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
         verifyJobWasCompleted(jobId, N_STEPS);

@@ -2,7 +2,7 @@ package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -32,11 +32,10 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
         Project project = projectVersion.getProject();
 
         // Step - Retrieve project
-        String route = RouteBuilder
+        JSONObject projectJson = SafaRequest
             .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
             .withVersion(projectVersion)
-            .get();
-        JSONObject projectJson = sendGet(route);
+            .getWithJsonObject();
 
         // VP - Verify that documents has empty list
         assertThat(projectJson.getJSONArray("documents").length()).isEqualTo(0);
@@ -48,7 +47,10 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
         dbEntityBuilder.newDocument(projectName, docName, docDescription, docType);
 
         // VP - Verify that project meta data contains a single document
-        projectJson = sendGet(route);
+        projectJson = SafaRequest
+            .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
+            .withVersion(projectVersion)
+            .getWithJsonObject();
         JSONArray documentsJson = projectJson.getJSONArray("documents");
         assertThat(documentsJson.length()).isEqualTo(1);
 

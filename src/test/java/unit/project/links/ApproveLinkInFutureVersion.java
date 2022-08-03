@@ -1,13 +1,14 @@
 package unit.project.links;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
@@ -23,13 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation
  */
-public class ApproveLinkInFutureVersion extends TraceBaseTest {
+class ApproveLinkInFutureVersion extends TraceBaseTest {
 
     @Autowired
     AppEntityRetrievalService appEntityRetrievalService;
 
     @Test
-    public void ableToEditGeneratedLinksInFutureVersions() throws Exception {
+    void ableToEditGeneratedLinksInFutureVersions() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
@@ -40,11 +41,11 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
             .newVersionWithReturn(projectName);
 
         // Step - Upload before files containing generated links
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // Step - Get generated links
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
+        JSONArray links = SafaRequest.withRoute(url).getWithJsonArray();
         JSONObject link = links.getJSONObject(0);
 
         // Step - Set link to approved
@@ -71,7 +72,7 @@ public class ApproveLinkInFutureVersion extends TraceBaseTest {
     }
 
     @Test
-    public void testApproveDeclineLinks() throws Exception {
+    void testApproveDeclineLinks() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";

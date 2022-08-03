@@ -14,7 +14,7 @@ import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 /**
  * Tests that creating a graph from a project:
@@ -41,7 +41,7 @@ public class TestGraphCreation extends LayoutBaseTest {
 
     @Test
     public void testName2Node() {
-        assertThat(name2nodes.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        assertThat(name2nodes.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
         for (ArtifactAppEntity artifact : project.getArtifacts()) {
             assertThat(name2nodes.containsKey(artifact.id)).isTrue();
         }
@@ -55,7 +55,7 @@ public class TestGraphCreation extends LayoutBaseTest {
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
 
-        assertThat(graphNodesNames.size()).isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+        assertThat(graphNodesNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
     }
 
     @Test

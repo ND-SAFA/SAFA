@@ -1,11 +1,11 @@
 package unit.project.documents;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Document;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
@@ -40,8 +40,8 @@ public class DeleteDocument extends ApplicationBaseTest {
         String route = RouteBuilder
             .withRoute(AppRoutes.Projects.Documents.deleteDocument)
             .withDocument(document)
-            .get();
-        sendDelete(route, status().isNoContent());
+            .buildEndpoint();
+        SafaRequest.withRoute(route).deleteWithJsonObject();
 
         // VP - Verify that no documents are associated with project
         List<Document> projectDocuments = this.documentRepository.findByProject(project);

@@ -90,7 +90,8 @@ public class AppRoutes {
         public static class FlatFiles {
             public static final String updateProjectVersionFromFlatFiles = projectPrefix
                 + "/versions/{versionId}/flat-files";
-            public static final String projectFlatFiles = projectPrefix + "/flat-files";
+            public static final String downloadFlatFiles = updateProjectVersionFromFlatFiles + "/{fileType}";
+            public static final String createProjectFromFlatFiles = projectPrefix + "/flat-files";
             public static final String parseArtifactFile = projectPrefix + "/parse/artifacts/{artifactType}";
             public static final String parseTraceFile = projectPrefix + "/parse/traces";
 

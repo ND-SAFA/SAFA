@@ -1,8 +1,8 @@
 package unit.project.sharing;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class TestProjectRetrievalWithSharing extends BaseSharingTest {
+class TestProjectRetrievalWithSharing extends BaseSharingTest {
 
     /**
      * Tests that a user is able to retrieve all the projects they own.
@@ -20,14 +20,14 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void sharedProjectAppearsInGetProjects() throws Exception {
+    void sharedProjectAppearsInGetProjects() throws Exception {
         String projectName = "test-project";
 
         // Step - Create and share a project.
         createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONArray projects = sendGetWithArrayResponse(AppRoutes.Projects.getProjects, status().is2xxSuccessful());
+        JSONArray projects = SafaRequest.withRoute(AppRoutes.Projects.getProjects).getWithJsonArray();
 
         // VP - Verify that shared project is visible
         assertThat(projects.length()).isEqualTo(1);
@@ -35,7 +35,7 @@ public class TestProjectRetrievalWithSharing extends BaseSharingTest {
     }
 
     @Test
-    public void retrieveProjectMembers() throws Exception {
+    void retrieveProjectMembers() throws Exception {
         String projectName = "test-project";
 
         // Step - Create and share a project.

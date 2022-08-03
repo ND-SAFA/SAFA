@@ -11,7 +11,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.MultipartRequestService;
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
@@ -34,13 +36,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Testing layer for encapsulating application logic.
  */
-public class ApplicationBaseTest extends WebSocketBaseTest {
+public abstract class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
@@ -48,7 +49,7 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
     UserDetailsService userDetailsService;
 
     public void setAuthorization() {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(currentUsername);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(defaultUser);
         UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
@@ -59,33 +60,13 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        return appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
-    public void uploadFlatFilesToVersion(ProjectVersion projectVersion,
-                                         String pathToFileDir) throws Exception {
-        uploadFlatFilesToVersion(projectVersion,
-            pathToFileDir,
-            AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles);
-    }
-
-    public JSONObject uploadFlatFilesToVersion(ProjectVersion projectVersion,
-                                               String pathToFileDir,
-                                               String baseRoute) throws Exception {
-        assertTokenExists();
-        String path = RouteBuilder
-            .withRoute(baseRoute)
-            .withVersion(projectVersion)
-            .get();
-        MockMultipartHttpServletRequestBuilder beforeRequest = createMultiPartRequest(path,
-            pathToFileDir);
-        return sendRequest(beforeRequest, status().isCreated(), this.token);
-    }
-
-    public ProjectVersion createProjectAndUploadBeforeFiles(String projectName) throws SafaError, IOException {
+    public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
-        List<MultipartFile> files = MultipartHelper.createMultipartFilesFromDirectory(
+        List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
             ProjectPaths.PATH_TO_DEFAULT_PROJECT,
             "files");
         fileUploadService.uploadFilesToServer(project, files);
@@ -105,18 +86,17 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
-        String route = RouteBuilder
+        return SafaRequest
             .withRoute(AppRoutes.Projects.Commits.commitChange)
             .withVersion(commitVersion)
-            .get();
-        return sendPost(route, commitBuilder.asJson(), expectedStatus);
+            .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
     }
 
-    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName) throws Exception {
-        return setupDualVersions(projectName, true);
+    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName) throws Exception {
+        return createDualVersions(projectName, true);
     }
 
-    protected Pair<ProjectVersion, ProjectVersion> setupDualVersions(String projectName, boolean uploadFiles) throws Exception {
+    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName, boolean uploadFiles) throws Exception {
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
@@ -126,8 +106,8 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
         ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
 
         if (uploadFiles) {
-            uploadFlatFilesToVersion(beforeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
-            uploadFlatFilesToVersion(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
+            FlatFileRequest.updateProjectVersionFromFlatFiles(beforeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
         }
 
         return new Pair<>(beforeVersion, afterVersion);
@@ -145,18 +125,19 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
     protected JSONObject shareProject(Project project,
                                       String email,
                                       ProjectRole role,
-                                      ResultMatcher httpResult) throws Exception {
+                                      ResultMatcher resultMatcher) throws Exception {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        String url = RouteBuilder.withRoute(AppRoutes.Projects.Membership.addProjectMember).withProject(project).get();
-        return sendPost(url, toJson(request), httpResult);
+        return SafaRequest
+            .withRoute(AppRoutes.Projects.Membership.addProjectMember)
+            .withProject(project)
+            .postWithJsonObject(request, resultMatcher);
     }
 
     protected JSONArray getProjectMembers(Project project) throws Exception {
-        String url = RouteBuilder
+        return SafaRequest
             .withRoute(AppRoutes.Projects.Membership.getProjectMembers)
             .withProject(project)
-            .get();
-        return sendGetWithArrayResponse(url, status().is2xxSuccessful());
+            .getWithJsonArray();
     }
 
     protected void assertMatch(Object expected, Object actual) {
@@ -195,23 +176,21 @@ public class ApplicationBaseTest extends WebSocketBaseTest {
 
     protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion,
                                                     JSONObject docJson) throws Exception {
-        String route =
-            RouteBuilder
+        return
+            SafaRequest
                 .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
                 .withVersion(projectVersion)
-                .get();
-        return sendPost(route, docJson, status().isCreated());
+                .postWithJsonObject(docJson);
     }
 
     protected JSONArray addArtifactToDocument(ProjectVersion projectVersion,
                                               Document document,
                                               JSONArray artifactsJson) throws Exception {
-        String route = RouteBuilder
+        return SafaRequest
             .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
             .withVersion(projectVersion)
             .withDocument(document)
-            .get();
-        return sendPostWithArrayResponse(route, artifactsJson);
+            .postWithJsonArray(artifactsJson);
     }
 
     protected String getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {

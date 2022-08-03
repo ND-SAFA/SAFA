@@ -64,7 +64,7 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * For FTA logic nodes,  the logical operator of this node.
      */
-    public FTANodeType logicType;
+    public FTAType logicType;
 
     public ArtifactAppEntity() {
         this.id = "";

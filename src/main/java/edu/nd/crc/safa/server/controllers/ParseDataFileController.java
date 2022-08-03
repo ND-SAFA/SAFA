@@ -6,29 +6,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFile;
-import edu.nd.crc.safa.importer.flatfiles.TraceFileParser;
+import edu.nd.crc.safa.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.flatfiles.entities.AbstractTraceFile;
+import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.server.entities.api.FileParser;
-import edu.nd.crc.safa.server.entities.api.ParseArtifactFileResponse;
-import edu.nd.crc.safa.server.entities.api.ParseFileResponse;
-import edu.nd.crc.safa.server.entities.api.ParseTraceFileResponse;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.ModificationType;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
 
-import org.apache.commons.csv.CSVParser;
-import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,18 +64,34 @@ public class ParseDataFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.parseArtifactFile)
     @ResponseStatus(HttpStatus.OK)
-    public ParseArtifactFileResponse parseArtifactFile(@PathVariable String artifactType,
-                                                       @RequestParam MultipartFile file) {
-        ParseArtifactFileResponse response = new ParseArtifactFileResponse();
+    public EntityParsingResult<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
+                                                                            @RequestParam MultipartFile file) {
+        EntityParsingResult<ArtifactAppEntity, String> response = new EntityParsingResult<>();
         tryParseFile(response, () -> {
-            CSVParser fileCSV = ArtifactFile.readArtifactFile(file);
-            EntityCreation<ArtifactAppEntity, String> entityCreationResponse =
-                ArtifactFile.parseArtifactFileIntoApplicationEntities(
-                    artifactType,
-                    file.getOriginalFilename(),
-                    fileCSV);
-            response.setArtifacts(entityCreationResponse.getEntities());
-            response.setErrors(entityCreationResponse.getErrors());
+            AbstractArtifactFile<? extends Object> artifactFile =
+                DataFileBuilder.createArtifactFileParser(artifactType,
+                    DocumentType.ARTIFACT_TREE,
+                    file);
+            response.setEntities(artifactFile.getEntities());
+            response.setErrors(artifactFile.getErrors());
+        });
+        return response;
+    }
+
+    /**
+     * Parses an trace link data file containing list of source and target artifact pairs into trace links entities.
+     *
+     * @param file The file defining a list of trace links containing columns source and target.
+     * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
+     */
+    @PostMapping(value = AppRoutes.Projects.FlatFiles.parseTraceFile)
+    @ResponseStatus(HttpStatus.OK)
+    public EntityParsingResult<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
+        EntityParsingResult<TraceAppEntity, String> response = new EntityParsingResult<>();
+        tryParseFile(response, () -> {
+            AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(file);
+            response.setEntities(traceFile.getEntities());
+            response.setErrors(traceFile.getErrors());
         });
         return response;
     }
@@ -113,28 +125,7 @@ public class ParseDataFileController extends BaseController {
         return response;
     }
 
-    /**
-     * Parses an trace link data file containing list of source and target artifact pairs into trace links entities.
-     *
-     * @param file The file defining a list of trace links containing columns source and target.
-     * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
-     */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.parseTraceFile)
-    @ResponseStatus(HttpStatus.OK)
-    public ParseTraceFileResponse parseTraceFile(@RequestParam MultipartFile file) {
-        ParseTraceFileResponse response = new ParseTraceFileResponse();
-        tryParseFile(response, () -> {
-            EntityCreation<TraceAppEntity, Pair<String, Long>> parseResponse =
-                TraceFileParser.readTraceFile(file);
-            List<String> errors = parseResponse.getErrors().stream().map(Pair::getValue0).collect(Collectors.toList());
-
-            response.setTraces(parseResponse.getEntities());
-            response.setErrors(errors);
-        });
-        return response;
-    }
-
-    private void tryParseFile(ParseFileResponse response, FileParser fileParser) {
+    private <T> void tryParseFile(EntityParsingResult<T, String> response, FileParser fileParser) {
         try {
             fileParser.parseFile();
         } catch (Exception e) {

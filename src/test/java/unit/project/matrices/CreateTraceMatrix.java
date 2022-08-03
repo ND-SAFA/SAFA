@@ -1,11 +1,10 @@
 package unit.project.matrices;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.TraceMatrix;
@@ -32,13 +31,12 @@ public class CreateTraceMatrix extends TraceMatrixBaseTest {
         assertThat(projectMatrices.size()).isEqualTo(0);
 
         // Step - Send request
-        String route = RouteBuilder
+        SafaRequest
             .withRoute(AppRoutes.Projects.TraceMatrix.createTraceMatrix)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
-            .get();
-        sendPost(route, new JSONObject(), status().isOk());
+            .postWithJsonObject(new JSONObject());
 
         // VP - Assert that single matrix exists for project.
         projectMatrices = traceMatrixRepository.findByProject(project);

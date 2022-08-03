@@ -1,43 +1,33 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import lombok.AllArgsConstructor;
+
 /**
  * Enumeration of the type of documents a project may have.
  */
+@AllArgsConstructor
 public enum DocumentType {
     /**
      * Document containing only pure system artifacts.
      */
-    ARTIFACT_TREE {
-        public String toString() {
-            return "ARTIFACT_TREE";
-        }
-    },
+    ARTIFACT_TREE("ARTIFACT_TREE"),
     /**
-     * Document containing system artifacts and the nodes for
-     * conducting a fault tree analysis.
+     * Document containing AND & OR nodes
      */
-    FTA {
-        public String toString() {
-            return "FTA";
-        }
-    },
+    FTA("FTA"),
     /**
-     * Document containing system artifacts and nodes required
-     * for constructing a safety case
+     * Document containing context, goals, strategies, and evidence.
      */
-    SAFETY_CASE {
-        public String toString() {
-            return "SAFETY_CASE";
-        }
-    },
+    SAFETY_CASE("SAFETY_CASE"),
+    /**
+     * Document being represented in a table.
+     */
+    FMEA("FMEA");
 
-    /**
-     * Document containing system artifacts containing custom fields
-     * in a table
-     */
-    FMEA {
-        public String toString() {
-            return "FMEA";
-        }
-    },
+    private String value;
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
 }

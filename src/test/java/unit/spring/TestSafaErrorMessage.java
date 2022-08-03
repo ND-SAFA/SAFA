@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.Project;
 
@@ -18,18 +18,17 @@ import unit.ApplicationBaseTest;
  * - status (0 if success otherwise some error code > 0)
  * - body (contains error message and other information)
  */
-public class TestSafaErrorMessage extends ApplicationBaseTest {
+class TestSafaErrorMessage extends ApplicationBaseTest {
 
     @Test
-    public void testServerError() throws Exception {
+    void testServerError() throws Exception {
         Project project = new Project();
         project.setProjectId(UUID.randomUUID());
-        String routeName = RouteBuilder
+
+        JSONObject obj = SafaRequest
             .withRoute(AppRoutes.Projects.Versions.getVersions)
             .withProject(project)
-            .get();
-
-        JSONObject obj = sendGet(routeName, status().isBadRequest());
+            .getWithJsonObject(status().is4xxClientError());
 
         //Verification Points
         Object error = obj.get("message");

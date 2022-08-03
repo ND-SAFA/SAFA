@@ -2,12 +2,11 @@ package unit.project.parse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import unit.ApplicationBaseTest;
 
 /**
@@ -15,20 +14,12 @@ import unit.ApplicationBaseTest;
  */
 public class ParseBaseTest extends ApplicationBaseTest {
 
-    protected String uploadArtifactFileAndGetError(String routeName, String fileName) throws Exception {
-        return uploadEntityFileAndGetError(routeName, fileName, "artifacts");
-    }
-
-    protected String uploadTraceFileAndGetError(String routeName, String fileName) throws Exception {
-        return uploadEntityFileAndGetError(routeName, fileName, "traces");
-    }
-
-    protected String uploadEntityFileAndGetError(String routeName, String fileName, String entityName) throws Exception {
+    public String uploadEntityFileAndGetError(String routeName, String fileName) throws Exception {
         // Step - Upload file and get response body
         JSONObject body = parseFileAndReturnBody(routeName, fileName);
 
         // Step - Extract artifact and errors from body
-        JSONArray entities = body.getJSONArray(entityName);
+        JSONArray entities = body.getJSONArray("entities");
         JSONArray errors = body.getJSONArray("errors");
 
         // VP - Verify that message contains constraint
@@ -38,26 +29,26 @@ public class ParseBaseTest extends ApplicationBaseTest {
         return errors.getString(0);
     }
 
-    protected JSONArray uploadArtifactFileAndGetArtifacts(String routeName, String fileName) throws Exception {
+    protected JSONArray uploadFileAndGetEntities(String routeName, String fileName) throws Exception {
         // Step - Upload file and get response body
         JSONObject body = parseFileAndReturnBody(routeName, fileName);
 
         // Step - Extract artifact and errors from body
-        JSONArray artifacts = body.getJSONArray("artifacts");
+        JSONArray entities = body.getJSONArray("entities");
         JSONArray errors = body.getJSONArray("errors");
 
         // VP - Verify that message contains constraint
         assertThat(errors.length()).isEqualTo(0);
 
-        return artifacts;
+        return entities;
     }
 
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
-        String pathToFile = ProjectPaths.PATH_TO_DEFAULT_PROJECT + "/" + fileName;
-        MockMultipartHttpServletRequestBuilder request = createSingleFileRequest(routeName, pathToFile);
-
-        // Step - Extract artifact and errors from body
-        return sendRequest(request, MockMvcResultMatchers.status().isOk(), this.token);
+        String pathToFile = ProjectPaths.getPathToDefaultProjectFile(fileName);
+        return SafaRequest
+            .withRoute(routeName)
+            .getFlatFileHelper()
+            .postWithFile(pathToFile);
     }
 }

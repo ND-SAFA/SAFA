@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.entities.db.IArtifact;
@@ -28,7 +28,7 @@ import unit.ApplicationBaseTest;
  * 4. Deletion of artifacts
  * 5. Recreation of artifacts
  */
-public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest {
+abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest {
     String projectName = "test-project";
     String projectDescription = "project-description";
     String artifactName = "RE-10";
@@ -55,7 +55,7 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
     }
 
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         // Step - Create project with artifact type
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
@@ -162,12 +162,11 @@ public abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationB
             .withModifiedArtifact(artifactJson));
 
         // Step - Get project delta
-        String deltaRouteName = RouteBuilder
+        JSONObject projectDelta = SafaRequest
             .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
-            .get();
-        JSONObject projectDelta = sendGet(deltaRouteName);
+            .getWithJsonObject();
 
         // VP - Verify that change is detected
         JSONObject modifiedArtifacts = projectDelta.getJSONObject("artifacts").getJSONObject("modified");

@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.server.entities.app.project.FTANodeType;
+import edu.nd.crc.safa.server.entities.app.project.FTAType;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -37,14 +37,14 @@ public class FTAArtifact implements IArtifact {
      * For FTA nodes, the logic type of the artifact (e.g. AND / OR)
      */
     @Column(name = "logic_type")
-    FTANodeType logicType;
+    FTAType logicType;
 
     public FTAArtifact() {
     }
 
-    public FTAArtifact(Artifact artifact, FTANodeType ftaNodeType) {
+    public FTAArtifact(Artifact artifact, FTAType ftaType) {
         this.artifact = artifact;
-        this.logicType = ftaNodeType;
+        this.logicType = ftaType;
     }
 
     public UUID getFtaArtifactId() {
@@ -63,11 +63,11 @@ public class FTAArtifact implements IArtifact {
         this.artifact = artifact;
     }
 
-    public FTANodeType getLogicType() {
+    public FTAType getLogicType() {
         return logicType;
     }
 
-    public void setLogicType(FTANodeType logicType) {
+    public void setLogicType(FTAType logicType) {
         this.logicType = logicType;
     }
 

@@ -2,13 +2,12 @@ package unit.project.artifacts;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.Hashtable;
 import java.util.Map;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.delta.EntityDelta;
 import edu.nd.crc.safa.server.entities.app.delta.ModifiedEntity;
+import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
 
@@ -66,7 +65,7 @@ public class TestArtifactCustomFields extends ApplicationBaseTest {
         ArtifactAppEntity appEntity =
             artifactVersionRepository.retrieveAppEntitiesByProjectVersion(projectVersion).get(0);
         Map<String, String> customFieldsResponse = appEntity.customFields;
-        assertThat(customFieldsResponse.size()).isEqualTo(1);
+        assertThat(customFieldsResponse.size()).isOne();
         assertThat(customFieldsResponse.containsKey(fieldName)).isTrue();
         assertThat(customFieldsResponse.get(fieldName)).isEqualTo(fieldValue);
 
@@ -83,7 +82,7 @@ public class TestArtifactCustomFields extends ApplicationBaseTest {
         // Step - Get delta
         EntityDelta<ArtifactAppEntity> delta = this.artifactVersionRepository.calculateEntityDelta(projectVersion,
             afterVersion);
-        Hashtable<String, ModifiedEntity<ArtifactAppEntity>> modifiedArtifacts = delta.getModified();
+        Map<String, ModifiedEntity<ArtifactAppEntity>> modifiedArtifacts = delta.getModified();
 
         // VP - Verify change detected
         assertThat(modifiedArtifacts.containsKey(artifactId)).isTrue();

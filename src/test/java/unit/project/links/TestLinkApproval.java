@@ -1,7 +1,6 @@
 package unit.project.links;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.RouteBuilder;
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
@@ -26,10 +27,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that generated trace links are able to be reviewed.
  */
-public class TestLinkApproval extends TraceBaseTest {
+class TestLinkApproval extends TraceBaseTest {
 
     @Test
-    public void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
+    void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
         String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
@@ -50,7 +51,9 @@ public class TestLinkApproval extends TraceBaseTest {
 
         // Step - Get generated links for project version
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
+        JSONArray links = SafaRequest
+            .withRoute(url)
+            .getWithJsonArray();
 
         // VP - Verify that single generated link is returned.
         assertThat(links.length()).isEqualTo(1);
@@ -137,11 +140,11 @@ public class TestLinkApproval extends TraceBaseTest {
         Project project = projectVersion.getProject();
 
         // Step - Upload flat files and generate some trace links
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // Step - Get all trace links that were generated.
         String url = getGeneratedLinkEndpoint(projectVersion);
-        JSONArray links = sendGetWithArrayResponse(url, status().isOk());
+        JSONArray links = SafaRequest.withRoute(url).getWithJsonArray();
         int numberOfLinks = links.length();
 
         // Step - Construct list of artifact app entities from the generated links
@@ -162,13 +165,15 @@ public class TestLinkApproval extends TraceBaseTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.Links.generateLinks).get();
+        String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.Links.generateLinks).buildEndpoint();
 
         JSONObject generateTraceLinkBody = new JSONObject();
         generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
         generateTraceLinkBody.put("targetArtifacts", targetArtifacts);
 
-        JSONArray generatedLinks = sendPostWithArrayResponse(generateRoute, generateTraceLinkBody);
+        JSONArray generatedLinks = SafaRequest
+            .withRoute(generateRoute)
+            .postWithJsonArray(generateTraceLinkBody);
 
         // VP - Verify that same number of links were generated.
         assertThat(generatedLinks.length()).isEqualTo(numberOfLinks);
@@ -188,7 +193,7 @@ public class TestLinkApproval extends TraceBaseTest {
 
         // Step - Create project with artifacts.
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify that trace does not exist
         Project project = projectVersion.getProject();

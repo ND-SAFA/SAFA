@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.Project;
@@ -12,7 +13,7 @@ import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
@@ -32,7 +33,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
-        uploadFlatFilesToVersion(updateVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(updateVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify that no artifacts associated with empty version
         List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
@@ -44,12 +45,12 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
         assertThat(updateBodies.size())
             .as("bodies created in later version")
-            .isEqualTo(SampleProjectConstants.N_ARTIFACTS);
+            .isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
         List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(updateTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
+        assertThat(updateTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
-        uploadFlatFilesToVersion(noChangeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - No new artifacts were created
         List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);
@@ -59,6 +60,6 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
         // VP - No new trace links were created
         List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(noChangeTraces.size()).isEqualTo(SampleProjectConstants.N_LINKS);
+        assertThat(noChangeTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
     }
 }

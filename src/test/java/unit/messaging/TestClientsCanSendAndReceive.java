@@ -2,6 +2,7 @@ package unit.messaging;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
@@ -36,7 +37,7 @@ public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
             .subscribeToVersion(clientTwo, projectVersion);
 
         // Step - Upload flat files
-        this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Artifact and traces received
         assertThat(getQueueSize(clientOne)).isEqualTo(1);

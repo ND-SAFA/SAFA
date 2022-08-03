@@ -61,7 +61,7 @@ public class ProjectService {
      */
     public void deleteProject(Project project) throws SafaError {
         this.projectRepository.delete(project);
-        OSHelper.deletePath(ProjectPaths.getPathToStorage(project));
+        OSHelper.deletePath(ProjectPaths.getPathToStorage(project, false));
     }
 
     /**

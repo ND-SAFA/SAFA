@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.builders;
 
+import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Document;
@@ -11,8 +12,8 @@ import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 /**
  * Given a route template, allows the users to specify the needed parameters and validates the final path.
  */
-public class RouteBuilder {
-    String path;
+public class RouteBuilder<T extends RouteBuilder<T>> {
+    protected String path;
 
     public RouteBuilder(String path) {
         this.path = path;
@@ -22,67 +23,72 @@ public class RouteBuilder {
         return new RouteBuilder(routeTemplate);
     }
 
-    public RouteBuilder withVersion(ProjectVersion version) {
+    public T withVersion(ProjectVersion version) {
         this.path = this.path.replace("{versionId}", version.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withProject(Project project) {
+    public T withProject(Project project) {
         this.path = this.path.replace("{projectId}", project.getProjectId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withType(ArtifactType artifactType) {
+    public T withType(ArtifactType artifactType) {
         this.path = this.path.replace("{typeId}", artifactType.getTypeId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withDocument(Document document) {
+    public T withDocument(Document document) {
         this.path = this.path.replace("{documentId}", document.getDocumentId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withBaselineVersion(ProjectVersion baselineVersion) {
+    public T withBaselineVersion(ProjectVersion baselineVersion) {
         this.path = this.path.replace("{baselineVersionId}", baselineVersion.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withTargetVersion(ProjectVersion targetVersion) {
+    public T withTargetVersion(ProjectVersion targetVersion) {
         this.path = this.path.replace("{targetVersionId}", targetVersion.getVersionId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withArtifactType(String artifactType) {
+    public T withArtifactType(String artifactType) {
         this.path = this.path.replace("{artifactType}", artifactType);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withArtifactId(Artifact artifact) {
+    public T withArtifactId(Artifact artifact) {
         this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withProjectMembership(ProjectMembership projectMembership) {
+    public T withProjectMembership(ProjectMembership projectMembership) {
         this.path = this.path.replace("{projectMembershipId}", projectMembership.getMembershipId().toString());
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withSourceArtifactTypeName(String sourceArtifactTypeName) {
+    public T withSourceArtifactTypeName(String sourceArtifactTypeName) {
         this.path = this.path.replace("{sourceArtifactTypeName}", sourceArtifactTypeName);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withTargetArtifactTypeName(String targetArtifactTypeName) {
+    public T withTargetArtifactTypeName(String targetArtifactTypeName) {
         this.path = this.path.replace("{targetArtifactTypeName}", targetArtifactTypeName);
-        return this;
+        return (T) this;
     }
 
-    public RouteBuilder withJob(JobDbEntity job) {
+    public T withJob(JobDbEntity job) {
         this.path = this.path.replace("{jobId}", job.getId().toString());
-        return this;
+        return (T) this;
     }
 
-    public String get() {
+    public T withFileType(DataFileBuilder.AcceptedFileTypes fileType) {
+        this.path = this.path.replace("{fileType}", fileType.toString());
+        return (T) this;
+    }
+
+    public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new RuntimeException("Path is not fully configured:" + this.path);
         }

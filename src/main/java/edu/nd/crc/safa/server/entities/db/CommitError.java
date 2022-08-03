@@ -12,10 +12,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for storing parsing errors when
@@ -23,6 +24,8 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "commit_error")
+@Data
+@NoArgsConstructor
 public class CommitError implements Serializable {
     @Id
     @GeneratedValue
@@ -48,9 +51,6 @@ public class CommitError implements Serializable {
     @Column(name = "description", length = 500)
     String description;
 
-    public CommitError() {
-    }
-
     public CommitError(ProjectVersion projectVersion,
                        String description,
                        ProjectEntity projectParsingActivity) {
@@ -60,27 +60,7 @@ public class CommitError implements Serializable {
         this.applicationActivity = projectParsingActivity;
     }
 
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("id", this.id);
-        json.put("description:", this.description);
-        json.put("activity:", this.applicationActivity);
-        return json.toString();
-    }
-
     public String getErrorId() {
         return this.id.toString();
-    }
-
-    public ProjectEntity getApplicationActivity() {
-        return this.applicationActivity;
-    }
-
-    public void setApplicationActivity(ProjectEntity applicationActivity) {
-        this.applicationActivity = applicationActivity;
-    }
-
-    public String getDescription() {
-        return this.description;
     }
 }

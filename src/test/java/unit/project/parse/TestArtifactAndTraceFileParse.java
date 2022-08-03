@@ -8,12 +8,12 @@ import edu.nd.crc.safa.config.AppRoutes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.SampleProjectConstants;
+import unit.DefaultProjectConstants;
 
 /**
  * Tests that system is able to parse artifact and trace files containing no errors.
  */
-public class TestArtifactAndTraceFileParse extends ParseBaseTest {
+class TestArtifactAndTraceFileParse extends ParseBaseTest {
 
     /**
      * Tests that an artifact files contains as many artifacts as were defined within in.
@@ -21,16 +21,16 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
      * @throws Exception Throws exception if http request fail.
      */
     @Test
-    public void testArtifactEntities() throws Exception {
+    void testArtifactEntities() throws Exception {
         String baseRoute = AppRoutes.Projects.FlatFiles.parseArtifactFile;
         String type = "Design";
 
         //Step - Upload file, parse artifacts, and collect them
-        String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).get();
-        JSONArray artifacts = uploadArtifactFileAndGetArtifacts(routeName, SampleProjectConstants.DESIGN_FILE);
+        String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).buildEndpoint();
+        JSONArray artifacts = uploadFileAndGetEntities(routeName, DefaultProjectConstants.File.DESIGN_FILE);
 
         //VP - Verify that all artifacts were parsed
-        assertThat(artifacts.length()).isEqualTo(SampleProjectConstants.N_DESIGNS);
+        assertThat(artifacts.length()).isEqualTo(DefaultProjectConstants.Entities.N_DESIGNS);
 
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
@@ -44,7 +44,7 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
      * @throws Exception Throws exception if http request fail.
      */
     @Test
-    public void testTraceEntities() throws Exception {
+    void testTraceEntities() throws Exception {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
@@ -52,7 +52,7 @@ public class TestArtifactAndTraceFileParse extends ParseBaseTest {
         JSONObject responseBody = parseFileAndReturnBody(route, fileName);
 
         // VP - Verify that message contains constraint
-        JSONArray traces = responseBody.getJSONArray("traces");
+        JSONArray traces = responseBody.getJSONArray("entities");
         JSONArray errors = responseBody.getJSONArray("errors");
         assertThat(traces.length()).isGreaterThan(1);
         assertThat(errors.length()).isEqualTo(0);

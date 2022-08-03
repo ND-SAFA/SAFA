@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.server.repositories.artifacts;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,8 +24,10 @@ import edu.nd.crc.safa.server.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
 import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
 import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.utilities.JSONHelper;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,9 +60,6 @@ public class ArtifactVersionRepositoryImpl
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
 
-    @Autowired
-    JSONHelper jsonHelper;
-
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
         return this.artifactVersionRepository.save(artifactVersion);
@@ -69,7 +69,8 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactVersion instantiateVersionEntityWithModification(ProjectVersion projectVersion,
                                                                     ModificationType modificationType,
                                                                     Artifact artifact,
-                                                                    ArtifactAppEntity artifactAppEntity) {
+                                                                    ArtifactAppEntity artifactAppEntity)
+        throws JsonProcessingException {
         if (modificationType == ModificationType.REMOVED || artifactAppEntity == null) {
             return new ArtifactVersion(projectVersion,
                 ModificationType.REMOVED,
@@ -83,7 +84,7 @@ public class ArtifactVersionRepositoryImpl
             artifact,
             artifactAppEntity.summary,
             artifactAppEntity.body,
-            jsonHelper.stringify(artifactAppEntity.customFields));
+            JsonFileUtilities.toJson(artifactAppEntity.customFields).toString());
     }
 
     @Override
@@ -131,7 +132,13 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
+
         ProjectVersion projectVersion = artifactVersion.getProjectVersion();
+        TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
+        };
+        Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
+
+
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
                 artifactVersion.getTypeName(),
@@ -139,7 +146,7 @@ public class ArtifactVersionRepositoryImpl
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
                 artifactVersion.getArtifact().getDocumentType(),
-                jsonHelper.parse(artifactVersion.getCustomFields()));
+                customFields);
 
         // Step 2 - Attach document links
         attachDocumentLinks(projectVersion, artifactVersion, artifactAppEntity);
@@ -191,7 +198,7 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    private void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
+    public void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
         switch (artifactAppEntity.getDocumentType()) {
             case FTA:
                 FTAArtifact ftaArtifact;

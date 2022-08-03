@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.services;
 
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
+import edu.nd.crc.safa.flatfiles.services.FileUploadService;
+import edu.nd.crc.safa.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
@@ -32,7 +32,6 @@ public class ServiceProvider {
     private final FlatFileService flatFileService;
     private final EntityVersionService entityVersionService;
     private final AppEntityRetrievalService appEntityRetrievalService;
-    private final ArtifactFileParser artifactFileParser;
     // Common
     private final NotificationService notificationService;
     private final JobService jobService;

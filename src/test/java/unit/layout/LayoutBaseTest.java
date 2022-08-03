@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.layout.ElkGraphCreator;
 import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
@@ -56,7 +57,7 @@ public class LayoutBaseTest extends ApplicationBaseTest {
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
         this.project = getProjectAtVersion(projectVersion);
         Pair<ElkNode, Hashtable<String, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(project.artifacts, project.traces);

@@ -61,7 +61,7 @@ public class EntityVersionService {
                                             @NotNull List<TraceAppEntity> traces) throws SafaError {
         this.setArtifactsAtVersionAndSaveErrors(projectVersion, artifacts);
         this.setTracesAtVersionAndSaveErrors(projectVersion, traces);
-        appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
     /**

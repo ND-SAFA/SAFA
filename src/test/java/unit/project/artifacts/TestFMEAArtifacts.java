@@ -9,7 +9,7 @@ import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;
 import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
-import edu.nd.crc.safa.utilities.JSONHelper;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,11 @@ public class TestFMEAArtifacts extends ArtifactBaseTest<Artifact> {
     @Autowired
     ProjectRetriever artifactRepository;
 
-    @Autowired
-    JSONHelper jsonHelper;
-
     @Override
     public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {
         return this.jsonBuilder
             .withProject(projectName, projectName, projectDescription)
-            .withFMEAArtifact(projectName, artifactName, artifactType, artifactBody, jsonHelper.map2Json(customFields))
+            .withFMEAArtifact(projectName, artifactName, artifactType, artifactBody, JsonFileUtilities.toJson(customFields))
             .getArtifact(projectName, artifactName);
     }
 
@@ -51,7 +48,7 @@ public class TestFMEAArtifacts extends ArtifactBaseTest<Artifact> {
     @Override
     public Map<String, Object> getJsonExpectedProperties() {
         Map<String, Object> expectedProperties = new Hashtable<>();
-        expectedProperties.put("customFields", jsonHelper.map2Json(customFields));
+        expectedProperties.put("customFields", JsonFileUtilities.toJson(customFields));
         return expectedProperties;
     }
 

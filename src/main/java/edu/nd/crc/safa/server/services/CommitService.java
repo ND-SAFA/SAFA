@@ -3,7 +3,7 @@ package edu.nd.crc.safa.server.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.common.EntityCreation;
+import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.server.entities.api.AppEntityCreator;
 import edu.nd.crc.safa.server.entities.api.CommitAction;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
@@ -152,7 +152,7 @@ public class CommitService {
                 appEntity.getBaseEntityId());
 
         // Commit added entities
-        EntityCreation<AppEntity, CommitError> addedResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> addedResponse = commitActionOnAppEntities(
             projectChange.getAdded(),
             saveOrModifyAction,
             appEntityCreator,
@@ -163,7 +163,7 @@ public class CommitService {
         commitErrors = new ArrayList<>(addedResponse.getErrors());
 
         // Commit modified entities
-        EntityCreation<AppEntity, CommitError> modifiedResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> modifiedResponse = commitActionOnAppEntities(
             projectChange.getModified(),
             saveOrModifyAction,
             appEntityCreator,
@@ -173,7 +173,7 @@ public class CommitService {
         change.getModified().addAll(entitiesModified);
 
         // Commit removed entities
-        EntityCreation<AppEntity, CommitError> removeResponse = commitActionOnAppEntities(
+        EntityParsingResult<AppEntity, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
             removeAction,
             appEntityCreator,
@@ -191,23 +191,23 @@ public class CommitService {
      * @param appEntities      The app entities to perform action on.
      * @param commitAction     The commit action applies to each app entity.
      * @param appEntityCreator The AppEntityCreator used to rebuild app entities from resulting version entities.
-     * @param <AppEntity>      The Application side entity to process.
-     * @param <VersionEntity>  The version entity of the base entity being processed.
+     * @param <A>              The Application side entity to process.
+     * @param <V>              The version entity of the base entity being processed.
      * @return List of processed app entities.
      * @throws SafaError Throws error is anything goes wrong during commit.
      */
-    private <AppEntity, VersionEntity> EntityCreation<AppEntity, CommitError> commitActionOnAppEntities(
-        List<AppEntity> appEntities,
-        CommitAction<AppEntity, VersionEntity> commitAction,
-        AppEntityCreator<AppEntity, VersionEntity> appEntityCreator,
+    private <A, V> EntityParsingResult<A, CommitError> commitActionOnAppEntities(
+        List<A> appEntities,
+        CommitAction<A, V> commitAction,
+        AppEntityCreator<A, V> appEntityCreator,
         boolean failOnError
     ) throws SafaError {
-        List<AppEntity> updatedEntities = new ArrayList<>();
+        List<A> updatedEntities = new ArrayList<>();
         List<CommitError> commitErrors = new ArrayList<>();
-        for (AppEntity appEntity : appEntities) {
-            Pair<VersionEntity, CommitError> commitResponse = commitAction.commitAction(appEntity);
+        for (A a : appEntities) {
+            Pair<V, CommitError> commitResponse = commitAction.commitAction(a);
 
-            VersionEntity versionEntity = commitResponse.getValue0();
+            V v = commitResponse.getValue0();
             CommitError commitError = commitResponse.getValue1();
             if (commitError != null) {
                 if (failOnError) {
@@ -215,11 +215,11 @@ public class CommitService {
                 } else {
                     commitErrors.add(commitError);
                 }
-            } else if (versionEntity != null) {
-                AppEntity traceAppEntity = appEntityCreator.createAppEntity(versionEntity);
-                updatedEntities.add(traceAppEntity);
+            } else if (v != null) {
+                A updatedA = appEntityCreator.createAppEntity(v);
+                updatedEntities.add(updatedA);
             }
         }
-        return new EntityCreation<>(updatedEntities, commitErrors);
+        return new EntityParsingResult<>(updatedEntities, commitErrors);
     }
 }

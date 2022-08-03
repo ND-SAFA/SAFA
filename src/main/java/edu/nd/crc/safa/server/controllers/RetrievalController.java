@@ -42,7 +42,7 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Projects.Entities.getProjectInVersion)
     public ProjectAppEntity getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.appEntityRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
     /**

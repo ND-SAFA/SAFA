@@ -16,13 +16,13 @@ import unit.ApplicationBaseTest;
 /**
  * Test that user is able to create new directory and upload files.
  */
-public class TestUploadFiles extends ApplicationBaseTest {
+class TestUploadFiles extends ApplicationBaseTest {
 
     @Test
-    public void smokeTest() throws SafaError {
+    void smokeTest() throws SafaError {
         String testName = "hellWorld";
         Project project = dbEntityBuilder.newProject(testName).getProject(testName);
-        String pathToTestProject = ProjectPaths.getPathToStorage(project, false);
+        String pathToTestProject = ProjectPaths.getPathToUploadedFiles(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();
         OSHelper.clearOrCreateDirectory(pathToTestProject);

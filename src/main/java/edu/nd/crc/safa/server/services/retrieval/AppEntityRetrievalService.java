@@ -74,7 +74,7 @@ public class AppEntityRetrievalService {
      * @param projectVersion The point in the project whose entities are being retrieved.
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectAppEntity retrieveProjectAppEntityAtProjectVersion(ProjectVersion projectVersion) {
 
         Project project = projectVersion.getProject();
 

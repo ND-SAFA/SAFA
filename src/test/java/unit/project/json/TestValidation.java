@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 
@@ -16,14 +17,14 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that each entity present in ProjectAppEntity is validated upon parsing.
  */
-public class TestValidation extends BaseProjectJsonTest {
+class TestValidation extends BaseProjectJsonTest {
     /**
      * Attempts to update it without including a project version.
      *
      * @throws Exception Throws exception is update request fails.
      */
     @Test
-    public void attemptUpdateWithoutVersionId() throws Exception {
+    void attemptUpdateWithoutVersionId() throws Exception {
         // Step - Create an empty project and version.
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
@@ -54,7 +55,7 @@ public class TestValidation extends BaseProjectJsonTest {
      * @throws Exception Throws exception is post request fails.
      */
     @Test
-    public void testProjectVersionValidation() throws Exception {
+    void testProjectVersionValidation() throws Exception {
         // Step - Create project and version.
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
@@ -82,7 +83,7 @@ public class TestValidation extends BaseProjectJsonTest {
      * @throws Exception Throws exception is post request fails.
      */
     @Test
-    public void testProjectIdentifierValidation() throws Exception {
+    void testProjectIdentifierValidation() throws Exception {
         JSONObject response = buildProjectValidationRequest(null, new ArrayList<>(), new ArrayList<>());
         assertThat(response.getString("message")).matches(".*name.*not.*null[\\s\\S]");
     }
@@ -95,7 +96,7 @@ public class TestValidation extends BaseProjectJsonTest {
      * @throws Exception Throws exception is a problem occurred while sending a http message.
      */
     @Test
-    public void testArtifactValidation() throws Exception {
+    void testArtifactValidation() throws Exception {
         // Step - Create invalid artifact - empty type name
         JSONObject invalidArtifact = jsonBuilder
             .withProject(projectName, projectName, projectDescription)
@@ -117,7 +118,7 @@ public class TestValidation extends BaseProjectJsonTest {
      * @throws Exception Throws exception is project update request fails.
      */
     @Test
-    public void testTraceValidation() throws Exception {
+    void testTraceValidation() throws Exception {
         // Step - contains
         String projectName = "trace-validation";
 
@@ -180,6 +181,7 @@ public class TestValidation extends BaseProjectJsonTest {
             projectJson.put("traces", traces);
         }
 
-        return sendPost(url, projectJson, status().isBadRequest());
+        return SafaRequest.withRoute(url)
+            .postWithJsonObject(projectJson, status().isBadRequest());
     }
 }

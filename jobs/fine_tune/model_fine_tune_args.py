@@ -32,7 +32,8 @@ class ModelFineTuneArgs(TrainingArguments):
         self.output_dir = output_path
         self.__set_args(**kwargs)
         self.model_generator = ModelGenerator(base_model, model_path)
-        self.dataset = TraceDatasetCreator(s_arts, t_arts, links, self.model_generator, self.linked_targets_only)
+        self.dataset = TraceDatasetCreator(source_artifacts=s_arts, target_artifacts=t_arts, true_links=links,
+                                           model_generator=self.model_generator, linked_targets_only=self.linked_targets_only)
 
     def __set_args(self, **kwargs) -> None:
         """

@@ -20,36 +20,15 @@ class ModelGenerator:
     __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    def __init__(self, model_path: str):
+    def __init__(self, base_model: SupportedBaseModel, model_path: str):
         """
         Handles loading model and related functions
         :param model_path: the path to the saved model
         """
         self.model_path = model_path
-        self.model_name = self._get_model_name_from_path(self.model_path)
-        self.base_model_class = self._get_base_model_class(self.model_name)
+        self.model_name = base_model.name
+        self.base_model_class = base_model.value
         self.arch_type = self._get_model_architecture_type(self.model_name)
-
-    @staticmethod
-    def _get_model_name_from_path(model_path: str) -> str:
-        """
-        Extracts the model name from the model path
-        :param model_path: location of model
-        :return: the model_name
-        """
-        return model_path.split(os.sep)[-1]
-
-    @staticmethod
-    def _get_base_model_class(model_name: str) -> PreTrainedModel:
-        """
-        Gets the base model class
-        :param model_name: the name of the model
-        :return: PreTrainedModel class
-        """
-        try:
-            return SupportedBaseModel[model_name].value
-        except KeyError:
-            raise KeyError("Model %s is not supported" % model_name)
 
     @staticmethod
     def _get_model_architecture_type(model_name: str) -> ArchitectureType:
@@ -64,8 +43,9 @@ class ModelGenerator:
         except KeyError:
             return ArchitectureType.SINGLE
 
+    # this may not be needed but keeping for now...
     @staticmethod
-    def create_path(domain: Domain, project_id: str, base_model: SupportedBaseModel):
+    def create_path(domain: Domain,  base_model: SupportedBaseModel, project_id: str,) -> str:
         """
         Creates the path to the saved model
         :param domain: domain used for pretraining
@@ -73,7 +53,7 @@ class ModelGenerator:
         :param base_model: the base model for training
         :return: the model path
         """
-        return os.path.join(domain.value, project_id, base_model.value)
+        return os.path.join(domain.value, base_model.value, project_id)
 
     def __load_model(self) -> PreTrainedModel:
         """

@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from transformers.training_args import TrainingArguments
 from data.trace_dataset_creator import TraceDatasetCreator
+from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_generator import ModelGenerator
 from constants import RESAMPLE_RATE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, EVAL_DATASET_SIZE_DEFAULT, PAD_TO_MAX_LENGTH_DEFAULT, \
     LINKED_TARGETS_ONLY_DEFAULT
@@ -15,9 +16,11 @@ class ModelFineTuneArgs(TrainingArguments):
     dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
 
-    def __init__(self, model_path: str, output_path: str, s_arts: Dict, t_arts: Dict, links: List, **kwargs):
+    def __init__(self, base_model: SupportedBaseModel, model_path: str, output_path: str, s_arts: Dict, t_arts: Dict, links: List,
+                 **kwargs):
         """
         Arguments for Learning Model
+        :param base_model: the base model
         :param model_path: location of model
         :param output_path: destination for model
         :param s_arts: source artifacts represented as id, token mappings
@@ -28,7 +31,7 @@ class ModelFineTuneArgs(TrainingArguments):
         """
         self.output_dir = output_path
         self.__set_args(**kwargs)
-        self.model_generator = ModelGenerator(model_path)
+        self.model_generator = ModelGenerator(base_model, model_path)
         self.dataset = TraceDatasetCreator(s_arts, t_arts, links, self.model_generator, self.linked_targets_only)
 
     def __set_args(self, **kwargs) -> None:

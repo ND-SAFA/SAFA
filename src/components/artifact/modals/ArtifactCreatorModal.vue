@@ -1,6 +1,6 @@
 <template>
   <generic-modal
-    :title="title"
+    :title="creatorTitle"
     :isOpen="!!isOpen"
     :isLoading="isLoading"
     size="l"

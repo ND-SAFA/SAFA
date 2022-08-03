@@ -13,8 +13,6 @@
           v-for="link in links"
           :key="link.traceLinkId"
           :link="link"
-          :source-body="artifacts[link.sourceId].body"
-          :target-body="artifacts[link.targetId].body"
           :show-approve="showApprove"
           :show-decline="showDecline"
           @link:approve="$emit('link:approve', $event)"
@@ -27,7 +25,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLink, Artifact } from "@/types";
+import { TraceLink } from "@/types";
 import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
 import SectionControls from "./SectionControls.vue";
 
@@ -51,7 +49,6 @@ export default Vue.extend({
       default: true,
     },
     links: Array as PropType<TraceLink[]>,
-    artifacts: Object as PropType<Record<string, Artifact>>,
     startOpen: {
       type: Boolean,
       default: true,

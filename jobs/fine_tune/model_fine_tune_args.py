@@ -16,8 +16,8 @@ class ModelFineTuneArgs(TrainingArguments):
     dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
 
-    def __init__(self, base_model: SupportedBaseModel, model_path: str, output_path: str, s_arts: Dict, t_arts: Dict, links: List,
-                 **kwargs):
+    def __init__(self, base_model: SupportedBaseModel, model_path: str, s_arts: Dict, t_arts: Dict, links: List = None,
+                 output_path: str = None, **kwargs):
         """
         Arguments for Learning Model
         :param base_model: the base model

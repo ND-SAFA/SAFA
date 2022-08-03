@@ -7,4 +7,5 @@ class RequestParams(Enum):
     TARGETS = "targets"
     OUTPUT_PATH = "outputPath"
     BASE_MODEL = "baseModel"
+    LINKS = "links"
 

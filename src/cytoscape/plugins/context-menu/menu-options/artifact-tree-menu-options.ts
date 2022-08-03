@@ -37,6 +37,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Link",
     tooltipText: "Create a new trace link",
     coreAsWell: true,
+    hasTrailingDivider: true,
     onClickFunction(): void {
       if (projectModule.isProjectDefined) {
         enableDrawMode();
@@ -82,6 +83,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Edit this artifact",
     selector: "node",
     coreAsWell: false,
+    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
         artifactSelectionModule.selectArtifact(artifact.id);
@@ -113,6 +115,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create an identical version of this artifact",
     selector: "node",
     coreAsWell: false,
+    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
         await handleDuplicateArtifact(artifact, {});

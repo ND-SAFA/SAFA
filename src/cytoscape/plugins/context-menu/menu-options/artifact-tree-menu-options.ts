@@ -24,11 +24,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new artifact",
     coreAsWell: true,
     onClickFunction(): void {
-      if (projectModule.isProjectDefined) {
+      projectModule.ifProjectDefined(() => {
         appModule.openArtifactCreatorTo({ isNewArtifact: true });
-      } else {
-        logModule.onWarning("Please select a project to create artifacts.");
-      }
+      });
     },
     isVisible: () => true,
   },
@@ -39,11 +37,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     hasTrailingDivider: true,
     onClickFunction(): void {
-      if (projectModule.isProjectDefined) {
+      projectModule.ifProjectDefined(() => {
         enableDrawMode();
-      } else {
-        logModule.onWarning("Please select a project to create trace links.");
-      }
+      });
     },
   },
   {
@@ -70,7 +66,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: Artifact) => {
         artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.SET_ARTIFACT_BODY(true);
+        appModule.toggleArtifactBody();
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

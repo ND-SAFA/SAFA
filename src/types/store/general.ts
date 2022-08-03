@@ -1,4 +1,4 @@
-import { TraceLink } from "@/types";
+import { DocumentType, FTANodeType, SafetyCaseType, TraceLink } from "@/types";
 
 /**
  * Enumerates the allowed trace link directions between artifact types.
@@ -18,7 +18,15 @@ export enum PanelType {
   right,
   artifactCreator,
   errorDisplay,
+  artifactBody,
+  traceLinkCreator,
 }
+
+export type PanelOpenState =
+  | boolean
+  | SafetyCaseType
+  | FTANodeType
+  | DocumentType;
 
 /**
  * Defines the state of a panel.
@@ -31,7 +39,7 @@ export interface PanelState {
   /**
    * Whether the panel is open.
    */
-  isOpen: boolean;
+  isOpen: PanelOpenState;
 }
 
 /**

@@ -2,17 +2,27 @@
   <v-container>
     <v-row>
       <v-col cols="6">
-        <h1 class="text-h5">{{ link.sourceName }}</h1>
+        <div class="d-flex justify-space-between align-end">
+          <h1 class="text-h5">{{ link.sourceName }}</h1>
+          <span class="text-caption text--secondary">
+            {{ sourceArtifact.type }}
+          </span>
+        </div>
         <v-divider />
-        <generic-artifact-body-display :body="sourceBody" />
+        <generic-artifact-body-display :body="sourceArtifact.body" />
       </v-col>
 
       <v-divider vertical inset />
 
       <v-col cols="6">
-        <h1 class="text-h5">{{ link.targetName }}</h1>
+        <div class="d-flex justify-space-between align-end">
+          <h1 class="text-h5">{{ link.targetName }}</h1>
+          <span class="text-caption text--secondary">
+            {{ targetArtifact.type }}
+          </span>
+        </div>
         <v-divider />
-        <generic-artifact-body-display :body="targetBody" />
+        <generic-artifact-body-display :body="targetArtifact.body" />
       </v-col>
     </v-row>
 
@@ -59,8 +69,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types";
+import { Artifact, TraceLink } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
+import { artifactModule } from "@/store";
 
 /**
  * Displays a trace link.
@@ -78,14 +89,6 @@ export default Vue.extend({
   props: {
     link: {
       type: Object as PropType<TraceLink>,
-      required: true,
-    },
-    sourceBody: {
-      type: String,
-      required: true,
-    },
-    targetBody: {
-      type: String,
       required: true,
     },
     showDecline: {
@@ -109,6 +112,18 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The artifact this link comes from.
+     */
+    sourceArtifact(): Artifact {
+      return artifactModule.getArtifactsById[this.link.sourceId];
+    },
+    /**
+     * @return The artifact this link goes towards.
+     */
+    targetArtifact(): Artifact {
+      return artifactModule.getArtifactsById[this.link.targetId];
+    },
     /**
      * @return The text to display on the delete button.
      */

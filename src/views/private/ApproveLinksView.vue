@@ -10,26 +10,23 @@
         show-decline
         title="Un-Reviewed Trace Links"
         :links="links"
-        :artifacts="artifactsById"
         @link:approve="handleApprove"
         @link:decline="handleDecline"
       />
       <approval-section
         show-approve
-        title="Declined Trace Links"
         :show-decline="false"
+        title="Declined Trace Links"
         :start-open="false"
         :links="declinedLinks"
-        :artifacts="artifactsById"
         @link:approve="handleApproveDeclined"
       />
       <approval-section
         show-decline
-        title="Approved Trace Links"
         :show-approve="false"
+        title="Approved Trace Links"
         :start-open="false"
         :links="approvedLinks"
-        :artifacts="artifactsById"
         @link:decline="handleDeclineApproved"
       />
     </template>
@@ -40,7 +37,7 @@
 import Vue from "vue";
 import { TraceApproval, TraceLink, ProjectVersion, EmptyLambda } from "@/types";
 import { navigateBack } from "@/router";
-import { artifactModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
 import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
 import { ApprovalSection, PrivatePage } from "@/components";
 
@@ -65,12 +62,6 @@ export default Vue.extend({
     },
   },
   computed: {
-    /**
-     * @return A collection of all artifacts, keyed by their id.
-     */
-    artifactsById() {
-      return artifactModule.getArtifactsById;
-    },
     /**
      * @return The current project version.
      */

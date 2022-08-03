@@ -122,6 +122,7 @@ export default class ProjectModule extends VuexModule {
     );
     await traceModule.deleteTraceLinks(traceLinks);
     await subtreeModule.updateSubtreeMap();
+    viewportModule.applyAutomove();
   }
 
   @Action

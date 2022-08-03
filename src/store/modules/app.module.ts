@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import type { PanelState } from "@/types";
-import { FTANodeType, PanelType, SafetyCaseType } from "@/types";
+import { PanelOpenState, PanelType } from "@/types";
 import { artifactSelectionModule } from "@/store";
 
 @Module({ namespaced: true, name: "app" })
@@ -33,15 +33,17 @@ export default class ProjectModule extends VuexModule {
    */
   private isCreateLinkEnabled = false;
   /**
-   * Whether the artifact creator is open.
-   * If the value is set to a safety case or FTA node type, then the
-   * artifact creator will open to that type set.
+   * Whether the artifact creator is open, or the type of artifact to create.
    */
-  private isArtifactCreatorOpen: boolean | string = false;
+  private isArtifactCreatorOpen: PanelOpenState = false;
   /**
    * Whether the artifact body modal is open.
    */
   private isArtifactBodyOpen = false;
+  /**
+   * Whether the trace link creator is open.
+   */
+  private isTraceLinkCreatorOpen = false;
 
   @Action
   /**
@@ -57,14 +59,6 @@ export default class ProjectModule extends VuexModule {
    */
   onLoadEnd(): void {
     this.SET_IS_LOADING(false);
-  }
-
-  @Action
-  /**
-   * Closes the side panels.
-   */
-  openErrorDisplay(): void {
-    this.openPanel(PanelType.errorDisplay);
   }
 
   @Action
@@ -96,22 +90,56 @@ export default class ProjectModule extends VuexModule {
   /**
    * Closes the side panels.
    */
-  closeCreator(): void {
-    this.closePanel(PanelType.artifactCreator);
+  toggleErrorDisplay(): void {
+    this.TOGGLE_PANEL_STATE(PanelType.errorDisplay);
+  }
+
+  @Action
+  /**
+   * Toggles whether the artifact body modal is open.
+   */
+  toggleArtifactBody(): void {
+    this.TOGGLE_PANEL_STATE(PanelType.artifactBody);
+  }
+
+  @Action
+  /**
+   * Toggles whether the trace link creator is open.
+   */
+  toggleTraceLinkCreator(): void {
+    this.TOGGLE_PANEL_STATE(PanelType.traceLinkCreator);
+  }
+
+  @Action
+  /**
+   * Opens the artifact creator to a specific node type.
+   * @param openTo - What to open to.
+   */
+  openArtifactCreatorTo(openTo: {
+    type?: PanelOpenState;
+    isNewArtifact?: boolean;
+  }): void {
+    const { type, isNewArtifact } = openTo;
+
+    if (isNewArtifact) artifactSelectionModule.clearSelections();
+
+    this.SET_PANEL_STATE({
+      type: PanelType.artifactCreator,
+      isOpen: type || true,
+    });
   }
 
   @Action
   /**
    * Closes the side panels.
    */
-  closeErrorDisplay(): void {
-    this.closePanel(PanelType.errorDisplay);
+  closeArtifactCreator(): void {
+    this.closePanel(PanelType.artifactCreator);
   }
 
   @Action
   /**
    * If a project is selected, opens the given panel.
-   *
    * @param panel - The type of panel.
    */
   openPanel(panel: PanelType): void {
@@ -124,7 +152,6 @@ export default class ProjectModule extends VuexModule {
   @Action
   /**
    * Closes the given panel.
-   *
    * @param panel - The type of panel.
    */
   closePanel(panel: PanelType): void {
@@ -134,32 +161,9 @@ export default class ProjectModule extends VuexModule {
     });
   }
 
-  @Action
-  /**
-   * Opens the artifact creator to a specific node type.
-   *
-   * @param type - The type of panel.
-   * @param isNewArtifact - Whether the artifact creator should
-   * create a new artifact.
-   */
-  openArtifactCreatorTo({
-    type,
-    isNewArtifact,
-  }: {
-    type?: SafetyCaseType | FTANodeType;
-    isNewArtifact?: boolean;
-  }): void {
-    if (isNewArtifact) {
-      artifactSelectionModule.clearSelections();
-    }
-    this.SET_ARTIFACT_CREATOR(type || true);
-  }
-
   @Mutation
   /**
    * Sets whether trace link draw mode is enabled.
-   *
-   * @param enabled - Whether to enable the draw mode.
    */
   SET_CREATE_LINK_ENABLED(enabled: boolean): void {
     this.isCreateLinkEnabled = enabled;
@@ -168,8 +172,6 @@ export default class ProjectModule extends VuexModule {
   @Mutation
   /**
    * Sets the current loading state.
-   *
-   * @param isLoading - Whether the app is loading.
    */
   SET_IS_LOADING(isLoading: boolean): void {
     this.isLoading = isLoading;
@@ -178,8 +180,6 @@ export default class ProjectModule extends VuexModule {
   @Mutation
   /**
    * Sets the current saving state.
-   *
-   * @param isSaving - Whether the app is saving.
    */
   SET_IS_SAVING(isSaving: boolean): void {
     this.isSaving = isSaving;
@@ -187,67 +187,41 @@ export default class ProjectModule extends VuexModule {
 
   @Mutation
   /**
-   * Sets the artifact creator state.
-   *
-   * @param isOpenOrType - The state of the artifact creator.
-   */
-  SET_ARTIFACT_CREATOR(isOpenOrType: boolean | string): void {
-    this.isArtifactCreatorOpen = isOpenOrType;
-  }
-
-  @Mutation
-  /**
-   * Sets whether the artifact body modal is open.
-   *
-   * @param isOpen - Whether to open the modal.
-   */
-  SET_ARTIFACT_BODY(isOpen: boolean): void {
-    this.isArtifactBodyOpen = isOpen;
-  }
-
-  @Mutation
-  /**
    * Sets whether a panel is open or closed.
-   *
    * @param panelState - The panel type and whether it should be open.
    */
   SET_PANEL_STATE(panelState: PanelState): void {
-    const { isOpen } = panelState;
+    const { isOpen, type: panel } = panelState;
+    const value = !!isOpen;
 
-    switch (panelState.type) {
-      case PanelType.left:
-        this.isLeftOpen = isOpen;
-        break;
-      case PanelType.right:
-        this.isRightOpen = isOpen;
-        break;
-      case PanelType.artifactCreator:
-        this.isArtifactCreatorOpen = isOpen;
-        break;
-      case PanelType.errorDisplay:
-        this.isErrorDisplayOpen = isOpen;
-        break;
-      default:
-        throw Error("Unrecognized panel: " + panelState.type);
+    if (panel === PanelType.left) {
+      this.isLeftOpen = value;
+    } else if (panel === PanelType.right) {
+      this.isRightOpen = value;
+    } else if (panel === PanelType.artifactCreator) {
+      this.isArtifactCreatorOpen = isOpen;
+    } else if (panel === PanelType.errorDisplay) {
+      this.isErrorDisplayOpen = value;
+    } else if (panel === PanelType.artifactBody) {
+      this.isArtifactBodyOpen = value;
+    } else if (panel === PanelType.traceLinkCreator) {
+      this.isTraceLinkCreatorOpen = value;
     }
   }
 
   @Mutation
   /**
    * Toggles the open state of the given panel.
-   *
-   * @param panel - The panel type to toggle.
    */
   TOGGLE_PANEL_STATE(panel: PanelType): void {
-    switch (panel) {
-      case PanelType.left:
-        this.isLeftOpen = !this.isLeftOpen;
-        break;
-      case PanelType.right:
-        this.isRightOpen = !this.isRightOpen;
-        break;
-      default:
-        throw Error(`${panel} cannot be toggled`);
+    if (panel === PanelType.left) {
+      this.isLeftOpen = !this.isLeftOpen;
+    } else if (panel === PanelType.right) {
+      this.isRightOpen = !this.isRightOpen;
+    } else if (panel === PanelType.artifactBody) {
+      this.isArtifactBodyOpen = !this.isArtifactBodyOpen;
+    } else if (panel === PanelType.traceLinkCreator) {
+      this.isTraceLinkCreatorOpen = !this.isTraceLinkCreatorOpen;
     }
   }
 
@@ -299,6 +273,14 @@ export default class ProjectModule extends VuexModule {
   get getIsCreateLinkEnabled(): boolean {
     return this.isCreateLinkEnabled;
   }
+
+  /**
+   * @return Whether the artifact creator is open.
+   */
+  get getIsTraceLinkCreatorOpen(): boolean {
+    return this.isTraceLinkCreatorOpen;
+  }
+
   /**
    * @return Whether the app is currently saving.
    */

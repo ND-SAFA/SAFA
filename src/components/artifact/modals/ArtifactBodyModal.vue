@@ -62,7 +62,7 @@ export default Vue.extend({
   },
   methods: {
     handleClose() {
-      appModule.SET_ARTIFACT_BODY(false);
+      appModule.toggleArtifactBody();
     },
   },
 });

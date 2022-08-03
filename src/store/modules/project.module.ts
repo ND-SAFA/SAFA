@@ -140,6 +140,19 @@ export default class ProjectModule extends VuexModule {
     typeOptionsModule.SET_TYPES(allArtifactTypes);
   }
 
+  @Action
+  /**
+   * Runs the callback only if the project is defined. Otherwise logs a warning.
+   * @param cb - The callback to run.
+   */
+  ifProjectDefined(cb: () => void): void {
+    if (this.isProjectDefined) {
+      cb();
+    } else {
+      logModule.onWarning("Please select a project.");
+    }
+  }
+
   @Mutation
   /**
    * Updates the project identifier.

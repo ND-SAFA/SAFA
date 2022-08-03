@@ -73,7 +73,7 @@ export default Vue.extend({
      * Opens the error display panel.
      */
     handleSeeError(): void {
-      appModule.openErrorDisplay();
+      appModule.toggleErrorDisplay();
     },
   },
   computed: {

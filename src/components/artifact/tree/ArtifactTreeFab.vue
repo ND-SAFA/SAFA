@@ -29,7 +29,14 @@
       small
       :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
       :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
-      :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Add Trace Link'"
+      :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
+      @click="handleDrawTraceLink"
+    />
+    <generic-icon-button
+      fab
+      small
+      icon-id="mdi-ray-start-end"
+      tooltip="Add Trace Link"
       @click="handleAddTraceLink"
     />
     <generic-icon-button
@@ -44,7 +51,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, documentModule, logModule, projectModule } from "@/store";
+import { appModule, documentModule, projectModule } from "@/store";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
@@ -75,28 +82,32 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Opens the add artifact window.
+     * Opens the add artifact modal.
      */
     handleAddArtifact(): void {
-      if (projectModule.isProjectDefined) {
+      projectModule.ifProjectDefined(() => {
         appModule.openArtifactCreatorTo({ isNewArtifact: true });
-      } else {
-        logModule.onWarning("Please select a project to create artifacts.");
-      }
+      });
+    },
+    /**
+     * Opens the add trace link modal.
+     */
+    handleAddTraceLink(): void {
+      projectModule.ifProjectDefined(() => {
+        appModule.toggleTraceLinkCreator();
+      });
     },
     /**
      * Enables the trace link creator.
      */
-    handleAddTraceLink(): void {
-      if (projectModule.isProjectDefined) {
+    handleDrawTraceLink(): void {
+      projectModule.ifProjectDefined(() => {
         if (this.isCreateLinkEnabled) {
           disableDrawMode();
         } else {
           enableDrawMode();
         }
-      } else {
-        logModule.onWarning("Please select a project to create trace links.");
-      }
+      });
     },
   },
 });

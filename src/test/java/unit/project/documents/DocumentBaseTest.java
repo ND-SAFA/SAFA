@@ -19,7 +19,7 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that the client is create a new document for a project.
  */
-public class DocumentBaseTest extends ApplicationBaseTest {
+public abstract class DocumentBaseTest extends ApplicationBaseTest {
 
     String projectName = "test-project";
     String docName = "test-document";
@@ -64,7 +64,7 @@ public class DocumentBaseTest extends ApplicationBaseTest {
 
     protected JSONArray getProjectDocuments(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
+            .withRoute(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
             .withProject(project)
             .getWithJsonArray();
     }

@@ -14,9 +14,9 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that uploading flat files incurs a single update message.
  */
-public class TestFlatFileMessage extends ApplicationBaseTest {
+class TestFlatFileMessage extends ApplicationBaseTest {
     @Test
-    public void singleMessageOnFlatFileUpload() throws Exception {
+    void singleMessageOnFlatFileUpload() throws Exception {
         String projectName = "test-project";
 
         // Step - Create project and version id

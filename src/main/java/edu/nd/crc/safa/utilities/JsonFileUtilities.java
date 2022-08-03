@@ -103,7 +103,7 @@ public interface JsonFileUtilities {
         try {
             return supplier.get();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new SafaError(e.getMessage());
         }
     }
 

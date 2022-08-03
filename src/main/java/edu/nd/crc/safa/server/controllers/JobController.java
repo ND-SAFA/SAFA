@@ -71,7 +71,7 @@ public class JobController extends BaseController {
         this.serviceProvider = serviceProvider;
     }
 
-    @GetMapping(AppRoutes.Jobs.getJobs)
+    @GetMapping(AppRoutes.Jobs.GET_JOBS)
     public List<JobAppEntity> getJobStatus() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
     }
@@ -82,7 +82,7 @@ public class JobController extends BaseController {
      * @param jobId The UUID for the job to stop.
      * @throws SafaError Throws error because still in construction.
      */
-    @DeleteMapping(AppRoutes.Jobs.deleteJob)
+    @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         //TODO: Find a way to stop jobs
         this.jobService.deleteJob(jobId);
@@ -96,7 +96,7 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.flatFileProjectUpdateJob)
+    @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
                                                  @RequestParam MultipartFile[] files) throws SafaError,

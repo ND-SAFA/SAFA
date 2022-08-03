@@ -17,7 +17,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     void retrieveNoProjects() throws Exception {
         JSONArray response = SafaRequest
-            .withRoute(AppRoutes.Projects.getProjects)
+            .withRoute(AppRoutes.Projects.GET_PROJECTS)
             .getWithJsonArray();
         assertThat(response.length()).isZero();
     }
@@ -38,7 +38,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("firstProject")
             .newProject("secondProject")
             .newProject("other project", otherUser);
-        JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.getProjects).getWithJsonArray();
+        JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isEqualTo(2);
     }
 

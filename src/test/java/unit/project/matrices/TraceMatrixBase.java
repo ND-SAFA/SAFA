@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
 /**
- * Tests that projects defined in database are able to be retrieved by user.
+ * Tests that projects defined in database are to be retrieved by user.
  */
-public class TraceMatrixBaseTest extends ApplicationBaseTest {
+public abstract class TraceMatrixBase extends ApplicationBaseTest {
 
     protected String sourceArtifactTypeName = "Requirements";
     protected String targetArtifactTypeName = "Design";

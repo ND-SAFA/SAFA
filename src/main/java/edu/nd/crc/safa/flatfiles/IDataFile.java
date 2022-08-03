@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.flatfiles;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,5 +29,5 @@ public interface IDataFile<E> {
      *
      * @param file The file to export entities to.
      */
-    void export(File file) throws Exception;
+    void export(File file) throws IOException;
 }

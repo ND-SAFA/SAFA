@@ -52,7 +52,7 @@ public class RuleService {
      */
     public List<ParserRule> getProjectRules(Project project) {
         List<Rule> databaseRules = this.ruleRepository.findByProject(project);
-        List<ParserRule> projectRules = new ArrayList<ParserRule>();
+        List<ParserRule> projectRules = new ArrayList<>();
 
         for (Rule rule : databaseRules) {
             projectRules.add(new ParserRule(

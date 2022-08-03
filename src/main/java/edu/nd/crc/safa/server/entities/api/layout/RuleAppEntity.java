@@ -53,7 +53,7 @@ public class RuleAppEntity {
     List<RuleAppEntity> subRules;
 
     public String toString() {
-        if (subRules.size() > 0) {
+        if (!subRules.isEmpty()) {
             return this.subRules
                 .stream()
                 .map(RuleAppEntity::toString)

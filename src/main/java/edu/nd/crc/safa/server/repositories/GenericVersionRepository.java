@@ -2,7 +2,6 @@ package edu.nd.crc.safa.server.repositories;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -144,11 +143,11 @@ public abstract class GenericVersionRepository<
             .stream()
             .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
             .collect(Collectors.toList());
-        Hashtable<String, List<V>> entityHashTable = new Hashtable<>();
+        Map<String, List<V>> entityHashTable = new HashMap<>();
         entityHashTable.put(entityId, versionEntities);
         List<V> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
             entityHashTable);
-        return currentVersionQuery.size() == 0 ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
+        return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
 
     /**
@@ -246,7 +245,7 @@ public abstract class GenericVersionRepository<
                     removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
-                    throw new RuntimeException("Missing case in switch for modification type:" + modificationType);
+                    throw new SafaError("Missing case in switch for modification type:" + modificationType);
             }
         }
 
@@ -292,9 +291,8 @@ public abstract class GenericVersionRepository<
     private void createOrUpdateVersionEntity(V versionEntity) throws SafaError {
         try {
             this.findExistingVersionEntity(versionEntity)
-                .ifPresent((existingVersionEntity) -> {
-                    versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId());
-                });
+                .ifPresent(existingVersionEntity ->
+                    versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
             this.save(versionEntity);
         } catch (Exception e) {
             String name = versionEntity.getBaseEntityId();
@@ -416,14 +414,12 @@ public abstract class GenericVersionRepository<
         Map<String, List<V>> nameToVersionEntityMap) {
         List<V> entityVersionsAtProjectVersion = new ArrayList<>();
 
-        for (String entityName : nameToVersionEntityMap.keySet()) {
-            List<V> allEntityVersion = nameToVersionEntityMap.get(entityName);
+        for (Map.Entry<String, List<V>> entry : nameToVersionEntityMap.entrySet()) {
             V latest = null;
-            for (V body : allEntityVersion) {
-                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)) {
-                    if (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion())) {
-                        latest = body;
-                    }
+            for (V body : entry.getValue()) {
+                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)
+                    && (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion()))) {
+                    latest = body;
                 }
             }
 
@@ -434,8 +430,8 @@ public abstract class GenericVersionRepository<
         return entityVersionsAtProjectVersion;
     }
 
-    private Hashtable<String, List<V>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
-        Hashtable<String, List<V>> entityHashtable = new Hashtable<>();
+    private Map<String, List<V>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
+        Map<String, List<V>> entityHashtable = new HashMap<>();
         List<V> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
         for (V versionEntity : versionEntities) {
             String entityId = versionEntity.getBaseEntityId();
@@ -452,11 +448,11 @@ public abstract class GenericVersionRepository<
 
     private V getEntityAtVersion(List<V> bodies, ProjectVersion version) {
         return this
-            .getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThanOrEqualTo(version));
+            .getLatestEntityVersionWithFilter(bodies, target -> target.isLessThanOrEqualTo(version));
     }
 
     private V getEntityBeforeVersion(List<V> bodies, ProjectVersion version) {
-        return this.getLatestEntityVersionWithFilter(bodies, (target) -> target.isLessThan(version));
+        return this.getLatestEntityVersionWithFilter(bodies, target -> target.isLessThan(version));
     }
 
     private V instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,

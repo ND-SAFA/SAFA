@@ -190,9 +190,9 @@ public class AppEntityRetrievalService {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .filter(t -> existingArtifactIds.contains(t.sourceId)
-                && existingArtifactIds.contains(t.targetId)
-                && t.approvalStatus != ApprovalStatus.DECLINED)
+            .filter(t -> existingArtifactIds.contains(t.getSourceId())
+                && existingArtifactIds.contains(t.getTargetId())
+                && t.getApprovalStatus() != ApprovalStatus.DECLINED)
             .collect(Collectors.toList());
         //TODO: Look at absorbing filter method into the retrieval method by default.
     }
@@ -212,7 +212,7 @@ public class AppEntityRetrievalService {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
-            .filter(t -> artifactName.equals(t.sourceName) || artifactName.equals(t.targetName))
+            .filter(t -> artifactName.equals(t.getSourceName()) || artifactName.equals(t.getTargetName()))
             .collect(Collectors.toList());
     }
 

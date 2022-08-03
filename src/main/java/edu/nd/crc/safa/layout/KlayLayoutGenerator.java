@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.layout;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,18 +50,18 @@ public class KlayLayoutGenerator {
     }
 
     private Map<String, LayoutPosition> createPositionMap() {
-        Map<String, LayoutPosition> positionMap = new Hashtable<>();
+        Map<String, LayoutPosition> positionMap = new HashMap<>();
         addChildrenToMap(positionMap, graph);
         return positionMap;
     }
 
     private void addPositionToMap(Map<String, LayoutPosition> map, ElkNode graph) {
         String id = graph.getIdentifier();
-        if (!map.containsKey(id)) {
+        map.computeIfAbsent(id, newKey -> {
             LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
-            map.put(id, graphPosition);
             addChildrenToMap(map, graph);
-        }
+            return graphPosition;
+        });
     }
 
     private void addChildrenToMap(Map<String, LayoutPosition> map, ElkNode graph) {

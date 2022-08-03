@@ -3,6 +3,7 @@ package edu.nd.crc.safa.server.entities.api;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,13 +15,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
 public class SafaError extends RuntimeException {
-    Exception exception;
-    List<String> errors;
-    String details;
-    String message;
+    private final Exception exception;
+    private final List<String> errors;
+    private final String message;
 
     public SafaError(String message) {
         this.message = message;
+        this.exception = null;
         this.errors = new ArrayList<>();
     }
 
@@ -33,38 +34,18 @@ public class SafaError extends RuntimeException {
                 .map(StackTraceElement::toString)
                 .collect(Collectors.toList());
         this.errors.add(0, e.getLocalizedMessage());
-        this.details = e.getMessage();
     }
 
     public void printError() {
-        if (this.exception != null) {
-            this.exception.printStackTrace();
-        } else {
-            this.printStackTrace();
-        }
+        Objects.requireNonNullElse(this.exception, this).printStackTrace();
     }
 
+    @Override
     public String getMessage() {
         return this.message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getDetails() {
-        return this.details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
     public List<String> getErrors() {
         return this.errors;
-    }
-
-    public void setErrors(List<String> newStackTrace) {
-        this.errors = newStackTrace;
     }
 }

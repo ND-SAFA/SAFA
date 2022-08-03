@@ -1,6 +1,7 @@
 package unit.project.rule;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,12 @@ import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
 import edu.nd.crc.safa.warnings.RuleName;
 
-public class AtLeastOneRuleTest implements IRuleTest {
+/**
+ * Defines a rule test consisting of creating a rule constraining
+ * defined source type to have at least one child of a defined target
+ * type.
+ */
+public class AtLeastOneRule implements IRuleTest {
     String projectName = "test";
     String ruleName = "test-rule";
     String ruleDescription = "test-description";
@@ -56,11 +62,11 @@ public class AtLeastOneRuleTest implements IRuleTest {
     public void assertWarnings(Map<String, List<RuleName>> warnings) {
         String artifactId = artifactVersion.getArtifact().getArtifactId().toString();
         assertThat(artifactId).isNotNull();
-        assertThat(warnings.containsKey(artifactId)).isTrue();
+        assertThat(warnings).containsKey(artifactId);
         String violatedRuleName = warnings
             .get(artifactId)
             .get(0)
-            .ruleName;
+            .getRuleName();
         assertThat(violatedRuleName).isEqualTo(ruleName);
     }
 }

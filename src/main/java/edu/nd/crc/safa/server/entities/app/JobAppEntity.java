@@ -2,6 +2,7 @@ package edu.nd.crc.safa.server.entities.app;
 
 import java.lang.reflect.Field;
 
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 
 /**
@@ -28,7 +29,7 @@ public class JobAppEntity extends JobDbEntity {
             jobAppEntity.steps = JobSteps.getJobSteps(jobAppEntity.jobType);
             return jobAppEntity;
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Illegally accessed field while creating job app entity.");
+            throw new SafaError("Illegally accessed field while creating job app entity.");
         }
     }
 

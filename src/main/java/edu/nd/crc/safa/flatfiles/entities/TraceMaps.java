@@ -2,7 +2,6 @@ package edu.nd.crc.safa.flatfiles.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +25,8 @@ public class TraceMaps {
         ArtifactMaps artifactMaps
     ) {
         for (TraceAppEntity trace : projectAppEntity.traces) {
-            String sourceType = artifactMaps.getArtifactByName(trace.sourceName).type;
-            String targetType = artifactMaps.getArtifactByName(trace.targetName).type;
+            String sourceType = artifactMaps.getArtifactByName(trace.getSourceName()).type;
+            String targetType = artifactMaps.getArtifactByName(trace.getTargetName()).type;
 
             if (type2traces.containsKey(sourceType)) {
                 Map<String, List<TraceAppEntity>> sourceTypeTraces = type2traces.get(sourceType);
@@ -37,7 +36,7 @@ public class TraceMaps {
                     sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
                 }
             } else {
-                Map<String, List<TraceAppEntity>> sourceTypeTraces = new Hashtable<>();
+                Map<String, List<TraceAppEntity>> sourceTypeTraces = new HashMap<>();
                 sourceTypeTraces.put(targetType, new ArrayList<>(List.of(trace)));
                 type2traces.put(sourceType, sourceTypeTraces);
             }

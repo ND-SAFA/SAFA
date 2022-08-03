@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
  * Sets up internal SAFA and JIRA authentication in order to skip
  * testing the API directly.
  */
-public class JiraBaseFlatFileTest extends JobBaseFlatFileTest {
+public abstract class JiraBaseFlatFileTest extends JobBaseFlatFileTest {
 
     String jiraProjectName = "test-jira-project";
     int N_STEPS = 5;

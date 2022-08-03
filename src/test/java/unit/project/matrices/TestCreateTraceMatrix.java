@@ -1,6 +1,7 @@
 package unit.project.matrices;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -17,22 +18,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class CreateTraceMatrix extends TraceMatrixBaseTest {
+class TestCreateTraceMatrix extends TraceMatrixBase {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
 
     @Test
-    public void createTraceMatrix() throws Exception {
+    void createTraceMatrix() throws Exception {
         Project project = this.createEmptyProject();
 
         // VP - Assert that single matrix exists for project.
         List<TraceMatrix> projectMatrices = traceMatrixRepository.findByProject(project);
-        assertThat(projectMatrices.size()).isEqualTo(0);
+        assertThat(projectMatrices).isEmpty();
 
         // Step - Send request
         SafaRequest
-            .withRoute(AppRoutes.Projects.TraceMatrix.createTraceMatrix)
+            .withRoute(AppRoutes.Projects.TraceMatrix.CREATE_TRACE_MATRIX)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)

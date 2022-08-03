@@ -41,10 +41,9 @@ public class ArtifactTypeService {
     }
 
     private String getUnknownTypeError(String typeName, List<ArtifactType> artifactTypes) {
-        String errorMessage = String.format(
+        return String.format(
             "Trace matrix definition references unknown type: %s. Defined types include: %s",
             typeName,
             artifactTypes);
-        return errorMessage;
     }
 }

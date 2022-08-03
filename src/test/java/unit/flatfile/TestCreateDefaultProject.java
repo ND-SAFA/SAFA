@@ -20,7 +20,7 @@ class TestCreateDefaultProject extends BaseFlatFileTest {
 
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
+            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 

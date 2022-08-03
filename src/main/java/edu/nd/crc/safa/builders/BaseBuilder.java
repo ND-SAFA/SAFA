@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.builders;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 
@@ -8,48 +9,48 @@ public abstract class BaseBuilder {
 
     public abstract void createEmptyData();
 
-    protected <T, K> void addEntry(Hashtable<String, Hashtable<K, T>> table,
+    protected <T, K> void addEntry(Map<String, Map<K, T>> table,
                                    String projectName,
                                    K entityIndex,
                                    T newEntity) {
         if (table.containsKey(projectName)) {
             table.get(projectName).put(entityIndex, newEntity);
         } else {
-            Hashtable<K, T> newTable = new Hashtable<>();
+            Map<K, T> newTable = new HashMap<>();
             newTable.put(entityIndex, newEntity);
             table.put(projectName, newTable);
         }
     }
 
-    protected <T> void addEntry(Hashtable<String, Hashtable<Integer, T>> table,
+    protected <T> void addEntry(Map<String, Map<Integer, T>> table,
                                 String projectName,
                                 T newEntity) {
         if (table.containsKey(projectName)) {
             int entityIndex = table.get(projectName).size();
             table.get(projectName).put(entityIndex, newEntity);
         } else {
-            Hashtable<Integer, T> newTable = new Hashtable<>();
+            Map<Integer, T> newTable = new HashMap<>();
             newTable.put(0, newEntity);
             table.put(projectName, newTable);
         }
     }
 
-    protected void addArtifactBody(Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactVersion>>> table,
+    protected void addArtifactBody(Map<String, Map<String, Map<Long, ArtifactVersion>>> table,
                                    String projectName,
                                    String artifactName,
                                    int versionIndex,
                                    ArtifactVersion body) {
         if (table.containsKey(projectName)) {
-            Hashtable<String, Hashtable<Long, ArtifactVersion>> projectTable = table.get(projectName);
-            if (projectTable.contains(artifactName)) {
-                projectTable.get(projectName).put((long) versionIndex, body);
+            Map<String, Map<Long, ArtifactVersion>> projectTable = table.get(projectName);
+            if (projectTable.containsKey(artifactName)) {
+                projectTable.get(artifactName).put((long) versionIndex, body);
             } else {
-                Hashtable<Long, ArtifactVersion> versionTable = new Hashtable<>();
+                Map<Long, ArtifactVersion> versionTable = new HashMap<>();
                 versionTable.put((long) versionIndex, body);
                 projectTable.put(artifactName, versionTable);
             }
         } else {
-            Hashtable<String, Hashtable<Long, ArtifactVersion>> projectTable = new Hashtable<>();
+            Map<String, Map<Long, ArtifactVersion>> projectTable = new HashMap<>();
             table.put(projectName, projectTable);
             addArtifactBody(table, projectName, artifactName, versionIndex, body);
         }

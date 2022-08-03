@@ -49,13 +49,13 @@ public class RuleController extends BaseController {
      * @return Mapping of artifact id's to the warnings objects present in those artifacts.
      * @throws SafaError Throws error if user does not have read permission on project version.
      */
-    @GetMapping(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
+    @GetMapping(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
     public Map<String, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.appEntityRetrievalService.retrieveWarningsInProjectVersion(projectVersion);
     }
 
-    @PostMapping(AppRoutes.Projects.Rules.createWarningInProject)
+    @PostMapping(AppRoutes.Projects.Rules.CREATE_WARNING_IN_PROJECT)
     public RuleAppEntity createWarningInProject(@PathVariable UUID projectId,
                                                 @RequestBody RuleAppEntity ruleAppEntity) {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();

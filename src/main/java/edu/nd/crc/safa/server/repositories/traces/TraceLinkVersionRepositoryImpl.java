@@ -75,8 +75,8 @@ public class TraceLinkVersionRepositoryImpl
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
             .getByProjectAndSourceAndTarget(
                 project,
-                newTrace.sourceName,
-                newTrace.targetName);
+                newTrace.getSourceName(),
+                newTrace.getTargetName());
         TraceLink traceLink = traceLinkOptional.isEmpty() ? createNewTraceLink(newTrace, project) :
             traceLinkOptional.get();
         assertNotOverridingManualLink(projectVersion, newTrace, traceLink);
@@ -134,14 +134,14 @@ public class TraceLinkVersionRepositoryImpl
     private TraceLink createNewTraceLink(TraceAppEntity newTrace, Project project) throws SafaError {
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
             .findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(project,
-                newTrace.sourceName,
-                newTrace.targetName);
+                newTrace.getSourceName(),
+                newTrace.getTargetName());
         if (traceLinkOptional.isPresent()) {
             return traceLinkOptional.get();
         }
 
-        Artifact sourceArtifact = assertAndFindArtifact(project, newTrace.sourceName);
-        Artifact targetArtifact = assertAndFindArtifact(project, newTrace.targetName);
+        Artifact sourceArtifact = assertAndFindArtifact(project, newTrace.getSourceName());
+        Artifact targetArtifact = assertAndFindArtifact(project, newTrace.getTargetName());
         TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
         traceMatrixService.assertOrCreateTraceMatrix(project,
             sourceArtifact.getType(),
@@ -159,7 +159,8 @@ public class TraceLinkVersionRepositoryImpl
                 traceLink);
         if (existingLinkOptional.isPresent()) {
             TraceLinkVersion previousTraceLinkVersion = existingLinkOptional.get();
-            if (previousTraceLinkVersion.getTraceType() == TraceType.MANUAL && newTrace.traceType != TraceType.MANUAL) {
+            if (previousTraceLinkVersion.getTraceType() == TraceType.MANUAL
+                && newTrace.getTraceType() != TraceType.MANUAL) {
                 throw new SafaError("Generated link cannot override manual one.");
             }
         }

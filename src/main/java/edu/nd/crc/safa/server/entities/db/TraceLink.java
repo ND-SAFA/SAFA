@@ -58,7 +58,7 @@ public class TraceLink implements Serializable, IBaseEntity {
         nullable = false
     )
     Artifact targetArtifact;
-    
+
     public TraceLink(Artifact sourceArtifact,
                      Artifact targetArtifact) {
         this.sourceArtifact = sourceArtifact;
@@ -92,10 +92,5 @@ public class TraceLink implements Serializable, IBaseEntity {
     @Override
     public String getBaseEntityId() {
         return this.getTraceLinkId().toString();
-    }
-
-    public boolean equals(TraceLink other) {
-        return this.sourceArtifact.getArtifactId().equals(other.sourceArtifact.getArtifactId())
-            && this.targetArtifact.getArtifactId().equals(other.targetArtifact.getArtifactId());
     }
 }

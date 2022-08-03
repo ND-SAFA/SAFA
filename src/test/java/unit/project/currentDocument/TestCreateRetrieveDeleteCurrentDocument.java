@@ -16,10 +16,10 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that a user is able to set the current document, retrieve it, and remove it.
  */
-public class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
+class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
 
     @Test
-    public void createRetrieveDeleteDocument() throws Exception {
+    void createRetrieveDeleteDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-doc";
         String docDescription = "test-doc-description";
@@ -37,7 +37,7 @@ public class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest
 
         // Step - Set current document
         SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.setCurrentDocument)
+            .withRoute(AppRoutes.Projects.Documents.SET_CURRENT_DOCUMENT)
             .withDocument(document)
             .postWithJsonObject(new JSONObject());
 
@@ -45,14 +45,14 @@ public class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest
         assertThat(getCurrentDocumentId(projectVersion)).isEqualTo(document.getDocumentId().toString());
 
         // Step - Delete currentDocumentId
-        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.clearCurrentDocument).buildEndpoint();
+        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.CLEAR_CURRENT_DOCUMENT).buildEndpoint();
         SafaRequest.withRoute(deleteRoute).deleteWithJsonObject();
 
         // VP - Verify that currentDocumentId is back to null
         assertThat(getCurrentDocumentId(projectVersion)).isNull();
     }
 
-    public String getCurrentDocumentId(ProjectVersion projectVersion) {
+    String getCurrentDocumentId(ProjectVersion projectVersion) {
         return getProjectAtVersion(projectVersion).currentDocumentId;
     }
 }

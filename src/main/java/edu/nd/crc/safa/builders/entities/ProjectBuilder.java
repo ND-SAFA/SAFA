@@ -131,7 +131,7 @@ public class ProjectBuilder {
 
         int nArtifactsInType = (int) this.artifactVersions
             .stream()
-            .filter(a -> a.getArtifact().getType().getName().equals(artifactType))
+            .filter(a -> a.getArtifact().getType().getName().equals(artifactType.getName()))
             .count();
         return String.format("%s%s", prefix, nArtifactsInType);
     }

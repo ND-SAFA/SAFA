@@ -45,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Scope("singleton")
 @AllArgsConstructor
 public class FlatFileService {
+    private static final String DELIMITER = "*";
 
     private final CommitErrorRepository commitErrorRepository;
     private final EntityVersionService entityVersionService;
@@ -140,16 +141,15 @@ public class FlatFileService {
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
                                                               List<TraceAppEntity> generatedLinks) {
-        String DELIMITER = "*";
         List<String> approvedLinks = manualLinks.stream()
-            .filter(link -> link.approvalStatus.equals(ApprovalStatus.APPROVED))
-            .map(link -> link.sourceName + DELIMITER + link.targetName)
+            .filter(link -> link.getApprovalStatus().equals(ApprovalStatus.APPROVED))
+            .map(link -> link.getSourceName() + DELIMITER + link.getTargetName())
             .collect(Collectors.toList());
 
         return generatedLinks
             .stream()
             .filter(t -> {
-                String tId = t.sourceName + DELIMITER + t.targetName;
+                String tId = t.getSourceName() + DELIMITER + t.getTargetName();
                 return !approvedLinks.contains(tId);
             })
             .collect(Collectors.toList());
@@ -204,7 +204,7 @@ public class FlatFileService {
                 .collect(Collectors.toList());
         projectCommit.getErrors().addAll(commitErrors);
     }
-    
+
     private JSONObject getTimFileContent(Project project) throws IOException {
         String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
         if (!Files.exists(Paths.get(pathToTimFile))) {

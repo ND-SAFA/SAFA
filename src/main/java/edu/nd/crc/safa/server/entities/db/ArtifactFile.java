@@ -25,7 +25,7 @@ public class ArtifactFile {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "file_id")
-    UUID FileId;
+    UUID fileId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

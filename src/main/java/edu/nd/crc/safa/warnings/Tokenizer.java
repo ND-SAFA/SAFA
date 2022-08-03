@@ -3,25 +3,29 @@ package edu.nd.crc.safa.warnings;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * The modules that parses a rule definition into a list of tokens.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Tokenizer {
 
     public static List<Token> lex(String input) {
-        String buffer = "";
+        StringBuilder buffer = new StringBuilder();
         int depth = 0;
         boolean isFunc = false;
 
-        List<Token> result = new ArrayList<Token>();
+        List<Token> result = new ArrayList<>();
         for (int i = 0; i < input.length(); i++) {
             switch (input.charAt(i)) {
                 case '(':
-                    if (!buffer.isEmpty()) {
-                        result.add(new Token(TokenType.FUNC_START, buffer));
+                    if (!buffer.toString().isEmpty()) {
+                        result.add(new Token(TokenType.FUNC_START, buffer.toString()));
                         depth = 1;
                         isFunc = true;
-                        buffer = "";
+                        buffer = new StringBuilder();
                     } else {
                         result.add(new Token(TokenType.LEFT_PAREN, "("));
                         depth++;
@@ -32,9 +36,9 @@ public class Tokenizer {
 
                     if (depth == 0 && isFunc) {
                         isFunc = false;
-                        if (!buffer.isEmpty()) {
-                            result.add(new Token(TokenType.ARGUMENT, buffer));
-                            buffer = "";
+                        if (!buffer.toString().isEmpty()) {
+                            result.add(new Token(TokenType.ARGUMENT, buffer.toString()));
+                            buffer = new StringBuilder();
                         }
                         result.add(new Token(TokenType.FUNC_END, ")"));
                     } else {
@@ -42,9 +46,9 @@ public class Tokenizer {
                     }
                     break;
                 case ',':
-                    if (!buffer.isEmpty()) {
-                        result.add(new Token(TokenType.ARGUMENT, buffer));
-                        buffer = "";
+                    if (!buffer.toString().isEmpty()) {
+                        result.add(new Token(TokenType.ARGUMENT, buffer.toString()));
+                        buffer = new StringBuilder();
                     }
                     break;
                 case '&':
@@ -52,7 +56,7 @@ public class Tokenizer {
                         result.add(new Token(TokenType.AND, "&&"));
                         i++;
                     } else {
-                        buffer += input.charAt(i);
+                        buffer.append(input.charAt(i));
                     }
                     break;
                 case '|':
@@ -60,7 +64,7 @@ public class Tokenizer {
                         result.add(new Token(TokenType.OR, "||"));
                         i++;
                     } else {
-                        buffer += input.charAt(i);
+                        buffer.append(input.charAt(i));
                     }
                     break;
                 case '!':
@@ -68,7 +72,7 @@ public class Tokenizer {
                     break;
                 default:
                     if (!Character.isWhitespace(input.charAt(i))) {
-                        buffer += input.charAt(i);
+                        buffer.append(input.charAt(i));
                     }
                     break;
             }

@@ -62,7 +62,7 @@ public class ParseDataFileController extends BaseController {
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.parseArtifactFile)
+    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
                                                                             @RequestParam MultipartFile file) {
@@ -84,7 +84,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.parseTraceFile)
+    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
         EntityParsingResult<TraceAppEntity, String> response = new EntityParsingResult<>();
@@ -103,7 +103,7 @@ public class ParseDataFileController extends BaseController {
      * @param artifactName The name / identifier of the artifact.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
-    @GetMapping(AppRoutes.Projects.Entities.checkIfArtifactExists)
+    @GetMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
                                                   @PathVariable String artifactName) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();

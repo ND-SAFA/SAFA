@@ -12,9 +12,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that projects defined in database are able to be retrieved by user.
+ * Tests that projects defined in database are to be retrieved by user.
  */
-public class UpdateAndDeleteMemberships extends BaseSharingTest {
+class TestUpdateAndDeleteMemberships extends BaseSharingTest {
 
     /**
      * Tests that a project role can be modified.
@@ -22,7 +22,7 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void updateProjectMembership() throws Exception {
+    void updateAndDeleteMemberships() throws Exception {
         String projectName = "test-project";
 
         // Step - Create and share a project.
@@ -45,7 +45,7 @@ public class UpdateAndDeleteMemberships extends BaseSharingTest {
      * @throws SafaError If http fails.
      */
     @Test
-    public void testDeleteMembership() throws Exception {
+    void testDeleteMembership() throws Exception {
 
         String projectName = "test-project";
 

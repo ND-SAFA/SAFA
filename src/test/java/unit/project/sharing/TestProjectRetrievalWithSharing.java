@@ -27,7 +27,7 @@ class TestProjectRetrievalWithSharing extends BaseSharingTest {
         createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONArray projects = SafaRequest.withRoute(AppRoutes.Projects.getProjects).getWithJsonArray();
+        JSONArray projects = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
 
         // VP - Verify that shared project is visible
         assertThat(projects.length()).isEqualTo(1);

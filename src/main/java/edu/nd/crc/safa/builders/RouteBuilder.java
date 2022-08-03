@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.builders;
 
 import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.db.Artifact;
 import edu.nd.crc.safa.server.entities.db.ArtifactType;
 import edu.nd.crc.safa.server.entities.db.Document;
@@ -90,7 +91,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public String buildEndpoint() {
         if (this.path.contains("{")) {
-            throw new RuntimeException("Path is not fully configured:" + this.path);
+            throw new SafaError("Path is not fully configured:" + this.path);
         }
         return this.path;
     }

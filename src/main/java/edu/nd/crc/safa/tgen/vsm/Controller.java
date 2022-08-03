@@ -26,14 +26,15 @@ public class Controller implements ISimilarScoreCalculator {
         double acc = 0;
         double l1 = 0;
         double l2 = 0;
-        for (String term : vec1.keySet()) {
+        for (Map.Entry<String, Double> entry : vec1.entrySet()) {
+            String term = entry.getKey();
             if (vec2.containsKey(term)) {
-                acc += vec1.get(term) * vec2.get(term);
+                acc += entry.getValue() * entry.getValue();
             }
-            l1 += vec1.get(term) * vec1.get(term);
+            l1 += entry.getValue() * entry.getValue();
         }
-        for (String term : vec2.keySet()) {
-            l2 += vec2.get(term) * vec2.get(term);
+        for (Map.Entry<String, Double> entry : vec2.entrySet()) {
+            l2 += entry.getValue() * entry.getValue();
         }
         double base = (Math.sqrt(l1) * Math.sqrt(l2));
         if (base == 0) {

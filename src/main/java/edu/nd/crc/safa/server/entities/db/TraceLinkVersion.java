@@ -99,11 +99,12 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         TraceLink traceLink,
         TraceAppEntity traceAppEntity) {
         TraceLinkVersion traceLinkVersion = new TraceLinkVersion();
-        traceLinkVersion.traceType = traceAppEntity.traceType == null ? TraceType.MANUAL : traceAppEntity.traceType;
-        traceLinkVersion.approvalStatus = traceAppEntity.approvalStatus == null
+        traceLinkVersion.traceType = traceAppEntity.getTraceType() == null
+            ? TraceType.MANUAL : traceAppEntity.getTraceType();
+        traceLinkVersion.approvalStatus = traceAppEntity.getApprovalStatus() == null
             ? getDefaultApprovalStatus(traceLinkVersion.traceType) :
-            traceAppEntity.approvalStatus;
-        traceLinkVersion.score = traceAppEntity.score == 0 ? traceLinkVersion.score : traceAppEntity.score;
+            traceAppEntity.getApprovalStatus();
+        traceLinkVersion.score = traceAppEntity.getScore() == 0 ? traceLinkVersion.score : traceAppEntity.getScore();
         traceLinkVersion.projectVersion = projectVersion;
         traceLinkVersion.modificationType = modificationType;
         traceLinkVersion.traceLink = traceLink;
@@ -220,11 +221,11 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @Override
     public boolean hasSameContent(TraceAppEntity other) {
         return hasSameContent(
-            other.sourceName,
-            other.targetName,
-            other.traceType,
-            other.approvalStatus,
-            other.score
+            other.getSourceName(),
+            other.getTargetName(),
+            other.getTraceType(),
+            other.getApprovalStatus(),
+            other.getScore()
         );
     }
 

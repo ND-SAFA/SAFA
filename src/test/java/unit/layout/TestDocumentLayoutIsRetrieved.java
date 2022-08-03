@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that nodes are formatted in a hierarchical structure.
  */
-public class TestDocumentLayout extends BaseCorrectnessTest {
+class TestDocumentLayoutIsRetrieved extends CorrectnessBaseTest {
 
     @Test
-    public void testDocumentLayoutInProjectRetrieval() throws Exception {
+    void testDocumentLayoutIsRetrieved() throws Exception {
         String documentName = "test-document";
 
         // Step - Create project
@@ -44,7 +44,7 @@ public class TestDocumentLayout extends BaseCorrectnessTest {
     }
 
     @Test
-    public void testDocumentLayoutOnCreation() throws Exception {
+    void testDocumentLayoutOnCreation() throws Exception {
         String docName = "doc-name";
         DocumentType docType = DocumentType.ARTIFACT_TREE;
         String docDescription = "";

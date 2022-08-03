@@ -9,16 +9,18 @@ import java.util.Optional;
  * Defines the client-facing entity for defining a new rule that generates project warnings.
  */
 public class ParserRule {
-    private final RuleName mRuleName;
-    public List<Token> mTokens;
-    List<String> ImplementedFunctions = Arrays.asList(
+    private static final String FALSE = "False";
+    private static final String TRUE = "True";
+    private static final List<String> IMPLEMENTED_FUNCTIONS = Arrays.asList(
         "at-least-one",
         "at-least-n",
         "exactly-one",
         "exactly-n",
         "less-than-n"
     );
-    String mText;
+    private final RuleName mRuleName;
+    private final List<Token> mTokens;
+    private final String mText;
 
     public ParserRule(ParserRule that) {
         mRuleName = that.mRuleName;
@@ -32,19 +34,15 @@ public class ParserRule {
         mTokens = Tokenizer.lex(mText);
     }
 
-    public RuleName getName() {
+    public RuleName getMRuleName() {
         return mRuleName;
-    }
-
-    public String unprocessedRule() {
-        return mText;
     }
 
     public boolean isRuleSatisfied() {
         return mTokens.get(0).tokenType == TokenType.TRUE;
     }
 
-    public boolean isValid() { // TODO: Call this when implementing saving project rules
+    public boolean isValid() {
         // Handle unbalanced parenthesis
         long lParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.LEFT_PAREN).count();
         long rParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.RIGHT_PAREN).count();
@@ -63,7 +61,7 @@ public class ParserRule {
         return mTokens
             .stream()
             .filter(t -> t.tokenType == TokenType.FUNC_START)
-            .anyMatch(t -> ImplementedFunctions.contains(t.value));
+            .anyMatch(t -> IMPLEMENTED_FUNCTIONS.contains(t.value));
     }
 
     public Optional<Function> parseFunction() {
@@ -149,9 +147,9 @@ public class ParserRule {
         }
 
         if (rulePassed) {
-            mTokens.set(start, new Token(TokenType.TRUE, "True"));
+            mTokens.set(start, new Token(TokenType.TRUE, TRUE));
         } else {
-            mTokens.set(start, new Token(TokenType.FALSE, "False"));
+            mTokens.set(start, new Token(TokenType.FALSE, FALSE));
         }
 
         for (int i = start; i < end; i++) {
@@ -201,9 +199,9 @@ public class ParserRule {
                 assert b.isBoolean();
 
                 if (b.tokenType == TokenType.TRUE) {
-                    input.set(i, new Token(TokenType.FALSE, "False"));
+                    input.set(i, new Token(TokenType.FALSE, FALSE));
                 } else {
-                    input.set(i, new Token(TokenType.TRUE, "True"));
+                    input.set(i, new Token(TokenType.TRUE, TRUE));
                 }
                 input.remove(i + 1);
                 return true;
@@ -223,9 +221,9 @@ public class ParserRule {
                 final boolean rightBool = right.tokenType == TokenType.TRUE;
 
                 if (leftBool && rightBool) {
-                    input.set(i - 1, new Token(TokenType.TRUE, "True"));
+                    input.set(i - 1, new Token(TokenType.TRUE, TRUE));
                 } else {
-                    input.set(i - 1, new Token(TokenType.FALSE, "False"));
+                    input.set(i - 1, new Token(TokenType.FALSE, FALSE));
                 }
                 input.remove(i);
                 input.remove(i);
@@ -246,9 +244,9 @@ public class ParserRule {
                 final boolean rightBool = right.tokenType == TokenType.TRUE;
 
                 if (leftBool || rightBool) {
-                    input.set(i - 1, new Token(TokenType.TRUE, "True"));
+                    input.set(i - 1, new Token(TokenType.TRUE, TRUE));
                 } else {
-                    input.set(i - 1, new Token(TokenType.FALSE, "False"));
+                    input.set(i - 1, new Token(TokenType.FALSE, FALSE));
                 }
                 input.remove(i);
                 input.remove(i);

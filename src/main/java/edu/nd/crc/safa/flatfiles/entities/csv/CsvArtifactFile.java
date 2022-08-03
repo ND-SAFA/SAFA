@@ -14,6 +14,7 @@ import edu.nd.crc.safa.server.entities.db.DocumentType;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.csv.CSVRecord;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
  * <p>File is expected to contain a name, summary, and body
  */
 @Setter
+@EqualsAndHashCode
 public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     /**
@@ -69,8 +71,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     private String[] getArtifactRow(ArtifactAppEntity artifact) {
         return new String[]{artifact.summary,
             artifact.body,
-            artifact.logicType.toString(),
-            artifact.safetyCaseType.toString()};
+            artifact.getLogicType().toString(),
+            artifact.getSafetyCaseType().toString()};
     }
 
     @Override
@@ -121,7 +123,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                     artifactAppEntity::setLogicType);
             }
 
-            return new Pair(artifactAppEntity, null);
+            return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }

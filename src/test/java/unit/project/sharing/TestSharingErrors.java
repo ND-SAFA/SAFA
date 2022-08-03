@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * 1. User is not found
  * 2. User is already on the project
  */
-public class TestSharingErrors extends BaseSharingTest {
+class TestSharingErrors extends BaseSharingTest {
 
     /**
      * Tests that error message notifies user that email is not registered
@@ -23,7 +23,7 @@ public class TestSharingErrors extends BaseSharingTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void userNotFoundError() throws Exception {
+    void userNotFoundError() throws Exception {
         String projectName = "test-project";
 
         // Step - Create a project

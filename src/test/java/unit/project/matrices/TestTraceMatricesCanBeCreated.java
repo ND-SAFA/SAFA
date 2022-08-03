@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-class TestTraceMatricesCanBeCreated extends TraceMatrixBaseTest {
+class TestTraceMatricesCanBeCreated extends TraceMatrixBase {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
@@ -33,7 +33,7 @@ class TestTraceMatricesCanBeCreated extends TraceMatrixBaseTest {
         this.traceMatrixRepository.save(traceMatrix);
 
         // Step - Send request to retrieve matrix.
-        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
+        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.GET_TRACE_MATRICES)
             .withProject(project)
             .getWithJsonObject();
 

@@ -15,7 +15,7 @@ class TestBackwardComparisons extends BaseDeltaTest {
     @Test
     void backwardsVersioning() throws Exception {
         // Step - Calculate Delta in Backwards direction
-        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .getWithJsonObject();

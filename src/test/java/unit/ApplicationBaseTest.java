@@ -87,7 +87,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Commits.commitChange)
+            .withRoute(AppRoutes.Projects.Commits.COMMIT_CHANGE)
             .withVersion(commitVersion)
             .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
     }
@@ -128,14 +128,14 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                       ResultMatcher resultMatcher) throws Exception {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.addProjectMember)
+            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
             .withProject(project)
             .postWithJsonObject(request, resultMatcher);
     }
 
     protected JSONArray getProjectMembers(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.getProjectMembers)
+            .withRoute(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
             .withProject(project)
             .getWithJsonArray();
     }
@@ -178,7 +178,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                                     JSONObject docJson) throws Exception {
         return
             SafaRequest
-                .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
+                .withRoute(AppRoutes.Projects.Documents.CREATE_OR_UPDATE_DOCUMENT)
                 .withVersion(projectVersion)
                 .postWithJsonObject(docJson);
     }
@@ -187,7 +187,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                               Document document,
                                               JSONArray artifactsJson) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
+            .withRoute(AppRoutes.Projects.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
             .withVersion(projectVersion)
             .withDocument(document)
             .postWithJsonArray(artifactsJson);

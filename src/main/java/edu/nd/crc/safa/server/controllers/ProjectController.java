@@ -51,15 +51,12 @@ public class ProjectController extends BaseController {
      * @throws SafaError Throws error if a database violation occurred while creating or updating any entities in
      *                   payload.
      */
-    @PostMapping(AppRoutes.Projects.createOrUpdateProjectMeta)
+    @PostMapping(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createOrUpdateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity)
         throws SafaError {
 
-        ProjectVersion payloadProjectVersion = projectAppEntity.projectVersion;
-        ProjectAppEntity response;
-
-        if (projectAppEntity.projectId.equals("")) { // new projects expected to have no projectId or projectVersion
+        if (projectAppEntity.projectId.isEmpty()) { // new projects expected to have no projectId or projectVersion
             // Step - Create project identifier
             Project projectEntity = Project.fromAppEntity(projectAppEntity);
             projectService.saveProjectWithCurrentUserAsOwner(projectEntity);
@@ -86,7 +83,7 @@ public class ProjectController extends BaseController {
      *
      * @return List of project identifiers.
      */
-    @GetMapping(AppRoutes.Projects.Membership.getUserProjects)
+    @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
     public List<ProjectIdentifier> getUserProjects() {
         return projectService.getCurrentUserProjects();
     }
@@ -97,7 +94,7 @@ public class ProjectController extends BaseController {
      * @param projectId UUID of project to delete.
      * @throws SafaError Throws error if project with associated id is not found.
      */
-    @DeleteMapping(AppRoutes.Projects.deleteProjectById)
+    @DeleteMapping(AppRoutes.Projects.DELETE_PROJECT_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();

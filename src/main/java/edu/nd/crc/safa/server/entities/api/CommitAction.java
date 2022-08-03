@@ -9,6 +9,6 @@ import org.javatuples.Pair;
  * and returning the version entity if successful
  * or the error otherwise.
  */
-public interface CommitAction<AppEntity, VersionEntity> {
-    Pair<VersionEntity, CommitError> commitAction(AppEntity appEntity) throws SafaError;
+public interface CommitAction<A, V> {
+    Pair<V, CommitError> commitAction(A a) throws SafaError;
 }

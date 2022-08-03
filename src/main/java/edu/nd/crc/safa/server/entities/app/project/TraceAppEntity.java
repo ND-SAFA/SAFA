@@ -1,37 +1,31 @@
 package edu.nd.crc.safa.server.entities.app.project;
 
-import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.server.entities.db.TraceType;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.json.JSONObject;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents the front-end model of a trace link.
  */
-@Getter
-@Setter
+@NoArgsConstructor
+@Data
 public class TraceAppEntity implements IAppEntity {
     @NotNull
-    public String traceLinkId; // TODO: Convert to UUID
+    String traceLinkId = "";
     @NotEmpty
-    public String sourceName;
-    public String sourceId;
+    String sourceName;
+    String sourceId;
     @NotEmpty
-    public String targetName;
-    public String targetId;
-    public ApprovalStatus approvalStatus;
-    public double score;
-    public TraceType traceType;
-
-    public TraceAppEntity() {
-        this.traceLinkId = "";
-    }
+    String targetName;
+    String targetId;
+    ApprovalStatus approvalStatus;
+    double score;
+    TraceType traceType;
 
     public TraceAppEntity(String traceLinkId,
                           String sourceName,
@@ -71,17 +65,6 @@ public class TraceAppEntity implements IAppEntity {
         return this;
     }
 
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("traceLinkId", this.traceLinkId);
-        json.put("source", sourceName);
-        json.put("target", targetName);
-        json.put("type", traceType);
-        json.put("status", approvalStatus);
-        json.put("score", score);
-        return json.toString();
-    }
-
     @Override
     public String getBaseEntityId() {
         return this.traceLinkId;
@@ -90,10 +73,5 @@ public class TraceAppEntity implements IAppEntity {
     @Override
     public void setBaseEntityId(String id) {
         this.traceLinkId = id;
-    }
-
-    public boolean equals(TraceAppEntity other) {
-        return Objects.equals(this.sourceName, other.sourceName)
-            && Objects.equals(this.targetName, other.targetName);
     }
 }

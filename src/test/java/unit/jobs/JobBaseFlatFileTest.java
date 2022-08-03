@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.flatfile.BaseFlatFileTest;
 
-public class JobBaseFlatFileTest extends BaseFlatFileTest {
+public abstract class JobBaseFlatFileTest extends BaseFlatFileTest {
 
     @Autowired
     public JobService jobService;
@@ -46,7 +46,7 @@ public class JobBaseFlatFileTest extends BaseFlatFileTest {
 
     public UUID createJobFromDefaultProject() throws Exception {
         JSONObject jobSubmissionResponse = FlatFileRequest
-            .withRoute(AppRoutes.Jobs.flatFileProjectUpdateJob)
+            .withRoute(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
             .withVersion(projectVersion)
             .getFlatFileHelper()
             .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);

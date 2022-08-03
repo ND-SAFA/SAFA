@@ -1,6 +1,6 @@
 package unit.warnings;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
-public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
+class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
     @Autowired
     RuleService ruleService;
 
     @Test
-    public void testRequirementHasNoPackageLink() {
+    void testRequirementHasNoPackageLink() {
         String projectName = "test-project";
         String targetType = "Requirement";
         String targetName = "RE-8";
@@ -54,6 +54,6 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
         // VP - Verify that target triggered warning
         String targetId = this.dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
-        assertThat(violations.containsKey(targetId)).isTrue();
+        assertThat(violations).containsKey(targetId);
     }
 }

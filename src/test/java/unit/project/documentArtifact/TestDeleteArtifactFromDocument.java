@@ -1,6 +1,7 @@
 package unit.project.documentArtifact;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import unit.ApplicationBaseTest;
  * Tests that the client is able to add multiple artifact to some
  * specified document.
  */
-class DeleteArtifactFromDocument extends ApplicationBaseTest {
+class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
 
     @Autowired
     DocumentArtifactRepository documentArtifactRepository;
@@ -34,7 +35,7 @@ class DeleteArtifactFromDocument extends ApplicationBaseTest {
      * Verifies that the response object contains
      */
     @Test
-    void testRemoveArtifactFromDocument() throws Exception {
+    void testDeleteArtifactFromDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
@@ -62,14 +63,14 @@ class DeleteArtifactFromDocument extends ApplicationBaseTest {
         Optional<DocumentArtifact> documentArtifactOptional =
             this.documentArtifactRepository.findByProjectVersionAndDocumentAndArtifact(projectVersion,
                 document, artifact);
-        assertThat(documentArtifactOptional.isPresent()).isTrue();
+        assertThat(documentArtifactOptional).isPresent();
 
         // Step - Subscribe to version updates
         createNewConnection(defaultUser)
             .subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Request artifact is removed from document
-        String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.removeArtifactFromDocument)
+        String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
             .withVersion(projectVersion)
             .withDocument(document)
             .withArtifactId(artifact)
@@ -78,7 +79,7 @@ class DeleteArtifactFromDocument extends ApplicationBaseTest {
 
         // VP - Verify that artifact is no longer linked
         List<DocumentArtifact> documentArtifactList = this.documentArtifactRepository.findByDocument(document);
-        assertThat(documentArtifactList.size()).isEqualTo(0);
+        assertThat(documentArtifactList).isEmpty();
 
         // VP - Verify that websocket message to update artifacts.
         VersionMessage message = getNextMessage(defaultUser, VersionMessage.class);

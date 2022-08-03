@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.server.entities.app.documents;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +14,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DocumentAppEntity extends Document {
-
-    List<String> artifactIds = new ArrayList<>();
-    List<DocumentColumnAppEntity> columns = new ArrayList<>();
-    Map<String, LayoutPosition> layout = new Hashtable<>();
+    private List<String> artifactIds = new ArrayList<>();
+    private List<DocumentColumnAppEntity> columns = new ArrayList<>();
+    private Map<String, LayoutPosition> layout = new HashMap<>();
 
     public DocumentAppEntity(Document document,
                              List<String> artifactIds,

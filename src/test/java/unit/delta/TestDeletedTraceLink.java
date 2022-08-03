@@ -76,7 +76,7 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
                              String expectedChange) throws Exception {
         // Step - Reverse delta
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

@@ -46,25 +46,25 @@ public class ArtifactAppEntity implements IAppEntity {
     @NotEmpty
     public String type;
     /**
-     * List of document Ids this artifact belongs to.
-     */
-    public List<String> documentIds;
-    /**
      * Mapping of columns ids to column values for this artifact.
      */
-    public Map<String, String> customFields;
+    Map<String, String> customFields;
     /**
      * The type of document this artifact is displayed in.
      */
-    public DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    DocumentType documentType = DocumentType.ARTIFACT_TREE;
     /**
      * For safety case nodes, the type of safety case node.
      */
-    public SafetyCaseType safetyCaseType;
+    SafetyCaseType safetyCaseType;
     /**
      * For FTA logic nodes,  the logical operator of this node.
      */
-    public FTAType logicType;
+    FTAType logicType;
+    /**
+     * List of document Ids this artifact belongs to.
+     */
+    List<String> documentIds;
 
     public ArtifactAppEntity() {
         this.id = "";

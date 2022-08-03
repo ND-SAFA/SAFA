@@ -121,7 +121,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
         // VP - Verify that type is created
         String typeTestName = "Artifact type created: " + typeName;
         Optional<ArtifactType> artifactType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, typeName);
-        assertThat(artifactType.isPresent()).as(typeTestName).isTrue();
+        assertThat(artifactType).as(typeTestName).isPresent();
 
         // VP - Verify that # of artifact is as expected.
         verifyNumberOfItems(typeName,

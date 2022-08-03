@@ -69,7 +69,7 @@ public class JiraIssueDTO {
             @Data
             public static class Content {
                 String type;
-                List<ContentContent> content;
+                List<ContentContent> content; // Cannot rename because this is the format defined by JIRA
             }
 
             @Data

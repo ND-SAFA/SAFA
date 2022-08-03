@@ -15,10 +15,10 @@ import unit.ApplicationBaseTest;
  * Tests that notifications are sent to subscribed users when a member is
  * added or removed from a project.
  */
-public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
+class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
 
     @Test
-    public void canSendAndReceiveMessagesBetweenClients() throws Exception {
+    void canSendAndReceiveMessagesBetweenClients() throws Exception {
         String projectName = "add-member-websocket-message";
 
         String projectMemberUsername = "user@gmail.com";

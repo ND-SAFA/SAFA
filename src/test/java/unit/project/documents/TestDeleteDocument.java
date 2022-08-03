@@ -17,13 +17,13 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that a user is able to delete a document in a project.
  */
-public class DeleteDocument extends ApplicationBaseTest {
+class TestDeleteDocument extends ApplicationBaseTest {
 
     /**
      * Verifies that a document can be deleted by a user.
      */
     @Test
-    public void testDeleteOnlyDocument() throws Exception {
+    void testDeleteOnlyDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
@@ -38,13 +38,13 @@ public class DeleteDocument extends ApplicationBaseTest {
 
         // Step - Create new document payload
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.Documents.deleteDocument)
+            .withRoute(AppRoutes.Projects.Documents.DELETE_DOCUMENT)
             .withDocument(document)
             .buildEndpoint();
         SafaRequest.withRoute(route).deleteWithJsonObject();
 
         // VP - Verify that no documents are associated with project
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        assertThat(projectDocuments.size()).isEqualTo(0);
+        assertThat(projectDocuments.size()).isZero();
     }
 }

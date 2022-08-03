@@ -14,12 +14,12 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that system able to calculate and create the next version in a project.
  */
-public class TestCreateNextRevision extends ApplicationBaseTest {
+class TestCreateNextRevision extends ApplicationBaseTest {
     @Autowired
     VersionService versionService;
 
     @Test
-    public void createNextVersion() throws SafaError {
+    void createNextVersion() throws SafaError {
         String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)

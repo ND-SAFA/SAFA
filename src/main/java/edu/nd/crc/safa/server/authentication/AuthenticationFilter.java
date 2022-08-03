@@ -10,12 +10,12 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.server.entities.db.SafaUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -41,20 +41,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
      * @return Authentication object signally a successful user authentication.
      * @throws AuthenticationException If given user is not found in database.
      */
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
-        try {
-            SafaUser applicationUser = new ObjectMapper().readValue(req.getInputStream(), SafaUser.class);
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                applicationUser.getEmail(),
-                applicationUser.getPassword(),
-                new ArrayList<>());
+        SafaUser applicationUser = new ObjectMapper().readValue(req.getInputStream(), SafaUser.class);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+            applicationUser.getEmail(),
+            applicationUser.getPassword(),
+            new ArrayList<>());
 
-            return authenticationManager.authenticate(token);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return authenticationManager.authenticate(token);
     }
 
     /**
@@ -66,7 +63,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication auth) throws IOException {
 
-        String username = ((SafaUserDetails)auth.getPrincipal()).getUsername();
+        String username = ((SafaUserDetails) auth.getPrincipal()).getUsername();
         String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
         JSONObject responseJson = new JSONObject();
 

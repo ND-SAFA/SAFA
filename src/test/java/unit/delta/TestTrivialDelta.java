@@ -33,7 +33,7 @@ class TestTrivialDelta extends BaseDeltaTest {
         dbEntityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
-        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

@@ -13,9 +13,9 @@ import edu.nd.crc.safa.server.entities.db.TraceLink;
 import unit.ApplicationBaseTest;
 
 /**
- * Tests that generated trace links are able to be reviewed.
+ * Tests that generated trace links are reviewed.
  */
-public class TraceBaseTest extends ApplicationBaseTest {
+public abstract class TraceBaseTest extends ApplicationBaseTest {
 
     protected void assertTraceExists(Project project, String sourceName, String targetName) {
         assertTraceStatus(project, sourceName, targetName, true);
@@ -36,7 +36,7 @@ public class TraceBaseTest extends ApplicationBaseTest {
     protected String getGeneratedLinkEndpoint(ProjectVersion projectVersion) {
 
         return RouteBuilder
-            .withRoute(AppRoutes.Projects.Links.getGeneratedLinksInProjectVersion)
+            .withRoute(AppRoutes.Projects.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
             .withVersion(projectVersion)
             .buildEndpoint();
     }

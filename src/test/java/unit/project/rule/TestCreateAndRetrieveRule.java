@@ -20,7 +20,7 @@ import unit.ApplicationBaseTest;
 
 class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
-    List<IRuleTest> ruleTests = List.of(new AtLeastOneRuleTest());
+    List<IRuleTest> ruleTests = List.of(new AtLeastOneRule());
 
     @Test
     void createAtLeastOneRule() throws Exception {
@@ -35,7 +35,7 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
             // Step - Create rule
             RuleAppEntity rule = ruleTest.getRule();
             JSONObject ruleCreated = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.createWarningInProject)
+                .withRoute(AppRoutes.Projects.Rules.CREATE_WARNING_IN_PROJECT)
                 .withProject(project)
                 .postWithJsonObject(rule);
 
@@ -48,7 +48,7 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
             // Step - Retrieve project warnings
             JSONObject projectWarnings = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
+                .withRoute(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
                 .withVersion(projectVersion)
                 .getWithJsonObject();
 

@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that the client can edit an existing document.
  */
-public class EditDocument extends DocumentBaseTest {
+class TestEditDocument extends DocumentBaseTest {
 
     /**
      * Verifies that a new document can be created for a project.
      */
     @Test
-    public void testEditDescription() throws Exception {
+    void testEditDescription() throws Exception {
         String newDescription = "this is another description";
         DocumentType docType = DocumentType.ARTIFACT_TREE;
 
@@ -48,7 +48,7 @@ public class EditDocument extends DocumentBaseTest {
      * Verifies that a new document can be created for a project.
      */
     @Test
-    public void testDeleteArtifactIds() throws Exception {
+    void testDeleteArtifactIds() throws Exception {
         String newDescription = "this is another description";
         String artifactName = "RE-10";
         String artifactType = "requirement";

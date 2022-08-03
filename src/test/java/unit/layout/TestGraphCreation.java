@@ -1,9 +1,10 @@
 package unit.layout;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.Hashtable;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.layout.ElkGraphCreator;
@@ -23,10 +24,10 @@ import unit.DefaultProjectConstants;
  * 3. Number of islands is detected
  * 4. Artifact positions are calculated
  */
-public class TestGraphCreation extends LayoutBaseTest {
+class TestGraphCreation extends LayoutBaseTest {
 
     @Test
-    public void testInternalMethods() {
+    void testInternalMethods() {
         String d1Name = "D1";
         String parentId = "F5";
         int nChildren = 0;
@@ -40,15 +41,15 @@ public class TestGraphCreation extends LayoutBaseTest {
     }
 
     @Test
-    public void testName2Node() {
-        assertThat(name2nodes.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+    void testName2Node() {
+        assertThat(name2nodes).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
         for (ArtifactAppEntity artifact : project.getArtifacts()) {
-            assertThat(name2nodes.containsKey(artifact.id)).isTrue();
+            assertThat(name2nodes).containsKey(artifact.id);
         }
     }
 
     @Test
-    public void testNodeAreChildrenOnGraph() {
+    void testNodeAreChildrenOnGraph() {
         List<String> graphNodesNames = this.rootGraphNode
             .getChildren()
             .stream()
@@ -59,7 +60,7 @@ public class TestGraphCreation extends LayoutBaseTest {
     }
 
     @Test
-    public void testChildrenOfTwoArtifactProject() {
+    void testChildrenOfTwoArtifactProject() {
         String rootId = "Root";
         List<String> artifactIds = List.of("R1", "R2");
         List<ArtifactAppEntity> artifacts = artifactIds
@@ -69,13 +70,13 @@ public class TestGraphCreation extends LayoutBaseTest {
         List<TraceAppEntity> traces = List.of(createTrace(artifactIds.get(0), artifactIds.get(1)));
 
         // Create Graph
-        Pair<ElkNode, Hashtable<String, ElkNode>> result = ElkGraphCreator
+        Pair<ElkNode, Map<String, ElkNode>> result = ElkGraphCreator
             .createGraphFromProject(artifacts, traces);
 
         // Extract information
         ElkNode graph = result.getValue0();
         graph.setIdentifier(rootId);
-        Hashtable<String, ElkNode> name2Node = result.getValue1();
+        Map<String, ElkNode> name2Node = result.getValue1();
 
         // VP - Verify that root node has correct children
         List<ElkNode> children = graph.getChildren();

@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Responsible for testing OSHelper IO capabilities.
  */
-public class TestOSHelperTest {
+class TestOSHelperTest {
 
     @Test
-    public void canCreateAndDeleteFolder() throws SafaError {
+    void canCreateAndDeleteFolder() throws SafaError {
         String pathToDummyFolder = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
@@ -29,7 +29,7 @@ public class TestOSHelperTest {
     }
 
     @Test
-    public void deleteNestedDirectories() throws SafaError {
+    void deleteNestedDirectories() throws SafaError {
         String pathToParent = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
         String pathToChild = pathToParent + "/pathToChild";
 

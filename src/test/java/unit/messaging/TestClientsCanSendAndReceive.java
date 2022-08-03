@@ -14,10 +14,10 @@ import unit.ApplicationBaseTest;
  * Provides a smoke test verifying that two users subscribed to the same version channel
  * are able to receive updates when the other commits them.
  */
-public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
+class TestClientsCanSendAndReceive extends ApplicationBaseTest {
 
     @Test
-    public void canSendAndReceiveMessagesBetweenClients() throws Exception {
+    void canSendAndReceiveMessagesBetweenClients() throws Exception {
         String projectName = "websocket-test";
         String clientOne = "user-1";
         String clientTwo = "user-2";

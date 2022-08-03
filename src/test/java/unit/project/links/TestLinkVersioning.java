@@ -20,7 +20,7 @@ import unit.ApplicationBaseTest;
  * TODO: Test that modification is detected
  * TODO: Test that removal is detected
  */
-public class TestLinkVersioning extends ApplicationBaseTest {
+class TestLinkVersioning extends ApplicationBaseTest {
 
     String projectName = "project-name";
 
@@ -31,7 +31,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
      * @throws Exception If http requests fails
      */
     @Test
-    public void testNoChangeDetected() throws Exception {
+    void testNoChangeDetected() throws Exception {
 
         // Step - Create project with two versions: base and target
         dbEntityBuilder

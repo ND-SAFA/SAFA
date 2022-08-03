@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that a rule definitions is correctly split into tokens.
  */
-public class TestTokenizer {
+class TestTokenizer {
 
     @Test
-    public void testLexicalParsing() {
+    void testLexicalParsing() {
         String functionName = "exactly-n";
         String query = String.format("%s(0, Requirement, child, Package)", functionName);
         List<Token> tokens = Tokenizer.lex(query);

@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation
  */
-class ApproveLinkInFutureVersion extends TraceBaseTest {
+class TestApproveLinkInFutureVersion extends TraceBaseTest {
 
     @Autowired
     AppEntityRetrievalService appEntityRetrievalService;
@@ -93,7 +93,7 @@ class ApproveLinkInFutureVersion extends TraceBaseTest {
         // VP - Verify that trace link is unreviewed
         Optional<TraceLinkVersion> unreviewedLinkQuery = traceLinkVersionRepository
             .findByProjectVersionAndTraceLink(projectVersion, generatedLink.getTraceLink());
-        assertThat(unreviewedLinkQuery.isPresent()).isTrue();
+        assertThat(unreviewedLinkQuery).isPresent();
         assertThat(unreviewedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.UNREVIEWED);
 
         // Step - Set trace link status to approved
@@ -111,7 +111,7 @@ class ApproveLinkInFutureVersion extends TraceBaseTest {
             traceLinkVersionRepository.findByProjectVersionAndTraceLink(
                 projectVersion,
                 generatedLink.getTraceLink());
-        assertThat(approvedLinkQuery.isPresent()).isTrue();
+        assertThat(approvedLinkQuery).isPresent();
         assertThat(approvedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.APPROVED);
 
         // Step - Set trace link status to decline d
@@ -128,7 +128,7 @@ class ApproveLinkInFutureVersion extends TraceBaseTest {
         Optional<TraceLinkVersion> declinedLinkQuery = traceLinkVersionRepository.findByProjectVersionAndTraceLink(
             projectVersion,
             generatedLink.getTraceLink());
-        assertThat(declinedLinkQuery.isPresent()).isTrue();
+        assertThat(declinedLinkQuery).isPresent();
         assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.DECLINED);
     }
 }

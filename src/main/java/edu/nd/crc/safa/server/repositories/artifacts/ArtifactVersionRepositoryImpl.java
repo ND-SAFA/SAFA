@@ -84,7 +84,7 @@ public class ArtifactVersionRepositoryImpl
             artifact,
             artifactAppEntity.summary,
             artifactAppEntity.body,
-            JsonFileUtilities.toJson(artifactAppEntity.customFields).toString());
+            JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
     }
 
     @Override

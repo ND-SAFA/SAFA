@@ -22,7 +22,7 @@ import unit.ApplicationBaseTest;
  * Tests that the client is able to add multiple artifact to some
  * specified document.
  */
-public class CreateArtifactInDocument extends ApplicationBaseTest {
+class TestCreateArtifactInDocument extends ApplicationBaseTest {
 
     @Autowired
     DocumentArtifactRepository documentArtifactRepository;
@@ -31,7 +31,7 @@ public class CreateArtifactInDocument extends ApplicationBaseTest {
      * Verifies that the response object contains
      */
     @Test
-    public void testCreateArtifactInDocument() throws Exception {
+    void testCreateArtifactInDocument() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";

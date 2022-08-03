@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RuleName {
-    public String ruleName;
-    public String ruleMessage;
+    private String ruleName;
+    private String ruleMessage;
 }

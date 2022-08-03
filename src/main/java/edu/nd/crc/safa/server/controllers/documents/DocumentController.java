@@ -65,7 +65,7 @@ public class DocumentController extends BaseDocumentController {
      * @return DocumentAppEntity The updated or created document.
      * @throws SafaError Throws error if authorized user does not have edit permissions.
      */
-    @PostMapping(AppRoutes.Projects.Documents.createOrUpdateDocument)
+    @PostMapping(AppRoutes.Projects.Documents.CREATE_OR_UPDATE_DOCUMENT)
     @ResponseStatus(HttpStatus.CREATED)
     public DocumentAppEntity createOrUpdateDocument(@PathVariable UUID versionId,
                                                     @RequestBody @Valid DocumentAppEntity documentAppEntity)
@@ -120,7 +120,7 @@ public class DocumentController extends BaseDocumentController {
      * @return List of project documents.
      * @throws SafaError Throws error if authorized user does not have permission to view project.
      */
-    @GetMapping(AppRoutes.Projects.Documents.getProjectDocuments)
+    @GetMapping(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         return this.appEntityRetrievalService.getDocumentsInProject(project);
@@ -134,7 +134,7 @@ public class DocumentController extends BaseDocumentController {
      * @param documentId The UUID of the document to delete.
      * @throws SafaError Throws error is authorized user does not have edit permission.
      */
-    @DeleteMapping(AppRoutes.Projects.Documents.deleteDocument)
+    @DeleteMapping(AppRoutes.Projects.Documents.DELETE_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         Document document = getDocumentById(this.documentRepository, documentId);

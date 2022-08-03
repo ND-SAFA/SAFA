@@ -1,6 +1,7 @@
 package unit.project.artifacts;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
-public class TestArtifactCustomFields extends ApplicationBaseTest {
+class TestArtifactCustomFields extends ApplicationBaseTest {
 
     @Autowired
     ArtifactVersionRepository artifactVersionRepository;
@@ -27,7 +28,7 @@ public class TestArtifactCustomFields extends ApplicationBaseTest {
      * custom fields.
      */
     @Test
-    public void createWithFields() throws Exception {
+    void createWithFields() throws Exception {
         String projectName = "test";
         String artifactName = "RE-20";
         String type = "requirements";
@@ -64,10 +65,10 @@ public class TestArtifactCustomFields extends ApplicationBaseTest {
         // VP - Verify that custom fields persisted
         ArtifactAppEntity appEntity =
             artifactVersionRepository.retrieveAppEntitiesByProjectVersion(projectVersion).get(0);
-        Map<String, String> customFieldsResponse = appEntity.customFields;
-        assertThat(customFieldsResponse.size()).isOne();
-        assertThat(customFieldsResponse.containsKey(fieldName)).isTrue();
-        assertThat(customFieldsResponse.get(fieldName)).isEqualTo(fieldValue);
+        Map<String, String> customFieldsResponse = appEntity.getCustomFields();
+        assertThat(customFieldsResponse)
+            .hasSize(1)
+            .containsEntry(fieldName, fieldValue);
 
         // Step - Create second version
         ProjectVersion afterVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
@@ -85,7 +86,7 @@ public class TestArtifactCustomFields extends ApplicationBaseTest {
         Map<String, ModifiedEntity<ArtifactAppEntity>> modifiedArtifacts = delta.getModified();
 
         // VP - Verify change detected
-        assertThat(modifiedArtifacts.containsKey(artifactId)).isTrue();
+        assertThat(modifiedArtifacts).containsKey(artifactId);
         ModifiedEntity<ArtifactAppEntity> modifiedArtifactEntity = modifiedArtifacts.get(artifactId);
         String beforeValue = modifiedArtifactEntity.getBefore().getCustomFields().get(fieldName);
         String afterValue = modifiedArtifactEntity.getAfter().getCustomFields().get(fieldName);

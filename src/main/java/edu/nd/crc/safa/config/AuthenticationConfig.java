@@ -66,8 +66,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Endpoint Settings
             .authorizeRequests()
             .antMatchers(
-                AppRoutes.Accounts.loginLink,
-                AppRoutes.Accounts.createNewUser,
+                AppRoutes.Accounts.LOGIN,
+                AppRoutes.Accounts.CREATE_ACCOUNT,
                 "/websocket/**").permitAll()
             // API Generation
             .antMatchers(

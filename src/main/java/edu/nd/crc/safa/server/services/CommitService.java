@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.common.EntityParsingResult;
-import edu.nd.crc.safa.server.entities.api.AppEntityCreator;
 import edu.nd.crc.safa.server.entities.api.CommitAction;
+import edu.nd.crc.safa.server.entities.api.IAppEntityCreator;
 import edu.nd.crc.safa.server.entities.api.ProjectChange;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -124,62 +124,62 @@ public class CommitService {
      * @param projectVersion          The project version that should be notified of the changes.
      * @param projectChange           The entities that are being touched.
      * @param versionEntityRepository The IVersionRepository used for this entity.
-     * @param appEntityCreator        The constructor for creating app entities from version entities.
-     * @param <AppEntity>             The entity used on the application side.
-     * @param <VersionEntity>         The entity used for version control.
+     * @param iAppEntityCreator       The constructor for creating app entities from version entities.
+     * @param <A>                     The entity used on the application side.
+     * @param <V>                     The entity used for version control.
      * @return ProjectChange containing processed entities.
      * @throws SafaError Throws error if anything goes wrong during any commit.
      */
-    private <AppEntity extends IAppEntity,
-        VersionEntity extends IVersionEntity<AppEntity>> Pair<ProjectChange<AppEntity>,
+    private <A extends IAppEntity,
+        V extends IVersionEntity<A>> Pair<ProjectChange<A>,
         List<CommitError>> commitEntityChanges(
         ProjectVersion projectVersion,
-        ProjectChange<AppEntity> projectChange,
-        IVersionRepository<VersionEntity, AppEntity> versionEntityRepository,
-        AppEntityCreator<AppEntity, VersionEntity> appEntityCreator,
+        ProjectChange<A> projectChange,
+        IVersionRepository<V, A> versionEntityRepository,
+        IAppEntityCreator<A, V> iAppEntityCreator,
         boolean failOnError
     ) throws SafaError {
-        ProjectChange<AppEntity> change = new ProjectChange<>();
+        ProjectChange<A> change = new ProjectChange<>();
         List<CommitError> commitErrors;
 
         // Define actions
-        CommitAction<AppEntity, VersionEntity> saveOrModifyAction = (appEntity) ->
+        CommitAction<A, V> saveOrModifyAction = a ->
             versionEntityRepository.commitAppEntityToProjectVersion(
-                projectVersion, appEntity);
-        CommitAction<AppEntity, VersionEntity> removeAction = (appEntity) ->
+                projectVersion, a);
+        CommitAction<A, V> removeAction = a ->
             versionEntityRepository.deleteVersionEntityByBaseEntityId(
                 projectVersion,
-                appEntity.getBaseEntityId());
+                a.getBaseEntityId());
 
         // Commit added entities
-        EntityParsingResult<AppEntity, CommitError> addedResponse = commitActionOnAppEntities(
+        EntityParsingResult<A, CommitError> addedResponse = commitActionOnAppEntities(
             projectChange.getAdded(),
             saveOrModifyAction,
-            appEntityCreator,
+            iAppEntityCreator,
             failOnError
         );
-        List<AppEntity> entitiesAdded = addedResponse.getEntities();
+        List<A> entitiesAdded = addedResponse.getEntities();
         change.getAdded().addAll(entitiesAdded);
         commitErrors = new ArrayList<>(addedResponse.getErrors());
 
         // Commit modified entities
-        EntityParsingResult<AppEntity, CommitError> modifiedResponse = commitActionOnAppEntities(
+        EntityParsingResult<A, CommitError> modifiedResponse = commitActionOnAppEntities(
             projectChange.getModified(),
             saveOrModifyAction,
-            appEntityCreator,
+            iAppEntityCreator,
             failOnError
         );
-        List<AppEntity> entitiesModified = modifiedResponse.getEntities();
+        List<A> entitiesModified = modifiedResponse.getEntities();
         change.getModified().addAll(entitiesModified);
 
         // Commit removed entities
-        EntityParsingResult<AppEntity, CommitError> removeResponse = commitActionOnAppEntities(
+        EntityParsingResult<A, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
             removeAction,
-            appEntityCreator,
+            iAppEntityCreator,
             failOnError
         );
-        List<AppEntity> entitiesRemoved = removeResponse.getEntities();
+        List<A> entitiesRemoved = removeResponse.getEntities();
         change.getRemoved().addAll(entitiesRemoved);
         return new Pair<>(change, commitErrors);
     }
@@ -188,18 +188,18 @@ public class CommitService {
      * Performs given commit action on list of app entities. Uses AppEntityCreator to convert
      * returned version entities into app entities.
      *
-     * @param appEntities      The app entities to perform action on.
-     * @param commitAction     The commit action applies to each app entity.
-     * @param appEntityCreator The AppEntityCreator used to rebuild app entities from resulting version entities.
-     * @param <A>              The Application side entity to process.
-     * @param <V>              The version entity of the base entity being processed.
+     * @param appEntities       The app entities to perform action on.
+     * @param commitAction      The commit action applies to each app entity.
+     * @param iAppEntityCreator The AppEntityCreator used to rebuild app entities from resulting version entities.
+     * @param <A>               The Application side entity to process.
+     * @param <V>               The version entity of the base entity being processed.
      * @return List of processed app entities.
      * @throws SafaError Throws error is anything goes wrong during commit.
      */
     private <A, V> EntityParsingResult<A, CommitError> commitActionOnAppEntities(
         List<A> appEntities,
         CommitAction<A, V> commitAction,
-        AppEntityCreator<A, V> appEntityCreator,
+        IAppEntityCreator<A, V> iAppEntityCreator,
         boolean failOnError
     ) throws SafaError {
         List<A> updatedEntities = new ArrayList<>();
@@ -216,7 +216,7 @@ public class CommitService {
                     commitErrors.add(commitError);
                 }
             } else if (v != null) {
-                A updatedA = appEntityCreator.createAppEntity(v);
+                A updatedA = iAppEntityCreator.createAppEntity(v);
                 updatedEntities.add(updatedA);
             }
         }

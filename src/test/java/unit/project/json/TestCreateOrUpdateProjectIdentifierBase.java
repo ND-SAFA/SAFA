@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that user is able to create and update a project idenfier via JSON.
  */
-public class TestCreateOrUpdateProjectIdentifier extends BaseProjectJsonTest {
+class TestCreateOrUpdateProjectIdentifierBase extends ProjectJsonBaseTest {
 
 
     /**
@@ -16,7 +16,7 @@ public class TestCreateOrUpdateProjectIdentifier extends BaseProjectJsonTest {
      * name and description.
      */
     @Test
-    public void createProjectIdentifier() throws Exception {
+    void createProjectIdentifier() throws Exception {
         // Step - Create JSON
         JSONObject projectJson = createBaseProjectJson();
 
@@ -33,7 +33,7 @@ public class TestCreateOrUpdateProjectIdentifier extends BaseProjectJsonTest {
      * Tests that project identifier can be updated with new name and description.
      */
     @Test
-    public void updateProjectIdentifier() throws Exception {
+    void updateProjectIdentifier() throws Exception {
         String newName = "new-project-name";
         String newDescription = "new-description";
 

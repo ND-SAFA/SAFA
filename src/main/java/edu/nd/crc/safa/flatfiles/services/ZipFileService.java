@@ -33,16 +33,16 @@ public class ZipFileService {
         response.setHeader("Content-Disposition", contentDisposition);
         ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream());
         for (File file : files) {
-            InputStream targetStream = new FileInputStream(file);
+            try (InputStream targetStream = new FileInputStream(file)) {
+                ZipEntry zipEntry = new ZipEntry(file.getName());
+                zipEntry.setSize(file.length());
+                zipEntry.setTime(System.currentTimeMillis());
 
-            ZipEntry zipEntry = new ZipEntry(file.getName());
-            zipEntry.setSize(file.length());
-            zipEntry.setTime(System.currentTimeMillis());
+                zipOutputStream.putNextEntry(zipEntry);
 
-            zipOutputStream.putNextEntry(zipEntry);
-
-            StreamUtils.copy(targetStream, zipOutputStream);
-            zipOutputStream.closeEntry();
+                StreamUtils.copy(targetStream, zipOutputStream);
+                zipOutputStream.closeEntry();
+            }
         }
         zipOutputStream.finish();
     }

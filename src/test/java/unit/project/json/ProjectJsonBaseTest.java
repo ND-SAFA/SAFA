@@ -17,7 +17,7 @@ import unit.ApplicationBaseTest;
  * Creates a constant environment and functions for creating or updating projects
  * via the JSON route.
  */
-public class BaseProjectJsonTest extends ApplicationBaseTest {
+public abstract class ProjectJsonBaseTest extends ApplicationBaseTest {
     protected final int N_TYPES = 2;
     protected final int N_ARTIFACTS = 2;
     protected final int N_TRACES = 1;
@@ -38,7 +38,7 @@ public class BaseProjectJsonTest extends ApplicationBaseTest {
     protected JSONObject postProjectJson(JSONObject projectJson,
                                          ResultMatcher expectedStatus) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.createOrUpdateProjectMeta)
+            .withRoute(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
             .postWithJsonObject(projectJson, expectedStatus);
     }
 

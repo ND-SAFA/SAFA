@@ -5,19 +5,12 @@ package edu.nd.crc.safa.server.entities.app.project;
  * be updated via notifications.
  */
 public enum ProjectEntityTypes {
-    DOCUMENTS {
-        public String toString() {
-            return "DOCUMENTS";
-        }
-    },
-    MEMBERS {
-        public String toString() {
-            return "MEMBERS";
-        }
-    },
-    TYPES {
-        public String toString() {
-            return "TYPES";
-        }
+    DOCUMENTS,
+    MEMBERS,
+    TYPES;
+
+    @Override
+    public String toString() {
+        return this.name();
     }
 }

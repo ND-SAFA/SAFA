@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that the client is create a new document for a project.
  */
-public class CreateFMEADocument extends DocumentBaseTest {
+class TestCreateFmeaDocument extends DocumentBaseTest {
 
     @Autowired
     DocumentColumnRepository documentColumnRepository;
@@ -28,7 +28,7 @@ public class CreateFMEADocument extends DocumentBaseTest {
      * Verifies that a new document can be created for a project.
      */
     @Test
-    public void testCreateFMEA() throws Exception {
+    void testCreateFmeaDocument() throws Exception {
         DocumentType docType = DocumentType.FMEA;
         String columnName = "Artifact ID";
         String newColumnName = "NEW COLUMN NAME";

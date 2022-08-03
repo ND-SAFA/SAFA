@@ -29,7 +29,7 @@ public class TreeVerifier {
                                                                 List<ParserRule> rulesToApply) {
         Map<String, List<RuleName>> results = new HashMap<>();
 
-        artifactBodies.forEach((artifactBody) -> {
+        artifactBodies.forEach(artifactBody -> {
 
             List<RuleName> artifactWarnings = new ArrayList<>();
             for (ParserRule rule : rulesToApply) {
@@ -52,7 +52,7 @@ public class TreeVerifier {
                 rule.reduce();
 
                 if (!rule.isRuleSatisfied()) {
-                    artifactWarnings.add(rule.getName());
+                    artifactWarnings.add(rule.getMRuleName());
                 }
             }
             if (!artifactWarnings.isEmpty()) {

@@ -7,7 +7,7 @@ import edu.nd.crc.safa.server.entities.app.project.IAppEntity;
 /**
  * Interface that generalizing similarities between all versioned entities.
  */
-public interface IVersionEntity<AppType extends IAppEntity> {
+public interface IVersionEntity<A extends IAppEntity> {
 
     ProjectVersion getProjectVersion();
 
@@ -19,7 +19,7 @@ public interface IVersionEntity<AppType extends IAppEntity> {
 
     void setVersionEntityId(UUID versionEntityId);
 
-    boolean hasSameContent(IVersionEntity e);
+    boolean hasSameContent(IVersionEntity<A> e);
 
-    boolean hasSameContent(AppType a);
+    boolean hasSameContent(A a);
 }

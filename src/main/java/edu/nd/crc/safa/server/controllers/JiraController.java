@@ -69,7 +69,7 @@ public class JiraController extends BaseController {
         this.serviceProvider = serviceProvider;
     }
 
-    @PostMapping(AppRoutes.Projects.Import.pullJiraProject)
+    @PostMapping(AppRoutes.Projects.Import.PULL_JIRA_PROJECT)
     public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
                                         @PathVariable("cloudId") String cloudId) throws Exception {
         JobService jobService = this.serviceProvider.getJobService();
@@ -92,7 +92,7 @@ public class JiraController extends BaseController {
         return JobAppEntity.createFromJob(jobDbEntity);
     }
 
-    @PostMapping(AppRoutes.Accounts.jiraCredentials)
+    @PostMapping(AppRoutes.Accounts.JIRA_CREDENTIALS)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -131,7 +131,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
+    @PutMapping(AppRoutes.Accounts.JIRA_CREDENTIALS_REFRESH)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -157,7 +157,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @GetMapping(AppRoutes.Projects.retrieveJIRAProjects)
+    @GetMapping(AppRoutes.Projects.RETRIEVE_JIRA_PROJECTS)
     public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
         @PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
@@ -165,9 +165,10 @@ public class JiraController extends BaseController {
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
+            JiraAccessCredentials jiraAccessCredentials = accessCredentialsRepository
                 .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            List<JiraProjectResponseDTO> response = jiraConnectionService.retrieveJIRAProjectsPreview(credentials);
+            List<JiraProjectResponseDTO> response = jiraConnectionService
+                .retrieveJIRAProjectsPreview(jiraAccessCredentials);
 
             output.setResult(new JiraResponseDTO<>(response, JiraResponseMessage.OK));
         });
@@ -175,7 +176,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Accounts.jiraCredentialsValidate)
+    @PostMapping(AppRoutes.Accounts.JIRA_CREDENTIALS_VALIDATE)
     public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
         @RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);

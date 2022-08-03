@@ -8,9 +8,9 @@ import lombok.Data;
  */
 @Data
 public class Function {
-    public int count;
-    public Condition condition;
-    public String targetArtifactType;
-    public ArtifactRelationship artifactRelationship;
-    public String sourceArtifactType;
+    String targetArtifactType;
+    ArtifactRelationship artifactRelationship;
+    String sourceArtifactType;
+    Condition condition;
+    int count;
 }

@@ -10,7 +10,6 @@ import java.util.Map;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.tgen.vsm.Controller;
 
 import lombok.NoArgsConstructor;
@@ -33,23 +32,23 @@ public class TraceLinkGenerator {
         return generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor);
     }
 
-    private <Key, Link> List<Link> generateLinksFromTokens(Map<Key, Collection<String>> sTokens,
-                                                           Map<Key, Collection<String>> tTokens,
-                                                           TraceLinkConstructor<Key, Link> traceLinkConstructor) {
+    private <K, L> List<L> generateLinksFromTokens(Map<K, Collection<String>> sTokens,
+                                                   Map<K, Collection<String>> tTokens,
+                                                   TraceLinkConstructor<K, L> traceLinkConstructor) {
         Controller vsm = new Controller();
         vsm.buildIndex(tTokens.values());
 
-        List<Link> generatedLinks = new ArrayList<>();
-        for (Key sourceKey : sTokens.keySet()) {
-            for (Key targetKey : tTokens.keySet()) {
-                double score = vsm.getSimilarityScore(sTokens.get(sourceKey), tTokens.get(targetKey));
+        List<L> generatedLS = new ArrayList<>();
+        for (Map.Entry<K, Collection<String>> source : sTokens.entrySet()) {
+            for (Map.Entry<K, Collection<String>> target : tTokens.entrySet()) {
+                double score = vsm.getSimilarityScore(source.getValue(), target.getValue());
                 if (score > ProjectVariables.TRACE_THRESHOLD) {
-                    Link value = traceLinkConstructor.createTraceLink(sourceKey, targetKey, score);
-                    generatedLinks.add(value);
+                    L value = traceLinkConstructor.createTraceLink(source.getKey(), target.getKey(), score);
+                    generatedLS.add(value);
                 }
             }
         }
-        return generatedLinks;
+        return generatedLS;
     }
 
     public Map<String, Collection<String>> tokenizeArtifactAppEntities(List<ArtifactAppEntity> artifacts) {
@@ -58,11 +57,6 @@ public class TraceLinkGenerator {
             artifactTokens.put(artifact.name, getWordsInArtifactAppEntity(artifact));
         }
         return artifactTokens;
-    }
-
-    private List<String> getWordsInArtifactBody(ArtifactVersion artifactVersion) {
-        String[] artifactWords = artifactVersion.getContent().split(" ");
-        return Arrays.asList(artifactWords);
     }
 
     private List<String> getWordsInArtifactAppEntity(ArtifactAppEntity artifact) {

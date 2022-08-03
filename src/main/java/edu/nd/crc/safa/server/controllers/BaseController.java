@@ -69,7 +69,6 @@ public abstract class BaseController {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
         SafaError error = new SafaError(errorMessage.toString());
-        error.setDetails(exception.getMessage());
         return error;
     }
 
@@ -78,9 +77,7 @@ public abstract class BaseController {
     public SafaError handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
-        SafaError error = new SafaError(errorMessage, exception);
-        error.setDetails(exception.getMessage());
-        return error;
+        return new SafaError(errorMessage, exception);
     }
 
     @ExceptionHandler(Exception.class)

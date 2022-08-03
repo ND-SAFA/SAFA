@@ -45,7 +45,7 @@ public class VersionController extends BaseController {
      * @return List of project versions associated with project.
      * @throws SafaError Throws error if project with ID is not found.
      */
-    @GetMapping(AppRoutes.Projects.Versions.getVersions)
+    @GetMapping(AppRoutes.Projects.Versions.GET_VERSIONS)
     public List<ProjectVersion> getVersions(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         return versionService.getProjectVersions(project);
@@ -58,7 +58,7 @@ public class VersionController extends BaseController {
      * @return Most up-to-date project version.
      * @throws SafaError Throws error if not project if found with associated id.
      */
-    @GetMapping(AppRoutes.Projects.Versions.getCurrentVersion)
+    @GetMapping(AppRoutes.Projects.Versions.GET_CURRENT_VERSION)
     public ProjectVersion getCurrentVersion(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         return versionService.getCurrentVersion(project);
@@ -71,7 +71,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws SafaError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.Projects.Versions.createNewMajorVersion)
+    @PostMapping(AppRoutes.Projects.Versions.CREATE_NEW_MAJOR_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewMajorVersion(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
@@ -85,7 +85,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws SafaError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.Projects.Versions.createNewMinorVersion)
+    @PostMapping(AppRoutes.Projects.Versions.CREATE_NEW_MINOR_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewMinorVersion(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
@@ -99,7 +99,7 @@ public class VersionController extends BaseController {
      * @return Project version created.
      * @throws SafaError Throws error if no project found with given id.
      */
-    @PostMapping(AppRoutes.Projects.Versions.createNewRevisionVersion)
+    @PostMapping(AppRoutes.Projects.Versions.CREATE_NEW_REVISION_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewRevisionVersion(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
@@ -112,7 +112,7 @@ public class VersionController extends BaseController {
      * @param versionId UUID identifying version to delete.
      * @throws SafaError Throws error if not version is associated with given id.
      */
-    @DeleteMapping(AppRoutes.Projects.Entities.deleteVersionById)
+    @DeleteMapping(AppRoutes.Projects.Entities.DELETE_VERSION_BY_ID)
     public void deleteVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         this.projectVersionRepository.delete(projectVersion);

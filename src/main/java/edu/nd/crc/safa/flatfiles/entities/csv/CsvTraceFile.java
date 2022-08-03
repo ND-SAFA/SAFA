@@ -32,7 +32,7 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     }
 
     @Override
-    protected void exportAsFileContent(File file) throws Exception {
+    protected void exportAsFileContent(File file) throws IOException {
         CsvFileUtilities.writeEntitiesAsCsvFile(file,
             CsvArtifactFile.Constants.REQUIRED_COLUMNS,
             this.entities,
@@ -41,8 +41,8 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
 
     private String[] getTraceRow(TraceAppEntity traceAppEntity) {
         return new String[]{
-            traceAppEntity.sourceName,
-            traceAppEntity.targetName
+            traceAppEntity.getSourceName(),
+            traceAppEntity.getTargetName()
         };
     }
 

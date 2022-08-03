@@ -4,30 +4,16 @@ import java.util.List;
 
 import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
- * Container for a request to generate trace links between artifacts.
+ * Request to generate trace links between artifacts.
  */
+@Data
+@NoArgsConstructor
 public class TraceLinkGenerationRequest {
 
     List<ArtifactAppEntity> sourceArtifacts;
     List<ArtifactAppEntity> targetArtifacts;
-
-    public TraceLinkGenerationRequest() {
-    }
-
-    public List<ArtifactAppEntity> getSourceArtifacts() {
-        return sourceArtifacts;
-    }
-
-    public void setSourceArtifacts(List<ArtifactAppEntity> sourceArtifacts) {
-        this.sourceArtifacts = sourceArtifacts;
-    }
-
-    public List<ArtifactAppEntity> getTargetArtifacts() {
-        return targetArtifacts;
-    }
-
-    public void setTargetArtifacts(List<ArtifactAppEntity> targetArtifacts) {
-        this.targetArtifacts = targetArtifacts;
-    }
 }

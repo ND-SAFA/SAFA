@@ -1,4 +1,4 @@
-package unit.spring;
+package unit.utilities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +26,7 @@ class TestSafaErrorMessage extends ApplicationBaseTest {
         project.setProjectId(UUID.randomUUID());
 
         JSONObject obj = SafaRequest
-            .withRoute(AppRoutes.Projects.Versions.getVersions)
+            .withRoute(AppRoutes.Projects.Versions.GET_VERSIONS)
             .withProject(project)
             .getWithJsonObject(status().is4xxClientError());
 

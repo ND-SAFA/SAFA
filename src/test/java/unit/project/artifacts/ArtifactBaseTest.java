@@ -115,7 +115,7 @@ abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest
         assertThat(artifactAddedJson.getString("documentType")).isEqualTo(this.getDocumentType().toString());
 
         for (Map.Entry<String, Object> entry : this.getJsonExpectedProperties().entrySet()) {
-            assertThat(artifactAddedJson.get(entry.getKey()).toString()).isEqualTo(entry.getValue().toString());
+            assertThat(artifactAddedJson.get(entry.getKey())).hasToString(entry.getValue().toString());
         }
 
         // VP - Verify that single artifact was persisted in project
@@ -163,7 +163,7 @@ abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest
 
         // Step - Get project delta
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
             .getWithJsonObject();

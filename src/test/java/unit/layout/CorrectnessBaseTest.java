@@ -20,7 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import unit.ApplicationBaseTest;
 
-public class BaseCorrectnessTest extends ApplicationBaseTest {
+public abstract class CorrectnessBaseTest extends ApplicationBaseTest {
     protected String projectName = "project name";
     protected String artifactType = "Requirement";
     protected String artifactBody = "This is body";

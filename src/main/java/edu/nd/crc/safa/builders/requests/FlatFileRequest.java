@@ -34,7 +34,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         ProjectVersion projectVersion,
         String pathToFileDir) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
+            .withRoute(AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
             .withVersion(projectVersion)
             .getFlatFileHelper()
             .postWithFilesInDirectory(pathToFileDir);

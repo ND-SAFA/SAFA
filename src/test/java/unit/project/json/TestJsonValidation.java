@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that each entity present in ProjectAppEntity is validated upon parsing.
  */
-class TestValidation extends BaseProjectJsonTest {
+class TestJsonValidation extends ProjectJsonBaseTest {
     /**
      * Attempts to update it without including a project version.
      *
@@ -162,7 +162,7 @@ class TestValidation extends BaseProjectJsonTest {
         List<JSONObject> artifacts,
         List<JSONObject> traces) throws Exception {
         // Step - Setup constants
-        String url = AppRoutes.Projects.createOrUpdateProjectMeta;
+        String url = AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META;
         JSONObject projectJson = new JSONObject();
 
         // Step - Create project payload

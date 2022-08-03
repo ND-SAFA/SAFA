@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that user is able to submit a project creation job via JSON.
  */
-class TestJSONJobUpload extends BaseProjectJsonTest {
+class TestJSONBaseJobUpload extends ProjectJsonBaseTest {
 
     /**
      * Test that user is able to update project with checks for:
@@ -71,14 +71,14 @@ class TestJSONJobUpload extends BaseProjectJsonTest {
         // VP - requirements created
         Optional<ArtifactType> requirementType = artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, "requirement");
-        assertThat(requirementType.isPresent()).as("requirement type created").isTrue();
+        assertThat(requirementType).as("requirement type created").isPresent();
         List<Artifact> requirements = artifactRepository.findByProjectAndType(project, requirementType.get());
-        assertThat(requirements.size()).as("requirements created").isEqualTo(1);
+        assertThat(requirements).as("requirements created").hasSize(1);
 
         // VP - design definitions created
         Optional<ArtifactType> designType = artifactTypeRepository
             .findByProjectAndNameIgnoreCase(project, "design");
-        assertThat(designType.isPresent()).as("design type created").isTrue();
+        assertThat(designType).as("design type created").isPresent();
         List<Artifact> designs = artifactRepository.findByProjectAndType(project, designType.get());
         assertThat(designs.size())
             .as("designs created)")

@@ -4,11 +4,16 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Enumerates all the steps for each job
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JobSteps {
 
     private static final String[] flatFileProjectCreation = {
@@ -28,7 +33,7 @@ public class JobSteps {
         "Model training",
         "Done"
     };
-    public static String[] jiraProjectCreationSteps = {
+    public static String[] jiraProjectCreationSteps = { // Not final because modified in some tests
         "Authenticate User Credentials",
         "Retrieve JIRA project",
         "Create SAFA Project",
@@ -46,7 +51,7 @@ public class JobSteps {
             case TRAIN_MODEL:
                 return modelTrainingSteps;
             default:
-                throw new RuntimeException(jobType + " is under development.");
+                throw new SafaError(jobType + " is under development.");
         }
     }
 

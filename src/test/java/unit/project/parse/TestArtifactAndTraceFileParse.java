@@ -22,12 +22,12 @@ class TestArtifactAndTraceFileParse extends ParseBaseTest {
      */
     @Test
     void testArtifactEntities() throws Exception {
-        String baseRoute = AppRoutes.Projects.FlatFiles.parseArtifactFile;
+        String baseRoute = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE;
         String type = "Design";
 
         //Step - Upload file, parse artifacts, and collect them
         String routeName = RouteBuilder.withRoute(baseRoute).withArtifactType(type).buildEndpoint();
-        JSONArray artifacts = uploadFileAndGetEntities(routeName, DefaultProjectConstants.File.DESIGN_FILE);
+        JSONArray artifacts = uploadFileAndGetEntities(routeName);
 
         //VP - Verify that all artifacts were parsed
         assertThat(artifacts.length()).isEqualTo(DefaultProjectConstants.Entities.N_DESIGNS);
@@ -48,13 +48,13 @@ class TestArtifactAndTraceFileParse extends ParseBaseTest {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
-        String route = AppRoutes.Projects.FlatFiles.parseTraceFile;
+        String route = AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE;
         JSONObject responseBody = parseFileAndReturnBody(route, fileName);
 
         // VP - Verify that message contains constraint
         JSONArray traces = responseBody.getJSONArray("entities");
         JSONArray errors = responseBody.getJSONArray("errors");
         assertThat(traces.length()).isGreaterThan(1);
-        assertThat(errors.length()).isEqualTo(0);
+        assertThat(errors.length()).isZero();
     }
 }

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class LayoutService {
         List<TraceAppEntity> projectTraces,
         List<DocumentAppEntity> documents
     ) {
-        Map<String, Map<String, LayoutPosition>> documentLayouts = new Hashtable<>();
+        Map<String, Map<String, LayoutPosition>> documentLayouts = new HashMap<>();
         for (DocumentAppEntity documentAppEntity : documents) {
             String documentId = documentAppEntity.getDocumentId().toString();
             Map<String, LayoutPosition> documentLayout = generateDocumentLayout(
@@ -79,8 +79,8 @@ public class LayoutService {
         List<TraceAppEntity> documentTraces =
             projectTraces
                 .stream()
-                .filter(t -> documentArtifactIds.contains(t.sourceId)
-                    && documentArtifactIds.contains(t.targetId))
+                .filter(t -> documentArtifactIds.contains(t.getSourceId())
+                    && documentArtifactIds.contains(t.getTargetId()))
                 .collect(Collectors.toList());
 
         // Step - Generate layout

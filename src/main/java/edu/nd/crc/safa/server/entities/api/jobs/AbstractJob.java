@@ -38,7 +38,7 @@ public abstract class AbstractJob implements Job {
      */
     ServiceProvider serviceProvider;
 
-    public AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
+    protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
         this.serviceProvider = serviceProvider;
     }
@@ -65,7 +65,7 @@ public abstract class AbstractJob implements Job {
                 jobService.failJob(jobDbEntity);
                 e.printStackTrace();
                 notificationService.broadUpdateJobMessage(jobDbEntity);
-                throw new RuntimeException(e);
+                throw new SafaError(e.getMessage());
             }
         }
         this.done();
@@ -87,13 +87,13 @@ public abstract class AbstractJob implements Job {
         int methodQuerySize = methodQuery.size();
 
         if (methodQuerySize == 0) {
-            throw new RuntimeException("Could not find implementation for step: " + stepName);
+            throw new SafaError("Could not find implementation for step: " + stepName);
         } else if (methodQuery.size() == 1) {
             return methodQuery.get(0);
         } else {
             List<String> methodNames = methodQuery.stream().map(Method::getName).collect(Collectors.toList());
-            String error = String.format("Found more than one implementation for step: %s\n%s", stepName, methodNames);
-            throw new RuntimeException(error);
+            String error = String.format("Found more than one implementation for step: %s%n%s", stepName, methodNames);
+            throw new SafaError(error);
         }
     }
 
@@ -121,12 +121,12 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public JobParametersIncrementer getJobParametersIncrementer() {
-        return (params) -> params;
+        return params -> params;
     }
 
     @Override
     public JobParametersValidator getJobParametersValidator() {
-        return (params) -> {
+        return params -> {
         };
     }
 }

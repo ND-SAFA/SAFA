@@ -15,6 +15,8 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.config.DefaultArtifactTypeIcons;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -24,6 +26,7 @@ import org.hibernate.annotations.Type;
  * to which projects.
  */
 @Entity
+@Data
 @Table(name = "artifact_type",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -31,6 +34,7 @@ import org.hibernate.annotations.Type;
         }, name = AppConstraints.UNIQUE_ARTIFACT_TYPE_PER_PROJECT)
     }
 )
+@NoArgsConstructor
 public class ArtifactType implements Serializable {
 
     @Id
@@ -54,52 +58,14 @@ public class ArtifactType implements Serializable {
     @Column(name = "icon", nullable = false)
     String icon;
 
-    public ArtifactType() {
-    }
-
     public ArtifactType(Project project, String name) {
         this.project = project;
         this.name = name;
         this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
+    @Override
     public String toString() {
         return this.name;
-    }
-
-    public UUID getTypeId() {
-        return this.typeId;
-    }
-
-    public void setTypeId(UUID typeId) {
-        this.typeId = typeId;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Project getProject() {
-        return this.project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public boolean equals(ArtifactType other) {
-        return this.typeId.equals(other.typeId);
     }
 }

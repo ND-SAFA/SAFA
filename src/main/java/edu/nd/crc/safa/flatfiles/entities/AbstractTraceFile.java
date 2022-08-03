@@ -75,8 +75,8 @@ public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEnti
         Map<String, List<String>> source2target = new HashMap<>();
         List<TraceAppEntity> validTraces = new ArrayList<>();
         for (TraceAppEntity trace : traces) {
-            String sourceName = trace.sourceName;
-            String targetName = trace.targetName;
+            String sourceName = trace.getSourceName();
+            String targetName = trace.getTargetName();
             if (source2target.containsKey(sourceName)) {
                 List<String> targets = source2target.get(sourceName);
                 if (targets.contains(targetName)) {
@@ -97,11 +97,11 @@ public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEnti
 
     private List<String> assertTraceContainsPointers(TraceAppEntity traceAppEntity, List<String> artifactNames) {
         List<String> errors = new ArrayList<>();
-        if (!artifactNames.contains(traceAppEntity.sourceName)) {
-            errors.add("Link contains unknown source artifact:" + traceAppEntity.sourceName);
+        if (!artifactNames.contains(traceAppEntity.getSourceName())) {
+            errors.add("Link contains unknown source artifact:" + traceAppEntity.getSourceName());
         }
-        if (!artifactNames.contains(traceAppEntity.targetName)) {
-            errors.add("Link contains unknown target artifact:" + traceAppEntity.sourceName);
+        if (!artifactNames.contains(traceAppEntity.getTargetName())) {
+            errors.add("Link contains unknown target artifact:" + traceAppEntity.getTargetName());
         }
         return errors;
     }

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 
 import org.junit.jupiter.api.Test;
 
-class FlatFileTestJobDeletion extends JobBaseFlatFileTest {
+class TestFlatFileJobDeletion extends JobBaseFlatFileTest {
 
     @Test
     void testDeleteJob() throws Exception {
@@ -20,7 +20,7 @@ class FlatFileTestJobDeletion extends JobBaseFlatFileTest {
         UUID jobId = createJobFromDefaultProject();
         JobDbEntity job = this.jobService.getJobById(jobId);
         String route = RouteBuilder
-            .withRoute(AppRoutes.Jobs.deleteJob)
+            .withRoute(AppRoutes.Jobs.DELETE_JOB)
             .withJob(job)
             .buildEndpoint();
 

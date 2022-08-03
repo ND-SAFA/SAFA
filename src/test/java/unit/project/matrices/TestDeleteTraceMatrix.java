@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Tests that projects defined in database are able to be retrieved by user.
+ * Tests that client is able to delete a trace matrix.
  */
-public class DeleteTraceMatrix extends TraceMatrixBaseTest {
+class TestDeleteTraceMatrix extends TraceMatrixBase {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
 
     @Test
-    public void deleteTraceMatrix() throws Exception {
+    void testDeleteTraceMatrix() throws Exception {
         Project project = this.createEmptyProject();
         ArtifactType sourceArtifactType = this.dbEntityBuilder.getType(projectName, sourceArtifactTypeName);
         ArtifactType targetArtifactType = this.dbEntityBuilder.getType(projectName, targetArtifactTypeName);
@@ -33,7 +33,7 @@ public class DeleteTraceMatrix extends TraceMatrixBaseTest {
 
         // Step - Send request to delete matrix.
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.TraceMatrix.deleteTraceMatrix)
+            .withRoute(AppRoutes.Projects.TraceMatrix.DELETE_TRACE_MATRIX)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)
@@ -42,6 +42,6 @@ public class DeleteTraceMatrix extends TraceMatrixBaseTest {
 
         // VP - Assert that no matrix exists for project.
         int nMatrices = traceMatrixRepository.findByProject(project).size();
-        assertThat(nMatrices).isEqualTo(0);
+        assertThat(nMatrices).isZero();
     }
 }

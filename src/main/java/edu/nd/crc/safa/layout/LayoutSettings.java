@@ -1,8 +1,12 @@
 package edu.nd.crc.safa.layout;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * Settings involved for setting the layout generation.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LayoutSettings {
     public static final int ARTIFACT_WIDTH = 225;
     public static final int ARTIFACT_HEIGHT = 170;

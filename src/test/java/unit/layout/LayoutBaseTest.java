@@ -1,8 +1,8 @@
 package unit.layout;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
@@ -24,13 +24,13 @@ import unit.ApplicationBaseTest;
  * 2. Creating graph from project
  * 3. Filling out Hashtable
  */
-public class LayoutBaseTest extends ApplicationBaseTest {
+public abstract class LayoutBaseTest extends ApplicationBaseTest {
 
     String projectName = "test-project";
     ProjectVersion projectVersion;
     ProjectAppEntity project;
     ElkNode rootGraphNode;
-    Hashtable<String, ElkNode> name2nodes;
+    Map<String, ElkNode> name2nodes;
 
     public static List<ElkNode> getChildren(ElkNode elkNode) {
         List<ElkNode> children = new ArrayList<>();
@@ -59,7 +59,7 @@ public class LayoutBaseTest extends ApplicationBaseTest {
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
         this.project = getProjectAtVersion(projectVersion);
-        Pair<ElkNode, Hashtable<String, ElkNode>> response =
+        Pair<ElkNode, Map<String, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(project.artifacts, project.traces);
         rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();

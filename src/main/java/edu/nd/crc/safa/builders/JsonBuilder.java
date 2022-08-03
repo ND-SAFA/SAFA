@@ -5,11 +5,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.app.documents.DocumentColumnDataType;
 import edu.nd.crc.safa.server.entities.app.project.FTAType;
 import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
 import edu.nd.crc.safa.server.entities.db.DocumentType;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -19,9 +22,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class JsonBuilder extends BaseBuilder {
-
-    Hashtable<String, JSONObject> projects;
-    Hashtable<String, JSONObject> projectVersions;
+    Map<String, JSONObject> projects;
+    Map<String, JSONObject> projectVersions;
 
     public JsonBuilder() {
         createEmptyData();
@@ -43,10 +45,10 @@ public class JsonBuilder extends BaseBuilder {
                                    List<JSONObject> traces) {
         JSONObject project = new JSONObject();
         project.put("projectId", projectId);
-        project.put("name", name);
+        project.put(Constants.NAME, name);
         project.put("description", description);
-        project.put("artifacts", artifacts);
-        project.put("traces", traces);
+        project.put(Constants.ARTIFACTS, artifacts);
+        project.put(Constants.TRACES, traces);
         projects.put(name, project);
         return this;
     }
@@ -77,7 +79,7 @@ public class JsonBuilder extends BaseBuilder {
                                             String type,
                                             String body) {
         this.withArtifact(projectName, artifactId, name, type, body);
-        JSONArray artifacts = this.projects.get(projectName).getJSONArray("artifacts");
+        JSONArray artifacts = this.projects.get(projectName).getJSONArray(Constants.ARTIFACTS);
         return (JSONObject) artifacts.get(artifacts.length() - 1);
     }
 
@@ -97,18 +99,16 @@ public class JsonBuilder extends BaseBuilder {
                                     Map<String, String> customFields) {
         JSONObject project = this.projects.get(projectName);
         JSONObject artifact = new JSONObject();
-        if (artifact != null) { // TODO: don't let this in production
-            artifact.put("id", artifactId);
-        }
 
+        artifact.put("id", artifactId);
         artifact.put("name", name);
         artifact.put("type", type);
         artifact.put("body", body);
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
-        artifact.put("documentType", DocumentType.ARTIFACT_TREE.toString());
+        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.ARTIFACT_TREE.toString());
         artifact.put("customFields", customFields);
-        project.getJSONArray("artifacts").put(artifact);
+        project.getJSONArray(Constants.ARTIFACTS).put(artifact);
         return this;
     }
 
@@ -122,7 +122,7 @@ public class JsonBuilder extends BaseBuilder {
         this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("safetyCaseType", safetyCaseType.toString());
-        artifact.put("documentType", DocumentType.SAFETY_CASE.toString());
+        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.SAFETY_CASE.toString());
         return this;
     }
 
@@ -136,7 +136,7 @@ public class JsonBuilder extends BaseBuilder {
         this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("logicType", ftaType.toString());
-        artifact.put("documentType", DocumentType.FTA.toString());
+        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.FTA.toString());
         return this;
     }
 
@@ -150,13 +150,13 @@ public class JsonBuilder extends BaseBuilder {
         this.withArtifact(projectName, "", artifactName, artifactType, body);
         JSONObject artifact = this.getArtifact(projectName, artifactName);
         artifact.put("customFields", customFields);
-        artifact.put("documentType", DocumentType.FMEA.toString());
+        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.FMEA.toString());
         return this;
     }
 
     public JSONObject withTraceAndReturn(String projectName, String source, String target) {
         this.withTrace(projectName, source, target);
-        JSONArray traces = this.projects.get(projectName).getJSONArray("traces");
+        JSONArray traces = this.projects.get(projectName).getJSONArray(Constants.TRACES);
         return (JSONObject) traces.get(traces.length() - 1);
     }
 
@@ -167,7 +167,7 @@ public class JsonBuilder extends BaseBuilder {
         trace.put("sourceName", sourceName);
         trace.put("targetName", targetName);
 
-        this.projects.get(projectName).getJSONArray("traces").put(trace);
+        this.projects.get(projectName).getJSONArray(Constants.TRACES).put(trace);
         return this;
     }
 
@@ -193,7 +193,7 @@ public class JsonBuilder extends BaseBuilder {
                                      DocumentType documentType,
                                      List<String> artifactIds) {
         JSONObject docJson = new JSONObject();
-        docJson.put("name", docName);
+        docJson.put(Constants.NAME, docName);
         docJson.put("description", description);
         docJson.put("type", documentType.toString());
         docJson.put("artifactIds", artifactIds);
@@ -216,14 +216,22 @@ public class JsonBuilder extends BaseBuilder {
     }
 
     public JSONObject getArtifact(String projectName, String artifactName) {
-        JSONArray artifacts = this.projects.get(projectName).getJSONArray("artifacts");
+        JSONArray artifacts = this.projects.get(projectName).getJSONArray(Constants.ARTIFACTS);
         for (Object artifactObj : artifacts) {
             JSONObject artifact = (JSONObject) artifactObj;
-            if (artifact.getString("name").equals(artifactName)) {
+            if (artifact.getString(Constants.NAME).equals(artifactName)) {
                 return artifact;
             }
         }
         String error = String.format("Could not find artifact %s in project %s.", artifactName, projectName);
-        throw new RuntimeException("Could not find artifact with name:" + error);
+        throw new SafaError("Could not find artifact with name:" + error);
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    static class Constants {
+        private static final String ARTIFACTS = "artifacts";
+        private static final String TRACES = "traces";
+        private static final String NAME = "name";
+        private static final String DOCUMENT_TYPE = "documentType";
     }
 }

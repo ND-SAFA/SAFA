@@ -1,6 +1,5 @@
 package unit;
 
-import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.flatfiles.services.FileUploadService;
@@ -79,9 +78,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected DbEntityBuilder dbEntityBuilder;
 
     @Autowired
-    protected AppEntityBuilder appBuilder;
-
-    @Autowired
     protected JsonBuilder jsonBuilder;
 
     @Autowired
@@ -95,7 +91,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @BeforeEach
     public void createNewBuilders() {
         dbEntityBuilder.createEmptyData();
-        appBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
     }
 }

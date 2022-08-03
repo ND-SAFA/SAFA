@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 import unit.DefaultProjectConstants;
 
-public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
+class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
     @Test
-    public void testUpdateProjectViaFlatFiles() throws Exception {
+    void testUpdateProjectViaFlatFiles() throws Exception {
         String projectName = "test-project";
 
         dbEntityBuilder
@@ -39,7 +39,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
         assertThat(initialBodies.size())
             .as("no bodies at init")
-            .isEqualTo(0);
+            .isZero();
 
         // VP - Verify that artifacts are constructed and associated with update version
         List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
@@ -56,7 +56,7 @@ public class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);
         assertThat(noChangeBodies.size())
             .as("no changes were detected in project versions")
-            .isEqualTo(0);
+            .isZero();
 
         // VP - No new trace links were created
         List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);

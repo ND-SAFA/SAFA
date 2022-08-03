@@ -136,7 +136,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.name, a.summary, a.body, a.customFields.toString());
+        return hasSameContent(a.name, a.summary, a.body, a.getCustomFields().toString());
     }
 
     private boolean hasSameContent(String name, String summary, String content, String customFields) {

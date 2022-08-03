@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PermissionService {
-
+    private static final String EDIT_PERMISSION_ERROR = "User does not have edit permissions on project.";
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserService safaUserService;
 
@@ -32,21 +32,21 @@ public class PermissionService {
     public void requireOwnerPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasOwnerPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new SafaError(EDIT_PERMISSION_ERROR);
         }
     }
 
     public void requireViewPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasViewingPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new SafaError(EDIT_PERMISSION_ERROR);
         }
     }
 
     public void requireEditPermission(Project project) throws SafaError {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasEditPermission(project, currentUser)) {
-            throw new SafaError("User does not have edit permissions on project.");
+            throw new SafaError(EDIT_PERMISSION_ERROR);
         }
     }
 
@@ -60,10 +60,6 @@ public class PermissionService {
 
     private boolean hasEditPermission(Project project, SafaUser user) {
         return hasPermissionOrGreater(project, user, ProjectRole.EDITOR);
-    }
-
-    private boolean hasAdminPermission(Project project, SafaUser user) {
-        return hasPermissionOrGreater(project, user, ProjectRole.ADMIN);
     }
 
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {

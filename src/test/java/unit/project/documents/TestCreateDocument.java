@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that the client is create a new document for a project.
  */
-public class CreateNewDocument extends DocumentBaseTest {
+class TestCreateDocument extends DocumentBaseTest {
 
     /**
      * Verifies that a new document can be created for a project.
      */
     @Test
-    public void testCreateNewDocument() throws Exception {
+    void testCreateDocument() throws Exception {
 
         DocumentType docType = DocumentType.ARTIFACT_TREE;
 

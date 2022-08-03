@@ -43,14 +43,14 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
         verifyProjectCreated(projectVersion);
 
         // Step - Download current project as JSON flat files
-        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.downloadFlatFiles)
+        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
             .withVersion(projectVersion)
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.createProjectFromFlatFiles)
+            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFiles(projectFiles)
             .getJSONObject("projectVersion")
@@ -79,25 +79,25 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
         String artifactName = Constants.ARTIFACT_NAMES.get(DocumentType.ARTIFACT_TREE);
         ArtifactAppEntity artifact = name2artifact.get(artifactName);
         assertThat(artifact.type).isEqualTo(Constants.ARTIFACT_TYPE);
-        assertThat(artifact.documentType).isEqualTo(DocumentType.ARTIFACT_TREE);
-        assertThat(artifact.safetyCaseType).isNull();
-        assertThat(artifact.logicType).isNull();
+        assertThat(artifact.getDocumentType()).isEqualTo(DocumentType.ARTIFACT_TREE);
+        assertThat(artifact.getSafetyCaseType()).isNull();
+        assertThat(artifact.getLogicType()).isNull();
 
         // VP - Verify safety artifact
         String safetyArtifactName = Constants.ARTIFACT_NAMES.get(DocumentType.SAFETY_CASE);
         ArtifactAppEntity safetyArtifact = name2artifact.get(safetyArtifactName);
         assertThat(safetyArtifact.type).isEqualTo(Constants.SAFETY_CASE_TYPE.name());
-        assertThat(safetyArtifact.documentType).isEqualTo(DocumentType.SAFETY_CASE);
-        assertThat(safetyArtifact.safetyCaseType).isEqualTo(Constants.SAFETY_CASE_TYPE);
-        assertThat(safetyArtifact.logicType).isNull();
+        assertThat(safetyArtifact.getDocumentType()).isEqualTo(DocumentType.SAFETY_CASE);
+        assertThat(safetyArtifact.getSafetyCaseType()).isEqualTo(Constants.SAFETY_CASE_TYPE);
+        assertThat(safetyArtifact.getLogicType()).isNull();
 
         // VP - Verify FTA artifact
         String logicArtifactName = Constants.ARTIFACT_NAMES.get(DocumentType.FTA);
         ArtifactAppEntity logicArtifact = name2artifact.get(logicArtifactName);
         assertThat(logicArtifact.type).isEqualTo(Constants.FTA_TYPE.name());
-        assertThat(logicArtifact.documentType).isEqualTo(DocumentType.FTA);
-        assertThat(logicArtifact.safetyCaseType).isNull();
-        assertThat(logicArtifact.logicType).isEqualTo(Constants.FTA_TYPE);
+        assertThat(logicArtifact.getDocumentType()).isEqualTo(DocumentType.FTA);
+        assertThat(logicArtifact.getSafetyCaseType()).isNull();
+        assertThat(logicArtifact.getLogicType()).isEqualTo(Constants.FTA_TYPE);
     }
 
     protected static class Constants {

@@ -18,7 +18,7 @@ class TestVersionRetrieval extends ApplicationBaseTest {
     void getEmptyVersions() throws Exception {
         Project project = dbEntityBuilder.newProjectWithReturn("test-project");
         JSONArray response = getVersionsInProject(project);
-        assertThat(response.length()).isEqualTo(0);
+        assertThat(response.length()).isZero();
     }
 
     @Test
@@ -34,7 +34,7 @@ class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private JSONArray getVersionsInProject(Project project) throws Exception {
-        return new SafaRequest(AppRoutes.Projects.Versions.getVersions)
+        return new SafaRequest(AppRoutes.Projects.Versions.GET_VERSIONS)
             .withProject(project)
             .getWithJsonArray();
     }

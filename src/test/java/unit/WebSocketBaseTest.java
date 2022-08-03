@@ -59,7 +59,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
         WebSocketTransport transport = new WebSocketTransport(webSocketClient);
         SockJsClient client = new SockJsClient(List.of(transport));
         stompClient = new WebSocketStompClient(client);
-        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.messageSizeLimit);
+        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.MESSAGE_SIZE_LIMIT);
     }
 
     @BeforeEach

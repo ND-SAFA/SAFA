@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that nodes are formatted in a hierarchical structure.
  */
-public class TestLayoutCorrectness extends BaseCorrectnessTest {
+class TestLayoutCorrectnessBase extends CorrectnessBaseTest {
 
     @Test
-    public void testParentWithTwoChildren() throws Exception {
+    void testParentWithTwoChildren() throws Exception {
         // Step - Create project
         createProject();
 

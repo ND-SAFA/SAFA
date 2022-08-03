@@ -1,5 +1,9 @@
 package edu.nd.crc.safa.config;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DefaultArtifactTypeIcons {
 
     public static String getArtifactIcon(String name) {

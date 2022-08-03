@@ -10,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import unit.ApplicationBaseTest;
 
 /**
- * Tests that projects defined in database are able to be retrieved by user.
+ * Tests that projects defined in database are to be retrieved by user.
  */
-public class BaseSharingTest extends ApplicationBaseTest {
+public abstract class BaseSharingTest extends ApplicationBaseTest {
 
     protected final String otherUserEmail = "doesNotExist@gmail.com";
     protected final String otherUserPassword = "somePassword";

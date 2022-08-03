@@ -19,8 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @param <I> The type of record this file is handling.
  */
 @Data
-public abstract class AbstractDataFile<E, I> implements IDataFile<E>,
-    IFlatFileParser<E> {
+public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileParser {
     /**
      * Rows in csv file representing artifacts.
      */
@@ -87,7 +86,7 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>,
     }
 
     @Override
-    public void export(File file) throws Exception {
+    public void export(File file) throws IOException {
         exportAsFileContent(file);
     }
 
@@ -95,9 +94,9 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>,
      * Exports artifacts to given file.
      *
      * @param file The file to write entities to
-     * @throws Exception If trouble reading objects, reading file, or writing to file.
+     * @throws IOException If trouble reading objects, reading file, or writing to file.
      */
-    protected abstract void exportAsFileContent(File file) throws Exception;
+    protected abstract void exportAsFileContent(File file) throws IOException;
 
     /**
      * Validates given entities and returns any errors found.

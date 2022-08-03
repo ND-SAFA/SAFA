@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.server.entities.api.jira;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 /**

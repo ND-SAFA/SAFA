@@ -60,7 +60,7 @@ public class DocumentArtifactController extends BaseDocumentController {
      * @return List of updated artifact containing document id in series of documents.
      * @throws SafaError Throws error if authorized user does not have edit permission on project
      */
-    @PostMapping(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
+    @PostMapping(AppRoutes.Projects.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
     public List<ArtifactAppEntity> addArtifactToDocuments(@PathVariable UUID versionId,
                                                           @PathVariable UUID documentId,
                                                           @RequestBody List<ArtifactAppEntity> artifacts
@@ -77,7 +77,7 @@ public class DocumentArtifactController extends BaseDocumentController {
         return artifacts;
     }
 
-    @DeleteMapping(AppRoutes.Projects.DocumentArtifact.removeArtifactFromDocument)
+    @DeleteMapping(AppRoutes.Projects.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeArtifactFromDocument(@PathVariable UUID versionId,
                                            @PathVariable UUID documentId,

@@ -9,15 +9,15 @@ import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that a user is able to delete a document in a project.
+ * Tests that a user is able to retrieve a document in a project.
  */
-public class RetrieveDocuments extends DocumentBaseTest {
+class TestRetrieveDocuments extends DocumentBaseTest {
 
     /**
      * Verifies that a document can be deleted by a user.
      */
     @Test
-    public void testGetProjectDocuments() throws Exception {
+    void testGetProjectDocuments() throws Exception {
         String projectName = "test-project";
         String docName = "test-document";
         String docNameTwo = "test-another-doc";
@@ -31,7 +31,7 @@ public class RetrieveDocuments extends DocumentBaseTest {
         JSONArray documents = getProjectDocuments(project);
 
         // VP - Verify that no documents are returned
-        assertThat(documents.length()).isEqualTo(0);
+        assertThat(documents.length()).isZero();
 
         // Step - Create two documents.
         dbEntityBuilder

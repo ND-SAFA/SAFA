@@ -1,20 +1,20 @@
-from transformers import AutoModel, BertPreTrainedModel
-from transformers.models.electra.modeling_electra import (
-    ElectraClassificationHead,
-)
-from models.single_lm_forward import single_lm_forward
+
+from transformers import ElectraPreTrainedModel
+from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
+
+from models.single_model_forward_pass import single_model_forward_pass
 
 
-class BertTraceSingle(BertPreTrainedModel):
+class ElectraTraceSingle(ElectraPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
-        self.bert = AutoModel.from_config(config)
+        self.electra = ElectraModel(config)
         self.cls = ElectraClassificationHead(config)
         self.init_weights()
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None, **kwargs):
-        return single_lm_forward(
-            model=self.bert,
+        return single_model_forward_pass(
+            model=self.electra,
             cls_header=self.cls,
             num_labels=self.config.num_labels,
             input_ids=input_ids,
@@ -23,3 +23,4 @@ class BertTraceSingle(BertPreTrainedModel):
             labels=labels,
             kwargs=kwargs,
         )
+

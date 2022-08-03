@@ -1,35 +1,21 @@
-from bert_trace_single import BertTraceSingle
-from models.bert_trace_siamese import BertTraceSiamese
-from models.electra_trace_single import ElectraTraceSingle
 
-from typing import Dict
+
 import os
-from transformers.modeling_utils import PreTrainedModel
+from typing import Dict
+
 from transformers import AutoConfig, AutoTokenizer
-from enum import IntEnum, Enum
+from transformers.modeling_utils import PreTrainedModel
 
 from constants import MAX_SEQ_LENGTH_DEFAULT
+from models.base_models.supported_base_model import SupportedBaseModel
+from models.model_properties import ArchitectureType
 from pretrain.corpuses.domain import Domain
 
 
-class SupportedBaseModel(Enum):
-    BERT_TRACE_SINGLE = BertTraceSingle
-    BERT_TRACE_SIAMESE = BertTraceSiamese
-    ELECTRA_TRACE_SINGLE = ElectraTraceSingle
-
-
-class ArchitectureType(IntEnum):
-    SINGLE = 1
-    SIAMESE = 2
-
-
-class ModelSize(Enum):
-    SMALL = "small"
-    BASE = "base"
-    LARGE = "large"
-
-
 class ModelGenerator:
+    """
+    Represents a learning model
+    """
     __tokenizer: AutoTokenizer = None
     __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
@@ -131,5 +117,6 @@ class ModelGenerator:
         :param kwargs: other arguments for tokenizer
         :return: feature name, value mappings
         """
-        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True, max_length=self._max_seq_length,
+        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True,
+                                    max_length=self._max_seq_length,
                                     padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

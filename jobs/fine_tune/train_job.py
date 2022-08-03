@@ -1,8 +1,8 @@
-from jobs.base_job import BaseLMJob
-from jobs.job_result import JobResult
+from jobs.fine_tune.abstract_fine_tune_job import AbstractFineTuneJob
+from jobs.abstract.job_result import JobResult
 
 
-class TrainJob(BaseLMJob):
+class TrainJob(AbstractFineTuneJob):
 
     # TODO
     def _get_checkpoint(self) -> str:

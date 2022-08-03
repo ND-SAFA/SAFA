@@ -1,21 +1,26 @@
-from typing import List, Dict
+from typing import Dict, List
 
-from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
-from transformers.trainer import Trainer
-from data.trace_dataset import TraceDatasetCreator
-from jobs.job_args import LMArgs
-from models.model_generator import ModelGenerator
+import numpy as np
+from datasets import load_metric
 from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
+from transformers.trainer import Trainer
+from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
-from datasets import load_metric
-import numpy as np
+
+from data.trace_dataset_creator import TraceDatasetCreator
+from jobs.fine_tune.model_fine_tune_args import ModelFineTuneArgs
+from models.model_generator import ModelGenerator
 from train.metrics.supported_metrics import get_metric_path
 
 
-class LMTrainer(Trainer):
+class ModelTrainer(Trainer):
+    """
+    Responsible for using given model for training and prediction using given dataset.
+    """
 
-    def __init__(self, args: LMArgs, model_generator: ModelGenerator, dataset_creator: TraceDatasetCreator):
+    def __init__(self, args: ModelFineTuneArgs, model_generator: ModelGenerator,
+                 dataset_creator: TraceDatasetCreator):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments

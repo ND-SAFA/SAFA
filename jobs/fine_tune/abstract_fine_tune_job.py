@@ -1,13 +1,13 @@
 from abc import ABC
 
 from jobs.abstract.abstract_job import AbstractJob
-from jobs.train.model_training_args import ModelTrainingArgs
+from jobs.fine_tune.model_fine_tune_args import ModelFineTuneArgs
 from train.model_trainer import ModelTrainer
 
 
-class AbstractModelJob(AbstractJob, ABC):
+class AbstractFineTuneJob(AbstractJob, ABC):
 
-    def __init__(self, args: ModelTrainingArgs):
+    def __init__(self, args: ModelFineTuneArgs):
         """
         Base job for task using a model (i.e. training, prediction, evaluation...)
         :param args: arguments used for configuring the model

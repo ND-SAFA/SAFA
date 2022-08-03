@@ -1,11 +1,6 @@
-from typing import Type
-
 import torch
 from torch import nn
 from transformers import AutoModel, BertPreTrainedModel
-from transformers.modeling_utils import PreTrainedModel
-
-from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
 from models.single_model_forward_pass import calculate_softmax_from_logits
 
 
@@ -80,17 +75,3 @@ class BertTraceSiamese(BertPreTrainedModel):
         sim_scores = torch.softmax(logits, 1).data.tolist()
         return [x[1] for x in sim_scores]
 
-
-class BertTraceSiameseModelGenerator(AbstractModelGenerator):
-
-    @property
-    def base_model_class(self) -> Type[PreTrainedModel]:
-        return BertTraceSiamese
-
-    @property
-    def arch_type(self) -> ArchitectureType:
-        return ArchitectureType.SIAMESE
-
-    # TODO
-    def get_model_path(self) -> str:
-        pass

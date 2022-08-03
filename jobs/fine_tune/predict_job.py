@@ -1,8 +1,8 @@
-from jobs.abstract.abstract_model_job import AbstractModelJob
+from jobs.fine_tune.abstract_fine_tune_job import AbstractFineTuneJob
 from jobs.abstract.job_result import JobResult
 
 
-class PredictJob(AbstractModelJob):
+class PredictJob(AbstractFineTuneJob):
 
     def __start(self) -> JobResult:
         """

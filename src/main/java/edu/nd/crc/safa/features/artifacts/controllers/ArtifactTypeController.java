@@ -5,13 +5,13 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.common.BaseController;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;

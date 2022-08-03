@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.LayoutSettings;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
-import edu.nd.crc.safa.features.layout.LayoutSettings;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -3,9 +3,9 @@ package edu.nd.crc.safa.features.traces.entities.app;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

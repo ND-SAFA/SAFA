@@ -3,18 +3,18 @@ package edu.nd.crc.safa.features.commits.services;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

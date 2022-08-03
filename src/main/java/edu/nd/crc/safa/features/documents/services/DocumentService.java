@@ -5,21 +5,21 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
 import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

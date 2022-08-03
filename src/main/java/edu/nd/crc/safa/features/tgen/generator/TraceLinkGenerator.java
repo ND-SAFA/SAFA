@@ -9,8 +9,8 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.tgen.vsm.Controller;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;

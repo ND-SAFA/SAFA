@@ -8,19 +8,19 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.FTAType;
+import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.ArtifactMaps;
 import edu.nd.crc.safa.features.flatfiles.entities.TraceMaps;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;

@@ -12,8 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,16 +1,16 @@
 package edu.nd.crc.safa.features.common;
 
+import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.features.commits.services.EntityVersionService;
+import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
-import edu.nd.crc.safa.authentication.SafaUserService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

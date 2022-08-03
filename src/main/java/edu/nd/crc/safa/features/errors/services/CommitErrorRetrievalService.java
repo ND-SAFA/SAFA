@@ -3,11 +3,11 @@ package edu.nd.crc.safa.features.errors.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.errors.entities.app.ErrorApplicationEntity;
+import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

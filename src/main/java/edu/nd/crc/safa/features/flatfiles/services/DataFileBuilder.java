@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvArtifactFile;
@@ -11,9 +13,7 @@ import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.json.JsonArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.json.JsonTraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;

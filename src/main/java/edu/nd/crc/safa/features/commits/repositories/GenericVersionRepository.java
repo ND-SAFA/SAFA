@@ -8,19 +8,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
-import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
-import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
+import edu.nd.crc.safa.features.commits.entities.db.VersionEntityAction;
 import edu.nd.crc.safa.features.common.IBaseEntity;
 import edu.nd.crc.safa.features.common.IVersionEntity;
+import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
+import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.commits.entities.db.VersionEntityAction;
-import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

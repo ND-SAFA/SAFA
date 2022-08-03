@@ -10,14 +10,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
-import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

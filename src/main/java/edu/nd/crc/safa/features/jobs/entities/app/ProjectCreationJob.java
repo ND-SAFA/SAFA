@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 
 /**

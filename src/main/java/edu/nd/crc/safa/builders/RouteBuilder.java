@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.builders;
 
-import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;

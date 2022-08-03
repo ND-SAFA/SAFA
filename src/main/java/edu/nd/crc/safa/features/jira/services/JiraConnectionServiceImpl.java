@@ -3,14 +3,14 @@ package edu.nd.crc.safa.features.jira.services;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

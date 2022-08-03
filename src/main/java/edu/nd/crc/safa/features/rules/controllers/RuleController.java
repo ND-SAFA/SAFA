@@ -8,14 +8,14 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.rules.entities.db.Rule;
-import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
+import edu.nd.crc.safa.features.rules.entities.db.Rule;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
+import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

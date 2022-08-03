@@ -7,12 +7,12 @@ import java.util.Map;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.entities.db.Rule;
-import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
-import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.rules.parser.DefaultTreeRules;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.parser.TreeVerifier;
+import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

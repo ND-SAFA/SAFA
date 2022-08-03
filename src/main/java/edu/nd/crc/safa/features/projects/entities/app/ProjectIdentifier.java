@@ -3,8 +3,8 @@ package edu.nd.crc.safa.features.projects.entities.app;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
 /**

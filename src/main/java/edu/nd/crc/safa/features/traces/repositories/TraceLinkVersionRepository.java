@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

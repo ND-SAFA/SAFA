@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

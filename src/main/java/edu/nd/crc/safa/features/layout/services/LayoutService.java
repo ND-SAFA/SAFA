@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
 import edu.nd.crc.safa.features.layout.generator.KlayLayoutGenerator;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import org.springframework.stereotype.Service;
 

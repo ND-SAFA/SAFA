@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.matrices.services.TraceMatrixService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
-import edu.nd.crc.safa.features.matrices.services.TraceMatrixService;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

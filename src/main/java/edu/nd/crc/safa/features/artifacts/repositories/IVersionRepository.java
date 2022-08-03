@@ -3,11 +3,11 @@ package edu.nd.crc.safa.features.artifacts.repositories;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
-import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.common.IVersionEntity;
+import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
+import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;

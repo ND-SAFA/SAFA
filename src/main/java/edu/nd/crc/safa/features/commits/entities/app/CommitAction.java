@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.commits.entities.app;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import org.javatuples.Pair;
 

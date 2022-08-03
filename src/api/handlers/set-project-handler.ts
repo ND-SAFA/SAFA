@@ -89,17 +89,13 @@ export async function handleSetProject(project: Project): Promise<void> {
  * Reloads the current project.
  */
 export async function handleReloadProject(): Promise<void> {
-  const document = documentModule.document;
-
-  await handleLoadVersion(projectModule.versionId);
-  await documentModule.switchDocuments(document);
+  await handleLoadVersion(projectModule.versionId, documentModule.document);
 }
 
 /**
  * Moves user to the document if one is set by currentDocumentId
  * Otherwise default document would continue to be in view.
- * @param project The project possibly containing a currentDocumentId
- * TODO: Clear currentDocument whenever project is cleared.
+ * @param project The project possibly containing a currentDocumentId.
  */
 async function setCurrentDocument(project: Project): Promise<void> {
   if (project.currentDocumentId) {

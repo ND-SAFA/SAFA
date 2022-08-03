@@ -1,4 +1,10 @@
-import { appModule, errorModule, projectModule, viewportModule } from "@/store";
+import {
+  appModule,
+  documentModule,
+  errorModule,
+  projectModule,
+  viewportModule,
+} from "@/store";
 import { navigateTo, Routes } from "@/router";
 import {
   getArtifactsInVersion,
@@ -8,19 +14,29 @@ import {
   handleSetProject,
   getWarningsInProjectVersion,
 } from "@/api";
+import { ProjectDocument } from "@/types";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
  * tree page in order to show the new project.
  *
  * @param versionId - The id of the version to retrieve and load.
+ * @param document - The document to start with viewing.
  */
-export async function handleLoadVersion(versionId: string): Promise<void> {
+export async function handleLoadVersion(
+  versionId: string,
+  document?: ProjectDocument
+): Promise<void> {
   appModule.onLoadStart();
 
   return navigateTo(Routes.ARTIFACT)
     .then(() => getProjectVersion(versionId))
     .then(handleSetProject)
+    .then(async () => {
+      if (!document) return;
+
+      await documentModule.switchDocuments(document);
+    })
     .finally(appModule.onLoadEnd);
 }
 

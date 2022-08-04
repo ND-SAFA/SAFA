@@ -1,5 +1,5 @@
 <template>
-  <v-avatar :size="size" @click.native="onAvatarClick">
+  <v-avatar :size="size" @click="onAvatarClick" style="cursor: pointer">
     <img :src="pathToLogo" alt="SAFA" />
   </v-avatar>
 </template>

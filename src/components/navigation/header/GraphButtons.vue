@@ -1,12 +1,12 @@
 <template>
   <div class="d-flex flex-row">
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in changeButtons">
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="secondary"
+        color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         @click="definition.handler"
@@ -14,13 +14,13 @@
       />
     </template>
 
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in viewButtons">
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="secondary"
+        color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         @click="definition.handler"
@@ -28,7 +28,7 @@
       />
     </template>
 
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <checkmark-menu
       :key="filterButton.label"

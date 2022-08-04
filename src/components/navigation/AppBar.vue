@@ -2,7 +2,7 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="blue-grey mt-1" v-if="doShowGraphButtons" />
+      <v-divider class="white faded mt-1" v-if="doShowGraphButtons" />
       <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 
@@ -11,7 +11,7 @@
         <v-col cols="8">
           <div class="d-flex flex-row">
             <generic-icon-button
-              color="secondary"
+              color="white"
               :tooltip="leftPanelTooltip"
               :icon-id="leftPanelIcon"
               @click="handleLeftPanelClick"
@@ -23,7 +23,7 @@
         <v-col cols="4">
           <v-row justify="end" class="ma-0 pa-0">
             <generic-icon-button
-              color="secondary"
+              color="white"
               :tooltip="rightPanelTooltip"
               :icon-id="rightPanelIcon"
               @click="handleRightPanelClick"

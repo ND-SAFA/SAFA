@@ -63,7 +63,7 @@ export default Vue.extend({
   data() {
     return {
       hover: true,
-      hoverColor: ThemeColors.menuHighlight,
+      hoverColor: ThemeColors.lightGrey,
     };
   },
   computed: {
@@ -85,7 +85,7 @@ export default Vue.extend({
      * @return The button color.
      */
     buttonColor(): string {
-      return this.definition.buttonColor || "secondary";
+      return this.definition.buttonColor || "white";
     },
     /**
      * @return The item color.

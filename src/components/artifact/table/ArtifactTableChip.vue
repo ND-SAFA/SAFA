@@ -19,7 +19,7 @@
 import Vue from "vue";
 
 /**
- * ArtifactTableChip
+ * Renders a chip on an artifact table row.
  */
 export default Vue.extend({
   name: "ArtifactTableChip",

@@ -118,7 +118,7 @@ export default Vue.extend({
     this.fetchProjects();
   },
   watch: {
-    userEmail() {
+    $route() {
       this.fetchProjects();
     },
     /**

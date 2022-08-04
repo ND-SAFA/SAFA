@@ -37,7 +37,7 @@ export default Vue.extend({
   },
   props: {
     value: {
-      type: Array as PropType<string[] | string | undefined>,
+      type: [Array, String] as PropType<string[] | string | undefined>,
       required: false,
     },
     multiple: {

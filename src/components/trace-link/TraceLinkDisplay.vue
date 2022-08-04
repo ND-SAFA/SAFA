@@ -5,6 +5,7 @@
         <generic-artifact-body-display
           :artifact="sourceArtifact"
           display-title
+          display-divider
         />
       </v-col>
 
@@ -14,11 +15,12 @@
         <generic-artifact-body-display
           :artifact="targetArtifact"
           display-title
+          display-divider
         />
       </v-col>
     </v-row>
 
-    <div class="d-flex flex-row justify-end mt-1">
+    <div class="d-flex flex-row justify-end">
       <v-btn
         outlined
         v-if="showApprove"

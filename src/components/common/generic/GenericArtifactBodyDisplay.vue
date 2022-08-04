@@ -5,7 +5,7 @@
         <span class="text-h6 mr-2">{{ artifact.name }}</span>
         <span class="text-caption text--secondary">{{ artifactType }}</span>
       </div>
-      <v-divider />
+      <v-divider v-if="displayDivider || isExpanded" />
     </v-list-item-title>
     <v-list-item-subtitle v-if="!isExpanded" v-html="artifact.body" />
     <v-list-item-content v-if="isExpanded" v-html="artifact.body" />
@@ -34,6 +34,7 @@ export default Vue.extend({
       required: true,
     },
     displayTitle: Boolean,
+    displayDivider: Boolean,
   },
   data() {
     return {

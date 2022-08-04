@@ -40,29 +40,6 @@ export async function handleResetGraph(
 }
 
 /**
- 1. Sets a new project.
- 2. Subscribes to the new project's version.
- 3. Clears any deltas to previous projects and their settings.
- *
- * @param project - The project to set.
- */
-export async function handleProjectSubscription(
-  project: Project
-): Promise<void> {
-  const projectId = project.projectId;
-  const versionId = project.projectVersion?.versionId || "";
-  const isDifferentProject = projectModule.versionId !== versionId;
-
-  project.artifactTypes = await getProjectArtifactTypes(projectId);
-
-  await handleSelectVersion(projectId, versionId);
-  await projectModule.initializeProject(project);
-  await handleResetGraph(isDifferentProject);
-  await handleLoadTraceMatrices();
-  await updateParam(QueryParams.VERSION, versionId);
-}
-
-/**
  * Clears project store data.
  */
 export async function handleClearProject(): Promise<void> {
@@ -80,9 +57,19 @@ export async function handleClearProject(): Promise<void> {
  * @param project - Project created containing entities.
  */
 export async function handleSetProject(project: Project): Promise<void> {
-  await handleProjectSubscription(project);
+  const projectId = project.projectId;
+  const versionId = project.projectVersion?.versionId || "";
+  const isDifferentProject = projectModule.versionId !== versionId;
+
+  project.artifactTypes = await getProjectArtifactTypes(projectId);
+
+  await handleSelectVersion(projectId, versionId);
+  await projectModule.initializeProject(project);
+  await handleResetGraph(isDifferentProject);
+  await handleLoadTraceMatrices();
   errorModule.setArtifactWarnings(project.warnings);
   await setCurrentDocument(project);
+  await updateParam(QueryParams.VERSION, versionId);
 }
 
 /**

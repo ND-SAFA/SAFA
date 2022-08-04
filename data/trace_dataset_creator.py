@@ -8,7 +8,7 @@ from constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RE
 from data.artifact import Artifact
 from data.data_key import DataKey
 from data.trace_link import TraceLink
-from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+from models.model_generator import ModelGenerator, ArchitectureType
 
 
 class TraceDatasetCreator:
@@ -23,7 +23,7 @@ class TraceDatasetCreator:
 
     def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str],
                  true_links: List[Tuple[str, str]],
-                 model_generator: AbstractModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
+                 model_generator: ModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs datasets for trace link training and validation
         :param source_artifacts: source artifacts represented as mapping between id and token

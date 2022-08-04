@@ -1,12 +1,9 @@
-from typing import Type
-
 from transformers import AutoModel, BertPreTrainedModel
-from transformers.modeling_utils import PreTrainedModel
 from transformers.models.electra.modeling_electra import (
     ElectraClassificationHead,
 )
 
-from models.abstract_model_generator import AbstractModelGenerator, ArchitectureType
+
 from models.single_model_forward_pass import single_model_forward_pass
 
 
@@ -29,17 +26,3 @@ class BertTraceSingle(BertPreTrainedModel):
             kwargs=kwargs,
         )
 
-
-class BertTraceSingleModelGenerator(AbstractModelGenerator):
-
-    @property
-    def base_model_class(self) -> Type[PreTrainedModel]:
-        return BertTraceSingle
-
-    @property
-    def arch_type(self) -> ArchitectureType:
-        return ArchitectureType.SINGLE
-
-    # TODO
-    def get_model_path(self) -> str:
-        pass

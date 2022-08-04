@@ -1,25 +1,18 @@
-from abc import abstractmethod
-from enum import Enum, IntEnum
-from typing import Dict, Type
+
+
+import os
+from typing import Dict
 
 from transformers import AutoConfig, AutoTokenizer
 from transformers.modeling_utils import PreTrainedModel
 
 from constants import MAX_SEQ_LENGTH_DEFAULT
+from models.base_models.supported_base_model import SupportedBaseModel
+from models.model_properties import ArchitectureType
+from pretrain.corpuses.domain import Domain
 
 
-class ArchitectureType(IntEnum):
-    SINGLE = 1
-    SIAMESE = 2
-
-
-class ModelSize(Enum):
-    SMALL = "small"
-    BASE = "base"
-    LARGE = "large"
-
-
-class AbstractModelGenerator:
+class ModelGenerator:
     """
     Represents a learning model
     """
@@ -27,55 +20,49 @@ class AbstractModelGenerator:
     __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    @abstractmethod
-    @property
-    def base_model_class(self) -> Type[PreTrainedModel]:
+    def __init__(self, base_model: SupportedBaseModel, model_path: str):
         """
-        Associated PreTrainedModel class
-        :return: PreTrainedModel class
+        Handles loading model and related functions
+        :param model_path: the path to the saved model
         """
-        pass
+        self.model_path = model_path
+        self.model_name = base_model.name
+        self.base_model_class = base_model.value
+        self.arch_type = self._get_model_architecture_type(self.model_name)
 
-    @abstractmethod
-    def get_model_path(self) -> str:
+    @staticmethod
+    def _get_model_architecture_type(model_name: str) -> ArchitectureType:
         """
-        Path to the model
-        :return: model path
+        Gets the architecture type of model
+        :param model_name: the name of the model
+        :return: the ArchitectureType of model
         """
-        pass
+        arch_type = model_name.split("_")[-1]
+        try:
+            return ArchitectureType[arch_type]
+        except KeyError:
+            return ArchitectureType.SINGLE
 
-    @abstractmethod
-    @property
-    def arch_type(self) -> ArchitectureType:
+    # this may not be needed but keeping for now...
+    @staticmethod
+    def create_path(domain: Domain,  base_model: SupportedBaseModel, project_id: str,) -> str:
         """
-        Architecture type (i.e. siamese or single)
-        :return: ArchitectureType
+        Creates the path to the saved model
+        :param domain: domain used for pretraining
+        :param project_id: id of current project
+        :param base_model: the base model for training
+        :return: the model path
         """
-        pass
-
-    @property
-    def model_size(self) -> ModelSize:
-        """
-        Size of model (i.e. small, large, base...)
-        :return: ModelSize
-        """
-        return ModelSize.BASE
-
-    def get_model_name(self) -> str:
-        """
-        Name of the model
-        :return: model name
-        """
-        return self.base_model_class.__name__
+        return os.path.join(domain.value, base_model.value, project_id)
 
     def __load_model(self) -> PreTrainedModel:
         """
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        config = AutoConfig.from_pretrained(self.get_model_path())
+        config = AutoConfig.from_pretrained(self.model_path)
         config.num_labels = 2
-        return self.base_model_class.from_pretrained(self.get_model_path(), config=config)
+        return self.base_model_class.from_pretrained(self.model_path, config=config)
 
     def get_model(self) -> PreTrainedModel:
         """
@@ -92,7 +79,7 @@ class AbstractModelGenerator:
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
-            self.__tokenizer = AutoTokenizer.from_pretrained(self.get_model_path)
+            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         return self.__tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:

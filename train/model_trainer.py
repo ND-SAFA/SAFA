@@ -9,8 +9,8 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 from transformers.trainer_utils import PredictionOutput
 
 from data.trace_dataset_creator import TraceDatasetCreator
-from jobs.train.model_training_args import ModelTrainingArgs
-from models.abstract_model_generator import AbstractModelGenerator
+from jobs.fine_tune.model_fine_tune_args import ModelFineTuneArgs
+from models.model_generator import ModelGenerator
 from train.metrics.supported_metrics import get_metric_path
 
 
@@ -19,7 +19,7 @@ class ModelTrainer(Trainer):
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: ModelTrainingArgs, model_generator: AbstractModelGenerator,
+    def __init__(self, args: ModelFineTuneArgs, model_generator: ModelGenerator,
                  dataset_creator: TraceDatasetCreator):
         """
         Handles the training and evaluation of learning models

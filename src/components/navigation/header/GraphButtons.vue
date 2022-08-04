@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-row">
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in changeButtons">
       <generic-icon-button
@@ -14,7 +14,7 @@
       />
     </template>
 
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in viewButtons">
       <generic-icon-button
@@ -28,7 +28,7 @@
       />
     </template>
 
-    <v-divider inset vertical class="secondary mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <checkmark-menu
       :key="filterButton.label"

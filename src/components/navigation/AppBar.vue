@@ -2,7 +2,7 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="grey mt-1" v-if="doShowGraphButtons" />
+      <v-divider class="white faded mt-1" v-if="doShowGraphButtons" />
       <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 

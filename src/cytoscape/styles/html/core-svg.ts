@@ -1,5 +1,5 @@
 import { ArtifactData, SvgStyle } from "@/types";
-import { capitalize, ThemeColors } from "@/util";
+import { capitalize, getTextColor, ThemeColors } from "@/util";
 import { getBody } from "./artifact-helper";
 import { svgFooter } from "./artifact-footer";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
@@ -21,9 +21,6 @@ export function svgNode(
   svgShape: string
 ): string {
   const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
-  const title = data.safetyCaseType
-    ? capitalize(data.safetyCaseType)
-    : capitalize(data.artifactType);
   const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
 
   return `
@@ -37,7 +34,7 @@ export function svgNode(
         class="artifact-svg-wrapper ${deltaClass}"
       >
         ${svgShape}
-        ${svgTitle(title, y)}
+        ${svgTitle(data, y)}
         ${svgDiv({ x, y: y + 7, width })}
         ${svgDetails(data, y + 27)}
         ${svgBody(data, {
@@ -56,16 +53,20 @@ export function svgNode(
 /**
  * Creates the SVG for representing a safety case node's title.
  *
- * @param title - The title of the node.
+ * @param data - The artifact data to render.
  * @param yPos - The y position to start drawing at.
  *
  * @return stringified SVG for the node.
  */
-function svgTitle(title: string, yPos: number): string {
+function svgTitle(data: ArtifactData, yPos: number): string {
+  const title = data.safetyCaseType
+    ? capitalize(data.safetyCaseType)
+    : capitalize(data.artifactType);
+
   return `
    <text 
       x="50%" y="${yPos}" text-anchor="middle"
-      fill="${ThemeColors.artifactText}" 
+      fill="${getTextColor(data.artifactDeltaState)}" 
       font-weight="600"
     >
       ${title}
@@ -107,7 +108,7 @@ function svgDetails(data: ArtifactData, yPos: number): string {
       text-anchor="middle" 
       shape-rendering="crispEdges"
       font-weight="600"
-      fill="${ThemeColors.artifactText}"
+      fill="${getTextColor(data.artifactDeltaState)}"
     >
       ${data.artifactName}
     </text>
@@ -139,7 +140,8 @@ function svgBody(
          width: ${style.width}px;
          height: ${style.height}px;
          line-height: 1rem;
-         text-align: center;"
+         text-align: center;
+         color: ${getTextColor(data.artifactDeltaState)}"
      >
        ${getBody(data.body, style.truncateLength)}
      </span>

@@ -55,33 +55,33 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
     selector: `edge[deltaType='${ArtifactDeltaState.ADDED}']`,
     style: {
-      "target-arrow-color": ThemeColors.artifactAdded,
-      "source-arrow-color": ThemeColors.artifactAdded,
-      "line-color": ThemeColors.artifactAdded,
+      "target-arrow-color": ThemeColors.added,
+      "source-arrow-color": ThemeColors.added,
+      "line-color": ThemeColors.added,
     },
   },
   {
     selector: `edge[deltaType='${ArtifactDeltaState.MODIFIED}']`,
     style: {
-      "target-arrow-color": ThemeColors.artifactModified,
-      "source-arrow-color": ThemeColors.artifactModified,
-      "line-color": ThemeColors.artifactModified,
+      "target-arrow-color": ThemeColors.modified,
+      "source-arrow-color": ThemeColors.modified,
+      "line-color": ThemeColors.modified,
     },
   },
   {
     selector: `${GENERATED_APPROVED_LINK_SELECTOR}[deltaType='${ArtifactDeltaState.MODIFIED}']`,
     style: {
-      "target-arrow-color": ThemeColors.artifactAdded,
-      "source-arrow-color": ThemeColors.artifactAdded,
-      "line-color": ThemeColors.artifactAdded,
+      "target-arrow-color": ThemeColors.added,
+      "source-arrow-color": ThemeColors.added,
+      "line-color": ThemeColors.added,
     },
   },
   {
     selector: `edge[deltaType='${ArtifactDeltaState.REMOVED}']`,
     style: {
-      "target-arrow-color": ThemeColors.artifactRemoved,
-      "source-arrow-color": ThemeColors.artifactRemoved,
-      "line-color": ThemeColors.artifactRemoved,
+      "target-arrow-color": ThemeColors.removed,
+      "source-arrow-color": ThemeColors.removed,
+      "line-color": ThemeColors.removed,
     },
   },
   // Nodes
@@ -91,11 +91,11 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
       width: ARTIFACT_WIDTH + "px",
       height: ARTIFACT_HEIGHT + "px",
       padding: 50,
-      "background-color": ThemeColors.artifactDefault,
+      "background-color": ThemeColors.lightGrey,
       shape: "roundrectangle",
       "border-style": "solid",
       "border-width": 0,
-      "border-color": ThemeColors.artifactBorder,
+      "border-color": ThemeColors.darkGrey,
       "text-wrap": "ellipsis",
     },
   },
@@ -109,19 +109,19 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
     selector: `node[artifactDeltaState='${ArtifactDeltaState.ADDED}']`,
     style: {
-      "background-color": ThemeColors.artifactAdded,
+      "background-color": ThemeColors.added,
     },
   },
   {
     selector: `node[artifactDeltaState='${ArtifactDeltaState.MODIFIED}']`,
     style: {
-      "background-color": ThemeColors.artifactModified,
+      "background-color": ThemeColors.modified,
     },
   },
   {
     selector: `node[artifactDeltaState='${ArtifactDeltaState.REMOVED}']`,
     style: {
-      "background-color": ThemeColors.artifactRemoved,
+      "background-color": ThemeColors.removed,
     },
   },
   // Nodes - Logic

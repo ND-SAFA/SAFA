@@ -4,7 +4,6 @@
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
-      class="elevation-1"
       :headers="headers"
       :items="items"
       :search="searchText"
@@ -24,6 +23,7 @@
 
       <template v-slot:[`item.name`]="{ item }">
         <div class="d-flex flex-row align-center">
+          <artifact-table-delta-chip :artifact="item" />
           <generic-icon-button
             v-if="getHasWarnings(item)"
             icon-id="mdi-hazard-lights"
@@ -96,6 +96,7 @@ import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
+import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 
 /**
  * Represents a table of artifacts.
@@ -103,6 +104,7 @@ import ArtifactTableCell from "./ArtifactTableCell.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    ArtifactTableDeltaChip,
     ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
@@ -171,7 +173,8 @@ export default Vue.extend({
      * @return The artifact table's items.
      */
     items(): FlatArtifact[] {
-      const selectedTypes = this.inDeltaView ? [] : this.selectedDeltaTypes;
+      const selectedTypes = this.inDeltaView ? this.selectedDeltaTypes : [];
+
       return artifactModule.flatArtifacts.filter(
         ({ id }) =>
           selectedTypes.length === 0 ||
@@ -197,7 +200,9 @@ export default Vue.extend({
      */
     handleEdit(artifact: Artifact) {
       artifactSelectionModule.selectArtifact(artifact.id);
-      appModule.openArtifactCreatorTo({ isNewArtifact: false });
+      appModule.openArtifactCreatorTo({
+        isNewArtifact: false,
+      });
     },
     /**
      * Opens the delete artifact window.
@@ -222,12 +227,10 @@ export default Vue.extend({
      */
     getItemBackground(item: Artifact): string {
       if (artifactSelectionModule.getSelectedArtifactId === item.id) {
-        return "artifact-selected";
-      } else {
-        const deltaState = deltaModule.getArtifactDeltaType(item.id);
-
-        return `artifact-${deltaState.toLowerCase()}`;
+        return "artifact-row-selected";
       }
+
+      return "";
     },
     /**
      * Returns whether the artifact has any warnings.

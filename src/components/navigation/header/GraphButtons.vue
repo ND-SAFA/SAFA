@@ -6,7 +6,7 @@
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="secondary"
+        color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         @click="definition.handler"
@@ -20,7 +20,7 @@
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="secondary"
+        color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         @click="definition.handler"

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="columns.length > 0">
     <h1 class="text-h6">Custom Fields</h1>
     <v-divider class="mb-2" />
     <single-custom-field-input

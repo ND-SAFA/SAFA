@@ -16,8 +16,8 @@ class ModelFineTuneArgs(TrainingArguments):
     dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
 
-    def __init__(self, base_model: SupportedBaseModel, model_path: str, output_path: str, s_arts: Dict, t_arts: Dict, links: List,
-                 **kwargs):
+    def __init__(self, base_model: SupportedBaseModel, model_path: str, s_arts: Dict, t_arts: Dict, links: List = None,
+                 output_path: str = None, **kwargs):
         """
         Arguments for Learning Model
         :param base_model: the base model
@@ -32,7 +32,8 @@ class ModelFineTuneArgs(TrainingArguments):
         self.output_dir = output_path
         self.__set_args(**kwargs)
         self.model_generator = ModelGenerator(base_model, model_path)
-        self.dataset = TraceDatasetCreator(s_arts, t_arts, links, self.model_generator, self.linked_targets_only)
+        self.dataset = TraceDatasetCreator(source_artifacts=s_arts, target_artifacts=t_arts, true_links=links,
+                                           model_generator=self.model_generator, linked_targets_only=self.linked_targets_only)
 
     def __set_args(self, **kwargs) -> None:
         """

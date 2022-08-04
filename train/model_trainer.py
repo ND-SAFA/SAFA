@@ -53,7 +53,7 @@ class ModelTrainer(Trainer):
         Performs the prediction and (optionally) evaluation for the model
         :return: a dictionary containing the results
         """
-        self.eval_dataset = self.dataset.get_prediction_dataset(self.args.dataset_size)
+        self.eval_dataset = self.dataset.get_validation_dataset(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
         if self.args.metrics:
             output.metrics = self._eval(output, self.args.metrics)

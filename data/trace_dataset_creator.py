@@ -19,11 +19,11 @@ class TraceDatasetCreator:
     pos_link_ids: set = set()
     neg_link_ids: set = set()
     __training_dataset: List[Dict] = None
+    __validation_dataset: List[Dict] = None
     __prediction_dataset: List[Dict] = None
 
-    def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str],
-                 true_links: List[Tuple[str, str]],
-                 model_generator: ModelGenerator, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
+    def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str], model_generator: ModelGenerator,
+                 true_links: List[Tuple[str, str]] = None, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs datasets for trace link training and validation
         :param source_artifacts: source artifacts represented as mapping between id and token
@@ -50,16 +50,25 @@ class TraceDatasetCreator:
             self.__training_dataset.extend(self._get_feature_entries(reduced_neg_link_ids, 1))
         return self.__training_dataset
 
-    def get_prediction_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT) -> List[Dict]:
+    def get_validation_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT) -> List[Dict]:
         """
-        Gets the dataset used for prediction/validation
+        Gets the dataset used for validation
         :param dataset_size: desired size for dataset (if larger than original dataset, the entire dataset is used)
-        :return: the prediction/validation dataset
+        :return: the validation dataset
         """
-        if self.__prediction_dataset is None:
+        if self.__validation_dataset is None:
             new_length = min(dataset_size, len(self.links))
             reduced_link_ids = self._reduce_data_size(list(self.links.keys()), new_length, include_duplicates=False)
-            self.__prediction_dataset = self._get_feature_entries(reduced_link_ids)
+            self.__validation_dataset = self._get_feature_entries(reduced_link_ids)
+        return self.__validation_dataset
+
+    def get_prediction_dataset(self) -> List[Dict]:
+        """
+        Gets the dataset used for validation
+        :return: the prediction dataset
+        """
+        if self.__prediction_dataset is None:
+            self.__prediction_dataset = self._get_feature_entries(self.links.keys())
         return self.__prediction_dataset
 
     # TODO is this needed? incorporate into training/validation?
@@ -148,7 +157,7 @@ class TraceDatasetCreator:
             feature_entries.extend([feature_entry for i in range(resample_rate)])
         return feature_entries
 
-    def _create_links(self, s_arts: Dict[str, str], t_arts: Dict, true_links: List[Tuple[str, str]]) -> None:
+    def _create_links(self, s_arts: Dict[str, str], t_arts: Dict, true_links: List[Tuple[str, str]] = None) -> None:
         """
         Creates Trace Links from all source and target pairs
         :param s_arts: source artifacts represented as id, token mappings
@@ -163,7 +172,8 @@ class TraceDatasetCreator:
                 target = Artifact(t_id, t_token, self.model_generator.get_feature)
                 link = TraceLink(source, target, self.model_generator.get_feature)
                 self.links[link.id_] = link
-        self._create_pos_and_neg_links(true_links)
+        if true_links:
+            self._create_pos_and_neg_links(true_links)
 
     def _create_pos_and_neg_links(self, true_links: List[Tuple[str, str]]) -> None:
         """

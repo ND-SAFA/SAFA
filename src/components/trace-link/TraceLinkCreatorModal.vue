@@ -24,7 +24,10 @@
       </v-row>
     </template>
     <template v-slot:actions>
-      <v-row justify="end">
+      <v-row justify="end" align="center">
+        <span v-if="!!errorMessage" class="text-body-1 error--text pr-2">
+          {{ errorMessage }}
+        </span>
         <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
           Create
         </v-btn>
@@ -83,13 +86,28 @@ export default Vue.extend({
       return artifactModule.getArtifactById(this.targetArtifactId);
     },
     /**
+     * @return Any errors in trying to create this link.
+     */
+    errorMessage(): string {
+      if (!this.sourceArtifactId || !this.targetArtifactId) return "";
+
+      const isLinkAllowed = traceModule.isLinkAllowed(
+        this.sourceArtifact,
+        this.targetArtifact
+      );
+
+      return isLinkAllowed === true
+        ? ""
+        : isLinkAllowed || "Cannot create a trace link.";
+    },
+    /**
      * @return Whether a link can be created.
      */
     canSave(): boolean {
       return (
         !!this.sourceArtifactId &&
         !!this.targetArtifactId &&
-        traceModule.isLinkAllowed(this.sourceArtifact, this.targetArtifact)
+        this.errorMessage === ""
       );
     },
   },

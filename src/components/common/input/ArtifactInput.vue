@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { Artifact } from "@/types";
 import { artifactModule } from "@/store";
 import { GenericArtifactBodyDisplay } from "@/components/common/generic";
@@ -37,8 +37,8 @@ export default Vue.extend({
   },
   props: {
     value: {
-      type: [Array, String],
-      required: true,
+      type: Array as PropType<string[] | string | undefined>,
+      required: false,
     },
     multiple: {
       type: Boolean,
@@ -97,13 +97,13 @@ export default Vue.extend({
     /**
      * Updates the model if the value changes.
      */
-    value(currentValue: string[] | string) {
+    value(currentValue: string[] | string | undefined) {
       this.model = currentValue;
     },
     /**
      * Emits changes to the model.
      */
-    model(currentValue: string[] | string) {
+    model(currentValue: string[] | string | undefined) {
       this.$emit("input", currentValue);
     },
   },

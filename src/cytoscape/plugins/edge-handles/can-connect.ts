@@ -18,5 +18,5 @@ export function canConnect(
 
   if (!sourceData || !targetData) return false;
 
-  return traceModule.isLinkAllowed(sourceData, targetData);
+  return traceModule.isLinkAllowed(sourceData, targetData) === true;
 }

@@ -69,12 +69,12 @@ export interface ChannelSubscriptionId {
 export type LinkValidator = (sourceId: string, targetId: string) => boolean;
 
 /**
- * Returns whether a link can be created between artifacts.
+ * Returns true if a link can be created, otherwise an error.
  */
 export type CreateLinkValidator = (
   source: Artifact | ArtifactData,
   target: Artifact | ArtifactData
-) => boolean;
+) => boolean | string;
 
 /**
  * Returns the trace link between the given artifact ids.

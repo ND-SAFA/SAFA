@@ -50,15 +50,15 @@ function getChildDeltaStates(data: ArtifactData): NodeChildDelta[] {
   const toRender = [
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.ADDED),
-      color: ThemeColors.artifactAdded,
+      color: ThemeColors.added,
     },
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.MODIFIED),
-      color: ThemeColors.artifactModified,
+      color: ThemeColors.modified,
     },
     {
       doRender: childDeltaStates.includes(ArtifactDeltaState.REMOVED),
-      color: ThemeColors.artifactRemoved,
+      color: ThemeColors.removed,
     },
   ];
 

@@ -45,7 +45,7 @@
       </template>
     </v-select>
     <generic-icon-button
-      color="secondary"
+      color="white"
       :icon-id="toggleViewIcon"
       :tooltip="toggleViewTooltip"
       @click="handleToggleTableView"

@@ -34,7 +34,7 @@ export function svgFooter(
       <text 
         y="${textY}"
         x="${hasWarnings ? 20 : 80}"
-        fill="${ThemeColors.artifactText}"
+        fill="${ThemeColors.black}"
       >
         ${data.hiddenChildren} Hidden
       </text>
@@ -54,7 +54,7 @@ export function svgFooter(
         <text 
           x="${hasChildren ? outerStyle.width - 80 : 80}"
           y="${textY}" 
-          fill="${ThemeColors.artifactText}"
+          fill="${ThemeColors.black}"
         >
           ${warningCount} Warning${warningCount !== 1 ? "s" : ""}
         </text>
@@ -64,7 +64,7 @@ export function svgFooter(
           width="20" height="20"
         >
           <div style="font-family: Material Icons; color: ${
-            ThemeColors.artifactWarning
+            ThemeColors.warning
           }">
             warning
           </div>
@@ -79,7 +79,7 @@ export function svgFooter(
       rx="8" 
       width="${outerStyle.width}" 
       height="${ARTIFACT_CHILDREN_HEIGHT}"
-      fill="${ThemeColors.artifactBorder}"
+      fill="${ThemeColors.darkGrey}"
       class="artifact-border"
     />
     <rect
@@ -88,7 +88,7 @@ export function svgFooter(
       rx="7" 
       width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
       height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
-      fill="${ThemeColors.artifactDefault}"
+      fill="${ThemeColors.lightGrey}"
       class="artifact-svg"
     />
     ${children}

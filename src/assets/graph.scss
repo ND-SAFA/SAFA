@@ -70,23 +70,34 @@ $graph-border-radius: 8px;
   }
 
   &:hover > .artifact-border {
-    fill: darken($color-border, 30);
+    fill: darken($color-border, 50);
   }
 
   &:hover > .artifact-svg-div {
-    stroke: darken($color-border, 30);
+    stroke: darken($color-border, 50);
+  }
+
+  &.artifact-svg-delta-ADDED,
+  &.artifact-svg-delta-MODIFIED,
+  &.artifact-svg-delta-REMOVED {
+    .artifact-border {
+      fill: darken($color-border, 30);
+    }
+    .artifact-svg-div {
+      stroke: darken($color-border, 30);
+    }
   }
 
   &.artifact-svg-delta-ADDED:hover > .artifact-svg {
-    fill: lighten($color-added, 5);
+    fill: lighten($color-added, 10);
   }
 
   &.artifact-svg-delta-MODIFIED:hover > .artifact-svg {
-    fill: lighten($color-modified, 5);
+    fill: lighten($color-modified, 10);
   }
 
   &.artifact-svg-delta-REMOVED:hover > .artifact-svg {
-    fill: lighten($color-removed, 5);
+    fill: lighten($color-removed, 10);
   }
 }
 

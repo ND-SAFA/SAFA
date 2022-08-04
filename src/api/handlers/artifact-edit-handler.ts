@@ -40,6 +40,7 @@ export async function handleSaveArtifact(
 
       await projectModule.addOrUpdateArtifacts(createdArtifacts);
       artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      // TODO: load new layout
       await viewportModule.setArtifactTreeLayout();
 
       if (!parentArtifact) {

@@ -1,8 +1,7 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, ThemeColors } from "@/util";
 import { svgNode } from "./core-svg";
-
-const borderWidth = 3;
+import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
 
 /**
  * Creates the HTML for representing a safety case node in a graph.
@@ -48,9 +47,9 @@ export function svgDefault(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-        x="${borderWidth}" y="${borderWidth}" rx="7" 
-        width="${outerWidth - borderWidth * 2}" 
-        height="${outerHeight - borderWidth * 2}"
+        x="${ARTIFACT_BORDER_WIDTH}" y="${ARTIFACT_BORDER_WIDTH}" rx="7" 
+        width="${outerWidth - ARTIFACT_BORDER_WIDTH * 2}" 
+        height="${outerHeight - ARTIFACT_BORDER_WIDTH * 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -84,9 +83,9 @@ function svgGoal(data: ArtifactData): string {
         class="artifact-border"
       />
       <rect
-          x="${borderWidth}" y="${borderWidth}"
-        width="${outerWidth - borderWidth * 2}" 
-        height="${outerHeight - borderWidth * 2}"
+          x="${ARTIFACT_BORDER_WIDTH}" y="${ARTIFACT_BORDER_WIDTH}"
+        width="${outerWidth - ARTIFACT_BORDER_WIDTH * 2}" 
+        height="${outerHeight - ARTIFACT_BORDER_WIDTH * 2}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -122,7 +121,7 @@ function svgSolution(data: ArtifactData): string {
         class="artifact-border"
       />
       <circle 
-        cx="100" cy="100" r="${radius - borderWidth}"
+        cx="100" cy="100" r="${radius - ARTIFACT_BORDER_WIDTH}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />
@@ -158,10 +157,14 @@ function svgStrategy(data: ArtifactData): string {
       />
       <polygon
         points="
-          ${xOffset + borderWidth},${borderWidth}
-          ${outerWidth + xOffset - borderWidth},${borderWidth}
-          ${outerWidth - borderWidth},${outerHeight - borderWidth} 
-          ${borderWidth},${outerHeight - borderWidth}"
+          ${xOffset + ARTIFACT_BORDER_WIDTH},${ARTIFACT_BORDER_WIDTH}
+          ${
+            outerWidth + xOffset - ARTIFACT_BORDER_WIDTH
+          },${ARTIFACT_BORDER_WIDTH}
+          ${outerWidth - ARTIFACT_BORDER_WIDTH},${
+      outerHeight - ARTIFACT_BORDER_WIDTH
+    } 
+          ${ARTIFACT_BORDER_WIDTH},${outerHeight - ARTIFACT_BORDER_WIDTH}"
         fill="${getBackgroundColor(data.artifactDeltaState)}"
         class="artifact-svg"
       />

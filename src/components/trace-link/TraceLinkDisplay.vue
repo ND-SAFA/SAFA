@@ -1,22 +1,24 @@
 <template>
-  <v-container>
-    <v-row>
+  <div>
+    <v-row class="my-4">
       <v-col cols="6">
-        <h1 class="text-h5">{{ link.sourceName }}</h1>
-        <v-divider />
-        <generic-artifact-body-display :body="sourceBody" />
+        <generic-artifact-body-display
+          :artifact="sourceArtifact"
+          display-title
+        />
       </v-col>
 
       <v-divider vertical inset />
 
       <v-col cols="6">
-        <h1 class="text-h5">{{ link.targetName }}</h1>
-        <v-divider />
-        <generic-artifact-body-display :body="targetBody" />
+        <generic-artifact-body-display
+          :artifact="targetArtifact"
+          display-title
+        />
       </v-col>
     </v-row>
 
-    <div class="d-flex flex-row justify-end pt-5">
+    <div class="d-flex flex-row justify-end mt-1">
       <v-btn
         outlined
         v-if="showApprove"
@@ -54,13 +56,14 @@
         Cancel
       </v-btn>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types";
+import { Artifact, TraceLink } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
+import { artifactModule } from "@/store";
 
 /**
  * Displays a trace link.
@@ -78,14 +81,6 @@ export default Vue.extend({
   props: {
     link: {
       type: Object as PropType<TraceLink>,
-      required: true,
-    },
-    sourceBody: {
-      type: String,
-      required: true,
-    },
-    targetBody: {
-      type: String,
       required: true,
     },
     showDecline: {
@@ -109,6 +104,18 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The artifact this link comes from.
+     */
+    sourceArtifact(): Artifact {
+      return artifactModule.getArtifactsById[this.link.sourceId];
+    },
+    /**
+     * @return The artifact this link goes towards.
+     */
+    targetArtifact(): Artifact {
+      return artifactModule.getArtifactsById[this.link.targetId];
+    },
     /**
      * @return The text to display on the delete button.
      */

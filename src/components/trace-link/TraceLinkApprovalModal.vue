@@ -10,11 +10,9 @@
       <trace-link-display
         v-if="!!link"
         :link="link"
-        :source-body="sourceBody"
-        :target-body="targetBody"
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
-        :show-delete="!canBeModified"
+        :show-delete="canBeDeleted"
         @link:approve="handleApprove"
         @link:decline="handleDecline"
         @link:delete="handleDecline"
@@ -30,7 +28,7 @@ import { TraceApproval, TraceLink, TraceType } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
-import { artifactModule } from "@/store";
+import { deltaModule } from "@/store";
 
 /**
  * A modal for approving trace links.
@@ -47,23 +45,13 @@ export default Vue.extend({
     },
     link: Object as PropType<TraceLink>,
   },
-  data() {
-    return {
-      sourceBody: "",
-      targetBody: "",
-    };
-  },
-  watch: {
-    isOpen(isOpen: boolean) {
-      if (!isOpen || !this.link) return;
-
-      const artifactsById = artifactModule.getArtifactsById;
-
-      this.sourceBody = artifactsById[this.link.sourceId].body;
-      this.targetBody = artifactsById[this.link.targetId].body;
-    },
-  },
   computed: {
+    /**
+     * @return Whether this link can be deleted.
+     */
+    canBeDeleted(): boolean {
+      return !this.canBeModified && !deltaModule.inDeltaView;
+    },
     /**
      * @return Whether this link can be modified.
      */

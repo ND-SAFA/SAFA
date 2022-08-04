@@ -3,7 +3,7 @@
     <v-row justify="end" class="mr-1 mb-1">
       <generic-icon-button
         tooltip="View Artifact Body"
-        icon-id="mdi-code-tags"
+        icon-id="mdi-application-array-outline"
         @click="handleViewBody"
       />
       <generic-icon-button
@@ -98,7 +98,7 @@ export default Vue.extend({
      * Opens the artifact body display.
      */
     handleViewBody(): void {
-      appModule.SET_ARTIFACT_BODY(true);
+      appModule.toggleArtifactBody();
     },
   },
 });

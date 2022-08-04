@@ -122,6 +122,7 @@ export default class ProjectModule extends VuexModule {
     );
     await traceModule.deleteTraceLinks(traceLinks);
     await subtreeModule.updateSubtreeMap();
+    viewportModule.applyAutomove();
   }
 
   @Action
@@ -138,6 +139,19 @@ export default class ProjectModule extends VuexModule {
 
     this.SET_ARTIFACT_TYPES(allArtifactTypes);
     typeOptionsModule.SET_TYPES(allArtifactTypes);
+  }
+
+  @Action
+  /**
+   * Runs the callback only if the project is defined. Otherwise logs a warning.
+   * @param cb - The callback to run.
+   */
+  ifProjectDefined(cb: () => void): void {
+    if (this.isProjectDefined) {
+      cb();
+    } else {
+      logModule.onWarning("Please select a project.");
+    }
   }
 
   @Mutation

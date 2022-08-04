@@ -8,7 +8,12 @@ import type {
   ArtifactTypeIcons,
 } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
-import { Artifact, SafetyCaseType } from "@/types";
+import {
+  allowedSafetyCaseTypes,
+  Artifact,
+  CreateLinkValidator,
+  SafetyCaseType,
+} from "@/types";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
@@ -140,13 +145,31 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * @returns A function for determining if the trace link is allowed based on the type of the nodes.
    */
-  get isLinkAllowedByType(): (
-    sourceType: string,
-    targetType: string
-  ) => boolean {
-    return (sourceType, targetType) => {
-      //TODO: Add custom logic for tracing safety cases or FTA nodes.
-      return !this.artifactTypeDirections[targetType]?.includes(sourceType);
+  get isLinkAllowedByType(): CreateLinkValidator {
+    return (source, target) => {
+      const sourceType =
+        "artifactType" in source ? source.artifactType : source.type;
+      const targetType =
+        "artifactType" in target ? target.artifactType : target.type;
+      const isSourceDefaultArtifact =
+        !source.safetyCaseType && !source.logicType;
+      const isTargetDefaultArtifact =
+        !target.safetyCaseType && !target.logicType;
+
+      if (isSourceDefaultArtifact) {
+        return !this.artifactTypeDirections[targetType]?.includes(sourceType);
+      } else if (source.safetyCaseType) {
+        if (isTargetDefaultArtifact) return true;
+        if (target.logicType || !target.safetyCaseType) return false;
+
+        return allowedSafetyCaseTypes[source.safetyCaseType].includes(
+          target.safetyCaseType
+        );
+      } else if (source.logicType) {
+        return isTargetDefaultArtifact;
+      }
+
+      return false;
     };
   }
 

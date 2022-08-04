@@ -9,6 +9,7 @@
       :items="items"
       :search="searchText"
       :item-class="getItemBackground"
+      sort-by="name"
     >
       <template v-slot:top>
         <artifact-table-header
@@ -69,13 +70,6 @@
             @click="handleCreate"
           />
         </v-row>
-
-        <artifact-creator-modal
-          :title="artifactCreatorTitle"
-          :is-open="createDialogueOpen"
-          :artifact="selectedArtifact"
-          @close="handleCloseCreate"
-        />
       </template>
     </v-data-table>
   </v-container>
@@ -101,7 +95,6 @@ import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactCreatorModal from "../modals/ArtifactCreatorModal.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 
 /**
@@ -113,13 +106,10 @@ export default Vue.extend({
     ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
-    ArtifactCreatorModal,
     ArtifactTableCell,
   },
   data() {
     return {
-      selectedArtifact: undefined as Artifact | undefined,
-      createDialogueOpen: false as boolean | DocumentType.FMEA,
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
     };
@@ -188,12 +178,6 @@ export default Vue.extend({
           selectedTypes.includes(deltaModule.getArtifactDeltaType(id))
       );
     },
-    /**
-     * @return The title of the artifact creator.
-     */
-    artifactCreatorTitle(): string {
-      return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
-    },
   },
   methods: {
     /**
@@ -212,8 +196,8 @@ export default Vue.extend({
      * @param artifact - The artifact to edit.
      */
     handleEdit(artifact: Artifact) {
-      this.selectedArtifact = artifact;
-      this.createDialogueOpen = true;
+      artifactSelectionModule.selectArtifact(artifact.id);
+      appModule.openArtifactCreatorTo({ isNewArtifact: false });
     },
     /**
      * Opens the delete artifact window.
@@ -226,14 +210,10 @@ export default Vue.extend({
      * Opens the create artifact window.
      */
     handleCreate() {
-      this.createDialogueOpen = DocumentType.FMEA;
-    },
-    /**
-     * Closes the create artifact window.
-     */
-    handleCloseCreate() {
-      this.createDialogueOpen = false;
-      this.selectedArtifact = undefined;
+      appModule.openArtifactCreatorTo({
+        isNewArtifact: true,
+        type: DocumentType.FMEA,
+      });
     },
     /**
      * Returns the background class name of an artifact row.

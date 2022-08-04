@@ -4,7 +4,6 @@ import {
   appModule,
   artifactModule,
   artifactSelectionModule,
-  logModule,
   projectModule,
   subtreeModule,
   viewportModule,
@@ -24,11 +23,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new artifact",
     coreAsWell: true,
     onClickFunction(): void {
-      if (projectModule.isProjectDefined) {
+      projectModule.ifProjectDefined(() => {
         appModule.openArtifactCreatorTo({ isNewArtifact: true });
-      } else {
-        logModule.onWarning("Please select a project to create artifacts.");
-      }
+      });
     },
     isVisible: () => true,
   },
@@ -38,11 +35,21 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
-      if (projectModule.isProjectDefined) {
+      projectModule.ifProjectDefined(() => {
+        appModule.toggleTraceLinkCreator();
+      });
+    },
+  },
+  {
+    id: "draw-link",
+    content: "Draw Link",
+    tooltipText: "Draw a new trace link between artifacts",
+    coreAsWell: true,
+    hasTrailingDivider: true,
+    onClickFunction(): void {
+      projectModule.ifProjectDefined(() => {
         enableDrawMode();
-      } else {
-        logModule.onWarning("Please select a project to create trace links.");
-      }
+      });
     },
   },
   {
@@ -69,7 +76,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: Artifact) => {
         artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.SET_ARTIFACT_BODY(true);
+        appModule.toggleArtifactBody();
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -82,6 +89,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Edit this artifact",
     selector: "node",
     coreAsWell: false,
+    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
         artifactSelectionModule.selectArtifact(artifact.id);
@@ -113,6 +121,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create an identical version of this artifact",
     selector: "node",
     coreAsWell: false,
+    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: Artifact) => {
         await handleDuplicateArtifact(artifact, {});

@@ -1,4 +1,11 @@
-import { TraceLink } from "@/types";
+import {
+  Artifact,
+  ArtifactData,
+  DocumentType,
+  FTANodeType,
+  SafetyCaseType,
+  TraceLink,
+} from "@/types";
 
 /**
  * Enumerates the allowed trace link directions between artifact types.
@@ -18,7 +25,15 @@ export enum PanelType {
   right,
   artifactCreator,
   errorDisplay,
+  artifactBody,
+  traceLinkCreator,
 }
+
+export type PanelOpenState =
+  | boolean
+  | SafetyCaseType
+  | FTANodeType
+  | DocumentType;
 
 /**
  * Defines the state of a panel.
@@ -31,7 +46,7 @@ export interface PanelState {
   /**
    * Whether the panel is open.
    */
-  isOpen: boolean;
+  isOpen: PanelOpenState;
 }
 
 /**
@@ -52,6 +67,14 @@ export interface ChannelSubscriptionId {
  * Returns whether a link exists from the given source to the given target ID.
  */
 export type LinkValidator = (sourceId: string, targetId: string) => boolean;
+
+/**
+ * Returns true if a link can be created, otherwise an error.
+ */
+export type CreateLinkValidator = (
+  source: Artifact | ArtifactData,
+  target: Artifact | ArtifactData
+) => boolean | string;
 
 /**
  * Returns the trace link between the given artifact ids.

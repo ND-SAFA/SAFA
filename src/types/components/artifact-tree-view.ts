@@ -3,7 +3,9 @@ import {
   ArtifactWarning,
   CytoCoreElementData,
   CytoCoreElementDefinition,
+  FTANodeType,
   LayoutPosition,
+  SafetyCaseType,
   TraceLink,
 } from "@/types";
 
@@ -11,6 +13,10 @@ import {
  * Defines an artifact's data in cytoscape.
  */
 export interface ArtifactData extends CytoCoreElementData {
+  /**
+   * The id of the artifact.
+   */
+  id: string;
   /**
    * The content of the artifact.
    */
@@ -30,11 +36,11 @@ export interface ArtifactData extends CytoCoreElementData {
   /**
    * For FTA nodes, the logic type of the artifact.
    */
-  logicType?: string;
+  logicType?: FTANodeType;
   /**
    * For safety case nodes, the type of the artifact.
    */
-  safetyCaseType?: string;
+  safetyCaseType?: SafetyCaseType;
   /**
    * The state of changes to the artifact.
    */

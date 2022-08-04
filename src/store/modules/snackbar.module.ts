@@ -87,6 +87,8 @@ export default class SnackbarModule extends VuexModule {
    * Logs and prints message to the console.
    */
   onDevMessage(message: string): void {
+    if (process.env.NODE_ENV === "production") return;
+
     console.log(message);
     this.ADD_DEV_MESSAGE(`Info: ${message}`);
   }

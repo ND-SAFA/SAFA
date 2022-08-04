@@ -1,7 +1,7 @@
 <template>
   <v-text-field
     filled
-    label="Password"
+    :label="label"
     v-model="model"
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
@@ -26,6 +26,10 @@ export default Vue.extend({
     value: {
       type: String,
       required: true,
+    },
+    label: {
+      type: String,
+      default: "Password",
     },
   },
   data() {

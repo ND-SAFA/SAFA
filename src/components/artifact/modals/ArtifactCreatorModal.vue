@@ -1,6 +1,6 @@
 <template>
   <generic-modal
-    :title="title"
+    :title="creatorTitle"
     :isOpen="!!isOpen"
     :isLoading="isLoading"
     size="l"
@@ -47,10 +47,6 @@ export default Vue.extend({
     ArtifactCreatorInputs,
   },
   props: {
-    title: {
-      type: String,
-      default: "Create New Artifact",
-    },
     isOpen: {
       type: [Boolean, String],
       required: true,
@@ -70,6 +66,12 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return The selected artifact.
+     */
+    creatorTitle() {
+      return this.artifact ? "Edit Artifact" : "Create Artifact";
+    },
     currentArtifactName(): string {
       return this.artifact?.name || "";
     },

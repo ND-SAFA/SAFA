@@ -10,7 +10,7 @@
             data-cy="account-dropdown"
           >
             <v-avatar>
-              <v-icon color="white" style="font-size: 48px">
+              <v-icon color="secondary" style="font-size: 48px">
                 mdi-account-circle
               </v-icon>
             </v-avatar>

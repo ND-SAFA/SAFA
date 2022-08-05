@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class TestDeltaState extends BaseDeltaTest {
 
         // Step - Calculate delta between versions
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

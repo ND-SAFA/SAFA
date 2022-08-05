@@ -2,10 +2,10 @@ package unit.project.version;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.VersionService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.services.VersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,12 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that system able to calculate and create the next version in a project.
  */
-public class TestCreateNextRevision extends ApplicationBaseTest {
+class TestCreateNextRevision extends ApplicationBaseTest {
     @Autowired
     VersionService versionService;
 
     @Test
-    public void createNextVersion() throws SafaError {
+    void createNextVersion() throws SafaError {
         String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)

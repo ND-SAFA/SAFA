@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

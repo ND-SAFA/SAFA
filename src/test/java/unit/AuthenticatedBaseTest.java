@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -51,7 +51,7 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
     public void createUser(String email, String password) throws Exception {
         SafaUser user = new SafaUser(email, password);
         SafaRequest
-            .withRoute(AppRoutes.Accounts.createNewUser)
+            .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
             .postWithJsonObject(user);
     }
 
@@ -72,7 +72,7 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
         user.put("email", email);
         user.put("password", password);
         JSONObject response = SafaRequest
-            .withRoute(AppRoutes.Accounts.loginLink)
+            .withRoute(AppRoutes.Accounts.LOGIN)
             .postWithJsonObject(user, test);
         if (setToken) {
             this.token = response.getString("token");
@@ -96,7 +96,7 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
 
         }
         SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.deleteProjectMembership)
+            .withRoute(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
             .withProjectMembership(projectMembershipOptional.get())
             .deleteWithJsonObject();
     }

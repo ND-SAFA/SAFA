@@ -4,10 +4,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.TraceMatrix;
-import edu.nd.crc.safa.server.repositories.traces.TraceMatrixRepository;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
+import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-class TestTraceMatricesCanBeCreated extends TraceMatrixBaseTest {
+class TestTraceMatricesCanBeCreated extends TraceMatrixBase {
 
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
@@ -33,7 +33,7 @@ class TestTraceMatricesCanBeCreated extends TraceMatrixBaseTest {
         this.traceMatrixRepository.save(traceMatrix);
 
         // Step - Send request to retrieve matrix.
-        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.getTraceMatrices)
+        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.GET_TRACE_MATRICES)
             .withProject(project)
             .getWithJsonObject();
 

@@ -16,16 +16,16 @@ import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ProjectMembershipRequest;
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
 import org.json.JSONArray;
@@ -87,7 +87,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Commits.commitChange)
+            .withRoute(AppRoutes.Projects.Commits.COMMIT_CHANGE)
             .withVersion(commitVersion)
             .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
     }
@@ -128,14 +128,14 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                       ResultMatcher resultMatcher) throws Exception {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.addProjectMember)
+            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
             .withProject(project)
             .postWithJsonObject(request, resultMatcher);
     }
 
     protected JSONArray getProjectMembers(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.getProjectMembers)
+            .withRoute(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
             .withProject(project)
             .getWithJsonArray();
     }
@@ -178,7 +178,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                                     JSONObject docJson) throws Exception {
         return
             SafaRequest
-                .withRoute(AppRoutes.Projects.Documents.createOrUpdateDocument)
+                .withRoute(AppRoutes.Projects.Documents.CREATE_OR_UPDATE_DOCUMENT)
                 .withVersion(projectVersion)
                 .postWithJsonObject(docJson);
     }
@@ -187,7 +187,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                               Document document,
                                               JSONArray artifactsJson) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.DocumentArtifact.addArtifactsToDocument)
+            .withRoute(AppRoutes.Projects.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
             .withVersion(projectVersion)
             .withDocument(document)
             .postWithJsonArray(artifactsJson);

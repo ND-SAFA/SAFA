@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.MultipartRequestService;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 import org.springframework.mock.web.MockMultipartFile;
@@ -34,7 +34,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         ProjectVersion projectVersion,
         String pathToFileDir) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.updateProjectVersionFromFlatFiles)
+            .withRoute(AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
             .withVersion(projectVersion)
             .getFlatFileHelper()
             .postWithFilesInDirectory(pathToFileDir);

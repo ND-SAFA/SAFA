@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.CommitError;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceType;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -121,7 +121,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
         // VP - Verify that type is created
         String typeTestName = "Artifact type created: " + typeName;
         Optional<ArtifactType> artifactType = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, typeName);
-        assertThat(artifactType.isPresent()).as(typeTestName).isTrue();
+        assertThat(artifactType).as(typeTestName).isPresent();
 
         // VP - Verify that # of artifact is as expected.
         verifyNumberOfItems(typeName,

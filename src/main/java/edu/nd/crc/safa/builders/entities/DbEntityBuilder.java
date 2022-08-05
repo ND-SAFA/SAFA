@@ -3,38 +3,40 @@ package edu.nd.crc.safa.builders.entities;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.builders.BaseBuilder;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.FTAType;
-import edu.nd.crc.safa.server.entities.app.project.SafetyCaseType;
-import edu.nd.crc.safa.server.entities.db.ApprovalStatus;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectMembership;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepositoryImpl;
-import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
-import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.FTAType;
+import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,9 +47,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DbEntityBuilder extends BaseBuilder {
 
+    static final int MAJOR_VERSION = 1;
+    static final int MINOR_VERSION = 1;
     static DbEntityBuilder instance;
-    final int majorVersion = 1;
-    final int minorVersion = 1;
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
     private final DocumentRepository documentRepository;
@@ -59,12 +61,12 @@ public class DbEntityBuilder extends BaseBuilder {
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
-    Hashtable<String, Project> projects;
-    Hashtable<String, Hashtable<Integer, ProjectVersion>> versions;
-    Hashtable<String, Hashtable<String, Document>> documents;
-    Hashtable<String, Hashtable<String, ArtifactType>> artifactTypes;
-    Hashtable<String, Hashtable<String, Artifact>> artifacts;
-    Hashtable<String, Hashtable<String, Hashtable<Long, ArtifactVersion>>> bodies;
+    Map<String, Project> projects;
+    Map<String, Map<Integer, ProjectVersion>> versions;
+    Map<String, Map<String, Document>> documents;
+    Map<String, Map<String, ArtifactType>> artifactTypes;
+    Map<String, Map<String, Artifact>> artifacts;
+    Map<String, Map<String, Map<Long, ArtifactVersion>>> bodies;
     int revisionNumber;
     SafaUser currentUser;
 
@@ -164,7 +166,7 @@ public class DbEntityBuilder extends BaseBuilder {
                                                int versionIndex,
                                                String docName,
                                                String artifactName) {
-        ProjectVersion projectVersion = this.getProjectVersion(projectName, 0);
+        ProjectVersion projectVersion = this.getProjectVersion(projectName, versionIndex);
         Document document = this.getDocument(projectName, docName);
         Artifact artifact = this.getArtifact(projectName, artifactName);
         DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
@@ -181,8 +183,8 @@ public class DbEntityBuilder extends BaseBuilder {
     public DbEntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
         ProjectVersion projectVersion = new ProjectVersion(project,
-            this.majorVersion,
-            this.minorVersion,
+            MAJOR_VERSION,
+            MINOR_VERSION,
             this.revisionNumber++);
         this.projectVersionRepository.save(projectVersion);
         addEntry(this.versions, projectName, projectVersion);
@@ -383,7 +385,7 @@ public class DbEntityBuilder extends BaseBuilder {
     public Artifact getArtifact(String projectName, String artifactName) {
         assertProjectExists(this.artifacts, projectName);
         if (!this.artifacts.get(projectName).containsKey(artifactName)) {
-            throw new RuntimeException(String.format("Artifact %s has not been created.", artifactName));
+            throw new SafaError(String.format("Artifact %s has not been created.", artifactName));
         }
         return this.artifacts.get(projectName).get(artifactName);
     }
@@ -395,7 +397,7 @@ public class DbEntityBuilder extends BaseBuilder {
 
     public ArtifactVersion getArtifactBody(String projectName, String artifactName, int versionIndex) {
         assertProjectExists(this.bodies, projectName);
-        Hashtable<String, Hashtable<Long, ArtifactVersion>> project = this.bodies.get(projectName);
+        Map<String, Map<Long, ArtifactVersion>> project = this.bodies.get(projectName);
         assertEntityExists(project, artifactName, "Artifact");
         assertEntityExists(project.get(artifactName), (long) versionIndex, "Version Index");
         return this.bodies.get(projectName).get(artifactName).get((long) versionIndex);
@@ -404,9 +406,8 @@ public class DbEntityBuilder extends BaseBuilder {
     public List<ArtifactVersion> getArtifactBodies(String projectName) {
         assertProjectExists(this.bodies, projectName);
         List<ArtifactVersion> projectBodies = new ArrayList<>();
-        this.bodies.get(projectName).values().forEach(artifactVersionTable -> {
-            projectBodies.addAll(artifactVersionTable.values());
-        });
+        this.bodies.get(projectName).values().forEach(artifactVersionTable ->
+            projectBodies.addAll(artifactVersionTable.values()));
         return projectBodies;
     }
 
@@ -421,7 +422,7 @@ public class DbEntityBuilder extends BaseBuilder {
         return this.traceLinkVersionRepository.getProjectLinks(project);
     }
 
-    private <T> void assertProjectExists(Hashtable<String, T> table, String projectName) {
+    private <T> void assertProjectExists(Map<String, T> table, String projectName) {
         assertEntityExists(table, projectName, "Project");
     }
 
@@ -435,9 +436,9 @@ public class DbEntityBuilder extends BaseBuilder {
      * @param <T>        The value of the table.
      * @param <K>        The Type of Key used to index into the table.
      */
-    private <T, K> void assertEntityExists(Hashtable<K, T> table, K keyName, String entityName) {
+    private <T, K> void assertEntityExists(Map<K, T> table, K keyName, String entityName) {
         if (!table.containsKey(keyName)) {
-            throw new RuntimeException(String.format("[%s: %s] has not been created.", keyName, entityName));
+            throw new IllegalStateException(String.format("[%s: %s] has not been created.", keyName, entityName));
         }
     }
 }

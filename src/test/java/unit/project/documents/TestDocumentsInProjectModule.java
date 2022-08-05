@@ -4,9 +4,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,13 +16,13 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that a user is able to delete a document in a project.
  */
-public class TestDocumentsInProjectModule extends ApplicationBaseTest {
+class TestDocumentsInProjectModule extends ApplicationBaseTest {
 
     /**
      * Verifies that a root document is
      */
     @Test
-    public void testRootDocumentCreatedWithProject() throws Exception {
+    void testRootDocumentCreatedWithProject() throws Exception {
         String projectName = "test-project";
 
         // Step - Create empty project
@@ -33,12 +33,12 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
 
         // Step - Retrieve project
         JSONObject projectJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
+            .withRoute(AppRoutes.Projects.Entities.GET_PROJECT_IN_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
 
         // VP - Verify that documents has empty list
-        assertThat(projectJson.getJSONArray("documents").length()).isEqualTo(0);
+        assertThat(projectJson.getJSONArray("documents").length()).isZero();
 
         // Step - Create a document
         String docName = "this is a random title";
@@ -48,7 +48,7 @@ public class TestDocumentsInProjectModule extends ApplicationBaseTest {
 
         // VP - Verify that project meta data contains a single document
         projectJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Entities.getProjectInVersion)
+            .withRoute(AppRoutes.Projects.Entities.GET_PROJECT_IN_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
         JSONArray documentsJson = projectJson.getJSONArray("documents");

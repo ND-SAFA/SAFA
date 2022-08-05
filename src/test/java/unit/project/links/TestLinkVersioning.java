@@ -6,10 +6,10 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -20,7 +20,7 @@ import unit.ApplicationBaseTest;
  * TODO: Test that modification is detected
  * TODO: Test that removal is detected
  */
-public class TestLinkVersioning extends ApplicationBaseTest {
+class TestLinkVersioning extends ApplicationBaseTest {
 
     String projectName = "project-name";
 
@@ -31,7 +31,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
      * @throws Exception If http requests fails
      */
     @Test
-    public void testNoChangeDetected() throws Exception {
+    void testNoChangeDetected() throws Exception {
 
         // Step - Create project with two versions: base and target
         dbEntityBuilder

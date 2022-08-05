@@ -1,29 +1,29 @@
 package unit.warnings;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.TraceLink;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.server.services.RuleService;
-import edu.nd.crc.safa.warnings.RuleName;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.rules.services.RuleService;
+import edu.nd.crc.safa.features.rules.parser.RuleName;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import unit.ApplicationBaseTest;
 
-public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
+class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
     @Autowired
     RuleService ruleService;
 
     @Test
-    public void testRequirementHasNoPackageLink() {
+    void testRequirementHasNoPackageLink() {
         String projectName = "test-project";
         String targetType = "Requirement";
         String targetName = "RE-8";
@@ -54,6 +54,6 @@ public class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
         // VP - Verify that target triggered warning
         String targetId = this.dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
-        assertThat(violations.containsKey(targetId)).isTrue();
+        assertThat(violations).containsKey(targetId);
     }
 }

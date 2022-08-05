@@ -3,11 +3,11 @@ package unit.project.artifacts;
 import java.util.Hashtable;
 import java.util.Map;
 
-import edu.nd.crc.safa.server.entities.app.project.FTAType;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.FTAArtifact;
-import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;
+import edu.nd.crc.safa.features.artifacts.entities.FTAType;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
+import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
+import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

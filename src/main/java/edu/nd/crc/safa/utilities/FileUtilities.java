@@ -15,7 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -111,10 +111,10 @@ public class FileUtilities {
 
     public static JSONObject toLowerCase(JSONObject jsonObject) throws JSONException {
         JSONObject result = new JSONObject();
-        Iterator keys = jsonObject.keys();
+        Iterator<String> keys = jsonObject.keys();
 
         while (keys.hasNext()) {
-            String key = keys.next().toString();
+            String key = keys.next();
             Object value = jsonObject.get(key);
             if (value instanceof JSONObject) {
                 result.put(key.toLowerCase(), toLowerCase((JSONObject) value));
@@ -134,7 +134,7 @@ public class FileUtilities {
      * @throws IOException If file is missing or not able to be read.
      */
     public static JSONObject readJSONFile(String path) throws IOException {
-        String fileContent = FileUtils.readFileToString(new File(path), "utf-8");
+        String fileContent = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
         return new JSONObject(fileContent);
     }
 
@@ -166,9 +166,9 @@ public class FileUtilities {
     }
 
     public static void writeToFile(File file, String fileContent) throws IOException {
-        FileWriter myWriter = new FileWriter(file);
-        myWriter.write(fileContent);
-        myWriter.close();
+        try (FileWriter myWriter = new FileWriter(file)) {
+            myWriter.write(fileContent);
+        }
     }
 
     public void hasRequiredFields(JSONObject json, Iterator<String> fields) {

@@ -2,7 +2,7 @@ package edu.nd.crc.safa.builders;
 
 import java.io.IOException;
 
-import edu.nd.crc.safa.server.entities.api.StringCreator;
+import edu.nd.crc.safa.features.projects.entities.app.StringCreator;
 
 import org.json.JSONException;
 import org.springframework.mock.web.MockHttpServletResponse;

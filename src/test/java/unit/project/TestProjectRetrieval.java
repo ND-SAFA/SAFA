@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
     void retrieveNoProjects() throws Exception {
         JSONArray response = SafaRequest
-            .withRoute(AppRoutes.Projects.getProjects)
+            .withRoute(AppRoutes.Projects.GET_PROJECTS)
             .getWithJsonArray();
         assertThat(response.length()).isZero();
     }
@@ -38,7 +38,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("firstProject")
             .newProject("secondProject")
             .newProject("other project", otherUser);
-        JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.getProjects).getWithJsonArray();
+        JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isEqualTo(2);
     }
 

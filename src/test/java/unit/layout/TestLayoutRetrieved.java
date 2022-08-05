@@ -5,19 +5,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.Map;
 
-import edu.nd.crc.safa.layout.LayoutPosition;
-import edu.nd.crc.safa.layout.LayoutSettings;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.LayoutSettings;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests that the layout is being returned when retrieving a project.
  */
-public class TestLayoutRetrieved extends LayoutBaseTest {
+class TestLayoutRetrieved extends LayoutBaseTest {
 
     @Test
-    public void testValidLayoutExistsInDefaultProject() throws Exception {
+    void testValidLayoutExistsInDefaultProject() throws Exception {
         Map<String, LayoutPosition> layout = project.getLayout();
 
         // VP - Verify position created for every artifact
@@ -27,8 +27,8 @@ public class TestLayoutRetrieved extends LayoutBaseTest {
             LayoutPosition artifactPosition = layout.get(artifact.id);
             double x = artifactPosition.getX();
             double y = artifactPosition.getY();
-            assertThat(x).isGreaterThan(0);
-            assertThat(y).isGreaterThan(0);
+            assertThat(x).isPositive();
+            assertThat(y).isPositive();
         }
 
         // VP - F1 is at least one node height above F4

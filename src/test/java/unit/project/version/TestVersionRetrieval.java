@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ class TestVersionRetrieval extends ApplicationBaseTest {
     void getEmptyVersions() throws Exception {
         Project project = dbEntityBuilder.newProjectWithReturn("test-project");
         JSONArray response = getVersionsInProject(project);
-        assertThat(response.length()).isEqualTo(0);
+        assertThat(response.length()).isZero();
     }
 
     @Test
@@ -34,7 +34,7 @@ class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private JSONArray getVersionsInProject(Project project) throws Exception {
-        return new SafaRequest(AppRoutes.Projects.Versions.getVersions)
+        return new SafaRequest(AppRoutes.Projects.Versions.GET_VERSIONS)
             .withProject(project)
             .getWithJsonArray();
     }

@@ -9,10 +9,10 @@ import java.util.Map;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.IArtifact;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.artifacts.IProjectEntityRetriever;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.artifacts.entities.db.IArtifact;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
 
 import org.javatuples.Pair;
 import org.json.JSONArray;
@@ -115,7 +115,7 @@ abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest
         assertThat(artifactAddedJson.getString("documentType")).isEqualTo(this.getDocumentType().toString());
 
         for (Map.Entry<String, Object> entry : this.getJsonExpectedProperties().entrySet()) {
-            assertThat(artifactAddedJson.get(entry.getKey()).toString()).isEqualTo(entry.getValue().toString());
+            assertThat(artifactAddedJson.get(entry.getKey())).hasToString(entry.getValue().toString());
         }
 
         // VP - Verify that single artifact was persisted in project
@@ -163,7 +163,7 @@ abstract class ArtifactBaseTest<T extends IArtifact> extends ApplicationBaseTest
 
         // Step - Get project delta
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.calculateProjectDelta)
+            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
             .getWithJsonObject();

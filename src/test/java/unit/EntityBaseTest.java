@@ -1,25 +1,24 @@
 package unit;
 
-import edu.nd.crc.safa.builders.AppEntityBuilder;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.flatfiles.services.FileUploadService;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactTypeRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ArtifactVersionRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.FTAArtifactRepository;
-import edu.nd.crc.safa.server.repositories.artifacts.ProjectRetriever;
-import edu.nd.crc.safa.server.repositories.artifacts.SafetyCaseArtifactRepository;
-import edu.nd.crc.safa.server.repositories.documents.DocumentArtifactRepository;
-import edu.nd.crc.safa.server.repositories.documents.DocumentRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectMembershipRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkRepository;
-import edu.nd.crc.safa.server.repositories.traces.TraceLinkVersionRepository;
-import edu.nd.crc.safa.server.services.ProjectService;
+import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
+import edu.nd.crc.safa.authentication.SafaUserService;
+import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
+import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,9 +78,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected DbEntityBuilder dbEntityBuilder;
 
     @Autowired
-    protected AppEntityBuilder appBuilder;
-
-    @Autowired
     protected JsonBuilder jsonBuilder;
 
     @Autowired
@@ -95,7 +91,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @BeforeEach
     public void createNewBuilders() {
         dbEntityBuilder.createEmptyData();
-        appBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
     }
 }

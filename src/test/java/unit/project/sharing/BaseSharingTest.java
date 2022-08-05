@@ -2,17 +2,17 @@ package unit.project.sharing;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.junit.jupiter.api.BeforeEach;
 import unit.ApplicationBaseTest;
 
 /**
- * Tests that projects defined in database are able to be retrieved by user.
+ * Tests that projects defined in database are to be retrieved by user.
  */
-public class BaseSharingTest extends ApplicationBaseTest {
+public abstract class BaseSharingTest extends ApplicationBaseTest {
 
     protected final String otherUserEmail = "doesNotExist@gmail.com";
     protected final String otherUserPassword = "somePassword";

@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
-import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +58,7 @@ class TestSafaUserController extends ApplicationBaseTest {
         loginUser(testEmail, testPassword, status().isOk());
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
-        JSONArray response = new SafaRequest(AppRoutes.Projects.getProjects).getWithJsonArray();
+        JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isZero();
     }
 
@@ -66,7 +66,7 @@ class TestSafaUserController extends ApplicationBaseTest {
     void testInvalidRequestMissingCredentials() throws Exception {
         SafaRequest.clearAuthorizationToken();
         SafaRequest
-            .withRoute(AppRoutes.Projects.getProjects)
+            .withRoute(AppRoutes.Projects.GET_PROJECTS)
             .getWithJsonObject(status().isForbidden());
     }
 

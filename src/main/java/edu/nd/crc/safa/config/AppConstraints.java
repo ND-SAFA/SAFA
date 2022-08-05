@@ -1,11 +1,16 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * The central container of all database constraints defined in project offering
  * translated messages.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AppConstraints {
 
     // Project Entities
@@ -24,7 +29,7 @@ public class AppConstraints {
     //Documents
     public static final String SINGLE_DEFAULT_DOCUMENT_PER_USER = "SINGLE_DEFAULT_DOCUMENT_PER_USER";
 
-    public static final String[] registeredConstraints = new String[]{
+    protected static final String[] registeredConstraints = new String[]{
         AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT,
         AppConstraints.UNIQUE_ARTIFACT_TYPE_PER_PROJECT,
         AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET,
@@ -72,7 +77,7 @@ public class AppConstraints {
             case AppConstraints.NULL_VALUE:
                 return createNullError(cause);
             default:
-                throw new RuntimeException("Constrain friendly name is not defined.");
+                throw new SafaError("Constrain friendly name is not defined.");
         }
     }
 

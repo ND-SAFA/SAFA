@@ -8,10 +8,10 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
-import edu.nd.crc.safa.server.entities.app.project.ProjectMessage;
-import edu.nd.crc.safa.server.entities.db.ArtifactType;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectMessage;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Create artifact type
         String endpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.ArtifactType.createOrUpdateArtifactType)
+            .withRoute(AppRoutes.Projects.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
             .withProject(project)
             .buildEndpoint();
         ArtifactType initialArtifactType = new ArtifactType(project, typeName);
@@ -84,7 +84,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Retrieve artifact type
         JSONArray projectTypes = SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.getProjectArtifactTypes)
+            .withRoute(AppRoutes.Projects.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
             .withProject(project)
             .getWithJsonArray();
 
@@ -94,13 +94,13 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Delete artifact type
         SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.deleteArtifactType)
+            .withRoute(AppRoutes.Projects.ArtifactType.DELETE_ARTIFACT_TYPE)
             .withType(createdArtifactType)
             .deleteWithJsonObject();
 
         // Step - Retrieve artifact types
         projectTypes = SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.getProjectArtifactTypes)
+            .withRoute(AppRoutes.Projects.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
             .withProject(project).getWithJsonArray();
 
         // VP - Verify that type retrieved.

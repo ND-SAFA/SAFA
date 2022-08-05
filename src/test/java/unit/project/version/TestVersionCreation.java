@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class TestVersionCreation extends ApplicationBaseTest {
             .newProjectWithReturn(projectName);
         JSONObject response =
             SafaRequest
-                .withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion)
+                .withRoute(AppRoutes.Projects.Versions.CREATE_NEW_REVISION_VERSION)
                 .withProject(project)
                 .postWithJsonObject(new JSONObject(), status().is4xxClientError());
         assertThat(response.getString("message")).contains("initial version");
@@ -38,7 +38,7 @@ class TestVersionCreation extends ApplicationBaseTest {
             .getProject(projectName);
         JSONObject projectVersionJson =
             SafaRequest
-                .withRoute(AppRoutes.Projects.Versions.createNewRevisionVersion)
+                .withRoute(AppRoutes.Projects.Versions.CREATE_NEW_REVISION_VERSION)
                 .withProject(project)
                 .postWithJsonObject(new JSONObject());
 
@@ -59,7 +59,7 @@ class TestVersionCreation extends ApplicationBaseTest {
             .newVersion(projectName)
             .getProject(projectName);
         JSONObject projectVersionJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Versions.createNewMinorVersion)
+            .withRoute(AppRoutes.Projects.Versions.CREATE_NEW_MINOR_VERSION)
             .withProject(project)
             .postWithJsonObject(new JSONObject());
 
@@ -79,7 +79,7 @@ class TestVersionCreation extends ApplicationBaseTest {
             .newVersion(projectName)
             .getProject(projectName);
         JSONObject projectVersionJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Versions.createNewMajorVersion)
+            .withRoute(AppRoutes.Projects.Versions.CREATE_NEW_MAJOR_VERSION)
             .withProject(project)
             .postWithJsonObject(new JSONObject());
 

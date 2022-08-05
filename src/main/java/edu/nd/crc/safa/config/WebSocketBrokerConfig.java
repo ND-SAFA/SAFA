@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -17,13 +15,12 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @Configuration
 public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
-    public static final int messageSizeLimit = 50 * 1024 * 1024;
-    private final Logger log = LoggerFactory.getLogger(WebSocketBrokerConfig.class);
+    public static final int MESSAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
-        registration.setMessageSizeLimit(messageSizeLimit); // default : 64 * 1024
-        registration.setSendBufferSizeLimit(messageSizeLimit); // default : 512 * 1024
+        registration.setMessageSizeLimit(MESSAGE_SIZE_LIMIT); // default : 64 * 1024
+        registration.setSendBufferSizeLimit(MESSAGE_SIZE_LIMIT); // default : 512 * 1024
     }
 
     @Override

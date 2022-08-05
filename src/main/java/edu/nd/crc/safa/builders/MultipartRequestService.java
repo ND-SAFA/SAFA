@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,7 +89,7 @@ public interface MultipartRequestService {
         File[] directoryFiles = directory.listFiles();
 
         if (directoryFiles == null) {
-            throw new RuntimeException("Could not list files inside directory: " + directory.getPath());
+            throw new SafaError("Could not list files inside directory: " + directory.getPath());
         }
         return directoryFiles;
     }

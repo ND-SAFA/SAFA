@@ -7,9 +7,9 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.server.entities.app.project.ProjectAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class TestDownloadAsCsv extends ApplicationBaseTest {
         setAuthorization();
         ProjectAppEntity projectAppEntity =
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.downloadFlatFiles)
+        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
             .withVersion(projectVersion)
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();

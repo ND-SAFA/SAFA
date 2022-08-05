@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 
-import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
-import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
-import edu.nd.crc.safa.server.authentication.TokenService;
+import edu.nd.crc.safa.authentication.AuthenticationFilter;
+import edu.nd.crc.safa.authentication.AuthorizationFilter;
+import edu.nd.crc.safa.authentication.TokenService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,8 +66,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Endpoint Settings
             .authorizeRequests()
             .antMatchers(
-                AppRoutes.Accounts.loginLink,
-                AppRoutes.Accounts.createNewUser,
+                AppRoutes.Accounts.LOGIN,
+                AppRoutes.Accounts.CREATE_ACCOUNT,
                 "/websocket/**").permitAll()
             // API Generation
             .antMatchers(

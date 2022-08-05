@@ -12,7 +12,7 @@ import unit.ApplicationBaseTest;
 /**
  * Provides a base of functions for testing the parsing of data files.
  */
-public class ParseBaseTest extends ApplicationBaseTest {
+public abstract class ParseBaseTest extends ApplicationBaseTest {
 
     public String uploadEntityFileAndGetError(String routeName, String fileName) throws Exception {
         // Step - Upload file and get response body
@@ -23,22 +23,22 @@ public class ParseBaseTest extends ApplicationBaseTest {
         JSONArray errors = body.getJSONArray("errors");
 
         // VP - Verify that message contains constraint
-        assertThat(entities.length()).isEqualTo(0);
+        assertThat(entities.length()).isZero();
         assertThat(errors.length()).isEqualTo(1);
 
         return errors.getString(0);
     }
 
-    protected JSONArray uploadFileAndGetEntities(String routeName, String fileName) throws Exception {
+    protected JSONArray uploadFileAndGetEntities(String routeName) throws Exception {
         // Step - Upload file and get response body
-        JSONObject body = parseFileAndReturnBody(routeName, fileName);
+        JSONObject body = parseFileAndReturnBody(routeName, unit.DefaultProjectConstants.File.DESIGN_FILE);
 
         // Step - Extract artifact and errors from body
         JSONArray entities = body.getJSONArray("entities");
         JSONArray errors = body.getJSONArray("errors");
 
         // VP - Verify that message contains constraint
-        assertThat(errors.length()).isEqualTo(0);
+        assertThat(errors.length()).isZero();
 
         return entities;
     }

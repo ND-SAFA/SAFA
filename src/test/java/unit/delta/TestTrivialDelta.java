@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.javatuples.Pair;
 import org.json.JSONObject;
@@ -33,7 +33,7 @@ class TestTrivialDelta extends BaseDeltaTest {
         dbEntityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
-        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.calculateProjectDelta)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

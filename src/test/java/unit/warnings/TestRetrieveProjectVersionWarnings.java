@@ -7,9 +7,9 @@ import java.util.Hashtable;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.app.project.VersionEntityTypes;
-import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.notifications.VersionMessage;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ import unit.ApplicationBaseTest;
  * Responsible for testing if you can retrieve the warnings
  * present in a specified project version.
  */
-public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
+class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
     /**
      * Uses atLeastOneRequirementOrDesignOrProcessForRequirement default rule to expect
@@ -29,7 +29,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
      * 3. No warning exists with a second design artifact is connected to requirement
      */
     @Test
-    public void testRetrievingProjectWarnings() throws Exception {
+    void testRetrievingProjectWarnings() throws Exception {
         String projectName = "project-name";
         String requirementName = "RE-20";
         String requirementType = "Requirement";
@@ -45,7 +45,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         JSONObject emptyRules = getProjectRules(projectVersion);
 
         // VP - Verify that no rules are retrieved
-        assertThat(emptyRules.length()).isEqualTo(0);
+        assertThat(emptyRules.length()).isZero();
 
         // Step - Create requirement artifact
         String requirementId = this.dbEntityBuilder
@@ -99,7 +99,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         JSONObject rulesWithDesign = getProjectRules(projectVersion);
 
         // VP - Verify that no rules are generated
-        assertThat(rulesWithDesign.length()).isEqualTo(0);
+        assertThat(rulesWithDesign.length()).isZero();
 
         // Step - Delete design artifact
         JSONObject updatedDesign = designJson
@@ -123,7 +123,7 @@ public class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
     }
 
     private JSONObject getProjectRules(ProjectVersion projectVersion) throws Exception {
-        return new SafaRequest(AppRoutes.Projects.Rules.getWarningsInProjectVersion)
+        return new SafaRequest(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
     }

@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Method;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.api.jobs.ProjectCreationJob;
-import edu.nd.crc.safa.server.entities.app.JobSteps;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.services.ServiceProvider;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.jobs.entities.app.JobType;
+import edu.nd.crc.safa.features.jobs.entities.app.ProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

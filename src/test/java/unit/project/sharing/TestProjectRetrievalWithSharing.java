@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class TestProjectRetrievalWithSharing extends BaseSharingTest {
         createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONArray projects = SafaRequest.withRoute(AppRoutes.Projects.getProjects).getWithJsonArray();
+        JSONArray projects = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
 
         // VP - Verify that shared project is visible
         assertThat(projects.length()).isEqualTo(1);

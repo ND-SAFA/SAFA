@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.entities.db.DocumentType;
-import edu.nd.crc.safa.server.entities.db.Project;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONArray;
 import unit.ApplicationBaseTest;
@@ -19,7 +19,7 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that the client is create a new document for a project.
  */
-public class DocumentBaseTest extends ApplicationBaseTest {
+public abstract class DocumentBaseTest extends ApplicationBaseTest {
 
     String projectName = "test-project";
     String docName = "test-document";
@@ -64,7 +64,7 @@ public class DocumentBaseTest extends ApplicationBaseTest {
 
     protected JSONArray getProjectDocuments(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.getProjectDocuments)
+            .withRoute(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
             .withProject(project)
             .getWithJsonArray();
     }

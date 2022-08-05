@@ -10,14 +10,13 @@ import lombok.NoArgsConstructor;
 /**
  * Contains a set of entities along with a series of errors associated with them.
  *
- * @param <E> The type of entity contained.
- * @param <M> The errors associated with entities.
+ * @param <Entity> The type of entity contained.
+ * @param <Error>  The errors associated with entities.
  */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EntityParsingResult<E, M> {
-
-    List<E> entities = new ArrayList<>();
-    List<M> errors = new ArrayList<>();
+public class EntityParsingResult<Entity, Error> {
+    List<Entity> entities = new ArrayList<>();
+    List<Error> errors = new ArrayList<>();
 }

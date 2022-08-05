@@ -16,6 +16,8 @@ import javax.persistence.UniqueConstraint;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -32,6 +34,8 @@ import org.hibernate.annotations.Type;
                 "user_id"
             }, name = AppConstraints.SINGLE_ROLE_PER_PROJECT)
     })
+@Data
+@NoArgsConstructor
 public class ProjectMembership implements Serializable {
 
     @Id
@@ -58,44 +62,9 @@ public class ProjectMembership implements Serializable {
     @Enumerated(EnumType.STRING)
     ProjectRole role;
 
-    public ProjectMembership() {
-    }
-
     public ProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;
         this.member = member;
         this.role = role;
-    }
-
-    public UUID getMembershipId() {
-        return membershipId;
-    }
-
-    public void setMembershipId(UUID membershipId) {
-        this.membershipId = membershipId;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public SafaUser getMember() {
-        return member;
-    }
-
-    public void setMember(SafaUser user) {
-        this.member = user;
-    }
-
-    public ProjectRole getRole() {
-        return role;
-    }
-
-    public void setRole(ProjectRole projectRole) {
-        this.role = projectRole;
     }
 }

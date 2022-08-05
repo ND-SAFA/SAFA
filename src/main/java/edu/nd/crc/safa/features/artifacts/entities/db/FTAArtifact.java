@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -20,6 +22,8 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "fta_artifact")
+@NoArgsConstructor
+@Data
 public class FTAArtifact implements IArtifact {
     @Id
     @GeneratedValue
@@ -39,36 +43,9 @@ public class FTAArtifact implements IArtifact {
     @Column(name = "logic_type")
     FTAType logicType;
 
-    public FTAArtifact() {
-    }
-
     public FTAArtifact(Artifact artifact, FTAType ftaType) {
         this.artifact = artifact;
         this.logicType = ftaType;
-    }
-
-    public UUID getFtaArtifactId() {
-        return ftaArtifactId;
-    }
-
-    public void setFtaArtifactId(UUID ftaArtifactId) {
-        this.ftaArtifactId = ftaArtifactId;
-    }
-
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    public void setArtifact(Artifact artifact) {
-        this.artifact = artifact;
-    }
-
-    public FTAType getLogicType() {
-        return logicType;
-    }
-
-    public void setLogicType(FTAType logicType) {
-        this.logicType = logicType;
     }
 
     public String getName() {

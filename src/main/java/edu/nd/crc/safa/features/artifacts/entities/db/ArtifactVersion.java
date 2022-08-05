@@ -70,7 +70,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         nullable = false,
         columnDefinition = "TEXT")
     String content;
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     String customFields;
 
     public ArtifactVersion() {

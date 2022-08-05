@@ -37,7 +37,7 @@ export async function handleLoadVersion(
 
       await documentModule.switchDocuments(document);
     })
-    .finally(appModule.onLoadEnd);
+    .finally(() => appModule.onLoadEnd());
 }
 
 /**

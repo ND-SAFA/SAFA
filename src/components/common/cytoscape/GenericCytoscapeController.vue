@@ -1,5 +1,6 @@
 <template>
   <cytoscape
+    :id="id"
     class="cy-container"
     :config="cytoCoreGraph.config"
     :preConfig="preConfig"
@@ -22,6 +23,10 @@ export default Vue.extend({
   props: {
     cytoCoreGraph: {
       type: Object as PropType<CytoCoreGraph>,
+      required: true,
+    },
+    id: {
+      type: String,
       required: true,
     },
   },

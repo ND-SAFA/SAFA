@@ -61,6 +61,7 @@ export default Vue.extend({
       return {
         data: {
           type: "node",
+          graph: "artifact",
           id,
           body,
           artifactName: name,

@@ -45,7 +45,7 @@ export default class GraphLayout implements IGraphLayout {
       cy.layout({
         name: "klay",
         klay: this.klaySettings,
-      });
+      }).run();
     } else {
       cy.layout({
         name: "preset",

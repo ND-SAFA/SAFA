@@ -1,5 +1,6 @@
 <template>
   <generic-cytoscape-controller
+    id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
@@ -17,11 +18,13 @@
         :trace-definition="traceLink"
         :faded="isTraceLinkFaded(traceLink)"
         @click:right="handleLinkRightClick"
+        graph="artifact"
       />
       <generic-graph-link
         v-for="traceLink in subtreeLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
+        graph="artifact"
       />
       <trace-link-approval-modal
         :is-open="isTraceModalOpen"

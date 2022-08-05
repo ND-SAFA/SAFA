@@ -8,8 +8,12 @@ $color-text: #969696;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
+// Artifact Tree
+
 .cy-container,
-#cytoscape-div {
+#cytoscape-div,
+#cytoscape-artifact,
+#cytoscape-tim {
   height: 100% !important;
   max-height: 100vh !important;
 }
@@ -21,46 +25,6 @@ $graph-border-radius: 8px;
     transition: opacity 0.25s ease-in-out;
     opacity: 100;
   }
-}
-
-.artifact-container {
-  display: flex;
-  flex-direction: column;
-  white-space: nowrap;
-  overflow: hidden;
-
-  &.artifact-border {
-    border-radius: $graph-border-radius;
-    border: $graph-border-width solid $color-border;
-    box-shadow: 0 0 0;
-
-    &:hover {
-      box-shadow:
-              rgba(0, 0, 0, 0.2) 0px 8px 9px -5px,
-              rgba(0, 0, 0, 0.14) 0px 15px 22px 2px,
-              rgba(0, 0, 0, 0.12) 0px 6px 28px 5px;
-    }
-  }
-}
-
-.artifact-header {
-  text-align: center;
-  border-bottom: $graph-border-width solid $color-border;
-  margin: 0 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artifact-sub-header {
-  text-align: center;
-}
-
-.artifact-body {
-  padding: 0 5px 5px 5px;
-  text-align: center;
-  white-space: initial;
-  flex-grow: 1;
-  line-height: 1 !important;
 }
 
 .artifact-svg-wrapper {
@@ -101,6 +65,8 @@ $graph-border-radius: 8px;
   }
 }
 
+// Artifact Tree - Context Menu
+
 .cy-context-menus-cxt-menu {
   border-radius: $graph-border-radius;
   border-color: $color-border;
@@ -116,6 +82,16 @@ $graph-border-radius: 8px;
   }
 }
 
+// Artifact Table
+
 .artifact-row-selected {
   background-color: $color-selected;
 }
+
+// Good box shadow:
+//&:hover {
+//  box-shadow:
+//          rgba(0, 0, 0, 0.2) 0px 8px 9px -5px,
+//          rgba(0, 0, 0, 0.14) 0px 15px 22px 2px,
+//          rgba(0, 0, 0, 0.12) 0px 6px 28px 5px;
+//}

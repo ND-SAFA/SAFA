@@ -10,6 +10,7 @@
     </v-row>
     <v-container class="elevation-3 overflow-hidden" style="max-height: 50vh">
       <generic-cytoscape-controller
+        id="cytoscape-tim"
         :cyto-core-graph="cytoCoreGraph"
         style="max-height: 50vh !important"
       >
@@ -24,6 +25,7 @@
             :key="getTraceId(tracePanel)"
             :trace-definition="tracePanel.projectFile"
             :count="tracePanel.projectFile.traces.length"
+            graph="tim"
           />
         </template>
       </generic-cytoscape-controller>

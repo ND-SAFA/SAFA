@@ -272,15 +272,19 @@ export interface CytoCoreElementDefinition {
  * cytoscape element.
  */
 export interface CytoCoreElementData {
-  /*
+  /**
    * A unique identifier for the element with cytoscape instance.
    */
   id: string;
-  /*
+  /**
    * The type of element being represented.
    */
   type: "node" | "edge";
-  /*
+  /**
+   * The type of graph for this node.
+   */
+  graph: "artifact" | "tim";
+  /**
    * The cytoscape label placed within nodes and besides edges.
    */
   label?: string;

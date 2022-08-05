@@ -98,5 +98,7 @@ function linkAPIHandler(
   onSuccess: () => Promise<void>
 ): void {
   appModule.onLoadStart();
-  linkAPI(link).then(onSuccess).finally(appModule.onLoadEnd);
+  linkAPI(link)
+    .then(onSuccess)
+    .finally(() => appModule.onLoadEnd());
 }

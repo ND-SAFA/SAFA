@@ -11,10 +11,14 @@ import {
   TIM_NODE_SHAPE,
   TIM_NODE_WIDTH,
 } from "@/cytoscape/styles/config/tim-tree-config";
+import { ThemeColors } from "@/util";
+
+export const TIM_NODE_SELECTOR = "node[graph='tim']";
+export const TIM_EDGE_SELECTOR = "edge[graph='tim']";
 
 export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
   {
-    selector: "edge",
+    selector: TIM_EDGE_SELECTOR,
     style: {
       "curve-style": TIM_EDGE_STYLE,
       "source-arrow-shape": TIM_EDGE_ARROW_SHAPE,
@@ -30,12 +34,12 @@ export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: "node",
+    selector: TIM_NODE_SELECTOR,
     style: {
       shape: TIM_NODE_SHAPE,
       width: TIM_NODE_WIDTH,
       height: TIM_NODE_HEIGHT,
-      backgroundColor: "white",
+      "background-color": ThemeColors.lightGrey,
       "border-width": TIM_NODE_BORDER_WIDTH,
       "border-color": TIM_NODE_COLOR,
     },

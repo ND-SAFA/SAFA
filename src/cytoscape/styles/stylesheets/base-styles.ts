@@ -10,13 +10,15 @@ import {
   TraceType,
 } from "@/types";
 
-export const GENERATED_LINK_SELECTOR = `edge[traceType='${TraceType.GENERATED}']`;
+export const ARTIFACT_NODE_SELECTOR = "node[graph='artifact']";
+export const ARTIFACT_EDGE_SELECTOR = "edge[graph='artifact']";
+export const GENERATED_LINK_SELECTOR = `${ARTIFACT_EDGE_SELECTOR}[traceType='${TraceType.GENERATED}']`;
 export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${TraceApproval.APPROVED}']`;
 
 export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   // Edges
   {
-    selector: "edge",
+    selector: ARTIFACT_EDGE_SELECTOR,
     style: {
       width: "2px",
       "curve-style": "bezier",
@@ -27,7 +29,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: "edge[?faded]",
+    selector: `${ARTIFACT_EDGE_SELECTOR}[?faded]`,
     style: { opacity: 0.1 },
   },
   // Edges - Generated
@@ -39,7 +41,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `edge[approvalStatus='${TraceApproval.UNREVIEWED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[approvalStatus='${TraceApproval.UNREVIEWED}']`,
     style: {
       "line-style": "dashed",
       "line-dash-pattern": [6, 3],
@@ -53,7 +55,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   },
   // Edges - Delta
   {
-    selector: `edge[deltaType='${ArtifactDeltaState.ADDED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.ADDED}']`,
     style: {
       "target-arrow-color": ThemeColors.added,
       "source-arrow-color": ThemeColors.added,
@@ -61,7 +63,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `edge[deltaType='${ArtifactDeltaState.MODIFIED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.MODIFIED}']`,
     style: {
       "target-arrow-color": ThemeColors.modified,
       "source-arrow-color": ThemeColors.modified,
@@ -77,7 +79,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `edge[deltaType='${ArtifactDeltaState.REMOVED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.REMOVED}']`,
     style: {
       "target-arrow-color": ThemeColors.removed,
       "source-arrow-color": ThemeColors.removed,
@@ -86,47 +88,46 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   },
   // Nodes
   {
-    selector: "node",
+    selector: ARTIFACT_NODE_SELECTOR,
     style: {
-      width: ARTIFACT_WIDTH + "px",
-      height: ARTIFACT_HEIGHT + "px",
+      width: ARTIFACT_WIDTH,
+      height: ARTIFACT_HEIGHT,
       padding: 50,
       "background-color": ThemeColors.lightGrey,
       shape: "roundrectangle",
       "border-style": "solid",
       "border-width": 0,
       "border-color": ThemeColors.darkGrey,
-      "text-wrap": "ellipsis",
     },
   },
   {
-    selector: "node[?isSelected]",
+    selector: `${ARTIFACT_NODE_SELECTOR}[?isSelected]`,
     style: {
       "border-width": 6,
     },
   },
   // Nodes - Delta
   {
-    selector: `node[artifactDeltaState='${ArtifactDeltaState.ADDED}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[artifactDeltaState='${ArtifactDeltaState.ADDED}']`,
     style: {
       "background-color": ThemeColors.added,
     },
   },
   {
-    selector: `node[artifactDeltaState='${ArtifactDeltaState.MODIFIED}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[artifactDeltaState='${ArtifactDeltaState.MODIFIED}']`,
     style: {
       "background-color": ThemeColors.modified,
     },
   },
   {
-    selector: `node[artifactDeltaState='${ArtifactDeltaState.REMOVED}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[artifactDeltaState='${ArtifactDeltaState.REMOVED}']`,
     style: {
       "background-color": ThemeColors.removed,
     },
   },
   // Nodes - Logic
   {
-    selector: `node[logicType='${FTANodeType.AND}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${FTANodeType.AND}']`,
     style: {
       shape: "polygon",
       "shape-polygon-points":
@@ -137,7 +138,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `node[logicType='${FTANodeType.OR}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${FTANodeType.OR}']`,
     style: {
       shape: "polygon",
       "shape-polygon-points":
@@ -150,7 +151,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   },
   // Nodes - Safety Case
   {
-    selector: `node[safetyCaseType='${SafetyCaseType.GOAL}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.GOAL}']`,
     style: {
       shape: "rectangle",
       width: ARTIFACT_WIDTH,
@@ -158,7 +159,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `node[safetyCaseType='${SafetyCaseType.CONTEXT}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.CONTEXT}']`,
     style: {
       shape: "roundrectangle",
       width: ARTIFACT_WIDTH,
@@ -166,7 +167,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `node[safetyCaseType='${SafetyCaseType.SOLUTION}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.SOLUTION}']`,
     style: {
       shape: "ellipse",
       width: ARTIFACT_HEIGHT * 1.4,
@@ -174,7 +175,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `node[safetyCaseType='${SafetyCaseType.STRATEGY}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.STRATEGY}']`,
     style: {
       shape: "polygon",
       "shape-polygon-points": "-0.8 -0.8, 1 -0.8, 0.8 0.8, -1 0.8",

@@ -1,11 +1,11 @@
 import { ArtifactData, SvgStyle } from "@/types";
-import { capitalize, getTextColor, ThemeColors } from "@/util";
+import { capitalize, getTextColor } from "@/util";
 import { getBody } from "./artifact-helper";
 import { svgFooter } from "./artifact-footer";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 
 /**
- * Creates the SVG safety case node.
+ * Creates the SVG standard node.
  *
  * @param data - The artifact data to render.
  * @param outerStyle - The styles to render the SVG with.
@@ -22,6 +22,10 @@ export function svgNode(
 ): string {
   const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
   const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
+  const textColor = getTextColor(data.artifactDeltaState);
+  const title = data.safetyCaseType
+    ? capitalize(data.safetyCaseType)
+    : capitalize(data.artifactType);
 
   return `
     <div style="opacity: ${data.opacity}">
@@ -34,9 +38,9 @@ export function svgNode(
         class="artifact-svg-wrapper ${deltaClass}"
       >
         ${svgShape}
-        ${svgTitle(data, y)}
+        ${svgTitle(title, textColor, y)}
         ${svgDiv({ x, y: y + 7, width })}
-        ${svgDetails(data, y + 27)}
+        ${svgDetails(data.artifactName, textColor, y + 27)}
         ${svgBody(data, {
           x,
           y: y + 35,
@@ -53,20 +57,17 @@ export function svgNode(
 /**
  * Creates the SVG for representing a safety case node's title.
  *
- * @param data - The artifact data to render.
+ * @param title - The title to render.
+ * @param color - The text color to render.
  * @param yPos - The y position to start drawing at.
  *
  * @return stringified SVG for the node.
  */
-function svgTitle(data: ArtifactData, yPos: number): string {
-  const title = data.safetyCaseType
-    ? capitalize(data.safetyCaseType)
-    : capitalize(data.artifactType);
-
+export function svgTitle(title: string, color: string, yPos: number): string {
   return `
    <text 
       x="50%" y="${yPos}" text-anchor="middle"
-      fill="${getTextColor(data.artifactDeltaState)}" 
+      fill="${color}" 
       font-weight="600"
     >
       ${title}
@@ -81,7 +82,7 @@ function svgTitle(data: ArtifactData, yPos: number): string {
  *
  * @return stringified SVG for the node.
  */
-function svgDiv(style: Omit<SvgStyle, "height">): string {
+export function svgDiv(style: Omit<SvgStyle, "height">): string {
   return `
      <line 
         x1="${style.x}" y1="${style.y}" 
@@ -96,21 +97,22 @@ function svgDiv(style: Omit<SvgStyle, "height">): string {
 /**
  * Creates the SVG for representing a safety case node's warnings and collapsed children.
  *
- * @param data - The artifact data to render.
+ * @param title - The title to render.
+ * @param color - The text color to render.
  * @param yPos - The y position to start drawing at.
  *
  * @return stringified SVG for the node.
  */
-function svgDetails(data: ArtifactData, yPos: number): string {
+export function svgDetails(title: string, color: string, yPos: number): string {
   return `
     <text 
       x="50%" y="${yPos}" 
       text-anchor="middle" 
       shape-rendering="crispEdges"
       font-weight="600"
-      fill="${getTextColor(data.artifactDeltaState)}"
+      fill="${color}"
     >
-      ${data.artifactName}
+      ${title}
     </text>
   `;
 }

@@ -1,2 +1,1 @@
-export * from "./artifact-html";
-export * from "./tim-html";
+export * from "./label-html";

@@ -7,6 +7,7 @@ import {
   ArtifactPanel,
 } from "@/types";
 import { parseArtifactFile } from "@/api";
+import { logModule } from "@/store";
 
 /**
  * Creates an artifact uploader.
@@ -102,11 +103,12 @@ function createParsedArtifactFile(
 ): Promise<void> {
   return parseArtifactFile(panel.projectFile.type, file)
     .then((res: ParseArtifactFileResponse) => {
-      const { artifacts, errors } = res;
+      const { entities, errors } = res;
       const validArtifacts: Artifact[] = [];
 
-      artifacts.forEach((artifact) => {
+      entities.forEach((artifact) => {
         const error = getArtifactError(artifactMap, artifact);
+
         if (error === undefined) {
           validArtifacts.push(artifact);
           artifactMap[artifact.name] = artifact;
@@ -121,9 +123,10 @@ function createParsedArtifactFile(
         errors,
         file,
       };
-      panel.entityNames = artifacts.map((a) => a.name);
+      panel.entityNames = entities.map(({ name }) => name);
     })
-    .catch(() => {
+    .catch((e) => {
+      logModule.onDevError(e);
       panel.projectFile.isValid = false;
       panel.projectFile.errors = ["Unable to parse file"];
     });

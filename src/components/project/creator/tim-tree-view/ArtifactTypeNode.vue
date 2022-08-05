@@ -26,6 +26,7 @@ export default Vue.extend({
         data: {
           id: this.artifactPanel.projectFile.type,
           type: "node",
+          graph: "tim",
           count: this.artifactPanel.projectFile.artifacts.length,
         },
       };

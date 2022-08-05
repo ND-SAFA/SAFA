@@ -37,8 +37,6 @@ RUN npm install --silent
 RUN npm run build
 RUN npm install -g serve
 
-RUN npm run lint
-
 EXPOSE 80
 
 ENTRYPOINT ["serve", "-p", "80", "-s", "-n", "dist"]

@@ -10,6 +10,7 @@ import {
 } from "@/types";
 import { parseTraceFile, createGeneratedLinks } from "@/api";
 import { extractTraceId } from "@/util";
+import { logModule } from "@/store";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -137,24 +138,31 @@ function createParsedArtifactFile(
   panel: TracePanel,
   file: File
 ): Promise<void> {
-  return parseTraceFile(file).then((res: ParseTraceFileResponse) => {
-    const { traces, errors } = res;
-    const validTraces: TraceLink[] = [];
+  return parseTraceFile(file)
+    .then((res: ParseTraceFileResponse) => {
+      const { entities, errors } = res;
+      const validTraces: TraceLink[] = [];
 
-    traces.forEach((link) => {
-      const error = getTraceError(panel.projectFile, artifactMap, link);
-      if (error === undefined) {
-        validTraces.push(link);
-      } else {
-        errors.push(error);
-      }
+      entities.forEach((link) => {
+        const error = getTraceError(panel.projectFile, artifactMap, link);
+
+        if (error === undefined) {
+          validTraces.push(link);
+        } else {
+          errors.push(error);
+        }
+      });
+
+      panel.projectFile.traces = validTraces;
+      panel.projectFile.errors = errors;
+      panel.projectFile.file = file;
+      panel.entityNames = entities.map(extractTraceId);
+    })
+    .catch((e) => {
+      logModule.onDevError(e);
+      panel.projectFile.isValid = false;
+      panel.projectFile.errors = ["Unable to parse file"];
     });
-
-    panel.projectFile.traces = validTraces;
-    panel.projectFile.errors = errors;
-    panel.projectFile.file = file;
-    panel.entityNames = traces.map(extractTraceId);
-  });
 }
 
 /**

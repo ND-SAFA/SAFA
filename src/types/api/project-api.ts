@@ -62,7 +62,7 @@ export interface ParseArtifactFileResponse extends ParseFileResponse {
   /**
    * The artifacts parsed.
    */
-  artifacts: Artifact[];
+  entities: Artifact[];
 }
 
 /**
@@ -72,7 +72,7 @@ export interface ParseTraceFileResponse extends ParseFileResponse {
   /**
    * The traces parsed.
    */
-  traces: TraceLink[];
+  entities: TraceLink[];
 }
 
 /**

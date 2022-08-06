@@ -1,5 +1,3 @@
-
-
 import os
 from typing import Dict
 
@@ -8,7 +6,7 @@ from transformers.modeling_utils import PreTrainedModel
 
 from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_properties import ArchitectureType
+from models.model_properties import ArchitectureType, ModelSize
 from pretrain.corpuses.domain import Domain
 
 
@@ -20,15 +18,29 @@ class ModelGenerator:
     __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    def __init__(self, base_model: SupportedBaseModel, model_path: str):
+    def __init__(self, base_model_name: str, model_path: str, model_size: ModelSize = ModelSize.BASE):
         """
         Handles loading model and related functions
         :param model_path: the path to the saved model
         """
         self.model_path = model_path
-        self.model_name = base_model.name
-        self.base_model_class = base_model.value
+        self.model_name = base_model_name
+        self.base_model = self._get_supported_base_model(self.model_name)
+        self.base_model_class = self.base_model.value
         self.arch_type = self._get_model_architecture_type(self.model_name)
+        self.model_size = model_size
+
+    @staticmethod
+    def _get_supported_base_model(model_name: str) -> SupportedBaseModel:
+        """
+        Gets the supported base model
+        :param model_name: the name of the model
+        :return: the SupportedBaseModel
+        """
+        try:
+            return SupportedBaseModel[model_name]
+        except KeyError:
+            raise NameError("Model name %s unknown" % model_name)
 
     @staticmethod
     def _get_model_architecture_type(model_name: str) -> ArchitectureType:
@@ -45,7 +57,7 @@ class ModelGenerator:
 
     # this may not be needed but keeping for now...
     @staticmethod
-    def create_path(domain: Domain,  base_model: SupportedBaseModel, project_id: str,) -> str:
+    def create_path(domain: Domain, base_model: SupportedBaseModel, project_id: str, ) -> str:
         """
         Creates the path to the saved model
         :param domain: domain used for pretraining

@@ -5,7 +5,7 @@ from typing import Dict
 from transformers.convert_tf_hub_seq_to_seq_bert_to_pytorch import convert_tf_checkpoint_to_pytorch
 
 from constants import EVAL_RESULTS_KEY
-from jobs.pretrain.model_pretrain_args import ModelPretrainArgs
+from jobs.pretrain.pretrain_args import ModelPretrainArgs
 from pretrain.electra.build_pretraining_dataset import write_examples
 from pretrain.electra.run_pretraining import train_or_eval
 

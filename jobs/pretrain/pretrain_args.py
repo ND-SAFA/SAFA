@@ -1,6 +1,6 @@
-from constants import PRETRAIN_DATA_PATH, PRETRAIN_VOCAB_FILE, PRETRAIN_BATCH_SIZE_DEFAULT, PRETRAIN_LEARNING_RATE_DEFAULT, \
-    PRETRAIN_MODEL_NAME, PRETRAIN_MODEL_PATH
-from models.model_generator import ModelSize, ModelGenerator
+from constants import PRETRAIN_BATCH_SIZE_DEFAULT, PRETRAIN_DATA_PATH, PRETRAIN_LEARNING_RATE_DEFAULT, \
+    PRETRAIN_MODEL_NAME, PRETRAIN_VOCAB_FILE
+from models.model_generator import ModelGenerator
 from pretrain.corpuses.domain import Domain, get_path
 from pretrain.electra.configure_pretraining import PretrainingConfig
 
@@ -14,11 +14,11 @@ class ModelPretrainArgs(PretrainingConfig):
     train_batch_size: int = PRETRAIN_BATCH_SIZE_DEFAULT
     learning_rate: float = PRETRAIN_LEARNING_RATE_DEFAULT
 
-    def __init__(self, model_path: str, output_path: str, corpus_dir: str = None, domain: Domain = Domain.BASE,
-                 model_size: ModelSize = ModelSize.BASE, **kwargs):
+    def __init__(self, model_generator: ModelGenerator, output_path: str,
+                 corpus_dir: str = None, domain: Domain = Domain.BASE, **kwargs):
         """
         Arguments for Pretraining
-        :param model_path: location of model
+        :param model_generator: generates model and path to checkpoint
         :param output_path: destination for model
         :param domain: the desired domain to use corpus from (may specify corpus dir instead)
         :param corpus_dir: location of corpus for dataset (if not provided, domain corpus will be used)
@@ -30,9 +30,11 @@ class ModelPretrainArgs(PretrainingConfig):
         if corpus_dir is None:
             corpus_dir = get_path(domain)
         self.corpus_dir = corpus_dir
+        model_size = self.model_generator.model_size
+        model_path = self.model_generator.model_path
         super().__init__(PRETRAIN_MODEL_NAME.format(model_size.value), self.data_dir, model_dir=model_path,
-                        model_size = model_size.value, ** kwargs)
-        self.model_generator = ModelGenerator(PRETRAIN_MODEL_PATH.format(model_size.value))
+                         model_size=model_size.value, **kwargs)
+        self.model_generator = model_generator
 
     def set_do_train(self, do_train: bool = True) -> None:
         """

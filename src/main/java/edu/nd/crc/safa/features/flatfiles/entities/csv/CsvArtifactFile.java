@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
  * <p>File is expected to contain a name, summary, and body
  */
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     /**

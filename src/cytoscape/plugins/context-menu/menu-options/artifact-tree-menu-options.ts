@@ -84,22 +84,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
     },
   },
   {
-    id: "view-body",
-    content: "View Body",
-    tooltipText: "View this artifact's body text",
-    selector: "node",
-    coreAsWell: false,
-    onClickFunction(event: EventObject): void {
-      handleOnClick(event, (artifact: Artifact) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.SET_ARTIFACT_BODY(true);
-      });
-    },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
-      return artifactData !== undefined;
-    },
-  },
-  {
     id: "edit-artifact",
     content: "Edit Artifact",
     tooltipText: "Edit this artifact",

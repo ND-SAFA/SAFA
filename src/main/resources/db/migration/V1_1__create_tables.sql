@@ -11,7 +11,7 @@ create table artifact_body
 (
     entity_version_id varchar(255) not null,
     content           TEXT         not null,
-    custom_fields     LONGTEXT,
+    custom_fields     TEXT,
     modification_type integer      not null,
     summary           varchar(255) not null,
     artifact_id       varchar(255) not null,

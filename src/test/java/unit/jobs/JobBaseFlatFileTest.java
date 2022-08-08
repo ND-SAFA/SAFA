@@ -7,13 +7,13 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;

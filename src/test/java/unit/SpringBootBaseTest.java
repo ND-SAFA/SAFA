@@ -30,9 +30,6 @@ public abstract class SpringBootBaseTest {
     protected ProjectController controller;
 
     @Autowired
-    protected EntityManager entityManager;
-
-    @Autowired
     protected ServiceProvider serviceProvider;
 
     @Autowired

@@ -8,7 +8,12 @@
       </div>
     </v-col>
     <v-col cols="3">
-      <v-btn @click="handleSubmit" color="primary" class="ml-10">
+      <v-btn
+        @click="handleSubmit"
+        color="primary"
+        class="ml-10"
+        data-cy="button-create-trace-matrix"
+      >
         Create Trace Matrix
       </v-btn>
     </v-col>
@@ -16,10 +21,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
-import { logModule } from "@/store";
 import { ButtonRow } from "@/components/common";
+import { logModule } from "@/store";
+import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
+import Vue, { PropType } from "vue";
 
 /**
  * Trace file creator.

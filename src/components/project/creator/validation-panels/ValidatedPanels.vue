@@ -9,6 +9,7 @@
           color="primary"
           :disabled="isButtonDisabled"
           @click="$emit('add')"
+          data-cy="button-create-panel"
         >
           Create new {{ itemName }}</v-btn
         >
@@ -21,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
 import { ThemeColors } from "@/util";
+import Vue, { PropType } from "vue";
 
 /**
  * Validated upload panels.

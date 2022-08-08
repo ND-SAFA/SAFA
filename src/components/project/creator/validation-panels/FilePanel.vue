@@ -3,7 +3,9 @@
     <v-expansion-panel-header>
       <v-row dense align="center" justify="start">
         <v-col class="flex-grow-0">
-          <v-icon :color="iconColor">{{ iconName }}</v-icon>
+          <v-icon :color="iconColor" data-cy="button-artifact-dropbox">{{
+            iconName
+          }}</v-icon>
         </v-col>
         <v-col>
           <slot name="title" />
@@ -43,7 +45,7 @@
         <v-row justify="center">
           <v-expansion-panels accordion>
             <v-expansion-panel v-if="entityNames.length !== 0">
-              <v-expansion-panel-header>
+              <v-expansion-panel-header data-cy="button-file-entities">
                 <span class="text-h6">Entities</span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
@@ -88,7 +90,13 @@
         </v-row>
 
         <v-row class="mt-5" justify="end">
-          <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
+          <v-btn
+            @click="$emit('delete')"
+            color="error"
+            data-cy="button-delete-artifact"
+          >
+            Delete
+          </v-btn>
         </v-row>
       </v-container>
     </v-expansion-panel-content>
@@ -96,9 +104,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { GenericFileSelector, GenericSwitch } from "@/components/common";
 import { logModule } from "@/store";
-import { GenericSwitch, GenericFileSelector } from "@/components/common";
+import Vue, { PropType } from "vue";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 

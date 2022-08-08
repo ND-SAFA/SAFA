@@ -26,15 +26,15 @@ export function svgNode(
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : capitalize(data.artifactType);
+  const footer = svgFooter(data, outerStyle);
+  const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
 
   return `
     <div style="opacity: ${data.opacity}">
       <svg 
         width="${outerStyle.width}" 
-        height="${outerStyle.height + ARTIFACT_CHILDREN_HEIGHT + 6}" 
-        style="margin-top: ${
-          outerStyle.marginTop + ARTIFACT_CHILDREN_HEIGHT + 6
-        }px"
+        height="${outerStyle.height + heightOffset}" 
+        style="margin-top: ${outerStyle.marginTop + heightOffset}px"
         class="artifact-svg-wrapper ${deltaClass}"
       >
         ${svgShape}
@@ -48,7 +48,7 @@ export function svgNode(
           height,
           truncateLength,
         })}
-        ${svgFooter(data, outerStyle)}
+        ${footer}
       </svg>
     </div>
   `;

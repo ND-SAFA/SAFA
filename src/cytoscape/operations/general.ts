@@ -11,7 +11,7 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { logModule } from "@/store";
+import { artifactSelectionModule, logModule } from "@/store";
 import { areArraysEqual } from "@/util";
 import { applyAutoMoveEvents } from "@/cytoscape";
 
@@ -220,6 +220,23 @@ export function cyDisplayAll(
     cy.nodes().style({ display: "element" });
     cy.edges().style({ display: "element" });
   });
+}
+
+/**
+ * Centers the viewport on all graph nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyResetTree(
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  const selectedId = artifactSelectionModule.getSelectedArtifactId;
+
+  if (selectedId) {
+    artifactSelectionModule.selectArtifact(selectedId);
+  } else {
+    cyCenterNodes(cyPromise);
+  }
 }
 
 /**

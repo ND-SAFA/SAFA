@@ -22,8 +22,13 @@ $graph-border-radius: 8px;
   opacity: 0;
 
   &.visible {
-    transition: opacity 0.25s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0.2s;
     opacity: 100;
+  }
+
+  &.disabled {
+    display: none;
   }
 }
 

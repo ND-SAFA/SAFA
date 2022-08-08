@@ -18,8 +18,8 @@ import {
   cyCreateLayout,
   cyCenterOnArtifacts,
   cyApplyAutomove,
-  cyCenterNodes,
   cyResetTim,
+  cyResetTree,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -97,8 +97,6 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
-    const selectedId = artifactSelectionModule.getSelectedArtifactId;
-
     appModule.onLoadStart();
 
     this.SET_LAYOUT(layoutPayload.layout);
@@ -107,14 +105,8 @@ export default class ViewportModule extends VuexModule {
 
     setTimeout(() => {
       appModule.onLoadEnd();
-      cyCenterNodes();
       cyResetTim();
-
-      if (selectedId) {
-        artifactSelectionModule.selectArtifact(selectedId);
-      } else {
-        cyCenterNodes();
-      }
+      cyResetTree();
     }, 200);
   }
 

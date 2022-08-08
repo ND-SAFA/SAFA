@@ -2,7 +2,7 @@
   <generic-cytoscape-controller
     id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
-    :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
+    :class="className"
   >
     <template v-slot:elements>
       <artifact-node
@@ -41,13 +41,14 @@ import { TraceLink, Artifact, CytoCoreGraph } from "@/types";
 import {
   appModule,
   artifactModule,
+  artifactSelectionModule,
   deltaModule,
   documentModule,
   subtreeModule,
   traceModule,
   viewportModule,
 } from "@/store";
-import { artifactTreeGraph } from "@/cytoscape";
+import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
@@ -72,10 +73,22 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return Whether to render the artifact tree.
+     * @return Whether the tree should be rendered at all.
      */
-    isVisible(): boolean {
-      return !appModule.getIsLoading && !documentModule.isTableDocument;
+    isInView(): boolean {
+      return !documentModule.isTableDocument;
+    },
+    /**
+     * @return The class name for the artifact tree.
+     */
+    className(): string {
+      if (!this.isInView) {
+        return "artifact-view disabled";
+      } else if (!appModule.getIsLoading) {
+        return "artifact-view visible";
+      } else {
+        return "artifact-view";
+      }
     },
     /**
      * @return The artifact tree graph.
@@ -121,16 +134,15 @@ export default Vue.extend({
   },
   watch: {
     nodesInView(): void {
-      this.setNodesInView();
+      this.artifactsInView = this.nodesInView;
+    },
+    isInView(inView: boolean): void {
+      if (!inView || !artifactSelectionModule.getSelectedArtifactId) return;
+
+      setTimeout(() => cyResetTree(), 200);
     },
   },
   methods: {
-    /**
-     * Sets whether the artifacts are in view.
-     */
-    setNodesInView(): void {
-      this.artifactsInView = this.nodesInView;
-    },
     /**
      * Returns whether to fade an artifact.
      * @param id - The artifact to check.

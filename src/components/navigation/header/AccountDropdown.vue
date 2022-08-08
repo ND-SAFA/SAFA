@@ -22,7 +22,7 @@
 
     <v-card>
       <v-list-item-content class="justify-center">
-        <div class="mx-auto text-center">
+        <div class="text-center">
           <v-avatar>
             <v-icon color="secondary" style="font-size: 48px">
               mdi-account-circle
@@ -32,6 +32,7 @@
           <p class="text-caption mx-1">{{ userEmail }}</p>
           <v-divider class="my-3"></v-divider>
           <v-btn text rounded @click="handleFeedback">Send Feedback</v-btn>
+          <br />
           <v-btn text rounded @click="handleEditAccount">Edit Account</v-btn>
           <v-divider class="my-3"></v-divider>
           <v-btn

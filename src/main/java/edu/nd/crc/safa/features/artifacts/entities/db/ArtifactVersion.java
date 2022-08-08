@@ -68,10 +68,10 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @Lob
     @Column(name = "content",
         nullable = false,
-        columnDefinition = "text")
+        columnDefinition = "mediumtext")
     String content;
     @Lob
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "mediumtext")
     String customFields;
 
     public ArtifactVersion() {

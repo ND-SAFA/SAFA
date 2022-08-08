@@ -53,7 +53,6 @@ export function cyZoomReset(
 export function cyZoomIn(cyPromise: CyPromise = artifactTreeCyPromise): void {
   cyPromise.then((cy) => {
     cy.zoom(cy.zoom() + ZOOM_INCREMENT);
-    cy.center(cy.nodes());
   });
 }
 
@@ -65,7 +64,6 @@ export function cyZoomIn(cyPromise: CyPromise = artifactTreeCyPromise): void {
 export function cyZoomOut(cyPromise: CyPromise = artifactTreeCyPromise): void {
   cyPromise.then((cy) => {
     cy.zoom(cy.zoom() - ZOOM_INCREMENT);
-    cy.center(cy.nodes());
   });
 }
 

@@ -8,6 +8,7 @@
       solo
       rounded
       dense
+      clearable
       append-icon="mdi-magnify"
       v-model="searchText"
     />
@@ -25,7 +26,7 @@
       >
         <template v-slot:activator>
           <v-list-item-title>
-            <v-tooltip bottom>
+            <v-tooltip bottom open-delay="300">
               <template v-slot:activator="{ on, attrs }">
                 <div v-on="on" v-bind="attrs">
                   <span class="text-body-1">

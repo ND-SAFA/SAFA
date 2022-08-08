@@ -31,6 +31,7 @@
           <h3 class="text-h6">{{ userName }}</h3>
           <p class="text-caption mx-1">{{ userEmail }}</p>
           <v-divider class="my-3"></v-divider>
+          <v-btn text rounded @click="handleFeedback">Send Feedback</v-btn>
           <v-btn text rounded @click="handleEditAccount">Edit Account</v-btn>
           <v-divider class="my-3"></v-divider>
           <v-btn
@@ -71,6 +72,14 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Routes the user to the feedback page.
+     */
+    handleFeedback(): void {
+      window.open(
+        "https://www.notion.so/nd-safa/b73d1a8bfe0345f8b4d72daa1ceaf934?v=6e5d2439907a428fa1db2671a5eaa0b6"
+      );
+    },
     /**
      * Logs the user out.
      */

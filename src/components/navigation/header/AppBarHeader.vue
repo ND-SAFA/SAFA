@@ -4,6 +4,7 @@
       <safa-icon />
       <h1 class="text-h4 white--text ml-4">SAFA</h1>
       <button-row :definitions="definitions" class="mx-3" />
+      <saving-icon />
     </v-flex>
 
     <div class="mr-5">
@@ -54,6 +55,7 @@ import {
 } from "@/components/project";
 import AccountDropdown from "./AccountDropdown.vue";
 import VersionLabel from "./VersionLabel.vue";
+import SavingIcon from "./SavingIcon.vue";
 
 export default Vue.extend({
   name: "AppBarHeader",
@@ -65,6 +67,7 @@ export default Vue.extend({
     UploadNewVersionModal,
     BaselineVersionModal,
     VersionCreator,
+    SavingIcon,
   },
   data() {
     return {

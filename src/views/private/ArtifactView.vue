@@ -3,13 +3,17 @@
     <template v-slot:page>
       <artifact-table />
       <artifact-tree />
+      <artifact-tree-fab />
+
       <artifact-creator-modal
-        :title="creatorTitle"
         :is-open="isArtifactCreatorOpen"
         :artifact="selectedArtifact"
         @close="closeArtifactCreator"
       />
-      <artifact-tree-fab />
+      <trace-link-creator-modal
+        :is-open="isTraceLinkCreatorOpen"
+        @close="closeTraceLinkCreator"
+      />
     </template>
   </private-page>
 </template>
@@ -23,6 +27,7 @@ import {
   PrivatePage,
   ArtifactCreatorModal,
   ArtifactTreeFab,
+  TraceLinkCreatorModal,
 } from "@/components";
 
 /**
@@ -31,6 +36,7 @@ import {
 export default Vue.extend({
   name: "ArtifactView",
   components: {
+    TraceLinkCreatorModal,
     ArtifactTreeFab,
     ArtifactTable,
     PrivatePage,
@@ -45,18 +51,16 @@ export default Vue.extend({
       return appModule.getIsArtifactCreatorOpen;
     },
     /**
-     * @return The selected artifact.
+     * Returns whether the trace link creator is open.
      */
-    selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+    isTraceLinkCreatorOpen() {
+      return appModule.getIsTraceLinkCreatorOpen;
     },
     /**
      * @return The selected artifact.
      */
-    creatorTitle() {
-      return artifactSelectionModule.getSelectedArtifact
-        ? "Edit Artifact"
-        : "Create Artifact";
+    selectedArtifact() {
+      return artifactSelectionModule.getSelectedArtifact;
     },
   },
   methods: {
@@ -64,7 +68,13 @@ export default Vue.extend({
      * Closes the artifact creator.
      */
     closeArtifactCreator(): void {
-      appModule.closeCreator();
+      appModule.closeArtifactCreator();
+    },
+    /**
+     * Closes the trace link creator.
+     */
+    closeTraceLinkCreator(): void {
+      appModule.toggleTraceLinkCreator();
     },
   },
 });

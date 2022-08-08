@@ -3,8 +3,8 @@
     <v-row justify="end" class="mr-1 mb-1">
       <generic-icon-button
         tooltip="View Artifact Body"
-        icon-id="mdi-code-tags"
-        @click="isArtifactBodyOpen = true"
+        icon-id="mdi-application-array-outline"
+        @click="handleViewBody"
       />
       <generic-icon-button
         v-if="!selectedArtifact.logicType"
@@ -24,27 +24,13 @@
         <h1
           v-on="on"
           v-bind="attrs"
-          class="text-h6 text-ellipsis artifact-title"
+          class="text-h5 text-ellipsis artifact-title"
         >
           {{ selectedArtifactName }}
         </h1>
       </template>
       {{ selectedArtifactName }}
     </v-tooltip>
-
-    <generic-modal
-      :is-open="isArtifactBodyOpen"
-      :title="selectedArtifactName"
-      :actionsHeight="0"
-      size="l"
-      @close="isArtifactBodyOpen = false"
-    >
-      <template v-slot:body>
-        <pre class="text-body-1 mt-2 overflow-auto">
-          {{ selectedArtifactBody }}
-        </pre>
-      </template>
-    </generic-modal>
   </div>
 </template>
 
@@ -53,7 +39,7 @@ import Vue from "vue";
 import { PanelType } from "@/types";
 import { appModule, artifactSelectionModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton, GenericModal } from "@/components/common";
+import { GenericIconButton } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -61,13 +47,7 @@ import { GenericIconButton, GenericModal } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
-    GenericModal,
     GenericIconButton,
-  },
-  data() {
-    return {
-      isArtifactBodyOpen: false,
-    };
   },
   computed: {
     /**
@@ -88,6 +68,14 @@ export default Vue.extend({
     selectedArtifactBody(): string {
       return this.selectedArtifact?.body.trim() || "";
     },
+    /**
+     * An incredibly crude and temporary way to distinguish code nodes.
+     *
+     * @return Whether to display this body as code.
+     */
+    isCodeDisplay(): boolean {
+      return this.selectedArtifact?.type.includes("code") || false;
+    },
   },
   methods: {
     /**
@@ -105,6 +93,12 @@ export default Vue.extend({
      */
     handleEditArtifact(): void {
       appModule.openArtifactCreatorTo({});
+    },
+    /**
+     * Opens the artifact body display.
+     */
+    handleViewBody(): void {
+      appModule.toggleArtifactBody();
     },
   },
 });

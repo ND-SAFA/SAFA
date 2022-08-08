@@ -2,7 +2,7 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="blue-grey mt-1" v-if="doShowGraphButtons" />
+      <v-divider class="white faded mt-1" v-if="doShowGraphButtons" />
       <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 
@@ -11,7 +11,7 @@
         <v-col cols="8">
           <div class="d-flex flex-row">
             <generic-icon-button
-              color="secondary"
+              color="white"
               :tooltip="leftPanelTooltip"
               :icon-id="leftPanelIcon"
               @click="handleLeftPanelClick"
@@ -23,7 +23,7 @@
         <v-col cols="4">
           <v-row justify="end" class="ma-0 pa-0">
             <generic-icon-button
-              color="secondary"
+              color="white"
               :tooltip="rightPanelTooltip"
               :icon-id="rightPanelIcon"
               @click="handleRightPanelClick"
@@ -46,6 +46,7 @@ import { GenericIconButton } from "@/components/common";
 import { AppBarHeader, GraphButtons } from "./header";
 import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
+import { Route } from "vue-router";
 
 /**
  * Displays the navigation top bar.
@@ -59,6 +60,19 @@ export default Vue.extend({
     GenericIconButton,
     LoadingBar,
   },
+  data() {
+    return {
+      doShowGraphButtons: router.currentRoute.path === Routes.ARTIFACT,
+    };
+  },
+  watch: {
+    /**
+     * Checks whether the graph buttons should be visible when the route changes.
+     */
+    $route(to: Route) {
+      this.doShowGraphButtons = to.path === Routes.ARTIFACT;
+    },
+  },
   computed: {
     /**
      * @return Whether the left panel is open.
@@ -68,12 +82,6 @@ export default Vue.extend({
      * @return Whether the right panel is open.
      */
     isRightOpen: () => appModule.getIsRightOpen,
-    /**
-     * @return Whether to display graphing buttons.
-     */
-    doShowGraphButtons(): boolean {
-      return router.currentRoute.path === Routes.ARTIFACT;
-    },
     /**
      * @return Whether to disable graphing buttons.
      */

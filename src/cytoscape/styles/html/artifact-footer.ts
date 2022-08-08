@@ -2,7 +2,7 @@ import { ArtifactData, SvgStyle } from "@/types";
 import { ThemeColors } from "@/util";
 import { svgStoplight } from "./artifact-stoplight";
 import { getWarnings } from "./artifact-helper";
-import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
 
 /**
  * Creates the SVG for representing a safety case node's footer.
@@ -16,6 +16,7 @@ export function svgFooter(
   data: ArtifactData,
   outerStyle: Pick<SvgStyle, "width" | "height">
 ): string {
+  const baseY = outerStyle.height + 4;
   const textY = data.childDeltaStates?.length
     ? outerStyle.height + 20
     : outerStyle.height + 26;
@@ -33,7 +34,7 @@ export function svgFooter(
       <text 
         y="${textY}"
         x="${hasWarnings ? 20 : 80}"
-        fill="${ThemeColors.artifactText}"
+        fill="${ThemeColors.black}"
       >
         ${data.hiddenChildren} Hidden
       </text>
@@ -53,7 +54,7 @@ export function svgFooter(
         <text 
           x="${hasChildren ? outerStyle.width - 80 : 80}"
           y="${textY}" 
-          fill="${ThemeColors.artifactText}"
+          fill="${ThemeColors.black}"
         >
           ${warningCount} Warning${warningCount !== 1 ? "s" : ""}
         </text>
@@ -63,7 +64,7 @@ export function svgFooter(
           width="20" height="20"
         >
           <div style="font-family: Material Icons; color: ${
-            ThemeColors.artifactWarning
+            ThemeColors.warning
           }">
             warning
           </div>
@@ -73,21 +74,29 @@ export function svgFooter(
 
   return `
     <rect 
-      x="0" y="${outerStyle.height + 4}" rx="8" 
-      width="${outerStyle.width}" height="${ARTIFACT_CHILDREN_HEIGHT}"
-      fill="${ThemeColors.artifactBorder}"
+      x="0" 
+      y="${baseY}" 
+      rx="8" 
+      width="${outerStyle.width}" 
+      height="${ARTIFACT_CHILDREN_HEIGHT}"
+      fill="${ThemeColors.darkGrey}"
+      class="artifact-border"
     />
     <rect
-      x="1" y="${outerStyle.height + 5}" rx="7" 
-      width="${outerStyle.width - 2}" height="${ARTIFACT_CHILDREN_HEIGHT - 2}"
-      fill="${ThemeColors.artifactDefault}"
+      x="${ARTIFACT_BORDER_WIDTH}" 
+      y="${baseY + ARTIFACT_BORDER_WIDTH}"
+      rx="7" 
+      width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
+      height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
+      fill="${ThemeColors.lightGrey}"
+      class="artifact-svg"
     />
     ${children}
     ${warnings}
     ${svgStoplight(data, {
-      x: 4,
-      y: textY + 6,
-      width: outerStyle.width - 8,
+      x: 6,
+      y: textY + 4,
+      width: outerStyle.width - 12,
     })}
   `;
 }

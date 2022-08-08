@@ -1,9 +1,7 @@
 # pull official base image
-FROM node:13.12.0-alpine
+FROM node:14-alpine
 
 ARG API_ENDPOINT
-RUN test -n "$API_ENDPOINT"
-
 ARG JIRA_CLIENT_ID
 ARG JIRA_CLIENT_SECRET
 ARG JIRA_REDIRECT_LINK
@@ -14,9 +12,8 @@ ARG GITHUB_REDIRECT_LINK
 # set working directory
 WORKDIR /app
 
-# install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
+# copy files & environment variables
+COPY package*.json ./
 COPY src /app/src
 COPY public /app/public
 COPY tsconfig.json ./
@@ -35,11 +32,10 @@ VUE_APP_GITHUB_REDIRECT_LINK=$GITHUB_REDIRECT_LINK\n\
 " > ./.env.production
 RUN cat .env.production
 
+# install app dependencies & build
 RUN npm install --silent
 RUN npm run build
 RUN npm install -g serve
-
-RUN npm run lint
 
 EXPOSE 80
 

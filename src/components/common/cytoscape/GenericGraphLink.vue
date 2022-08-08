@@ -22,6 +22,10 @@ export default Vue.extend({
       type: Object as PropType<TraceLink>,
       required: true,
     },
+    graph: {
+      type: String as PropType<"tim" | "artifact">,
+      required: true,
+    },
     count: Number,
     faded: Boolean,
   },
@@ -49,6 +53,7 @@ export default Vue.extend({
         data: {
           ...this.traceDefinition,
           type: "edge",
+          graph: this.graph,
           id: traceLinkId,
           // Reversed to show arrow toward parent.
           source: targetId,

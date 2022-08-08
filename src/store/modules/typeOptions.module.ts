@@ -8,6 +8,12 @@ import type {
   ArtifactTypeIcons,
 } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
+import {
+  allowedSafetyCaseTypes,
+  Artifact,
+  CreateLinkValidator,
+  SafetyCaseType,
+} from "@/types";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**
@@ -69,6 +75,25 @@ export default class TypeOptionsModule extends VuexModule {
     });
   }
 
+  @Action
+  /**
+   * Adds a new artifact type if it does not yet exist.
+   */
+  addArtifactTypes(newArtifacts: Artifact[]): void {
+    newArtifacts.forEach(({ type }) => {
+      if (this.artifactTypeDirections[type]) return;
+
+      this.SET_TYPE_ICONS({
+        ...this.artifactTypeIcons,
+        [type]: "mdi-help",
+      });
+      this.SET_LINK_DIRECTIONS({
+        ...this.artifactTypeDirections,
+        [type]: [],
+      });
+    });
+  }
+
   @Mutation
   /**
    * Sets a new collection of allowed directions between artifact types.
@@ -110,19 +135,41 @@ export default class TypeOptionsModule extends VuexModule {
    * @returns all types of artifacts.
    */
   get artifactTypes(): string[] {
-    return Object.keys(this.linkDirections);
+    const safetyCaseTypes = Object.values(SafetyCaseType) as string[];
+
+    return Object.keys(this.linkDirections).filter(
+      (type) => !safetyCaseTypes.includes(type)
+    );
   }
 
   /**
    * @returns A function for determining if the trace link is allowed based on the type of the nodes.
    */
-  get isLinkAllowedByType(): (
-    sourceType: string,
-    targetType: string
-  ) => boolean {
-    return (sourceType, targetType) => {
-      //TODO: Add custom logic for tracing safety cases or FTA nodes.
-      return !this.artifactTypeDirections[targetType]?.includes(sourceType);
+  get isLinkAllowedByType(): CreateLinkValidator {
+    return (source, target) => {
+      const sourceType =
+        "artifactType" in source ? source.artifactType : source.type;
+      const targetType =
+        "artifactType" in target ? target.artifactType : target.type;
+      const isSourceDefaultArtifact =
+        !source.safetyCaseType && !source.logicType;
+      const isTargetDefaultArtifact =
+        !target.safetyCaseType && !target.logicType;
+
+      if (isSourceDefaultArtifact) {
+        return !this.artifactTypeDirections[targetType]?.includes(sourceType);
+      } else if (source.safetyCaseType) {
+        if (isTargetDefaultArtifact) return true;
+        if (target.logicType || !target.safetyCaseType) return false;
+
+        return allowedSafetyCaseTypes[source.safetyCaseType].includes(
+          target.safetyCaseType
+        );
+      } else if (source.logicType) {
+        return isTargetDefaultArtifact;
+      }
+
+      return false;
     };
   }
 

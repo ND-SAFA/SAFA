@@ -7,17 +7,14 @@
         </keep-alive>
       </transition>
     </v-main>
-
-    <snackbar :timeout="5000" />
-    <app-confirm-modal :message="confirmationMessage" />
+    <navigation />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { logModule } from "@/store";
 import { handleAuthentication } from "@/api";
-import { AppConfirmModal, Snackbar } from "@/components";
+import { Navigation } from "@/components";
 
 /**
  * Renders the SAFA app.
@@ -25,19 +22,10 @@ import { AppConfirmModal, Snackbar } from "@/components";
 export default Vue.extend({
   name: "App",
   components: {
-    Snackbar,
-    AppConfirmModal,
+    Navigation,
   },
   async mounted() {
     await handleAuthentication();
-  },
-  computed: {
-    /**
-     * @return The current confirmation message, if one exists.
-     */
-    confirmationMessage() {
-      return logModule.getConfirmationMessage;
-    },
   },
 });
 </script>

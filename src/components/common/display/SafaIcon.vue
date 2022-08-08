@@ -1,5 +1,5 @@
 <template>
-  <v-avatar :size="size" @click.native="onAvatarClick">
+  <v-avatar :size="size" @click="onAvatarClick" style="cursor: pointer">
     <img :src="pathToLogo" alt="SAFA" />
   </v-avatar>
 </template>
@@ -30,7 +30,7 @@ export default Vue.extend({
      * Navigates to the project creator when the logo is clicked.
      */
     onAvatarClick() {
-      navigateTo(Routes.PROJECT_CREATOR);
+      navigateTo(Routes.HOME);
     },
   },
 });

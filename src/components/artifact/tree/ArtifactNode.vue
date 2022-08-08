@@ -53,8 +53,7 @@ export default Vue.extend({
       const warnings =
         errorModule.getArtifactWarnings[this.artifactDefinition.id];
       const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
-      const hiddenChildWarnings =
-        errorModule.getWarningsByArtifactNames(hiddenChildren);
+      const hiddenChildWarnings = errorModule.getWarningsByIds(hiddenChildren);
       const hiddenChildDeltaStates =
         deltaModule.getDeltaStatesByArtifactNames(hiddenChildren);
       const opacity = this.hidden ? 0 : this.faded ? 0.1 : 1;
@@ -62,6 +61,7 @@ export default Vue.extend({
       return {
         data: {
           type: "node",
+          graph: "artifact",
           id,
           body,
           artifactName: name,

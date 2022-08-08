@@ -1,12 +1,22 @@
-$color-warning: #EEBC3D;
-$color-added: #81c784;
-$color-removed: #e57373;
-$color-modified: #64b5f6;
+$color-warning: #F5B53F;
+$color-added: #00AD69;
+$color-removed: #E11F26;
+$color-modified: #5975B8;
 $color-selected: #EEEEEE;
-$color-border: #888888;
-$color-text: #888888;
+$color-border: #969696;
+$color-text: #969696;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
+
+// Artifact Tree
+
+.cy-container,
+#cytoscape-div,
+#cytoscape-artifact,
+#cytoscape-tim {
+  height: 100% !important;
+  max-height: 100vh !important;
+}
 
 .artifact-view {
   opacity: 0;
@@ -17,67 +27,71 @@ $graph-border-radius: 8px;
   }
 }
 
-.artifact-container {
-  display: flex;
-  flex-direction: column;
-  white-space: nowrap;
-  overflow: hidden;
-}
+.artifact-svg-wrapper {
+  &:hover > .artifact-svg {
+    fill: #FFFFFF;
+    filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
+  }
 
-.artifact-border {
-  border-radius: $graph-border-radius;
-  border: $graph-border-width solid $color-border;
-  box-shadow: 0 0 0;
+  &:hover > .artifact-border {
+    fill: darken($color-border, 50);
+  }
 
-  &:hover {
-    box-shadow:
-      rgba(0, 0, 0, 0.2) 0px 8px 9px -5px,
-      rgba(0, 0, 0, 0.14) 0px 15px 22px 2px,
-      rgba(0, 0, 0, 0.12) 0px 6px 28px 5px;
+  &:hover > .artifact-svg-div {
+    stroke: darken($color-border, 50);
+  }
+
+  &.artifact-svg-delta-ADDED,
+  &.artifact-svg-delta-MODIFIED,
+  &.artifact-svg-delta-REMOVED {
+    .artifact-border {
+      fill: darken($color-border, 30);
+    }
+    .artifact-svg-div {
+      stroke: darken($color-border, 30);
+    }
+  }
+
+  &.artifact-svg-delta-ADDED:hover > .artifact-svg {
+    fill: lighten($color-added, 10);
+  }
+
+  &.artifact-svg-delta-MODIFIED:hover > .artifact-svg {
+    fill: lighten($color-modified, 10);
+  }
+
+  &.artifact-svg-delta-REMOVED:hover > .artifact-svg {
+    fill: lighten($color-removed, 10);
   }
 }
 
-.artifact-header {
-  text-align: center;
-  border-bottom: $graph-border-width solid $color-border;
-  margin: 0 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artifact-sub-header {
-  text-align: center;
-}
-
-.artifact-body {
-  padding: 0 5px 5px 5px;
-  text-align: center;
-  white-space: initial;
-  flex-grow: 1;
-  line-height: 1 !important;
-}
-
-.cy-container,
-#cytoscape-div {
-  height: 100% !important;
-  max-height: 100vh !important;
-}
-
-.artifact-svg-wrapper:hover > .artifact-svg {
-  fill: #FFFFFF;
-  filter: drop-shadow(0px 4px 2px rgb(0 0 0 / 0.3));
-}
+// Artifact Tree - Context Menu
 
 .cy-context-menus-cxt-menu {
   border-radius: $graph-border-radius;
   border-color: $color-border;
+  overflow: hidden;
 
-  > button {
-    border-radius: $graph-border-radius;
+  > button:hover {
+    color: black;
+    background-color: $color-selected;
+  }
 
-    &:hover {
-      color: black;
-      background-color: $color-selected;
-    }
+  > .cy-context-menus-divider {
+    border-bottom: 1px solid lighten($color-border, 30);
   }
 }
+
+// Artifact Table
+
+.artifact-row-selected {
+  background-color: $color-selected;
+}
+
+// Good box shadow:
+//&:hover {
+//  box-shadow:
+//          rgba(0, 0, 0, 0.2) 0px 8px 9px -5px,
+//          rgba(0, 0, 0, 0.14) 0px 15px 22px 2px,
+//          rgba(0, 0, 0, 0.12) 0px 6px 28px 5px;
+//}

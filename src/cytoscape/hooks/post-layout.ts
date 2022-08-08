@@ -8,7 +8,7 @@ import {
   ArtifactData,
 } from "@/types";
 import { artifactSelectionModule, viewportModule } from "@/store";
-import { cyCenterNodes, cyZoomReset } from "@/cytoscape";
+import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { isArtifactData } from "@/util";
 import { artifactTreeMenuItems } from "@/cytoscape/plugins";
@@ -123,9 +123,20 @@ export const dynamicVisibilityHookForContextMenuItems = (
   });
 };
 
+/**
+ * Post layout hooks for the artifact tree.
+ */
 export const DefaultPostLayoutHooks: LayoutHook[] = [
   centerViewOnNode,
   applyAutoMoveEvents,
   applyCytoEvents,
   dynamicVisibilityHookForContextMenuItems,
+];
+
+/**
+ * Post layout hooks for the TIM tree.
+ */
+export const TIMPostLayoutHooks: LayoutHook[] = [
+  (): void => cyCenterNodes(timTreeCyPromise),
+  applyCytoEvents,
 ];

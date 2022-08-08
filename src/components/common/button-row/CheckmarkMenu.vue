@@ -6,7 +6,7 @@
           <v-btn
             v-on="{ ...menuOn, ...on }"
             v-bind="attrs"
-            color="secondary"
+            color="white"
             icon
             :class="isDisabled ? 'disable-events' : ''"
           >
@@ -53,7 +53,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      hoverColor: ThemeColors.menuHighlight,
+      hoverColor: ThemeColors.lightGrey,
     };
   },
 });

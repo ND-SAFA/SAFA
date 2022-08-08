@@ -1,23 +1,6 @@
 import { ArtifactData } from "@/types";
 
 /**
- * Returns the warning message for an artifact.
- *
- * @param data - The artifact data to render.
- *
- * @return The warning message.
- */
-export function getWarningMessage(data: ArtifactData): string {
-  let message = data.warnings?.[0]?.ruleName || "Warning";
-
-  if (data.hiddenChildren) {
-    message = data.childWarnings?.[0]?.ruleName || message;
-  }
-
-  return message;
-}
-
-/**
  * Returns the number of parent and child warnings for an artifact.
  *
  * @param data - The artifact data to render.

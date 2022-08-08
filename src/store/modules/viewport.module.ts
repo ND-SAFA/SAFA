@@ -97,6 +97,8 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
+    const selectedId = artifactSelectionModule.getSelectedArtifactId;
+
     appModule.onLoadStart();
 
     this.SET_LAYOUT(layoutPayload.layout);
@@ -107,6 +109,12 @@ export default class ViewportModule extends VuexModule {
       appModule.onLoadEnd();
       cyCenterNodes();
       cyResetTim();
+
+      if (selectedId) {
+        artifactSelectionModule.selectArtifact(selectedId);
+      } else {
+        cyCenterNodes();
+      }
     }, 200);
   }
 

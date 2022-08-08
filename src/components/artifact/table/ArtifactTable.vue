@@ -4,11 +4,11 @@
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
-      class="elevation-1"
       :headers="headers"
       :items="items"
       :search="searchText"
       :item-class="getItemBackground"
+      sort-by="name"
     >
       <template v-slot:top>
         <artifact-table-header
@@ -19,6 +19,20 @@
 
       <template v-slot:[`item.type`]="{ item }">
         <artifact-table-chip :text="item.type" />
+      </template>
+
+      <template v-slot:[`item.name`]="{ item }">
+        <div class="d-flex flex-row align-center">
+          <artifact-table-delta-chip :artifact="item" />
+          <generic-icon-button
+            v-if="getHasWarnings(item)"
+            icon-id="mdi-hazard-lights"
+            tooltip="View warnings"
+            color="secondary"
+            @click="handleView(item)"
+          />
+          <span class="text-body-1 ml-1">{{ item.name }}</span>
+        </div>
       </template>
 
       <template
@@ -56,13 +70,6 @@
             @click="handleCreate"
           />
         </v-row>
-
-        <artifact-creator-modal
-          :title="artifactCreatorTitle"
-          :is-open="createDialogueOpen"
-          :artifact="selectedArtifact"
-          @close="handleCloseCreate"
-        />
       </template>
     </v-data-table>
   </v-container>
@@ -82,13 +89,14 @@ import {
   artifactSelectionModule,
   deltaModule,
   documentModule,
+  errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactCreatorModal from "../ArtifactCreatorModal.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
+import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 
 /**
  * Represents a table of artifacts.
@@ -96,16 +104,14 @@ import ArtifactTableCell from "./ArtifactTableCell.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    ArtifactTableDeltaChip,
     ArtifactTableHeader,
     ArtifactTableChip,
     GenericIconButton,
-    ArtifactCreatorModal,
     ArtifactTableCell,
   },
   data() {
     return {
-      selectedArtifact: undefined as Artifact | undefined,
-      createDialogueOpen: false as boolean | DocumentType.FMEA,
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
     };
@@ -167,18 +173,13 @@ export default Vue.extend({
      * @return The artifact table's items.
      */
     items(): FlatArtifact[] {
-      const selectedTypes = this.inDeltaView ? [] : this.selectedDeltaTypes;
+      const selectedTypes = this.inDeltaView ? this.selectedDeltaTypes : [];
+
       return artifactModule.flatArtifacts.filter(
         ({ id }) =>
           selectedTypes.length === 0 ||
           selectedTypes.includes(deltaModule.getArtifactDeltaType(id))
       );
-    },
-    /**
-     * @return The title of the artifact creator.
-     */
-    artifactCreatorTitle(): string {
-      return this.selectedArtifact ? "Edit Artifact" : "Create Artifact";
     },
   },
   methods: {
@@ -198,8 +199,10 @@ export default Vue.extend({
      * @param artifact - The artifact to edit.
      */
     handleEdit(artifact: Artifact) {
-      this.selectedArtifact = artifact;
-      this.createDialogueOpen = true;
+      artifactSelectionModule.selectArtifact(artifact.id);
+      appModule.openArtifactCreatorTo({
+        isNewArtifact: false,
+      });
     },
     /**
      * Opens the delete artifact window.
@@ -212,14 +215,10 @@ export default Vue.extend({
      * Opens the create artifact window.
      */
     handleCreate() {
-      this.createDialogueOpen = DocumentType.FMEA;
-    },
-    /**
-     * Closes the create artifact window.
-     */
-    handleCloseCreate() {
-      this.createDialogueOpen = false;
-      this.selectedArtifact = undefined;
+      appModule.openArtifactCreatorTo({
+        isNewArtifact: true,
+        type: DocumentType.FMEA,
+      });
     },
     /**
      * Returns the background class name of an artifact row.
@@ -228,12 +227,18 @@ export default Vue.extend({
      */
     getItemBackground(item: Artifact): string {
       if (artifactSelectionModule.getSelectedArtifactId === item.id) {
-        return "artifact-selected";
-      } else {
-        const deltaState = deltaModule.getArtifactDeltaType(item.id);
-
-        return `artifact-${deltaState.toLowerCase()}`;
+        return "artifact-row-selected";
       }
+
+      return "";
+    },
+    /**
+     * Returns whether the artifact has any warnings.
+     * @param item - The artifact to search for
+     * @return Whether the artifact has warnings.
+     */
+    getHasWarnings(item: Artifact): boolean {
+      return errorModule.getWarningsByIds([item.id]).length > 0;
     },
   },
 });

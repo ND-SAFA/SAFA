@@ -4,20 +4,20 @@ import { ArtifactDeltaState, JobStatus } from "@/types";
  * Defines all colors in the theme.
  */
 export enum ThemeColors {
-  primary = "#00304c",
-  secondary = "#FFD740",
-  accent = "#006aff",
-  error = "rgb(255, 82, 82)",
+  primary = "#5975B8",
+  secondary = "#F5B53F",
+  accent = "#F5871F",
+  error = "#E11F26",
 
-  menuHighlight = "#f0f0f0",
+  white = "#FFFFFF", // Text
+  black = "#000000", // Text
+  lightGrey = "#DDDDDD", // Backgrounds
+  darkGrey = "#969696", // Borders
 
-  artifactDefault = "#fafafa",
-  artifactBorder = "#888888",
-  artifactText = "#36405a",
-  artifactAdded = "#81c784",
-  artifactRemoved = "#e57373",
-  artifactModified = "#64b5f6",
-  artifactWarning = "#EEBC3D",
+  added = "#00AD69",
+  modified = "#5975B8",
+  removed = "#E11F26",
+  warning = "#F5B53F",
 }
 
 /**
@@ -28,13 +28,26 @@ export enum ThemeColors {
 export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
   switch (deltaState) {
     case ArtifactDeltaState.ADDED:
-      return ThemeColors.artifactAdded;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.artifactRemoved;
+      return ThemeColors.added;
     case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.artifactModified;
+      return ThemeColors.modified;
+    case ArtifactDeltaState.REMOVED:
+      return ThemeColors.removed;
     default:
-      return ThemeColors.artifactDefault;
+      return ThemeColors.lightGrey;
+  }
+}
+
+/**
+ * Returns the text color for the given delta state.
+ * @param deltaState - The delta state to get the color for.
+ * @return The color.
+ */
+export function getTextColor(deltaState?: ArtifactDeltaState): string {
+  if (!deltaState || deltaState === ArtifactDeltaState.NO_CHANGE) {
+    return ThemeColors.black;
+  } else {
+    return ThemeColors.white;
   }
 }
 
@@ -47,11 +60,11 @@ export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
 export function getJobStatusColor(status: JobStatus): string {
   switch (status) {
     case JobStatus.COMPLETED:
-      return ThemeColors.artifactModified;
+      return ThemeColors.modified;
     case JobStatus.IN_PROGRESS:
       return "#EEBC3D";
     case JobStatus.CANCELLED:
-      return ThemeColors.artifactRemoved;
+      return ThemeColors.removed;
     default:
       return "";
   }

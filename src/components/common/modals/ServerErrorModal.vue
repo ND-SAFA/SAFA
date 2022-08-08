@@ -44,7 +44,7 @@ export default Vue.extend({
   },
   methods: {
     handleClose() {
-      appModule.closeErrorDisplay();
+      appModule.toggleErrorDisplay();
     },
   },
 });

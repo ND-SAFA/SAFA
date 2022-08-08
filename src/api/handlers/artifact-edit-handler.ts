@@ -1,10 +1,4 @@
-import {
-  Artifact,
-  ConfirmationType,
-  IOHandlerCallback,
-  TraceApproval,
-  TraceType,
-} from "@/types";
+import { Artifact, ConfirmationType, IOHandlerCallback } from "@/types";
 import {
   artifactSelectionModule,
   logModule,
@@ -45,7 +39,8 @@ export async function handleSaveArtifact(
       const createdArtifacts = await createArtifact(versionId, artifact);
 
       await projectModule.addOrUpdateArtifacts(createdArtifacts);
-      await artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      // TODO: load new layout
       await viewportModule.setArtifactTreeLayout();
 
       if (!parentArtifact) {
@@ -54,16 +49,7 @@ export async function handleSaveArtifact(
       }
 
       for (const createdArtifact of createdArtifacts) {
-        await handleCreateLink({
-          traceLinkId: "",
-          sourceName: createdArtifact.name,
-          sourceId: createdArtifact.id,
-          targetName: parentArtifact.name,
-          targetId: parentArtifact.id,
-          approvalStatus: TraceApproval.APPROVED,
-          score: 1,
-          traceType: TraceType.MANUAL,
-        });
+        await handleCreateLink(createdArtifact, parentArtifact);
       }
     }
 
@@ -120,8 +106,8 @@ export function handleDeleteArtifact(
 
         deleteArtifact(artifact)
           .then(async () => {
-            await projectModule.deleteArtifacts([artifact]);
             await artifactSelectionModule.UNSELECT_ARTIFACT();
+            await projectModule.deleteArtifacts([artifact]);
             onSuccess?.();
             resolve();
           })

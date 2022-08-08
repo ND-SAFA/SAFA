@@ -1,20 +1,48 @@
-import { EmptyLambda, TraceApproval, TraceLink } from "@/types";
+import {
+  Artifact,
+  ArtifactData,
+  EmptyLambda,
+  TraceApproval,
+  TraceLink,
+  TraceType,
+} from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
 import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
-import { extractTraceId } from "@/util";
 
 /**
  * Creates a new trace link.
  *
- * @param link - The trace link to process.
+ * @param source - The artifact to link from.
+ * @param target - The artifact to link to.
  */
-export async function handleCreateLink(link: TraceLink): Promise<void> {
+export async function handleCreateLink(
+  source: Artifact | ArtifactData,
+  target: Artifact | ArtifactData
+): Promise<void> {
+  const sourceName =
+    "artifactName" in source ? source.artifactName : source.name;
+  const targetName =
+    "artifactName" in target ? target.artifactName : target.name;
+
+  const traceLink: TraceLink = {
+    traceLinkId: "",
+    sourceId: source.id,
+    sourceName,
+    targetId: target.id,
+    targetName,
+    traceType: TraceType.MANUAL,
+    approvalStatus: TraceApproval.APPROVED,
+    score: 1,
+  };
+
   try {
-    const createdLinks = await createLink(link);
+    const createdLinks = await createLink(traceLink);
 
     await projectModule.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
-    logModule.onError(`Unable to create trace link: ${extractTraceId(link)}`);
+    logModule.onError(
+      `Unable to create trace link: ${sourceName} -> ${targetName}`
+    );
     logModule.onDevError(e);
   }
 }
@@ -70,5 +98,7 @@ function linkAPIHandler(
   onSuccess: () => Promise<void>
 ): void {
   appModule.onLoadStart();
-  linkAPI(link).then(onSuccess).finally(appModule.onLoadEnd);
+  linkAPI(link)
+    .then(onSuccess)
+    .finally(() => appModule.onLoadEnd());
 }

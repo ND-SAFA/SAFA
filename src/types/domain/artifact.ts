@@ -19,6 +19,17 @@ export enum SafetyCaseType {
 }
 
 /**
+ * A map from each safety case types to what they can trace to.
+ */
+export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
+  {
+    [SafetyCaseType.GOAL]: [SafetyCaseType.GOAL, SafetyCaseType.STRATEGY],
+    [SafetyCaseType.SOLUTION]: [SafetyCaseType.GOAL],
+    [SafetyCaseType.CONTEXT]: [SafetyCaseType.GOAL],
+    [SafetyCaseType.STRATEGY]: [SafetyCaseType.GOAL],
+  };
+
+/**
  * Defines an artifact file.
  */
 export interface Artifact {

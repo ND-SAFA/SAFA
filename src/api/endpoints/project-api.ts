@@ -56,8 +56,8 @@ export async function deleteProject(projectId: string): Promise<void> {
  * @return The delta from the source to the target versions.
  */
 export async function getProjectDelta(
-  sourceVersionId: string,
-  targetVersionId: string
+  targetVersionId: string,
+  sourceVersionId: string
 ): Promise<ProjectDelta> {
   return authHttpClient<ProjectDelta>(
     fillEndpoint(Endpoint.getProjectDelta, {

@@ -6,8 +6,8 @@ import type {
   LinkValidator,
   TraceLink,
 } from "@/types";
-import { TraceApproval } from "@/types";
-import { documentModule } from "@/store";
+import { CreateLinkValidator, TraceApproval } from "@/types";
+import { documentModule, traceModule, typeOptionsModule } from "@/store";
 import { getTraceId } from "@/util";
 
 @Module({ namespaced: true, name: "trace" })
@@ -150,6 +150,26 @@ export default class TraceModule extends VuexModule {
       );
 
       return traceLinkQuery.length > 0;
+    };
+  }
+
+  /**
+   * @retuyrn Whether a link between these artifacts is allowed.
+   */
+  get isLinkAllowed(): CreateLinkValidator {
+    return (source, target) => {
+      if (source.id === target.id) {
+        return "An artifact cannot link to itself.";
+      } else if (
+        traceModule.doesLinkExist(source.id, target.id) ||
+        traceModule.doesLinkExist(target.id, source.id)
+      ) {
+        return "This trace link already exists.";
+      } else if (!typeOptionsModule.isLinkAllowedByType(source, target)) {
+        return `The type "${source.type}" cannot trace to "${target.type}".`;
+      }
+
+      return true;
     };
   }
 }

@@ -6,8 +6,6 @@
     <v-expansion-panel-content>
       <trace-link-display
         :link="link"
-        :source-body="sourceBody"
-        :target-body="targetBody"
         :show-decline="showDecline"
         :show-approve="showApprove"
         :show-delete="false"
@@ -35,14 +33,6 @@ export default Vue.extend({
   props: {
     link: {
       type: Object as PropType<TraceLink>,
-      required: true,
-    },
-    sourceBody: {
-      type: String,
-      required: true,
-    },
-    targetBody: {
-      type: String,
       required: true,
     },
     showDecline: {

@@ -54,16 +54,16 @@ dependencies {
 
     //Spring
     implementation 'org.springframework.boot:spring-boot-starter-web:2.7.2'
-    implementation 'org.springframework.data:spring-data-commons:2.6.0'
-    implementation 'org.springframework.data:spring-data-jpa:2.5.6' // TODO: Upgrade contains breaking changes
-    implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
-    implementation 'org.springframework:spring-websocket:5.3.13'
-    implementation 'org.springframework:spring-messaging:5.3.13'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
-    implementation 'org.springframework.security:spring-security-messaging:5.6.0'
-    implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.1'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.6.6'
-    implementation 'org.springframework.batch:spring-batch-core:4.3.5'
+    implementation 'org.springframework.data:spring-data-commons:2.7.2'
+    implementation 'org.springframework.data:spring-data-jpa:2.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.2'
+    implementation 'org.springframework:spring-websocket:5.3.22'
+    implementation 'org.springframework:spring-messaging:5.3.22'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.2'
+    implementation 'org.springframework.security:spring-security-messaging:5.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.2'
+    implementation 'org.springframework.batch:spring-batch-core:4.3.6'
 
     //authentication
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'

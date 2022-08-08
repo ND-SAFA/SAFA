@@ -1,11 +1,14 @@
 package unit;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
+import javax.sql.DataSource;
 
 import edu.nd.crc.safa.MainApplication;
-import edu.nd.crc.safa.features.projects.controllers.ProjectController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.projects.controllers.ProjectController;
 
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -35,6 +38,9 @@ public abstract class SpringBootBaseTest {
     @Autowired
     JobRepository jobRepository;
 
+    @Autowired
+    DataSource dataSource;
+
     /**
      * Sets the current job launcher to run job synchronously so that
      *
@@ -48,5 +54,21 @@ public abstract class SpringBootBaseTest {
         jobLauncher.afterPropertiesSet();
 
         serviceProvider.setJobLauncher(jobLauncher);
+    }
+
+    /**
+     * Sets the testing database's mode, H2, to legacy in order for spring
+     * batch to be able to initialize its own tables.
+     *
+     * @throws SQLException Throws exception if unable to set legacy mode.
+     */
+    @PostConstruct
+    public void setLegacyModeInH2Database() throws SQLException {
+        String query = "SET MODE LEGACY;\n";
+        Connection connection = this.dataSource.getConnection();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(query);
+        }
+        connection.close();
     }
 }

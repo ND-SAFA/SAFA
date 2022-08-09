@@ -18,7 +18,7 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "ci:test": "cypress run",
+    "ci:test": "cypress run --headed --browser chrome",
     "ci:run": "start-server-and-test start http://localhost:8080 ci:test"
   },
   "main": "background.js",

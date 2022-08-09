@@ -12,14 +12,12 @@ describe("Canvas", () => {
     cy.login(user.email, user.password);
 
     // Validates that artifacts appear on the graph.
-    cy.get(".artifact-container").should("be.visible");
+    cy.get(".artifact-svg-wrapper").should("be.visible");
 
     // Opens the right click window.
     cy.get("canvas")
       .first()
-      .then(($el) =>
-        cy.wrap($el).rightclick($el.width() / 2, $el.height() / 2)
-      );
+      .then(($el) => cy.wrap($el).rightclick(0, $el.height() / 2));
 
     // Click the add artifact button.
     cy.get("#add-artifact")

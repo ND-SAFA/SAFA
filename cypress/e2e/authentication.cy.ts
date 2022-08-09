@@ -5,22 +5,23 @@ describe("Authentication", () => {
     cy.visit("http://localhost:8080");
   });
 
-  describe("Account Creation", () => {
-    describe("I can create an account", () => {
-      it("displays successful account creation", () => {
-        cy.clickButton("button-create-account-redirect").wait(500);
-
-        cy.inputText("input-email", validUser.email)
-          .inputText("input-password", validUser.password)
-          .clickButton("button-create-account");
-
-        cy.contains(
-          "p",
-          "Your account has been successfully created. Please check your email to complete the sign up process."
-        );
-      });
-    });
-  });
+  // Disabled until account deletion is added, or until running in a test DB
+  // describe("Account Creation", () => {
+  //   describe("I can create an account", () => {
+  //     it("displays successful account creation", () => {
+  //       cy.clickButton("button-create-account-redirect").wait(500);
+  //
+  //       cy.inputText("input-email", validUser.email)
+  //         .inputText("input-password", validUser.password)
+  //         .clickButton("button-create-account");
+  //
+  //       cy.contains(
+  //         "p",
+  //         "Your account has been successfully created. Please check your email to complete the sign up process."
+  //       );
+  //     });
+  //   });
+  // });
 
   describe("Account Login", () => {
     describe("I can log in", () => {

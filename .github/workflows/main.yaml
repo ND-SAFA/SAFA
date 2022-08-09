@@ -5,6 +5,10 @@ on:
     branches:
       - production
       - development
+  pull_request:
+    branches:
+      - production
+      - development
 
 jobs:
   lint-run:
@@ -23,9 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          eslint: true
+        run: npm run lint
   cypress-run:
     name: Cypress E2E Tests
     runs-on: ubuntu-latest

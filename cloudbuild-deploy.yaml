@@ -24,4 +24,4 @@ steps:
 images:
   - gcr.io/$PROJECT_ID/safa-fend-${_STAGE}
 
-timeout: 900s
+timeout: 1200s

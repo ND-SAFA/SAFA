@@ -46,13 +46,13 @@ export default class ViewportModule extends VuexModule {
    *
    * @param artifact - The artifact to select and view.
    */
-  async viewArtifactSubtree(artifact: Artifact): Promise<void> {
+  async viewArtifactSubtree(artifactId: string): Promise<void> {
     const artifactsInSubtree = [
-      ...subtreeModule.getSubtreeByArtifactId(artifact.id),
-      artifact.id,
+      ...subtreeModule.getSubtreeByArtifactId(artifactId),
+      artifactId,
     ];
 
-    artifactSelectionModule.selectArtifact(artifact.id);
+    artifactSelectionModule.selectArtifact(artifactId);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",

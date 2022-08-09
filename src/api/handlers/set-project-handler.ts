@@ -64,6 +64,7 @@ export async function handleSetProject(project: Project): Promise<void> {
   project.artifactTypes = await getProjectArtifactTypes(projectId);
 
   await handleSelectVersion(projectId, versionId);
+  artifactSelectionModule.clearSelections();
   await projectModule.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();

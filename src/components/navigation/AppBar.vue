@@ -18,6 +18,7 @@
             />
             <document-selector />
             <graph-buttons />
+            <searchbar />
           </div>
         </v-col>
         <v-col cols="4">
@@ -40,13 +41,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Route } from "vue-router";
 import { appModule, documentModule } from "@/store";
 import { router, Routes } from "@/router";
 import { GenericIconButton } from "@/components/common";
-import { AppBarHeader, GraphButtons } from "./header";
+import { AppBarHeader, GraphButtons, Searchbar } from "./header";
 import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
-import { Route } from "vue-router";
 
 /**
  * Displays the navigation top bar.
@@ -54,6 +55,7 @@ import { Route } from "vue-router";
 export default Vue.extend({
   name: "AppBar",
   components: {
+    Searchbar,
     DocumentSelector,
     GraphButtons,
     AppBarHeader,

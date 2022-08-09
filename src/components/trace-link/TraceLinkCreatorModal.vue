@@ -6,7 +6,7 @@
     size="l"
   >
     <template v-slot:body>
-      <v-row class="mt-8">
+      <v-row class="mt-2">
         <v-col cols="6">
           <artifact-input
             v-model="sourceArtifactId"

@@ -138,7 +138,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, viewportModule.viewArtifactSubtree);
+      handleOnClick(event, ({ id }) => viewportModule.viewArtifactSubtree(id));
     },
     isVisible: hasSubtree,
   },

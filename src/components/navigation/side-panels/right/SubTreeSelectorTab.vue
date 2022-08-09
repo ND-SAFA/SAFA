@@ -165,7 +165,7 @@ export default Vue.extend({
      * @param artifact - The artifact focus on.
      */
     async handleArtifactClick(artifact: Artifact): Promise<void> {
-      await viewportModule.viewArtifactSubtree(artifact);
+      await viewportModule.viewArtifactSubtree(artifact.id);
     },
   },
 });

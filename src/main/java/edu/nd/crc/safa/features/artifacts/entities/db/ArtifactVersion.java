@@ -9,12 +9,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -65,12 +65,13 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @Column(name = "summary", nullable = false)
     String summary;
 
+    @Lob
     @Column(name = "content",
-        length = ProjectVariables.ARTIFACT_CONTENT_LENGTH,
         nullable = false,
-        columnDefinition = "TEXT")
+        columnDefinition = "mediumtext")
     String content;
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(columnDefinition = "mediumtext")
     String customFields;
 
     public ArtifactVersion() {

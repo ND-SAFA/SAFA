@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
  * Tests that changes made in future version do not affect past ones.
  */
 class TestTrivialDelta extends BaseDeltaTest {
+
     @Test
     void testComparisonAgainstSameVersion() throws Exception {
         String projectName = "testThatTrivialArtifactNotCalculated";

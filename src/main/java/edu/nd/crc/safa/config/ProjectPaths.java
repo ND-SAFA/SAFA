@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class ProjectPaths {
     // Flat files
     public static final String PATH_TO_ROOT = System.getProperty("user.dir");
+    public static final String PATH_TO_SRC = PATH_TO_ROOT + "/src/main/java/edu/nd/crc/safa";
     public static final String PATH_TO_BUILD = ProjectPaths.PATH_TO_ROOT + "/build";
     public static final String PATH_TO_STORAGE = ProjectPaths.PATH_TO_BUILD + "/storage";
     public static final String PATH_TO_RESOURCES = ProjectPaths.PATH_TO_ROOT + "/resources";

@@ -36,7 +36,7 @@ public class Rule {
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id", nullable = false, unique = true)
+    @JoinColumn(name = "project_id", nullable = false)
     Project project;
     /**
      * The name of the rule.

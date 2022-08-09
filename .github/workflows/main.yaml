@@ -41,3 +41,5 @@ jobs:
           build: npm run build
           wait-on: 'http://localhost:8080'
           start: npm start
+          browser: chrome
+          headed: true

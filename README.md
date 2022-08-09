@@ -14,16 +14,3 @@ To get the stack running on your localhost port 8080 then run:
 In order to delete any docker data associated with the database of the api run:
 
 `docker-compose down -v`
-
-## Project Access Requirements
-
-Jira Project Access for: http://spwd.cse.nd.edu:8080/ \
-GitHub Read Access for: https://github.com/SAREC-Lab/Dronology
-
-Log into Jira:
-
-1. Open a browser window, and navigate to http://spwd.cse.nd.edu:8080/
-1. Log in with your credentials and close browser
-
-Double check to make sure that you have access to https://github.com/SAREC-Lab/Dronology/
-

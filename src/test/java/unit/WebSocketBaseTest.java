@@ -9,9 +9,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.NotificationService;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.notifications.NotificationService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +36,7 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
  * <p>
  * TODO: Do I need to clear subscriptions?
  */
-public class WebSocketBaseTest extends AuthenticatedBaseTest {
+public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
 
     static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
     private static ObjectMapper mapper;
@@ -43,7 +44,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     private static HashMap<String, BlockingQueue<String>> idToQueue;
     private static HashMap<String, StompSession> idToSession;
 
-    final int TIME_TO_POLL_SECONDS = 5; // seconds
+    final int TIME_TO_POLL_SECONDS = 10; // # of seconds to wait for a message until failing
     final int TIME_TO_POLL_MS = TIME_TO_POLL_SECONDS * 1000;
 
     @LocalServerPort
@@ -58,7 +59,7 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
         WebSocketTransport transport = new WebSocketTransport(webSocketClient);
         SockJsClient client = new SockJsClient(List.of(transport));
         stompClient = new WebSocketStompClient(client);
-        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.messageSizeLimit);
+        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.MESSAGE_SIZE_LIMIT);
     }
 
     @BeforeEach
@@ -110,6 +111,17 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
     }
 
     /**
+     * Subscribes client with associated id to the given project version.
+     *
+     * @param clientId    The ID given to client subscribing to project version.
+     * @param jobDbEntity The job whose updates are listened for.
+     */
+    public void subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
+        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(jobDbEntity);
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
+    }
+
+    /**
      * Returns the next message in the queue associated with given client id.
      *
      * @param clientId    The Id of the client whose queue we're reading.
@@ -126,6 +138,10 @@ public class WebSocketBaseTest extends AuthenticatedBaseTest {
 
     public <T> T toClass(String response, Class<T> targetClass) throws JsonProcessingException {
         return mapper.readValue(response, targetClass);
+    }
+
+    public ObjectMapper getMapper() {
+        return objectMapper;
     }
 
     /**

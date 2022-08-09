@@ -2,9 +2,10 @@ package unit.messaging;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -13,10 +14,10 @@ import unit.ApplicationBaseTest;
  * Provides a smoke test verifying that two users subscribed to the same version channel
  * are able to receive updates when the other commits them.
  */
-public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
+class TestClientsCanSendAndReceive extends ApplicationBaseTest {
 
     @Test
-    public void canSendAndReceiveMessagesBetweenClients() throws Exception {
+    void canSendAndReceiveMessagesBetweenClients() throws Exception {
         String projectName = "websocket-test";
         String clientOne = "user-1";
         String clientTwo = "user-2";
@@ -36,7 +37,7 @@ public class TestClientsCanSendAndReceive extends ApplicationBaseTest {
             .subscribeToVersion(clientTwo, projectVersion);
 
         // Step - Upload flat files
-        this.uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Artifact and traces received
         assertThat(getQueueSize(clientOne)).isEqualTo(1);

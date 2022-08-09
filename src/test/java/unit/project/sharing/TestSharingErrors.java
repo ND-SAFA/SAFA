@@ -3,8 +3,8 @@ package unit.project.sharing;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * 1. User is not found
  * 2. User is already on the project
  */
-public class TestSharingErrors extends BaseSharingTest {
+class TestSharingErrors extends BaseSharingTest {
 
     /**
      * Tests that error message notifies user that email is not registered
@@ -23,7 +23,7 @@ public class TestSharingErrors extends BaseSharingTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void userNotFoundError() throws Exception {
+    void userNotFoundError() throws Exception {
         String projectName = "test-project";
 
         // Step - Create a project
@@ -35,7 +35,7 @@ public class TestSharingErrors extends BaseSharingTest {
         JSONObject response = shareProject(project, nonUserEmail, ProjectRole.VIEWER, status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account
-        String error = response.getJSONObject("body").getString("message");
+        String error = response.getString("message");
         assertThat(error).matches(".*user.*exists.*email.*[\\s\\S]");
     }
 }

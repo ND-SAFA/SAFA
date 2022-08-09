@@ -1,0 +1,114 @@
+package edu.nd.crc.safa.utilities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * Extracts list of records in JSON files containing entities to be extracted as records.
+ */
+public interface JsonFileUtilities {
+    /**
+     * Reads JSON file and extracts array using given key and converts them to a list of
+     * json objects.
+     *
+     * @param jsonFile     The file containing the array.
+     * @param arrayKeyName The key the array is under in given json object.
+     * @return List of objects representing given array.
+     */
+    static List<JSONObject> getArrayAsRecords(JSONObject jsonFile, String arrayKeyName) {
+        if (!jsonFile.has(arrayKeyName)) {
+            throw new SafaError("Expected file to contain key: " + arrayKeyName);
+        }
+        JSONArray jsonArtifactArray = jsonFile.getJSONArray(arrayKeyName);
+        List<JSONObject> jsonArtifacts = new ArrayList<>();
+
+        for (int i = 0; i < jsonArtifactArray.length(); i++) {
+            jsonArtifacts.add(jsonArtifactArray.getJSONObject(i));
+        }
+
+        return jsonArtifacts;
+    }
+
+    /**
+     * Converts given entities to a JSON object containing array of entities under param name.
+     *
+     * @param entities  The entities to parse and store in the JSON object.
+     * @param paramName The name containing the entities in the JSON object.
+     * @return JSONObject containing parsed entities.
+     * @throws JsonProcessingException Throws error if entity cannot be parsed into JSON
+     */
+    static JSONObject writeEntitiesAsJson(List<? extends Object> entities,
+                                          String paramName) throws JsonProcessingException {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Object entity : entities) {
+            String entityContent = objectMapper.writeValueAsString(entity);
+            jsonArray.put(new JSONObject(entityContent));
+        }
+        jsonObject.put(paramName, jsonArray);
+        return jsonObject;
+    }
+
+    /**
+     * Converts object to JSONObject using Jackson ObjectMapper.
+     *
+     * @param object The object to convert to JSON
+     * @return JSON representation of object
+     */
+    static JSONObject toJson(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> {
+            String objectJsonString = objectMapper.writeValueAsString(object);
+            return new JSONObject(objectJsonString);
+        });
+    }
+
+    /**
+     * Converts JSON string to instance of java class.
+     *
+     * @param jsonString  Object json as string.
+     * @param exportClass Class to convert object to
+     * @param <T>         The type that gets parsed
+     * @return Instance of specified class.
+     */
+    static <T> T parse(String jsonString, Class<T> exportClass) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> objectMapper.readValue(jsonString, exportClass));
+    }
+
+    /**
+     * Converts JSON string to instance of java class.
+     *
+     * @param jsonString  Object json as string.
+     * @param exportClass Class to convert object to
+     * @param <T>         The type that gets parsed
+     * @return Instance of specified class.
+     */
+    static <T> T parse(String jsonString, TypeReference<T> exportClass) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JSONObject jsonObject = jsonString.length() == 0 ? new JSONObject() : new JSONObject(jsonString);
+        return wrapReturnValue(() -> objectMapper.readValue(jsonObject.toString(), exportClass));
+    }
+
+    private static <T> T wrapReturnValue(ThrowingSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            throw new SafaError(e.getMessage());
+        }
+    }
+
+    @FunctionalInterface
+    interface ThrowingSupplier<T> {
+        T get() throws JsonProcessingException;
+    }
+}

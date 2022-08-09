@@ -3,9 +3,10 @@ package unit.messaging;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.server.entities.app.ProjectMessage;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectMessage;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -14,10 +15,10 @@ import unit.ApplicationBaseTest;
  * Tests that notifications are sent to subscribed users when a member is
  * added or removed from a project.
  */
-public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
+class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
 
     @Test
-    public void canSendAndReceiveMessagesBetweenClients() throws Exception {
+    void canSendAndReceiveMessagesBetweenClients() throws Exception {
         String projectName = "add-member-websocket-message";
 
         String projectMemberUsername = "user@gmail.com";
@@ -31,21 +32,21 @@ public class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
         loginUser(projectMemberUsername, projectMemberPassword, false);
 
         // Step - Create two client and subscript to version
-        createNewConnection(currentUsername)
-            .subscribeToProject(currentUsername, project);
+        createNewConnection(defaultUser)
+            .subscribeToProject(defaultUser, project);
 
-        // Step - Upload flat files
+        // Step - Add member to project
         shareProject(project, projectMemberUsername, ProjectRole.VIEWER, status().isOk());
 
-        // VP - Artifact and traces received
-        String message = getNextMessage(currentUsername);
-        assertThat(message).isEqualTo(ProjectMessage.MEMBERS.toString());
+        // VP - New member notification is received.
+        ProjectMessage message = getNextMessage(defaultUser, ProjectMessage.class);
+        assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
 
         // Step - Remove member from project
         removeMemberFromProject(project, projectMemberUsername);
 
         // VP - Verify that message is sent to update members after deletion
-        message = getNextMessage(currentUsername);
-        assertThat(message).isEqualTo(ProjectMessage.MEMBERS.toString());
+        message = getNextMessage(defaultUser, ProjectMessage.class);
+        assertThat(message.getType()).isEqualTo(ProjectEntityTypes.MEMBERS);
     }
 }

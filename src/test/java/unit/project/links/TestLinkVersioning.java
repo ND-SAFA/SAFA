@@ -4,11 +4,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.ProjectEntities;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -19,7 +20,7 @@ import unit.ApplicationBaseTest;
  * TODO: Test that modification is detected
  * TODO: Test that removal is detected
  */
-public class TestLinkVersioning extends ApplicationBaseTest {
+class TestLinkVersioning extends ApplicationBaseTest {
 
     String projectName = "project-name";
 
@@ -30,7 +31,7 @@ public class TestLinkVersioning extends ApplicationBaseTest {
      * @throws Exception If http requests fails
      */
     @Test
-    public void testNoChangeDetected() throws Exception {
+    void testNoChangeDetected() throws Exception {
 
         // Step - Create project with two versions: base and target
         dbEntityBuilder
@@ -43,22 +44,22 @@ public class TestLinkVersioning extends ApplicationBaseTest {
 
         // Step - Create base trace link
         String flatFilesPath = ProjectPaths.PATH_TO_MINI_FILES;
-        uploadFlatFilesToVersion(v1, flatFilesPath);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectEntities baseEntities = projectRetrievalService.retrieveAndCreateProjectResponse(v1);
-        List<TraceAppEntity> baseTraces = baseEntities.getProject().getTraces();
+        ProjectAppEntity baseEntities = getProjectAtVersion(v1);
+        List<TraceAppEntity> baseTraces = baseEntities.getTraces();
         assertThat(baseTraces.size()).isEqualTo(1);
 
         // Step - Save same link to latter version
-        uploadFlatFilesToVersion(v2, flatFilesPath);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
 
         // VP - Verify that no change is stored by system
         assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectEntities targetEntities = projectRetrievalService.retrieveAndCreateProjectResponse(v1);
-        List<TraceAppEntity> targetTraces = targetEntities.getProject().getTraces();
+        ProjectAppEntity targetEntities = getProjectAtVersion(v1);
+        List<TraceAppEntity> targetTraces = targetEntities.getTraces();
         assertThat(targetTraces.size()).isEqualTo(1);
     }
 }

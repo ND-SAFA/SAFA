@@ -6,22 +6,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
+import unit.DefaultProjectConstants;
 import unit.EntityBaseTest;
-import unit.SampleProjectConstants;
 
 /**
  * Tests that we are able to read a CSV file containing headers.
  */
-public class TestCSVReader extends EntityBaseTest {
+class TestCSVReader extends EntityBaseTest {
     @Test
-    public void readCSVFile() throws Exception {
-        String pathToFile = ProjectPaths.getPathToTestResources("Design.csv");
+    void readCSVFile() throws Exception {
+        String pathToFile = ProjectPaths.getPathToDefaultProjectFile(
+            DefaultProjectConstants.File.DESIGN_FILE
+        );
         CSVParser designFile = FileUtilities.readCSVFile(pathToFile);
 
         //Verification points
@@ -29,7 +31,7 @@ public class TestCSVReader extends EntityBaseTest {
         String testArtifactId = "D1";
         String testSummaryQuery = "warning";
         String testContentQuery = "RPIC";
-        int nTotalRecords = SampleProjectConstants.N_DESIGNS;
+        int nTotalRecords = DefaultProjectConstants.Entities.N_DESIGNS;
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();
@@ -47,7 +49,7 @@ public class TestCSVReader extends EntityBaseTest {
     }
 
     @Test
-    public void csvFileNotFound() {
+    void csvFileNotFound() {
         Exception exception = assertThrows(SafaError.class, () -> {
             FileUtilities.readCSVFile("/abc/123");
         });

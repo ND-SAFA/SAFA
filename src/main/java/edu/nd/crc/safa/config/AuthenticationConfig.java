@@ -4,19 +4,18 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 
-import edu.nd.crc.safa.server.authentication.AuthenticationFilter;
-import edu.nd.crc.safa.server.authentication.AuthorizationFilter;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.authentication.TokenService;
+import edu.nd.crc.safa.authentication.AuthenticationFilter;
+import edu.nd.crc.safa.authentication.AuthorizationFilter;
+import edu.nd.crc.safa.authentication.TokenService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
@@ -29,7 +28,6 @@ import org.springframework.web.cors.CorsConfiguration;
  * 3. Enabled app-wide authentication except for login and create account routes. TODO: Add forgot password route.
  */
 @Configuration
-@EnableWebSecurity
 public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     private final List<String> allowedOrigins = Arrays.asList(
@@ -42,7 +40,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     private final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
     @Resource
-    private SafaUserService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Resource
     private TokenService tokenService;
@@ -68,14 +66,20 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Endpoint Settings
             .authorizeRequests()
             .antMatchers(
-                AppRoutes.Accounts.loginLink,
-                AppRoutes.Accounts.createNewUser,
+                AppRoutes.Accounts.LOGIN,
+                AppRoutes.Accounts.CREATE_ACCOUNT,
                 "/websocket/**").permitAll()
+            // API Generation
+            .antMatchers(
+                "/swagger-ui/**", // Needed to get configu
+                "/v3/api-docs/**",
+                "/docs").permitAll()
+            // Close authentication settings
             .anyRequest().authenticated()
             // Authentication Filters
             .and()
             .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

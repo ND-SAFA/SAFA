@@ -1,26 +1,13 @@
 package unit.project.artifacts;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Hashtable;
+import java.util.Map;
 
-import java.util.List;
-import java.util.Optional;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.DeltaService;
-
-import org.javatuples.Pair;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import unit.ApplicationBaseTest;
 
 /**
  * Tests that the client is allowed to:
@@ -28,176 +15,40 @@ import unit.ApplicationBaseTest;
  * 2. Modify existing artifacts
  * 3. Delete existing artifacts
  */
-public class TestArtifactController extends ApplicationBaseTest {
+public class TestArtifactController extends ArtifactBaseTest<Artifact> {
 
-    @Autowired
-    DeltaService deltaService;
+    String artifactType = "requirements";
 
-    /**
-     * Verifies that an artifact can be created and updated through ArtifactController.
-     */
-    @Test
-    public void testModificationDetected() throws Exception {
-        String projectName = "test-project";
-        String artifactName = "RE-10";
-        String modifiedSummary = "this is a new summary";
-        String modifiedName = "RE-42";
 
-        // Step - Create a new artifact
-        Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
-        ProjectVersion projectVersion = response.getValue0();
-        Project project = projectVersion.getProject();
-        JSONObject artifactJson = response.getValue1();
-
-        // VP - Verify artifact exists
-        int numberOfArtifacts = this.artifactRepository.findByProject(project).size();
-        assertArtifactExists(projectVersion, artifactName);
-        assertThat(numberOfArtifacts).isEqualTo(1);
-
-        // Step - Modify artifact summary
-        artifactJson.put("name", modifiedName);
-        artifactJson.put("summary", modifiedSummary);
-
-        // VP - Commit modified artifact for saving
-        commit(CommitBuilder
-            .withVersion(projectVersion)
-            .withModifiedArtifact(artifactJson));
-
-        // Step - Retrieve ArtifactBodies
-        List<ArtifactVersion> artifactBodies = artifactVersionRepository.findByProjectVersionProject(project);
-
-        // VP - Verify one single artifact body
-        List<Artifact> artifactInProject = this.artifactRepository.findByProject(project);
-        numberOfArtifacts = artifactInProject.size();
-        assertThat(numberOfArtifacts).isEqualTo(1);
-        assertThat(artifactBodies.size()).isEqualTo(1);
-
-        // VP - Verify body contains modification
-        ArtifactVersion body = artifactBodies.get(0);
-        assertThat(body.getModificationType()).isEqualTo(ModificationType.ADDED);
-        assertThat(body.getSummary()).isEqualTo(modifiedSummary);
-    }
-
-    /**
-     * Verifies that an artifact can be created and updated through ArtifactController.
-     */
-    @Test
-    public void testDeleteArtifact() throws Exception {
-        String projectName = "test-project";
-        String artifactName = "RE-10";
-
-        // Step - Create artifact
-        Pair<ProjectVersion, JSONObject> response = createArtifact(projectName, artifactName);
-        ProjectVersion projectVersion = response.getValue0();
-
-        // VP - Verify that artifact exists
-        assertArtifactExists(projectVersion, artifactName);
-        verifyArtifactBodyStatus(projectVersion, artifactName);
-
-        // Step - Delete artifact
-        JSONObject artifactJson = response.getValue1();
-        commit(CommitBuilder
-            .withVersion(projectVersion)
-            .withRemovedArtifact(artifactJson));
-
-        // VP - Verify artifact does not exist
-        Optional<ArtifactVersion> artifactBody =
-            this.artifactVersionRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
-        assertThat(artifactBody.isPresent()).isTrue();
-        ModificationType modificationType = artifactBody.get().getModificationType();
-        assertThat(modificationType).isEqualTo(ModificationType.REMOVED);
-    }
-
-    @Test
-    public void testArtifactExists() throws Exception {
-        String projectName = "test-project";
-
-        String artifactName = "RE-10";
-        String artifactType = "requirement";
-        String artifactSummary = "This is an artifact summary";
-        String artifactBody = "This is an artifact body";
-
-        // Step - Create project and new version.
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
-        // VP - Verify that status is okay and artifact does not exist
-        String url = RouteBuilder
-            .withRoute(AppRoutes.Projects.checkIfArtifactExists)
-            .withVersion(projectVersion)
-            .withArtifactName(artifactName)
-            .get();
-
-        JSONObject response = sendGet(url, status().isOk());
-        boolean artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
-        assertThat(artifactExists).isFalse();
-
-        // Step - Create artifact
-        Artifact artifact = dbEntityBuilder
-            .newType(projectName, artifactType)
-            .newArtifactAndBody(projectName, artifactType, artifactName, artifactSummary, artifactBody)
-            .getArtifact(projectName, artifactName);
-
-        // VP - Verify that status is okay and artifact does not exist
-        response = sendGet(url, status().isOk());
-        artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
-        assertThat(artifactExists).isTrue();
-
-        // Step - Delete artifact
-        JSONObject artifactJson = this.jsonBuilder
-            .withProject(projectName, projectName, "")
-            .withArtifactAndReturn(
-                projectName,
-                artifact.getArtifactId().toString(),
-                artifactName,
-                artifactType,
-                artifactBody);
-        CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactJson);
-        commit(commitBuilder);
-
-        // VP - Verify that artifact no longer exists.
-        response = sendGet(url, status().isOk());
-        artifactExists = response.getJSONObject("body").getBoolean("artifactExists");
-        assertThat(artifactExists).isFalse();
-    }
-
-    private Pair<ProjectVersion, JSONObject> createArtifact(String projectName,
-                                                            String artifactName) throws Exception {
-        // Step - Create project with single version
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
-        // Step - Create Artifact JSON
-        JSONObject artifactJson = jsonBuilder
+    @Override
+    public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {
+        return jsonBuilder
             .withProject(projectName, projectName, "")
             .withArtifactAndReturn(projectName, "", artifactName, "requirements", "this is a body");
-
-        // Step - Send request to create artifact
-        commit(CommitBuilder
-            .withVersion(projectVersion)
-            .withAddedArtifact(artifactJson));
-        String artifactId =
-            this.artifactRepository
-                .findByProjectAndName(projectVersion.getProject(), artifactName)
-                .get()
-                .getArtifactId()
-                .toString();
-        artifactJson.put("id", artifactId);
-
-        return new Pair<>(projectVersion, artifactJson);
     }
 
-    private void assertArtifactExists(ProjectVersion projectVersion, String artifactName) {
-        Optional<Artifact> artifactQuery = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
-            artifactName);
-        assertThat(artifactQuery.isPresent()).isEqualTo(true);
+    @Override
+    public String getArtifactType() {
+        return artifactType;
     }
 
-    private void verifyArtifactBodyStatus(ProjectVersion projectVersion, String artifactName) {
-        Optional<ArtifactVersion> artifactBody =
-            this.artifactVersionRepository.findByProjectVersionAndArtifactName(projectVersion, artifactName);
-        assertThat(artifactBody.isPresent()).isEqualTo(true);
+    @Override
+    public DocumentType getDocumentType() {
+        return DocumentType.ARTIFACT_TREE;
+    }
+
+    @Override
+    public Map<String, Object> getJsonExpectedProperties() {
+        return new Hashtable<>();
+    }
+
+    @Override
+    public IProjectEntityRetriever<Artifact> getArtifactRepository() {
+        return artifactRepository;
+    }
+
+    @Override
+    public Class getArtifactClass() {
+        return Artifact.class;
     }
 }

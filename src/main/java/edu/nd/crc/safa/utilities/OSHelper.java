@@ -3,14 +3,17 @@ package edu.nd.crc.safa.utilities;
 import java.io.File;
 import java.io.IOException;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
 /**
  * Responsible for encapsulating common operating system
  * primarily surrounding file manipulation.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OSHelper {
 
     /**
@@ -25,10 +28,8 @@ public class OSHelper {
     public static void clearOrCreateDirectory(String pathToDir) throws SafaError {
         File myDir = new File(pathToDir);
 
-        if (!myDir.exists()) {
-            if (!myDir.mkdirs()) {
-                throw new SafaError(String.format("creating folder at path: %s", pathToDir));
-            }
+        if (!myDir.exists() && !myDir.mkdirs()) {
+            throw new SafaError(String.format("creating folder at path: %s", pathToDir));
         }
 
         try {

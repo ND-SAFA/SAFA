@@ -4,19 +4,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.warnings.Token;
-import edu.nd.crc.safa.warnings.TokenType;
-import edu.nd.crc.safa.warnings.Tokenizer;
+import edu.nd.crc.safa.features.rules.parser.Token;
+import edu.nd.crc.safa.features.rules.parser.TokenType;
+import edu.nd.crc.safa.features.rules.parser.Tokenizer;
 
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests that a rule definitions is correctly split into tokens.
  */
-public class TestTokenizer {
+class TestTokenizer {
 
     @Test
-    public void testLexicalParsing() {
+    void testLexicalParsing() {
         String functionName = "exactly-n";
         String query = String.format("%s(0, Requirement, child, Package)", functionName);
         List<Token> tokens = Tokenizer.lex(query);

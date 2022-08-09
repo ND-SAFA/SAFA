@@ -2,18 +2,21 @@ package unit.project.artifacts;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.db.Artifact;
-import edu.nd.crc.safa.server.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.server.entities.db.ModificationType;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.services.EntityVersionService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +26,14 @@ import unit.ApplicationBaseTest;
  * Verifies that:
  * 1. We are able to find the last inputted artifact body.
  */
-public class TestArtifactService extends ApplicationBaseTest {
+class TestArtifactService extends ApplicationBaseTest {
 
 
     @Autowired
     EntityVersionService entityVersionService;
 
     @Test
-    public void checkAbleToFindLastArtifactBody() {
+    void checkAbleToFindLastArtifactBody() {
         String artifactName = "RE-8";
         String artifactTypeName = "requirements";
         String summary = "this is a summary";
@@ -49,7 +52,7 @@ public class TestArtifactService extends ApplicationBaseTest {
         //VP - Able to find first created body
         Optional<ArtifactVersion> artifactBodyQuery = this.artifactVersionRepository.findLastArtifactBody(project, artifact);
 
-        assertThat(artifactBodyQuery.isPresent()).isTrue();
+        assertThat(artifactBodyQuery).isPresent();
         ArtifactVersion artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.ADDED);
         assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
@@ -70,16 +73,16 @@ public class TestArtifactService extends ApplicationBaseTest {
         //VP 2 - Find new modified body
         artifactBodyQuery = this.artifactVersionRepository.findLastArtifactBody(project, artifact);
 
-        assertThat(artifactBodyQuery.isPresent()).isTrue();
+        assertThat(artifactBodyQuery).isPresent();
         artifactVersionFound = artifactBodyQuery.get();
         assertThat(artifactVersionFound.getModificationType()).isEqualTo(ModificationType.REMOVED);
         assertThat(artifactVersionFound.getArtifact().getName()).isEqualTo(artifactName);
-        assertThat(artifactVersionFound.getContent()).isEqualTo("");
-        assertThat(artifactVersionFound.getSummary()).isEqualTo("");
+        assertThat(artifactVersionFound.getContent()).isEmpty();
+        assertThat(artifactVersionFound.getSummary()).isEmpty();
     }
 
     @Test
-    public void testNoBodyFound() {
+    void testNoBodyFound() {
         String artifactName = "RE-8";
         String artifactTypeName = "requirements";
         String projectName = "test-project";
@@ -91,11 +94,11 @@ public class TestArtifactService extends ApplicationBaseTest {
         Optional<ArtifactVersion> artifactBodyQuery = this.artifactVersionRepository
             .findLastArtifactBody(dbEntityBuilder.getProject(projectName),
                 dbEntityBuilder.getArtifact(projectName, artifactName));
-        assertThat(artifactBodyQuery.isPresent()).isFalse();
+        assertThat(artifactBodyQuery).isEmpty();
     }
 
     @Test
-    public void testNoChangeDetected() throws SafaError {
+    void testNoChangeDetected() throws SafaError {
         String projectName = "test-project";
         String artifactTypeName = "requirement";
         String artifactName = "RE-8";
@@ -112,19 +115,23 @@ public class TestArtifactService extends ApplicationBaseTest {
 
         // Step - Create new version + update artifact with same artifact (no change)
         ArtifactVersion artifactVersion = dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
-        ArtifactAppEntity artifactApp = new ArtifactAppEntity(artifactVersion);
+        ArtifactAppEntity artifactApp = this.artifactVersionRepository
+            .retrieveAppEntityFromVersionEntity(artifactVersion);
 
         // VP - Verify that no new entry has been created
         ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
 
-        entityVersionService.commitVersionArtifacts(newVersion, Arrays.asList(artifactApp));
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        entityVersionService.setProjectEntitiesAtVersion(newVersion,
+            Arrays.asList(artifactApp),
+            new ArrayList<>());
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
 
     @Test
-    public void artifactModificationDetected() throws SafaError {
+    void artifactModificationDetected() throws SafaError {
         String projectName = "test-project";
         String typeName = "requirements";
         String artifactName = "RE-8";
@@ -148,15 +155,17 @@ public class TestArtifactService extends ApplicationBaseTest {
             typeName,
             artifactName,
             artifactSummary,
-            newContent);
+            newContent,
+            DocumentType.ARTIFACT_TREE,
+            new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        this.entityVersionService.commitVersionArtifacts(projectVersion,
-            Arrays.asList(appEntity));
+        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        this.entityVersionService.setProjectEntitiesAtVersion(projectVersion, List.of(appEntity), new ArrayList<>());
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,
                 artifact);
-        assertThat(updatedBodyQuery.isPresent()).isTrue();
+        assertThat(updatedBodyQuery).isPresent();
         ArtifactVersion updatedBody = updatedBodyQuery.get();
         assertThat(updatedBody.getModificationType()).isEqualTo(ModificationType.MODIFIED);
         assertThat(updatedBody.getContent()).isEqualTo(newContent);

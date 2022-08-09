@@ -6,44 +6,50 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 
 import org.junit.jupiter.api.Test;
+import unit.DefaultProjectConstants;
 
-public class TestParsingErrors extends ParseBaseTest {
+class TestParsingErrors extends ParseBaseTest {
 
     @Test
-    public void errorForWrongColumnsInArtifactFile() throws Exception {
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.parseArtifactFile).withArtifactType("Designs").get();
+    void errorForWrongColumnsInArtifactFile() throws Exception {
+        String routeName = RouteBuilder
+            .withRoute(AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+            .withArtifactType("Designs")
+            .buildEndpoint();
         String fileName = "Design2Requirement.csv";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadArtifactFileAndGetError(routeName, fileName);
+        String c = uploadEntityFileAndGetError(routeName, fileName);
         assertThat(c).contains("id, summary, content");
     }
 
     @Test
-    public void errorForWrongColumnsInTraceFile() throws Exception {
-        String fileName = "Design.csv";
-
+    void errorForWrongColumnsInTraceFile() throws Exception {
         // VP - Verify error message informs that columns are wrong
-        String c = uploadTraceFileAndGetError(AppRoutes.Projects.parseTraceFile, fileName);
+        String c = uploadEntityFileAndGetError(AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE,
+            DefaultProjectConstants.File.DESIGN_FILE);
         assertThat(c).contains("source, target");
     }
 
     @Test
-    public void errorForWrongFileToArtifactParser() throws Exception {
-        String routeName = RouteBuilder.withRoute(AppRoutes.Projects.parseArtifactFile).withArtifactType("Designs").get();
+    void jsonFileHasMissingArtifactKey() throws Exception {
+        String routeName = RouteBuilder
+            .withRoute(AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+            .withArtifactType("Designs")
+            .buildEndpoint();
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadArtifactFileAndGetError(routeName, fileName);
-        assertThat(c).contains("Expected a CSV file");
+        String c = uploadEntityFileAndGetError(routeName, fileName);
+        assertThat(c).contains("key").contains("artifacts");
     }
 
     @Test
-    public void errorForWrongFileToTraceParser() throws Exception {
+    void jsonFileHasMissingTraceKey() throws Exception {
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadTraceFileAndGetError(AppRoutes.Projects.parseTraceFile, fileName);
-        assertThat(c).contains("Expected a CSV file");
+        String c = uploadEntityFileAndGetError(AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE, fileName);
+        assertThat(c).contains("key").contains("traces");
     }
 }

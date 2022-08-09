@@ -1,23 +1,25 @@
 package unit.project;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
 /**
  * Tests that projects defined in database are able to be retrieved by user.
  */
-public class TestProjectRetrieval extends ApplicationBaseTest {
+class TestProjectRetrieval extends ApplicationBaseTest {
     @Test
-    public void retrieveNoProjects() throws Exception {
-        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
-        assertThat(response.getJSONArray("body").length()).isEqualTo(0);
+    void retrieveNoProjects() throws Exception {
+        JSONArray response = SafaRequest
+            .withRoute(AppRoutes.Projects.GET_PROJECTS)
+            .getWithJsonArray();
+        assertThat(response.length()).isZero();
     }
 
     /**
@@ -26,7 +28,7 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void retrieveMultipleProjects() throws Exception {
+    void retrieveMultipleProjects() throws Exception {
         SafaUser otherUser = new SafaUser();
         otherUser.setEmail("doesNotExist@gmail.com");
         otherUser.setPassword("somePassword");
@@ -36,8 +38,8 @@ public class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("firstProject")
             .newProject("secondProject")
             .newProject("other project", otherUser);
-        JSONObject response = sendGet(AppRoutes.Projects.createOrUpdateProjects, status().isOk());
-        assertThat(response.getJSONArray("body").length()).isEqualTo(2);
+        JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
+        assertThat(response.length()).isEqualTo(2);
     }
 
 }

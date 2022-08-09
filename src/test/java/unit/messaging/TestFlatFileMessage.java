@@ -2,9 +2,11 @@ package unit.messaging;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.server.entities.app.VersionMessage;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.notifications.VersionMessage;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
@@ -12,9 +14,9 @@ import unit.ApplicationBaseTest;
 /**
  * Tests that uploading flat files incurs a single update message.
  */
-public class TestFlatFileMessage extends ApplicationBaseTest {
+class TestFlatFileMessage extends ApplicationBaseTest {
     @Test
-    public void singleMessageOnFlatFileUpload() throws Exception {
+    void singleMessageOnFlatFileUpload() throws Exception {
         String projectName = "test-project";
 
         // Step - Create project and version id
@@ -27,11 +29,11 @@ public class TestFlatFileMessage extends ApplicationBaseTest {
         createNewConnection(clientId).subscribeToVersion(clientId, projectVersion);
 
         // Step - Upload flat files
-        uploadFlatFilesToVersion(projectVersion, ProjectPaths.PATH_TO_BEFORE_FILES);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
 
         // VP - Verify that single message sent
         assertThat(getQueueSize(clientId)).isEqualTo(1);
-        String message = getNextMessage(clientId);
-        assertThat(message).isEqualTo(VersionMessage.VERSION.toString());
+        VersionMessage message = getNextMessage(clientId, VersionMessage.class);
+        assertThat(message.getType()).isEqualTo(VersionEntityTypes.VERSION);
     }
 }

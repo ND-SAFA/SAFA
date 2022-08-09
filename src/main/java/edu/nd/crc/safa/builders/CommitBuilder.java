@@ -1,10 +1,9 @@
 package edu.nd.crc.safa.builders;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.app.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +17,7 @@ public class CommitBuilder {
     private final ProjectCommit projectCommit;
 
     public CommitBuilder(ProjectVersion projectVersion) {
-        projectCommit = new ProjectCommit(projectVersion);
+        projectCommit = new ProjectCommit(projectVersion, true);
     }
 
     public static CommitBuilder withVersion(ProjectVersion projectVersion) {
@@ -42,11 +41,6 @@ public class CommitBuilder {
 
     public CommitBuilder withAddedTrace(JSONObject json) throws JsonProcessingException {
         this.projectCommit.getTraces().getAdded().add(asTraceAppEntity(json));
-        return this;
-    }
-
-    public CommitBuilder withModifiedTrace(TraceLinkVersion traceLinkVersion) {
-        this.withModifiedTrace(new TraceAppEntity(traceLinkVersion));
         return this;
     }
 

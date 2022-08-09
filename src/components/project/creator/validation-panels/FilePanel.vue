@@ -35,6 +35,7 @@
               v-if="showFileUploader"
               v-model="ignoreErrors"
               label="Ignore Errors"
+              data-cy="button-ignore-errors"
             />
           </v-col>
           <v-col v-if="!isValid && showFileUploader" style="text-align: end">

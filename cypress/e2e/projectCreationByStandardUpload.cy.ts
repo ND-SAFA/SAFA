@@ -44,7 +44,8 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
 
-        cy.clickButton("button-artifact-type");
+        cy.getCy("button-create-panel").should("not.be.disabled");
+        cy.clickButton("button-create-panel");
         cy.getCy("button-create-panel").should("be.disabled");
       });
 
@@ -97,6 +98,7 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("be.disabled");
       });
     });
+
     describe("I can preview the list of artifacts loaded from a file", () => {
       it("displays buttons for all of the artifacts in the file", () => {
         cy.setProjectInformationInStandardUpload(
@@ -155,7 +157,10 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.getCy("input-artifact-type").last().type("requirement");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.requirement);
+        cy.uploadFiles("input-files", SimpleProjectFilesMap.requirement2hazard);
+
+        cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.clickButton("button-ignore-errors");
       });
     });
   });

@@ -8,6 +8,7 @@ import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
@@ -154,8 +155,8 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
             }
         }
 
-        this.projectCommit.getArtifacts().getAdded().addAll(artifacts);
-        this.projectCommit.getTraces().getAdded().addAll(traces);
+        this.projectCommit.addArtifacts(ModificationType.ADDED, artifacts);
+        this.projectCommit.addTraces(ModificationType.ADDED, traces);
     }
 
     /**

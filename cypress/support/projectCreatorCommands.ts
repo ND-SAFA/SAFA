@@ -5,3 +5,5 @@ Cypress.Commands.add(
     cy.getCy("input-project-description").first().type(description);
   }
 );
+
+Cypress.Commands.add("selectForPossibleErros", (containsErros: boolean) => {}); //need to finish command

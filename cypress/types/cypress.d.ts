@@ -64,8 +64,8 @@ declare namespace Cypress {
      * @param description - Project description.
      */
     setProjectInformationInStandardUpload(
-      name: string,
-      description: string
+      name?: string,
+      description?: string
     ): Chainable<void>;
   }
 }

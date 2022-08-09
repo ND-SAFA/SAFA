@@ -1,4 +1,4 @@
-import files from "../fixtures/simpleProjectFiles.json";
+import files from "./simpleProjectFiles.json";
 
 export const SimpleProjectFilesMap = {
   tim: files[0],

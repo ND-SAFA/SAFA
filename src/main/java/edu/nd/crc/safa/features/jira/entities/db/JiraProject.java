@@ -39,12 +39,12 @@ public class JiraProject {
      */
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "safa_project_id", nullable = false, unique = true)
+    @JoinColumn(name = "safa_project_id", nullable = false)
     Project project;
     /**
      * ID of associated jira project
      */
-    @Column(name = "jira_project_id", nullable = false, unique = true)
+    @Column(name = "jira_project_id", nullable = false)
     Long jiraProjectId;
 
     public JiraProject(Project project, Long jiraProjectId) {

@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run linters
-        run: npm run lint
+        uses: icrawl/action-eslint@v1
   cypress-run:
     name: Cypress E2E Tests
     runs-on: ubuntu-latest

@@ -8,11 +8,13 @@
       :headers="headers"
       :items="items"
       :search="searchText"
+      :expanded="expanded"
       :item-class="getItemBackground"
       sort-by="name"
       show-group-by
       show-expand
       single-expand
+      fixed-header
       :items-per-page="50"
       @click:row="handleView($event)"
     >
@@ -30,13 +32,9 @@
       <template v-slot:[`item.name`]="{ item }">
         <div class="d-flex flex-row align-center">
           <artifact-table-delta-chip :artifact="item" />
-          <generic-icon-button
-            v-if="getHasWarnings(item)"
-            icon-id="mdi-hazard-lights"
-            tooltip="View warnings"
-            color="secondary"
-            @click="handleView(item)"
-          />
+          <v-icon v-if="getHasWarnings(item)" color="secondary">
+            mdi-hazard-lights
+          </v-icon>
           <span class="text-body-1 ml-1">{{ item.name }}</span>
         </div>
       </template>
@@ -121,6 +119,7 @@ export default Vue.extend({
     return {
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
+      expanded: [] as Artifact[],
     };
   },
   computed: {
@@ -152,11 +151,13 @@ export default Vue.extend({
           text: "Name",
           value: "name",
           width: "200px",
+          filterable: true,
         },
         {
           text: "Type",
           value: "type",
           width: "200px",
+          filterable: true,
         },
         ...documentModule.tableColumns.map((col) => ({
           text: col.name,
@@ -202,8 +203,10 @@ export default Vue.extend({
     handleView(artifact: Artifact) {
       if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
         artifactSelectionModule.clearSelections();
+        this.expanded = [];
       } else {
         artifactSelectionModule.selectArtifact(artifact.id);
+        this.expanded = [artifact];
       }
     },
     /**
@@ -258,8 +261,13 @@ export default Vue.extend({
 
 <style lang="scss">
 .v-data-table__expanded__content {
-  //box-shadow: none !important;
   box-shadow: inset 0px 2px 8px -5px rgba(50, 50, 50, 0.75),
     inset 0px -2px 8px -5px rgba(50, 50, 50, 0.75) !important;
+}
+
+.artifact-view {
+  tr {
+    cursor: pointer;
+  }
 }
 </style>

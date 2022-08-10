@@ -5,12 +5,13 @@
 
     <v-text-field
       label="Search Artifacts"
-      solo
-      rounded
+      outlined
       dense
       clearable
       append-icon="mdi-magnify"
       v-model="searchText"
+      @click:clear="searchText = ''"
+      hint="Search by artifact name or type"
     />
 
     <div class="full-width text-right text-subtitle-1 text--secondary">

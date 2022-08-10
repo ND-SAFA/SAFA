@@ -5,18 +5,21 @@
         v-on="on"
         v-bind="attrs"
         small
-        class="text-body-1 mr-1"
+        class="text-body-1"
         style="max-width: 200px"
       >
-        <span class="text-ellipsis">{{ text }}</span>
+        <v-icon small>{{ icon }}</v-icon>
+        <span class="text-ellipsis ml-1">{{ displayText }}</span>
       </v-chip>
     </template>
-    <span>{{ text }}</span>
+    <span>{{ displayText }}</span>
   </v-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { typeOptionsModule } from "@/store";
+import { getArtifactTypePrintName } from "@/util";
 
 /**
  * Renders a chip on an artifact table row.
@@ -25,6 +28,23 @@ export default Vue.extend({
   name: "ArtifactTableChip",
   props: {
     text: String,
+    displayIcon: Boolean,
+  },
+  computed: {
+    /**
+     * @return The icon to display on this chip.
+     */
+    icon(): string {
+      return this.displayIcon
+        ? typeOptionsModule.getArtifactTypeIcon(this.text)
+        : "";
+    },
+    /**
+     * @return The text to display on this chip.
+     */
+    displayText(): string {
+      return this.displayIcon ? getArtifactTypePrintName(this.text) : this.text;
+    },
   },
 });
 </script>

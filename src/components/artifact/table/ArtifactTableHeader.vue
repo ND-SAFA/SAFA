@@ -4,13 +4,13 @@
       <v-col>
         <v-text-field
           dense
-          rounded
           outlined
           clearable
-          label="Search"
+          label="Search Artifacts"
           style="max-width: 600px"
           v-model="searchText"
           hint="Search by artifact name or type"
+          append-icon="mdi-magnify"
         />
       </v-col>
       <v-col class="flex-grow-0">

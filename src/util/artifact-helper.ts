@@ -12,11 +12,11 @@ export function filterArtifacts(
   queryText: string
 ): boolean {
   const lowercaseQuery = queryText.toLowerCase();
-  const { name, type } = artifact;
+  const { name, type, body } = artifact;
 
   return (
     name.toLowerCase().includes(lowercaseQuery) ||
     type.toLowerCase().includes(lowercaseQuery) ||
-    type.toLowerCase().includes(lowercaseQuery)
+    body.toLowerCase().includes(lowercaseQuery)
   );
 }

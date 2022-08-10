@@ -155,4 +155,21 @@ export default class ArtifactModule extends VuexModule {
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});
   }
+
+  /**
+   * @return A collection of artifact lists, keyed by their type.
+   */
+  get getArtifactsByType(): Record<string, Artifact[]> {
+    const artifactsByType: Record<string, Artifact[]> = {};
+
+    this.artifacts.forEach((artifact) => {
+      if (!artifactsByType[artifact.type]) {
+        artifactsByType[artifact.type] = [];
+      }
+
+      artifactsByType[artifact.type].push(artifact);
+    });
+
+    return artifactsByType;
+  }
 }

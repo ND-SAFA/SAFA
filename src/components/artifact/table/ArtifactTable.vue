@@ -18,7 +18,7 @@
       </template>
 
       <template v-slot:[`item.type`]="{ item }">
-        <artifact-table-chip :text="item.type" />
+        <artifact-table-chip :text="item.type" display-icon />
       </template>
 
       <template v-slot:[`item.name`]="{ item }">

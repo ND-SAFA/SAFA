@@ -257,13 +257,15 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion The version whose app entities are retrieved.
      * @param appEntities    The set of all artifacts existing in given project version.
+     * @param asCompleteSet  Whether appEntities are complete set of artifacts at project version
      * @return List of pairs of VersionEntities or commit errors
      */
 
     @Override
     public List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
-        List<A> appEntities) {
+        List<A> appEntities,
+        boolean asCompleteSet) {
 
         List<String> processedAppEntities = new ArrayList<>();
         List<Pair<V, CommitError>> response = appEntities
@@ -275,15 +277,17 @@ public abstract class GenericVersionRepository<
                 }
             }).collect(Collectors.toList());
 
-        List<Pair<V, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
-                projectVersion.getProject())
-            .stream()
-            .filter(b -> !processedAppEntities.contains(b.getBaseEntityId()))
-            .map(b -> this.deleteVersionEntityByBaseEntityId(
-                projectVersion,
-                b.getBaseEntityId()))
-            .collect(Collectors.toList());
-        response.addAll(removedVersionEntities);
+        if (asCompleteSet) { // calculates deletes entities if this is complete set
+            List<Pair<V, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
+                    projectVersion.getProject())
+                .stream()
+                .filter(b -> !processedAppEntities.contains(b.getBaseEntityId()))
+                .map(b -> this.deleteVersionEntityByBaseEntityId(
+                    projectVersion,
+                    b.getBaseEntityId()))
+                .collect(Collectors.toList());
+            response.addAll(removedVersionEntities);
+        }
 
         return response;
     }

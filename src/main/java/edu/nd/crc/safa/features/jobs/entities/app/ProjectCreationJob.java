@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -25,6 +26,10 @@ public class ProjectCreationJob extends AbstractJob {
      * The service used for creating entities.
      */
     EntityVersionService entityVersionService;
+    /**
+     * Whether entities created should be treated as the complete set of entities
+     */
+    boolean asCompleteSet;
 
     public ProjectCreationJob(JobDbEntity jobDbEntity,
                               ServiceProvider serviceProvider,
@@ -32,18 +37,21 @@ public class ProjectCreationJob extends AbstractJob {
         super(jobDbEntity, serviceProvider);
         this.projectCommit = projectCommit;
         this.entityVersionService = serviceProvider.getEntityVersionService();
+        this.asCompleteSet = ProjectVariables.PROJECT_CREATION_AS_COMPLETE_SET;// TODO: Use flag from request
     }
 
     public void savingArtifacts() throws SafaError {
-        this.entityVersionService.setArtifactsAtVersionAndSaveErrors(
+        this.entityVersionService.addArtifactsAtVersionAndSaveErrors(
             projectCommit.getCommitVersion(),
-            projectCommit.getArtifacts().getAdded());
+            projectCommit.getArtifacts().getAdded(),
+            this.asCompleteSet);
     }
 
     public void savingTraces() throws SafaError {
         this.entityVersionService.setTracesAtVersionAndSaveErrors(
             projectCommit.getCommitVersion(),
-            projectCommit.getTraces().getAdded());
+            projectCommit.getTraces().getAdded(),
+            this.asCompleteSet);
     }
 
     public void generatingLayout() {

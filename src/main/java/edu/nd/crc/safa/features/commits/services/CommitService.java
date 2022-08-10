@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
@@ -65,7 +66,7 @@ public class CommitService {
         for (ArtifactAppEntity artifact : projectCommit.getArtifacts().getRemoved()) {
             List<TraceAppEntity> linksToArtifact = this.appEntityRetrievalService
                 .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
-            projectCommit.addRemovedTraces(linksToArtifact);
+            projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
         }
 
         // Commit artifact and trace changes.

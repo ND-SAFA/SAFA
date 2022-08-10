@@ -72,12 +72,14 @@ public interface IVersionRepository<
      *
      * @param projectVersion The project version whose changes are committed to.
      * @param appEntities    The app entities whose states are saved.
+     * @param asCompleteSet  Whether entities create entire set of entities in project.
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
     List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
-        List<A> appEntities) throws SafaError;
+        List<A> appEntities,
+        boolean asCompleteSet) throws SafaError;
 
     /**
      * Deletes entity version with given name and commits to given project version.

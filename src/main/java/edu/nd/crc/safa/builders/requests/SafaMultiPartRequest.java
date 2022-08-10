@@ -23,19 +23,30 @@ public abstract class SafaMultiPartRequest extends SafaRequest {
      *
      * @param files         The files attached to multipart request.
      * @param resultMatcher The expected status of the HTTP request.
+     * @param kwargs        Set of parameters added to request.
      * @return Response to HTTP request.
      * @throws Exception Throws exception if server fails to send HTTP request.
      */
     protected JSONObject sendRequestWithFiles(List<MockMultipartFile> files,
-                                              ResultMatcher resultMatcher
+                                              ResultMatcher resultMatcher,
+                                              JSONObject kwargs
     ) throws Exception {
         SafaRequest.assertTokenExists();
         MockMultipartHttpServletRequestBuilder request = this.buildMultiPartRequest();
 
+        // Step - Adding file to request
         for (MockMultipartFile file : files) {
             request.file(file);
         }
 
+        // Step - Adding external parameters to request
+        for (String key : kwargs.keySet()) {
+            byte[] content = kwargs.get(key).toString().getBytes();
+            MockMultipartFile jsonFile = new MockMultipartFile(key, "", "application/json", content);
+            request.file(jsonFile);
+        }
+
+        // Step - Send request
         return sendAuthenticatedRequest(
             request,
             resultMatcher,

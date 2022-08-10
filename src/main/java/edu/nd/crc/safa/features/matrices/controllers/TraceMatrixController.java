@@ -87,7 +87,7 @@ public class TraceMatrixController extends BaseController {
     public void createTraceMatrix(@PathVariable UUID projectId,
                                   @PathVariable String sourceArtifactTypeName,
                                   @PathVariable String targetArtifactTypeName) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         Optional<TraceMatrix> traceMatrixQuery = traceMatrixRepository.queryForMatrixInProject(project,
             sourceArtifactTypeName, targetArtifactTypeName);
         if (traceMatrixQuery.isPresent()) {

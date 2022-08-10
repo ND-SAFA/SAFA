@@ -8,15 +8,15 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +125,8 @@ class TestArtifactService extends ApplicationBaseTest {
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
         entityVersionService.setProjectEntitiesAtVersion(newVersion,
             Arrays.asList(artifactApp),
-            new ArrayList<>());
+            new ArrayList<>(),
+            true);
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies.size()).isEqualTo(1);
     }
@@ -161,7 +162,10 @@ class TestArtifactService extends ApplicationBaseTest {
 
         // VP - Verify that artifact body is detected to be modified
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        this.entityVersionService.setProjectEntitiesAtVersion(projectVersion, List.of(appEntity), new ArrayList<>());
+        this.entityVersionService.setProjectEntitiesAtVersion(projectVersion,
+            List.of(appEntity),
+            new ArrayList<>(),
+            true);
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,
                 artifact);

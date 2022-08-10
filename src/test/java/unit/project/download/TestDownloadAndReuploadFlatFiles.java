@@ -11,14 +11,15 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.entities.ProjectBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import unit.ApplicationBaseTest;
 
@@ -50,9 +51,9 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
-            .postWithFiles(projectFiles)
+            .postWithFiles(projectFiles, new JSONObject())
             .getJSONObject("projectVersion")
             .getString("versionId");
 

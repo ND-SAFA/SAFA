@@ -1,4 +1,4 @@
-from jobs.abstract.job_result import JobResult
+from jobs.common.job_result import JobResult
 from jobs.pretrain.abstract_pretrain_job import AbstractPreTrainJob
 
 

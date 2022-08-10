@@ -1,14 +1,14 @@
 from abc import abstractmethod
 from typing import Union
 
-from jobs.abstract.job_result import JobResult
-from jobs.fine_tune.model_fine_tune_args import ModelFineTuneArgs
+from jobs.common.job_result import JobResult
+from jobs.trace.trace_args import ModelTraceArgs
 from pretrain.electra.configure_pretraining import PretrainingConfig
 
 
 class AbstractJob:
 
-    def __init__(self, args: Union[ModelFineTuneArgs, PretrainingConfig]):
+    def __init__(self, args: Union[ModelTraceArgs, PretrainingConfig]):
         """
         Base job class
         :param args: job arguments

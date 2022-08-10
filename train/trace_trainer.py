@@ -8,31 +8,26 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
-from data.trace_dataset_creator import TraceDatasetCreator
-from jobs.fine_tune.model_fine_tune_args import ModelFineTuneArgs
-from models.model_generator import ModelGenerator
+from jobs.trace.trace_args import ModelTraceArgs
 from train.metrics.supported_metrics import get_metric_path
 
 
-class ModelTrainer(Trainer):
+class TraceTrainer(Trainer):
     """
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: ModelFineTuneArgs, model_generator: ModelGenerator,
-                 dataset_creator: TraceDatasetCreator):
+    def __init__(self, args: ModelTraceArgs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
-        :param model_generator: the ModelGenerator
-        :param dataset_creator: the TraceDatasetCreator
         """
-        model = model_generator.get_model()
-        tokenizer = model_generator.get_tokenizer()
         self.args = args
-        self.model_generator = model_generator
+        self.model_generator = args.model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
-        self.dataset = dataset_creator
+        self.trace_dataset_creator = args.trace_dataset_creator
+        model = self.model_generator.get_model()
+        tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer)
 
     # TODO
@@ -42,7 +37,7 @@ class ModelTrainer(Trainer):
         :param checkpoint: path to checkpoint
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.dataset.get_training_dataset(self.args.resample_rate)
+        self.train_dataset = self.trace_dataset_creator.get_training_dataset(self.args.resample_rate)
         output = self.train(resume_from_checkpoint=checkpoint)
         self.save_model()
         return dict(output)
@@ -53,7 +48,7 @@ class ModelTrainer(Trainer):
         Performs the prediction and (optionally) evaluation for the model
         :return: a dictionary containing the results
         """
-        self.eval_dataset = self.dataset.get_validation_dataset(self.args.dataset_size)
+        self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.dataset_size)
         output = self.predict(self.eval_dataset)
         if self.args.metrics:
             output.metrics = self._eval(output, self.args.metrics)

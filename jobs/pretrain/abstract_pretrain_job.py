@@ -1,7 +1,7 @@
 from abc import ABC
 
-from jobs.abstract.abstract_job import AbstractJob
-from jobs.pretrain.model_pretrain_args import ModelPretrainArgs
+from jobs.common.abstract_job import AbstractJob
+from jobs.pretrain.pretrain_args import ModelPretrainArgs
 from pretrain.pretrainer import PreTrainer
 
 

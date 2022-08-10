@@ -1,4 +1,4 @@
-package unit.utilities;
+package features.utilities;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,8 +12,8 @@ import edu.nd.crc.safa.utilities.FileUtilities;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
-import unit.DefaultProjectConstants;
-import unit.EntityBaseTest;
+import features.base.DefaultProjectConstants;
+import features.base.EntityBaseTest;
 
 /**
  * Tests that we are able to read a CSV file containing headers.

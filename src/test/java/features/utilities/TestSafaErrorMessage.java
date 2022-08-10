@@ -1,4 +1,4 @@
-package unit.utilities;
+package features.utilities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import unit.ApplicationBaseTest;
+import features.base.ApplicationBaseTest;
 
 /**
  * Tests that server errors include a

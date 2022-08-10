@@ -1,4 +1,4 @@
-package unit.utilities;
+package features.utilities;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.utilities.OSHelper;
 
 import org.junit.jupiter.api.Test;
-import unit.ApplicationBaseTest;
+import features.base.ApplicationBaseTest;
 
 /**
  * Test that user is able to create new directory and upload files.

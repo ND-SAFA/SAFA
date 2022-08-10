@@ -93,8 +93,9 @@ public class EntityVersionService {
      * Calculates the changes in each trace from the previous versions and stores
      * changes at given ProjectVersion.
      *
-     * @param projectVersion The ProjectVersion associated with calculated artifact changes.
-     * @param traces         List of artifact's in a project whose version will be stored.
+     * @param projectVersion   The ProjectVersion associated with calculated artifact changes.
+     * @param traces           List of artifact's in a project whose version will be stored.
+     * @param setAsCompleteSet Whether given traces should be treated as entire set of traces in version.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
     public void setTracesAtVersionAndSaveErrors(ProjectVersion projectVersion,

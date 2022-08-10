@@ -18,12 +18,12 @@
       {{ searchHint }}
     </div>
 
-    <v-list class="search-container full-width">
+    <v-list class="search-container full-width" expand>
       <v-list-group
         v-for="type in artifactTypes"
         :key="type"
         :prepend-icon="getIconName(type)"
-        value="true"
+        :value="!!searchText"
       >
         <template v-slot:activator>
           <v-list-item-title>

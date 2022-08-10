@@ -16,7 +16,8 @@ export async function handleUploadProjectVersion(
   projectId: string,
   versionId: string,
   selectedFiles: File[],
-  setVersionIfSuccessful: boolean
+  setVersionIfSuccessful: boolean,
+  isCompleteSet = false
 ): Promise<void> {
   if (selectedFiles.length === 0) {
     logModule.onWarning("Please add at least one file to upload.");
@@ -26,6 +27,8 @@ export async function handleUploadProjectVersion(
     selectedFiles.forEach((file: File) => {
       formData.append("files", file);
     });
+
+    formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
 
     if (setVersionIfSuccessful) {
       handleSelectVersion(projectId, versionId).catch((e) =>

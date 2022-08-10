@@ -1,15 +1,24 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row align="center">
+      <v-col cols="1">
+        <generic-icon-button
+          fab
+          color="primary"
+          icon-id="mdi-plus"
+          tooltip="Create Artifact"
+          @click="handleCreate"
+        />
+      </v-col>
       <v-col>
         <v-text-field
           dense
           outlined
           clearable
+          hide-details
           label="Search Artifacts"
           style="max-width: 600px"
           v-model="searchText"
-          hint="Search by artifact name or type"
           append-icon="mdi-magnify"
         />
       </v-col>
@@ -40,9 +49,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactDeltaState } from "@/types";
+import { ArtifactDeltaState, DocumentType } from "@/types";
 import { deltaTypeOptions } from "@/util";
-import { deltaModule } from "@/store";
+import { appModule, deltaModule } from "@/store";
+import { GenericIconButton } from "@/components/common";
 import TableColumnEditor from "./TableColumnEditor.vue";
 
 /**
@@ -55,6 +65,7 @@ export default Vue.extend({
   name: "ArtifactTableHeader",
   components: {
     TableColumnEditor,
+    GenericIconButton,
   },
   data() {
     return {
@@ -83,6 +94,17 @@ export default Vue.extend({
      */
     selectedDeltaTypes(items: ArtifactDeltaState[]) {
       this.$emit("filter", items);
+    },
+  },
+  methods: {
+    /**
+     * Opens the create artifact window.
+     */
+    handleCreate() {
+      appModule.openArtifactCreatorTo({
+        isNewArtifact: true,
+        type: DocumentType.FMEA,
+      });
     },
   },
 });

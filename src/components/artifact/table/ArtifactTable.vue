@@ -64,30 +64,13 @@
           {{ item.body }}
         </td>
       </template>
-
-      <template v-slot:footer>
-        <v-row justify="end" class="mr-2 mt-1">
-          <generic-icon-button
-            fab
-            color="primary"
-            icon-id="mdi-plus"
-            tooltip="Create"
-            @click="handleCreate"
-          />
-        </v-row>
-      </template>
     </v-data-table>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  ArtifactDeltaState,
-  DocumentType,
-  FlatArtifact,
-} from "@/types";
+import { Artifact, ArtifactDeltaState, FlatArtifact } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -225,15 +208,6 @@ export default Vue.extend({
      */
     handleDelete(artifact: Artifact) {
       handleDeleteArtifact(artifact, {});
-    },
-    /**
-     * Opens the create artifact window.
-     */
-    handleCreate() {
-      appModule.openArtifactCreatorTo({
-        isNewArtifact: true,
-        type: DocumentType.FMEA,
-      });
     },
     /**
      * Returns the background class name of an artifact row.

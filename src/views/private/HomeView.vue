@@ -1,21 +1,33 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <h1 class="text-h3 text-center my-10">Welcome to SAFA!</h1>
+      <typography
+        el="h1"
+        y="10"
+        align="center"
+        variant="large"
+        value="Welcome to SAFA!"
+      />
       <v-row>
         <v-col cols="6">
           <v-card outlined>
             <v-card-title>
-              <v-icon style="font-size: 40px" :color="iconColor">
+              <v-icon large :color="iconColor">
                 mdi-folder-plus-outline
               </v-icon>
-              <h2 class="text-h5 ml-1">Create New Project</h2>
+              <typography
+                el="h2"
+                l="2"
+                variant="subtitle"
+                value="Create New Project"
+              />
             </v-card-title>
             <v-card-subtitle>
               <v-divider class="mb-2" />
-              <p class="text-subtitle-2">
-                Chose which data source you would like to create a project from.
-              </p>
+              <typography
+                variant="small"
+                value="Chose which data source you would like to create a project from."
+              />
             </v-card-subtitle>
             <v-card-text>
               <div class="mx-auto width-min">
@@ -42,16 +54,20 @@
         <v-col cols="6">
           <v-card outlined>
             <v-card-title>
-              <v-icon style="font-size: 40px" :color="iconColor">
-                mdi-view-list
-              </v-icon>
-              <h2 class="text-h5 ml-1">Load Existing Project</h2>
+              <v-icon large :color="iconColor"> mdi-view-list </v-icon>
+              <typography
+                el="h2"
+                l="2"
+                variant="subtitle"
+                value="Load Existing Project"
+              />
             </v-card-title>
             <v-card-subtitle>
               <v-divider class="mb-2" />
-              <p class="text-subtitle-2">
-                Select an existing project and version to load.
-              </p>
+              <typography
+                variant="small"
+                value="Select an existing project and version to load."
+              />
             </v-card-subtitle>
             <v-card-text>
               <project-version-list />
@@ -66,9 +82,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { CreatorTypes } from "@/types";
-import { PrivatePage, ProjectVersionList } from "@/components";
 import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
+import { PrivatePage, ProjectVersionList, Typography } from "@/components";
 
 /**
  * Displays the home page.
@@ -78,6 +94,7 @@ export default Vue.extend({
   components: {
     PrivatePage,
     ProjectVersionList,
+    Typography,
   },
   data() {
     return {

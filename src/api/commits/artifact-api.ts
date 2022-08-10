@@ -13,8 +13,8 @@ export async function getDoesArtifactExist(
   artifactName: string
 ): Promise<boolean> {
   const res = await authHttpClient<ArtifactNameValidationResponse>(
-    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId, artifactName }),
-    { method: "GET" }
+    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
+    { method: "POST", body: JSON.stringify({ artifactName }) }
   );
 
   return res.artifactExists;

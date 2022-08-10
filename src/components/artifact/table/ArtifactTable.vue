@@ -1,6 +1,7 @@
 <template>
   <v-container
     v-if="isTableView"
+    style="height: 100%"
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
@@ -9,6 +10,11 @@
       :search="searchText"
       :item-class="getItemBackground"
       sort-by="name"
+      show-group-by
+      show-expand
+      single-expand
+      :items-per-page="50"
+      @click:row="handleView($event)"
     >
       <template v-slot:top>
         <artifact-table-header
@@ -44,11 +50,6 @@
 
       <template v-slot:[`item.actions`]="{ item }">
         <generic-icon-button
-          icon-id="mdi-view-split-vertical"
-          :tooltip="`View '${item.name}'`"
-          @click="handleView(item)"
-        />
-        <generic-icon-button
           icon-id="mdi-pencil"
           :tooltip="`Edit '${item.name}'`"
           @click="handleEdit(item)"
@@ -58,6 +59,12 @@
           :tooltip="`Delete '${item.name}'`"
           @click="handleDelete(item)"
         />
+      </template>
+
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" class="text-body-1">
+          {{ item.body }}
+        </td>
       </template>
 
       <template v-slot:footer>
@@ -160,6 +167,11 @@ export default Vue.extend({
           text: "Actions",
           value: "actions",
           width: "150px",
+          groupable: false,
+        },
+        {
+          value: "data-table-expand",
+          groupable: false,
         },
       ];
     },
@@ -243,3 +255,11 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.v-data-table__expanded__content {
+  //box-shadow: none !important;
+  box-shadow: inset 0px 2px 8px -5px rgba(50, 50, 50, 0.75),
+    inset 0px -2px 8px -5px rgba(50, 50, 50, 0.75) !important;
+}
+</style>

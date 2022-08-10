@@ -1,5 +1,5 @@
 <template>
-  <v-form style="min-width: 300px">
+  <v-form style="min-width: 200px; width: 30vw">
     <v-autocomplete
       outlined
       dense

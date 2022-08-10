@@ -33,7 +33,7 @@ export enum Endpoint {
 
   // Commits
   commit = "projects/versions/:versionId/commit",
-  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/:artifactName",
+  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/",
 
   // Types
   getProjectArtifactTypes = "projects/:projectId/artifactTypes",

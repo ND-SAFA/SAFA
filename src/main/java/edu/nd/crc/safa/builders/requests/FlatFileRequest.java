@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.builders.MultipartRequestService;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.json.JSONObject;
@@ -33,11 +34,13 @@ public class FlatFileRequest extends SafaMultiPartRequest {
     public static JSONObject updateProjectVersionFromFlatFiles(
         ProjectVersion projectVersion,
         String pathToFileDir) throws Exception {
+        JSONObject kwargs = new JSONObject();
+        kwargs.put(ProjectVariables.AS_COMPLETE_SET, true);
         return SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(pathToFileDir);
+            .postWithFilesInDirectory(pathToFileDir, kwargs);
     }
 
     /**
@@ -48,24 +51,25 @@ public class FlatFileRequest extends SafaMultiPartRequest {
     public JSONObject postWithFile(String pathToFile) throws Exception {
         String attributeName = "file";
         MockMultipartFile file = MultipartRequestService.readAsMockMultipartFile(pathToFile, attributeName);
-        return sendRequestWithFiles(List.of(file), status().is2xxSuccessful());
+        return sendRequestWithFiles(List.of(file), status().is2xxSuccessful(), new JSONObject());
     }
 
-    public JSONObject postWithFiles(List<File> files) throws Exception {
+    public JSONObject postWithFiles(List<File> files, JSONObject kwargs) throws Exception {
         List<MockMultipartFile> mockMultipartFiles = MultipartRequestService.convertToMockMultipartFiles(files,
             "files");
-        return this.sendRequestWithFiles(mockMultipartFiles, status().is2xxSuccessful());
+        return this.sendRequestWithFiles(mockMultipartFiles, status().is2xxSuccessful(), kwargs);
     }
 
     /**
      * Attaches files in directory to request and sends it.
      *
      * @param pathToFileDir Path to directory containing files attached to request.
+     * @param kwargs        Variables parameters added to request.
      * @return Response to HTTP request.
      * @throws Exception Throws exception if error occurred during reading files or sending request.
      */
-    public JSONObject postWithFilesInDirectory(String pathToFileDir) throws Exception {
-        return postWithFilesInDirectory(pathToFileDir, status().is2xxSuccessful());
+    public JSONObject postWithFilesInDirectory(String pathToFileDir, JSONObject kwargs) throws Exception {
+        return postWithFilesInDirectory(pathToFileDir, status().is2xxSuccessful(), kwargs);
     }
 
     /**
@@ -73,17 +77,19 @@ public class FlatFileRequest extends SafaMultiPartRequest {
      *
      * @param pathToFileDir Path to directory containing files attached to request.
      * @param resultMatcher Expected status of request.
+     * @param kwargs        Parameters added to request
      * @return Response to HTTP request.
      * @throws Exception Throws exception if error occurred during reading files or sending request.
      */
     public JSONObject postWithFilesInDirectory(String pathToFileDir,
-                                               ResultMatcher resultMatcher) throws Exception {
+                                               ResultMatcher resultMatcher,
+                                               JSONObject kwargs) throws Exception {
         SafaRequest.assertTokenExists();
 
         String attributeName = "files";
 
         List<MockMultipartFile> files =
             MultipartRequestService.readDirectoryAsMockMultipartFiles(pathToFileDir, attributeName);
-        return sendRequestWithFiles(files, resultMatcher);
+        return sendRequestWithFiles(files, resultMatcher, kwargs);
     }
 }

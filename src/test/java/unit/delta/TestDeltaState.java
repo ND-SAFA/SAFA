@@ -1,14 +1,15 @@
 package unit.delta;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -32,11 +33,11 @@ class TestDeltaState extends BaseDeltaTest {
 
         // VP - Verify that # of entities in before version
         List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
-        assertThat(originalBodies.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+        assertThat(originalBodies).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that # of entities in after version coincides with # of changes.
         List<ArtifactVersion> changedBodies = this.artifactVersionRepository.findByProjectVersion(afterVersion);
-        assertThat(changedBodies.size()).isEqualTo(Constants.N_CHANGES);
+        assertThat(changedBodies).hasSize(Constants.N_CHANGES);
 
         // Step - Calculate delta between versions
         JSONObject projectDelta = SafaRequest

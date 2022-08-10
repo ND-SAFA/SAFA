@@ -53,14 +53,16 @@ public class EntityVersionService {
      * @param projectVersion The version to store the entities to.
      * @param artifacts      The artifacts to store to version.
      * @param traces         The traces to store to version.
+     * @param asCompleteSet  Whether traces should be set
      * @throws SafaError Throws error is a problem occurs while saving artifacts or traces.
      */
     @Transactional
     public void setProjectEntitiesAtVersion(ProjectVersion projectVersion,
                                             @NotNull List<ArtifactAppEntity> artifacts,
-                                            @NotNull List<TraceAppEntity> traces) throws SafaError {
-        this.setArtifactsAtVersionAndSaveErrors(projectVersion, artifacts);
-        this.setTracesAtVersionAndSaveErrors(projectVersion, traces);
+                                            @NotNull List<TraceAppEntity> traces,
+                                            boolean asCompleteSet) throws SafaError {
+        this.addArtifactsAtVersionAndSaveErrors(projectVersion, artifacts, asCompleteSet);
+        this.setTracesAtVersionAndSaveErrors(projectVersion, traces, asCompleteSet);
         appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
@@ -70,12 +72,14 @@ public class EntityVersionService {
      *
      * @param projectVersion   The ProjectVersion associated with calculated artifact changes.
      * @param projectArtifacts List of artifact's in a project whose version will be stored.
+     * @param setAsCompleteSet Whether given entities should be created as complete set of artifacts at version.
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
-    public void setArtifactsAtVersionAndSaveErrors(ProjectVersion projectVersion,
-                                                   List<ArtifactAppEntity> projectArtifacts) throws SafaError {
+    public void addArtifactsAtVersionAndSaveErrors(ProjectVersion projectVersion,
+                                                   List<ArtifactAppEntity> projectArtifacts,
+                                                   boolean setAsCompleteSet) throws SafaError {
         List<Pair<ArtifactVersion, CommitError>> commitResponse = this.artifactVersionRepository
-            .commitAllAppEntitiesToProjectVersion(projectVersion, projectArtifacts);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, projectArtifacts, setAsCompleteSet);
         for (Pair<ArtifactVersion, CommitError> commitPayload : commitResponse) {
             CommitError commitError = commitPayload.getValue1();
             if (commitError != null) {
@@ -94,9 +98,10 @@ public class EntityVersionService {
      * @throws SafaError Throws error if any database related errors arise during saving the new artifacts/
      */
     public void setTracesAtVersionAndSaveErrors(ProjectVersion projectVersion,
-                                                List<TraceAppEntity> traces) throws SafaError {
+                                                List<TraceAppEntity> traces,
+                                                boolean setAsCompleteSet) throws SafaError {
         List<Pair<TraceLinkVersion, CommitError>> commitResponse = this.traceLinkVersionRepository
-            .commitAllAppEntitiesToProjectVersion(projectVersion, traces);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, traces, setAsCompleteSet);
 
         for (Pair<TraceLinkVersion, CommitError> payload : commitResponse) {
             CommitError commitError = payload.getValue1();

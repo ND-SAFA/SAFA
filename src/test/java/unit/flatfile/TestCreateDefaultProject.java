@@ -17,12 +17,11 @@ class TestCreateDefaultProject extends BaseFlatFileTest {
 
     @Test
     void testUseCase() throws Exception {
-
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT, new JSONObject());
 
         // VP - Verify response contains entities
         Project project = verifyDefaultProjectCreationResponse(responseBody);

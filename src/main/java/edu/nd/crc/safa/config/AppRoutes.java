@@ -108,7 +108,7 @@ public class AppRoutes {
             public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = PROJECT_PREFIX
                 + "/versions/{versionId}/flat-files";
             public static final String DOWNLOAD_FLAT_FILES = UPDATE_PROJECT_VERSION_FROM_FLAT_FILES + "/{fileType}";
-            public static final String CREATE_PROJECT_FROM_FLAT_FILES = PROJECT_PREFIX + "/flat-files";
+            public static final String CREATE_NEW_PROJECT_FROM_FLAT_FILES = PROJECT_PREFIX + "/flat-files";
             public static final String PARSE_ARTIFACT_FILE = PROJECT_PREFIX + "/parse/artifacts/{artifactType}";
             public static final String PARSE_TRACE_FILE = PROJECT_PREFIX + "/parse/traces";
 

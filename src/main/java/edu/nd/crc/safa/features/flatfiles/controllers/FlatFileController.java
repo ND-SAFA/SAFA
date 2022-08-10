@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,25 +63,31 @@ public class FlatFileController extends BaseController {
     /**
      * Uploads and parses given flat files to the specified version.
      *
-     * @param versionId - The id of the version that will be modified by given files.
-     * @param files     - The flat files containing tim.json, artifact files, and trace link files.
+     * @param versionId     The id of the version that will be modified by given files.
+     * @param files         The flat files containing tim.json, artifact files, and trace link files.
+     * @param asCompleteSet Whether entities in flat files are complete set of entities in version.
      * @return ServerResponse whose body contains all entities in project created.
-     * @throws SafaError - If no files are given.
+     * @throws SafaError Throws errors if no files are given.
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
-        @RequestParam MultipartFile[] files) throws SafaError, IOException {
+        @RequestParam("files") MultipartFile[] files,
+        @RequestPart(value = ProjectVariables.AS_COMPLETE_SET, required = false) Boolean asCompleteSet) throws SafaError, IOException {
         if (files.length == 0) {
             throw new SafaError("Could not create project because no files were received.");
+        }
+        if (asCompleteSet == null) {
+            asCompleteSet = false;
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
         ProjectAppEntity projectCreated = this.flatFileService.createProjectFromFlatFiles(
             project,
             projectVersion,
-            files);
+            files,
+            asCompleteSet);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
         return projectCreated;
     }
@@ -91,7 +99,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.CREATE_PROJECT_FROM_FLAT_FILES)
+    @PostMapping(value = AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files)
         throws SafaError, IOException {
@@ -103,7 +111,8 @@ public class FlatFileController extends BaseController {
         ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
         ProjectAppEntity projectAppEntity = this.flatFileService.createProjectFromFlatFiles(project,
             projectVersion,
-            files);
+            files,
+            true);
         this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
         return projectAppEntity;
     }

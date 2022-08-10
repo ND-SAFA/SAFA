@@ -60,16 +60,18 @@ public class FlatFileService {
      * @param project        The project whose artifacts and trace links should be associated with
      * @param projectVersion The version that the artifacts and errors will be associated with.
      * @param files          the flat files defining the project
+     * @param asCompleteSet  Whether entities in flat files are complete set of entities in project version.
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
     public ProjectAppEntity createProjectFromFlatFiles(Project project,
                                                        ProjectVersion projectVersion,
-                                                       MultipartFile[] files)
+                                                       MultipartFile[] files,
+                                                       boolean asCompleteSet)
         throws SafaError, IOException {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         JSONObject timFileContent = getTimFileContent(project);
-        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent);
+        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent, asCompleteSet);
         return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
@@ -78,12 +80,14 @@ public class FlatFileService {
      * Note, this route expects all files to be stored in local storage
      * before processing.
      *
-     * @param projectVersion the project version to be associated with the files specified.
+     * @param projectVersion The project version to be associated with the files specified.
      * @param timFileJson    JSON definition of project extracted from tim.json file.
+     * @param asCompleteSet  Whether to save entities in flat files as entire set of entities in project.
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
-                                                JSONObject timFileJson) throws SafaError {
+                                                JSONObject timFileJson,
+                                                boolean asCompleteSet) throws SafaError {
         try {
             // Step - Parse artifacts, traces, and trace generation requests
             Pair<ProjectCommit, List<TraceGenerationRequest>> parseTIMResponse = parseTIMIntoCommit(
@@ -108,7 +112,8 @@ public class FlatFileService {
             this.entityVersionService.setProjectEntitiesAtVersion(
                 projectVersion,
                 projectCommit.getArtifacts().getAdded(), // not other modifications on flat file upload
-                projectCommit.getTraces().getAdded());
+                projectCommit.getTraces().getAdded(),
+                asCompleteSet);
             this.commitErrorRepository.saveAll(projectCommit.getErrors());
         } catch (IOException | JSONException e) {
             throw new SafaError("An error occurred while parsing TIM file.", e);

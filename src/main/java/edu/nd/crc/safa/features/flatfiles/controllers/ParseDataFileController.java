@@ -10,6 +10,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -20,6 +21,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.FileParser;
+import edu.nd.crc.safa.features.flatfiles.entities.app.ArtifactNameCheck;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -31,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,16 +103,17 @@ public class ParseDataFileController extends BaseController {
     /**
      * Returns flag `artifactExists` indicating whether artifact exists in the project.
      *
-     * @param versionId    The version id to check if the given artifact name is already in it.
-     * @param artifactName The name / identifier of the artifact.
+     * @param versionId         The version id to check if the given artifact name is already in it.
+     * @param artifactNameCheck Object containing artifact name to check.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
     @GetMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
-                                                  @PathVariable String artifactName) throws SafaError {
+                                                  @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         Optional<Artifact> artifactQuery =
-            this.artifactRepository.findByProjectAndName(projectVersion.getProject(), artifactName);
+            this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
+                artifactNameCheck.getArtifactName());
         boolean artifactExists = false;
         if (artifactQuery.isPresent()) {
             String artifactId = artifactQuery.get().getArtifactId().toString();
@@ -122,7 +126,7 @@ public class ParseDataFileController extends BaseController {
             }
         }
         Map<String, Boolean> response = new HashMap<>();
-        response.put("artifactExists", artifactExists);
+        response.put(ProjectVariables.ARTIFACT_EXISTS, artifactExists);
         return response;
     }
 

@@ -46,16 +46,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class ParseDataFileController extends BaseController {
 
-    private final ProjectRetriever artifactRepository;
-    private final ArtifactVersionRepository artifactVersionRepository;
+    private final CheckArtifactNameService checkArtifactNameService;
 
     @Autowired
     public ParseDataFileController(ResourceBuilder resourceBuilder,
-                                   ProjectRetriever artifactRepository,
-                                   ArtifactVersionRepository artifactVersionRepository) {
+                                   CheckArtifactNameService checkArtifactNameService) {
         super(resourceBuilder);
-        this.artifactRepository = artifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
+        this.checkArtifactNameService = checkArtifactNameService;
     }
 
     /**
@@ -110,20 +107,7 @@ public class ParseDataFileController extends BaseController {
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
                                                   @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        Optional<Artifact> artifactQuery =
-            this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
-                artifactNameCheck.getArtifactName());
-        boolean artifactExists = false;
-        if (artifactQuery.isPresent()) {
-            String artifactId = artifactQuery.get().getArtifactId().toString();
-            Optional<ArtifactVersion> artifactVersionQuery =
-                this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(
-                    projectVersion,
-                    artifactId);
-            if (artifactVersionQuery.isPresent()) {
-                artifactExists = !artifactVersionQuery.get().getModificationType().equals(ModificationType.REMOVED);
-            }
-        }
+        boolean artifactExists = checkArtifactNameService.doesArtifactExist(projectVersion, artifactNameCheck);
         Map<String, Boolean> response = new HashMap<>();
         response.put(ProjectVariables.ARTIFACT_EXISTS, artifactExists);
         return response;

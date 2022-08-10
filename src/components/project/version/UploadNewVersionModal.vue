@@ -17,6 +17,11 @@
           v-if="selectedVersion !== undefined"
           v-model="selectedFiles"
         />
+        <v-switch
+          v-model="replaceAllArtifacts"
+          label="Replace all artifacts"
+          class="ml-1"
+        />
       </v-stepper-content>
     </template>
   </project-version-stepper-modal>
@@ -55,6 +60,7 @@ export default Vue.extend({
       selectedFiles: [] as File[],
       isLoading: false,
       setAsNewVersion: true,
+      replaceAllArtifacts: false,
     };
   },
   watch: {
@@ -110,7 +116,8 @@ export default Vue.extend({
         this.selectedProject.projectId,
         this.selectedVersion.versionId,
         this.selectedFiles,
-        this.setAsNewVersion
+        this.setAsNewVersion,
+        this.replaceAllArtifacts
       )
         .then(() => this.handleClose())
         .finally(() => (this.isLoading = false));

@@ -22,9 +22,9 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     style: {
       width: "2px",
       "curve-style": "bezier",
-      "line-color": ThemeColors.primary,
+      "line-color": ThemeColors.black,
       "source-arrow-shape": "chevron",
-      "source-arrow-color": ThemeColors.primary,
+      "source-arrow-color": ThemeColors.black,
       "arrow-scale": 2,
     },
   },

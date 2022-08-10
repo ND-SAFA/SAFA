@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row class="my-4">
+    <v-row class="my-1">
       <v-col cols="6">
         <generic-artifact-body-display
           :artifact="sourceArtifact"

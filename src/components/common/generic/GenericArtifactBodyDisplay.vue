@@ -36,7 +36,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      isExpanded: false,
+      isExpanded: this.displayDivider && this.artifact.body.length < 500,
     };
   },
   computed: {

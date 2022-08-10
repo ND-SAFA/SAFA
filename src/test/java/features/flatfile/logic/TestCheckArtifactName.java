@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.base.ApplicationBaseTest;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 class TestCheckArtifactName extends ApplicationBaseTest {
@@ -50,13 +51,10 @@ class TestCheckArtifactName extends ApplicationBaseTest {
         assertThat(doesArtifactExists(v2, artifactName)).isTrue();
 
         // Step - Delete artifact
-        ArtifactVersion artifactVersion = this.dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setId(artifactVersion.getArtifact().getArtifactId().toString());
-        artifactAppEntity.setName(artifactVersion.getName());
+        JSONObject artifactJson = getArtifactJson(artifactName, 0);
         CommitBuilder deleteCommit = CommitBuilder
             .withVersion(v2)
-            .withRemovedArtifact(JsonFileUtilities.toJson(artifactAppEntity));
+            .withRemovedArtifact(artifactJson);
         commit(deleteCommit);
 
         // VP - Verify that
@@ -70,5 +68,13 @@ class TestCheckArtifactName extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .postWithJsonObject(new ArtifactNameCheck(artifactName))
             .getBoolean(ProjectVariables.ARTIFACT_EXISTS);
+    }
+
+    private JSONObject getArtifactJson(String artifactName, int versionIndex) {
+        ArtifactVersion artifactVersion = this.dbEntityBuilder.getArtifactBody(projectName, artifactName, versionIndex);
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
+        artifactAppEntity.setId(artifactVersion.getArtifact().getArtifactId().toString());
+        artifactAppEntity.setName(artifactVersion.getName());
+        return JsonFileUtilities.toJson(artifactAppEntity);
     }
 }

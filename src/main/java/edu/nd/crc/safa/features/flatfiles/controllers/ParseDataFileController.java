@@ -1,10 +1,8 @@
 package edu.nd.crc.safa.features.flatfiles.controllers;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
@@ -12,25 +10,20 @@ import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.common.BaseController;
-import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.FileParser;
 import edu.nd.crc.safa.features.flatfiles.entities.app.ArtifactNameCheck;
+import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,7 +96,7 @@ public class ParseDataFileController extends BaseController {
      * @param artifactNameCheck Object containing artifact name to check.
      * @return `artifactExists` flag indicating presence of artifact in project.
      */
-    @GetMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
+    @PostMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
                                                   @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();

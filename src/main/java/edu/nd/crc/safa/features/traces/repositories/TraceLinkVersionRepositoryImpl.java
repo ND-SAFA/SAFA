@@ -5,10 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.matrices.services.TraceMatrixService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
@@ -32,7 +32,7 @@ public class TraceLinkVersionRepositoryImpl
     @Autowired
     TraceLinkRepository traceLinkRepository;
     @Autowired
-    ProjectRetriever artifactRepository;
+    ArtifactRepository artifactRepository;
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
     @Autowired

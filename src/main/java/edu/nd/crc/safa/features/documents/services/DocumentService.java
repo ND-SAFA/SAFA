@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -16,7 +17,6 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepositor
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class DocumentService {
 
-    private final ProjectRetriever artifactRepository;
+    private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
     private final NotificationService notificationService;

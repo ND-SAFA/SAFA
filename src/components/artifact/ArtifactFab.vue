@@ -1,6 +1,5 @@
 <template>
   <v-speed-dial
-    v-if="isVisible"
     fixed
     bottom
     right
@@ -25,6 +24,7 @@
       </v-btn>
     </template>
     <generic-icon-button
+      v-if="isVisible"
       fab
       small
       :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
@@ -59,7 +59,7 @@ import { disableDrawMode, enableDrawMode } from "@/cytoscape";
  * Displays the artifact tree action buttons.
  */
 export default Vue.extend({
-  name: "ArtifactTreeFab",
+  name: "ArtifactFab",
   components: {
     GenericIconButton,
   },

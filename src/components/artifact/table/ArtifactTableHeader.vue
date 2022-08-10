@@ -1,15 +1,6 @@
 <template>
   <v-container>
     <v-row align="center">
-      <v-col cols="1">
-        <generic-icon-button
-          fab
-          color="primary"
-          icon-id="mdi-plus"
-          tooltip="Create Artifact"
-          @click="handleCreate"
-        />
-      </v-col>
       <v-col>
         <v-text-field
           dense
@@ -29,6 +20,7 @@
               outlined
               multiple
               dense
+              hide-details
               v-if="inDeltaView"
               label="Delta Types"
               v-model="selectedDeltaTypes"
@@ -52,7 +44,6 @@ import Vue from "vue";
 import { ArtifactDeltaState, DocumentType } from "@/types";
 import { deltaTypeOptions } from "@/util";
 import { appModule, deltaModule } from "@/store";
-import { GenericIconButton } from "@/components/common";
 import TableColumnEditor from "./TableColumnEditor.vue";
 
 /**
@@ -65,7 +56,6 @@ export default Vue.extend({
   name: "ArtifactTableHeader",
   components: {
     TableColumnEditor,
-    GenericIconButton,
   },
   data() {
     return {

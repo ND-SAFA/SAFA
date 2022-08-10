@@ -3,7 +3,7 @@
     <template v-slot:page>
       <artifact-table />
       <artifact-tree />
-      <artifact-tree-fab />
+      <artifact-fab />
 
       <artifact-creator-modal
         :is-open="isArtifactCreatorOpen"
@@ -26,7 +26,7 @@ import {
   ArtifactTable,
   PrivatePage,
   ArtifactCreatorModal,
-  ArtifactTreeFab,
+  ArtifactFab,
   TraceLinkCreatorModal,
 } from "@/components";
 
@@ -37,7 +37,7 @@ export default Vue.extend({
   name: "ArtifactView",
   components: {
     TraceLinkCreatorModal,
-    ArtifactTreeFab,
+    ArtifactFab,
     ArtifactTable,
     PrivatePage,
     ArtifactTree,

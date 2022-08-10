@@ -64,7 +64,6 @@ public class ParseDataFileController extends BaseController {
      * @param artifactType The name of the artifact type associated with artifacts.
      * @param file         The file defining a list of artifacts containing columns id, summary, and content.
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
-     * @throws IOException Throws error if file was unable to be read otherwise errors are returned as parsing errors.
      */
     @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
     @ResponseStatus(HttpStatus.OK)
@@ -72,7 +71,7 @@ public class ParseDataFileController extends BaseController {
                                                                             @RequestParam MultipartFile file) {
         EntityParsingResult<ArtifactAppEntity, String> response = new EntityParsingResult<>();
         tryParseFile(response, () -> {
-            AbstractArtifactFile<? extends Object> artifactFile =
+            AbstractArtifactFile<?> artifactFile =
                 DataFileBuilder.createArtifactFileParser(artifactType,
                     DocumentType.ARTIFACT_TREE,
                     file);

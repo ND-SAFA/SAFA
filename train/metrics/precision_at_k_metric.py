@@ -1,12 +1,12 @@
-from train.metrics.lmmetric import LMMetric
+from train.metrics.trace_metric import TraceMetric
 from constants import K_METRIC_DEFAULT
 
 
-class MAPatK(LMMetric):
+class PrecisionAtKMetric(TraceMetric):
 
     @property
     def name(self) -> str:
-        return "map_at_k"
+        return "precision_at_k"
 
     # TODO
     def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:

@@ -1,7 +1,7 @@
-from train.metrics.lmmetric import LMMetric
+from train.metrics.trace_metric import TraceMetric
 
 
-class MRR(LMMetric):
+class MRRMetric(TraceMetric):
 
     @property
     def name(self) -> str:

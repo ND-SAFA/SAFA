@@ -6,7 +6,7 @@ import os
 from constants import PROJ_PATH
 
 
-class LMMetric(Metric, ABC):
+class TraceMetric(Metric, ABC):
 
     @property
     @abstractmethod

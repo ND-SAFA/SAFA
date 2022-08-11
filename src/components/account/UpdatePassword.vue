@@ -1,0 +1,72 @@
+<template>
+  <div style="max-width: 300px">
+    <typography variant="subtitle" el="h2" value="Password" y="2" />
+    <password-field
+      label="Current Password"
+      v-model="oldPassword"
+      :errors="passwordErrors"
+    />
+    <password-field label="New Password" v-model="newPassword" />
+    <v-btn
+      :disabled="!oldPassword || !newPassword"
+      outlined
+      @click="handleEditPassword"
+    >
+      Update Password
+    </v-btn>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import { PasswordField, Typography } from "@/components";
+import { handleChangePassword } from "@/api";
+
+/**
+ * Allows for password updating.
+ */
+export default Vue.extend({
+  name: "MyAccountView",
+  components: {
+    Typography,
+    PasswordField,
+  },
+  data() {
+    return {
+      oldPassword: "",
+      newPassword: "",
+      passwordError: false,
+    };
+  },
+  computed: {
+    /**
+     * @return The current password errors.
+     */
+    passwordErrors(): string[] {
+      return this.passwordError ? ["Incorrect password"] : [];
+    },
+  },
+  methods: {
+    /**
+     * Handles an password edit.
+     */
+    handleEditPassword(): void {
+      this.passwordError = false;
+
+      handleChangePassword(
+        {
+          oldPassword: this.oldPassword,
+          newPassword: this.newPassword,
+        },
+        {
+          onSuccess: () => {
+            this.oldPassword = "";
+            this.newPassword = "";
+          },
+          onError: () => (this.passwordError = true),
+        }
+      );
+    },
+  },
+});
+</script>

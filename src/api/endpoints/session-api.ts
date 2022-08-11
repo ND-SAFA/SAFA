@@ -1,8 +1,9 @@
 import {
   SessionModel,
-  UserChangeModel,
+  PasswordResetModel,
   UserModel,
   UserResetModel,
+  PasswordChangeModel,
 } from "@/types";
 import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
@@ -68,14 +69,44 @@ export async function createPasswordReset(user: UserResetModel): Promise<void> {
 }
 
 /**
- * Requests to change a user's password.
+ * Requests to update a user's reset password.
  *
- * @param user - The user to change the password.
+ * @param password - The password change information.
  * @throws The password change request was unsuccessful.
  */
-export async function updatePassword(user: UserChangeModel): Promise<void> {
-  await authHttpClient<SessionModel>(fillEndpoint(Endpoint.resetPassword), {
+export async function updatePassword(
+  password: PasswordResetModel
+): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.resetPassword), {
     method: "PUT",
-    body: JSON.stringify(user),
+    body: JSON.stringify(password),
+  });
+}
+
+/**
+ * Requests to change a user's password.
+ *
+ * @param password - The password change information.
+ * @throws The password change request was unsuccessful.
+ */
+export async function savePassword(
+  password: PasswordChangeModel
+): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.updatePassword), {
+    method: "PUT",
+    body: JSON.stringify(password),
+  });
+}
+
+/**
+ * Requests to delete a user's account.
+ *
+ * @param password - The current password.
+ * @throws The delete request was unsuccessful.
+ */
+export async function deleteAccount(password: string): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.deleteAccount), {
+    method: "POST",
+    body: JSON.stringify({ password }),
   });
 }

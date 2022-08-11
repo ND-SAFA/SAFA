@@ -16,6 +16,7 @@ export enum Endpoint {
   resetPassword = "accounts/reset",
 
   // Jobs
+  createProjectJob = "jobs/projects",
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",

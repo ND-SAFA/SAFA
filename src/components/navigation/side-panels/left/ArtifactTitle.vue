@@ -1,5 +1,5 @@
 <template>
-  <div class="my-2">
+  <div class="mt-2">
     <v-row justify="end" class="mr-1 mb-1">
       <generic-icon-button
         tooltip="View Artifact Body"
@@ -21,13 +21,14 @@
     </v-row>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <h1
+        <typography
+          ellipsis
           v-on="on"
           v-bind="attrs"
-          class="text-h5 text-ellipsis artifact-title"
-        >
-          {{ selectedArtifactName }}
-        </h1>
+          variant="subtitle"
+          el="h1"
+          :value="selectedArtifactName"
+        />
       </template>
       {{ selectedArtifactName }}
     </v-tooltip>
@@ -40,6 +41,7 @@ import { PanelType } from "@/types";
 import { appModule, artifactSelectionModule } from "@/store";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -47,6 +49,7 @@ import { GenericIconButton } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
+    Typography,
     GenericIconButton,
   },
   computed: {

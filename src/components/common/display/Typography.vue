@@ -1,5 +1,20 @@
 <template>
-  <span v-if="el === 'span'" :class="className">
+  <div v-if="isExpandable" style="width: 100%">
+    <div v-if="isExpanded" :class="className" style="white-space: normal">
+      {{ value }}
+    </div>
+    <div
+      v-else
+      :class="className + ' text-ellipsis'"
+      style="white-space: nowrap; width: inherit"
+    >
+      {{ value }}
+    </div>
+    <v-btn text small @click.stop="isExpanded = !isExpanded">
+      {{ isExpanded ? "See Less" : "See More" }}
+    </v-btn>
+  </div>
+  <span v-else-if="el === 'span'" :class="className">
     {{ value }}
   </span>
   <p v-else-if="el === 'p'" :class="className">
@@ -22,7 +37,14 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 
-type TextType = "large" | "title" | "subtitle" | "body" | "small" | "caption";
+type TextType =
+  | "large"
+  | "title"
+  | "subtitle"
+  | "body"
+  | "small"
+  | "caption"
+  | "expandable";
 
 type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
 
@@ -37,8 +59,10 @@ export default Vue.extend({
   name: "Typography",
   props: {
     value: String,
-    class: String,
+    classes: String,
     error: Boolean,
+    defaultExpanded: Boolean,
+    ellipsis: Boolean,
     variant: {
       type: String as PropType<TextType>,
       default: "body",
@@ -68,15 +92,27 @@ export default Vue.extend({
       default: "",
     },
   },
+  data() {
+    return {
+      isExpanded: this.defaultExpanded && this.value.length < 500,
+    };
+  },
   computed: {
+    /**
+     * @return Whether this text is expandable.
+     */
+    isExpandable(): boolean {
+      return this.variant === "expandable";
+    },
     /**
      * @return The class name based on the text type.
      */
     className(): string {
       let classNames = ` text-${this.align}`;
 
-      if (this.class) classNames += ` ${this.class}`;
+      if (this.classes) classNames += ` ${this.classes}`;
       if (this.error) classNames += ` error--text`;
+      if (this.ellipsis) classNames += ` text-ellipsis`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;

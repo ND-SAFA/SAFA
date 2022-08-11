@@ -4,7 +4,7 @@
       <typography el="h1" variant="title" :value="title" />
       <section-controls @open:all="openAll" @close:all="closeAll" />
     </div>
-    <v-divider />
+    <v-divider class="mb-2" />
     <v-expansion-panels multiple v-model="openLinks">
       <trace-link-expansion-panel
         v-for="link in links"

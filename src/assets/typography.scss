@@ -10,3 +10,8 @@ $body-font-family: "Source Sans Pro";
   }
   font-family: $body-font-family, sans-serif !important;
 }
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

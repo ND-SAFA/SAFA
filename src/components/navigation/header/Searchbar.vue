@@ -1,5 +1,5 @@
 <template>
-  <v-form style="min-width: 300px">
+  <v-form style="min-width: 200px; width: 30vw">
     <v-autocomplete
       outlined
       dense
@@ -39,7 +39,7 @@ import {
   viewportModule,
 } from "@/store";
 import { GenericArtifactBodyDisplay } from "@/components/common";
-import { filterArtifacts } from "@/util";
+import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 
 /**
  * Artifact search bar.
@@ -88,7 +88,10 @@ export default Vue.extend({
      */
     artifacts(): ArtifactSearchItem[] {
       return Object.entries(artifactModule.getArtifactsByType)
-        .map(([type, artifacts]) => [{ header: type }, ...artifacts])
+        .map(([type, artifacts]) => [
+          { header: getArtifactTypePrintName(type) },
+          ...artifacts,
+        ])
         .reduce((acc, cur) => [...acc, ...cur], []);
     },
     value: {

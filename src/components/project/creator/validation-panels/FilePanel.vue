@@ -1,96 +1,72 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <v-row dense align="center" justify="start">
-        <v-col class="flex-grow-0">
-          <v-icon :color="iconColor">{{ iconName }}</v-icon>
-        </v-col>
-        <v-col>
-          <slot name="title" />
-        </v-col>
-      </v-row>
+      <div class="d-flex align-center">
+        <v-icon class="mr-1" :color="iconColor">{{ iconName }}</v-icon>
+        <slot name="title" />
+      </div>
     </v-expansion-panel-header>
     <v-expansion-panel-content>
-      <v-container>
-        <v-row>
-          <v-container>
-            <v-row class="full-width">
-              <slot name="before-rows" />
-            </v-row>
-            <v-row>
-              <v-divider />
-            </v-row>
-          </v-container>
-        </v-row>
+      <slot name="before-rows" />
 
-        <v-row v-if="showFileUploader">
-          <generic-file-selector :multiple="false" @input="emitChangeFiles" />
-        </v-row>
+      <generic-file-selector
+        v-if="showFileUploader"
+        :multiple="false"
+        @input="emitChangeFiles"
+      />
 
-        <v-row justify="space-between" align="center" dense>
-          <v-col>
-            <generic-switch
-              v-if="showFileUploader"
-              v-model="ignoreErrors"
-              label="Ignore Errors"
+      <div class="d-flex justify-space-between align-center">
+        <generic-switch
+          v-if="showFileUploader"
+          v-model="ignoreErrors"
+          label="Ignore Errors"
+        />
+        <typography v-if="!isValid && showFileUploader" error :value="error" />
+      </div>
+
+      <v-expansion-panels accordion>
+        <v-expansion-panel v-if="entityNames.length !== 0">
+          <v-expansion-panel-header>
+            <typography variant="subtitle" value="Entities" />
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-btn
+              outlined
+              color="primary"
+              class="ma-1"
+              v-for="entityName in entityNames"
+              :key="entityName"
+              @click="underDevelopmentError()"
+            >
+              {{ entityName }}
+            </v-btn>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel v-if="errors.length > 0">
+          <v-expansion-panel-header disable-icon-rotate>
+            <typography
+              variant="subtitle"
+              :value="errors.length === 0 ? 'No Errors' : 'Errors'"
             />
-          </v-col>
-          <v-col v-if="!isValid && showFileUploader" style="text-align: end">
-            {{ error }}
-          </v-col>
-        </v-row>
+            <template v-slot:actions>
+              <v-icon color="error">mdi-alert-circle</v-icon>
+            </template>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <typography
+              v-for="(error, i) in errors"
+              :key="i"
+              error
+              :value="error"
+            />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
-        <v-row justify="center">
-          <v-expansion-panels accordion>
-            <v-expansion-panel v-if="entityNames.length !== 0">
-              <v-expansion-panel-header>
-                <span class="text-h6">Entities</span>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-row>
-                  <v-btn
-                    outlined
-                    color="primary"
-                    class="ma-1"
-                    v-for="entityName in entityNames"
-                    :key="entityName"
-                    @click="underDevelopmentError()"
-                  >
-                    {{ entityName }}
-                  </v-btn>
-                </v-row>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel v-if="errors.length > 0">
-              <v-expansion-panel-header disable-icon-rotate>
-                <span class="text-h6">
-                  {{ errors.length === 0 ? "No Errors" : "Errors" }}
-                </span>
-                <template v-slot:actions>
-                  <v-icon color="error">mdi-alert-circle</v-icon>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p
-                  v-for="(error, i) in errors"
-                  :key="i"
-                  class="error--text my-0"
-                >
-                  {{ error }}
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-row>
-
-        <v-row v-if="showFileUploader">
-          <v-divider />
-        </v-row>
-
-        <v-row class="mt-5" justify="end">
-          <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
-        </v-row>
-      </v-container>
+      <div class="d-flex justify-space-between mt-4">
+        <v-spacer />
+        <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
+      </div>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
@@ -98,7 +74,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { logModule } from "@/store";
-import { GenericSwitch, GenericFileSelector } from "@/components/common";
+import {
+  GenericSwitch,
+  GenericFileSelector,
+  Typography,
+} from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
@@ -113,6 +93,7 @@ const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 export default Vue.extend({
   name: "FilePanel",
   components: {
+    Typography,
     GenericSwitch,
     GenericFileSelector,
   },

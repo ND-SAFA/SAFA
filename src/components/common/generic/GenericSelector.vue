@@ -18,27 +18,25 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <v-row class="ma-1" v-if="!minimal">
-        <v-col cols="11" class="ma-0 pa-0">
-          <v-text-field
-            v-model="search"
-            label="Search"
-            rounded
-            solo
-            dense
-            prepend-inner-icon="mdi-magnify"
-          />
-        </v-col>
-        <v-col cols="1" class="ma-0 pa-0">
-          <v-row justify="center" class="ma-0 pa-0">
-            <generic-icon-button
-              tooltip="Refresh"
-              icon-id="mdi-refresh"
-              @click="$emit('refresh')"
-            />
-          </v-row>
-        </v-col>
-      </v-row>
+      <div
+        v-if="!minimal"
+        class="d-flex justify-space-between align-center my-2"
+      >
+        <v-text-field
+          v-model="search"
+          label="Search"
+          outlined
+          dense
+          hide-details
+          class="mr-1"
+          prepend-inner-icon="mdi-magnify"
+        />
+        <generic-icon-button
+          tooltip="Refresh"
+          icon-id="mdi-refresh"
+          @click="$emit('refresh')"
+        />
+      </div>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <generic-icon-button
@@ -54,16 +52,17 @@
         @click="$emit('item:delete', item)"
       />
     </template>
-    <template v-slot:footer>
-      <v-row justify="end" class="mr-2 mt-1" v-if="!minimal">
+    <template v-slot:[`footer.prepend`]>
+      <div class="py-3">
         <generic-icon-button
+          v-if="!minimal"
           fab
           color="primary"
           icon-id="mdi-plus"
           tooltip="Create"
           @click="$emit('item:add')"
         />
-      </v-row>
+      </div>
     </template>
   </v-data-table>
 </template>

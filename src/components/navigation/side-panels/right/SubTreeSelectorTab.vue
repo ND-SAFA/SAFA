@@ -18,12 +18,12 @@
       {{ searchHint }}
     </div>
 
-    <v-list class="search-container full-width">
+    <v-list class="search-container full-width" expand>
       <v-list-group
         v-for="type in artifactTypes"
         :key="type"
         :prepend-icon="getIconName(type)"
-        value="true"
+        :value="!!searchText"
       >
         <template v-slot:activator>
           <v-list-item-title>
@@ -70,7 +70,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Artifact } from "@/types";
-import { getArtifactTypePrintName } from "@/util";
+import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
 
 /**
@@ -125,14 +125,11 @@ export default Vue.extend({
      */
     updateArtifacts(): void {
       const artifacts = artifactModule.artifacts;
-      const lowercaseSearch = this.searchText.toLowerCase();
       const hashTable: Record<string, Artifact[]> = {};
 
-      this.artifacts = lowercaseSearch
-        ? artifacts.filter(
-            ({ name, body }) =>
-              name.toLowerCase().includes(lowercaseSearch) ||
-              body.toLowerCase().includes(lowercaseSearch)
+      this.artifacts = this.searchText
+        ? artifacts.filter((artifact) =>
+            filterArtifacts(artifact, this.searchText)
           )
         : artifacts;
 

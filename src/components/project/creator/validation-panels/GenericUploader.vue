@@ -2,7 +2,7 @@
   <v-container>
     <validated-panels
       :itemName="itemName"
-      :showError="projectFiles.length === 0"
+      :showError="showError"
       :isValidStates="isValidStates"
       :isButtonDisabled="isCreatorOpen"
       :defaultValidState="defaultValidState"
@@ -85,6 +85,12 @@ export default Vue.extend({
     openPanelIndexes: [] as number[],
   }),
   computed: {
+    /**
+     * @return Whether to show errors.
+     */
+    showError(): boolean {
+      return this.defaultValidState ? false : this.projectFiles.length === 0;
+    },
     /**
      * @return Whether all panels are valid.
      */

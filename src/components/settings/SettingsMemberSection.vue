@@ -1,44 +1,42 @@
 <template>
-  <v-row>
-    <v-col>
-      <h2 class="text-h5">Members</h2>
-      <v-divider />
-      <generic-selector
-        :headers="headers"
-        :items="members"
-        :is-open="true"
-        :has-delete="isAdmin"
-        :has-edit="isAdmin"
-        :has-select="false"
-        :is-loading="isLoading"
-        item-key="email"
-        @item:add="handleAddMember"
-        @item:edit="handleEditMember"
-        @item:delete="handleDeleteMember"
-        @refresh="handleRetrieveMembers"
-        class="mt-5"
-      >
-        <template v-slot:addItemDialogue>
-          <settings-member-information-modal
-            :is-open="isNewOpen"
-            :project="project"
-            @cancel="isNewOpen = false"
-            @confirm="handleConfirmAdd"
-          />
-        </template>
-        <template v-slot:editItemDialogue>
-          <settings-member-information-modal
-            :is-open="isEditOpen"
-            :clear-on-close="false"
-            :project="project"
-            :member="memberToEdit"
-            @cancel="isEditOpen = false"
-            @confirm="handleConfirmEdit"
-          />
-        </template>
-      </generic-selector>
-    </v-col>
-  </v-row>
+  <v-container>
+    <typography el="h1" variant="subtitle" value="Members" />
+    <v-divider />
+    <generic-selector
+      :headers="headers"
+      :items="members"
+      :is-open="true"
+      :has-delete="isAdmin"
+      :has-edit="isAdmin"
+      :has-select="false"
+      :is-loading="isLoading"
+      item-key="email"
+      @item:add="handleAddMember"
+      @item:edit="handleEditMember"
+      @item:delete="handleDeleteMember"
+      @refresh="handleRetrieveMembers"
+      class="mt-5"
+    >
+      <template v-slot:addItemDialogue>
+        <settings-member-information-modal
+          :is-open="isNewOpen"
+          :project="project"
+          @cancel="isNewOpen = false"
+          @confirm="handleConfirmAdd"
+        />
+      </template>
+      <template v-slot:editItemDialogue>
+        <settings-member-information-modal
+          :is-open="isEditOpen"
+          :clear-on-close="false"
+          :project="project"
+          :member="memberToEdit"
+          @cancel="isEditOpen = false"
+          @confirm="handleConfirmEdit"
+        />
+      </template>
+    </generic-selector>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -46,7 +44,7 @@ import Vue, { PropType } from "vue";
 import { Project, ProjectMembership, ProjectRole } from "@/types";
 import { sessionModule } from "@/store";
 import { getProjectMembers, handleDeleteMember } from "@/api";
-import { GenericSelector } from "@/components/common/generic";
+import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**
@@ -54,7 +52,7 @@ import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue
  */
 export default Vue.extend({
   name: "SettingsMemberSection",
-  components: { GenericSelector, SettingsMemberInformationModal },
+  components: { GenericSelector, SettingsMemberInformationModal, Typography },
   props: {
     project: {
       type: Object as PropType<Project>,

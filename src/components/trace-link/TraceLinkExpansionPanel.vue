@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      {{ headerName }}
+      <typography variant="subtitle" :value="headerName" />
     </v-expansion-panel-header>
     <v-expansion-panel-content>
       <trace-link-display
@@ -20,6 +20,7 @@
 import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays trace links on a panel.
@@ -29,7 +30,7 @@ import TraceLinkDisplay from "./TraceLinkDisplay.vue";
  */
 export default Vue.extend({
   name: "TraceLinkExpansionPanel",
-  components: { TraceLinkDisplay },
+  components: { Typography, TraceLinkDisplay },
   props: {
     link: {
       type: Object as PropType<TraceLink>,

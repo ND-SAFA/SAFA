@@ -4,8 +4,10 @@
       <v-row justify="center">
         <v-col align-self="center">
           <safa-icon />
-          Sorry, an error has occurred. Please refresh your browser and try
-          again.
+          <typography
+            value="Sorry, an error has occurred. Please refresh your browser and try
+            again."
+          />
         </v-col>
       </v-row>
     </template>
@@ -14,7 +16,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PrivatePage, SafaIcon } from "@/components";
+import { PrivatePage, SafaIcon, Typography } from "@/components";
 
 /**
  * The default page displayed if an unknown error is encountered.
@@ -22,6 +24,7 @@ import { PrivatePage, SafaIcon } from "@/components";
 export default Vue.extend({
   name: "ErrorPageView",
   components: {
+    Typography,
     SafaIcon,
     PrivatePage,
   },

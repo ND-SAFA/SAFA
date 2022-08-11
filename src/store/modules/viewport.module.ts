@@ -1,5 +1,5 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
+import type { CytoCore, LayoutPayload, IGraphLayout } from "@/types";
 import {
   appModule,
   artifactModule,

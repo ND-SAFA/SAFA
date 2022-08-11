@@ -1,10 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <v-btn text @click="handleGoBack">
-        <v-icon left> mdi-arrow-left </v-icon>
-        Back To Tree View
-      </v-btn>
+      <back-button text="Back To Tree View" />
       <approval-section
         show-approve
         show-decline
@@ -36,14 +33,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { TraceApproval, TraceLink, ProjectVersion, EmptyLambda } from "@/types";
-import { navigateBack } from "@/router";
 import { projectModule } from "@/store";
 import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
-import { ApprovalSection, PrivatePage } from "@/components";
+import { ApprovalSection, PrivatePage, BackButton } from "@/components";
 
 export default Vue.extend({
   name: "ApproveLinksView",
-  components: { PrivatePage, ApprovalSection },
+  components: { BackButton, PrivatePage, ApprovalSection },
   data() {
     return {
       links: [] as TraceLink[],
@@ -70,13 +66,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    /**
-     * Navigates back to the artifact page.
-     */
-    handleGoBack() {
-      navigateBack();
-    },
-
     /**
      * Loads the generated links for the current project.
      */

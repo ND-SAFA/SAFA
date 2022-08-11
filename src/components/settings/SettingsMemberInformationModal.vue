@@ -1,33 +1,27 @@
 <template>
   <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
     <template v-slot:body>
-      <v-row dense class="mt-4">
-        <v-col>
-          <v-text-field
-            v-model="userEmail"
-            label="User Email"
-            rounded
-            solo
-            dense
-            style="min-width: 300px"
-            :readonly="member !== undefined"
-            :rules="emailRules"
-            @update:error="handleErrorUpdate"
-          />
-        </v-col>
-        <v-col>
-          <button-row :definitions="buttonDefinition" />
-        </v-col>
-      </v-row>
+      <div class="d-flex align-center mt-4">
+        <v-text-field
+          v-model="userEmail"
+          label="User Email"
+          outlined
+          dense
+          hide-details
+          class="mr-1"
+          style="min-width: 300px"
+          :readonly="member !== undefined"
+          :rules="emailRules"
+          @update:error="handleErrorUpdate"
+        />
+        <button-row :definitions="buttonDefinition" />
+      </div>
     </template>
     <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn :disabled="!validated" color="error" @click="handleConfirm">
-            Add to Project
-          </v-btn>
-        </v-row>
-      </v-container>
+      <v-spacer />
+      <v-btn :disabled="!validated" color="primary" @click="handleConfirm">
+        Add to Project
+      </v-btn>
     </template>
   </generic-modal>
 </template>

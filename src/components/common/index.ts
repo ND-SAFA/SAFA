@@ -1,4 +1,4 @@
-export * from "./button-row";
+export * from "./button";
 export * from "./input";
 export * from "./generic";
 export * from "./display";

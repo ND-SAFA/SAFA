@@ -10,7 +10,7 @@
     v-bind:ignore-errors-flag.sync="ignoreErrors"
   >
     <template v-slot:title>
-      <h1 class="text-h5">{{ title }}</h1>
+      <typography el="h2" variant="subtitle" :value="title" />
     </template>
 
     <template v-slot:before-rows v-if="isTracePanel">
@@ -26,7 +26,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch } from "@/components/common";
+import { GenericSwitch, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -40,6 +40,7 @@ export default Vue.extend({
   components: {
     GenericSwitch,
     FilePanel,
+    Typography,
   },
   props: {
     artifactMap: {

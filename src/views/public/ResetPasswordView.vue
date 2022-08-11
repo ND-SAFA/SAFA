@@ -1,17 +1,25 @@
 <template>
   <card-page>
     <template v-slot:form>
-      <h2 class="text-h4 mb-3 text-center">Reset Password</h2>
+      <typography
+        align="center"
+        variant="title"
+        el="h1"
+        class="mb-3"
+        value="Reset Password"
+      />
 
       <div v-if="!isSubmitted">
-        <p class="text-body-1">Please enter a new password.</p>
+        <typography el="p" value="Please enter a new password." />
 
         <password-field v-model="password" />
       </div>
 
-      <p v-else class="text-body-1">
-        Your password has been successfully updated.
-      </p>
+      <typography
+        v-else
+        el="p"
+        value="Your password has been successfully updated."
+      />
     </template>
 
     <template v-slot:actions>
@@ -38,14 +46,14 @@
 import Vue from "vue";
 import { navigateTo, Routes } from "@/router";
 import { updatePassword } from "@/api";
-import { CardPage, PasswordField } from "@/components";
+import { CardPage, PasswordField, Typography } from "@/components";
 
 /**
  * Displays the reset password page.
  */
 export default Vue.extend({
   name: "ResetPasswordView",
-  components: { PasswordField, CardPage },
+  components: { PasswordField, CardPage, Typography },
   data() {
     return {
       password: "",

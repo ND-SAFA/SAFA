@@ -35,3 +35,41 @@ export interface ListItem {
    */
   subtitle?: string;
 }
+
+/**
+ * The variants of text that can be displayed.
+ */
+export type TextType =
+  | "large"
+  | "title"
+  | "subtitle"
+  | "body"
+  | "small"
+  | "caption"
+  | "expandable";
+
+/**
+ * The types of text elements.
+ */
+export type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
+
+/**
+ * The methods of alignment.
+ */
+export type AlignType = "left" | "center" | "right";
+
+/**
+ * The possible increments for spacing.
+ */
+export type SizeType =
+  | ""
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9"
+  | "10";

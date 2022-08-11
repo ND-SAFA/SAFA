@@ -1,14 +1,22 @@
 <template>
   <v-container
     v-if="isTableView"
+    style="height: 100%"
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
       :headers="headers"
       :items="items"
       :search="searchText"
+      :expanded="expanded"
       :item-class="getItemBackground"
       sort-by="name"
+      show-group-by
+      show-expand
+      single-expand
+      fixed-header
+      :items-per-page="50"
+      @click:row="handleView($event)"
     >
       <template v-slot:top>
         <artifact-table-header
@@ -17,59 +25,50 @@
         />
       </template>
 
-      <template v-slot:[`item.type`]="{ item }">
-        <artifact-table-chip :text="item.type" display-icon />
+      <template v-slot:[`item.name`]="{ item }">
+        <td class="d-flex flex-row align-center">
+          <artifact-table-delta-chip :artifact="item" />
+          <v-icon v-if="getHasWarnings(item)" color="secondary">
+            mdi-hazard-lights
+          </v-icon>
+          <typography l="1" :value="item.name" />
+        </td>
       </template>
 
-      <template v-slot:[`item.name`]="{ item }">
-        <div class="d-flex flex-row align-center">
-          <artifact-table-delta-chip :artifact="item" />
-          <generic-icon-button
-            v-if="getHasWarnings(item)"
-            icon-id="mdi-hazard-lights"
-            tooltip="View warnings"
-            color="secondary"
-            @click="handleView(item)"
-          />
-          <span class="text-body-1 ml-1">{{ item.name }}</span>
-        </div>
+      <template v-slot:[`item.type`]="{ item }">
+        <td>
+          <artifact-table-chip :text="item.type" display-icon />
+        </td>
       </template>
 
       <template
         v-for="column in columns"
         v-slot:[`item.${column.id}`]="{ item }"
       >
-        <artifact-table-cell :column="column" :item="item" :key="column.id" />
+        <td :key="column.id">
+          <artifact-table-cell :column="column" :item="item" />
+        </td>
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <generic-icon-button
-          icon-id="mdi-view-split-vertical"
-          :tooltip="`View '${item.name}'`"
-          @click="handleView(item)"
-        />
-        <generic-icon-button
-          icon-id="mdi-pencil"
-          :tooltip="`Edit '${item.name}'`"
-          @click="handleEdit(item)"
-        />
-        <generic-icon-button
-          icon-id="mdi-delete"
-          :tooltip="`Delete '${item.name}'`"
-          @click="handleDelete(item)"
-        />
+        <td>
+          <generic-icon-button
+            icon-id="mdi-pencil"
+            :tooltip="`Edit '${item.name}'`"
+            @click="handleEdit(item)"
+          />
+          <generic-icon-button
+            icon-id="mdi-delete"
+            :tooltip="`Delete '${item.name}'`"
+            @click="handleDelete(item)"
+          />
+        </td>
       </template>
 
-      <template v-slot:footer>
-        <v-row justify="end" class="mr-2 mt-1">
-          <generic-icon-button
-            fab
-            color="primary"
-            icon-id="mdi-plus"
-            tooltip="Create"
-            @click="handleCreate"
-          />
-        </v-row>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length">
+          <typography el="p" y="2" :value="item.body" />
+        </td>
       </template>
     </v-data-table>
   </v-container>
@@ -77,12 +76,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  Artifact,
-  ArtifactDeltaState,
-  DocumentType,
-  FlatArtifact,
-} from "@/types";
+import { Artifact, ArtifactDeltaState, FlatArtifact } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -92,7 +86,7 @@ import {
   errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { GenericIconButton, Typography } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
@@ -104,6 +98,7 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    Typography,
     ArtifactTableDeltaChip,
     ArtifactTableHeader,
     ArtifactTableChip,
@@ -114,6 +109,7 @@ export default Vue.extend({
     return {
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
+      expanded: [] as Artifact[],
     };
   },
   computed: {
@@ -145,11 +141,13 @@ export default Vue.extend({
           text: "Name",
           value: "name",
           width: "200px",
+          filterable: true,
         },
         {
           text: "Type",
           value: "type",
           width: "200px",
+          filterable: true,
         },
         ...documentModule.tableColumns.map((col) => ({
           text: col.name,
@@ -160,6 +158,11 @@ export default Vue.extend({
           text: "Actions",
           value: "actions",
           width: "150px",
+          groupable: false,
+        },
+        {
+          value: "data-table-expand",
+          groupable: false,
         },
       ];
     },
@@ -190,8 +193,10 @@ export default Vue.extend({
     handleView(artifact: Artifact) {
       if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
         artifactSelectionModule.clearSelections();
+        this.expanded = [];
       } else {
         artifactSelectionModule.selectArtifact(artifact.id);
+        this.expanded = [artifact];
       }
     },
     /**
@@ -210,15 +215,6 @@ export default Vue.extend({
      */
     handleDelete(artifact: Artifact) {
       handleDeleteArtifact(artifact, {});
-    },
-    /**
-     * Opens the create artifact window.
-     */
-    handleCreate() {
-      appModule.openArtifactCreatorTo({
-        isNewArtifact: true,
-        type: DocumentType.FMEA,
-      });
     },
     /**
      * Returns the background class name of an artifact row.
@@ -243,3 +239,16 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.v-data-table__expanded__content {
+  box-shadow: inset 0px 2px 8px -5px rgba(50, 50, 50, 0.75),
+    inset 0px -2px 8px -5px rgba(50, 50, 50, 0.75) !important;
+}
+
+.artifact-view {
+  tr {
+    cursor: pointer;
+  }
+}
+</style>

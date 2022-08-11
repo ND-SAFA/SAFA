@@ -1,31 +1,28 @@
 <template>
   <v-container>
-    <div class="d-flex flex-row justify-space-between full-width">
-      <h1 class="text-h5 text-center">{{ title }}</h1>
+    <div class="d-flex justify-space-between full-width">
+      <typography el="h1" variant="title" :value="title" />
       <section-controls @open:all="openAll" @close:all="closeAll" />
     </div>
-
-    <v-divider />
-
-    <v-row class="pt-5">
-      <v-expansion-panels multiple v-model="openLinks">
-        <trace-link-expansion-panel
-          v-for="link in links"
-          :key="link.traceLinkId"
-          :link="link"
-          :show-approve="showApprove"
-          :show-decline="showDecline"
-          @link:approve="$emit('link:approve', $event)"
-          @link:decline="$emit('link:decline', $event)"
-        />
-      </v-expansion-panels>
-    </v-row>
+    <v-divider class="mb-2" />
+    <v-expansion-panels multiple v-model="openLinks">
+      <trace-link-expansion-panel
+        v-for="link in links"
+        :key="link.traceLinkId"
+        :link="link"
+        :show-approve="showApprove"
+        :show-decline="showDecline"
+        @link:approve="$emit('link:approve', $event)"
+        @link:decline="$emit('link:decline', $event)"
+      />
+    </v-expansion-panels>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
+import { Typography } from "@/components/common";
 import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
 import SectionControls from "./SectionControls.vue";
 
@@ -37,7 +34,7 @@ import SectionControls from "./SectionControls.vue";
  */
 export default Vue.extend({
   name: "ApprovalSection",
-  components: { TraceLinkExpansionPanel, SectionControls },
+  components: { Typography, TraceLinkExpansionPanel, SectionControls },
   props: {
     title: String,
     showApprove: {

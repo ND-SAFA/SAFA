@@ -9,11 +9,6 @@
       <v-row justify="center" class="mt-5">
         <v-container>
           <v-row justify="center">
-            <span class="text-body-1 mt-3 mb-3 text-center">
-              Select a Target Version
-            </span>
-          </v-row>
-          <v-row justify="center">
             <version-selector
               hide-current-version
               :project="project"

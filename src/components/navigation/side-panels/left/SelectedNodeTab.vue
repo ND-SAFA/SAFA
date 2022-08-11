@@ -14,7 +14,7 @@
       <artifact-errors />
     </div>
 
-    <p v-else class="text-caption">No artifact is selected.</p>
+    <typography v-else align="center" el="p" value="No artifact is selected." />
   </v-container>
 </template>
 

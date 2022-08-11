@@ -5,25 +5,35 @@
         <v-col cols="4">
           <typography :value="job.name" />
         </v-col>
-        <v-col cols="8" class="text--secondary">
+        <v-col cols="8">
           <v-row v-if="isCancelled(job.status)" no-gutters>
             <v-col cols="4">
-              <typography value="Upload Cancelled" />
+              <typography secondary value="Upload Cancelled" />
             </v-col>
             <v-col cols="4">
-              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
           <typography
             v-else-if="isCompleted(job.status)"
+            secondary
             :value="getCompletedText(job.completedAt)"
           />
           <v-row v-else no-gutters>
             <v-col cols="4">
-              <typography :value="`Upload Progress: ${job.currentProgress}%`" />
+              <typography
+                secondary
+                :value="`Upload Progress: ${job.currentProgress}%`"
+              />
             </v-col>
             <v-col cols="4">
-              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
         </v-col>

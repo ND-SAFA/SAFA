@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="isDeltaMode">
-    <h2 class="text-h6">Artifacts</h2>
+    <typography el="h2" variant="subtitle" value="Artifacts" />
     <v-divider class="mb-2" />
 
     <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
@@ -35,6 +35,7 @@
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
 import { deltaModule } from "@/store";
+import { Typography } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
 
@@ -45,7 +46,7 @@ import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
  */
 export default Vue.extend({
   name: "ArtifactDeltas",
-  components: { ArtifactDeltaDiff, DeltaButtonGroup },
+  components: { ArtifactDeltaDiff, DeltaButtonGroup, Typography },
   data() {
     return {
       selectedDeltaArtifact: undefined as ChangedArtifact | undefined,

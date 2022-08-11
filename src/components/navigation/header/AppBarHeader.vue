@@ -2,7 +2,7 @@
   <v-flex class="d-flex flex-row align-center">
     <v-flex class="d-flex flex-row align-center">
       <safa-icon />
-      <h1 class="text-h4 white--text ml-4">SAFA</h1>
+      <typography el="h1" variant="large" l="4" color="white" value="SAFA" />
       <button-row :definitions="definitions" class="mx-3" />
       <saving-icon />
     </v-flex>
@@ -47,7 +47,7 @@ import {
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import { handleLoadVersion } from "@/api";
-import { ButtonRow, SafaIcon } from "@/components/common";
+import { ButtonRow, SafaIcon, Typography } from "@/components/common";
 import {
   VersionCreator,
   BaselineVersionModal,
@@ -60,6 +60,7 @@ import SavingIcon from "./SavingIcon.vue";
 export default Vue.extend({
   name: "AppBarHeader",
   components: {
+    Typography,
     VersionLabel,
     AccountDropdown,
     SafaIcon,

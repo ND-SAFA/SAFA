@@ -10,16 +10,27 @@
     >
       {{ value }}
     </div>
-    <v-btn text small @click.stop="isExpanded = !isExpanded">
+    <v-btn
+      text
+      small
+      @click.stop="isExpanded = !isExpanded"
+      class="text--secondary"
+    >
       {{ isExpanded ? "See Less" : "See More" }}
     </v-btn>
   </div>
+  <pre v-else-if="variant === 'code'" :class="className">
+     {{ value }}
+  </pre>
   <span v-else-if="el === 'span'" :class="className">
     {{ value }}
   </span>
   <p v-else-if="el === 'p'" :class="className">
     {{ value }}
   </p>
+  <div v-else-if="el === 'div'" :class="className">
+    {{ value }}
+  </div>
   <h1 v-else-if="el === 'h1'" :class="className">
     {{ value }}
   </h1>
@@ -29,9 +40,6 @@
   <h3 v-else-if="el === 'h3'" :class="className">
     {{ value }}
   </h3>
-  <pre v-else-if="el === 'pre'" :class="className">
-    {{ value }}
-  </pre>
 </template>
 
 <script lang="ts">
@@ -46,9 +54,11 @@ export default Vue.extend({
   props: {
     value: String,
     classes: String,
+    color: String,
     error: Boolean,
     defaultExpanded: Boolean,
     ellipsis: Boolean,
+    secondary: Boolean,
     variant: {
       type: String as PropType<TextType>,
       default: "body",
@@ -97,8 +107,10 @@ export default Vue.extend({
       let classNames = ` text-${this.align}`;
 
       if (this.classes) classNames += ` ${this.classes}`;
+      if (this.color) classNames += ` ${this.color}--text`;
       if (this.error) classNames += ` error--text`;
       if (this.ellipsis) classNames += ` text-ellipsis`;
+      if (this.secondary) classNames += ` text--secondary`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;
@@ -115,6 +127,8 @@ export default Vue.extend({
           return "text-subtitle-2" + classNames;
         case "caption":
           return "text-caption text--secondary" + classNames;
+        case "code":
+          return "text-body-1 overflow-y-auto" + classNames;
         default:
           return "text-body-1" + classNames;
       }

@@ -7,11 +7,12 @@
     @close="handleClose"
   >
     <template v-slot:body>
-      <pre v-if="isCodeDisplay" class="text-body-1 mt-2 overflow-y-auto">
-          {{ selectedArtifactBody }}
-        </pre
-      >
-      <p class="text-body-1 mt-6">{{ selectedArtifactBody }}</p>
+      <typography
+        :variant="isCodeDisplay ? 'code' : 'body'"
+        el="p"
+        y="6"
+        :value="selectedArtifactBody"
+      />
     </template>
   </generic-modal>
 </template>
@@ -19,7 +20,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appModule, artifactSelectionModule } from "@/store";
-import { GenericModal } from "@/components/common";
+import { GenericModal, Typography } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -27,6 +28,7 @@ import { GenericModal } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
+    Typography,
     GenericModal,
   },
   computed: {

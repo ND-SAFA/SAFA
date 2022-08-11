@@ -1,17 +1,19 @@
 <template>
-  <v-row justify="space-between" class="pb-1">
-    <label>{{ title }}</label>
+  <div class="d-flex justify-space-between full-width align-center">
+    <typography :value="title" color="white" />
     <generic-icon-button
       tooltip="Close"
       icon-id="mdi-close"
+      color="white"
       @click="$emit('close')"
     />
-  </v-row>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import GenericIconButton from "../generic/GenericIconButton.vue";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays a generic modal title.
@@ -21,6 +23,7 @@ import GenericIconButton from "../generic/GenericIconButton.vue";
 export default Vue.extend({
   name: "GenericModalTitle",
   components: {
+    Typography,
     GenericIconButton,
   },
   props: {

@@ -20,7 +20,7 @@
       <template v-slot:prepend-item>
         <div class="full-width d-flex px-3">
           <v-spacer />
-          <span class="text-end text-caption">{{ matchText }}</span>
+          <typography align="end" variant="caption" :value="matchText" />
         </div>
       </template>
       <template v-slot:item="{ item }">
@@ -38,7 +38,7 @@ import {
   artifactSelectionModule,
   viewportModule,
 } from "@/store";
-import { GenericArtifactBodyDisplay } from "@/components/common";
+import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
 import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 
 /**
@@ -47,6 +47,7 @@ import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 export default Vue.extend({
   name: "Searchbar",
   components: {
+    Typography,
     GenericArtifactBodyDisplay,
   },
   data() {

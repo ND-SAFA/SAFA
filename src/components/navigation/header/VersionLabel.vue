@@ -1,15 +1,17 @@
 <template>
-  <v-row justify="end">
-    <h1 v-if="projectExists" class="text-h5 white--text">
-      {{ versionDisplayName }}
-    </h1>
-    <h1 v-else class="text-h5 white--text">No Project Selected</h1>
-  </v-row>
+  <typography
+    el="h1"
+    variant="subtitle"
+    color="white"
+    :value="versionDisplayName"
+  />
 </template>
+
 <script lang="ts">
 import Vue from "vue";
 import { versionToString } from "@/util";
 import { projectModule } from "@/store";
+import { Typography } from "@/components/common";
 
 const DEFAULT_PROJECT_NAME = "Untitled";
 const DEFAULT_VERSION_NAME = "X.X.X";
@@ -19,6 +21,7 @@ const DEFAULT_VERSION_NAME = "X.X.X";
  */
 export default Vue.extend({
   name: "VersionLabel",
+  components: { Typography },
   data() {
     return {
       projectName: DEFAULT_PROJECT_NAME,
@@ -33,7 +36,9 @@ export default Vue.extend({
      * @return The name of this project and version.
      */
     versionDisplayName(): string {
-      return `${this.projectName}@${this.versionName}`;
+      return this.projectExists
+        ? `${this.projectName}@${this.versionName}`
+        : "No Project Selected";
     },
     /**
      * @return The current project.

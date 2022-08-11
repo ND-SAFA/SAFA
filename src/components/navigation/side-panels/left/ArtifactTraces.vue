@@ -4,15 +4,15 @@
       <v-icon color="primary" style="transform: rotate(-45deg)">
         mdi-ray-start-arrow
       </v-icon>
-      <h2 class="text-h6 ml-1">Trace Links</h2>
+      <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
     </div>
 
     <v-divider class="mb-2" />
 
     <v-expansion-panels>
       <v-expansion-panel v-if="parents.length > 0">
-        <v-expansion-panel-header class="text-body-1">
-          {{ parentTitle }}
+        <v-expansion-panel-header>
+          <typography :value="parentTitle" />
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
@@ -29,8 +29,8 @@
       </v-expansion-panel>
 
       <v-expansion-panel v-if="children.length > 0">
-        <v-expansion-panel-header class="text-body-1">
-          {{ childTitle }}
+        <v-expansion-panel-header>
+          <typography :value="childTitle" />
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-list dense style="max-height: 300px" class="overflow-y-auto">
@@ -53,14 +53,14 @@
 import Vue from "vue";
 import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
-import GenericListItem from "@/components/common/generic/GenericListItem.vue";
+import { GenericListItem, Typography } from "@/components/common";
 
 /**
  * Displays the selected node's parents and children.
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { GenericListItem },
+  components: { Typography, GenericListItem },
   computed: {
     /**
      * @return The selected artifact.

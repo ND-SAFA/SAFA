@@ -14,7 +14,7 @@
       mdi-information-outline
     </v-icon>
     <div v-if="isFreeText(column.dataType)">
-      <span class="text-body-1">{{ item[column.id] || "" }}</span>
+      <typography :value="item[column.id] || ''" />
     </div>
     <div v-if="isRelation(column.dataType)">
       <artifact-table-chip
@@ -70,7 +70,11 @@ import {
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import { artifactModule } from "@/store";
 import { ThemeColors } from "@/util";
-import { GenericIconButton, SingleCustomFieldInput } from "@/components/common";
+import {
+  GenericIconButton,
+  SingleCustomFieldInput,
+  Typography,
+} from "@/components/common";
 import { handleSaveArtifact } from "@/api";
 
 /**
@@ -79,6 +83,7 @@ import { handleSaveArtifact } from "@/api";
 export default Vue.extend({
   name: "ArtifactTableCell",
   components: {
+    Typography,
     GenericIconButton,
     ArtifactTableChip,
     SingleCustomFieldInput,

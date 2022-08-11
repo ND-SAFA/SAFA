@@ -46,12 +46,13 @@ export type TextType =
   | "body"
   | "small"
   | "caption"
-  | "expandable";
+  | "expandable"
+  | "code";
 
 /**
  * The types of text elements.
  */
-export type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
+export type ElementType = "span" | "p" | "div" | "h1" | "h2" | "h3";
 
 /**
  * The methods of alignment.

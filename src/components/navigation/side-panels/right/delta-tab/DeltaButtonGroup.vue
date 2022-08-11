@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <h2 class="text-body-1">{{ title }}</h2>
+      <typography :value="title" />
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
@@ -21,6 +21,7 @@
 import Vue, { PropType } from "vue";
 import { Artifact, DeltaType, EntityModification, TraceLink } from "@/types";
 import { capitalize } from "@/util";
+import { Typography } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
 /**
@@ -30,7 +31,7 @@ import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
  */
 export default Vue.extend({
   name: "DeltaButtonGroup",
-  components: { ArtifactDeltaButton },
+  components: { Typography, ArtifactDeltaButton },
   props: {
     deltaType: {
       type: String as PropType<DeltaType>,

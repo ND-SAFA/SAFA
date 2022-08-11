@@ -9,6 +9,7 @@
     </v-list-item-title>
     <v-list-item-subtitle>
       <typography
+        secondary
         variant="expandable"
         :value="artifact.body"
         :defaultExpanded="!!displayDivider && !!displayTitle"

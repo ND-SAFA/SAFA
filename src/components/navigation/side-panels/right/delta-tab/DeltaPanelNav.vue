@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <h1 class="text-h4 my-2">Delta View</h1>
+  <v-container class="mt-2">
+    <typography el="h1" variant="title" value="Delta View" />
     <v-divider class="mb-2" />
 
     <v-btn
@@ -39,10 +39,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { Project } from "@/types";
-import { versionToString } from "@/util";
+import { handleReloadProject } from "@/api";
 import { deltaModule, projectModule } from "@/store";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
-import { handleReloadProject } from "@/api";
+import { Typography } from "@/components/common";
 
 /**
  * Displays the delta panel navigation.
@@ -51,6 +51,7 @@ export default Vue.extend({
   name: "DeltaPanelNav",
   components: {
     DeltaVersionsModal,
+    Typography,
   },
   data: () => ({
     isModalOpen: false,
@@ -68,18 +69,6 @@ export default Vue.extend({
      */
     isProjectDefined(): boolean {
       return this.project.projectId !== "";
-    },
-    /**
-     * @return The delta after version.
-     */
-    afterVersion(): string {
-      return versionToString(deltaModule.deltaVersion);
-    },
-    /**
-     * @return The delta before version.
-     */
-    beforeVersion(): string {
-      return versionToString(projectModule.getProject.projectVersion);
     },
     /**
      * @return Whether delta view is enabled.

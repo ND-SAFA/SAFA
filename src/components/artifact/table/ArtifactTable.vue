@@ -25,43 +25,49 @@
         />
       </template>
 
-      <template v-slot:[`item.type`]="{ item }">
-        <artifact-table-chip :text="item.type" display-icon />
-      </template>
-
       <template v-slot:[`item.name`]="{ item }">
-        <div class="d-flex flex-row align-center">
+        <td class="d-flex flex-row align-center">
           <artifact-table-delta-chip :artifact="item" />
           <v-icon v-if="getHasWarnings(item)" color="secondary">
             mdi-hazard-lights
           </v-icon>
-          <span class="text-body-1 ml-1">{{ item.name }}</span>
-        </div>
+          <typography l="1" :value="item.name" />
+        </td>
+      </template>
+
+      <template v-slot:[`item.type`]="{ item }">
+        <td>
+          <artifact-table-chip :text="item.type" display-icon />
+        </td>
       </template>
 
       <template
         v-for="column in columns"
         v-slot:[`item.${column.id}`]="{ item }"
       >
-        <artifact-table-cell :column="column" :item="item" :key="column.id" />
+        <td :key="column.id">
+          <artifact-table-cell :column="column" :item="item" />
+        </td>
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <generic-icon-button
-          icon-id="mdi-pencil"
-          :tooltip="`Edit '${item.name}'`"
-          @click="handleEdit(item)"
-        />
-        <generic-icon-button
-          icon-id="mdi-delete"
-          :tooltip="`Delete '${item.name}'`"
-          @click="handleDelete(item)"
-        />
+        <td>
+          <generic-icon-button
+            icon-id="mdi-pencil"
+            :tooltip="`Edit '${item.name}'`"
+            @click="handleEdit(item)"
+          />
+          <generic-icon-button
+            icon-id="mdi-delete"
+            :tooltip="`Delete '${item.name}'`"
+            @click="handleDelete(item)"
+          />
+        </td>
       </template>
 
       <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length" class="text-body-1">
-          {{ item.body }}
+        <td :colspan="headers.length">
+          <typography el="p" y="2" :value="item.body" />
         </td>
       </template>
     </v-data-table>
@@ -80,7 +86,7 @@ import {
   errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { GenericIconButton, Typography } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
@@ -92,6 +98,7 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    Typography,
     ArtifactTableDeltaChip,
     ArtifactTableHeader,
     ArtifactTableChip,

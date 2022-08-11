@@ -14,7 +14,7 @@ public class UserAppEntity {
 
     UUID userId;
     String email;
-
+    
     public UserAppEntity(SafaUser safaUser) {
         this.userId = safaUser.getUserId();
         this.email = safaUser.getEmail();

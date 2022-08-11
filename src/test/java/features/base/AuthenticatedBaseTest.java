@@ -45,7 +45,7 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
     public void defaultLogin() throws Exception {
         createUser(defaultUser, defaultUserPassword);
         loginUser(defaultUser, defaultUserPassword);
-        currentUser = safaUserService.getUserFromUsername(defaultUser);
+        currentUser = accountLookupService.getUserFromUsername(defaultUser);
     }
 
     public void createUser(String email, String password) throws Exception {

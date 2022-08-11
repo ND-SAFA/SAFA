@@ -36,21 +36,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-
-type TextType =
-  | "large"
-  | "title"
-  | "subtitle"
-  | "body"
-  | "small"
-  | "caption"
-  | "expandable";
-
-type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
-
-type AlignType = "left" | "center" | "right";
-
-type SizeType = "" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
+import { AlignType, ElementType, SizeType, TextType } from "@/types";
 
 /**
  * A generic component for displaying text.

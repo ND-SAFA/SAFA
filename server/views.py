@@ -1,6 +1,6 @@
 from typing import Dict
 
-from api import RequestParams
+from server.api import RequestParams
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 

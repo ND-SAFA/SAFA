@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex justify-space-between">
-      <typography el="h1" variant="title" value="Project TIM" />
+      <typography el="h1" variant="subtitle" value="Project TIM" />
       <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
     </div>
     <v-container class="elevation-3 overflow-hidden" style="max-height: 50vh">

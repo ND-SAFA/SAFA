@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 
-type TextType = "large" | "title" | "subtitle" | "body" | "small";
+type TextType = "large" | "title" | "subtitle" | "body" | "small" | "caption";
 
 type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
 
@@ -91,6 +91,8 @@ export default Vue.extend({
           return "text-h5" + classNames;
         case "small":
           return "text-subtitle-2" + classNames;
+        case "caption":
+          return "text-caption text--secondary" + classNames;
         default:
           return "text-body-1" + classNames;
       }

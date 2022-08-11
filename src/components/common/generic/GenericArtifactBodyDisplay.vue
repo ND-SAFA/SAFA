@@ -2,8 +2,8 @@
   <v-list-item-content style="max-width: 500px">
     <v-list-item-title v-if="!!displayTitle">
       <div class="d-flex align-center">
-        <span class="text-h6 mr-2">{{ artifact.name }}</span>
-        <span class="text-caption text--secondary">{{ artifactType }}</span>
+        <typography r="2" :value="artifact.name" />
+        <typography variant="caption" :value="artifactType" />
         <v-spacer />
         <v-btn text small @click.stop="isExpanded = !isExpanded">
           {{ isExpanded ? "See Less" : "See More" }}
@@ -20,12 +20,14 @@
 import Vue, { PropType } from "vue";
 import { Artifact } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
+import { Typography } from "@/components/common";
 
 /**
  * Displays the body of an artifact that can be expanded.
  */
 export default Vue.extend({
   name: "GenericArtifactBodyDisplay",
+  components: { Typography },
   props: {
     artifact: {
       type: Object as PropType<Artifact>,

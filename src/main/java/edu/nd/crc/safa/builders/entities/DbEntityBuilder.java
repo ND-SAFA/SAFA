@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
@@ -22,7 +23,6 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -55,7 +55,7 @@ public class DbEntityBuilder extends BaseBuilder {
     private final DocumentRepository documentRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
-    private final ProjectRetriever artifactRepository;
+    private final ArtifactRepository artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
@@ -77,7 +77,7 @@ public class DbEntityBuilder extends BaseBuilder {
                            DocumentRepository documentRepository,
                            DocumentArtifactRepository documentArtifactRepository,
                            ArtifactTypeRepository artifactTypeRepository,
-                           ProjectRetriever artifactRepository,
+                           ArtifactRepository artifactRepository,
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkVersionRepository traceLinkVersionRepository,

@@ -19,7 +19,6 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
@@ -41,7 +40,7 @@ public class ArtifactVersionRepositoryImpl
     ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
-    ProjectRetriever artifactRepository;
+    ArtifactRepository artifactRepository;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;

@@ -40,7 +40,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
-    protected ProjectRetriever artifactRepository;
+    protected ArtifactRepository artifactRepository;
 
     @Autowired
     protected ArtifactVersionRepository artifactVersionRepository;

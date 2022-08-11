@@ -14,6 +14,7 @@ public class ProjectVariables {
     public static final double TRACE_THRESHOLD = 0.5;
     public static final boolean PROJECT_CREATION_AS_COMPLETE_SET = false;
     public static final String AS_COMPLETE_SET = "asCompleteSet";
+    public static final String ARTIFACT_EXISTS = "artifactExists";
 }
 
 

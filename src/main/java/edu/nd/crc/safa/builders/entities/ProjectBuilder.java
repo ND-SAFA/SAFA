@@ -119,10 +119,10 @@ public class ProjectBuilder {
             this.dbEntityBuilder.newTypeAndReturn(projectName, artifactType);
     }
 
-    public ProjectVersion withVersion() {
+    public ProjectBuilder withVersion() {
         ProjectVersion projectVersion = this.dbEntityBuilder.newVersionWithReturn(this.projectName);
         this.currentVersion.setNewVersion(projectVersion);
-        return projectVersion;
+        return this;
     }
 
     public String getNextArtifactName(String typeName) {

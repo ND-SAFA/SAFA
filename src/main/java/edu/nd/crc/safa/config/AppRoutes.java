@@ -87,7 +87,7 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Entities {
             public static final String CHECK_IF_ARTIFACT_EXISTS = PROJECT_PREFIX
-                + "/versions/{versionId}/artifacts/validate/{artifactName}";
+                + "/versions/{versionId}/artifacts/validate";
             public static final String GET_PROJECT_IN_VERSION = PROJECT_PREFIX + "/versions/{versionId}";
             public static final String GET_ARTIFACTS_IN_PROJECT_VERSION = GET_PROJECT_IN_VERSION + "/artifacts";
             public static final String GET_TRACES_IN_VERSION = GET_PROJECT_IN_VERSION + "/traces";

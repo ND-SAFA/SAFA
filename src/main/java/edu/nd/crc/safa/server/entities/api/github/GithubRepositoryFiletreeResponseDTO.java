@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFileDTO.GithubRepositoryFileType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GithubRepositoryFiletreeResponseDTO {
 
     private String sha;

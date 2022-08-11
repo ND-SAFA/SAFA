@@ -37,14 +37,14 @@ public class GithubProject {
     private Project project;
 
     /**
-     * ID of associated jira project
+     * Repository name
      *
      * {@link NonNull} annotated properties are included in the constructor
      * by {@link RequiredArgsConstructor}
      */
     @NonNull
-    @Column(name = "github_project_id", nullable = false, unique = true)
-    private Long githubProjectId;
+    @Column(name = "repository_name", nullable = false, unique = true)
+    private String repositoryName;
 
     /**
      * GitHub branch used to pull the artifacts
@@ -59,4 +59,12 @@ public class GithubProject {
     @NonNull
     @Column(name = "last_commit_sha", nullable = false, length = 64)
     private String lastCommitSha;
+
+    /**
+     * User that created the project
+     */
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
+    private SafaUser user;
 }

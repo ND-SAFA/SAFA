@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Plain object representing a GitHub project
  */
@@ -24,4 +28,29 @@ public class GithubRepositoryDTO {
     private String description;
 
     private String visibility;
+
+    @JsonProperty("fork")
+    private Boolean isFork;
+
+    private Long size;
+
+    @JsonProperty("default_branch")
+    private String defaultBranch;
+
+    private List<String> topics;
+
+    @JsonProperty("created_at")
+    private Date creationDate;
+
+    private String language;
+
+    @JsonProperty("forks_count")
+    private String forksCount;
+
+    private String ownerLoginHandler;
+
+    @JsonProperty("owner")
+    public void setOwnerLoginHandler(Map<String, String> ownerData) {
+        this.ownerLoginHandler = ownerData.get("login");
+    }
 }

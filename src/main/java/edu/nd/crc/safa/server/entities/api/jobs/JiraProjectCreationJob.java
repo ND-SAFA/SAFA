@@ -94,8 +94,7 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
 
         // Step - Retrieve project information including issues
-        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
-            jiraProjectId);
+        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, jiraProjectId);
         this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
     }
 

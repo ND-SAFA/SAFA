@@ -4,7 +4,10 @@ import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
 import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.server.repositories.github.GithubAccessCredentialsRepository;
+import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
+import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
 import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
@@ -42,5 +45,9 @@ public class ServiceProvider {
     private final JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
     private final JiraConnectionService jiraConnectionService;
     // Jobs
-    JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
+    // GitHub
+    private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
+    private final GithubConnectionService githubConnectionService;
+    private final GithubProjectRepository githubProjectRepository;
 }

@@ -132,7 +132,7 @@ public class JiraController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.jiraCredentialsRefresh)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
+    public DeferredResult<JiraResponseDTO<Void>> refreshCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
@@ -141,11 +141,6 @@ public class JiraController extends BaseController {
                 .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
 
             JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
-
-            if (!StringUtils.hasText(newCredentials.getAccessToken())
-                || !StringUtils.hasText(newCredentials.getRefreshToken())) {
-                throw new SafaError("Invalid credentials");
-            }
 
             credentials.setBearerAccessToken(newCredentials.getAccessToken().getBytes());
             credentials.setRefreshToken(newCredentials.getRefreshToken());

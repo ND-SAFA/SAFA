@@ -12,6 +12,8 @@ public class AppRoutes {
         public static final String jiraCredentials = accountPrefix + "/jira/credentials";
         public static final String jiraCredentialsRefresh = accountPrefix + "/jira/credentials/{cloudId}";
         public static final String jiraCredentialsValidate = accountPrefix + "/jira/credentials/validate";
+        public static final String githubCredentials = accountPrefix + "/github/credentials";
+        public static final String githubAccessCredentialsRefresh= accountPrefix + "/github/credentials";
     }
 
     public static class Jobs {
@@ -28,10 +30,12 @@ public class AppRoutes {
         public static final String deleteProjectById = projectPrefix + "/{projectId}";
         public static final String createOrUpdateProjectMeta = projectPrefix;
         public static final String getProjects = projectPrefix;
+        public static final String retrieveGithubRepositories = projectPrefix + "/github";
 
         public static class Import {
             public static final String importPrefix = projectPrefix + "/import";
             public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";
+            public static final String pullGitHubRepository = importPrefix + "/github/{repositoryName}";
         }
 
         public static class Membership {

@@ -1,0 +1,30 @@
+package edu.nd.crc.safa.server.entities.api.github;
+
+import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * Simple DTO to wrap status messages for GitHub operations
+ */
+@AllArgsConstructor
+@Getter
+public class GithubResponseDTO<T> {
+
+    T payload;
+
+    GithubResponseMessage message;
+
+    @AllArgsConstructor
+    public enum GithubResponseMessage {
+        TOKEN_REFRESH_REQUIRED("token has expired. refresh it"),
+        CREATED("created"),
+        UPDATED("updated"),
+        OK("ok"),
+        ERROR("error"),
+        IMPORTED("imported"),
+        EXPIRED("expired credentials");
+
+        private final String value;
+    }
+}

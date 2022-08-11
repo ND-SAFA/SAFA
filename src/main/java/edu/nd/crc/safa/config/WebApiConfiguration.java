@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 import edu.nd.crc.safa.server.services.github.GithubConnectionServiceImpl;
@@ -34,7 +35,8 @@ public class WebApiConfiguration {
     private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
     private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
 
-    JiraProjectRepository jiraProjectRepository;
+    private JiraProjectRepository jiraProjectRepository;
+    private GithubProjectRepository githubProjectRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
@@ -43,7 +45,7 @@ public class WebApiConfiguration {
 
     @Bean
     public GithubConnectionService githubConnectionService() {
-        return new GithubConnectionServiceImpl(webClient());
+        return new GithubConnectionServiceImpl(githubProjectRepository, webClient());
     }
 
     private ExchangeFilterFunction logRequest() {

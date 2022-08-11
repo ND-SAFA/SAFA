@@ -3,8 +3,8 @@ import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
   createJiraProject,
+  createProjectCreationJob,
   handleJobSubmission,
-  handleSetProject,
   handleUploadProjectVersion,
   saveProject,
 } from "@/api";
@@ -22,11 +22,11 @@ export function handleImportProject(
 ): void {
   appModule.onLoadStart();
 
-  saveProject(project)
-    .then(async (projectCreated) => {
-      logModule.onSuccess(`Project has been created: ${project.name}`);
-      await navigateTo(Routes.ARTIFACT);
-      await handleSetProject(projectCreated);
+  createProjectCreationJob(project)
+    .then(async (job) => {
+      await handleJobSubmission(job);
+      await navigateTo(Routes.UPLOAD_STATUS);
+      logModule.onSuccess(`Project is being created: ${project.name}`);
       onSuccess?.();
     })
     .catch((e) => {

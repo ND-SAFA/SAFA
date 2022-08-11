@@ -1,4 +1,5 @@
 import {
+  Job,
   MemberRequest,
   Project,
   ProjectDelta,
@@ -18,6 +19,13 @@ export async function saveProject(
   project: Pick<Project, "projectId" | "name" | "description">
 ): Promise<Project> {
   return authHttpClient<Project>(Endpoint.project, {
+    method: "POST",
+    body: JSON.stringify(project),
+  });
+}
+
+export async function createProjectCreationJob(project: Project): Promise<Job> {
+  return authHttpClient<Job>(Endpoint.createProjectJob, {
     method: "POST",
     body: JSON.stringify(project),
   });

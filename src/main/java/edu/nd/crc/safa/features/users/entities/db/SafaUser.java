@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -19,6 +20,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "safa_user")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class SafaUser implements Serializable {
 
     public static final String ID_COLUMN = "user_id";
@@ -34,7 +36,7 @@ public class SafaUser implements Serializable {
 
     @Column(name = "password", nullable = false)
     String password;
-    
+
     public SafaUser(String email, String password) {
         this.email = email;
         this.password = password;

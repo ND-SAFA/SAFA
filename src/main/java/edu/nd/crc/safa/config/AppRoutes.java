@@ -14,9 +14,14 @@ public class AppRoutes {
         public static final String LOGIN = "/login";
         private static final String ACCOUNTS_PREFIX = "/accounts";
         public static final String CREATE_ACCOUNT = ACCOUNTS_PREFIX + "/create";
-        public static final String JIRA_CREDENTIALS = ACCOUNTS_PREFIX + "/jira/credentials";
-        public static final String JIRA_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/jira/credentials/{cloudId}";
-        public static final String JIRA_CREDENTIALS_VALIDATE = ACCOUNTS_PREFIX + "/jira/credentials/validate";
+        public static final String DELETE_ACCOUNT = ACCOUNTS_PREFIX + "/delete";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Jira {
+            public static final String JIRA_CREDENTIALS = ACCOUNTS_PREFIX + "/jira/credentials";
+            public static final String JIRA_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/jira/credentials/{cloudId}";
+            public static final String JIRA_CREDENTIALS_VALIDATE = ACCOUNTS_PREFIX + "/jira/credentials/validate";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

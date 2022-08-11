@@ -78,7 +78,7 @@ public class JiraController extends BaseController {
         return updateProjectByJiraJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Accounts.JIRA_CREDENTIALS)
+    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -117,7 +117,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PutMapping(AppRoutes.Accounts.JIRA_CREDENTIALS_REFRESH)
+    @PutMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_REFRESH)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -162,7 +162,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Accounts.JIRA_CREDENTIALS_VALIDATE)
+    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_VALIDATE)
     public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
         @RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);

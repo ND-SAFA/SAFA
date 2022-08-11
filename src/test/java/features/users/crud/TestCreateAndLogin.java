@@ -1,4 +1,4 @@
-package features.users.logic;
+package features.users.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 2. Log into an existing account
  * 3. User is not allowed without credentials.
  */
-class TestUserCrud extends AbstractUserTest {
+class TestCreateAndLogin extends AbstractUserTest {
 
 
     @Autowired

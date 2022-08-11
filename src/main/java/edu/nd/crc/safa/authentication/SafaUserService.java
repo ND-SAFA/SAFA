@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.authentication;
 
+import javax.validation.constraints.NotNull;
+
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
@@ -11,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,10 +27,11 @@ import org.springframework.stereotype.Service;
 public class SafaUserService implements UserDetailsService {
 
     private final SafaUserRepository safaUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * The implementation for UserDetailService that bridges Spring's default authentication and our
-     * custom user entity class, SafaUser.
+     * custom user entity class, {@link SafaUser}.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -45,5 +50,22 @@ public class SafaUserService implements UserDetailsService {
         Authentication authentication = securityContext.getAuthentication();
 
         return ((SafaUserDetails) authentication.getPrincipal()).getUser();
+    }
+
+    /**
+     * Deletes authenticated {@link SafaUser} if given password matches stored records
+     * once encoded. Otherwise, error is thrown.
+     *
+     * @param password The password to confirm account deletion.
+     */
+    public void deleteUser(@NotNull String password) {
+        SafaUser currentUser = this.getCurrentUser();
+        String encodedPassword = currentUser.getPassword();
+        boolean confirmDelete = this.passwordEncoder.matches(password, encodedPassword);
+        if (confirmDelete) {
+            this.safaUserRepository.delete(currentUser);
+        } else {
+            throw new SafaError("Given password does not match our records");
+        }
     }
 }

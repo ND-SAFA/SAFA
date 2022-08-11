@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.artifacts.base.AbstractArtifactTest;
@@ -26,7 +26,7 @@ public class TestFMEAArtifacts extends AbstractArtifactTest<Artifact> {
     }};
 
     @Autowired
-    ProjectRetriever artifactRepository;
+    ArtifactRepository artifactRepository;
 
     @Override
     public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {

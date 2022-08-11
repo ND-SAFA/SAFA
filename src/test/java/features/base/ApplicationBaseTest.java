@@ -16,16 +16,16 @@ import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 
 import org.javatuples.Pair;
 import org.json.JSONArray;
@@ -45,6 +45,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
     protected AppEntityRetrievalService appEntityRetrievalService;
+    protected String projectName = this.getClass().getName();
     @Autowired
     UserDetailsService userDetailsService;
 

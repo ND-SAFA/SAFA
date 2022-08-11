@@ -8,13 +8,13 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
@@ -34,13 +34,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DocumentArtifactController extends BaseDocumentController {
 
-    private final ProjectRetriever artifactRepository;
+    private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
 
     @Autowired
     public DocumentArtifactController(DocumentRepository documentRepository,
-                                      ProjectRetriever artifactRepository,
+                                      ArtifactRepository artifactRepository,
                                       DocumentArtifactRepository documentArtifactRepository,
                                       NotificationService notificationService,
                                       ResourceBuilder resourceBuilder) {

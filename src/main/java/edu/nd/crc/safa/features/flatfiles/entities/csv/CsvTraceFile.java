@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 

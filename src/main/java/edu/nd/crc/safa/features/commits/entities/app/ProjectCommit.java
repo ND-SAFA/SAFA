@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -34,6 +35,13 @@ public class ProjectCommit {
         this.traces = new ProjectChange<>();
         this.errors = new ArrayList<>();
         this.failOnError = true;
+    }
+
+    public ProjectCommit(ProjectAppEntity projectAppEntity) {
+        this();
+        this.commitVersion = projectAppEntity.getProjectVersion();
+        this.addArtifacts(ModificationType.ADDED, projectAppEntity.getArtifacts());
+        this.addTraces(ModificationType.ADDED, projectAppEntity.getTraces());
     }
 
     public ProjectCommit(ProjectVersion commitVersion, boolean failOnError) {

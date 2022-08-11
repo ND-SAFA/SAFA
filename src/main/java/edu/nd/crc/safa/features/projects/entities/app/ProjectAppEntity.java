@@ -55,6 +55,8 @@ public class ProjectAppEntity {
     Map<String, LayoutPosition> layout;
 
     public ProjectAppEntity() {
+        this.name = "";
+        this.description = "";
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
         this.members = new ArrayList<>();

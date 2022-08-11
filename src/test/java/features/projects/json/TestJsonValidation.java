@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that each entity present in ProjectAppEntity is validated upon parsing.
  */
-class TestJsonValidation extends ProjectJsonBaseTest {
+class TestJsonValidation extends AbstractProjectJsonTest {
     /**
      * Attempts to update it without including a project version.
      *
@@ -75,17 +75,6 @@ class TestJsonValidation extends ProjectJsonBaseTest {
         // VP - Verify that minor version is the error received
         String errorMessage = response.getString("message");
         assertThat(errorMessage).contains("minorVersion").contains("greater than 0");
-    }
-
-    /**
-     * Tests that a project description must be defined, even if empty.
-     *
-     * @throws Exception Throws exception is post request fails.
-     */
-    @Test
-    void testProjectIdentifierValidation() throws Exception {
-        JSONObject response = buildProjectValidationRequest(null, new ArrayList<>(), new ArrayList<>());
-        assertThat(response.getString("message")).matches(".*name.*not.*null[\\s\\S]");
     }
 
     /**

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.nd.crc.safa.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.flatfiles.entities.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;

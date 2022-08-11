@@ -22,8 +22,10 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
         private static final String JOBS_PREFIX = "/jobs";
+        //TODO : Add flat-file to path
         public static final String FLAT_FILE_PROJECT_UPDATE_JOB = JOBS_PREFIX + "/projects/versions/{versionId}";
         public static final String GET_JOBS = JOBS_PREFIX;
+        public static final String JSON_PROJECT_JOB = JOBS_PREFIX + "/projects";
         private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
         public static final String DELETE_JOB = JOB_ID;
     }
@@ -39,7 +41,7 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String IMPORT_PREFIX = PROJECT_PREFIX + "/import";
-            public static final String PULL_JIRA_PROJECT = IMPORT_PREFIX + "/jira/{cloudId}/{id}";
+            public static final String CREATE_PROJECT_FROM_JIRA = IMPORT_PREFIX + "/jira/{cloudId}/{id}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

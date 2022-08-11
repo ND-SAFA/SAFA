@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 

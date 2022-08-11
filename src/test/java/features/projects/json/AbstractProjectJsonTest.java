@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
  * Creates a constant environment and functions for creating or updating projects
  * via the JSON route.
  */
-public abstract class ProjectJsonBaseTest extends ApplicationBaseTest {
+public abstract class AbstractProjectJsonTest extends ApplicationBaseTest {
     protected final int N_TYPES = 2;
     protected final int N_ARTIFACTS = 2;
     protected final int N_TRACES = 1;

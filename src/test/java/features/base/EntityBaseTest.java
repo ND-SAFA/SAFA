@@ -1,24 +1,25 @@
 package features.base;
 
+import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
-import edu.nd.crc.safa.authentication.SafaUserService;
-import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
+import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +86,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected FTAArtifactRepository ftaArtifactRepository;
+
+    @Autowired
+    protected JobService jobService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 

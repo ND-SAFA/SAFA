@@ -17,9 +17,9 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.FileParser;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.entities.parser.FileParser;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;

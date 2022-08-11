@@ -17,11 +17,8 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMe
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
-import edu.nd.crc.safa.features.jobs.entities.app.JiraProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByJiraJobBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
@@ -70,27 +67,15 @@ public class JiraController extends BaseController {
         this.serviceProvider = serviceProvider;
     }
 
-    @PostMapping(AppRoutes.Projects.Import.PULL_JIRA_PROJECT)
+    @PostMapping(AppRoutes.Projects.Import.CREATE_PROJECT_FROM_JIRA)
     public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
                                         @PathVariable("cloudId") String cloudId) throws Exception {
-        JobService jobService = this.serviceProvider.getJobService();
-        // Step - Create job identifier
-        String jobName = JiraProjectCreationJob.createJobName(jiraProjectId.toString());
-        JobDbEntity jobDbEntity = jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);
 
-        // Step - Create jira project creation job
-        JiraProjectCreationJob job = new JiraProjectCreationJob(
-            jobDbEntity,
+        UpdateProjectByJiraJobBuilder updateProjectByJiraJobBuilder = new UpdateProjectByJiraJobBuilder(
             serviceProvider,
             jiraProjectId,
-            cloudId
-        );
-
-        // Step - Start job
-        jobService.executeJob(jobDbEntity, serviceProvider, job);
-
-        // Step - Respond with project
-        return JobAppEntity.createFromJob(jobDbEntity);
+            cloudId);
+        return updateProjectByJiraJobBuilder.perform();
     }
 
     @PostMapping(AppRoutes.Accounts.JIRA_CREDENTIALS)

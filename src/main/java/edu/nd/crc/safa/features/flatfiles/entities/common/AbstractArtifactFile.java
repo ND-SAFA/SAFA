@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.flatfiles.entities;
+package edu.nd.crc.safa.features.flatfiles.entities.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

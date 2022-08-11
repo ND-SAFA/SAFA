@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.flatfiles.entities;
+package edu.nd.crc.safa.features.flatfiles.entities.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,20 +90,20 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
     }
 
     /**
+     * Validates given entities and returns any errors found.
+     *
+     * @param projectAppEntity The entities existing in the system.
+     * @return List of errors
+     */
+    public abstract Pair<List<E>, List<String>> validateInProject(ProjectAppEntity projectAppEntity);
+
+    /**
      * Exports artifacts to given file.
      *
      * @param file The file to write entities to
      * @throws IOException If trouble reading objects, reading file, or writing to file.
      */
     protected abstract void exportAsFileContent(File file) throws IOException;
-
-    /**
-     * Validates given entities and returns any errors found.
-     *
-     * @param projectAppEntity The entities existing in the system.
-     * @return List of errors
-     */
-    abstract Pair<List<E>, List<String>> validateInProject(ProjectAppEntity projectAppEntity);
 
     /**
      * Keeps on valid entities and returns those with errors.

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.flatfiles.entities;
+package edu.nd.crc.safa.features.flatfiles.entities.common;
 
 /**
  * Interface for a parser of a flat file.

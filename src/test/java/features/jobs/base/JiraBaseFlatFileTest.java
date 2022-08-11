@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import features.flatfile.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +22,13 @@ import org.junit.jupiter.api.BeforeEach;
  * Sets up internal SAFA and JIRA authentication in order to skip
  * testing the API directly.
  */
-public abstract class JiraBaseFlatFileTest extends JobBaseFlatFileTest {
+public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     protected String jiraProjectName = "test-jira-project";
     protected int N_STEPS = 5;
     protected String cloudId = UUID.randomUUID().toString();
     protected Long jiraProjectId = (long) 1;
+
 
     @BeforeEach
     public void setJiraAuthorization() {
@@ -59,7 +61,7 @@ public abstract class JiraBaseFlatFileTest extends JobBaseFlatFileTest {
     }
 
     public JobDbEntity verifyJIRAJobWasCompleted(UUID jobId) {
-        return super.verifyJobWasCompleted(jobId, N_STEPS);
+        return JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);
     }
 
     public JobDbEntity createJIRAJob() {

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.flatfiles.entities;
+package edu.nd.crc.safa.features.flatfiles.entities.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +12,9 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractDataFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;

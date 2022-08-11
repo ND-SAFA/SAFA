@@ -1,7 +1,13 @@
 <template>
   <v-tooltip bottom z-index="12" :disabled="text.length < 10">
     <template v-slot:activator="{ on, attrs }">
-      <v-chip v-on="on" v-bind="attrs" small style="max-width: 200px">
+      <v-chip
+        v-on="on"
+        v-bind="attrs"
+        small
+        style="max-width: 200px"
+        class="mr-1"
+      >
         <v-icon small>{{ icon }}</v-icon>
         <typography ellipsis l="1" :value="displayText" />
       </v-chip>

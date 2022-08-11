@@ -26,12 +26,14 @@
       </template>
 
       <template v-slot:[`item.name`]="{ item }">
-        <td class="d-flex flex-row align-center">
-          <artifact-table-delta-chip :artifact="item" />
-          <v-icon v-if="getHasWarnings(item)" color="secondary">
-            mdi-hazard-lights
-          </v-icon>
-          <typography l="1" :value="item.name" />
+        <td>
+          <flex-box align="center">
+            <artifact-table-delta-chip :artifact="item" />
+            <v-icon v-if="getHasWarnings(item)" color="secondary">
+              mdi-hazard-lights
+            </v-icon>
+            <typography l="1" :value="item.name" />
+          </flex-box>
         </td>
       </template>
 
@@ -86,7 +88,7 @@ import {
   errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton, Typography } from "@/components/common";
+import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
@@ -98,6 +100,7 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    FlexBox,
     Typography,
     ArtifactTableDeltaChip,
     ArtifactTableHeader,

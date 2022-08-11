@@ -14,23 +14,25 @@
     <template v-slot:selection> {{ selectDisplay }} </template>
     <template v-slot:item="{ item }">
       <v-list-item-title @click.stop="handleEditOpen(item)">
-        {{ item.name }}
+        <typography :value="item.name" />
       </v-list-item-title>
-      <v-list-item-action class="d-flex flex-row pr-2">
-        <generic-icon-button
-          small
-          :is-disabled="isFirstItem(item)"
-          icon-id="mdi-menu-up"
-          :tooltip="`Move '${item.name}' Up`"
-          @click="handleMove(item, true)"
-        />
-        <generic-icon-button
-          small
-          :is-disabled="isLastItem(item)"
-          icon-id="mdi-menu-down"
-          :tooltip="`Move '${item.name}' Down`"
-          @click="handleMove(item, false)"
-        />
+      <v-list-item-action class="pr-2">
+        <flex-box>
+          <generic-icon-button
+            small
+            :is-disabled="isFirstItem(item)"
+            icon-id="mdi-menu-up"
+            :tooltip="`Move '${item.name}' Up`"
+            @click="handleMove(item, true)"
+          />
+          <generic-icon-button
+            small
+            :is-disabled="isLastItem(item)"
+            icon-id="mdi-menu-down"
+            :tooltip="`Move '${item.name}' Down`"
+            @click="handleMove(item, false)"
+          />
+        </flex-box>
       </v-list-item-action>
     </template>
 
@@ -57,12 +59,12 @@ import { DocumentColumn } from "@/types";
 import { columnTypeOptions } from "@/util";
 import { documentModule } from "@/store";
 import { handleColumnMove } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { GenericIconButton, FlexBox, Typography } from "@/components/common";
 import TableColumnModal from "./TableColumnModal.vue";
 
 export default Vue.extend({
   name: "TableColumnEditor",
-  components: { TableColumnModal, GenericIconButton },
+  components: { Typography, FlexBox, TableColumnModal, GenericIconButton },
   data() {
     return {
       isCreateOpen: false,

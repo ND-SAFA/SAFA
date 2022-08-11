@@ -101,7 +101,7 @@ export default Vue.extend({
       return this.variant === "expandable";
     },
     /**
-     * @return The class name based on the text type.
+     * @return The class name.
      */
     className(): string {
       let classNames = ` text-${this.align}`;

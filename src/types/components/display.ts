@@ -60,6 +60,16 @@ export type ElementType = "span" | "p" | "div" | "h1" | "h2" | "h3";
 export type AlignType = "left" | "center" | "right";
 
 /**
+ * The methods of justifying.
+ */
+export type JustifyType =
+  | "start"
+  | "center"
+  | "end"
+  | "space-between"
+  | "space-around";
+
+/**
  * The possible increments for spacing.
  */
 export type SizeType =

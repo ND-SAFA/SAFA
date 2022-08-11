@@ -1,7 +1,7 @@
 import os
 from enum import Enum
 
-from constants import PROJ_PATH
+from config.constants import PROJ_PATH
 
 
 class Domain(Enum):

@@ -4,7 +4,7 @@ from typing import Dict
 from transformers import AutoConfig, AutoTokenizer
 from transformers.modeling_utils import PreTrainedModel
 
-from constants import MAX_SEQ_LENGTH_DEFAULT
+from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ArchitectureType, ModelSize
 from pretrain.corpuses.domain import Domain

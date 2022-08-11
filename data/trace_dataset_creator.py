@@ -4,7 +4,7 @@ from typing import Dict, Iterable, List, Tuple
 
 import torch
 
-from constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
+from config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
 from data.artifact import Artifact
 from data.data_key import DataKey
 from data.trace_link import TraceLink

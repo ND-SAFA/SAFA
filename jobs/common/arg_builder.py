@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 
-from constants import LINKED_TARGETS_ONLY_DEFAULT, PRETRAIN_MODEL_PATH
+from config.constants import LINKED_TARGETS_ONLY_DEFAULT, PRETRAIN_MODEL_PATH
 from data.trace_dataset_creator import TraceDatasetCreator
 from jobs.pretrain.pretrain_args import ModelPretrainArgs
 from jobs.trace.trace_args import ModelTraceArgs

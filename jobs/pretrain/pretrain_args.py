@@ -1,4 +1,4 @@
-from constants import PRETRAIN_BATCH_SIZE_DEFAULT, PRETRAIN_DATA_PATH, PRETRAIN_LEARNING_RATE_DEFAULT, \
+from config.constants import PRETRAIN_BATCH_SIZE_DEFAULT, PRETRAIN_DATA_PATH, PRETRAIN_LEARNING_RATE_DEFAULT, \
     PRETRAIN_MODEL_NAME, PRETRAIN_VOCAB_FILE
 from models.model_generator import ModelGenerator
 from pretrain.corpuses.domain import Domain, get_path

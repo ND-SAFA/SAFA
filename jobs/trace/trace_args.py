@@ -2,7 +2,7 @@ from typing import List
 
 from transformers.training_args import TrainingArguments
 
-from constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
+from config.constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT
 from data.trace_dataset_creator import TraceDatasetCreator
 from models.model_generator import ModelGenerator

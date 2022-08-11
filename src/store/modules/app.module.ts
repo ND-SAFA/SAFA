@@ -9,9 +9,9 @@ import { artifactSelectionModule } from "@/store";
  */
 export default class ProjectModule extends VuexModule {
   /**
-   * Whether the app is currently loading.
+   * Whether the app is currently loading, as a number of loading process.
    */
-  private isLoading = false;
+  private isLoading = 0;
   /**
    * Whether the app is currently saving.
    */
@@ -50,7 +50,7 @@ export default class ProjectModule extends VuexModule {
    * Sets the app to loading.
    */
   onLoadStart(): void {
-    this.SET_IS_LOADING(true);
+    this.SET_IS_LOADING(this.isLoading + 1);
   }
 
   @Action
@@ -58,7 +58,7 @@ export default class ProjectModule extends VuexModule {
    * Sets the app to no longer loading.
    */
   onLoadEnd(): void {
-    this.SET_IS_LOADING(false);
+    this.SET_IS_LOADING(this.isLoading - 1);
   }
 
   @Action
@@ -173,7 +173,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the current loading state.
    */
-  SET_IS_LOADING(isLoading: boolean): void {
+  SET_IS_LOADING(isLoading: number): void {
     this.isLoading = isLoading;
   }
 
@@ -229,7 +229,7 @@ export default class ProjectModule extends VuexModule {
    * @return Whether the app is currently loading.
    */
   get getIsLoading(): boolean {
-    return this.isLoading;
+    return this.isLoading > 0;
   }
 
   /**

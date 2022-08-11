@@ -3,6 +3,7 @@
     el="h1"
     variant="subtitle"
     color="white"
+    classes="width-max"
     :value="versionDisplayName"
   />
 </template>

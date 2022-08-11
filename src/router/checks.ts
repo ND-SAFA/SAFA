@@ -6,8 +6,15 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appModule, logModule, projectModule, sessionModule } from "@/store";
+import {
+  appModule,
+  logModule,
+  projectModule,
+  sessionModule,
+  viewportModule,
+} from "@/store";
 import { handleClearProject } from "@/api";
+import { cyResetTree } from "@/cytoscape";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -52,9 +59,13 @@ export const routerChecks: Record<string, RouterCheck> = {
     appModule.closePanel(PanelType.left);
     appModule.closePanel(PanelType.right);
   },
-  clearProjectIfOpenCreate(to: Route) {
-    if (to.path !== Routes.PROJECT_CREATOR) return;
+  refocusGraph(to: Route) {
+    if (to.path !== Routes.ARTIFACT) return;
 
-    handleClearProject();
+    appModule.onLoadStart();
+
+    setTimeout(() => {
+      viewportModule.setArtifactTreeLayout().then(appModule.onLoadEnd);
+    }, 200);
   },
 };

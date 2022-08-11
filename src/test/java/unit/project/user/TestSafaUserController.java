@@ -10,7 +10,6 @@ import java.util.Optional;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.projects.SafaUserRepository;
-
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,5 +68,30 @@ public class TestSafaUserController extends ApplicationBaseTest {
         assertThrows(JSONException.class, () -> {
             loginUser(currentUsername, localPassword, status().is4xxClientError());
         });
+    }
+
+    @Test
+    public void invalidPasswordChangeAttempt() throws Exception {
+        String invalidOldPassword = (String) localPassword.subSequence(0, localPassword.length() / 2);
+
+        createUser(currentUsername, localPassword);
+        loginUser(currentUsername, localPassword);
+        changePassword(invalidOldPassword, localPassword, status().is4xxClientError());
+    }
+
+    @Test
+    public void anotherInvalidPasswordChangeAttempt() throws Exception {
+        createUser(currentUsername, localPassword);
+        loginUser(currentUsername, localPassword);
+        changePassword(localPassword, localPassword, status().is4xxClientError());
+    }
+
+    @Test
+    public void validPasswordChangeAttempt() throws Exception {
+        String validNewPassword = (String) localPassword.subSequence(0, localPassword.length() / 2);
+
+        createUser(currentUsername, localPassword);
+        loginUser(currentUsername, localPassword);
+        changePassword(localPassword, validNewPassword, status().is2xxSuccessful());
     }
 }

@@ -3,6 +3,7 @@ package unit;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
@@ -151,6 +152,18 @@ public class AuthenticatedBaseTest extends EntityBaseTest {
         if (setToken) {
             this.token = response.getString("token");
         }
+    }
+
+    public void changePassword(String oldPassword, String newPassword, ResultMatcher test) throws Exception {
+        JSONObject payload = new JSONObject();
+
+        payload.put("oldPassword", oldPassword);
+        payload.put("newPassword", newPassword);
+
+        sendRequest(
+            addJsonBody(put(AppRoutes.Accounts.changePassword), payload),
+            test,
+            this.token);
     }
 
     public void removeMemberFromProject(Project project, String username) throws Exception {

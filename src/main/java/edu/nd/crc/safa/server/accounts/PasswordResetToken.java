@@ -1,5 +1,15 @@
 package edu.nd.crc.safa.server.accounts;
 
+import java.util.Date;
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -7,10 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * Represents list of tokens used to reset user password

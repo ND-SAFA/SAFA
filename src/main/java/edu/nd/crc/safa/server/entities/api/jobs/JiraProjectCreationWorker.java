@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.ProjectCommit;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -16,7 +17,6 @@ import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.ProjectService;
 import edu.nd.crc.safa.server.services.ServiceProvider;

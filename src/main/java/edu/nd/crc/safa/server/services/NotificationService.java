@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.server.services;
 
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.project.ProjectEntityTypes;
@@ -9,7 +10,6 @@ import edu.nd.crc.safa.server.entities.app.project.VersionMessage;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
 import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

@@ -11,6 +11,7 @@ public class AppRoutes {
         public static final String createNewUser = accountPrefix + "/create";
         public static final String forgotPassword = accountPrefix + "/forgot";
         public static final String resetPassword = accountPrefix + "/reset";
+        public static final String changePassword = accountPrefix + "/change";
 
         public static final String jiraCredentials = accountPrefix + "/jira/credentials";
         public static final String jiraCredentialsRefresh = accountPrefix + "/jira/credentials/{cloudId}";

@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.server.accounts;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
+import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.authentication.TokenService;
 import edu.nd.crc.safa.server.controllers.BaseController;
 import edu.nd.crc.safa.server.entities.api.SafaError;
@@ -34,16 +34,19 @@ public class SafaUserController extends BaseController {
     private final SafaUserRepository safaUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final SafaUserService safaUserService;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
                               SafaUserRepository safaUserRepository,
                               PasswordEncoder passwordEncoder,
-                              TokenService tokenService) {
+                              TokenService tokenService,
+                              SafaUserService safaUserService) {
         super(resourceBuilder);
         this.safaUserRepository = safaUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.safaUserService = safaUserService;
     }
 
     @PostMapping(AppRoutes.Accounts.createNewUser)
@@ -54,11 +57,11 @@ public class SafaUserController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Accounts.forgotPassword)
-    // TODO: usually it's not a idea to use entities as DTOs
+    // TODO: usually it's not a good idea to use entities as DTOs since Hibernate could create the given entity
     public void forgotPassword(@RequestBody SafaUser user) {
         String username = user.getEmail();
         SafaUser retrievedUser = this.safaUserRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
+            .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
 
         Date expirationDate = new Date(System.currentTimeMillis() + SecurityConstants.FORGOT_PASSWORD_EXPIRATION_TIME);
         String token = this.tokenService.createTokenForUsername(username, expirationDate);
@@ -78,14 +81,31 @@ public class SafaUserController extends BaseController {
         Claims userClaims = this.tokenService.getTokenClaims(resetToken);
         String username = userClaims.getSubject();
         SafaUser retrievedUser = this.safaUserRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username does not exist:" + username));
+            .orElseThrow(() -> new UsernameNotFoundException("Username does not exist:" + username));
 
         if (userClaims.getExpiration().before(new Date())) {
             throw new SafaError("Reset password token has expired.");
         }
 
         retrievedUser.setPassword(passwordEncoder.encode(newPassword));
-        this.safaUserRepository.save(retrievedUser);
+        retrievedUser = this.safaUserRepository.save(retrievedUser);
         return new UserAppEntity(retrievedUser);
+    }
+
+    @PutMapping(AppRoutes.Accounts.changePassword)
+    public UserAppEntity changePassword(@Valid  @RequestBody PasswordChangeDTO dto) {
+        SafaUser principal = safaUserService.getCurrentUser();
+
+        if (dto.getNewPassword().equals(dto.getOldPassword())) {
+            throw new SafaError("New password cannot be the same with the old one");
+        }
+
+        if (!this.passwordEncoder.matches(dto.getOldPassword(), principal.getPassword())) {
+            throw new SafaError("Invalid old password");
+        }
+
+        principal.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        principal = this.safaUserRepository.save(principal);
+        return new UserAppEntity(principal);
     }
 }

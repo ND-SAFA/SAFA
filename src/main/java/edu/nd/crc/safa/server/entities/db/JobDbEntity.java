@@ -12,9 +12,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
-import edu.nd.crc.safa.server.accounts.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

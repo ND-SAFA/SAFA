@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.SafaError;
 import edu.nd.crc.safa.server.entities.api.jobs.JobType;
@@ -13,7 +14,6 @@ import edu.nd.crc.safa.server.entities.api.jobs.JobWorker;
 import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.app.JobStatus;
 import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.JobDbRepository;
 import edu.nd.crc.safa.server.services.ServiceProvider;
 

@@ -3,10 +3,10 @@ package edu.nd.crc.safa.server.services;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
+import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.authentication.SafaUserService;
 import edu.nd.crc.safa.server.entities.db.CurrentDocument;
 import edu.nd.crc.safa.server.entities.db.Document;
-import edu.nd.crc.safa.server.accounts.SafaUser;
 import edu.nd.crc.safa.server.repositories.documents.CurrentDocumentRepository;
 
 import lombok.AllArgsConstructor;

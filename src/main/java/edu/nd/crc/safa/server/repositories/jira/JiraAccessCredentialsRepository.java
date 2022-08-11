@@ -3,8 +3,8 @@ package edu.nd.crc.safa.server.repositories.jira;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.server.accounts.SafaUser;
+import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;

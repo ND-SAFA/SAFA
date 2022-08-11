@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
 import lombok.AccessLevel;

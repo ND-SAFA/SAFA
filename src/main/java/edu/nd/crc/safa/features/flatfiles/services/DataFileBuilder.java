@@ -6,8 +6,8 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvTraceFile;
 import edu.nd.crc.safa.features.flatfiles.entities.json.JsonArtifactFile;

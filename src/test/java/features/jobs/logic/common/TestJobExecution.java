@@ -1,4 +1,4 @@
-package features.jobs.logic.projectCreation;
+package features.jobs.logic.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Tests that the generic job worker is parsing step correctly.
  */
-class TestProjectCreationJob extends ApplicationBaseTest {
+class TestJobExecution extends ApplicationBaseTest {
 
     @Autowired
     ServiceProvider serviceProvider;

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that user is able to create and update a project idenfier via JSON.
  */
-class TestCreateOrUpdateProjectIdentifierBase extends ProjectJsonBaseTest {
+class TestCreateOrUpdateProjectIdentifierBase extends AbstractProjectJsonTest {
 
 
     /**

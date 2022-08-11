@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.builders.MultipartRequestService;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.flatfiles.entities.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvTraceFile;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;

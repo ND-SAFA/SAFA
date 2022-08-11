@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.flatfiles.entities;
+package edu.nd.crc.safa.features.flatfiles.entities.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;

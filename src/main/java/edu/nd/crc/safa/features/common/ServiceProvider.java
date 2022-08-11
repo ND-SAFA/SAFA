@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 public class ServiceProvider {
     // Flat Files
     private final ProjectService projectService;
+    private final ProjectVersionRepository projectVersionRepository;
     private final FileUploadService fileUploadService;
     private final FlatFileService flatFileService;
     private final EntityVersionService entityVersionService;

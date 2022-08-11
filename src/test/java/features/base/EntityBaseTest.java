@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepositor
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
+import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
@@ -85,6 +86,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected FTAArtifactRepository ftaArtifactRepository;
+
+    @Autowired
+    protected JobService jobService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 

@@ -2,10 +2,11 @@ package features.jobs.logic.flatfiles;
 
 import java.util.UUID;
 
-import features.jobs.base.JobBaseFlatFileTest;
+import features.jobs.base.AbstractFlatFileJobTest;
+import features.jobs.base.JobTestService;
 import org.junit.jupiter.api.Test;
 
-class TestProjectCreationWorkerFlatFile extends JobBaseFlatFileTest {
+class TestProjectCreationWorkerFlatFile extends AbstractFlatFileJobTest {
 
     int N_STEPS = 6;
 
@@ -22,13 +23,13 @@ class TestProjectCreationWorkerFlatFile extends JobBaseFlatFileTest {
     void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = createJobFromDefaultProject();
+        UUID jobId = createJobForDefaultProject();
 
         // Step - Get Job and subscribe for updates
         createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
-        verifyJobWasCompleted(jobId, N_STEPS);
+        JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);
 
         // VP - Verify that all entities were created
         verifyDefaultProjectEntities(projectVersion.getProject());

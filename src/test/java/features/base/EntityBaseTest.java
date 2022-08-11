@@ -1,6 +1,5 @@
 package features.base;
 
-import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
@@ -19,6 +18,8 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.users.services.AccountLookupService;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,6 +75,9 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected SafaUserService safaUserService;
+
+    @Autowired
+    protected AccountLookupService accountLookupService;
 
     @Autowired
     protected DbEntityBuilder dbEntityBuilder;

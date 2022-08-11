@@ -1,19 +1,17 @@
-package edu.nd.crc.safa.authentication;
+package edu.nd.crc.safa.features.users.services;
 
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,25 +20,11 @@ import org.springframework.stereotype.Service;
  * and resetting users.
  */
 @Service
-@Scope("singleton")
 @AllArgsConstructor
-public class SafaUserService implements UserDetailsService {
+public class SafaUserService {
 
-    private final SafaUserRepository safaUserRepository;
     private final PasswordEncoder passwordEncoder;
-
-    /**
-     * The implementation for UserDetailService that bridges Spring's default authentication and our
-     * custom user entity class, {@link SafaUser}.
-     */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new SafaUserDetails(this.getUserFromUsername(username));
-    }
-
-    public SafaUser getUserFromUsername(String username) {
-        return safaUserRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
-    }
+    private final SafaUserRepository safaUserRepository;
 
     /**
      * @return the current {@link SafaUser} logged in
@@ -50,6 +34,20 @@ public class SafaUserService implements UserDetailsService {
         Authentication authentication = securityContext.getAuthentication();
 
         return ((SafaUserDetails) authentication.getPrincipal()).getUser();
+    }
+
+    /**
+     * Creates new user with given email and password.
+     *
+     * @param email    User's email. Must be unique.
+     * @param password Account password
+     * @return {@link UserAppEntity} representing created user
+     */
+    public UserAppEntity createUser(String email, String password) {
+        String encodedPassword = this.passwordEncoder.encode(password);
+        SafaUser safaUser = new SafaUser(email, encodedPassword);
+        this.safaUserRepository.save(safaUser);
+        return new UserAppEntity(safaUser);
     }
 
     /**

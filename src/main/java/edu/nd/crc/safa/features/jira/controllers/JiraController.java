@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 
-import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
@@ -21,6 +20,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByJiraJobBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.slf4j.Logger;

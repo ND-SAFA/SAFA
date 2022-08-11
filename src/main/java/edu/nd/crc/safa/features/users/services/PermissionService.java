@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.users.services;
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;

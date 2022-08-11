@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.users.controllers;
 
-import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
@@ -8,10 +7,9 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.app.UserPassword;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,17 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class SafaUserController extends BaseController {
 
     private final SafaUserService safaUserService;
-    private final SafaUserRepository safaUserRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
-                              SafaUserRepository safaUserRepository,
-                              PasswordEncoder passwordEncoder,
                               SafaUserService safaUserService) {
         super(resourceBuilder);
-        this.safaUserRepository = safaUserRepository;
-        this.passwordEncoder = passwordEncoder;
         this.safaUserService = safaUserService;
     }
 
@@ -50,12 +42,7 @@ public class SafaUserController extends BaseController {
      */
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserAppEntity createNewUser(@RequestBody SafaUser newUser) {
-        String encodedPassword = this.passwordEncoder.encode(newUser.getPassword());
-        SafaUser safaUser = new SafaUser(null,
-            newUser.getEmail(),
-            encodedPassword);
-        this.safaUserRepository.save(safaUser);
-        return new UserAppEntity(safaUser);
+        return this.safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
     }
 
     /**

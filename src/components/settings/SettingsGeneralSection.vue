@@ -1,13 +1,13 @@
 <template>
   <v-container>
-    <div class="d-flex justify-space-between">
+    <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
       <generic-icon-button
         tooltip="Edit title"
         icon-id="mdi-pencil"
         @click="handleEdit"
       />
-    </div>
+    </flex-box>
     <v-divider />
     <typography :value="project.description" />
 
@@ -27,7 +27,7 @@ import Vue, { PropType } from "vue";
 import { Project, ProjectIdentifier } from "@/types";
 import { handleSaveProject } from "@/api";
 import { projectModule } from "@/store";
-import { GenericIconButton, Typography } from "@/components/common";
+import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
 /**
@@ -36,7 +36,12 @@ import { ProjectIdentifierModal } from "@/components/project/shared";
  */
 export default Vue.extend({
   name: "SettingsGeneralSection",
-  components: { Typography, GenericIconButton, ProjectIdentifierModal },
+  components: {
+    FlexBox,
+    Typography,
+    GenericIconButton,
+    ProjectIdentifierModal,
+  },
   props: {
     project: {
       type: Object as PropType<Project>,

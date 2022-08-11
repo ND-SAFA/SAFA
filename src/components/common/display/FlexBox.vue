@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AlignType, JustifyType } from "@/types";
+import { JustifyType, SizeType, AlignType } from "@/types";
 
 /**
  * A generic component for displaying flex content.
@@ -22,7 +22,32 @@ export default Vue.extend({
       type: String as PropType<JustifyType>,
       default: "start",
     },
+    x: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    l: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    r: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    y: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    t: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    b: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
     maxWidth: Number,
+    fullWidth: Boolean,
   },
   computed: {
     /**
@@ -43,6 +68,13 @@ export default Vue.extend({
 
       if (this.align) classNames += ` align-${this.align}`;
       if (this.justify) classNames += ` justify-${this.justify}`;
+      if (this.fullWidth) classNames += ` full-width`;
+      if (this.x) classNames += ` mx-${this.x}`;
+      if (this.l) classNames += ` ml-${this.l}`;
+      if (this.r) classNames += ` mr-${this.r}`;
+      if (this.y) classNames += ` my-${this.y}`;
+      if (this.t) classNames += ` mt-${this.t}`;
+      if (this.b) classNames += ` mb-${this.b}`;
 
       return classNames;
     },

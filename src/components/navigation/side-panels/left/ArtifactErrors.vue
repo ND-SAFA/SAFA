@@ -1,9 +1,9 @@
 <template>
   <div v-if="selectedArtifactWarnings.length > 0">
-    <div class="d-flex flex-row">
+    <flex-box>
       <v-icon color="secondary">mdi-hazard-lights</v-icon>
       <typography el="h2" l="1" variant="subtitle" value="Warnings" />
-    </div>
+    </flex-box>
 
     <v-divider class="mb-2" />
 
@@ -27,14 +27,14 @@
 import Vue from "vue";
 import { ArtifactWarning } from "@/types";
 import { artifactSelectionModule, errorModule } from "@/store";
-import { Typography } from "@/components/common";
+import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Displays the selected node's error.
  */
 export default Vue.extend({
   name: "ArtifactErrors",
-  components: { Typography },
+  components: { FlexBox, Typography },
   computed: {
     /**
      * @return The selected artifact.

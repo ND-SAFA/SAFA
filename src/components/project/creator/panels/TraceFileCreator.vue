@@ -1,24 +1,27 @@
 <template>
-  <div
+  <flex-box
     v-if="isOpen"
-    class="d-flex justify-space-between align-center my-3 full-width"
+    align="center"
+    justify="space-between"
+    full-width
+    y="3"
   >
-    <div class="d-flex">
+    <flex-box>
       <button-row :definitions="[sourceDefinition]" />
       <v-icon class="mx-2">mdi-arrow-right</v-icon>
       <button-row :definitions="[targetDefinition]" />
-    </div>
+    </flex-box>
     <v-btn @click="handleSubmit" color="primary" class="ml-10">
       Create Trace Matrix
     </v-btn>
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
 import { logModule } from "@/store";
-import { ButtonRow } from "@/components/common";
+import { ButtonRow, FlexBox } from "@/components/common";
 
 /**
  * Trace file creator.
@@ -29,6 +32,7 @@ import { ButtonRow } from "@/components/common";
 export default Vue.extend({
   name: "TraceFileCreator",
   components: {
+    FlexBox,
     ButtonRow,
   },
   props: {

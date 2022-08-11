@@ -1,10 +1,10 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <div class="d-flex align-center">
+      <flex-box align="center">
         <v-icon class="mr-1" :color="iconColor">{{ iconName }}</v-icon>
         <slot name="title" />
-      </div>
+      </flex-box>
     </v-expansion-panel-header>
     <v-expansion-panel-content>
       <slot name="before-rows" />
@@ -15,14 +15,14 @@
         @input="emitChangeFiles"
       />
 
-      <div class="d-flex justify-space-between align-center">
+      <flex-box justify="space-between" align="center">
         <generic-switch
           v-if="showFileUploader"
           v-model="ignoreErrors"
           label="Ignore Errors"
         />
         <typography v-if="!isValid && showFileUploader" error :value="error" />
-      </div>
+      </flex-box>
 
       <v-expansion-panels accordion>
         <v-expansion-panel v-if="entityNames.length !== 0">
@@ -63,10 +63,10 @@
         </v-expansion-panel>
       </v-expansion-panels>
 
-      <div class="d-flex justify-space-between mt-4">
+      <flex-box justify="space-between" t="4">
         <v-spacer />
         <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
-      </div>
+      </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
@@ -78,6 +78,7 @@ import {
   GenericSwitch,
   GenericFileSelector,
   Typography,
+  FlexBox,
 } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
@@ -93,6 +94,7 @@ const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 export default Vue.extend({
   name: "FilePanel",
   components: {
+    FlexBox,
     Typography,
     GenericSwitch,
     GenericFileSelector,

@@ -20,7 +20,7 @@
       </v-col>
     </v-row>
 
-    <div class="d-flex flex-row justify-end">
+    <flex-box justify="end">
       <v-btn
         outlined
         v-if="showApprove"
@@ -57,7 +57,7 @@
       >
         Cancel
       </v-btn>
-    </div>
+    </flex-box>
   </div>
 </template>
 
@@ -66,6 +66,7 @@ import Vue, { PropType } from "vue";
 import { Artifact, TraceLink } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactModule } from "@/store";
+import { FlexBox } from "@/components/common";
 
 /**
  * Displays a trace link.
@@ -78,6 +79,7 @@ import { artifactModule } from "@/store";
 export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
+    FlexBox,
     GenericArtifactBodyDisplay,
   },
   props: {

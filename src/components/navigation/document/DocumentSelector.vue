@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row align-center">
+  <flex-box align="center">
     <v-select
       ref="documentSelector"
       v-model="select"
@@ -50,19 +50,19 @@
       :tooltip="toggleViewTooltip"
       @click="handleToggleTableView"
     />
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { ProjectDocument } from "@/types";
 import { documentModule } from "@/store";
-import { GenericIconButton } from "@/components/common/generic";
+import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { DocumentModal, GenericIconButton },
+  components: { FlexBox, DocumentModal, GenericIconButton },
   data: () => ({
     isCreateOpen: false,
     isEditOpen: false,

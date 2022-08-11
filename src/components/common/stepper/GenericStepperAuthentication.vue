@@ -1,21 +1,24 @@
 <template>
-  <v-container class="d-flex justify-center">
-    <v-btn
-      large
-      color="primary"
-      :disabled="isDisabled"
-      :loading="isLoading"
-      @click="handleClick"
-    >
-      <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-      <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
-      <span v-else>{{ connectedTitle }}</span>
-    </v-btn>
+  <v-container>
+    <flex-box justify="center">
+      <v-btn
+        large
+        color="primary"
+        :disabled="isDisabled"
+        :loading="isLoading"
+        @click="handleClick"
+      >
+        <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
+        <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
+        <span v-else>{{ connectedTitle }}</span>
+      </v-btn>
+    </flex-box>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { FlexBox } from "@/components/common/display";
 
 /**
  * Displays an authentication stepper step.
@@ -24,6 +27,7 @@ import Vue from "vue";
  */
 export default Vue.extend({
   name: "GenericStepperAuthentication",
+  components: { FlexBox },
   props: {
     hasCredentials: {
       type: Boolean,

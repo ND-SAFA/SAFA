@@ -39,7 +39,7 @@
         </v-col>
       </v-row>
       <template v-slot:actions>
-        <div style="width: 120px" class="d-flex justify-end">
+        <flex-box justify="end">
           <v-chip
             outlined
             :color="getStatusColor(job.status)"
@@ -68,7 +68,7 @@
               {{ formatStatus(job.status) }}
             </span>
           </v-chip>
-        </div>
+        </flex-box>
       </template>
     </v-expansion-panel-header>
 
@@ -89,8 +89,9 @@
         </v-stepper-header>
       </v-stepper>
 
-      <div class="d-flex">
+      <flex-box full-width justify="end">
         <v-btn
+          outlined
           color="error"
           class="mr-1"
           data-cy="button-delete-job"
@@ -105,7 +106,7 @@
         >
           View Project
         </v-btn>
-      </div>
+      </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
@@ -117,13 +118,14 @@ import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logModule } from "@/store";
 import { Typography } from "@/components/common";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a project import job.
  */
 export default Vue.extend({
   name: "JobPanel",
-  components: { Typography },
+  components: { FlexBox, Typography },
   props: {
     job: {
       type: Object as PropType<Job>,

@@ -1,9 +1,9 @@
 <template>
   <v-container>
-    <div class="d-flex justify-space-between full-width">
+    <flex-box justify="space-between" full-width>
       <typography el="h1" variant="title" :value="title" />
       <section-controls @open:all="openAll" @close:all="closeAll" />
-    </div>
+    </flex-box>
     <v-divider class="mb-2" />
     <v-expansion-panels multiple v-model="openLinks">
       <trace-link-expansion-panel
@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { TraceLink } from "@/types";
-import { Typography } from "@/components/common";
+import { Typography, FlexBox } from "@/components/common";
 import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
 import SectionControls from "./SectionControls.vue";
 
@@ -34,7 +34,7 @@ import SectionControls from "./SectionControls.vue";
  */
 export default Vue.extend({
   name: "ApprovalSection",
-  components: { Typography, TraceLinkExpansionPanel, SectionControls },
+  components: { FlexBox, Typography, TraceLinkExpansionPanel, SectionControls },
   props: {
     title: String,
     showApprove: {

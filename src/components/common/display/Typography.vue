@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AlignType, ElementType, SizeType, TextType } from "@/types";
+import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
 
 /**
  * A generic component for displaying text.
@@ -68,14 +68,10 @@ export default Vue.extend({
       default: "span",
     },
     align: {
-      type: String as PropType<AlignType>,
+      type: String as PropType<TextAlignType>,
       default: "left",
     },
     x: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    y: {
       type: String as PropType<SizeType>,
       default: "",
     },
@@ -84,6 +80,18 @@ export default Vue.extend({
       default: "",
     },
     r: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    y: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    t: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    b: {
       type: String as PropType<SizeType>,
       default: "",
     },
@@ -112,9 +120,11 @@ export default Vue.extend({
       if (this.ellipsis) classNames += ` text-ellipsis`;
       if (this.secondary) classNames += ` text--secondary`;
       if (this.x) classNames += ` mx-${this.x}`;
-      if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;
       if (this.r) classNames += ` mr-${this.r}`;
+      if (this.y) classNames += ` my-${this.y}`;
+      if (this.t) classNames += ` mt-${this.t}`;
+      if (this.b) classNames += ` mb-${this.b}`;
 
       switch (this.variant) {
         case "large":

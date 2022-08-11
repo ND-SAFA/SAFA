@@ -1,11 +1,11 @@
 <template>
   <div v-if="parents.length + children.length > 0" class="mb-2">
-    <div class="d-flex flex-row">
+    <flex-box>
       <v-icon color="primary" style="transform: rotate(-45deg)">
         mdi-ray-start-arrow
       </v-icon>
       <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
-    </div>
+    </flex-box>
 
     <v-divider class="mb-2" />
 
@@ -53,14 +53,14 @@
 import Vue from "vue";
 import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
-import { GenericListItem, Typography } from "@/components/common";
+import { GenericListItem, Typography, FlexBox } from "@/components/common";
 
 /**
  * Displays the selected node's parents and children.
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { Typography, GenericListItem },
+  components: { FlexBox, Typography, GenericListItem },
   computed: {
     /**
      * @return The selected artifact.

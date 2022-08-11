@@ -109,7 +109,7 @@ export default Vue.extend({
     async handleRetrieveMembers(): Promise<void> {
       if (this.project.projectId !== "") {
         this.isLoading = true;
-        this.members = await getProjectMembers(this.project.projectId);
+        this.project.members = await getProjectMembers(this.project.projectId);
         this.isLoading = false;
       }
     },

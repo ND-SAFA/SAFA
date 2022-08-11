@@ -1,0 +1,17 @@
+from trace.metrics.trace_metric import TraceMetric
+from trace.config.constants import K_METRIC_DEFAULT
+
+
+class MapAtKMetric(TraceMetric):
+
+    @property
+    def name(self) -> str:
+        return "map_at_k"
+
+    # TODO
+    def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
+        pass
+
+    def _info(self):
+        # TODO: Specifies the datasets.MetricInfo object
+        pass

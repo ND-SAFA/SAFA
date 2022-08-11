@@ -1,8 +1,10 @@
 <template>
   <v-expansion-panels v-model="selectedJobs" multiple>
-    <p v-if="uploads.length === 0" class="text-caption">
-      There aren't any uploads yet.
-    </p>
+    <typography
+      v-if="uploads.length === 0"
+      variant="small"
+      value="There aren't any uploads yet."
+    />
     <job-panel v-for="(upload, i) in uploads" :key="i" :job="upload" />
   </v-expansion-panels>
 </template>
@@ -13,6 +15,7 @@ import { Job } from "@/types";
 import { jobModule } from "@/store";
 import { connectAndSubscribeToJob, getUserJobs } from "@/api";
 import JobPanel from "./JobPanel.vue";
+import { Typography } from "@/components/common";
 
 /**
  * Displays all jobs.
@@ -20,6 +23,7 @@ import JobPanel from "./JobPanel.vue";
 export default Vue.extend({
   name: "JobList",
   components: {
+    Typography,
     JobPanel,
   },
   data() {

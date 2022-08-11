@@ -72,8 +72,9 @@ export default Vue.extend({
      * @return The class name based on the text type.
      */
     className(): string {
-      let classNames = ` text-${this.align} ${this.class}`;
+      let classNames = ` text-${this.align}`;
 
+      if (this.class) classNames += ` ${this.class}`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;

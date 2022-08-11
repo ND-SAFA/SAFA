@@ -3,46 +3,60 @@
     <v-expansion-panel-header disable-icon-rotate>
       <v-row no-gutters>
         <v-col cols="4">
-          {{ job.name }}
+          <typography :value="job.name" />
         </v-col>
         <v-col cols="8" class="text--secondary">
           <v-row v-if="isCancelled(job.status)" no-gutters>
-            <v-col cols="4"> Upload Cancelled </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(job.lastUpdatedAt) }}
+              <typography value="Upload Cancelled" />
+            </v-col>
+            <v-col cols="4">
+              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
             </v-col>
           </v-row>
-          <span v-else-if="isCompleted(job.status)">
-            {{ getCompletedText(job.completedAt) }}
-          </span>
+          <typography
+            v-else-if="isCompleted(job.status)"
+            :value="getCompletedText(job.completedAt)"
+          />
           <v-row v-else no-gutters>
             <v-col cols="4">
-              Upload Progress: {{ job.currentProgress }}%
+              <typography :value="`Upload Progress: ${job.currentProgress}%`" />
             </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(job.lastUpdatedAt) }}
+              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <template v-slot:actions>
         <div style="width: 120px" class="d-flex justify-end">
-          <v-chip :color="getStatusColor(job.status)" data-cy="job-status">
-            <span class="mr-1">
-              {{ formatStatus(job.status) }}
-            </span>
+          <v-chip
+            outlined
+            :color="getStatusColor(job.status)"
+            data-cy="job-status"
+          >
             <v-progress-circular
               v-if="isInProgress(job.status)"
+              :color="getStatusColor(job.status)"
               indeterminate
               size="16"
               class="mx-1"
             />
-            <v-icon v-if="isCompleted(job.status)">
+            <v-icon
+              v-if="isCompleted(job.status)"
+              :color="getStatusColor(job.status)"
+            >
               mdi-check-circle-outline
             </v-icon>
-            <v-icon v-if="isCancelled(job.status)">
+            <v-icon
+              v-if="isCancelled(job.status)"
+              :color="getStatusColor(job.status)"
+            >
               mdi-close-circle-outline
             </v-icon>
+            <span class="ml-1">
+              {{ formatStatus(job.status) }}
+            </span>
           </v-chip>
         </div>
       </template>
@@ -53,9 +67,12 @@
         <v-stepper-header>
           <template v-for="(step, stepIndex) in job.steps">
             <v-stepper-step :key="stepIndex" :step="stepIndex">
-              <span class="upload-step">
-                {{ job.steps[stepIndex] }}
-              </span>
+              <typography
+                class="upload-step"
+                align="center"
+                el="p"
+                :value="job.steps[stepIndex]"
+              />
             </v-stepper-step>
             <v-divider :key="step" />
           </template>
@@ -89,13 +106,14 @@ import { Job, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logModule } from "@/store";
+import { Typography } from "@/components/common";
 
 /**
  * Displays a project import job.
- * TODO: Close panel before deleting job.
  */
 export default Vue.extend({
   name: "JobPanel",
+  components: { Typography },
   props: {
     job: {
       type: Object as PropType<Job>,
@@ -169,6 +187,5 @@ export default Vue.extend({
 <style>
 .upload-step {
   width: min-content;
-  text-align: center;
 }
 </style>

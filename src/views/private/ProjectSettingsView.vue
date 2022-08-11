@@ -1,10 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <v-btn text @click="handleGoBack">
-        <v-icon left> mdi-arrow-left </v-icon>
-        Back To Tree View
-      </v-btn>
+      <back-button text="Back To Tree View" />
       <v-container>
         <settings-general-section :project="project" />
         <settings-member-section :project="project" />
@@ -15,12 +12,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { navigateBack } from "@/router";
 import { projectModule } from "@/store";
 import {
   PrivatePage,
   SettingsGeneralSection,
   SettingsMemberSection,
+  BackButton,
 } from "@/components";
 
 /**
@@ -29,6 +26,7 @@ import {
 export default Vue.extend({
   name: "ProjectSettingsView",
   components: {
+    BackButton,
     PrivatePage,
     SettingsGeneralSection,
     SettingsMemberSection,
@@ -39,14 +37,6 @@ export default Vue.extend({
      */
     project() {
       return projectModule.getProject;
-    },
-  },
-  methods: {
-    /**
-     * Goes back to the artifact page.
-     */
-    handleGoBack() {
-      navigateBack();
     },
   },
 });

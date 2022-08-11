@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex justify-space-between">
-      <typography el="h1" variant="large" :value="project.name" />
+      <typography el="h1" variant="title" :value="project.name" />
       <generic-icon-button
         tooltip="Edit title"
         icon-id="mdi-pencil"

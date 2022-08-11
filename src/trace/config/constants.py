@@ -1,0 +1,12 @@
+import math
+
+# -------------- JOB ARGS --------------
+MAX_SEQ_LENGTH_DEFAULT = 256
+RESAMPLE_RATE_DEFAULT = 1
+EVAL_DATASET_SIZE_DEFAULT = math.inf
+PAD_TO_MAX_LENGTH_DEFAULT = True
+LINKED_TARGETS_ONLY_DEFAULT = False
+
+# -------------- METRICS --------------
+K_METRIC_DEFAULT = 10  # TODO
+

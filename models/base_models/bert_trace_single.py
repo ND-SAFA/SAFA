@@ -4,7 +4,7 @@ from transformers.models.electra.modeling_electra import (
 )
 
 
-from models.single_model_forward_pass import single_model_forward_pass
+from models.base_models.single_model_forward_pass import single_model_forward_pass
 
 
 class BertTraceSingle(BertPreTrainedModel):

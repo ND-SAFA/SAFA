@@ -38,7 +38,7 @@ export function svgTIM(data: TimNodeData): string {
       />
       ${svgTitle(data.id, ThemeColors.black, y)}
       ${svgDiv({ x, y: y + 17, width: TIM_NODE_WIDTH - x * 2 })}
-      ${svgDetails(`${data.count} Nodes`, ThemeColors.black, y + 37)}
+      ${svgDetails(`${data.count} Nodes`, ThemeColors.black, y + 47)}
     </svg>
     `;
 }

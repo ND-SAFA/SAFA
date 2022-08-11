@@ -10,11 +10,11 @@
           :disabled="isButtonDisabled"
           @click="$emit('add')"
         >
-          Create new {{ itemName }}</v-btn
-        >
+          Create new {{ itemName }}
+        </v-btn>
       </v-col>
-      <v-col v-if="showError" style="white-space: nowrap">
-        Requires at least 1 {{ itemName }}.
+      <v-col v-if="showError">
+        <typography :value="`Requires at least 1 ${itemName}.`" />
       </v-col>
     </v-row>
   </v-container>
@@ -23,6 +23,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ThemeColors } from "@/util";
+import { Typography } from "@/components/common";
 
 /**
  * Validated upload panels.
@@ -33,6 +34,7 @@ import { ThemeColors } from "@/util";
  */
 export default Vue.extend({
   name: "ValidatedPanels",
+  components: { Typography },
   props: {
     itemName: {
       type: String,

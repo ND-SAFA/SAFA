@@ -5,8 +5,6 @@
     submitText="Create Project"
     @submit="saveProject()"
   >
-    <v-row>Create a new project</v-row>
-
     <template v-slot:items>
       <v-stepper-content step="1">
         <project-identifier-input

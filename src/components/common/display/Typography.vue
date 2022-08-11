@@ -38,6 +38,7 @@ export default Vue.extend({
   props: {
     value: String,
     class: String,
+    error: Boolean,
     variant: {
       type: String as PropType<TextType>,
       default: "body",
@@ -75,6 +76,7 @@ export default Vue.extend({
       let classNames = ` text-${this.align}`;
 
       if (this.class) classNames += ` ${this.class}`;
+      if (this.error) classNames += ` error--text`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;

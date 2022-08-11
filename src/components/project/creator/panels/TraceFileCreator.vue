@@ -1,18 +1,17 @@
 <template>
-  <v-row v-if="isOpen" class="my-3" align="center">
-    <v-col cols="9">
-      <div class="d-flex width-min">
-        <button-row :definitions="[sourceDefinition]" />
-        <v-icon class="mx-2">mdi-arrow-right</v-icon>
-        <button-row :definitions="[targetDefinition]" />
-      </div>
-    </v-col>
-    <v-col cols="3">
-      <v-btn @click="handleSubmit" color="primary" class="ml-10">
-        Create Trace Matrix
-      </v-btn>
-    </v-col>
-  </v-row>
+  <div
+    v-if="isOpen"
+    class="d-flex justify-space-between align-center my-3 full-width"
+  >
+    <div class="d-flex">
+      <button-row :definitions="[sourceDefinition]" />
+      <v-icon class="mx-2">mdi-arrow-right</v-icon>
+      <button-row :definitions="[targetDefinition]" />
+    </div>
+    <v-btn @click="handleSubmit" color="primary" class="ml-10">
+      Create Trace Matrix
+    </v-btn>
+  </div>
 </template>
 
 <script lang="ts">

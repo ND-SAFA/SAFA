@@ -33,31 +33,12 @@ export default Vue.extend({
     SettingsGeneralSection,
     SettingsMemberSection,
   },
-  data() {
-    return {
-      headers: [
-        { text: "Email", value: "email", sortable: false, isSelectable: false },
-        {
-          text: "Role",
-          value: "role",
-          sortable: true,
-          isSelectable: false,
-        },
-      ],
-    };
-  },
   computed: {
     /**
      * @return The current project.
      */
     project() {
       return projectModule.getProject;
-    },
-    /**
-     * @return Whether the current project has a description.
-     */
-    hasDescription(): boolean {
-      return this.project.description !== "";
     },
   },
   methods: {

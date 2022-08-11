@@ -1,23 +1,16 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-row>
-        <v-col cols="11">
-          <h1 class="text-h4">{{ project.name }}</h1>
-        </v-col>
-        <v-col cols="1">
-          <generic-icon-button
-            tooltip="Edit title"
-            icon-id="mdi-pencil"
-            @click="handleEdit"
-          />
-        </v-col>
-      </v-row>
-      <v-divider />
-      <p class="text-body-1">
-        {{ project.description }}
-      </p>
-    </v-col>
+  <v-container>
+    <div class="d-flex justify-space-between">
+      <typography el="h1" variant="large" :value="project.name" />
+      <generic-icon-button
+        tooltip="Edit title"
+        icon-id="mdi-pencil"
+        @click="handleEdit"
+      />
+    </div>
+    <v-divider />
+    <typography :value="project.description" />
+
     <project-identifier-modal
       title="Edit Project"
       :is-open="isEditOpen"
@@ -26,16 +19,16 @@
       @close="isEditOpen = false"
       @save="handleSave"
     />
-  </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Project, ProjectIdentifier } from "@/types";
-import { GenericIconButton } from "@/components/common";
-import { ProjectIdentifierModal } from "@/components/project/shared";
 import { handleSaveProject } from "@/api";
 import { projectModule } from "@/store";
+import { GenericIconButton, Typography } from "@/components/common";
+import { ProjectIdentifierModal } from "@/components/project/shared";
 
 /**
  * Represents the section describing the project name and descriptions
@@ -43,7 +36,7 @@ import { projectModule } from "@/store";
  */
 export default Vue.extend({
   name: "SettingsGeneralSection",
-  components: { GenericIconButton, ProjectIdentifierModal },
+  components: { Typography, GenericIconButton, ProjectIdentifierModal },
   props: {
     project: {
       type: Object as PropType<Project>,

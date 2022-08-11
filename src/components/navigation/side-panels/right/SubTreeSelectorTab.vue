@@ -15,11 +15,11 @@
     />
 
     <typography
+      secondary
       el="div"
       variant="body"
       align="right"
       :value="searchHint"
-      color="grey"
     />
 
     <v-list class="search-container full-width" expand>
@@ -36,7 +36,7 @@
                 <div v-on="on" v-bind="attrs">
                   <typography :value="getTypePrintName(type)" />
                   <typography
-                    color="grey"
+                    secondary
                     :value="`(${artifactTypeHashTable[type].length})`"
                   />
                 </div>

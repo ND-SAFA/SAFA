@@ -6,7 +6,7 @@
           <typography :value="item.title" />
         </v-list-item-title>
         <v-list-item-subtitle v-if="!!item.subtitle">
-          <typography :value="item.subtitle" color="grey" />
+          <typography secondary :value="item.subtitle" />
         </v-list-item-subtitle>
       </v-list-item>
     </template>

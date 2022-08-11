@@ -6,13 +6,9 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 
 import lombok.AllArgsConstructor;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 
 /**
- * Defines a job performing some actions on some project version.
+ * Defines a job performing some actions on some identified entity.
  */
 public abstract class AbstractJobBuilder<I, W> {
     /**
@@ -24,23 +20,23 @@ public abstract class AbstractJobBuilder<I, W> {
      */
     I identifier;
     /**
-     * Entity affected in job.
+     * Work to be done by job.
      */
-    W change;
+    W work;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
     }
 
-    public JobAppEntity perform() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public JobAppEntity perform() throws Exception {
         // Step 1 - Select project version to change
         this.identifier = this.constructIdentifier();
 
         // Step - Construct change
-        this.change = this.constructJobWork(this.identifier);
+        this.work = this.constructJobWork(this.identifier);
 
         // Step 3 - Construct job definition
-        JobDefinition jobDefinition = this.constructJobForWork(this.change);
+        JobDefinition jobDefinition = this.constructJobForWork(this.work);
 
         // Step 4 - Start job
         JobDbEntity jobDbEntity = jobDefinition.jobDbEntity;

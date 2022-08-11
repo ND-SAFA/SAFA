@@ -19,10 +19,6 @@ import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
@@ -99,17 +95,17 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws SafaError,
-        JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-        JobParametersInvalidException, JobRestartException {
-        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(serviceProvider,
+                                                 @RequestParam MultipartFile[] files) throws Exception {
+        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
+            serviceProvider,
             versionId, files);
         return updateProjectByFlatFileJobBuilder.perform();
     }
 
     @PostMapping(AppRoutes.Jobs.JSON_PROJECT_JOB)
     public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
-        CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(serviceProvider, projectAppEntity);
+        CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
+            serviceProvider, projectAppEntity);
         return createProjectByJsonJobBuilder.perform();
     }
 }

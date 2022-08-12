@@ -1,7 +1,7 @@
 from datasets import list_metrics
-from train.metrics.map_at_k_metric import MapAtKMetric
-from train.metrics.mrr_metric import MRRMetric
-from train.metrics.precision_at_k_metric import PrecisionAtKMetric
+from trace.metrics.map_at_k_metric import MapAtKMetric
+from trace.metrics.mrr_metric import MRRMetric
+from trace.metrics.precision_at_k_metric import PrecisionAtKMetric
 
 SUPPORTED_METRICS = {MapAtKMetric.name: MapAtKMetric.path,
                      PrecisionAtKMetric.name: PrecisionAtKMetric.path,

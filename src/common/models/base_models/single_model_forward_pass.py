@@ -2,7 +2,7 @@ from typing import Optional
 
 import torch
 from torch.nn import CrossEntropyLoss
-from transformers import PreTrainedModel
+from transformers.modeling_utils import PreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead
 
 from common.config.constants import LOGITS, LOSS

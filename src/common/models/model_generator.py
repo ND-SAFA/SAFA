@@ -1,6 +1,7 @@
 from typing import Dict
 
-from transformers import AutoConfig, AutoTokenizer
+from transformers.models.auto.configuration_auto import AutoConfig
+from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.modeling_utils import PreTrainedModel
 
 from trace.config.constants import MAX_SEQ_LENGTH_DEFAULT
@@ -23,20 +24,20 @@ class ModelGenerator:
         """
         self.model_path = model_path
         self.model_name = base_model_name
-        self.base_model = self._get_supported_base_model(self.model_name)
+        self.base_model = self.get_supported_base_model(self.model_name)
         self.base_model_class = self.base_model.value
         self.arch_type = self._get_model_architecture_type(self.model_name)
         self.model_size = model_size
 
     @staticmethod
-    def _get_supported_base_model(model_name: str) -> SupportedBaseModel:
+    def get_supported_base_model(model_name: str) -> SupportedBaseModel:
         """
         Gets the supported base model
         :param model_name: the name of the model
         :return: the SupportedBaseModel
         """
         try:
-            return SupportedBaseModel[model_name]
+            return SupportedBaseModel[model_name.upper()]
         except KeyError:
             raise NameError("Model name %s unknown" % model_name)
 
@@ -49,7 +50,7 @@ class ModelGenerator:
         """
         arch_type = model_name.split("_")[-1]
         try:
-            return ArchitectureType[arch_type]
+            return ArchitectureType[arch_type.upper()]
         except KeyError:
             return ArchitectureType.SINGLE
 

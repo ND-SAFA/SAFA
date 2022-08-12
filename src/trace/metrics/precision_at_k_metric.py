@@ -1,5 +1,5 @@
-from train.metrics.trace_metric import TraceMetric
-from constants import K_METRIC_DEFAULT
+from trace.metrics.trace_metric import TraceMetric
+from trace.config.constants import K_METRIC_DEFAULT
 
 
 class PrecisionAtKMetric(TraceMetric):

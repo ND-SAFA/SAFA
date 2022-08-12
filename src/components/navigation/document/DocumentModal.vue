@@ -101,7 +101,7 @@ export default Vue.extend({
      * @return The modal title.
      */
     title(): string {
-      return this.isEditMode ? "Edit Document" : "Add Document";
+      return this.isEditMode ? "Edit View" : "Add View";
     },
     /**
      * @return Whether the current document name is valid.

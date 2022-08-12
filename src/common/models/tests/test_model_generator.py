@@ -56,6 +56,11 @@ class TestModelGenerator(TestCase):
         test_generator.get_tokenizer()
         self.assertTrue(from_pretrained_mock.called)
 
+        # second time calling get_tokenizer should not call from_pretrained
+        from_pretrained_mock.called = False
+        test_generator.get_tokenizer()
+        self.assertFalse(from_pretrained_mock.called)
+
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_set_max_seq_length_less_than_model_max(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = TestTokenizer

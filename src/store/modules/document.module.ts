@@ -205,7 +205,10 @@ export default class DocumentModule extends VuexModule {
    */
   get doesDocumentExist(): (name: string) => boolean {
     return (newName) => {
-      return !!this.projectDocuments.find(({ name }) => name === newName);
+      return (
+        newName !== this.baseDocument.name &&
+        !!this.projectDocuments.find(({ name }) => name === newName)
+      );
     };
   }
 

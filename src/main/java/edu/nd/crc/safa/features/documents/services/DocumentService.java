@@ -116,9 +116,9 @@ public class DocumentService {
      * @param updateArtifacts Whether to notify project version subsribers.
      */
     public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
-        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+        this.notificationService.broadcastUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
         if (updateArtifacts) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
     }
 

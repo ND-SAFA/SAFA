@@ -44,7 +44,7 @@ class TestGraphCreation extends AbstractLayoutTest {
     @Test
     void testName2Node() {
         assertThat(name2nodes).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
-        for (ArtifactAppEntity artifact : project.getArtifacts()) {
+        for (ArtifactAppEntity artifact : projectAppEntity.getArtifacts()) {
             assertThat(name2nodes).containsKey(artifact.id);
         }
     }

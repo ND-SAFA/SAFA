@@ -270,14 +270,18 @@ public abstract class GenericVersionRepository<
         List<String> processedAppEntities = new ArrayList<>();
         List<Pair<V, CommitError>> response = appEntities
             .stream()
-            .map(a -> this.commitAppEntityToProjectVersion(projectVersion, a))
-            .peek(commitResponse -> {
+            .map(a -> {
+                Pair<V, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, a);
                 if (commitResponse.getValue1() == null) {
-                    processedAppEntities.add(commitResponse.getValue0().getBaseEntityId());
+                    String baseEntityId = commitResponse.getValue0().getBaseEntityId();
+                    processedAppEntities.add(baseEntityId);
+                    a.setBaseEntityId(baseEntityId);
                 }
-            }).collect(Collectors.toList());
+                return commitResponse;
+            })
+            .collect(Collectors.toList());
 
-        if (asCompleteSet) { // calculates deletes entities if this is complete set
+        if (asCompleteSet) { // calculates deleted entities if this is complete set
             List<Pair<V, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
                     projectVersion.getProject())
                 .stream()

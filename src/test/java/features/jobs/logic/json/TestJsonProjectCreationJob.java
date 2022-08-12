@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  */
 class TestJsonProjectCreationJob extends ApplicationBaseTest {
     final String description = "description";
-    final int N_STEPS = 3;
+    final int N_STEPS = 1;
     final ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
         "",
         ArtifactConstants.type,

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * re-upload the project.
  */
 class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
-    String projectName = "project-name";
+    String projectName = "first-project";
 
     @Test
     void downloadAndReuploadFlatFiles() throws Exception {
@@ -68,7 +68,7 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
         ProjectAppEntity projectAppEntity = getProjectAtVersion(projectVersion);
 
         // VP - Verify that artifacts are created
-        assertThat(projectAppEntity.artifacts.size()).isEqualTo(Constants.N_ARTIFACTS);
+        assertThat(projectAppEntity.artifacts).hasSize(Constants.N_ARTIFACTS);
 
         // Step - Extract artifact information
         Map<String, ArtifactAppEntity> name2artifact = new HashMap<>();

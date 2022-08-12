@@ -7,14 +7,14 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.layout.services.LayoutService;
 import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -36,24 +36,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class DocumentController extends BaseDocumentController {
-
     private final DocumentService documentService;
-    private final NotificationService notificationService;
     private final AppEntityRetrievalService appEntityRetrievalService;
-    private final LayoutService layoutService;
+    private final NotificationService notificationService;
+    private final ServiceProvider serviceProvider;
 
     @Autowired
     public DocumentController(ResourceBuilder resourceBuilder,
                               DocumentRepository documentRepository,
-                              DocumentService documentService,
-                              NotificationService notificationService,
-                              AppEntityRetrievalService appEntityRetrievalService,
-                              LayoutService layoutService) {
+                              ServiceProvider serviceProvider) {
         super(resourceBuilder, documentRepository);
-        this.documentService = documentService;
-        this.notificationService = notificationService;
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.layoutService = layoutService;
+        this.serviceProvider = serviceProvider;
+        this.documentService = serviceProvider.getDocumentService();
+        this.notificationService = serviceProvider.getNotificationService();
+        this.appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
     }
 
 
@@ -78,6 +74,7 @@ public class DocumentController extends BaseDocumentController {
         // Create or update: document base entity
         Document document = documentAppEntity.toDocument();
         this.documentRepository.save(document);
+
         if (documentAppEntity.getDocumentId() == null) {
             documentAppEntity.setDocumentId(document.getDocumentId());
         }
@@ -103,14 +100,8 @@ public class DocumentController extends BaseDocumentController {
 
     public Map<String, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
                                                             DocumentAppEntity documentAppEntity) {
-        ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        //TODO: Replace with layout retrieval.
-        Map<String, Map<String, LayoutPosition>> documentLayoutMap =
-            this.layoutService.generateDocumentLayouts(projectAppEntity.artifacts,
-                projectAppEntity.traces,
-                List.of(documentAppEntity));
-        return documentLayoutMap.get(documentAppEntity.getDocumentId().toString());
+        LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion);
+        return projectLayout.generateDocumentLayout(documentAppEntity.toDocument(), true);
     }
 
     /**
@@ -148,7 +139,7 @@ public class DocumentController extends BaseDocumentController {
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
+        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
         this.documentRepository.delete(document);
     }
 }

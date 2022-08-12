@@ -9,10 +9,12 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -37,17 +39,17 @@ public class DocumentArtifactController extends BaseDocumentController {
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
+    private final ServiceProvider serviceProvider;
 
     @Autowired
-    public DocumentArtifactController(DocumentRepository documentRepository,
-                                      ArtifactRepository artifactRepository,
-                                      DocumentArtifactRepository documentArtifactRepository,
-                                      NotificationService notificationService,
-                                      ResourceBuilder resourceBuilder) {
+    public DocumentArtifactController(ResourceBuilder resourceBuilder,
+                                      DocumentRepository documentRepository,
+                                      ServiceProvider serviceProvider) {
         super(resourceBuilder, documentRepository);
-        this.artifactRepository = artifactRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
-        this.notificationService = notificationService;
+        this.serviceProvider = serviceProvider;
+        this.artifactRepository = serviceProvider.getArtifactRepository();
+        this.documentArtifactRepository = serviceProvider.getDocumentArtifactRepository();
+        this.notificationService = serviceProvider.getNotificationService();
     }
 
     /**
@@ -68,12 +70,16 @@ public class DocumentArtifactController extends BaseDocumentController {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
         for (ArtifactAppEntity a : artifacts) {
-            Artifact artifact = getArtifactById(UUID.fromString(a.getBaseEntityId()));
+            UUID artifactId = UUID.fromString(a.getBaseEntityId());
+            Artifact artifact = getArtifactById(artifactId);
             DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
             this.documentArtifactRepository.save(documentArtifact);
             a.addDocumentId(document.getDocumentId().toString());
         }
-        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+
+        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
+        layoutManager.generateDocumentLayout(document, true);
+        this.notificationService.broadcastUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
         return artifacts;
     }
 
@@ -90,8 +96,8 @@ public class DocumentArtifactController extends BaseDocumentController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
-        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+        this.notificationService.broadcastUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {

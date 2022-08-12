@@ -3,6 +3,7 @@ package features.jobs.logic.common;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -11,8 +12,10 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.app.ProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,8 +27,15 @@ class TestJobExecution extends ApplicationBaseTest {
     @Autowired
     ServiceProvider serviceProvider;
 
+    ProjectVersion projectVersion;
+
+    @BeforeEach
+    public void createProject() throws IOException {
+        this.projectVersion = createDefaultProject("project");
+    }
+
     @Test
-    void testThatStepsAreRetrieved() {
+    void testThatStepsAreRetrieved() throws IOException {
         ProjectCreationJob projectCreationJob = buildProjectCreationJob();
         for (String stepName : JobSteps.getJobSteps(JobType.PROJECT_CREATION)) {
             Method method = projectCreationJob.getMethodForStepByName(stepName);
@@ -44,7 +54,7 @@ class TestJobExecution extends ApplicationBaseTest {
         return new ProjectCreationJob(
             new JobDbEntity(),
             serviceProvider,
-            new ProjectCommit()
+            new ProjectCommit(projectVersion, false)
         );
     }
 }

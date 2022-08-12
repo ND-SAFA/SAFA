@@ -11,12 +11,12 @@ import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.eclipse.elk.graph.ElkConnectableShape;
 import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
-import features.base.ApplicationBaseTest;
 
 /**
  * Base class responsible for:
@@ -28,7 +28,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
 
     protected String projectName = "test-project";
     protected ProjectVersion projectVersion;
-    protected ProjectAppEntity project;
+    protected ProjectAppEntity projectAppEntity;
     protected ElkNode rootGraphNode;
     protected Map<String, ElkNode> name2nodes;
 
@@ -58,9 +58,9 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
-        this.project = getProjectAtVersion(projectVersion);
+        this.projectAppEntity = getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<String, ElkNode>> response =
-            ElkGraphCreator.createGraphFromProject(project.artifacts, project.traces);
+            ElkGraphCreator.createGraphFromProject(projectAppEntity.artifacts, projectAppEntity.traces);
         rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();
     }
@@ -71,7 +71,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
     }
 
     protected String getArtifactId(String name) {
-        return this.project
+        return this.projectAppEntity
             .getArtifacts()
             .stream()
             .filter(a -> a.name.equals(name))

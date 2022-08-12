@@ -14,8 +14,9 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.errors.services.CommitErrorRetrievalService;
+import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.layout.services.LayoutService;
+import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -55,10 +56,10 @@ public class AppEntityRetrievalService {
     private final ProjectMembershipRepository projectMembershipRepository;
     private final CurrentDocumentService currentDocumentService;
     private final DocumentService documentService;
+    private final ArtifactPositionService artifactPositionService;
 
     private final RuleService ruleService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-    private final LayoutService layoutService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -72,19 +73,13 @@ public class AppEntityRetrievalService {
         Project project = projectVersion.getProject();
 
         // Versioned Entities
-        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion);
-        List<String> artifactIds = artifacts
-            .stream()
-            .map(ArtifactAppEntity::getBaseEntityId)
-            .collect(Collectors.toList());
-        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
+        ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
         // Project Entities
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
 
         // Documents
         List<DocumentAppEntity> documents = this.documentService.getDocumentsInProject(project);
-        generatedAndSetDocumentLayouts(artifacts, traces, documents);
 
         // Current document
         String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
@@ -99,11 +94,11 @@ public class AppEntityRetrievalService {
         Map<String, List<RuleName>> warnings = this.retrieveWarningsInProjectVersion(projectVersion);
 
         // Layout
-        Map<String, LayoutPosition> layout = this.layoutService.generateLayoutForArtifactTree(artifacts, traces);
+        Map<String, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(null);
 
         return new ProjectAppEntity(projectVersion,
-            artifacts,
-            traces,
+            entities.getArtifacts(),
+            entities.getTraces(),
             projectMembers,
             documents,
             currentDocumentId,
@@ -113,16 +108,14 @@ public class AppEntityRetrievalService {
             layout);
     }
 
-    public void generatedAndSetDocumentLayouts(List<ArtifactAppEntity> projectArtifacts,
-                                               List<TraceAppEntity> projectTraces,
-                                               List<DocumentAppEntity> documents) {
-        //TODO: Replace with layout retrieval
-        Map<String, Map<String, LayoutPosition>> documentLayouts = this
-            .layoutService
-            .generateDocumentLayouts(projectArtifacts, projectTraces, documents);
-        for (DocumentAppEntity documentAppEntity : documents) {
-            documentAppEntity.setLayout(documentLayouts.get(documentAppEntity.getDocumentId().toString()));
-        }
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+        List<ArtifactAppEntity> artifacts = retrieveArtifactsInProjectVersion(projectVersion);
+        List<String> artifactIds = artifacts
+            .stream()
+            .map(ArtifactAppEntity::getBaseEntityId)
+            .collect(Collectors.toList());
+        List<TraceAppEntity> traces = retrieveTracesInProjectVersion(projectVersion, artifactIds);
+        return new ProjectEntities(artifacts, traces);
     }
 
     /**

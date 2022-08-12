@@ -12,34 +12,48 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Creates series of mapping data structures for organizing artifacts.
  */
-public class ProjectEntityMaps {
+public class ProjectEntities {
+    @Getter
     List<ArtifactAppEntity> artifacts;
+    @Getter
     List<TraceAppEntity> traces;
     Map<String, ArtifactAppEntity> name2artifact;
     Map<String, ArtifactAppEntity> id2artifact;
     Map<String, List<ArtifactAppEntity>> type2artifacts;
 
-    public ProjectEntityMaps(List<ArtifactAppEntity> artifacts, List<TraceAppEntity> traces) {
-        this.artifacts = artifacts;
-        this.traces = traces;
+    private ProjectEntities() {
+        this.artifacts = new ArrayList<>();
+        this.traces = new ArrayList<>();
         this.name2artifact = new HashMap<>();
         this.type2artifacts = new HashMap<>();
         this.id2artifact = new HashMap<>();
     }
 
-    public ProjectEntityMaps(ProjectAppEntity projectAppEntity) {
-        this(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
-        this.createMaps(projectAppEntity.artifacts);
+    public ProjectEntities(List<ArtifactAppEntity> artifacts) {
+        this();
+        this.artifacts = artifacts;
+        this.createMaps();
     }
 
-    private void createMaps(List<ArtifactAppEntity> artifacts) {
-        for (ArtifactAppEntity artifact : artifacts) {
+    public ProjectEntities(List<ArtifactAppEntity> artifacts, List<TraceAppEntity> traces) {
+        this();
+        this.artifacts = artifacts;
+        this.traces = traces;
+        this.createMaps();
+    }
+
+    public ProjectEntities(ProjectAppEntity projectAppEntity) {
+        this(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
+        this.createMaps();
+    }
+
+    private void createMaps() {
+        for (ArtifactAppEntity artifact : this.artifacts) {
             String artifactType = artifact.type;
             if (type2artifacts.containsKey(artifactType)) {
                 type2artifacts.get(artifactType).add(artifact);
@@ -78,7 +92,7 @@ public class ProjectEntityMaps {
         return key2artifact.get(key);
     }
 
-    public Entities getEntitiesInDocument(Document document) {
+    public ProjectEntities getEntitiesInDocument(Document document) {
         List<ArtifactAppEntity> documentArtifacts = this.artifacts
             .stream()
             .filter((a) -> a.getDocumentIds().contains(document.getDocumentId().toString()))
@@ -92,13 +106,6 @@ public class ProjectEntityMaps {
             .filter((t) -> documentArtifactNames.contains(t.getSourceName()) ||
                 documentArtifactNames.contains(t.getTargetName()))
             .collect(Collectors.toList());
-        return new Entities(documentArtifacts, documentTraces);
-    }
-
-    @AllArgsConstructor
-    @Data
-    public static class Entities {
-        List<ArtifactAppEntity> artifacts;
-        List<TraceAppEntity> traces;
+        return new ProjectEntities(documentArtifacts, documentTraces);
     }
 }

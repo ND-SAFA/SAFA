@@ -36,9 +36,9 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
 
         // Step - Extract artifact positions
         String documentId = document.getDocumentId().toString();
-        LayoutPosition a1Pos = getArtifactPositionInProjectLayout(project, documentId, a1Name);
-        LayoutPosition a2Pos = getArtifactPositionInProjectLayout(project, documentId, a2Name);
-        LayoutPosition a3Pos = getArtifactPositionInProjectLayout(project, documentId, a3Name);
+        LayoutPosition a1Pos = getLayoutPositionInDocument(project, documentId, a1Name);
+        LayoutPosition a2Pos = getLayoutPositionInDocument(project, documentId, a2Name);
+        LayoutPosition a3Pos = getLayoutPositionInDocument(project, documentId, a3Name);
 
         // VP - Verify that root has greatest y
         assertLayoutCorrectness(a1Pos, a2Pos, a3Pos);

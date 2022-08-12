@@ -52,22 +52,22 @@ public class KlayLayoutGenerator {
 
     private Map<String, LayoutPosition> createPositionMap() {
         Map<String, LayoutPosition> positionMap = new HashMap<>();
-        addChildrenToMap(positionMap, graph);
+        addChildrenToPositionMap(positionMap, graph);
         return positionMap;
+    }
+
+    private void addChildrenToPositionMap(Map<String, LayoutPosition> map, ElkNode graph) {
+        for (ElkNode child : graph.getChildren()) {
+            addPositionToMap(map, child);
+        }
     }
 
     private void addPositionToMap(Map<String, LayoutPosition> map, ElkNode graph) {
         String id = graph.getIdentifier();
         map.computeIfAbsent(id, newKey -> {
             LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
-            addChildrenToMap(map, graph);
+            addChildrenToPositionMap(map, graph);
             return graphPosition;
         });
-    }
-
-    private void addChildrenToMap(Map<String, LayoutPosition> map, ElkNode graph) {
-        for (ElkNode child : graph.getChildren()) {
-            addPositionToMap(map, child);
-        }
     }
 }

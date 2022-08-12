@@ -13,9 +13,10 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
+import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -26,6 +27,7 @@ import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.generator.TraceLinkGenerator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -48,7 +50,6 @@ public class FlatFileService {
     private static final String DELIMITER = "*";
 
     private final CommitErrorRepository commitErrorRepository;
-    private final EntityVersionService entityVersionService;
     private final TraceLinkGenerator traceLinkGenerator;
     private final FileUploadService fileUploadService;
     private final AppEntityRetrievalService appEntityRetrievalService;
@@ -66,12 +67,13 @@ public class FlatFileService {
      */
     public ProjectAppEntity createProjectFromFlatFiles(Project project,
                                                        ProjectVersion projectVersion,
+                                                       ServiceProvider serviceProvider,
                                                        MultipartFile[] files,
                                                        boolean asCompleteSet)
         throws SafaError, IOException {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         JSONObject timFileContent = getTimFileContent(project);
-        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent, asCompleteSet);
+        this.parseFlatFilesAndCommitEntities(projectVersion, serviceProvider, timFileContent, asCompleteSet);
         return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
     }
 
@@ -86,6 +88,7 @@ public class FlatFileService {
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
+                                                ServiceProvider serviceProvider,
                                                 JSONObject timFileJson,
                                                 boolean asCompleteSet) throws SafaError {
         try {
@@ -109,11 +112,16 @@ public class FlatFileService {
             projectCommit.getTraces().getAdded().addAll(generatedLinks);
 
             // Step - Commit all project entities
-            this.entityVersionService.setProjectEntitiesAtVersion(
-                projectVersion,
-                projectCommit.getArtifacts().getAdded(), // not other modifications on flat file upload
-                projectCommit.getTraces().getAdded(),
-                asCompleteSet);
+            ProjectEntities projectEntities = new ProjectEntities(
+                projectCommit.getArtifacts().getAdded(),
+                projectCommit.getTraces().getAdded()
+            );
+            ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
+            if (asCompleteSet) {
+                projectChanger.setEntitiesAsCompleteSet(projectEntities);
+            } else {
+                projectChanger.commit(projectCommit);
+            }
             this.commitErrorRepository.saveAll(projectCommit.getErrors());
         } catch (IOException | JSONException e) {
             throw new SafaError("An error occurred while parsing TIM file.", e);

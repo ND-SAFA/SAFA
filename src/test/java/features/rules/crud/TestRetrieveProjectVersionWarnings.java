@@ -7,14 +7,14 @@ import java.util.Hashtable;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.notifications.VersionMessage;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import features.base.ApplicationBaseTest;
 
 /**
  * Responsible for testing if you can retrieve the warnings

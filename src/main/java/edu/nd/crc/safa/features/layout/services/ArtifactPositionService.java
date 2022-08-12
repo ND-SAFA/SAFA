@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArtifactPositionService {
     ArtifactPositionRepository artifactPositionRepository;
-    ArtifactVersionRepository artifactVersionRepository;
+    ArtifactRepository artifactRepository;
 
     /**
      * Creates or updates artifact position within document using artifact version id and given document.
@@ -42,21 +42,26 @@ public class ArtifactPositionService {
                                                            Document document) {
         ArtifactPosition artifactPosition = new ArtifactPosition();
 
-        // Step 1 - Retrieve artifact version
-        Optional<ArtifactVersion> artifactVersionOptional = artifactVersionRepository
-            .findByProjectVersionAndArtifactName(projectVersion, artifactAppEntity.name);
-        assert artifactVersionOptional.isPresent();
-        ArtifactVersion artifactVersion = artifactVersionOptional.get();
+        // Step - 1 Retrieve artifact
+        String artifactName = artifactAppEntity.getName();
+        Optional<Artifact> artifactOptional = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
+            artifactName);
+        if (artifactOptional.isEmpty()) {
+            throw new IllegalArgumentException("Could not find artifact with name:" + artifactName);
+        }
+        Artifact artifact = artifactOptional.get();
 
         // Step 2 - Check if position has already been created or set properties
+        UUID documentId = document == null ? null : document.getDocumentId();
         Optional<ArtifactPosition> artifactPositionOptional =
-            artifactPositionRepository.findByArtifactVersionAndDocument(artifactVersion,
-                document);
+            artifactPositionRepository.findByProjectVersionAndArtifactAndDocumentDocumentId(
+                projectVersion, artifact, documentId);
         if (artifactPositionOptional.isPresent()) {
             artifactPosition = artifactPositionOptional.get();
         } else {
             // Step 2 - Set properties document
-            artifactPosition.setArtifactVersion(artifactVersion);
+            artifactPosition.setArtifact(artifact);
+            artifactPosition.setProjectVersion(projectVersion);
             artifactPosition.setDocument(document);
         }
 
@@ -71,7 +76,7 @@ public class ArtifactPositionService {
         Map<String, LayoutPosition> layout = new HashMap<>();
         List<ArtifactPosition> artifactPositions = this.artifactPositionRepository.findByDocumentDocumentId(documentId);
         for (ArtifactPosition artifactPosition : artifactPositions) {
-            String artifactId = artifactPosition.getArtifactVersion().getArtifact().getArtifactId().toString();
+            String artifactId = artifactPosition.getArtifact().getArtifactId().toString();
             LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
             layout.put(artifactId, layoutPosition);
         }

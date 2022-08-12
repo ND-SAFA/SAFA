@@ -9,18 +9,18 @@ import java.util.Optional;
 import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.notifications.VersionMessage;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import features.base.ApplicationBaseTest;
 
 /**
  * Tests that the client is able to add multiple artifact to some

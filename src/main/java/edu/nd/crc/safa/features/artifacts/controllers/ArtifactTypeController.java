@@ -66,7 +66,7 @@ public class ArtifactTypeController extends BaseController {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         artifactType.setProject(project);
         this.artifactTypeRepository.save(artifactType);
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.TYPES);
+        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.TYPES);
         return artifactType;
     }
 
@@ -82,6 +82,6 @@ public class ArtifactTypeController extends BaseController {
         Project project = artifactType.getProject();
         this.resourceBuilder.setProject(project).withEditProject();
         this.artifactTypeRepository.delete(artifactType);
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.TYPES);
+        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.TYPES);
     }
 }

@@ -1,14 +1,12 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
-import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.layout.entities.app.ProjectLayout;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.versions.ProjectChanger;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 /**
  * The worker responsible for providing method implementations for
@@ -26,42 +24,22 @@ public class ProjectCreationJob extends AbstractJob {
     /**
      * The service used for creating entities.
      */
-    EntityVersionService entityVersionService;
-    /**
-     * Whether entities created should be treated as the complete set of entities
-     */
-    boolean asCompleteSet;
+    ProjectChanger projectChanger;
 
     public ProjectCreationJob(JobDbEntity jobDbEntity,
                               ServiceProvider serviceProvider,
                               ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
+        ProjectVersion projectVersion = projectCommit.getCommitVersion();
+        if (projectVersion == null) {
+            throw new IllegalArgumentException("Project version is null!");
+        }
         this.projectCommit = projectCommit;
-        this.entityVersionService = serviceProvider.getEntityVersionService();
-        this.asCompleteSet = ProjectVariables.PROJECT_CREATION_AS_COMPLETE_SET;// TODO: Use flag from request
+        this.projectChanger = new ProjectChanger(projectVersion, serviceProvider);
     }
 
-    public void savingArtifacts() throws SafaError {
-        this.entityVersionService.addArtifactsAtVersionAndSaveErrors(
-            projectCommit.getCommitVersion(),
-            projectCommit.getArtifacts().getAdded(),
-            this.asCompleteSet);
-    }
-
-    public void savingTraces() throws SafaError {
-        this.entityVersionService.setTracesAtVersionAndSaveErrors(
-            projectCommit.getCommitVersion(),
-            projectCommit.getTraces().getAdded(),
-            this.asCompleteSet);
-    }
-
-    public void generatingLayout() {
-        AppEntityRetrievalService appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
-        this.projectAppEntity = appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(
-            projectCommit.getCommitVersion()
-        );
-        ProjectLayout projectLayout = new ProjectLayout(projectAppEntity, serviceProvider);
-        projectLayout.createLayoutForAllDocuments();
+    public void commitArtifactsAndTraceLinks() throws SafaError {
+        projectChanger.commit(projectCommit);
     }
 
     @Override

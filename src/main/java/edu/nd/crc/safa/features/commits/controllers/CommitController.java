@@ -5,9 +5,10 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
-import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommitController extends BaseController {
 
-    private final CommitService commitService;
+    private final ServiceProvider serviceProvider;
 
     @Autowired
     public CommitController(ResourceBuilder resourceBuilder,
-                            CommitService commitService
+                            ServiceProvider serviceProvider
     ) {
         super(resourceBuilder);
-        this.commitService = commitService;
+        this.serviceProvider = serviceProvider;
     }
 
     /**
@@ -46,6 +47,7 @@ public class CommitController extends BaseController {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         projectCommit.setCommitVersion(projectVersion);
         projectCommit.setFailOnError(true);
-        return this.commitService.performCommit(projectCommit);
+        ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
+        return projectChanger.commit(projectCommit);
     }
 }

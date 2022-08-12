@@ -15,14 +15,14 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 public class TraceMaps {
     Map<String, Map<String, List<TraceAppEntity>>> type2traces;
 
-    public TraceMaps(ProjectAppEntity projectAppEntity, ProjectEntityMaps projectEntityMaps) {
+    public TraceMaps(ProjectAppEntity projectAppEntity, ProjectEntities projectEntityMaps) {
         this.type2traces = new HashMap<>();
         this.createType2Traces(projectAppEntity, projectEntityMaps);
     }
 
     private void createType2Traces(
         ProjectAppEntity projectAppEntity,
-        ProjectEntityMaps projectEntityMaps
+        ProjectEntities projectEntityMaps
     ) {
         for (TraceAppEntity trace : projectAppEntity.traces) {
             String sourceType = projectEntityMaps.getArtifactByName(trace.getSourceName()).type;

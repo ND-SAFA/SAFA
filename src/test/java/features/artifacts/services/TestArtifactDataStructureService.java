@@ -2,7 +2,6 @@ package features.artifacts.services;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -11,26 +10,22 @@ import java.util.Optional;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Verifies that:
  * 1. We are able to find the last inputted artifact body.
  */
 class TestArtifactDataStructureService extends ApplicationBaseTest {
-
-
-    @Autowired
-    EntityVersionService entityVersionService;
 
     @Test
     void checkAbleToFindLastArtifactBody() {
@@ -105,7 +100,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         String artifactContent = "this is a body";
         String artifactSummary = "this is a summary";
 
-        // Step - Create project with: v1, type, artifact, body
+        // Step - Create project with: version, type, artifact, body
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
@@ -113,22 +108,21 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             .newArtifact(projectName, artifactTypeName, artifactName)
             .newArtifactBody(projectName, artifactName, artifactSummary, artifactContent);
 
-        // Step - Create new version + update artifact with same artifact (no change)
+        // Step - Create new version
+        ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
+
         ArtifactVersion artifactVersion = dbEntityBuilder.getArtifactBody(projectName, artifactName, 0);
         ArtifactAppEntity artifactApp = this.artifactVersionRepository
             .retrieveAppEntityFromVersionEntity(artifactVersion);
 
-        // VP - Verify that no new entry has been created
-        ProjectVersion newVersion = dbEntityBuilder.newVersionWithReturn(projectName);
-        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
-
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        entityVersionService.setProjectEntitiesAtVersion(newVersion,
-            Arrays.asList(artifactApp),
-            new ArrayList<>(),
-            true);
+        ProjectEntities projectEntities = new ProjectEntities(Arrays.asList(artifactApp));
+        ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities);
+        
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
-        assertThat(artifactBodies.size()).isEqualTo(1);
+        assertThat(artifactBodies).hasSize(1);
     }
 
     @Test
@@ -162,10 +156,10 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
 
         // VP - Verify that artifact body is detected to be modified
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        this.entityVersionService.setProjectEntitiesAtVersion(projectVersion,
-            List.of(appEntity),
-            new ArrayList<>(),
-            true);
+        ProjectEntities projectEntities = new ProjectEntities(List.of(appEntity));
+        ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities);
+
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,
                 artifact);

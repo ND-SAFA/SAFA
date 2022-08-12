@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.webjars.NotFoundException;
 
 public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected String projectName = "project name";
@@ -80,18 +81,27 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         return project.getLayout().get(id);
     }
 
-    protected LayoutPosition getArtifactPositionInProjectLayout(ProjectAppEntity project,
-                                                                String documentId,
-                                                                String artifactName) {
+    protected LayoutPosition getLayoutPositionInDocument(ProjectAppEntity project,
+                                                         String documentId,
+                                                         String artifactName) {
         String artifactId = getArtifactId(project.artifacts, artifactName);
-        return project
-            .getDocuments()
+        List<DocumentAppEntity> documents = project.getDocuments()
             .stream()
             .filter(d -> d.getDocumentId().toString().equals(documentId))
-            .findFirst()
-            .get()
-            .getLayout()
-            .get(artifactId);
+            .collect(Collectors.toList());
+
+        if (documents.size() == 0) {
+            throw new NotFoundException("Document id not found in project:" + documentId);
+        } else if (documents.size() > 1) {
+            throw new IllegalStateException("Found more than one document with id:" + documentId);
+        }
+
+        Map<String, LayoutPosition> documentLayout = documents.get(0).getLayout();
+
+        if (!documentLayout.containsKey(artifactId)) {
+            throw new IllegalArgumentException("Could not find layout position for artifact id:" + artifactId);
+        }
+        return documentLayout.get(artifactId);
     }
 
     protected List<String> getArtifactIds(JSONObject projectCommit) {

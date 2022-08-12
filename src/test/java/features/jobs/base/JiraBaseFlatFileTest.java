@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     protected String jiraProjectName = "test-jira-project";
-    protected int N_STEPS = 5;
+    protected int N_STEPS = 3;
     protected String cloudId = UUID.randomUUID().toString();
     protected Long jiraProjectId = (long) 1;
 

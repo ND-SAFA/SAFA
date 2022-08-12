@@ -10,15 +10,12 @@ import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.IVersionEntity;
-import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.layout.entities.app.ProjectLayout;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntityCreator;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -41,8 +38,6 @@ public class CommitService {
 
     private final AppEntityRetrievalService appEntityRetrievalService;
     private final NotificationService notificationService;
-    private final ServiceProvider serviceProvider;
-
 
     /**
      * Saves entities in commit to specified project version.
@@ -80,20 +75,14 @@ public class CommitService {
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
         errors.addAll(traceResponse.getValue1());
 
-        // Step - Generate layout updates
-        ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
-        ProjectLayout projectLayout = new ProjectLayout(projectAppEntity, serviceProvider);
-        projectLayout.updateLayoutWithChanges(projectCommit);
-
         if (artifactChanges.getSize() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
+            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
         if (traceChanges.getSize() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
+            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
         }
         if (artifactChanges.getSize() + traceChanges.getSize() > 0) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
+            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
         }
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges, errors, failOnError);
     }
@@ -150,7 +139,7 @@ public class CommitService {
         CommitAction<A, V> saveOrModifyAction = a ->
             versionEntityRepository.commitAppEntityToProjectVersion(
                 projectVersion, a);
-        CommitAction<A, V> removeAction = a ->
+        CommitAction<A, V> deleteAction = a ->
             versionEntityRepository.deleteVersionEntityByBaseEntityId(
                 projectVersion,
                 a.getBaseEntityId());
@@ -179,7 +168,7 @@ public class CommitService {
         // Commit removed entities
         EntityParsingResult<A, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
-            removeAction,
+            deleteAction,
             iAppEntityCreator,
             failOnError
         );

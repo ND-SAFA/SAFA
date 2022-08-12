@@ -10,6 +10,7 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
@@ -43,6 +44,7 @@ public class FlatFileController extends BaseController {
     private final FlatFileService flatFileService;
     private final ZipFileService zipFileService;
     private final FileDownloadService fileDownloadService;
+    private final ServiceProvider serviceProvider;
 
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
@@ -50,13 +52,15 @@ public class FlatFileController extends BaseController {
                               NotificationService notificationService,
                               FlatFileService flatFileService,
                               ZipFileService zipFileService,
-                              FileDownloadService fileDownloadService) {
+                              FileDownloadService fileDownloadService,
+                              ServiceProvider serviceProvider) {
         super(resourceBuilder);
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.flatFileService = flatFileService;
         this.zipFileService = zipFileService;
         this.fileDownloadService = fileDownloadService;
+        this.serviceProvider = serviceProvider;
     }
 
 
@@ -87,9 +91,10 @@ public class FlatFileController extends BaseController {
         ProjectAppEntity projectCreated = this.flatFileService.createProjectFromFlatFiles(
             project,
             projectVersion,
+            serviceProvider,
             files,
             asCompleteSet);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
         return projectCreated;
     }
 
@@ -112,9 +117,10 @@ public class FlatFileController extends BaseController {
         ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
         ProjectAppEntity projectAppEntity = this.flatFileService.createProjectFromFlatFiles(project,
             projectVersion,
+            serviceProvider,
             files,
             true);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
         return projectAppEntity;
     }
 
@@ -127,7 +133,7 @@ public class FlatFileController extends BaseController {
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = fileDownloadService.downloadProjectFiles(projectVersion, fileType);
+        List<File> projectFiles = fileDownloadService.downloadProjectFiles(projectVersion, fileType.toLowerCase());
         zipFileService.sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

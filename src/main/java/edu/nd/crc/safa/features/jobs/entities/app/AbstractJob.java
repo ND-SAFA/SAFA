@@ -52,18 +52,18 @@ public abstract class AbstractJob implements Job {
                 // Pre-step
                 Method method = getMethodForStepByName(stepName);
                 jobService.startStep(jobDbEntity);
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastUpdateJobMessage(jobDbEntity);
 
                 // Step
                 method.invoke(this);
 
                 // Post-step
                 jobService.endStep(jobDbEntity);
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastUpdateJobMessage(jobDbEntity);
             } catch (Exception e) {
                 jobService.failJob(jobDbEntity);
                 e.printStackTrace();
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastUpdateJobMessage(jobDbEntity);
                 throw new SafaError(e.getMessage());
             }
         }

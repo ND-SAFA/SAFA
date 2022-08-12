@@ -19,10 +19,10 @@ class TestLayoutRetrieved extends AbstractLayoutTest {
 
     @Test
     void testValidLayoutExistsInDefaultProject() throws Exception {
-        Map<String, LayoutPosition> layout = project.getLayout();
+        Map<String, LayoutPosition> layout = projectAppEntity.getLayout();
 
         // VP - Verify position created for every artifact
-        for (ArtifactAppEntity artifact : this.project.artifacts) {
+        for (ArtifactAppEntity artifact : this.projectAppEntity.artifacts) {
             boolean hasArtifact = layout.containsKey(artifact.id);
             assertThat(hasArtifact).isTrue();
             LayoutPosition artifactPosition = layout.get(artifact.id);

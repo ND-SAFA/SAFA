@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntityMaps;
+import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.flatfiles.entities.common.TraceMaps;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -43,7 +43,7 @@ public class FileDownloadService {
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         List<File> projectFiles = new ArrayList<>();
 
-        ProjectEntityMaps projectEntityMaps = new ProjectEntityMaps(projectAppEntity);
+        ProjectEntities projectEntityMaps = new ProjectEntities(projectAppEntity);
         List<ArtifactFileIdentifier> artifactFiles = writeArtifactFiles(fileType, project, projectEntityMaps,
             projectFiles);
         List<TraceFileIdentifier> traceFiles = writeTraceFiles(fileType, project, projectFiles,
@@ -58,7 +58,7 @@ public class FileDownloadService {
                                                       Project project,
                                                       List<File> projectFiles,
                                                       ProjectAppEntity projectAppEntity,
-                                                      ProjectEntityMaps projectEntityMaps) throws Exception {
+                                                      ProjectEntities projectEntityMaps) throws Exception {
         TraceMaps traceMaps = new TraceMaps(projectAppEntity, projectEntityMaps);
         List<TraceFileIdentifier> traceFiles = new ArrayList<>();
         for (String sourceType : traceMaps.getSourceTypes()) {
@@ -83,7 +83,7 @@ public class FileDownloadService {
 
     private List<ArtifactFileIdentifier> writeArtifactFiles(String fileType,
                                                             Project project,
-                                                            ProjectEntityMaps projectEntityMaps,
+                                                            ProjectEntities projectEntityMaps,
                                                             List<File> projectFiles) throws Exception {
         List<ArtifactFileIdentifier> artifactFiles = new ArrayList<>();
         for (String artifactType : projectEntityMaps.getArtifactTypes()) {

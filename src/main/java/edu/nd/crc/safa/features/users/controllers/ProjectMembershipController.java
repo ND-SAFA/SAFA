@@ -59,7 +59,7 @@ public class ProjectMembershipController extends BaseController {
         this.projectService.addOrUpdateProjectMembership(project,
             request.getMemberEmail(),
             request.getProjectRole());
-        this.notificationService.broadUpdateProjectMessage(project, ProjectEntityTypes.MEMBERS);
+        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.MEMBERS);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ProjectMembershipController extends BaseController {
         //TODO: Check for project permission before deleting.
         ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
         if (projectMembership != null) {
-            this.notificationService.broadUpdateProjectMessage(
+            this.notificationService.broadcastUpdateProjectMessage(
                 projectMembership.getProject(),
                 ProjectEntityTypes.MEMBERS);
         }

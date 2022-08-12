@@ -9,8 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -29,15 +30,20 @@ public class ArtifactPosition {
     @Type(type = "uuid-char")
     @Column(name = "id")
     UUID id;
-
     /**
      * The version in which artifact with this position exist in.
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "entityVersionId", nullable = false)
-    ArtifactVersion artifactVersion;
-
+    @JoinColumn(name = "artifact_id", nullable = false)
+    Artifact artifact;
+    /**
+     * The version in which artifact with this position exist in.
+     */
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "version_id", nullable = false)
+    ProjectVersion projectVersion;
     /**
      * The document this layout is setting this artifact at.
      */
@@ -45,13 +51,11 @@ public class ArtifactPosition {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "documentId")
     Document document;
-
     /**
      * How many pixels right from the top left corner of the graph.
      */
     @Column(nullable = false)
     double x;
-
     /**
      * How many pixels down from the top left corner of the graph.
      */

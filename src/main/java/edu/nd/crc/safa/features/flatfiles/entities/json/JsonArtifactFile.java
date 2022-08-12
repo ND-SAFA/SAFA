@@ -35,6 +35,7 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
+        this.entities.forEach(a -> a.setId(""));
         JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
             Constants.JSON_ARTIFACTS_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());

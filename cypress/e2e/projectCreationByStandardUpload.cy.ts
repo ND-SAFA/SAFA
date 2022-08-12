@@ -8,7 +8,9 @@ describe("Project Creation", () => {
       validUser.password
     );
   });
-
+  afterEach(() => {
+    cy.logout();
+  });
   describe("Manual Project Creation", () => {
     describe("Project Artifact Uploading", () => {
       it("cant continue without name", () => {

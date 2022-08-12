@@ -24,5 +24,5 @@ def get_path(domain: Domain):
     :param domain: the Domain
     :return: the path to the domain corpus
     """
-    dir_ = os.path.dirname(os.path.relpath(__file__, PROJ_PATH))
+    dir_ = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(dir_, domain.value)

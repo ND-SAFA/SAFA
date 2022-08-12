@@ -9,6 +9,7 @@
       :headers="headers"
       :items="items"
       :expanded="expanded"
+      :search="searchText"
       sort-by="targetName"
       item-key="traceLinkId"
       :items-per-page="50"
@@ -75,8 +76,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
-import { artifactModule, projectModule } from "@/store";
-import { getGeneratedLinks, handleApproveLink, handleDeclineLink } from "@/api";
+import { appModule, artifactModule, projectModule } from "@/store";
+import { getGeneratedLinks } from "@/api";
 import { FlexBox, TableChip, Typography } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import SectionControls from "./SectionControls.vue";
@@ -177,19 +178,24 @@ export default Vue.extend({
      * Loads the generated links for the current project.
      */
     async loadGeneratedLinks() {
-      const versionId = projectModule.versionIdWithLog;
-      this.links = await getGeneratedLinks(versionId);
-      this.approved = [];
-      this.declined = [];
-      this.expanded = [];
+      try {
+        appModule.onLoadStart();
+        const versionId = projectModule.versionIdWithLog;
+        this.links = await getGeneratedLinks(versionId);
+        this.approved = [];
+        this.declined = [];
+        this.expanded = [];
 
-      this.links.forEach((link) => {
-        if (link.approvalStatus === ApprovalType.APPROVED) {
-          this.approved.push(link.traceLinkId);
-        } else if (link.approvalStatus === ApprovalType.DECLINED) {
-          this.declined.push(link.traceLinkId);
-        }
-      });
+        this.links.forEach((link) => {
+          if (link.approvalStatus === ApprovalType.APPROVED) {
+            this.approved.push(link.traceLinkId);
+          } else if (link.approvalStatus === ApprovalType.DECLINED) {
+            this.declined.push(link.traceLinkId);
+          }
+        });
+      } finally {
+        appModule.onLoadEnd();
+      }
     },
     /**
      * Determines whether to show approval for a link.
@@ -225,12 +231,10 @@ export default Vue.extend({
      * @param link - The link to approve.
      */
     handleApprove(link: TraceLinkModel) {
-      handleApproveLink(link, () => {
-        this.declined = this.declined.filter(
-          (declinedId) => declinedId != link.traceLinkId
-        );
-        this.approved.push(link.traceLinkId);
-      });
+      this.declined = this.declined.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
+      this.approved.push(link.traceLinkId);
     },
     /**
      * Declines the given link and updates the stored links.
@@ -238,12 +242,10 @@ export default Vue.extend({
      * @param link - The link to decline.
      */
     handleDecline(link: TraceLinkModel) {
-      handleDeclineLink(link, () => {
-        this.approved = this.approved.filter(
-          (declinedId) => declinedId != link.traceLinkId
-        );
-        this.declined.push(link.traceLinkId);
-      });
+      this.approved = this.approved.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
+      this.declined.push(link.traceLinkId);
     },
     /**
      * Handles viewing a trace link.

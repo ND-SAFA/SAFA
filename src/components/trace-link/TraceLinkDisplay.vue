@@ -24,23 +24,26 @@
       <v-btn
         outlined
         v-if="showApprove"
+        :loading="isApproveLoading"
         color="primary"
         class="ma-1"
-        @click="$emit('link:approve', link)"
+        @click="handleApprove"
       >
         Approve
       </v-btn>
       <v-btn
         outlined
         v-if="showDecline"
+        :loading="isDeclineLoading"
         color="error"
         class="ma-1"
-        @click="$emit('link:decline', link)"
+        @click="handleDecline"
       >
         Decline
       </v-btn>
       <v-btn
         v-if="showDelete"
+        :loading="isDeleteLoading"
         color="error"
         class="ma-1"
         :text="!confirmDelete"
@@ -67,6 +70,7 @@ import { ArtifactModel, TraceLinkModel } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactModule } from "@/store";
 import { FlexBox } from "@/components/common";
+import { handleApproveLink, handleDeclineLink } from "@/api";
 
 /**
  * Displays a trace link.
@@ -105,6 +109,9 @@ export default Vue.extend({
       isSourceExpanded: false,
       isTargetExpanded: false,
       confirmDelete: false,
+      isApproveLoading: false,
+      isDeclineLoading: false,
+      isDeleteLoading: false,
     };
   },
   computed: {
@@ -129,13 +136,46 @@ export default Vue.extend({
   },
   methods: {
     /**
+     * Approves the given link and updates the stored links.
+     */
+    handleApprove() {
+      this.isApproveLoading = true;
+      handleApproveLink(this.link, {
+        onSuccess: () => {
+          this.isApproveLoading = false;
+          this.$emit("link:approve", this.link);
+        },
+        onError: () => (this.isApproveLoading = false),
+      });
+    },
+    /**
+     * Declines the given link and updates the stored links.
+     */
+    handleDecline() {
+      this.isDeclineLoading = true;
+      handleDeclineLink(this.link, {
+        onSuccess: () => {
+          this.isDeclineLoading = false;
+          this.$emit("link:decline", this.link);
+        },
+        onError: () => (this.isDeclineLoading = false),
+      });
+    },
+    /**
      * Attempts to delete the link, after confirming.
      */
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        this.$emit("link:delete", this.link);
+        this.isDeleteLoading = true;
+        handleDeclineLink(this.link, {
+          onSuccess: () => {
+            this.isDeleteLoading = false;
+            this.$emit("link:delete", this.link);
+          },
+          onError: () => (this.isDeleteLoading = false),
+        });
       }
     },
   },

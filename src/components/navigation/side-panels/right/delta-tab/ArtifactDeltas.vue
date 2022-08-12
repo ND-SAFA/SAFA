@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="isDeltaMode">
     <typography el="h2" variant="subtitle" value="Artifacts" />
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
+    <v-list expand>
       <delta-button-group
         delta-type="added"
         :items="addedArtifacts"
@@ -19,15 +19,16 @@
         :items="modifiedArtifacts"
         @click="handleModifiedSelect"
       />
-      <artifact-delta-diff
-        v-if="selectedDeltaArtifact !== undefined"
-        :isOpen="selectedDeltaArtifact !== undefined"
-        :name="selectedDeltaArtifact.name"
-        :input-artifact="selectedDeltaArtifact.artifact"
-        :delta-type="selectedDeltaArtifact.deltaType"
-        @close="handleCloseModal"
-      />
-    </v-expansion-panels>
+    </v-list>
+
+    <artifact-delta-diff
+      v-if="selectedDeltaArtifact !== undefined"
+      :isOpen="selectedDeltaArtifact !== undefined"
+      :name="selectedDeltaArtifact.name"
+      :input-artifact="selectedDeltaArtifact.artifact"
+      :delta-type="selectedDeltaArtifact.deltaType"
+      @close="handleCloseModal"
+    />
   </v-container>
 </template>
 

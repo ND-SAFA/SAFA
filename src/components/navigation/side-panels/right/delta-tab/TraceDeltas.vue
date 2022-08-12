@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="isDeltaMode">
     <typography el="h2" variant="subtitle" value="Trace Links" />
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
+    <v-list expand>
       <delta-button-group
         is-traces
         deltaType="added"
@@ -16,7 +16,7 @@
         :items="removedTraces"
         @click="handleRemovedSelect"
       />
-    </v-expansion-panels>
+    </v-list>
 
     <trace-link-approval-modal
       :is-open="isTraceModalOpen"

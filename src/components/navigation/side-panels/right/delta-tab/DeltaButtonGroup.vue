@@ -1,20 +1,20 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header>
-      <typography :value="title" />
-    </v-expansion-panel-header>
-
-    <v-expansion-panel-content>
-      <artifact-delta-button
-        v-for="{ name, id } in itemFields"
-        class="mr-1 mb-1"
-        :key="name"
-        :name="name"
-        :deltaType="deltaType"
-        @click="$emit('click', id)"
-      />
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+  <v-list-group :value="itemFields.length > 0">
+    <template v-slot:activator>
+      <v-list-item-title>
+        <typography :value="title" />
+      </v-list-item-title>
+    </template>
+    <v-divider class="faded mb-2" />
+    <artifact-delta-button
+      v-for="{ name, id } in itemFields"
+      class="mr-1 mb-1"
+      :key="name"
+      :name="name"
+      :deltaType="deltaType"
+      @click="$emit('click', id)"
+    />
+  </v-list-group>
 </template>
 
 <script lang="ts">

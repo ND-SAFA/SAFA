@@ -5,21 +5,22 @@
       <typography el="h2" l="1" variant="subtitle" value="Warnings" />
     </flex-box>
 
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels>
-      <v-expansion-panel
+    <v-list expand>
+      <v-list-group
         v-for="(warning, idx) in selectedArtifactWarnings"
         :key="idx"
       >
-        <v-expansion-panel-header>
-          <typography :value="warning.ruleName" />
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <typography :value="warning.ruleMessage" />
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+        <template v-slot:activator>
+          <v-list-item-title>
+            <typography :value="warning.ruleName" />
+          </v-list-item-title>
+        </template>
+        <v-divider class="faded" />
+        <typography :value="warning.ruleMessage" />
+      </v-list-group>
+    </v-list>
   </div>
 </template>
 

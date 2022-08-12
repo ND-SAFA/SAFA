@@ -7,45 +7,45 @@
       <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
     </flex-box>
 
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels>
-      <v-expansion-panel v-if="parents.length > 0">
-        <v-expansion-panel-header>
-          <typography :value="parentTitle" />
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(parent, idx) in parents">
-              <v-divider :key="parent.title + '-div'" v-if="idx !== 0" />
-              <generic-list-item
-                :key="parent.title"
-                :item="parent"
-                @click="handleArtifactClick(parent.title)"
-              />
-            </template>
-          </v-list>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
+    <v-list expand>
+      <v-list-group v-if="parents.length > 0">
+        <template v-slot:activator>
+          <v-list-item-title>
+            <typography :value="parentTitle" />
+          </v-list-item-title>
+        </template>
+        <v-divider class="faded" />
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <template v-for="parent in parents">
+            <generic-list-item
+              :key="parent.title"
+              :item="parent"
+              @click="handleArtifactClick(parent.title)"
+            />
+          </template>
+        </v-list>
+      </v-list-group>
 
-      <v-expansion-panel v-if="children.length > 0">
-        <v-expansion-panel-header>
-          <typography :value="childTitle" />
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(child, idx) in children">
-              <v-divider :key="child.title + '-div'" v-if="idx !== 0" />
-              <generic-list-item
-                :key="child.title"
-                :item="child"
-                @click="handleArtifactClick(child.title)"
-              />
-            </template>
-          </v-list>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+      <v-list-group v-if="children.length > 0">
+        <template v-slot:activator>
+          <v-list-item-title>
+            <typography :value="childTitle" />
+          </v-list-item-title>
+        </template>
+        <v-divider class="faded" />
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <template v-for="child in children">
+            <generic-list-item
+              :key="child.title"
+              :item="child"
+              @click="handleArtifactClick(child.title)"
+            />
+          </template>
+        </v-list>
+      </v-list-group>
+    </v-list>
   </div>
 </template>
 

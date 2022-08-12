@@ -1,5 +1,5 @@
 import { Frame } from "webstomp-client";
-import { ProjectMessage } from "@/types";
+import { ProjectMessageModel } from "@/types";
 import { getProjectMembers, handleDocumentReload } from "@/api";
 import { projectModule } from "@/store";
 
@@ -13,7 +13,7 @@ export async function handleProjectMessage(
   projectId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ProjectMessage = JSON.parse(frame.body);
+  const message: ProjectMessageModel = JSON.parse(frame.body);
   switch (message.type) {
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);

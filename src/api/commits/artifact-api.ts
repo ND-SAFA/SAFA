@@ -1,4 +1,4 @@
-import { Artifact, ArtifactNameValidationResponse } from "@/types";
+import { Artifact, NameValidationModel } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 
 /**
@@ -12,7 +12,7 @@ export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
 ): Promise<boolean> {
-  const res = await authHttpClient<ArtifactNameValidationResponse>(
+  const res = await authHttpClient<NameValidationModel>(
     fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
     { method: "POST", body: JSON.stringify({ artifactName }) }
   );

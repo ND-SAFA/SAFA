@@ -1,5 +1,5 @@
 import {
-  InternalGitHubCredentials,
+  GitHubCredentialsModel,
   InternalJiraCredentials,
   IOHandlerCallback,
   JiraAccessToken,
@@ -85,9 +85,9 @@ export function handleLoadJiraProjects(
  */
 export function handleAuthorizeGitHub(
   accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentials>
+  { onSuccess, onError }: IOHandlerCallback<GitHubCredentialsModel>
 ): void {
-  const handleSuccess = (token: InternalGitHubCredentials) => {
+  const handleSuccess = (token: GitHubCredentialsModel) => {
     onSuccess?.(token);
 
     localStorage.setItem(

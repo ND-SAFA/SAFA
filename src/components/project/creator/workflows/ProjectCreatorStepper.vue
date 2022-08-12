@@ -72,7 +72,7 @@ import {
   Artifact,
   ArtifactMap,
   Project,
-  ProjectMembership,
+  MembershipModel,
   ProjectRole,
   StepState,
   TraceFile,
@@ -187,7 +187,7 @@ export default Vue.extend({
      * @return The project to create.
      */
     project(): Project {
-      const user: ProjectMembership = {
+      const user: MembershipModel = {
         projectMembershipId: "",
         email: sessionModule.userEmail,
         role: ProjectRole.OWNER,

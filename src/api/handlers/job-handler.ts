@@ -1,4 +1,4 @@
-import { IOHandlerCallback, Job } from "@/types";
+import { IOHandlerCallback, JobModel } from "@/types";
 import {
   connect,
   deleteJobById,
@@ -21,7 +21,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
   await connect();
 
   stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) => {
-    const incomingJob: Job = JSON.parse(frame.body);
+    const incomingJob: JobModel = JSON.parse(frame.body);
 
     jobModule.addOrUpdateJob(incomingJob);
     logModule.onDevMessage(`New Job message: ${incomingJob.id}`);
@@ -32,7 +32,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
  * Subscribes to job updates via websocket messages, updates the
  * store, and selects the job.
  */
-export async function handleJobSubmission(job: Job): Promise<void> {
+export async function handleJobSubmission(job: JobModel): Promise<void> {
   await connectAndSubscribeToJob(job.id);
   jobModule.addOrUpdateJob(job);
   jobModule.selectJob(job);
@@ -46,7 +46,7 @@ export async function handleJobSubmission(job: Job): Promise<void> {
  * @param onError - Called if the action fails.
  */
 export function handleDeleteJob(
-  job: Job,
+  job: JobModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   deleteJobById(job.id)

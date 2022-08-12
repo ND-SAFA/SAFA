@@ -1,4 +1,4 @@
-import { InternalGitHubCredentials, IOHandlerCallback, Project } from "@/types";
+import { GitHubCredentialsModel, IOHandlerCallback, Project } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
@@ -110,7 +110,7 @@ export function handleImportJiraProject(
  */
 export function handleImportGitHubProject(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  credentials: InternalGitHubCredentials,
+  credentials: GitHubCredentialsModel,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

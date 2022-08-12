@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Job, JobStatus } from "@/types";
+import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logModule } from "@/store";
@@ -128,7 +128,7 @@ export default Vue.extend({
   components: { FlexBox, Typography },
   props: {
     job: {
-      type: Object as PropType<Job>,
+      type: Object as PropType<JobModel>,
       required: true,
     },
   },
@@ -179,13 +179,13 @@ export default Vue.extend({
      * Attempts to delete a job.
      * @param job - The job to delete.
      */
-    deleteJob(job: Job): void {
+    deleteJob(job: JobModel): void {
       handleDeleteJob(job, {});
     },
     /**
      * Navigates user to the completed project.
      */
-    async viewProject(job: Job): Promise<void> {
+    async viewProject(job: JobModel): Promise<void> {
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {

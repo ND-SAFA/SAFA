@@ -34,7 +34,7 @@ import {
   ButtonType,
   ListMenuDefinition,
   ProjectIdentifier,
-  ProjectMembership,
+  MembershipModel,
   ProjectRole,
 } from "@/types";
 import { logModule } from "@/store";
@@ -61,7 +61,7 @@ export default Vue.extend({
       default: "Share Project",
     },
     member: {
-      type: Object as PropType<ProjectMembership>,
+      type: Object as PropType<MembershipModel>,
       required: false,
     },
     clearOnClose: {
@@ -190,7 +190,7 @@ export default Vue.extend({
      * Updates member fields when the member changes.
      * @param newMember - The new member.
      */
-    member(newMember: ProjectMembership | undefined): void {
+    member(newMember: MembershipModel | undefined): void {
       if (!newMember) return;
 
       this.userRole = newMember.role;

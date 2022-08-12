@@ -13,8 +13,6 @@ import {
   sessionModule,
   viewportModule,
 } from "@/store";
-import { handleClearProject } from "@/api";
-import { cyResetTree } from "@/cytoscape";
 
 /**
  * Defines list of functions that are run before navigating to a new page.

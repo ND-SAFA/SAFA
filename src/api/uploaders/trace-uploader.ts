@@ -3,7 +3,7 @@ import {
   IGenericUploader,
   Artifact,
   TraceFile,
-  ParseTraceFileResponse,
+  ParseTraceFileModel,
   Link,
   TraceLink,
   TracePanel,
@@ -139,7 +139,7 @@ function createParsedArtifactFile(
   file: File
 ): Promise<void> {
   return parseTraceFile(file)
-    .then((res: ParseTraceFileResponse) => {
+    .then((res: ParseTraceFileModel) => {
       const { entities, errors } = res;
       const validTraces: TraceLink[] = [];
 

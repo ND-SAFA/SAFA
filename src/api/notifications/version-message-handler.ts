@@ -1,5 +1,5 @@
 import { Frame } from "webstomp-client";
-import { VersionMessage } from "@/types";
+import { VersionMessageModel } from "@/types";
 import {
   getProjectVersion,
   handleReloadArtifacts,
@@ -19,7 +19,7 @@ export async function handleVersionMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const message: VersionMessage = JSON.parse(frame.body);
+  const message: VersionMessageModel = JSON.parse(frame.body);
 
   // Handlers for automatic entity updates.
   switch (message.type) {

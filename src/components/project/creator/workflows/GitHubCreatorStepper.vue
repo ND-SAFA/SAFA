@@ -37,7 +37,7 @@ import Vue from "vue";
 import {
   GitHubInstallation,
   GitHubRepository,
-  InternalGitHubCredentials,
+  GitHubCredentialsModel,
   StepState,
 } from "@/types";
 import {
@@ -68,7 +68,7 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.GITHUB_TOKEN),
-      credentials: undefined as InternalGitHubCredentials | undefined,
+      credentials: undefined as GitHubCredentialsModel | undefined,
       isLoading: true,
 
       installations: [] as GitHubInstallation[],

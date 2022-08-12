@@ -36,18 +36,20 @@
       </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <generic-icon-button
-        v-if="hasEdit"
-        icon-id="mdi-pencil"
-        tooltip="Edit"
-        @click="$emit('item:edit', item)"
-      />
-      <generic-icon-button
-        v-if="isDeleteEnabled(item)"
-        icon-id="mdi-delete"
-        tooltip="Delete"
-        @click="$emit('item:delete', item)"
-      />
+      <flex-box>
+        <generic-icon-button
+          v-if="hasEdit"
+          icon-id="mdi-pencil"
+          tooltip="Edit"
+          @click="$emit('item:edit', item)"
+        />
+        <generic-icon-button
+          v-if="isDeleteEnabled(item)"
+          icon-id="mdi-delete"
+          tooltip="Delete"
+          @click="$emit('item:delete', item)"
+        />
+      </flex-box>
     </template>
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
